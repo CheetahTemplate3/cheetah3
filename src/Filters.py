@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.10 2001/12/19 02:10:25 tavis_rudd Exp $
+# $Id: Filters.py,v 1.11 2002/04/03 17:40:58 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -10,17 +10,20 @@ would otherwise require a real template object).
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/12/19 02:10:25 $
+Last Revision Date: $Date: 2002/04/03 17:40:58 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.10 $"[11:-2]
+__revision__ = "$Revision: 1.11 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
 
-from cStringIO import StringIO      # Used by Strip filter.
+try: # Used by Strip filter.
+    from cStringIO import StringIO
+except:
+    from StringIO import StringIO
 
 # intra-package imports ...
 
