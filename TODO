@@ -21,12 +21,7 @@ Requirements for 1.0
 Other TODO Items
 ================================================================================
 
-- Debugging tools.  $dumpSearchList() reduces each searchList element to a
-Python primitive type (using dir() on non-dictionaries) and prints it using
-pprint.pformat() with a comment before each: "*** searchList[1] ***".
-Boolean argument 'all' adds local variables, builtins, etc.  Boolean argument
-'allExceptLarge' skips any element with >20 variables, printing a warning:
-"skipping, ### variables".
+- Debugging tools.  See section below.
 
 - Reimplement filters so that they know the placeholder name:
   def filter(self, val, name=None, **kw)
@@ -64,6 +59,44 @@ Boolean argument 'all' adds local variables, builtins, etc.  Boolean argument
 - 'errorCatcher None' to stop catching errors in the middle of a template.
 
 - Finish up changes to #indent so that it matches the Users' Guide. (MO)
+
+
+Dump Tools
+==========
+It would be nice to provide debugging tools for users who can't figure
+out why a certain placeholder value isn't found or is being overridden.  
+My idea is to define $dumpSearchList() and $dumpSearchListFlat() in
+Template, which would print a stanza in the output showing all searchList
+variables and their values.  $dumpSearchList would group by searchList
+element; $dumpSearchListFlat would combine all into a single
+alphabetical listing.
+	I made an experimental version but it printed only instance variables,
+not methods and not inherited attributes.  Also, it wouldn't print right
+using the usual pattern of write-to-custom-StringIO-object-and-return-
+the-.getvalue() and I couldn't figure out why.
+	The stanza should be set apart by a row of stars with the words
+"BEGIN/END SEARCH LIST DUMP".  Then for $dumpSearchList, precede each
+group with "*** searchList[i], type <element type>, 142 variables ***".
+	Because some elements like 'self' may have hundreds of inherited
+methods that would create a forest-through-trees situation for the user,
+we may need an option to supress the variable listing for elements with
+> 20 variables (just print the summary line instead). ?
+	The final version should be in Template so it has implicit
+access to the searchList and perhaps later to other variables (locals,
+globals, "#set global"s, builtins) too.  This is such a central
+debugging tool that you should not have to monopolize an #extends
+(the template's only #extends) to use it.  You could import it, however,
+if you pass in the searchList explicitly as an argument.  In that case,
+perhaps we can base it on a generic module for dumping variables/values.
+	Note that we cannot simply depend on str() and pprint, because
+we need to show instances as dictionaries.  Likewise, dir() and vars()
+may get us part of the distance, but only if they show methods and
+inherited attributes too.  
+	These functions should print only top-level variables, not
+the subelements of collections.  I.e, if the first searchList element
+is a dictionary, show its keys/values, but do not expand any 
+subvalues if they are dictionaries too, unless the display tool happens
+to default to that.
 
 
 Rewrite the caching framework
