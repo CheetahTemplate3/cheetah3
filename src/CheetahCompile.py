@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.5 2001/11/04 20:12:11 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.6 2001/11/05 06:38:40 ianbicking Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/04 20:12:11 $
+Last Revision Date: $Date: 2001/11/05 06:38:40 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -45,14 +45,20 @@ class CheetahCompile:
     CHEETAH_EXTENSION = '.tmpl'
     SERVLET_EXTENSION = '.py'
     SERVLET_BACKUP_EXT = '.py_bak'
-
+    GENERATED_EXT = '.html'
+    
     def __init__(self):
         self.makeGenFile = False
+        self.compileDirectories = False
+        self.recurseDirectories = False
+        self.writeGenerated = False
+        self.printGenerated = False
+        self.compiledFiles = []
 
     def run(self):
         """The main program controller."""
         try:
-            opts, args = getopt.getopt( sys.argv[1:], 'hpdR', [])
+            opts, args = getopt.getopt( sys.argv[1:], 'hpdRw', [])
 
         except getopt.GetoptError, v:
             # print help information and exit:
@@ -68,26 +74,40 @@ class CheetahCompile:
                 self.usage()
                 sys.exit()
             if o in ('-R',):
-                if not args:
-                    args = ['.']
-                for dir in args:
-                    self.recursiveCompile(dir)
-                sys.exit()
+                self.compileDirectories = True
+                self.recurseDirectories = True
             if o in ('-d',):
-                if not args:
-                    args = ['.']
-                for dir in args:
-                    self.compileDir(dir)
-                sys.exit()
+                self.compileDirectories = True
             if o in ('-p',):
-                for fileName in args:
-                    className = os.path.split( os.path.splitext(fileName)[0] )[1]
-                    print Compiler(file=fileName, moduleName=className, mainClassName=className)
-                sys.exit()
+                self.printGenerated = True
+            if o in ('-w',):
+                self.writeGenerated = True
                     
+        if not args and self.compileDirectories:
+            args = ["."]
         for fileName in args:
+            self.processFile(fileName)
+        if self.writeGenerated:
+            for fileName in self.compiledFiles:
+                self.generate(fileName)
+
+    def processFile(self, fileName):
+        if os.path.isdir(fileName):
+            if not self.compileDirectories:
+                return
+            for file in os.listdir(fileName):
+                file = os.path.join(fileName, file)
+                if os.path.isdir(file):
+                    if self.recurseDirectories:
+                        self.processFile(file)
+                    continue
+                extension = os.path.splitext(file)[1]
+                if extension == self.CHEETAH_EXTENSION:
+                    self.processFile(file)
+        else:
             baseName = os.path.splitext(fileName)[0]
             self.compileFile(baseName)
+
     
     def recursiveCompile(self, dir='.', backupServletFiles=True):
         """Recursively walk through a directory tree and compile Cheetah files."""
@@ -106,20 +126,39 @@ class CheetahCompile:
             
     def compileFile(self, fileNameMinusExt):
         """Compile an single Cheetah file.  """
-    
+
+        self.compiledFiles.append(fileNameMinusExt)
         srcFile = fileNameMinusExt + self.CHEETAH_EXTENSION
         className = os.path.split(fileNameMinusExt)[1]
         genCode = str(Compiler(file=srcFile, moduleName=className, mainClassName=className))
-    
-        fp = open(fileNameMinusExt + self.SERVLET_EXTENSION,'w')
-        fp.write(genCode)
-        fp.close()
+
+        if not self.printGenerated \
+           or self.writeGenerated:
+            fp = open(fileNameMinusExt + self.SERVLET_EXTENSION,'w')
+            fp.write(genCode)
+            fp.close()
+        if self.printGenerated:
+            print genCode
     
         if self.makeGenFile and not os.path.exists(fileNameMinusExt +
                                             self.SERVLET_EXTENSION):
             code = self.inheritFromGenFile(fileNameMinusExt)
             fp = open(fileNameMinusExt + self.SERVLET_EXTENSION, "w")
             fp.write(code)
+            fp.close()
+
+    def generate(self, fileNameMinusExt):
+        ## @@: this sys.path is a hack
+        sys.path = [os.path.dirname(fileNameMinusExt)] + sys.path
+        try:
+            mod = __import__(os.path.basename(fileNameMinusExt))
+            klass = getattr(mod, os.path.basename(fileNameMinusExt))
+            value = str(klass())
+        except:
+            sys.stderr.write('Exception raised while trying to write file %s\n' % repr(fileNameMinusExt))
+        else:
+            fp = open(fileNameMinusExt + self.GENERATED_EXT, "w")
+            fp.write(value)
             fp.close()
 
     
@@ -147,15 +186,13 @@ class CheetahCompile:
 Compiles Cheetah files (.tmpl) into Webware servlet files (.py)
 
 Usage:
-  %(scriptName)s -h                 ---> print this help and exit
-  %(scriptName)s [-p] filename      ---> compile 'filename'
-  %(scriptName)s -d dir        ---> compile all files in dir, output to new
-                                          files with the .py extension
-  %(scriptName)s -R dir        ---> same as -d, but recursively on subdirs
-                                          
-Options:
-  -p                                 ---> print output to stdout rather than to file
-  
+  %(scriptName)s [OPTION] FILES
+  %(scriptName)s [OPTION] {-R|-d} FILES/DIRECTORIES
+
+  -R                          Recurse subdirectories
+  -d                          Compile all *.tmpl files in directory
+  -p                          Print generated Python code to stdout
+  -w                          Write output of template to *.html
 """ % {'scriptName':os.path.basename(sys.argv[0]),
        'version':version,
        'author':'Tavis Rudd',
