@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.44 2002/10/05 19:35:57 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.45 2002/10/05 21:38:09 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.44 $
+Version: $Revision: 1.45 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/10/05 19:35:57 $
+Last Revision Date: $Date: 2002/10/05 21:38:09 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.44 $"[11:-2]
+__revision__ = "$Revision: 1.45 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -162,22 +162,23 @@ class GenUtils:
 
         autoCall = self.setting('useAutocalling')
         nameChunks.reverse()
-
+        
         chunk = nameChunks.pop()
-        firstBit = chunk[0].split('.')[0]
-
-        if chunk[0] in self.localVars() or chunk[0] in self.globalVars():
-            # @@TR: note this method won't use autocalling on these vars!!            
-            translatedName = chunk[0] + chunk[2]
-        elif firstBit in self.localVars() or firstBit in self.globalVars():
-            translatedName = ('VFN(' + firstBit +
-                              ',"' + '.'.join(chunk[0].split('.')[1:]) +
-                              '",' + str(autoCall and chunk[1]) + ')'
-                              + chunk[2])            
-        else:
-            translatedName = ('VFS(SL,"' + chunk[0] +
-                              '",' + str(autoCall and chunk[1]) + ')'
-                              + chunk[2])
+        
+        #firstBit = chunk[0].split('.')[0]
+        #if chunk[0] in self.localVars():
+        #    # @@TR: note this method won't use autocalling on these vars!!            
+        #    translatedName = chunk[0] + chunk[2]
+        #elif firstBit in self.localVars():
+        #    translatedName = ('VFN(' + firstBit +
+        #                      ',"' + '.'.join(chunk[0].split('.')[1:]) +
+        #                      '",' + str(autoCall and chunk[1]) + ')'
+        #                      + chunk[2])            
+        #else:
+        
+        translatedName = ('VFS([locals()] + SL + [globals()],"' + chunk[0] +
+                          '",' + str(autoCall and chunk[1]) + ')'
+                          + chunk[2])
         
         while nameChunks:
             chunk = nameChunks.pop()
@@ -231,10 +232,6 @@ class MethodCompiler(SettingsManager, GenUtils):
         self._indentLev = self.setting('initialMethIndentLevel')
         self._pendingStrConstChunks = []
         self._localVars = ['self']
-        if self.setting('recognize__builtins__'):
-            import __builtin__
-            self._localVars.extend( dir(__builtin__) )
-
         self._methodSignature = None
         self._methodDef = None
         self._docStringLines = []
@@ -567,6 +564,8 @@ class AutoMethodCompiler(MethodCompiler):
                                       ("VFN","valueForName"),
                                       ("getmtime","getmtime"),
                                       ("currentTime","time.time"),
+                                      ("globals","globals"),
+                                      ("locals","locals"),
                                       ]:
                 self.addMethArg(argName, defVal)
         
@@ -997,7 +996,6 @@ class ModuleCompiler(Parser, GenUtils):
             ## controlling the handling of Cheetah $vars
             'useNameMapper': True,      # Unified dotted notation and the searchList
             'useAutocalling': True,
-            'recognize__builtins__':True,
             'useErrorCatcher':False,
 
             ## controlling the aesthetic appearance of the generated code
