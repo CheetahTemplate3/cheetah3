@@ -1,6 +1,9 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
+0.9.15 (Mar 25, 2003)
+  - a minor tweak to the cleanup actions of one of the test cases [TR]
+
 0.9.15rc2 (Mar 23, 2003)
   - Fixed a python version dependency bug related to Compiler.py's use of 
     isinstance() [TR]

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.46 2002/11/14 06:08:18 hierro Exp $
+# $Id: SyntaxAndOutput.py,v 1.47 2003/03/25 21:18:34 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.46 $
+Version: $Revision: 1.47 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/11/14 06:08:18 $
+Last Revision Date: $Date: 2003/03/25 21:18:34 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.46 $"[11:-2]
+__revision__ = "$Revision: 1.47 $"[11:-2]
 
 
 ##################################################
@@ -1948,10 +1948,9 @@ class ExtendsDirective(OutputTest):
         fp.close
 
     def tearDown(self):
-        if os.path.exists('SampleBaseClass.py'):
-            os.remove('SampleBaseClass.py')
-        if os.path.exists('SampleBaseClass.pyc'):
-            os.remove('SampleBaseClass.pyc')
+        for ext in ('py','pyc','pyo'):
+            if os.path.exists('SampleBaseClass.' + ext):
+                os.remove('SampleBaseClass.' + ext)
 
     def test1(self):
         """#extends Cheetah.Templates._SkeletonPage"""
