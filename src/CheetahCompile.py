@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.7 2001/11/05 07:25:33 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.8 2001/11/05 07:26:39 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/05 07:25:33 $
+Last Revision Date: $Date: 2001/11/05 07:26:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -130,7 +130,8 @@ class CheetahCompile:
         self.compiledFiles.append(fileNameMinusExt)
         srcFile = fileNameMinusExt + self.CHEETAH_EXTENSION
         className = os.path.split(fileNameMinusExt)[1]
-        genCode = str(Compiler(file=srcFile, moduleName=className, mainClassName=className))
+        genCode = str(Compiler(file=srcFile, moduleName=className,
+                               mainClassName=className))
 
         if not self.printGenerated or self.writeGenerated:
             fp = open(fileNameMinusExt + self.SERVLET_EXTENSION,'w')
@@ -140,14 +141,15 @@ class CheetahCompile:
             print genCode
 
     def generate(self, fileNameMinusExt):
-        ## @@: this sys.path is a hack
+        ## @@IB: this sys.path is a hack
         sys.path = [os.path.dirname(fileNameMinusExt)] + sys.path
         try:
             mod = __import__(os.path.basename(fileNameMinusExt))
             klass = getattr(mod, os.path.basename(fileNameMinusExt))
             value = str(klass())
         except:
-            sys.stderr.write('Exception raised while trying to write file %s\n' % repr(fileNameMinusExt))
+            sys.stderr.write('Exception raised while trying to write file %s\n'
+                             % repr(fileNameMinusExt))
         else:
             fp = open(fileNameMinusExt + self.GENERATED_EXT, "w")
             fp.write(value)
