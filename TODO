@@ -59,6 +59,9 @@ Requirements for 1.0
 - Recognize the exception value as a local variable inside the
   '#except Exception, ex' clause.  Currently $ex raises NotFound.
 
+- Reset the current filter to the default (or to the constructor's filter
+  if specified) at the beginning of each fill.  Currently, filter changes
+  leak from one fill to the next.
 
 Other TODO Items
 ================================================================================
