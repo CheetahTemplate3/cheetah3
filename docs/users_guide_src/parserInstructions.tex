@@ -10,10 +10,10 @@ The \code{\#breakpoint} is a debugging tool that tells the parser to stop
 parsing at a specific point. All source code from that point on will be ignored.
 
 The difference between \code{\#breakpoint} and \code{\#stop} is that
-\code{\#stop} occurs in normal templates but \code{\#breakpoint} is used
-only when debugging Cheetah.  Another difference is that \code{\#breakpoint}
-operates at compile time, while \code{\#stop} is executed at run time while
-filling the template.
+\code{\#stop} occurs in normal templates (e.g., inside an \code{\#if}) but
+\code{\#breakpoint} is used only when debugging Cheetah.  Another difference is
+that \code{\#breakpoint} operates at compile time, while \code{\#stop} is
+executed at run time while filling the template.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
