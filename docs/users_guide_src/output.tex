@@ -28,7 +28,11 @@ math \ldots \$math.sin(0.5)}.
 
 The \code{\#echo} directive is used to echo the output from expressions that
 can't be written as simple \$placeholders.  It serves the same purpose as ASP's
-<\%=EXPR\%> tag.
+$<$\%=EXPR\%$>$ tag.
+
+% @@MSO: The '<' and '>' on the previous line are showing up as Spanish
+% inverted '?' and '!' in my gv.  Backslashing them caused an error.  Only
+% placing them inside '$$' worked.
 
 \begin{verbatim}
 Here is my #echo ','.join(['silly']*5) # example 
@@ -206,33 +210,86 @@ Output from \code{\$placeholders} is passed through an ouput filter.  By default
 the filter just returns a string representation of the placeholder's value,
 unless it is \code{'None'}, in which case it returns an empty string. 
 
-The ouput filter can be specified via the \code{'outputFilter'} keyword to the
-\code{Template} class' constructor, or at run-time using the \code{\#filter}
-directive. The \code{Cheetah.Filters} module contains several filters.
-The current filters are:
+Certain filters take optional arguments to modify their behaviour.  To pass
+arguments, use the long placeholder syntax and precede each argument by a comma.
+For instance, the MaxLen filter takes an argument 'maxlen':
+
+\begin{verbatim}
+$\{placeholderName, $maxlen=20\}
+${functionCall($functionArg), $maxlen=$myMaxLen}
+\end{verbatim}
+
+To change the output filter, use the \code{'filter'} keyword to the
+\code{Template} class' constructor, or the \code{\#filter}
+directive at runtime (details below).  You may use \code{\#filter} as often as
+you want to switch between several filters, if certain \code{\$placeholders}
+need one filter and other \code{\$placeholders} need another.
+
+The standard filters are in the module \code{Cheetah.Filters}.  Cheetah
+currently provides:
 
 \begin{description}
 \item{\code{Filter}}
-     The default filter, which converts None to '' and everything else to
-     \code{str(whateverItIs)}.  This is the base class for all other filters.
+     \\ The default filter, which converts None to '' and everything else to
+     \code{str(whateverItIs)}.  This is the base class for all other filters,
+     and the minimum behaviour for all filters distributed with Cheetah.
 \item{\code{ReplaceNone}}
-     Same.
+     \\ Same.
 \item{\code{MaxLen}}
-     Same but truncate the value if it's longer than a certain length.
-     (TODO: how to specify the length?)
+     \\ Same, but truncate the value if it's longer than a certain length.
+     Use the 'maxlen' filter argument to specify the length, as in the
+     examples above.  If you don't specify 'maxlen', the value will not be
+     truncated.
 \item{\code{Pager}}
-     Output a "pageful" of a long string.  After the page, output HTML
+     \\ Output a "pageful" of a long string.  After the page, output HTML
      hyperlinks to the previous and next pages.  This filter uses several
-     environmental variables and other variables, which will be documented in
-     the future.
+     filter arguments and environmental variables, which have not been 
+     documented yet.
 \item{\code{WebSafe}}
-     Same as default but convert HTML-sensitive characters ('<', '\&', '>')
-     to HTML entities.  This filter is currently untested.
+     \\ Same as default, but convert HTML-sensitive characters ('<', '\&', '>')
+     to HTML entities so that the browser will display them literally rather
+     than interpreting them as HTML tags.  This is useful with database values
+     or user input that may contain sensitive characters.  But if your values
+     contain embedded HTML tags you want to preserve, you do not want this 
+     filter.
+     
+     The filter argument 'also' may be used to specify additional characters to
+     escape.  For instance, say you want to ensure a value displays all on one
+     line.  Escape all spaces in the value with '\&nbsp', the non-breaking
+     space:
+\begin{verbatim}
+${$country, $also=' '}}
+\end{verbatim}
 \end{description}
 
-More will be written about output filtering in future versions of this guide.
+To switch filters using a class object, pass the class using the
+{\bf filter} argument to the Template constructor, or via a placeholder to the
+\code{\#filter} directive: \code{\#filter \$myFilterClass}.  The class must be
+a subclass of \code{Cheetah.Filters.Filter}.  When passing a class object, the
+value of {\bf filtersLib} does not matter, and it does not matter where the
+class was defined.
 
-%% @@MO: Tavis TODO: rewrite this subsection.
+To switch filters by name, pass the name of the class as a string using the
+{\bf filter} argument to the Template constructor, or as a bare word (without
+quotes) to the \code{\#filter} directive: \code{\#filter TheFilter}.  The
+class will be looked up in the {\bf filtersLib}.
+
+The filtersLib is a module containing filter classes, by default
+\code{Cheetah.Filters}.  All classes in the module that are subclasses of
+\code{Cheetah.Filters.Filter} are considered filters.  If your filters are in
+another module, pass the module object as the {\bf filtersLib} argument to the
+Template constructor.
+
+You may always switch back to the default filter this way:
+\code{\#filter None}.  This is easy to remember because "no filter" means the
+default filter, and because None happens to be the only object the default
+filter treats specially.
+
+We are considering additional filters; see
+http://cheetah.colorstudy.net/twiki/bin/edit/Cheetah/OutputFilters
+for the latest ideas.
+
+%% @@MO: Tavis TODO: fix the description of the Pager filter.  It needs a howto.
 
 
 % Local Variables:

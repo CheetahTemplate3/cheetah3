@@ -115,20 +115,20 @@ for other systems.
 Here are typical ways to create a template object:
 \begin{description}
 \item{\code{templateObj = Template("The king is a \$placeholder1.")}}
-     Pass the Template Definition as a string.
+     \\ Pass the Template Definition as a string.
 \item{\code{templateObj = Template(file="fink.tmpl")}}
-     Read the Template Definition from a file named "fink.tmpl".  
+     \\ Read the Template Definition from a file named "fink.tmpl".  
 \item{\code{templateObj = Template(file=f)}}
-     Read the Template Definition from file-like object 'f'.
+     \\ Read the Template Definition from file-like object 'f'.
 \item{\code{templateObj = Template("The king is a \$placeholder1.", searchList=[dict, obj])}}
-     Pass the Template Definition as a string.  Also pass two Namespaces for the
-     searchList: a dictionary 'dict' and an instance 'obj'.
+     \\ Pass the Template Definition as a string.  Also pass two Namespaces for
+     the searchList: a dictionary 'dict' and an instance 'obj'.
 \item{\code{templateObj = Template(file="fink.txt", searchList=[dict, obj])}}
-     Same, but pass a filename instead of a string.  The \code{None} is required
-     here to represent the missing Template Definition string -- this due to
-     Python's rules for positional parameters.
+     \\ Same, but pass a filename instead of a string.  The \code{None} is
+     required here to represent the missing Template Definition string -- this
+     due to Python's rules for positional parameters.
 \item{\code{templateObj = Template(file=f, searchList=[dict, obj])}}
-     Same with a file object.
+     \\ Same with a file object.
 \end{description}
 
 The constructor accepts the following keyword arguments:
@@ -141,13 +141,18 @@ The constructor accepts the following keyword arguments:
      A filename must be a string, and a file object must be open for reading.
 \item{{\bf searchList}}
      A list of objects to search for \code{\$placeholder} values.
-\item{{\bf outputFilter}}
+\item{{\bf filter}}
      A class that will format every \code{\$placeholder} value.  You may
      specify a class object or string.  If a class object,
      it must be a subclass of \code{Cheetah.Filters.Filter}.  If a string, it
-     must be the name of one of the filters in \code{Cheetah.Filters}.
-     This is similar to the \code{\#filter} directive (section
-     \label{output.filter}).
+     must be the name of one of the filters in filtersLib module (see next 
+     item).
+     (You may also use the \code{\#filter} directive (section
+     \label{output.filter}) to switch filters at runtime.)
+\item{{\bf filtersLib}}
+     A module containing the filters Cheetah should look up by name.  The
+     default is \code{Cheetah.Filters}.  All classes in this module that are
+     subclasses of \code{Cheetah.Filters.Filter} are considered filters.
 \item{{\bf errorCatcher}}
      A class to handle \code{\$placeholder} errors.  You may
      specify a class object or string.  If a class object,
@@ -196,7 +201,7 @@ and its subdirectories.
 
 If you run \code{cheetah-compile} on a file FILENAME.tmpl, it will
 overwrite FILENAME.py if it exists in the same directory, no matter what
-FILENAME.py contains.} For this reason, you should make changes to the
+FILENAME.py contains.  For this reason, you should make changes to the
 \code{.tmpl} version of the template rather than the \code{.py} version.  Any
 \code{.py servlet files} that are about to be overwritten will are
 automatically backed up with the extension \code{.py\_bak}.
@@ -210,7 +215,9 @@ object).
 
 %% @@MSO: Not using the term '.tmpl/.py servlet files' here because they
 %% aren't necessarily Webware servlets.
-%% @@TR: but it might be best for simplicity to assume that
+%% @@TR: but it might be best for simplicity to assume that they are.
+%% @@MSO: No, because we should document basic standalone Cheetah first, then
+%% show how it integrates with Webware.
 
 % Local Variables:
 % TeX-master: "users_guide"

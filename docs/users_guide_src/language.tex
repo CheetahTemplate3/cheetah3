@@ -172,7 +172,13 @@ These tags may not be used inside other Cheetah tags.
 \item Placeholders can also be written in the form \code{\$\{placeholderName\}}
      and \code{\$(placeholderName)}.  This is useful for cases where there is no
      whitespace between the placeholder and surrounding text
-     (\code{surrounding\$\{embeddedVar\}text}).
+     (\code{surrounding\$\{embeddedVar\}text}).  The form with braces is called
+     the {\em long placeholder syntax}; the form without braces is called, you
+     guessed it, the {\em short placeholder syntax}.
+
+\item The syntax \code{\$\{placeholderName, \$arg1="val1"\}} passes arguments to
+     the output filter (see \code{\#filter}, section \ref{output.filter}.
+     The braces and comma are required in this case.
    
 \item Cheetah ignores all dollar signs (\code{\$}) that are not followed by a
      letter or an underscore.  Cheetah also ignores any placeholder escaped by a
@@ -191,6 +197,10 @@ These are not \$placeholders:
 \begin{verbatim}
 $@var $^var $15.50
 \end{verbatim}
+
+You can use compiler settings to change the placeholder delimeters if
+\code{\$}, \code{\{} and \code{\}} are not suitable.  This will be documented
+in the future.  None of the examples in this Guide use this feature.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Directive Syntax Rules}

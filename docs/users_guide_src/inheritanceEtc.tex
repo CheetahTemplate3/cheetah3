@@ -121,7 +121,7 @@ strings.
 
 The \code{\#def} directive is used to declare new methods of the generated Python
 class.  It is roughly analogous to Python's \code{def} statement.  Any Cheetah
-code in the contents of the \code{\#def} directive will be processed.  
+code in the body of the \code{\#def} will be processed.  
 
 \begin{verbatim}
 #def myMeth()
@@ -144,7 +144,8 @@ $a $b $c(123)
 $myMeth
 \end{verbatim}
 
-Methods can accept arguments, and have defaults for those arguments:
+Methods can accept arguments, and have defaults for those arguments.  Always use the 
+\code{\$} before variable names:
 \begin{verbatim}
 #def myMeth($a, $b=1234)
 This is the text in my method 
@@ -162,16 +163,26 @@ This is the text in my method
 1 - 1234
 \end{verbatim}
 
+If a method already exists with the same name as the \code{\#def}, it will be replaced
+with the new definition.  If the new \code{\#def} occurs in a subclass, it overrides the
+parent's definition.  See the \code{\#extends} directive above for information about
+subclasses.  Overriding is frequently used for blocks, which will be described next.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#block ... \#end block}
 \label{inheritanceEtc.block}
 
-The \code{\#block} directive allows you to delimit sections of your template
-that can be selectively reimplemented by sub-classes of the template.  It is
+The \code{\#block} directive allows you to mark sections of your template
+that can be selectively reimplemented by subclasses of the template.  It is
 very useful for selectively changing part of a template without having to
 copy-paste-and-edit the entire thing.  The output from a template definition
-that uses blocks will be identical to the output from the same template with the 
-\code{\#block and \#end block} tags removed. 
+that uses blocks will be identical to the output from the same template with
+the \code{\#block and \#end block} tags removed. 
+
+To reimplement the block, use the \code{\#def} directive.  The magical effect is that it
+goes back and changes the output text {\em at the point the original block was
+defined} rather than at the location of the reimplementation.
 
 \begin{verbatim}
 #block [blockName] 
@@ -206,11 +217,92 @@ inner block2 contents
 
 Note that the name of the block is optional for the \code{\#end block} tag.
 
-Like methods defined with \code{\#def}, blocks are compiled into methods of the
-generated Python class and can be reimplemented in subclasses using the
-\code{\#def} directive.  The only technical difference between
-\code{\#block} and \code{\#def} is that 
-\code{\#block} is evaluated once where it is defined
+Technically, \code{\#block} directive is equivalent to a \code{\#def} directive followed
+immediately by a \code{\#placeholder} for the same name.  In fact, that's what Cheetah does.
+So \code{\#block} creates a method as well as defining a block, and you may call this method
+using a placeholder if you want its output to appear in other locations too.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#settings ... \#endSettings}
+\label{inheritanceEtc.settings}
+
+[This explanation is preliminary and untested.]
+
+\code{\#settings} provides yet another way to set values for
+\code{\#placeholders} to find, using Cheetah's SettingsManager infrastructure.
+It is best understood by reading the comments in
+\code{\#SettingsManager.py} in conjunction with this documentation.
+
+SettingsManager provides a sophisticated strategy for getting and setting
+key/value pairs (called "settings") individually, or in bulk from a dictionary
+or a hierarchy of dictionaries.  A "hierarchy of dictionaries" means you can
+pass in a dictionary of dictionaries (of dictionaries, etc...) containing only
+the keys and subkeys (and subkeys, etc...) that have changed, and
+SettingsManager will merge all the changes in.  SettingsManager can also read
+settings from an exec'able Python string or file, or from a text string or file in ConfigParser format (aka Windows .ini format).  Cheetah does one up on 
+ConfigParser, however, because it parses case-sensitively, and automatically
+converts numeric values to numbers, 'None' to None, and 'true' and 'false' to
+Boolean true and false.  
+
+What does this have to do with Cheetah?  It means that you can put:
+
+\begin{verbatim}
+#settings
+test: blarg
+#end settings
+$test
+
+#settings python
+test = 'blarg'
+#end settings
+$test
+\end{verbatim}
+
+in your template and get the following output:
+
+\begin{verbatim}
+blarg
+
+blarg
+\end{verbatim}
+
+Pretty snazzy, eh?  What's going on here?  Both the first and the second
+stanzas above put a key 'test' with the value 'blarg' at the end of the 
+searchList.  "At the end" means it is at the bottom of the totem pole,
+the last in the pecking order, and will be overridden by any other key
+'test' in the searchList, by a \code{\#set} variable 'test', or by an attribute
+'test' in the template object.  The first stanza is in ConfigParser format
+(aka Windows .ini format)--note the lack of \code{\$} before the key, and the
+lack of quotes around the value.  The
+second stanza is in Python format, as if it were a Python module, with
+quotes, but no \code{\$}.
+
+%% @@MO: Is the first stanza 'test: blarg' or 'test = blarg'.  The former is
+%% what ConfigParser accepts (with a [section] header), and the latter is
+%% what Tavis' e-mail says.
+%% However, when I tried it either way, I got a "NameMapper.NotFound: test"
+%% error.
+
+You may also use \code{SettingsManager} in your own applications, by using it
+as a base class for your application class.  Then your users can keep their
+preferences in configuration files, and you can use the 
+\code{SettingsManager} methods to parse the files and extract the settings.
+
+(\code{\#settings} is also meant as a substitute for those who miss the
+\code{\#data} directive that existed in Cheetah 0.9.8a3 - 0.9.8 and are not
+satisfied with \code{\#attr} and \code{\#def}.)
+
+The following compiler settings affect \code{\#settings}:
+'putSettingsInSearchList' (default true).
+
+Dictionary merging can be turned off with the 'nomerge' keyword.
+
+%% @@MSO: Need example of the 'nomerge' keyword.  Where do you specify it?
+
+%% @@MSO: Tavis needs to refine this section, since only he understands how
+%% #settings is supposed to work.
 
 % Local Variables:
 % TeX-master: "users_guide"
