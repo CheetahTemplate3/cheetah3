@@ -78,7 +78,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 __author__ = "Steve Purcell"
 __email__ = "stephen_purcell at yahoo dot com"
-__revision__ = "$Revision: 1.4 $"[11:-2]
+__revision__ = "$Revision: 1.5 $"[11:-2]
 
 
 ##################################################
@@ -827,7 +827,8 @@ Examples:
                                                in MyTestCase
 """
     def __init__(self, module='__main__', defaultTest=None,
-                 argv=None, testRunner=None, testLoader=defaultTestLoader):
+                 argv=None, testRunner=None, testLoader=defaultTestLoader,
+                 testSuite=None):
         if type(module) == type(''):
             self.module = __import__(module)
             for part in string.split(module,'.')[1:]:
@@ -836,6 +837,7 @@ Examples:
             self.module = module
         if argv is None:
             argv = sys.argv
+        self.test = testSuite
         self.verbosity = 1
         self.explain = 0
         self.defaultTest = defaultTest
@@ -864,7 +866,7 @@ Examples:
                     self.verbosity = 2
                 if opt in ('-e','--explain'):
                     self.explain = True
-            if len(args) == 0 and self.defaultTest is None:
+            if len(args) == 0 and self.defaultTest is None and self.test is None:
                 self.test = self.testLoader.loadTestsFromModule(self.module)
                 return
             if len(args) > 0:
@@ -876,8 +878,9 @@ Examples:
             self.usageExit(msg)
 
     def createTests(self):
-        self.test = self.testLoader.loadTestsFromNames(self.testNames,
-                                                       self.module)
+        if self.test == None:
+            self.test = self.testLoader.loadTestsFromNames(self.testNames,
+                                                           self.module)
 
     def runTests(self):
         if self.testRunner is None:

@@ -30,6 +30,7 @@ else:
 
 ## Data Files and Scripts
 scripts = ['bin/cheetah-compile',
+           'bin/cheetah',
            ]
 data_files = ['recursive: src *.tmpl *.txt LICENSE README TODO CHANGES',
               ]

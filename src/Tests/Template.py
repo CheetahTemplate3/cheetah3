@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.5 2002/03/06 22:01:36 tavis_rudd Exp $
+# $Id: Template.py,v 1.6 2002/03/07 04:39:55 tavis_rudd Exp $
 """Tests of the Template class API
 
 THIS TEST MODULE IS JUST A SHELL AT THE MOMENT. Feel like filling it in??
@@ -7,12 +7,12 @@ THIS TEST MODULE IS JUST A SHELL AT THE MOMENT. Feel like filling it in??
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2002/03/06 22:01:36 $
+Last Revision Date: $Date: 2002/03/07 04:39:55 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 
 ##################################################
@@ -22,6 +22,7 @@ import sys
 import types
 import os
 import os.path
+
 
 import unittest_local_copy as unittest
 from Cheetah.Template import Template
