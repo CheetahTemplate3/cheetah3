@@ -1,6 +1,10 @@
 #!/usr/bin/env python
-# $Id: CGIImportMixin.py,v 1.2 2002/03/18 00:57:48 hierro Exp $
+# $Id: CGIImportMixin.py,v 1.3 2002/06/08 05:58:58 hierro Exp $
 """Mixin for Cheetah.Servlet for importing web transaction variables in bulk.
+
+This works for GET/POST fields both in Webware servlets and in CGI scripts, 
+and for cookies and session variables in Webware servlets.  If you try to
+read a cookie or session variable in a CGI script, you'll get a RuntimeError.
 
 The public method provided is:
 
@@ -17,6 +21,7 @@ searchList.  It handles:
 All the 'default*' and 'bad*' arguments have "use or raise" behavior, meaning 
 that if they're a subclass of Exception, they're raised.  If they're anything
 else, that value is substituted for the missing/bad value.  
+
 
 The simplest usage is:
 
@@ -153,12 +158,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2002/03/17
-Last Revision Date: $Date: 2002/03/18 00:57:48 $
+Last Revision Date: $Date: 2002/06/08 05:58:58 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.2 $"[11:-2]
+__revision__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -168,6 +173,7 @@ True, False = (1==1), (1==0)
 ##################################################
 ## DEPENDENCIES
 
+import cgi     # Used by CGIImportMixin.cgiImport() if this is a CGI script.
 import pprint
 from Cheetah.Utils.Misc import UseOrRaise
 
@@ -274,7 +280,19 @@ class CGIImportMixin:
         defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00, debug=False):
         """Import web transaction variables in bulk.  See module docstring.
         """
-        if   src == 'f':
+        isCgi = self.isCgi()
+        if   isCgi and src in ('f', 'v'):
+            form = cgi.FieldStorage()
+            source, func = 'field',   form.getvalue
+        elif isCgi and src == 'c':
+            raise RuntimeError("can't get cookies from a CGI script")
+        elif isCgi and src == 's':
+            raise RuntimeError("can't get session variables from a CGI script")
+        elif isCgi and src == 'v':
+            source, func = 'value',   self.request().value
+        elif isCgi and src == 's':
+            source, func = 'session', self.request().session().value
+        elif src == 'f':
             source, func = 'field',   self.request().field
         elif src == 'c':
             source, func = 'cookie',  self.request().cookie

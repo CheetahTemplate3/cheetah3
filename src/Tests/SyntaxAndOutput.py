@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.35 2002/06/05 23:02:30 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.36 2002/06/08 05:58:58 hierro Exp $
 """Syntax and Output tests.
 
 TODO
 - #finally
-- #filter (output filtering, was #formatter)
+- #filter
 - #errorCatcher
 - #echo
 - #silent
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.35 $
+Version: $Revision: 1.36 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/06/05 23:02:30 $
+Last Revision Date: $Date: 2002/06/08 05:58:58 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.35 $"[11:-2]
+__revision__ = "$Revision: 1.36 $"[11:-2]
 
 
 ##################################################
@@ -27,6 +27,7 @@ import sys
 import types
 import re
 from copy import deepcopy
+import os
 import os.path
 import new
 
@@ -2069,6 +2070,69 @@ class MiscComplexSyntax(OutputTest):
         """
         self.verify("#set $c = {'A':0}[{}.get('a', {'a' : 'A'}['a'])]\n$c",
                     "0")
+
+
+class CGI(OutputTest):
+    """CGI scripts with(out) the CGI environment and with(out) GET variables.
+    """
+    def _beginCGI(self):  
+        os.environ['REQUEST_METHOD'] = "GET"
+    def _endCGI(self):  
+        try:
+            del os.environ['REQUEST_METHOD']
+        except KeyError:
+            pass
+    _guaranteeNoCGI = _endCGI
+
+
+    def test1(self):
+        """A regular template."""
+        self._guaranteeNoCGI()
+        self.verify("$cgiHeaders#slurp\nHello, world!", 
+                    "Hello, world!")
+
+
+    def test2(self):
+        """A CGI script."""
+        self._beginCGI()
+        self.verify("$cgiHeaders#slurp\nHello, world!", 
+                    "Content-type: text/html\n\nHello, world!")
+        self._endCGI()
+
+
+    def test3(self):
+        """A (pseudo) Webware servlet.
+           
+           This uses the Python syntax escape to set self.isControlledByWebKit.
+           We could instead do '#silent self.isControlledByWebKit = True',
+           taking advantage of the fact that it will compile unchanged as long
+           as there's no '$' in the statement.  (It won't compile with an '$'
+           because that would convert to a function call, and you can't assign
+           to a function call.)  Because this isn't really being called from
+           Webware, we'd better not use any Webware services!  Likewise, we'd
+           better not call $cgiImport() because it would be misled.
+        """
+        self._beginCGI()
+        source = "<% self.isControlledByWebKit = True %>#slurp\n" + \
+                 "$cgiHeaders#slurp\n" + \
+                 "Hello, world!"
+        self.verify(source, "Hello, world!")
+        self._endCGI()
+
+
+    def test4(self):
+        """A CGI script with a GET variable."""
+        self._beginCGI()
+        os.environ['QUERY_STRING'] = "cgiWhat=world"
+        source = "$cgiHeaders#slurp\n" + \
+                 "#silent $cgiImport(['cgiWhat'])##slurp\n" + \
+                 "Hello, $cgiWhat!"
+        self.verify(source, 
+                    "Content-type: text/html\n\nHello, world!")
+        del os.environ['QUERY_STRING']
+        self._endCGI()
+
+
 
 ##################################################
 ## CREATE CONVERTED EOL VERSIONS OF THE TEST CASES 
