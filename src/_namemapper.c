@@ -65,14 +65,18 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
   firstKey = nameChunks[0];
 
   if (numChunks == 1) {		/* then we don't need to manage refs */
-    if (!(result = PyNamemapper_valueForKey(obj, firstKey))){
+    if (!(currentVal = PyNamemapper_valueForKey(obj, firstKey))){
       return NULL;
     }
-    if (executeCallables && PyCallable_Check(result) && (!PyInstance_Check(result)) 
-	&& (!PyClass_Check(result)) ) {
-      result = PyObject_CallObject(result, NULL);
+    if (executeCallables && PyCallable_Check(currentVal) && (!PyInstance_Check(currentVal)) 
+	&& (!PyClass_Check(currentVal)) ) {
+      result = PyObject_CallObject(currentVal, NULL);
+      Py_DECREF(currentVal);
+      return result;
+    } else {
+      return currentVal;
     }
-    return result;
+
     
   } else if (numChunks > 1) {	/* then we need to manage refs */
 				/* and can't use valueForKey */
@@ -115,8 +119,8 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
     }
     return currentVal;
   } 
+} /* end - valueForName */
 
-}
 
 static PyObject *
 PyNamemapper_valueFromSearchList(PyObject *searchList, 
