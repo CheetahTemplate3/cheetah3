@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.31 2001/08/11 04:57:39 tavis_rudd Exp $
+# $Id: Template.py,v 1.32 2001/08/11 05:22:19 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.31 $
+Version: $Revision: 1.32 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/11 04:57:39 $
+Last Revision Date: $Date: 2001/08/11 05:22:19 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.31 $"[11:-2]
+__version__ = "$Revision: 1.32 $"[11:-2]
 
 
 ##################################################
@@ -31,7 +31,7 @@ import os.path                    # used in Template.normalizePath()
 
 # intra-package imports ...
 from SettingsManager import SettingsManager
-from Parser import Parser
+from Parser import Parser, processTextVsTagsList
 from NameMapper import valueForName     # this is used in the generated code
 from SearchList import SearchList
 import CodeGenerator as CodeGen
@@ -55,7 +55,7 @@ from MacroDirective import MacroDirective, \
 
 import ErrorHandlers
 from Delimiters import delimiters as delims
-from Utilities import processTextVsTagsList, mergeNestedDictionaries 
+from Utilities import mergeNestedDictionaries 
 
 ##################################################
 ## CONSTANTS & GLOBALS ##

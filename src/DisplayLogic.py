@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: DisplayLogic.py,v 1.1 2001/08/11 01:03:16 tavis_rudd Exp $
+# $Id: DisplayLogic.py,v 1.2 2001/08/11 05:22:19 tavis_rudd Exp $
 """DisplayLogic Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,19 +7,20 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/11 01:03:16 $
+Last Revision Date: $Date: 2001/08/11 05:22:19 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
 
+import re
+
 # intra-package imports ...
 import TagProcessor
-from Delimiters import delimiters
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
@@ -35,13 +36,41 @@ class Error(Exception):
 
 class DisplayLogic(TagProcessor.TagProcessor):
     """A class for processing display logic tags in Cheetah Templates."""
+    _token = 'displayLogic'
+    _tagType = TagProcessor.EXEC_TAG_TYPE
     
     def __init__(self, templateObj):
         TagProcessor.TagProcessor.__init__(self, templateObj)
-        self._tagType = TagProcessor.EXEC_TAG_TYPE
-        self._delimRegexs = [delimiters['displayLogic_gobbleWS'],
-                             delimiters['displayLogic']]
-        self._token = 'displayLogic'
+
+        bits = self._directiveREbits
+        anythingBut = r'[^(?:' + bits['endTokenEsc'] + r')]+?' # anything but the endToken
+        gobbleWS = re.compile(bits['start_gobbleWS'] + r'(' +
+                              r'if[\f\t ]+' + anythingBut + '|' +
+                              r'else[\f\t ]*?|' +
+                              r'else[\f\t ]if[\t ]+' + anythingBut + '|' +
+                              r'elif[\f\t ]+' + anythingBut + '|' +
+                              r'for[\f\t ]+' + anythingBut + '|' +
+                              r'continue|' +
+                              r'break|' +
+                              r'end[\f\t ]+if|' +
+                              r'end[\f\t ]+for|' +
+                              r')[\f\t ]*' + bits['lazyEndGrp'],
+                              re.MULTILINE
+                              )
+        
+        plain =  re.compile(bits['start'] + r'(' +
+                            r'if[\f\t ]+.+?|' +
+                            r'else[\f\t ]*?|' +
+                            r'else[\f\t ]if[\f\t ]+.+?|' +
+                            r'elif[\f\t ]+.+?|' +
+                            r'for[\f\t ].+?|' +
+                            r'end[\f\t ]+if|' +
+                            r'end[\f\t ]+for|' +
+                            r')[\f\t ]*' + bits['endGrp'],
+                            re.MULTILINE
+                            )
+
+        self._delimRegexs = [gobbleWS, plain]
                     
     def translateTag(self, tag):
         """process display logic embedded in the template"""

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Utilities.py,v 1.6 2001/08/10 22:44:36 tavis_rudd Exp $
+# $Id: Utilities.py,v 1.7 2001/08/11 05:22:19 tavis_rudd Exp $
 """Utility classes and functions used in the Cheetah package
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/10 22:44:36 $
+Last Revision Date: $Date: 2001/08/11 05:22:19 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 
 ##################################################
@@ -32,30 +32,6 @@ class Error(Exception): pass
 
 ##################################################
 ## FUNCTIONS ##
-
-def escapeRegexChars(string):
-    return re.sub(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])', r'\\\1' , string)
-
-def separateTagsFromText(initialText, startTagRE, endTagRE):
-    """breaks a string up into a textVsTagsList where the odd items are plain
-    text and the even items are the contents of the tags."""
-
-    chunks = startTagRE.split(initialText)
-    textVsTagsList = []
-    for chunk in chunks:
-        textVsTagsList.extend(endTagRE.split(chunk))
-    return textVsTagsList
-
-def processTextVsTagsList(textVsTagsList, tagProcessorFunction):
-    """loops through textVsTagsList - the output from separateTagsFromText() -
-    and filters all the tag items with the tagProcessorFunction"""
-    
-    ## odd items are plain text, even ones are tags
-    processedList = textVsTagsList[:]
-    for i in range(1, len(processedList), 2):
-        processedList[i] = tagProcessorFunction(processedList[i])
-    return processedList
-
 def insertLineNums(string):
     """Return a version of the string with each line prefaced with its line
      number."""
@@ -81,7 +57,6 @@ def lineNumFromPos(string, pos):
      Mac-OS."""
     
     return len(string[0:pos].split('\n'))
-
 
 def unique(s):
     """Return a list of the elements in s, but without duplicates.

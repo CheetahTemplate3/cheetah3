@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.4 2001/08/11 04:57:39 tavis_rudd Exp $
+# $Id: Parser.py,v 1.5 2001/08/11 05:22:19 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/11 04:57:39 $
+Last Revision Date: $Date: 2001/08/11 05:22:19 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -23,7 +23,7 @@ from types import StringType
 from tokenize import tokenprog
 
 # intra-package imports ...
-from Utilities import lineNumFromPos, escapeRegexChars
+from Utilities import lineNumFromPos
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
@@ -31,13 +31,49 @@ from Utilities import lineNumFromPos, escapeRegexChars
 True = (1==1)
 False = (0==1)
 
-## Regex chunks for the parser
-#tools
+##################################################
+## FUNCTIONS ##
+
+def escapeRegexChars(string):
+    return re.sub(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])', r'\\\1' , string)
+
+def matchTokenOrfail(text, pos):
+    match = tokenprog.match(text, pos)
+    if match is None:
+        raise SyntaxError(text, pos)
+    return match, match.end()
+
+
+def separateTagsFromText(initialText, startTagRE, endTagRE):
+    """breaks a string up into a textVsTagsList where the odd items are plain
+    text and the even items are the contents of the tags."""
+
+    chunks = startTagRE.split(initialText)
+    textVsTagsList = []
+    for chunk in chunks:
+        textVsTagsList.extend(endTagRE.split(chunk))
+    return textVsTagsList
+
+def processTextVsTagsList(textVsTagsList, tagProcessorFunction):
+    """loops through textVsTagsList - the output from separateTagsFromText() -
+    and filters all the tag items with the tagProcessorFunction"""
+    
+    ## odd items are plain text, even ones are tags
+    processedList = textVsTagsList[:]
+    for i in range(1, len(processedList), 2):
+        processedList[i] = tagProcessorFunction(processedList[i])
+    return processedList
+
+# re tools
 def group(*choices): return '(' + '|'.join(choices) + ')'
 def nongroup(*choices): return '(?:' + '|'.join(choices) + ')'
 def namedGroup(name, *choices): return '(P:<' + name +'>' + '|'.join(choices) + ')'
 def any(*choices): return apply(group, choices) + '*'
 def maybe(*choices): return apply(group, choices) + '?'
+
+##################################################
+## Regex chunks for the parser ##
+
 
 #generic
 WS = r'[ \f\t]*'                        # Whitespace
@@ -51,14 +87,6 @@ nameCharLookAhead = r'(?=[A-Za-z_])'
 validSecondCharsLookAhead = r'(?=[A-Za-z_\*\{])'
 
 
-##################################################
-## FUNCTIONS ##
-
-def matchTokenOrfail(text, pos):
-    match = tokenprog.match(text, pos)
-    if match is None:
-        raise SyntaxError(text, pos)
-    return match, match.end()
 
 ##################################################
 ## CLASSES ##
