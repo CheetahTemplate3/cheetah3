@@ -1,6 +1,6 @@
 Please initial your changes (there's a key at bottom) and add a date for each release
 ================================================================================
-0.9.9a7 (unreleased)
+0.9.9a7 (Dec 6, 2001)
    - template constructor arg 'outputFilter' now 'filter', for consistency
      with #filter (MO)
    - template constructor raises TypeError if bad arguments (MO)
@@ -36,8 +36,7 @@ Please initial your changes (there's a key at bottom) and add a date for each re
    - started preparing to shift some of the 'shared' utility classes, such as
      SettingsManager, to the Webware core.  Cheetah 1.0 will probably require
      Webware to be installed so it can access those shared classes. (TR)
-
-     
+   - extended the template module command line interface(TR/MO)
 
 0.9.9a6 (Nov 6, 2001) 
    - fixed bug with quotations in longer constant string chunks (TR)
