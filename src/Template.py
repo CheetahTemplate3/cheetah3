@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.109 2002/12/17 15:58:02 hierro Exp $
+# $Id: Template.py,v 1.110 2003/03/17 00:23:40 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.109 $
+Version: $Revision: 1.110 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/12/17 15:58:02 $
+Last Revision Date: $Date: 2003/03/17 00:23:40 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.109 $"[11:-2]
+__revision__ = "$Revision: 1.110 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -455,6 +455,8 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         os.remove(tmpFilename)
         if os.path.exists( tmpFilename + 'c'):
             os.remove(tmpFilename + 'c')
+        if os.path.exists( tmpFilename + 'o'):
+            os.remove(tmpFilename + 'o')
             
         return mod
 
