@@ -1,8 +1,10 @@
 Please initial your changes and a date for each release
 ================================================================================
 0.9.8 (not released yet)
-  - the docs directory (./docs/src/) is rapidly changing until further notice.
-(MO)
+  - the docs directory (./docs/src/) is rapidly changing. (MO)
+  - Added package ./src/Tools/ for contributed classes/functions/packages not
+    necessary to run Cheetah.  The first such class is RecursiveNull.py by Ian
+    Bicking.  Added package Cheetah.Tools to list in ./setup.py . (MO)
 
 
 0.9.7 (July 13, 2001)
