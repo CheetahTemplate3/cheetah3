@@ -2,6 +2,11 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+0.9.13b2 (May 3, 2002)
+  - fixed the bug in Cheetah.Servlet.Servlet.serverSidePath that Jeff Johnson
+    found. (TR)
+
+
 0.9.13b1 (May 1, 2002)
   - Was going to import cStringIO instead of StringIO, but it made the 
     DummyTransaction.py unittest fail so I undid it.  Cheetah aims to provide
