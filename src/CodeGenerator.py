@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.12 2001/08/02 05:24:56 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.13 2001/08/02 05:48:16 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/02 05:24:56 $
+Last Revision Date: $Date: 2001/08/02 05:48:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.12 $"[11:-2]
+__version__ = "$Revision: 1.13 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -25,6 +25,7 @@ import types
 from time import time as currentTime # used in the cache refresh code
 
 # intra-package imports ...
+import TagProcessor
 import NameMapper
 from Validators import \
      validateDisplayLogicCode, \
@@ -43,11 +44,6 @@ from Utilities import lineNumFromPos
 True = (1==1)
 False = (0==1)
 
-# tag types for the main tags
-EVAL_TAG_TYPE = 0
-EXEC_TAG_TYPE = 1
-EMPTY_TAG_TYPE = 2
-
 # cacheType's for $placeholders
 NO_CACHE = 0
 STATIC_CACHE = 1
@@ -62,74 +58,11 @@ class Error(Exception):
 class NoDefault:
     pass
 
-class TagProcessor:
-    _tagType = EVAL_TAG_TYPE
-
-    def __init__(self):
-        pass
-
-    def preProcess(self, templateObj, templateDef):
-        delims = templateObj.setting('internalDelims')
-        tagTokenSeparator = templateObj.setting('tagTokenSeparator')
-        def subber(match, delims=delims, token=self._token,
-                   tagTokenSeparator=tagTokenSeparator):
-            tag = re.sub(r'(?:(?<=\A)|(?<!\\))\$',r'\$',match.group(1))
-            
-            return delims[0] + token + tagTokenSeparator  +\
-                   tag + delims[1]
-
-        for RE in self._delimRegexs:
-            templateDef = RE.sub(subber, templateDef)
-
-        return templateDef
-   
-    def initializeTemplateObj(self, templateObj):
-        """Initialize the templateObj so that all the necessary attributes are
-        in place for the tag-processing stage
-
-        This must be called by subclasses"""
-        
-        if not templateObj._codeGeneratorState.has_key('indentLevel'):
-            templateObj._codeGeneratorState['indentLevel'] = \
-                          templateObj._settings['initialIndentLevel']
-        if not hasattr(templateObj, '_localVarsList'):
-            # may have already been set by #set or #for
-            templateObj._localVarsList = []
-            
-        if not hasattr(templateObj,'_perResponseSetupCodeChunks'):
-            templateObj._perResponseSetupCodeChunks = {}
-
-        if not templateObj._codeGeneratorState.has_key('defaultCacheType'):
-            templateObj._codeGeneratorState['defaultCacheType'] = None
-
-    
-    def processTag(self, templateObj, tag):
-        return self.wrapTagCode( templateObj, self.translateTag(templateObj, tag) )
-
-    def translateTag(self, templateObj, tag):
-        pass
-
-    def wrapExecTag(self, templateObj, translatedTag):
-        return "''',])\n" + translatedTag + "outputList.extend(['''"
-
-    def wrapEvalTag(self, templateObj, translatedTag):
-        indent = templateObj._settings['indentationStep'] * \
-                 templateObj._codeGeneratorState['indentLevel']
-        return "''',\n" + indent + translatedTag + ", '''"
-
-    def wrapTagCode(self, templateObj, translatedTag):
-        if self._tagType == EVAL_TAG_TYPE:
-            return self.wrapEvalTag(templateObj, translatedTag)
-        elif self._tagType == EXEC_TAG_TYPE:
-            return self.wrapExecTag(templateObj, translatedTag)
-        elif self._tagType == EMPTY_TAG_TYPE:
-            return ''
-
-class DisplayLogicProcessor(TagProcessor):
+class DisplayLogicProcessor(TagProcessor.TagProcessor):
     """A class for processing display logic tags in Cheetah Templates."""
     
     def __init__(self):
-        self._tagType = EXEC_TAG_TYPE
+        self._tagType = TagProcessor.EXEC_TAG_TYPE
         self._delimRegexs = [delimiters['displayLogic_gobbleWS'],
                              delimiters['displayLogic']]
         self._token = 'displayLogic'
@@ -188,11 +121,11 @@ class DisplayLogicProcessor(TagProcessor):
             
         return outputCode
 
-class SetDirectiveProcessor(TagProcessor):
+class SetDirectiveProcessor(TagProcessor.TagProcessor):
     """A class for processing display logic tags in Cheetah Templates."""
     
     _token = 'setDirective'
-    _tagType = EXEC_TAG_TYPE
+    _tagType = TagProcessor.EXEC_TAG_TYPE
     _delimRegexs = [delimiters['setDirective'],]
                     
     def translateTag(self, templateObj, tag):
@@ -220,8 +153,8 @@ class SetDirectiveProcessor(TagProcessor):
                indent * templateObj._codeGeneratorState['indentLevel']
         
 
-class CacheDirectiveProcessor(TagProcessor):
-    _tagType = EMPTY_TAG_TYPE
+class CacheDirectiveProcessor(TagProcessor.TagProcessor):
+    _tagType = TagProcessor.EMPTY_TAG_TYPE
     _token = 'cacheDirective'
     _delimRegexs = [delimiters['cacheDirectiveStartTag'],]    
 
