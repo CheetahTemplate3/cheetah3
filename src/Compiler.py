@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.12 2001/11/06 03:50:38 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.13 2001/11/06 21:52:09 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2001/11/06 03:50:38 $
+Last Revision Date: $Date: 2001/11/06 21:52:09 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.12 $"[11:-2]
+__version__ = "$Revision: 1.13 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -661,7 +661,7 @@ class ClassCompiler(SettingsManager, GenUtils):
                           ') > self._fileMtime:')
             self.indent()
             self.addChunk('self.compile(file=' + repr(fileName) + ')')
-            self.addChunk('write(self.__mainCheetahMethod' + str(id(self)) + '(trans=trans))')            
+            self.addChunk('write(self._mainCheetahMethod' + str(id(self)) + '(trans=trans))')            
             self.addStop()
             self.dedent()
 
@@ -717,7 +717,7 @@ class ClassCompiler(SettingsManager, GenUtils):
     def cleanupState(self):
         if self._mainMethodName == 'respond':
             self._generatedAttribs.append('__str__ = respond')
-        self._generatedAttribs.append('__mainCheetahMethod' + str(id(self)) + '= ' + self._mainMethodName)
+        self._generatedAttribs.append('_mainCheetahMethod' + str(id(self)) + '= ' + self._mainMethodName)
         while self._activeMethods:
             methCompiler = self.getActiveMethodCompiler()
             self.swallowMethodCompiler(methCompiler)
