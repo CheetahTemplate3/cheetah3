@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.60 2002/10/07 18:46:47 tavis_rudd Exp $
+# $Id: Parser.py,v 1.61 2002/11/28 22:06:54 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.60 $
+Version: $Revision: 1.61 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/10/07 18:46:47 $
+Last Revision Date: $Date: 2002/11/28 22:06:54 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.60 $"[11:-2]
+__revision__ = "$Revision: 1.61 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -406,7 +406,7 @@ class _LowLevelSemanticsParser(Lexer):
             raise ParseError(self, msg='Invalid multi-line comment end token')
         return self.readTo(match.end())
 
-    def lineClearToStartToken(self, pos=None):
+    def isLineClearToStartToken(self, pos=None):
         if pos == None:
             pos = self.pos()
         self.checkPos(pos)            
@@ -417,7 +417,7 @@ class _LowLevelSemanticsParser(Lexer):
     def readToThisEndDirective(self, directiveKey):
         finalPos = endRawPos = startPos = self.pos()
         directiveChar = self.setting('directiveStartToken')[0]
-        lineClearToStartToken = False
+        isLineClearToStartToken = False
         while not self.atEnd():
             if self.peek() == directiveChar:
                 if self.isDirective() == 'end':
@@ -426,8 +426,8 @@ class _LowLevelSemanticsParser(Lexer):
                     self.advance(3)                 # to end of 'end'
                     self.getWhiteSpace()
                     if self.startswith(directiveKey):
-                        if self.lineClearToStartToken(endRawPos):
-                            lineClearToStartToken = True
+                        if self.isLineClearToStartToken(endRawPos):
+                            isLineClearToStartToken = True
                             endRawPos = self.findBOL(endRawPos)
                         self.advance(len(directiveKey)) # to end of directiveKey
                         self.getWhiteSpace()
@@ -443,10 +443,10 @@ class _LowLevelSemanticsParser(Lexer):
         
         if self.matchDirectiveEndToken():
             self.getDirectiveEndToken()
-        elif lineClearToStartToken and (not self.atEnd()) and self.peek() in '\r\n':
+        elif isLineClearToStartToken and (not self.atEnd()) and self.peek() in '\r\n':
             self.readToEOL(gobble=True)
             
-        if lineClearToStartToken and self.pos() > endOfFirstLinePos:
+        if isLineClearToStartToken and self.pos() > endOfFirstLinePos:
             self.delLeadingWS()
         return theBlock
 
@@ -1052,16 +1052,16 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.addStrConst(strConst)
 
     def eatComment(self):
-        lineClearToStartToken = self.lineClearToStartToken()
-        if lineClearToStartToken:
+        isLineClearToStartToken = self.isLineClearToStartToken()
+        if isLineClearToStartToken:
             self.delLeadingWS()
         self.getCommentStartToken()            
-        comm = self.readToEOL(gobble=lineClearToStartToken)
+        comm = self.readToEOL(gobble=isLineClearToStartToken)
         specialVarMatch = specialVarRE.match(comm)
         self.addComment(comm)
 
     def eatMultiLineComment(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLine = self.findEOL()
 
         self.getMultiLineCommentStartToken()
@@ -1150,7 +1150,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.directiveEaters[directiveKey]()
 
     def eatEndDirective(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         self.getDirectiveStartToken()
         self.advance(3)                 # to end of 'end'
         self.getWhiteSpace()
@@ -1164,15 +1164,15 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             raise ParseError(self, msg='Invalid end directive')
                     
         self.directiveEndEaters[directiveKey](
-            lineClearToStartToken=lineClearToStartToken)
+            isLineClearToStartToken=isLineClearToStartToken)
 
 
     def eatSimpleExprDirective(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLine = self.findEOL()
         self.getDirectiveStartToken()
         expr = self.getExpression().strip()
-        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLine)
         return expr
 
     ## specific directive eat methods
@@ -1188,7 +1188,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.addShBang(shBang.strip())
         
     def eatCompiler(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLine = self.findEOL()
         startPos = self.pos()
         self.getDirectiveStartToken()
@@ -1199,7 +1199,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
 
         if settingName.lower() == 'reset':
             self.getExpression() # gobble whitespace & junk
-            self.closeDirective(lineClearToStartToken, endOfFirstLine)
+            self.closeDirective(isLineClearToStartToken, endOfFirstLine)
             self._initializeSettings()
             self.configureParser()
             return
@@ -1211,7 +1211,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             raise ParserError(self)
         valueExpr = self.getExpression()
         endPos = self.pos()
-        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLine)
 
         try:
             self.setSetting(settingName, eval(valueExpr) )
@@ -1227,7 +1227,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             raise
 
     def eatCompilerSettings(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLine = self.findEOL()
         self.getDirectiveStartToken()
         self.advance(len('compiler-settings'))   # to end of 'settings'
@@ -1235,7 +1235,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         KWs = self.getTargetVarsList()
         self.getExpression()            # gobble any garbage
             
-        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLine)
         
         merge = True
         if 'nomerge' in KWs:
@@ -1266,7 +1266,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.configureParser()
 
     def eatAttr(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         startPos = self.pos()
         self.getDirectiveStartToken()
@@ -1283,10 +1283,10 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         val = eval(expr,{},{})
         if self._templateObj:
             setattr(self._templateObj, attribName, val)
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         
     def eatDef(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         startPos = self.pos()
         self.getDirectiveStartToken()
@@ -1307,12 +1307,12 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         if self.peek() == ':':
             self.getc()
             self.startSingleLineDef(methodName, argsList, startPos, endOfFirstLinePos)
-            self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+            self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         else:
-            self.startMultiLineDef(methodName, argsList, startPos, lineClearToStartToken)
+            self.startMultiLineDef(methodName, argsList, startPos, isLineClearToStartToken)
         
     def eatBlock(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         startPos = self.pos()
         self.getDirectiveStartToken()
@@ -1335,9 +1335,9 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             singleLiner = True
             self.getc()
             rawDef = self.startSingleLineDef(methodName, argsList, startPos, endOfFirstLinePos)
-            self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+            self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         else:
-            rawDef = self.startMultiLineDef(methodName, argsList, startPos, lineClearToStartToken)
+            rawDef = self.startMultiLineDef(methodName, argsList, startPos, isLineClearToStartToken)
             
         self._blockMetaData[methodName] = {'raw':rawDef,
                                            'lineCol':self.getRowCol(startPos),
@@ -1382,13 +1382,13 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         return signature
 
         
-    def startMultiLineDef(self, methodName, argsList, startPos, lineClearToStartToken=False):
+    def startMultiLineDef(self, methodName, argsList, startPos, isLineClearToStartToken=False):
 
         rawDef = self[startPos:self.pos()]
         self.getExpression()            # slurp up any garbage left at the end
         signature = self[startPos:self.pos()]
         endOfFirstLinePos = self.findEOL()
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         ## create the method compiler and register it
         
         from Compiler import AutoMethodCompiler
@@ -1405,12 +1405,12 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         return methodName, rawDef
 
     def eatImport(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLine = self.findEOL()
         self.getDirectiveStartToken()
         impStatement = self.getExpression()
         self.addImportStatement(impStatement)
-        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLine)
 
         ## this doesn't work with from math import *, etc.
         importVarNames = impStatement[impStatement.find('import') + len('import'):].split(',')
@@ -1425,7 +1425,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
                 setattr(TemplateMod, varName, val)
     
     def eatExtends(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLine = self.findEOL()
         self.getDirectiveStartToken()
         self.advance(len('extends'))
@@ -1433,7 +1433,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         # change the default mainMethodName from the default 'respond' 
         self.setMainMethodName('writeBody') 
         baseClassName = self.getDottedName()
-        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLine)
         
         ##################################################
         ## If the #extends directive contains a classname or modulename that isn't
@@ -1478,24 +1478,24 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             newClass.__init__(self._templateObj)
             
     def eatImplements(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLine = self.findEOL()
         self.getDirectiveStartToken()
         self.advance(len('implements'))
         self.getWhiteSpace()
         self.setMainMethodName(self.getIdentifier())
         self.getExpression()  # throw away and unwanted crap that got added in
-        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLine)
 
 
     def eatSilent(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         self.getDirectiveStartToken()
         self.advance(len('silent'))
         self.getWhiteSpace()
         expr = self.getExpression()
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         self.addSilent(expr)
 
     def eatEcho(self):
@@ -1507,7 +1507,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.addFilteredChunk(expr, rawExpr=expr)
 
     def eatSet(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLine = self.findEOL()
 
         self.getDirectiveStartToken()
@@ -1533,27 +1533,27 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         OP = self.getAssignmentOperator()
         RVALUE = self.getExpression()
         
-        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLine)
         self.addSet(LVALUE, OP, RVALUE, isGlobal)
     
     def eatSlurp(self):
-        if self.lineClearToStartToken():
+        if self.isLineClearToStartToken():
             self.delLeadingWS()
         self.commitStrConst()
         self.readToEOL(gobble=True)
 
     def eatRaw(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         self.getDirectiveStartToken()
         self.getExpression()
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
 
         rawBlock = self.readToThisEndDirective('raw')
         self.addStrConst(rawBlock)
     
     def eatInclude(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         self.getDirectiveStartToken()
         self.advance(len('include'))
@@ -1576,7 +1576,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             
         expr = self.getExpression()
             
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         self.addWriteChunk('self._includeCheetahSource(' + expr +
                            ', trans=trans, ' +
                            'includeFrom="' + includeFrom + '", raw=' +
@@ -1584,20 +1584,20 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
                            str(self.pos()) + str(time.time()) + '")')
 
     def eatCache(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         lineCol = self.getRowCol()
         self.getDirectiveStartToken()
         self.advance(len('cache'))
         startPos = self.pos()
         argList = self.getDefArgList(useNameMapper=True)
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         cacheInfo = self.genCacheInfoFromArgList(argList)
         self.startCacheRegion(cacheInfo, lineCol)
 
 
     def eatFilter(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
 
         self.getDirectiveStartToken()
@@ -1612,7 +1612,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             theFilter = self.getIdentifier()
             self.getWhiteSpace()
         
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
 
         if isKlass:
             self.addChunk('filter = self._currentFilter = ' + theFilterExpr.strip() +
@@ -1634,7 +1634,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
                 self.dedent()
         
     def eatErrorCatcher(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
 
         self.getDirectiveStartToken()
@@ -1646,7 +1646,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             self._templateObj._errorCatcher = \
                    getattr(ErrorCatchers, theChecker)(self._templateObj)
             
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         self.addChunk('if self._errorCatchers.has_key("' + theChecker + '"):')
         self.indent()
         self.addChunk('self._errorCatcher = self._errorCatchers["' +
@@ -1664,12 +1664,12 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.addWhile(self.eatSimpleExprDirective())
 
     def eatFor(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
 
         self.getDirectiveStartToken()
         expr = self.getExpression()
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         self.addFor(expr)
         
     def eatIf(self):
@@ -1713,37 +1713,37 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.addReturn(self.eatSimpleExprDirective())
 
     def eatRepeat(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         self.getDirectiveStartToken()
         self.advance(len('repeat'))
         expr = self.getExpression()
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         self.addFor('for i in range(' + expr + ')')
 
     def eatUnless(self):
-        lineClearToStartToken = self.lineClearToStartToken()
+        isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         self.getDirectiveStartToken()
         self.advance(len('unless'))
         expr = self.getExpression()
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         self.addIf('if not (' + expr + ')')
 
     ## end directive eaters
 
-    def eatEndDef(self, lineClearToStartToken=False):
+    def eatEndDef(self, isLineClearToStartToken=False):
         endOfFirstLinePos = self.findEOL()
         self.getExpression()
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         self.commitStrConst()
         methCompiler = self.getActiveMethodCompiler()
         self.swallowMethodCompiler(methCompiler)
 
-    def eatEndBlock(self, lineClearToStartToken=False):
+    def eatEndBlock(self, isLineClearToStartToken=False):
         endOfFirstLinePos = self.findEOL()
         self.getExpression()
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         methCompiler = self.getActiveMethodCompiler()
         methodName = methCompiler.methodName()
         if self.setting('includeBlockMarkers'):
@@ -1767,28 +1767,28 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         if self.setting('outputRowColComments'):
             self.appendToPrevChunk(' at line %s, col %s' % lineCol + '.')
 
-    def eatEndCache(self, lineClearToStartToken=False):
+    def eatEndCache(self, isLineClearToStartToken=False):
         endOfFirstLinePos = self.findEOL()
         self.getExpression()
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         self.endCacheRegion()
 
-    def eatEndFilter(self, lineClearToStartToken=False):
+    def eatEndFilter(self, isLineClearToStartToken=False):
         endOfFirstLinePos = self.findEOL()
         self.getExpression()
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         self.addChunk('filter = self._initialFilter')        
 
-    def eatEndErrorCatcher(self, lineClearToStartToken=False):
+    def eatEndErrorCatcher(self, isLineClearToStartToken=False):
         endOfFirstLinePos = self.findEOL()
         self.getExpression()
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         self.turnErrorCatcherOff()
 
-    def eatDedentDirective(self, lineClearToStartToken=False):        
+    def eatDedentDirective(self, isLineClearToStartToken=False):        
         endOfFirstLinePos = self.findEOL()
         self.getExpression()
-        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
         self.commitStrConst()            
         self.dedent()
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.50 2002/11/28 18:51:49 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.51 2002/11/28 22:06:37 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.50 $
+Version: $Revision: 1.51 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/11/28 18:51:49 $
+Last Revision Date: $Date: 2002/11/28 22:06:37 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.50 $"[11:-2]
+__revision__ = "$Revision: 1.51 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -1136,14 +1136,14 @@ class ModuleCompiler(Parser, GenUtils):
         
     ## gen methods
         
-    def closeDirective(self, lineClearToStartToken, endOfFirstLinePos):
+    def closeDirective(self, isLineClearToStartToken, endOfFirstLinePos):
 
         if self.matchDirectiveEndToken():
             self.getDirectiveEndToken()
-        elif lineClearToStartToken and (not self.atEnd()) and self.peek() in '\r\n':
+        elif isLineClearToStartToken and (not self.atEnd()) and self.peek() in '\r\n':
             self.readToEOL(gobble=True)
             
-        if lineClearToStartToken and (self.atEnd() or self.pos() > endOfFirstLinePos):
+        if isLineClearToStartToken and (self.atEnd() or self.pos() > endOfFirstLinePos):
             self.delLeadingWS()
     
     ## methods for adding stuff to the module and class definitions
