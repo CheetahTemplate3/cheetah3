@@ -16,13 +16,13 @@ ps:
 html:
 	-rm -rf $(DOCNAME)
 	$(MKHOWTO) --html --split 1 --iconserver . $(MAIN_TEX_FILE)
-	-rm -R ../$(DOCNAME)_html
+	-rm -rf ../$(DOCNAME)_html
 	mv $(DOCNAME) ../$(DOCNAME)_html
 
 htmlMultiPage:
 	-rm -rf $(DOCNAME)
 	$(MKHOWTO) --html --iconserver . $(MAIN_TEX_FILE)
-	-rm -R ../$(DOCNAME)_html_multipage
+	-rm -rf ../$(DOCNAME)_html_multipage
 	mv $(DOCNAME) ../$(DOCNAME)_html_multipage
 
 text:
