@@ -1,6 +1,6 @@
 Please initial your changes (there's a key at bottom) and add a date for each release
 ================================================================================
-0.9.12 (unreleased)
+0.9.12b1 (Mar 24, 2002)
    - $request().field(args) now works, identical to $request.field(args)
      to implement this, the request object is now self.request() instead of
      self.request.  This provides compatibility with Webware's servlet API.
@@ -24,6 +24,7 @@ Please initial your changes (there's a key at bottom) and add a date for each re
      subclasses it.  This adds the .cgiImport() method to all servlets, allowing
      sophisticated retrieval of form fields, cookies or session variables from
      one line of Cheetah or Python code.  See module docstring. (MO)
+   - lots of updates to the docs (MO)
 
 0.9.11 (Mar 07, 2002)
    - fixed a careless bug in cheetah-compile (TR)
