@@ -9,7 +9,8 @@ release
   - Utils.Misc.CheckKeywords(): prevent misspelled keyword arguments,
     used by Template constructor. (MO)
   - removed support for multiple inheritance (TR)
-  - added some bounds-checking code to _namemapper.c's getNameChunks function(TR)
+  - added some bounds-checking code to _namemapper.c's getNameChunks function
+    (TR)
   - changed the exceptions in _namemapper.c from the old string exceptions
     to proper exception objects (TR)
   - first portion of Developers' Guide written (MO)
