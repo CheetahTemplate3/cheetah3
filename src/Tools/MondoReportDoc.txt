@@ -32,9 +32,7 @@ about the previous and next pages.
 * * * * *
 MAIN PUBLIC CLASS
 
-To create a MondoReport instance, supply a list to operate on.  It may be a
-list of anything, but if you use the 'field' argument in any of the methods
-below, 
+To create a MondoReport instance, supply a list to operate on.
 
     mr = MondoReport(origList)
 
@@ -175,7 +173,7 @@ The letter ("A", "B", "C") corresponding to .number().  Undefined if .number()
 whatever character it happens to be.  
 
 To make a less dumb implementation (e.g., "Z, AA, BB" or "Z, A1, B1"):
-1) Subclass BatchRecord and override the .Letter method. then subclass MondoReport and set
+1) Subclass BatchRecord and override the .Letter method. 
 2) Subclass MondoReport and set the class variable .BatchRecordClass to your
 new improved class.
 
@@ -220,7 +218,7 @@ as 'r', but it's useful for previous/next batches.
     .size()
 
 The 'size' argument used when this BatchRecord was created.  
-'a.size() == b.size'.
+'a.size() == b.size()'.
 
     .first()
 
