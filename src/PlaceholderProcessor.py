@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.4 2001/07/11 21:42:11 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.5 2001/07/11 22:28:12 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/11 21:42:11 $
+Last Revision Date: $Date: 2001/07/11 22:28:12 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 
 ##################################################
@@ -298,14 +298,15 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
                                         tag + '"""](trans, iAmNested=True)')
             elif callable(tagValue):
                 isCallable = True
-                tagValue = tagValue()
 
         if cacheType == STATIC_CACHE:
             if not safeToAutoCall:
                 tagValue = eval(translatedTag)
+            elif isCallable:
+                tagValue = tagValue()
             return str(tagValue)
         elif cacheType == TIMED_REFRESH_CACHE:
-            if safeToAutoCall and isCallable:
+            if isCallable:
                 translatedTag = translatedTag + '()'
             templateObj._setTimedRefresh(translatedTag, cacheRefreshInterval)
             return self.wrapEvalTag(
@@ -313,7 +314,7 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
                 'timedRefreshCache["""' + translatedTag + '"""]')
         else:
             # NO_CACHE or is not safe to cache
-            if safeToAutoCall and isCallable:
+            if isCallable:
                 return self.wrapEvalTag(templateObj, "str(" + translatedTag + "())")
             else:
                 return self.wrapEvalTag(templateObj, "str(" + translatedTag + ")")
