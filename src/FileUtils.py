@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: FileUtils.py,v 1.10 2005/01/03 18:10:15 tavis_rudd Exp $
+# $Id: FileUtils.py,v 1.11 2005/03/29 00:44:25 tavis_rudd Exp $
 """File utitilies for Python:
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/09/26
-Last Revision Date: $Date: 2005/01/03 18:10:15 $
+Last Revision Date: $Date: 2005/03/29 00:44:25 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.10 $"[11:-2]
+__revision__ = "$Revision: 1.11 $"[11:-2]
 
 
 from glob import glob
@@ -71,7 +71,7 @@ class FileFinder:
     
     def __init__(self, rootPath,
                  globPatterns=('*',),
-                 ignoreBasenames=('CVS',),
+                 ignoreBasenames=('CVS','.svn'),
                  ignoreDirs=(),
                  ):
         
