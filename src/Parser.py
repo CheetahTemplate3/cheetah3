@@ -1,24 +1,24 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.2 2001/08/10 22:41:40 tavis_rudd Exp $
-"""Parser base-class for Cheetah's TagProcessor class and maybe for the Template
-class
+# $Id: Parser.py,v 1.3 2001/08/11 01:03:16 tavis_rudd Exp $
+"""Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/10 22:41:40 $
+Last Revision Date: $Date: 2001/08/11 01:03:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
 
 import re
+from re import DOTALL, MULTILINE
 from types import StringType
 from tokenize import tokenprog
 
@@ -31,10 +31,25 @@ from Utilities import lineNumFromPos, escapeRegexChars
 True = (1==1)
 False = (0==1)
 
-#Regex chunks for the parser
-escCharLookBehind = r'(?:(?<=\A)|(?<!\\))'
-validSecondCharsLookAhead = r'(?=[A-Za-z_\*\{])'
+## Regex chunks for the parser
+#tools
+def group(*choices): return '(' + '|'.join(choices) + ')'
+def nongroup(*choices): return '(?:' + '|'.join(choices) + ')'
+def namedGroup(name, *choices): return '(P:<' + name +'>' + '|'.join(choices) + ')'
+def any(*choices): return apply(group, choices) + '*'
+def maybe(*choices): return apply(group, choices) + '?'
+
+#generic
+WS = r'[ \f\t]*'                        # Whitespace
+EOL = r'\r\n|\n|\r'
+EOLZ = EOL + r'|\Z'
+escCharLookBehind = nongroup(r'(?<=\A)',r'(?<!\\)')
+name = r'[a-zA-Z_]\w*'
 nameCharLookAhead = r'(?=[A-Za-z_])'
+
+#placeholder-specific
+validSecondCharsLookAhead = r'(?=[A-Za-z_\*\{])'
+
 
 ##################################################
 ## FUNCTIONS ##
@@ -61,22 +76,108 @@ class SyntaxError(ValueError):
 class Error(Exception):
     pass
 
-class Parser:   
-    def __init__(self, templateObj):
-        """Setup some internal references to the templateObj. This method must
-        be called by subclasses."""
+class Parser:
+    """This is an abstract base-class that is inherited by both the Template and
+    TagProcessor classes.  It provides universal access to Cheetah's generic
+    parsing tools, the $placeholder parsing tools, and a few tools for
+    #directive parsing.
 
-        self._templateObj = templateObj
-        ## setup some method mappings for convenience
-        self.state = templateObj._getCodeGeneratorState
-        self.settings = templateObj.settings
-        self.setting = templateObj.setting
-        self.searchList = templateObj.searchList
-        self.evalPlaceholderString = templateObj.evalPlaceholderString
+    When it is inherited by TagProcessor and all TagProcessor's subclasses a
+    reference to the master templateObj must be supplied as the 'templateObj'
+    argument.  This is done automatically when the Template class sets up its
+    TagProcessors.  This approach allows the methods of 'Template' and the
+    methods of this class to coexist seemlessly."""
+    
+    def __init__(self, templateObj=None):
+        """This method sets up some internal references to the master
+        templateObj if a referenc is supplied. Otherwise, it will assume that it
+        IS the master templateObj and will setup the regex's the parser
+        uses. This method must be called by subclasses."""
 
-        self._placeholderREs = templateObj._placeholderREs
-        # don't use the RE's yet as they haven't been created.
+        if templateObj:
+            self._templateObj = templateObj
+            ## setup some method mappings for convenience
+            self.state = templateObj.state
+            self.settings = templateObj.settings
+            self.setting = templateObj.setting
+            self.searchList = templateObj.searchList
+            self.evalPlaceholderString = templateObj.evalPlaceholderString
+
+            self._placeholderREs = templateObj._placeholderREs
+            self._directiveREbits = templateObj._directiveREbits
+
+        else:                           # iAmATemplateObj
+            self._templateObj = self
+            self.makePlaceholderREs()       # inherited from the Parser class
+            self.makeDirectiveREbits()
+
+    ## regex setup ##
+
+    def makePlaceholderREs(self):
         
+        """Setup the regexs for placeholder parsing.  Do it here so all the
+        TagProcessors don't have to create them for themselves.
+
+        All $placeholders are translated into valid Python code by swapping
+        'placeholderStartToken' ($) for 'marker'.  This marker is then used by
+        the parser to find the start of each placeholder and allows $vars in
+        function arg lists to be parsed correctly.  '$x()' becomes '
+        placeholderTag.x()' when it's marked.
+
+        The marker starts with a space to allow $var$var to be parsed correctly.
+        $a$b is translated to --placeholderTag.a placeholderTag.b-- instead of
+        --placeholderTag.aplaceholderTag.b--, which the parser would mistake for
+        a single $placeholder The extra space is removed by the parser."""
+        
+        REs = self._placeholderREs = {}
+        marker = self.setting('placeholderMarker')
+        REs['nameMapperChunk'] = re.compile(
+            marker +
+            r'(?:CACHED\.|REFRESH_[0-9]+(?:_[0-9]+){0,1}\.){0,1}([A-Za-z_0-9\.]+)')
+
+        markerEscaped = escapeRegexChars(marker)
+        markerLookBehind= r'(?:(?<=' + markerEscaped + ')|(?<=' + markerEscaped + '\{))'
+        
+        REs['cachedTags'] = re.compile(
+            markerLookBehind + r'\*' + nameCharLookAhead)
+        REs['refreshTag'] = re.compile(markerLookBehind +
+                                                    r'\s*\*([0-9\.]+?)\*' +
+                                                    nameCharLookAhead)
+        REs['startToken'] = re.compile(
+            escCharLookBehind +
+            escapeRegexChars(self.setting('placeholderStartToken')) +
+            validSecondCharsLookAhead)
+
+        
+    def makeDirectiveREbits(self):
+        """Construct the regex bits that are used in directive parsing."""
+        bits = self._directiveREbits = {}
+        
+        startToken = self.setting('directiveStartToken')
+        endToken = self.setting('directiveEndToken')
+        startTokenEsc = escapeRegexChars(startToken)
+        endTokenEsc = escapeRegexChars(endToken)
+        endTokenEscGrp = nongroup(endTokenEsc)
+        start_gobbleWS = '(?:\A|^)' + WS + startTokenEsc
+        endGrp = nongroup(endTokenEsc, EOLZ)
+        lazyEndGrp = nongroup(EOLZ)
+
+        bits.update(locals())
+
+    def simpleDirectiveReList(self, directiveReChunk):
+        
+        """Return a list of two regexs for a simple directive: one
+        whitespace-gobbling and one plain.  A simple directive one that only has
+        a start-tag, such as #cache, #stop, or #include."""
+        
+        bits = self._directiveREbits
+        plainRE = re.compile(bits['startTokenEsc']  +
+                             directiveReChunk +
+                             bits['endGrp'])
+        gobbleRE = re.compile(bits['start_gobbleWS']  +
+                             directiveReChunk +
+                             bits['lazyEndGrp'])
+        return [gobbleRE, plainRE]
 
     ## data access methods  ##
         
@@ -274,3 +375,9 @@ class Parser:
         
         token = self.setting('placeholderStartToken')
         return theString.replace('\\' + token, token)
+
+    def evalPlaceholderString(self, txt):
+        """Return the value of a placeholderstring. This doesn't work with localVars."""
+        searchList = self.searchList()
+        searchList_getMeth = searchList.get # shortcut-namebing in the eval
+        return eval(txt)

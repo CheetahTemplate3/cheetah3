@@ -1,18 +1,18 @@
 #!/usr/bin/env python
-# $Id: StopDirectiveProcessor.py,v 1.4 2001/08/10 19:26:02 tavis_rudd Exp $
-"""StopDirectiveProcessor class Cheetah's codeGenerator
+# $Id: StopDirective.py,v 1.1 2001/08/11 01:03:16 tavis_rudd Exp $
+"""StopDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.1 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/10 19:26:02 $
+Last Revision Date: $Date: 2001/08/11 01:03:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.1 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -32,11 +32,14 @@ False = (0==1)
 class Error(Exception):
     pass
 
-class StopDirectiveProcessor(TagProcessor.TagProcessor):
+class StopDirective(TagProcessor.TagProcessor):
     _tagType = TagProcessor.EXEC_TAG_TYPE
     _token = 'stopDirective'
-    _delimRegexs = [delimiters['stopDirective_gobbleWS'],
-                    delimiters['stopDirective'],]    
+
+    def __init__(self, templateObj):
+        TagProcessor.TagProcessor.__init__(self,templateObj)
+        self._delimRegexs = self.simpleDirectiveReList(r'stop(.*?)')
+
     def translateTag(self, tag):
         indent = self.setting('indentationStep')
         

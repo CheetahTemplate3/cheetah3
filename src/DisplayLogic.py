@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-# $Id: DisplayLogicProcessor.py,v 1.1 2001/08/10 19:26:02 tavis_rudd Exp $
-"""DisplayLogicProcessor class Cheetah's codeGenerator
+# $Id: DisplayLogic.py,v 1.1 2001/08/11 01:03:16 tavis_rudd Exp $
+"""DisplayLogic Processor class Cheetah's codeGenerator
 
 Meta-Data
 ================================================================================
@@ -9,7 +9,7 @@ License: This software is released for unlimited distribution under the
          terms of the Python license.
 Version: $Revision: 1.1 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/10 19:26:02 $
+Last Revision Date: $Date: 2001/08/11 01:03:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
 __version__ = "$Revision: 1.1 $"[11:-2]
@@ -33,7 +33,7 @@ False = (0==1)
 class Error(Exception):
     pass
 
-class DisplayLogicProcessor(TagProcessor.TagProcessor):
+class DisplayLogic(TagProcessor.TagProcessor):
     """A class for processing display logic tags in Cheetah Templates."""
     
     def __init__(self, templateObj):

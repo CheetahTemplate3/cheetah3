@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.29 2001/08/10 22:44:36 tavis_rudd Exp $
+# $Id: Template.py,v 1.30 2001/08/11 01:03:16 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.29 $
+Version: $Revision: 1.30 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/10 22:44:36 $
+Last Revision Date: $Date: 2001/08/11 01:03:16 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.29 $"[11:-2]
+__version__ = "$Revision: 1.30 $"[11:-2]
 
 
 ##################################################
@@ -31,15 +31,16 @@ import os.path                    # used in Template.normalizePath()
 
 # intra-package imports ...
 from SettingsManager import SettingsManager
+from Parser import Parser
 from NameMapper import valueForName     # this is used in the generated code
 from SearchList import SearchList
 import CodeGenerator as CodeGen
 
 from PlaceholderProcessor import PlaceholderProcessor
-from DisplayLogicProcessor import DisplayLogicProcessor
-from SetDirectiveProcessor import SetDirectiveProcessor
-from CacheDirectiveProcessor import CacheDirectiveProcessor, EndCacheDirectiveProcessor
-from StopDirectiveProcessor import StopDirectiveProcessor
+from DisplayLogic import DisplayLogic
+from SetDirective import SetDirective
+from CacheDirective import CacheDirective, EndCacheDirective
+from StopDirective import StopDirective
 
 import ErrorHandlers
 from Delimiters import delimiters as delims
@@ -64,7 +65,7 @@ class RESTART:
     def __init__(self, templateDef):
         self.data = templateDef
     
-class Template(SettingsManager):
+class Template(SettingsManager, Parser):
     """The core template engine: parses, compiles, and serves templates."""
 
     _settings = {
@@ -78,6 +79,8 @@ class Template(SettingsManager):
         'blockMarkerEnd':['<!-- END BLOCK: ',' -->'],
         'includeBlockMarkers': False,
         'placeholderStartToken':'$',
+        'directiveStartToken':'#',
+        'directiveEndToken':'/#',
         
         ## The rest of this stuff is mainly for internal use
         'placeholderMarker':' placeholderTag.',
@@ -182,18 +185,16 @@ class Template(SettingsManager):
             raise TypeError("'file' argument must be a filename or file-like object")
 
         self._templateDef = str( templateDef )
-        self._placeholderREs = {} # must exist before calling self.initializeSettings()
         # by converting to string here we allow other objects such as other Templates
         # to be passed in
 
         ## process the settings
-        self.initializeSettings()
         if kw.has_key('overwriteSettings'):
             # this is intended to be used internally by Nested Templates in #include's
             self._settings = kw['overwriteSettings']
         elif kw.has_key('settings'):
             self.updateSettings(kw['settings'])
-
+       
         ## Setup the searchList of namespaces in which to search for $placeholders
         # + setup a dict of #set directive vars - include it in the searchList
         if kw.has_key('setVars'):
@@ -226,38 +227,61 @@ class Template(SettingsManager):
             
         if os.environ.get('CHEETAH_DEBUG'):
             self._settings['debug'] = True
+
+
+        ##  a hook for calculated settings    
+        self.initializeSettings()       
+
+
+        ## Setup the Parser base-class and the various TagProcessors
+        Parser.__init__(self) # do this before calling self.setupTagProcessors()
+        self.setupTagProcessors()
+
+        ## register the Plugins after everything else has been done, but
+        #  before the template has been compiled.
         for plugin in self._settings['plugins']:
             self._registerCheetahPlugin(plugin)
 
-
-        ## Setup the placeholderRE's for the Parser class
-        # - this may have to be moved up if the TagProcessors require them in their
-        # __init__() methods - they probably won't
-        self.createPlaceholderREs()
-        
         ## Now, start compile if we're meant to
         if not self.setting('delayedCompile'):
             self.compileTemplate()
 
-    def initializeSettings(self):
+    def setupTagProcessors(self):
         """Setup the tag processors."""
         
         placeholderProcessor =  PlaceholderProcessor(self)
         self.placeholderProcessor = placeholderProcessor
         
-        displayLogicProcessor = DisplayLogicProcessor(self)
-        setDirectiveProcessor = SetDirectiveProcessor(self)        
-        stopDirectiveProcessor = StopDirectiveProcessor(self)
-        cacheDirectiveProcessor = CacheDirectiveProcessor(self)
-        endCacheDirectiveProcessor = EndCacheDirectiveProcessor(self)
+        displayLogic = DisplayLogic(self)
+        setDirective = SetDirective(self)        
+        stopDirective = StopDirective(self)
+        cacheDirective = CacheDirective(self)
+        endCacheDirective = EndCacheDirective(self)
 
+        #raw
+        #comments
+        #set !
+        #data
+        #block
+        #macro
+        #include
+        #lazyMacroCalls
+        #explicitMacroCalls
+        #cache !
+        #slurp 3/4
+        #displayLogic 3/4
+        #stop !
+        #placeholders !
+        #unescape placeholders 1/2
+        
+        
         self.updateSettings({
             'preProcessors': [('rawDirectives',
                                CodeGen.preProcessRawDirectives),
                               ('comments',
                                CodeGen.preProcessComments),
                               ('setDirectives',
-                               setDirectiveProcessor.preProcess),
+                               setDirective.preProcess),
                               ('dataDirectives',
                                CodeGen.preProcessDataDirectives),
                               ('blockDirectives',
@@ -271,7 +295,7 @@ class Template(SettingsManager):
 
                               ('lazyMacroCalls',
                                CodeGen.preProcessLazyMacroCalls),
-                              ('lazyMacroCalls',
+                              ('lazyMacroCalls', # get rid of this dbl-call
                                CodeGen.preProcessLazyMacroCalls),
                               ('explicitMacroCalls',
                                CodeGen.preProcessExplicitMacroCalls),
@@ -281,21 +305,21 @@ class Template(SettingsManager):
                               ('comments',
                                CodeGen.preProcessComments),
                               ('setDirectives',
-                               setDirectiveProcessor.preProcess),
+                               setDirective.preProcess),
                               # + do includes after macro calls
                               ('includeDirectives',
                                CodeGen.preProcessIncludeDirectives),
                               
                               ('cacheDirective',
-                               cacheDirectiveProcessor.preProcess),
+                               cacheDirective.preProcess),
                               ('endCacheDirective',
-                               endCacheDirectiveProcessor.preProcess),
+                               endCacheDirective.preProcess),
                               ('slurpDirectives',
                                CodeGen.preProcessSlurpDirective),
                               ('display logic directives',
-                               displayLogicProcessor.preProcess),
+                               displayLogic.preProcess),
                               ('stop directives',
-                               stopDirectiveProcessor.preProcess),
+                               stopDirective.preProcess),
                               ('placeholders',
                                placeholderProcessor.preProcess),
                               ('unescapePlaceholders',
@@ -303,11 +327,11 @@ class Template(SettingsManager):
                               ],
             
             'coreTagProcessors':{'placeholders':placeholderProcessor,
-                                 'displayLogic':displayLogicProcessor,
-                                 'setDirective':setDirectiveProcessor,
-                                 'cacheDirective':cacheDirectiveProcessor,
-                                 'endCacheDirective':endCacheDirectiveProcessor,
-                                 'stopDirective':stopDirectiveProcessor,
+                                 'displayLogic':displayLogic,
+                                 'setDirective':setDirective,
+                                 'cacheDirective':cacheDirective,
+                                 'endCacheDirective':endCacheDirective,
+                                 'stopDirective':stopDirective,
                                  },
             
             
@@ -320,47 +344,6 @@ class Template(SettingsManager):
                             ) # self.updateSettings(...
         
         #end of self.initializeSettings()
-
-
-    def createPlaceholderREs(self):
-        
-        """Setup the regexs for placeholder parsing.  Do it here so all the
-        TagProcessors don't have to create them for themselves.
-
-        All $placeholders are translated into valid Python code by swapping
-        'placeholderStartToken' ($) for 'marker'.  This marker is then used by
-        the parser to find the start of each placeholder and allows $vars in
-        function arg lists to be parsed correctly.  '$x()' becomes '
-        placeholderTag.x()' when it's marked.
-
-        The marker starts with a space to allow $var$var to be parsed correctly.
-        $a$b is translated to --placeholderTag.a placeholderTag.b-- instead of
-        --placeholderTag.aplaceholderTag.b--, which the parser would mistake for
-        a single $placeholder The extra space is removed by the parser."""
-
-        from Parser import escCharLookBehind, \
-             validSecondCharsLookAhead, \
-             nameCharLookAhead
-        from Utilities import escapeRegexChars
-        
-        REs = self._placeholderREs
-        marker = self.setting('placeholderMarker')
-        REs['nameMapperChunk'] = re.compile(
-            marker +
-            r'(?:CACHED\.|REFRESH_[0-9]+(?:_[0-9]+){0,1}\.){0,1}([A-Za-z_0-9\.]+)')
-
-        markerEscaped = escapeRegexChars(marker)
-        markerLookBehind= r'(?:(?<=' + markerEscaped + ')|(?<=' + markerEscaped + '\{))'
-        
-        REs['cachedTags'] = re.compile(
-            markerLookBehind + r'\*' + nameCharLookAhead)
-        REs['refreshTag'] = re.compile(markerLookBehind +
-                                                    r'\s*\*([0-9\.]+?)\*' +
-                                                    nameCharLookAhead)
-        REs['startToken'] = re.compile(
-            escCharLookBehind +
-            escapeRegexChars(self.setting('placeholderStartToken')) +
-            validSecondCharsLookAhead)
 
         
     def searchList(self):
@@ -398,7 +381,7 @@ class Template(SettingsManager):
     ## make an alias
     recompile = compileTemplate
 
-    def _getCodeGeneratorState(self):
+    def state(self):
         """Return a reference to self._codeGeneratorState. This is used by the
         tag processors."""
         return self._codeGeneratorState
@@ -574,13 +557,6 @@ class Template(SettingsManager):
         tagToken, tag = tag.split(settings['tagTokenSeparator'])
         processedTag = settings['coreTagProcessors'][tagToken].processTag(tag)
         return processedTag
-
-
-    def evalPlaceholderString(self, txt):
-        """Return the value of a placeholderstring. This doesn't work with localVars."""
-        searchList = self.searchList()
-        searchList_getMeth = searchList.get # shortcut-namebing in the eval
-        return eval(txt)
         
     def _setTimedRefresh(self, translatedTag, interval):
         """Setup a cache refresh for a $*[time]*placeholder."""

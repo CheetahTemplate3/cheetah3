@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-# $Id: SetDirectiveProcessor.py,v 1.1 2001/08/10 19:26:02 tavis_rudd Exp $
-"""SetDirectiveProcessor class Cheetah's codeGenerator
+# $Id: SetDirective.py,v 1.1 2001/08/11 01:03:16 tavis_rudd Exp $
+"""SetDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
 ================================================================================
@@ -9,7 +9,7 @@ License: This software is released for unlimited distribution under the
          terms of the Python license.
 Version: $Revision: 1.1 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/10 19:26:02 $
+Last Revision Date: $Date: 2001/08/11 01:03:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
 __version__ = "$Revision: 1.1 $"[11:-2]
@@ -33,12 +33,15 @@ False = (0==1)
 class Error(Exception):
     pass
 
-class SetDirectiveProcessor(TagProcessor.TagProcessor):
+class SetDirective(TagProcessor.TagProcessor):
     """A class for processing display logic tags in Cheetah Templates."""
     
     _token = 'setDirective'
     _tagType = TagProcessor.EXEC_TAG_TYPE
-    _delimRegexs = [delimiters['setDirective'],]
+
+    def __init__(self, templateObj):
+        TagProcessor.TagProcessor.__init__(self,templateObj)
+        self._delimRegexs = self.simpleDirectiveReList(r'set[\f\t ]+(.+?)')
                     
     def translateTag(self, tag):
         """generate python code from setDirective tags, and register the vars with

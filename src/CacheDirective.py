@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-# $Id: CacheDirectiveProcessor.py,v 1.2 2001/08/10 19:26:02 tavis_rudd Exp $
-"""CacheDirectiveProcessor & EndCacheDirectiveProcessor classes Cheetah's
+# $Id: CacheDirective.py,v 1.1 2001/08/11 01:03:16 tavis_rudd Exp $
+"""CacheDirective & EndCacheDirective Processor classes Cheetah's
 codeGenerator
 
 Meta-Data
@@ -8,19 +8,19 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.1 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/10 19:26:02 $
+Last Revision Date: $Date: 2001/08/11 01:03:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.1 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
+import re
 
 # intra-package imports ...
 import TagProcessor
-from Delimiters import delimiters
 import PlaceholderProcessor
 ##################################################
 ## CONSTANTS & GLOBALS ##
@@ -34,25 +34,31 @@ False = (0==1)
 class Error(Exception):
     pass
 
-class CacheDirectiveProcessor(TagProcessor.TagProcessor):
+class CacheDirective(TagProcessor.TagProcessor):
     _tagType = TagProcessor.EMPTY_TAG_TYPE
     _token = 'cacheDirective'
-    _delimRegexs = [delimiters['cacheDirectiveStartTag'],]    
 
+    def __init__(self, templateObj):
+        TagProcessor.TagProcessor.__init__(self,templateObj)
+        self._delimRegexs = self.simpleDirectiveReList(r'cache(.*?)')
+        
     def translateTag(self, tag):
         tag = tag.strip()
         if not tag:
             self.state()['defaultCacheType'] = \
-                                       STATIC_CACHE
+                                       PlaceholderProcessor.STATIC_CACHE
         else:
             self.state()['defaultCacheType'] = \
-                                       TIMED_REFRESH_CACHE
+                                       PlaceholderProcessor.TIMED_REFRESH_CACHE
             self.state()['cacheRefreshInterval'] = float(tag)
 
         
-class EndCacheDirectiveProcessor(CacheDirectiveProcessor):
+class EndCacheDirective(CacheDirective):
     _token = 'endCacheDirective'
-    _delimRegexs = [delimiters['cacheDirectiveEndTag'],]    
-    
+
+    def __init__(self, templateObj):
+        CacheDirective.__init__(self,templateObj)
+        self._delimRegexs = self.simpleDirectiveReList(r'end[\f\t ]+cache(.*?)')
+        
     def translateTag(self, tag):
-        self.state()['defaultCacheType'] = NoDefault
+        self.state()['defaultCacheType'] = None

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: TagProcessor.py,v 1.5 2001/08/10 22:44:36 tavis_rudd Exp $
+# $Id: TagProcessor.py,v 1.6 2001/08/11 01:03:16 tavis_rudd Exp $
 """Tag Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/10 22:44:36 $
+Last Revision Date: $Date: 2001/08/11 01:03:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -64,7 +64,8 @@ class TagProcessor(Parser):
    
     def initializeTemplateObj(self):
         """Initialize the templateObj so that all the necessary attributes are
-        in place for the tag-processing stage
+        in place for the tag-processing stage.  It is only called for processors
+        that are registered as 'coreTagProcessors'.
 
         This must be called by subclasses"""
         templateObj = self.templateObj()
