@@ -10,17 +10,19 @@ Cheetah TODO list
 
 Requirements for 1.0
 =========================================================================
+FIXED 
 - "cheetah test" problem: Python 2.3(b1) causes 16 failures in
   SyntaxAndOutput.py because the result of boolean expressions is now True and
   False instead of 1 and 0 (or 'True' and 'False' instead of '1' and '0' when
   used as placeholders).  The same thing happens with $True and $False.  Add a
   preprocessing step to convert output to '1' and '0' before comparing to the
-  control string.
+  control string. 
 
 - "cheetah test" problem: subcommands fail mysteriously on Windows.  Rewrite
   to avoid using subcommands.  Instead, set sys.argv and call the appropriate
   main() for each test.
 
+FIXED IN BOTH THE PY AND C VERSIONS
 - Simplify NameMapper.py while maintaining new behavior (ignore dictionary
   attributes/methods when searching for match of first chunk in searchList
   lookup).  Modify _namemapper.c to conform.  Make valueForKey error
@@ -105,12 +107,14 @@ Other TODO Items
 
 - implement some better error handling for misformed #for, #if, #try directives,
   etc.  At the moment these errors are not caught until Python executes the
-  code.
+  code. @@TR: not a high priority as the python barfs suffice.
 
+FIXED
 - create better error message for bad code such as:
   ##cache
   This is a cached region.  $voom
   #end cache
+  
 
 - create a better error message for invalid syntax when a $var inside a 
   directive is enclosed in ${} or $(). E.g.:
@@ -120,9 +124,6 @@ Other TODO Items
   Parser.eatComment() and Parser.eatMultiLineComment().  It's already
   working if the line contains 'STUFF#slurp   ## comment'.  Need to make
   it work for 'STUFF    ## comment' (but retain the EOL newline).  
-
-- 'python setup.py uninstall'.  This may require hacking an uninstall feature
-  into distutils.
 
 - 'errorCatcher None' to stop catching errors in the middle of a template.
 
@@ -275,6 +276,8 @@ methods and include files.
 
 Upload File
 ========================================================================
+@@TR: This is way outside Cheetah's scope!
+
 A mixin method in Cheetah.Utils (for Template) that handles file uploads --
 these are too complicated for .webInput().  The method should do a "safe"
 file upload; e.g., http://us3.php.net/manual/en/features.file-upload.php ,
@@ -334,7 +337,8 @@ http://spyce.sourceforge.net/doc-tag_new.html
 
 Test Suite
 ================================================================================
-- test cases for the SkeletonPage framework
+- test cases for the SkeletonPage framework @@TR: I have no interest in this as
+  I plan on removing SkeletonPage.
 - add cases that test the cheetah-compile script
 - add cases that test the integration with WebKit.  Since these must be called
   from a running WebKit server, make a servlet that runs the tests and outputs
