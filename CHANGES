@@ -1,7 +1,7 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
-0.9.16a1 (??? 2003)
+0.9.16a1 (Jan 6, 2005)
   - fixed a unicode bug in Compiler.py [TR]
   - added new EncodeUnicode filter that Rene Pijlman contributed (I optimized it
     slightly) and made it the default filter for all templates. [TR]
