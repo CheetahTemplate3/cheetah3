@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.34 2002/05/14 23:18:25 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.35 2002/06/05 23:02:30 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.34 $
+Version: $Revision: 1.35 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/05/14 23:18:25 $
+Last Revision Date: $Date: 2002/06/05 23:02:30 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.34 $"[11:-2]
+__revision__ = "$Revision: 1.35 $"[11:-2]
 
 
 ##################################################
@@ -1909,10 +1909,6 @@ $sep$letter#slurp
 """,
                     "a, b, c")
 
-
-#################################################
-## TO FINISH
-
 class FilterDirective(OutputTest):
     
     def test1(self):
@@ -2064,6 +2060,15 @@ class GetVar(OutputTest):               # Template.getVar()
                     "1234")
 
 
+class MiscComplexSyntax(OutputTest):
+    def test1(self):
+        """Complex use of {},[] and () in a #set expression
+        ----
+        #set $c = {'A':0}[{}.get('a', {'a' : 'A'}['a'])]
+        $c
+        """
+        self.verify("#set $c = {'A':0}[{}.get('a', {'a' : 'A'}['a'])]\n$c",
+                    "0")
 
 ##################################################
 ## CREATE CONVERTED EOL VERSIONS OF THE TEST CASES 
