@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: setup.py,v 1.2 2001/06/13 05:10:16 tavis_rudd Exp $
+# $Id: setup.py,v 1.3 2001/07/13 23:26:22 tavis_rudd Exp $
 """A setup module for the Cheetah package, based on the disutils module
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/13 05:10:16 $
+Last Revision Date: $Date: 2001/07/13 23:26:22 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -78,6 +78,7 @@ if __name__ == '__main__':
                 'Cheetah.Templates',
                 'Cheetah.Plugins',
                 'Cheetah.Macros',
+                'Cheetah.Tests',
                 ]
 
     setup (name = "Cheetah",
