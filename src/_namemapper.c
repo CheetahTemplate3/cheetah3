@@ -121,7 +121,7 @@ PyNamemapper_valueFromSearchList(PyObject *searchList,
       return theValue;
     } else if (PyErr_Occurred() != NotFound) {
       return NULL;
-    }
+    } 
   }
   return NULL;	/* the first key wasn't found in any namespace -- NotFound is raised */
 }
@@ -214,7 +214,8 @@ namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
   int executeCallables = 0;
 
   char *nameCopy = NULL;
-  char *pa = NULL;
+  char *tmpPointer1 = NULL;
+  char *tmpPointer2 = NULL;
   char c;
   char *nameChunks[MAXCHUNKS];
   int numChunks;
@@ -229,13 +230,14 @@ namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
   }
 
   nameCopy = malloc(strlen(name) + 1);
-  pa = nameCopy;
-  while ((c = *name++)) {
+  tmpPointer1 = name;
+  tmpPointer2 = nameCopy;
+  while ((c = *tmpPointer1++)) {
     if (!isspace(c)) {
-      *pa++ = c;
+      *tmpPointer2++ = c;
     }
   }
-  *pa = '\0';
+  *tmpPointer2 = '\0';
   numChunks = getNameChunks(nameChunks, nameCopy);
 
   theValue = PyNamemapper_valueFromSearchList(searchList, nameChunks, numChunks, executeCallables);
@@ -243,6 +245,7 @@ namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
     free(nameCopy);
     return theValue;
   } else if (PyErr_Occurred() == NotFound) {
+    PyErr_Clear();
     free(nameCopy);
     notFound(name);
   } else {
@@ -273,7 +276,7 @@ void init_namemapper()
   
   /* add symbolic constants to the module */
   d = PyModule_GetDict(m);
-  NotFound = Py_BuildValue("s", "namemapper.NotFound");   /* export exception */
+  NotFound = Py_BuildValue("s", "NameMapper.NotFound");   /* export exception */
   PyDict_SetItemString(d, "NotFound", NotFound);       /* add more if need */
   
   /* check for errors */
