@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.19 2002/10/07 18:46:47 tavis_rudd Exp $
+# $Id: Filters.py,v 1.20 2003/11/20 22:14:59 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -10,12 +10,12 @@ would otherwise require a real template object).
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.19 $
+Version: $Revision: 1.20 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/10/07 18:46:47 $
+Last Revision Date: $Date: 2003/11/20 22:14:59 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.19 $"[11:-2]
+__revision__ = "$Revision: 1.20 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -85,8 +85,7 @@ class Filter:
         
     def filter(self, val, **kw):
         
-        """Replace None with an empty string.  Reimplement this method if you
-        want more advanced filterting."""
+        """Reimplement this method if you  want more advanced filterting."""
         
         return str(val)
 
@@ -104,8 +103,32 @@ class ReplaceNone(Filter):
         if val is None:
             return ''
         return str(val)
+#####
+class EncodeUnicode(Filter):
+    def filter(self, val, **kw):
+        """Encode Unicode strings, by default in UTF-8.
 
-
+        >>> import Cheetah.Template
+        >>> t = Cheetah.Template.Template('''
+        ... $myvar
+        ... ${myvar, encoding='utf16'}
+        ... ''', searchList=[{'myvar': u'Asni\xe8res'}],
+        ... filter='EncodeUnicode')
+        >>> print t
+        """
+        
+        if kw.has_key('encoding'):
+            encoding = kw['encoding']
+        else:
+            encoding = 'utf8'
+            
+        if type(val)==type(u''):
+            filtered = val.encode(encoding)
+        elif val is None:
+            filtered = ''
+        else:
+            filtered = str(val)
+        return filtered
 #####
 class MaxLen(Filter):
     def filter(self, val, **kw):
