@@ -14,7 +14,10 @@ Requirements for 1.0
   attributes/methods when searching for match of first chunk in searchList
   lookup).  Modify _namemapper.c to conform.  Make valueForKey error
   messages more meaningful: for $placeholder.html it raises "NotFound: html";
-  it should raise "NotFound: 'html' in $placeholder.html". (TR)
+  it should raise "NotFound: 'html' in $placeholder.html". Consider passing
+  the entire unparsed placeholder tag to all NameMapper functions for use in
+  a potential error message, the same way we're passing it to the output
+  filter.  Also consider passing it to the errorCatcher.  (TR)
 - update User's Guide about changes to SkeletonPage (no more #settings,
   etc) (TR)
 - Decide on Cheetah's 1.0 license and update the Users' Guide.  Cheetah
