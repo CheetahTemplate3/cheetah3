@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.113 2004/01/15 00:05:00 tavis_rudd Exp $
+# $Id: Template.py,v 1.114 2005/01/03 19:25:46 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,15 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.113 $
+Version: $Revision: 1.114 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2004/01/15 00:05:00 $
+Last Revision Date: $Date: 2005/01/03 19:25:46 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.113 $"[11:-2]
-
-##################################################
-## DEPENDENCIES
+__revision__ = "$Revision: 1.114 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import sys                        # used in the error handling code
@@ -31,7 +28,6 @@ except ImportError:
 from types import StringType, ClassType
 import time                       # used in the cache refresh code
 from time import time as currentTime # used in the cache refresh code
-import types                      # used in the constructor
 import os.path                    # used in Template.normalizePath()
 from os.path import getmtime, exists
 from random import randrange
@@ -39,36 +35,26 @@ from tempfile import gettempdir, mktemp
 import imp
 import traceback
 
-import __builtin__
-
-# Base classes for Template (intra-package imports)
-from SettingsManager import SettingsManager  
-from Servlet import Servlet                 
+# Base classes for Template
+from Cheetah.SettingsManager import SettingsManager  
+from Cheetah.Servlet import Servlet                 
 from Cheetah.Utils.WebInputMixin import WebInputMixin
 
 # More intra-package imports ...
-import ErrorCatchers              # for placeholder tags
-import Filters                          # the output filters
-from DummyTransaction import DummyTransaction
-from NameMapper import NotFound, valueFromSearchList, valueForName # this is used in the generated code
-from Utils import VerifyType             # Used in Template.__init__
-from Utils.Misc import checkKeywords     # Used in Template.__init__
-from Utils.Indenter import Indenter      # Used in Template.__init__ and for
-                                         # placeholders
+from Cheetah import ErrorCatchers              # for placeholder tags
+from Cheetah import Filters                          # the output filters
+from Cheetah.DummyTransaction import DummyTransaction
+from Cheetah.NameMapper import NotFound, valueFromSearchList, valueForName # this is used in the generated code
+from Cheetah.NameMapper import valueFromFrameOrSearchList # this is used in the generated code
+from Cheetah.Utils import VerifyType             # Used in Template.__init__
+from Cheetah.Utils.Misc import checkKeywords     # Used in Template.__init__
+from Cheetah.Utils.Indenter import Indenter      # Used in Template.__init__ and for
+                                                 # placeholders
 
-##################################################
-## CONSTANTS & GLOBALS
-
-try:
-    True, False
-except NameError:
-    True, False = (1==1),(1==0)
-
+# function name aliase in used dynamically loaded templates
 VFS = valueFromSearchList
+VFFSL = valueFromFrameOrSearchList
 VFN = valueForName
-
-##################################################
-## CLASSES
 
 class NoDefault:
     pass
@@ -85,7 +71,6 @@ class Template(SettingsManager, Servlet, WebInputMixin):
     _legalKWs = ['_globalSetVars', '_preBuiltSearchList']
 
     def __init__(self, source=None, searchList=[], file=None,
-                 settings={},           # user settings that are visible in templates
                  filter='EncodeUnicode', # which filter from Cheetah.Filters
                  filtersLib=Filters,
                  errorCatcher=None,
@@ -97,8 +82,8 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         """Reads in the template definition, sets up the namespace searchList,
         processes settings, then compiles.
 
-        Configuration settings should be passed in as a dictionary via the
-        'settings' keyword.
+        Compiler configuration settings should be passed in as a dictionary via
+        the 'compilerSettings' keyword.
 
         This method can also be called without arguments in cases where it is
         called as a baseclass from a pre-compiled Template servlet."""
@@ -123,7 +108,6 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             vt(source, 'source', [N,S,U], 'string or None')
             vt(searchList, 'searchList', [L,T], 'list or tuple')
             vt(file, 'file', [N,S,U,F], 'string, file open for reading, or None')
-            vt(settings, 'settings', [D], 'dictionary')
             vtc(filter, 'filter', [S,C], 'string or class', 
                 Filters.Filter,
                 '(if class, must be subclass of Cheetah.Filters.Filter)')
@@ -141,7 +125,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         if source is not None and file is not None:
             raise TypeError("you must supply either a source string or the" + 
                             " 'file' keyword argument, but not both")
-
+            
         
         ##################################################           
         ## Do superclass initialization.
@@ -156,7 +140,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         self._cacheData = {}
         self._generatedModuleCode = None
         self._generatedClassCode = None
-        if source or file:
+        if source is not None or file is not None:
             self.compile(source, file)
 
         
@@ -179,7 +163,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             self._searchList = [self._globalSetVars]            
             self._searchList.extend(list(searchList))
             self._searchList.append( self )
-                
+
         ##################################################
         ## setup the ouput filters
         self._filtersLib = filtersLib
@@ -347,7 +331,10 @@ class Template(SettingsManager, Servlet, WebInputMixin):
 
     ##################################################
     ## internal methods -- not to be called by end-users
-
+    ## @@TR 2005-01-01:  note that I plan to get rid of all of this in a future
+    ## release     
+    
+    
     def _bindCompiledMethod(self, methodCompiler):
         
         """Called by the Compiler class, to add new methods at runtime as the
@@ -367,10 +354,11 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             
 
         genMeth = self._bindFunctionAsMethod(locals()[methodName])
-        
+
         setattr(self,methodName, genMeth)
         if methodName == 'respond':
             self.__str__ = genMeth
+            self.__repr__ = genMeth
 
           
     def _bindFunctionAsMethod(self, function):
@@ -441,8 +429,9 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         """Used by the Compiler to do correct importing from Cheetah templates
         when the template is compiled via the Template class' interface rather
         than via 'cheetah compile'.
+
+        @@TR 2005-01-01: I really want to get away from this approach!
         """
-        
         tmpFilename = self._genTmpFilename()
         fp = open(tmpFilename,'w')
         fp.write(contents)
@@ -524,14 +513,51 @@ class Template(SettingsManager, Servlet, WebInputMixin):
                     file = open(initPy, 'w')
                     file.write('#')
                     file.close()
-            fp, pathname, stuff = imp.find_module(moduleName, [directory])
-            module = imp.load_module(fullModuleName, fp, pathname, stuff)
+            if os.name != 'java':
+                fp, pathname, stuff = imp.find_module(moduleName, [directory])
+                module = imp.load_module(fullModuleName, fp, pathname, stuff)
+            else:
+                module = self._jython_importModuleFromDirectory(fullModuleName, moduleName,
+                                                                directory)
         finally:
             if fp is not None:
                 fp.close()
                 
         return module
 
+    def _jython_importModuleFromDirectory(self, fullModuleName, moduleName,
+                                          directory):
+        fp = None
+        try:
+            try:
+                fp, pathname, stuff = imp.find_module(moduleName, [directory])
+                module = sys.modules.get(fullModuleName, None)
+                if module is not None:
+                    code = "del " + fullModuleName
+                    self._importCode(code, "_jython_importModuleFromDirectory_hlp")
+
+                (suffix, mode, type) = stuff
+                if type == imp.PY_SOURCE:
+                    module = self._importCode(fp, fullModuleName, 1)
+
+                return module
+
+            except:
+                module = imp.new_module(fullModuleName)
+                sys.modules[fullModuleName] = module
+                return module
+        finally:
+            if fp is not None:
+                fp.close()
+
+
+    def _importCode(self, code, name, add_to_sys_modules=0):
+        module = imp.new_module(name)
+        if add_to_sys_modules:
+            sys.modules[name] = module
+        exec code in module.__dict__
+
+        return module
 
 T = Template   # Short and sweet for debugging at the >>> prompt.
 
