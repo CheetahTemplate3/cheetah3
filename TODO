@@ -63,6 +63,13 @@ Other TODO Items
 
 - 'errorCatcher None' to stop catching errors in the middle of a template.
 
+- Utils.WebInputMixin: factor out Cheetah-specific code so it can be used in
+  non-Cheetah applications.  Don't modify the searchList: have a Template
+  wrapper method do that.  Consider turning it into a function that does not
+  require 'self'.  Consider making Webware-specific code into plugins so that,
+  e.g., other cookie-handling methods can be grafted in.  Maybe use callback
+  classes like the planned rewrite for CheetahWrapper.  Low priority.  (MO)
+
 
 Dump Tools
 ==========
