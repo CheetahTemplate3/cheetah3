@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: WebInputMixin.py,v 1.2 2002/06/10 02:56:22 hierro Exp $
+# $Id: WebInputMixin.py,v 1.3 2002/08/10 20:11:18 hierro Exp $
 """Mixin for Cheetah.Servlet for importing web transaction variables in bulk.
 
 This works for GET/POST fields both in Webware servlets and in CGI scripts, 
@@ -160,12 +160,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2002/03/17
-Last Revision Date: $Date: 2002/06/10 02:56:22 $
+Last Revision Date: $Date: 2002/08/10 20:11:18 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.2 $"[11:-2]
+__revision__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -282,6 +282,7 @@ class WebInputMixin:
         defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00, debug=False):
         """Import web transaction variables in bulk.  See module docstring.
         """
+        src = src.lower()
         isCgi = not self.isControlledByWebKit
         if   isCgi and src in ('f', 'v'):
             form = cgi.FieldStorage()
