@@ -13,6 +13,12 @@ Please initial your changes and add a date for each release
    - fixed bug with adding Python's __builtins__ to the local vars list (TR)
    - fixed bug with #echo (TR)
    - fixed bug that was preventing ${a, $b=1234} from working like ${a, b=1234} (TR)
+   - Cheetah.Filters.Strip: new filter to strip leading/trailing whitespace
+     but preserve newlines.  Suitable for #filter directive or (possible)
+     future #sed directive. (MO)
+   - Cheetah.Filters.StripSqueeze: new filter to canonicalize all whitespace
+     chunks to ' '.  Also removes all newlines (joining multi-line input into
+     one long line), and leading/trailing whitespace from the final result. (MO)
 
 0.9.9a6 (Nov 6, 2001) 
    - fixed bug with quotations in longer constant string chunks (TR)

@@ -1,19 +1,21 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.7 2001/11/10 20:40:56 hierro Exp $
+# $Id: Filters.py,v 1.8 2001/11/10 22:28:36 hierro Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/11/10 20:40:56 $
+Last Revision Date: $Date: 2001/11/10 22:28:36 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
+
+from cStringIO import StringIO      # Used by Strip filter.
 
 # intra-package imports ...
 
@@ -26,9 +28,6 @@ False = (0==1)
 # Additional entities WebSafe knows how to transform.  No need to include
 # '<', '>' or '&' since those will have been done already.
 webSafeEntities = {' ': '&nbsp;', '"': '&quot;'}
-
-##################################################
-## CLASSES
 
 class Error(Exception):
     pass
@@ -51,6 +50,9 @@ class DummyTemplate:
 
 _dummyTemplateObj = DummyTemplate()
 
+
+##################################################
+## BASE CLASS
 
 class Filter:
     """A baseclass for the Cheetah Filters."""
@@ -79,10 +81,13 @@ class Filter:
             return ''
         return str(val)
 
-    
 ## make an alias
 ReplaceNone = Filter
 
+##################################################
+## ENHANCED FILTERS
+    
+#####
 class MaxLen(Filter):
     def filter(self, val, **kw):
         """Replace None with '' and cut off at maxlen."""
@@ -92,6 +97,7 @@ class MaxLen(Filter):
         return output
 
 
+#####
 class Pager(Filter):
     def __init__(self, templateObj=_dummyTemplateObj):
         Filter.__init__(self, templateObj)
@@ -138,6 +144,7 @@ class Pager(Filter):
         return output
 
 
+#####
 class WebSafe(Filter):
     """Escape HTML entities in $placeholders.
     """
@@ -162,25 +169,65 @@ class WebSafe(Filter):
         return s
 
 
+#####
 class Strip(Filter):
-    """Strip leading/trailing whitespace but preserve trailing newline.
+    """Strip leading/trailing whitespace but preserve newlines.
 
-    If 'val' is a multi-line value, only the leading whitespace from the
-    first line and the trailing whitespace from the last line will be
-    removed.  This makes it suitable as a '#sed' filter ('#sed' has not been
-    implemented yet) but limis its usefulness as a '#filter' filter.
+    This filter goes through the value line by line, removing leading and
+    trailing whitespace on each line.  It does not strip newlines, so every
+    input line corresponds to one output line, with its trailing newline intact.
+
+    We do not use val.split('\n') because that would squeeze out consecutive
+    blank lines.  Instead, we search for each newline individually.  This
+    makes us unable to use the fast C .split method, but it makes the filter
+    much more widely useful.
+
+    This filter is intended to be usable both with the #filter directive and
+    with the proposed #sed directive (which has not been ratified yet.)
     """
     def filter(self, val, **kw):
-        val = Filter.filter(self, val, **kw)
-        if val[-1:] == '\n':
-            val = val[:-1]
-            eol = '\n'
-        else:
-            eol = ''
-        return val.strip() + eol
+        s = Filter.filter(self, val, **kw)
+        result = StringIO()
+        start = 0   # The current line will be s[start:end].
+        while 1: # Loop through each line.
+            end = s.find('\n', start)  # Find next newline.
+            if end == -1:  # If no more newlines.
+                break
+            chunk = s[start:end].strip()
+            result.write(chunk)
+            result.write('\n')
+            start = end + 1
+        # Write the unfinished portion after the last newline, if any.
+        chunk = s[start:].strip()
+        result.write(chunk)
+        return result.getvalue()
 
+#####
+class StripSqueeze(Filter):
+    """Canonicalizes every chunk of whitespace to a single space.
 
-# class StripSqueeze -- same as strip but also convert newlines -> ' '.
-# Implementation delayed till we decide if there's a use for it.
+    Strips leading/trailing whitespace.  Removes all newlines, so multi-line
+    input is joined into one ling line with NO trailing newline.
+    """
+    def filter(self, val, **kw):
+        s = Filter.filter(self, val, **kw)
+        s = val.split()
+        return " ".join(s)
+    
+##################################################
+## MAIN ROUTINE -- testing
+    
+def test():
+    s1 = "abc <=> &"
+    s2 = "   asdf  \n\t  1  2    3\n"
+    print "WebSafe INPUT:", `s1`
+    print "      WebSafe:", `WebSafe().filter(s1)`
+    
+    print
+    print " Strip INPUT:", `s2`
+    print "       Strip:", `Strip().filter(s2)`
+    print "StripSqueeze:", `StripSqueeze().filter(s2)`
 
+if __name__ == "__main__":  test()
+    
 # vim: shiftwidth=4 tabstop=4 expandtab

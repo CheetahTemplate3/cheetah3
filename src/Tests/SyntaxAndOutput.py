@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.14 2001/11/10 19:52:35 hierro Exp $
+# $Id: SyntaxAndOutput.py,v 1.15 2001/11/10 22:28:36 hierro Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.14 $
+Version: $Revision: 1.15 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/10 19:52:35 $
+Last Revision Date: $Date: 2001/11/10 22:28:36 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.14 $"[11:-2]
+__version__ = "$Revision: 1.15 $"[11:-2]
 
 
 ##################################################
@@ -108,8 +108,9 @@ defaultTestNameSpace = {
     'zero':0,
     'tenDigits': 1234567890,
     'webSafeTest': 'abc <=> &',
-    'strip1': '  \t\n   strippable whitespace   \t\t  \n',
-    'strip2': '  \t\n   strippable whitespace   \t\t  ',
+    'strip1': '  \t   strippable whitespace   \t\t  \n',
+    'strip2': '  \t   strippable whitespace   \t\t  ',
+    'strip3': '  \t   strippable whitespace   \t\t\n1 2  3\n',
     
     'blockToBeParsed':"""$numOne $numTwo""",
     'includeBlock2':"""$numOne $numTwo $aSetVar""",
@@ -1817,6 +1818,18 @@ class FilterDirective(OutputTest):
         """
         self.verify("#filter Strip\n$strip2",
                     "strippable whitespace")
+
+    def test10(self):
+        """#filter Strip -- multi-line
+        """
+        self.verify("#filter Strip\n$strip3",
+                    "strippable whitespace\n1 2  3\n")
+
+    def test11(self):
+        """#filter StripSqueeze -- canonicalize all whitespace to ' '
+        """
+        self.verify("#filter StripSqueeze\n$strip3",
+                    "strippable whitespace 1 2 3")
 
 
 class EchoDirective(OutputTest):
