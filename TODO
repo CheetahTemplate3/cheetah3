@@ -10,17 +10,20 @@ Languague Specification
 ================================================================================
 
 - finish the #cache directive's varyBy keyword
+- write a formalized grammar for Cheetah in BNF 
 
 Implementation
 ================================================================================
 
 - redesign and implement the Servlet Factory for Webware so the #extend
   directive will work with .tmpl files as well as .py files
+- implement the #cache directive's varyBy keyword
 
 Test Suite
 ================================================================================
-- write script that will run the test cases with both Python 2.0 and 2.1
 - test cases for the SkeletonPage framework
+- add cases that test the cheetah-compile script
+- add cases that test the integration with WebKit
 
 Documentation
 ================================================================================
@@ -29,13 +32,15 @@ Documentation
 
 Website
 ================================================================================
-- start a 3rd party page
 - automate the documentation update 
 - See if we can get WebKit working on Sourceforge...
 
 Examples
 ================================================================================
 - create some non-html code generation examples
+  - SQL
+  - LaTeX
+  - form email
 
 Packaging
 ================================================================================
