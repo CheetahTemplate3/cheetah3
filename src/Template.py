@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.104 2002/10/06 00:09:44 tavis_rudd Exp $
+# $Id: Template.py,v 1.105 2002/10/07 18:46:47 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.104 $
+Version: $Revision: 1.105 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/10/06 00:09:44 $
+Last Revision Date: $Date: 2002/10/07 18:46:47 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.104 $"[11:-2]
+__revision__ = "$Revision: 1.105 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -179,17 +179,14 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         ## setup the ouput filters
         self._filtersLib = filtersLib
         self._filters = {}
-        if filter:
-            if type(filter) == StringType:
-                filterName = filter
-                klass = getattr(self._filtersLib, filterName)
-            else:
-                klass = filter
-                filterName = klass.__name__
-            self._currentFilter = self._filters[filterName] = klass(self).filter
+        if type(filter) == StringType:
+            filterName = filter
+            klass = getattr(self._filtersLib, filterName)
         else:
-            self._currentFilter = str
-
+            klass = filter
+            filterName = klass.__name__
+            
+        self._currentFilter = self._filters[filterName] = klass(self).filter
         self._initialFilter = self._currentFilter
 
         ##################################################

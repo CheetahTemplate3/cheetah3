@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.59 2002/10/05 21:56:35 tavis_rudd Exp $
+# $Id: Parser.py,v 1.60 2002/10/07 18:46:47 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.59 $
+Version: $Revision: 1.60 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/10/05 21:56:35 $
+Last Revision Date: $Date: 2002/10/07 18:46:47 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.59 $"[11:-2]
+__revision__ = "$Revision: 1.60 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1123,10 +1123,9 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
                                               )
             codeChunk = 'self.' + methodName + '(localsDict=locals())'
 
-        self.addFilteredChunk( codeChunk + restOfEnclosure )
-        self.appendToPrevChunk(' # generated from ' + repr(rawPlaceholder) )
+        self.addFilteredChunk( codeChunk + restOfEnclosure, rawPlaceholder)
         if self.setting('outputRowColComments'):
-            self.appendToPrevChunk(' at line %s, col %s' % lineCol + '.')
+            self.appendToPrevChunk(' # from line %s, col %s' % lineCol + '.')
         if cacheInfo:
             self.endCacheRegion()
 
@@ -1505,7 +1504,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.getWhiteSpace()
         expr = self.getExpression()
         self.closeDirective(False, self.pos())
-        self.addFilteredChunk(expr)
+        self.addFilteredChunk(expr, rawExpr=expr)
 
     def eatSet(self):
         lineClearToStartToken = self.lineClearToStartToken()

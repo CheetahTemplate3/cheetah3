@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.18 2002/10/01 17:52:02 tavis_rudd Exp $
+# $Id: Filters.py,v 1.19 2002/10/07 18:46:47 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -10,12 +10,12 @@ would otherwise require a real template object).
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.18 $
+Version: $Revision: 1.19 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/10/01 17:52:02 $
+Last Revision Date: $Date: 2002/10/07 18:46:47 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.18 $"[11:-2]
+__revision__ = "$Revision: 1.19 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -88,16 +88,24 @@ class Filter:
         """Replace None with an empty string.  Reimplement this method if you
         want more advanced filterting."""
         
+        return str(val)
+
+
+##################################################
+## ENHANCED FILTERS
+
+#####
+class ReplaceNone(Filter):
+    def filter(self, val, **kw):
+        
+        """Replace None with an empty string.  Reimplement this method if you
+        want more advanced filterting."""
+        
         if val is None:
             return ''
         return str(val)
 
-## make an alias
-ReplaceNone = Filter
 
-##################################################
-## ENHANCED FILTERS
-    
 #####
 class MaxLen(Filter):
     def filter(self, val, **kw):

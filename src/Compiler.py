@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.47 2002/10/05 23:57:18 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.48 2002/10/07 18:46:45 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.47 $
+Version: $Revision: 1.48 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/10/05 23:57:18 $
+Last Revision Date: $Date: 2002/10/07 18:46:45 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.47 $"[11:-2]
+__revision__ = "$Revision: 1.48 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -324,8 +324,10 @@ class MethodCompiler(SettingsManager, GenUtils):
     def addWriteChunk(self, chunk):
         self.addChunk('write(' + chunk + ')')
 
-    def addFilteredChunk(self, chunk):
-        self.addWriteChunk('filter(' + chunk + ')')
+    def addFilteredChunk(self, chunk, rawExpr=None):
+        """
+        """
+        self.addWriteChunk('filter(' + chunk + ', rawExpr=' + repr(rawExpr) +')')
 
     def addStrConst(self, strConst):
         self.appendToPrevStrConst(strConst)
