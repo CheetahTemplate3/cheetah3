@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.12 2001/12/05 06:32:38 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.13 2001/12/05 08:34:47 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/12/05 06:32:38 $
+Last Revision Date: $Date: 2001/12/05 08:34:47 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.12 $"[11:-2]
+__version__ = "$Revision: 1.13 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -46,6 +46,8 @@ class CheetahCompile:
     SERVLET_EXTENSION = '.py'
     SERVLET_BACKUP_EXT = '.py_bak'
     GENERATED_EXT = '.html'
+    MAKE_BACKUPS = True
+    VERBOSE = False
     
     def __init__(self, scriptName=os.path.basename(sys.argv[0]),
                  cmdLineArgs=sys.argv[1:]):
@@ -61,7 +63,7 @@ class CheetahCompile:
     def run(self):
         """The main program controller."""
         try:
-            opts, args = getopt.getopt( self._cmdLineArgs, 'hpdRw', [])
+            opts, args = getopt.getopt( self._cmdLineArgs, 'hpdRwv', [])
 
         except getopt.GetoptError, v:
             # print help information and exit:
@@ -85,6 +87,8 @@ class CheetahCompile:
                 self.printGenerated = True
             if o in ('-w',):
                 self.writeGenerated = True
+            if o in ('-v',):
+                self.VERBOSE = True
                     
         if not args and self.compileDirectories:
             args = ["."]
@@ -110,6 +114,7 @@ class CheetahCompile:
         else:
             self.compileFile(fileName)
             
+         
     def compileFile(self, fileName):
         """Compile an single Cheetah file.  """
 
@@ -128,16 +133,25 @@ class CheetahCompile:
 
         if not self.printGenerated or self.writeGenerated:
             outputModuleFilename = fileNameMinusExt + self.SERVLET_EXTENSION
-            if os.path.exists(outputModuleFilename):
+
+            if self.MAKE_BACKUPS and os.path.exists(outputModuleFilename):
+                if self.VERBOSE:
+                    print 'Backing up %s before compiling %s' % (srcFile,
+                                                                 outputModuleFilename)
+                
                 shutil.copyfile(outputModuleFilename,
                                 fileNameMinusExt + self.SERVLET_BACKUP_EXT)
+            if self.VERBOSE:
+                print 'Compiling %s -> %s' % (srcFile,
+                                              className + self.SERVLET_EXTENSION)
+                
             fp = open(outputModuleFilename,'w')
             fp.write(genCode)
             fp.close()
             
         if self.printGenerated:
             print genCode
-
+            
     def generate(self, fileNameMinusExt):
         ## @@IB: this sys.path is a hack
         sys.path = [os.path.dirname(fileNameMinusExt)] + sys.path
@@ -168,6 +182,7 @@ Usage:
   -d                          Compile all *.tmpl files in directory
   -p                          Print generated Python code to stdout
   -w                          Write output of template to *.html
+  -v                          Be verbose
 """ % {'scriptName':self._scriptName,
        'version':version,
        'author':'Tavis Rudd',
