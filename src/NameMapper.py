@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.21 2002/10/28 07:38:58 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.22 2002/11/07 18:33:01 tavis_rudd Exp $
 
 """This module implements Cheetah's optional NameMapper syntax.
 
@@ -134,13 +134,13 @@ Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@damnsimple.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.21 $
+Version: $Revision: 1.22 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2002/10/28 07:38:58 $
+Last Revision Date: $Date: 2002/11/07 18:33:01 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__revision__ = "$Revision: 1.21 $"[11:-2]
+__revision__ = "$Revision: 1.22 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -184,10 +184,14 @@ except:
     
         if hasattr(obj, key):
             return getattr(obj, key)
-        try:
-            return obj[key]
-        except KeyError:
+        elif hasattr(obj, '__getitem__'):
+            try:
+                return obj[key]
+            except KeyError:
+                raise NotFound, key
+        else:
             raise NotFound, key
+                
 
 
     def valueForName(obj, name, executeCallables=False):
