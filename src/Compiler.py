@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.25 2002/03/06 16:57:14 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.26 2002/03/18 21:27:36 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.25 $
+Version: $Revision: 1.26 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/03/06 16:57:14 $
+Last Revision Date: $Date: 2002/03/18 21:27:36 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.25 $"[11:-2]
+__revision__ = "$Revision: 1.26 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -162,7 +162,7 @@ class GenUtils:
         chunk = nameChunks.pop()
         firstBit = chunk[0].split('.')[0]
 
-        if chunk[0] in self.localVars() or chunk[0] in self.importedVars():
+        if chunk[0] in self.localVars() or chunk[0] in self.globalVars():
             translatedName = chunk[0] + chunk[2]
         elif  firstBit in self.localVars():
             translatedName = ('VFN(' + firstBit +
@@ -1031,17 +1031,19 @@ class ModuleCompiler(Parser, GenUtils):
             "import Cheetah.ErrorCatchers as ErrorCatchers",
             ]        
 
-        self._importedVars = ['sys',
-                              'os',
-                              'os.path',
-                              'time',
-                              'types',
-                              'Template',
-                              'DummyTransaction',
-                              'NotFound',
-                              'Filters',
-                              'ErrorCatchers',
-                              ]
+        self._globalVars = ['sys',
+                            'os',
+                            'os.path',
+                            'time',
+                            'types',
+                            'Template',
+                            'DummyTransaction',
+                            'NotFound',
+                            'Filters',
+                            'ErrorCatchers',
+                            'True',
+                            'False',
+                            ]
         
         self._moduleConstants = [
             "True = (1==1)",
@@ -1083,13 +1085,13 @@ class ModuleCompiler(Parser, GenUtils):
     def finishedClasses(self):
         return self._finishedClasses
 
-    def importedVars(self):
-        return self._importedVars
+    def globalVars(self):
+        return self._globalVars
     
-    def addImportedVars(self, varNames):
-        self._importedVars.extend(varNames)
-        self._importedVars.sort()
-        self._importedVars.reverse()
+    def addGlobalVars(self, varNames):
+        self._globalVars.extend(varNames)
+        self._globalVars.sort()
+        self._globalVars.reverse()
 
 
     def errorCatcherIsOn(self):
