@@ -59,6 +59,7 @@ Please initial your changes and add a date for each release
   - made a Template.shutdown() method for cleaning up reference cycles before a 
     template object is deleted. (TR)
   - made the parsing and processing of #macros() more robust (TR)
+  - implemented the file update checking mechanism (TR)
 
  
 0.9.7 (July 13, 2001)

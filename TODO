@@ -12,8 +12,6 @@ Languague Specification
 
 Implementation
 ================================================================================
-- reimplement the #include directive so it monitors for changes to 
-  the included files
 - redesign and implement the Servlet Factory for Webware so the #extend directive
   will work with .tmpl files as well as .py files
 
@@ -31,7 +29,8 @@ Documentation
 
 Website
 ================================================================================
-- automate the documentation update (including regenerating the learn.html page)
+- start a 3rd party page
+- automate the documentation update 
 - See if we can get WebKit working on Sourceforge...
 
 Examples
