@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.18 2001/08/06 03:50:16 tavis_rudd Exp $
+# $Id: Template.py,v 1.19 2001/08/07 05:28:07 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.18 $
+Version: $Revision: 1.19 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/06 03:50:16 $
+Last Revision Date: $Date: 2001/08/07 05:28:07 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.18 $"[11:-2]
+__version__ = "$Revision: 1.19 $"[11:-2]
 
 
 ##################################################
@@ -127,20 +127,28 @@ class Template(SettingsManager):
                            CodeGen.preProcessBlockDirectives),
                           ('macroDirectives',
                            CodeGen.preProcessMacroDirectives),
+
+                          # do includes before macro calls
+                          ('includeDirectives',
+                           CodeGen.preProcessIncludeDirectives),
+
                           ('lazyMacroCalls',
                            CodeGen.preProcessLazyMacroCalls),
                           ('lazyMacroCalls',
                            CodeGen.preProcessLazyMacroCalls),
                           ('explicitMacroCalls',
                            CodeGen.preProcessExplicitMacroCalls),
-                          ('comments',
-                           CodeGen.preProcessComments),
+
                           ('rawDirectives',
                            CodeGen.preProcessRawDirectives),
+                          ('comments',
+                           CodeGen.preProcessComments),
                           ('setDirectives',
                            setDirectiveProcessor.preProcess),
+                          # + do includes after macro calls
                           ('includeDirectives',
                            CodeGen.preProcessIncludeDirectives),
+
                           ('cacheDirective',
                            cacheDirectiveProcessor.preProcess),
                           ('endCacheDirective',
