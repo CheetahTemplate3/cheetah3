@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.6 2001/08/11 18:05:12 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.7 2001/08/12 19:09:57 tavis_rudd Exp $
 
 """Utilities for accessing the members of an object via string representations
 of those members.  Template processing is its primary intended use.
@@ -58,13 +58,13 @@ Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
 License: This software is released for unlimited distribution
          under the terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/08/11 18:05:12 $
+Last Revision Date: $Date: 2001/08/12 19:09:57 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -83,31 +83,52 @@ digitsRE = re.compile(r'[0-9]+')
 isDigit = digitsRE.match
 digits = ['0','1','2','3','4','5','6','7','8','9']
 
-
-class NotFound(Exception):
-    pass
-
 class NoDefault:
     pass
 
 ##################################################
 ## FUNCTIONS ##
 
-def valueForName(obj, name, executeCallables=False):
-    """Get the value for the specified name.  This function can be called
-    recursively.  """
+try:
+    from _namemapper import NotFound, valueForKey, valueForName
+    # it is possible, with Jython for example, that _namemapper.c hasn't been compiled
+except:
+    class NotFound(Exception):
+        pass
+    
+    def valueForKey(obj, key):
+    
+        """Get the value of the specified key.  The 'obj' can be a a mapping or any
+        Python object that supports the __getattr__ method. The key can be a mapping
+        item, an attribute or an underscored attribute."""
+    
+        if hasattr(obj, key):
+            return getattr(obj, key)
+        try:
+            return obj[key]
+        except:
+            if hasattr(obj, '_' + key):
+                return getattr(obj, '_' + key)
+            else:
+                raise NotFound, key
 
-    if type(name)==StringType:
-        # then this is the first call to this function.
-        nameChunks=name.split('.')
-    else:
-        #if this function calls itself then name already is a list of nameChunks
-        nameChunks = name
 
-    ## go get a binding for the key ##
-    firstKey = nameChunks[0]
-    if len(nameChunks) > 1:
-        # its a composite name like: nestedObject.item
+    def valueForName(obj, name, executeCallables=False):
+        """Get the value for the specified name.  This function can be called
+        recursively.  """
+    
+        if type(name)==StringType:
+            # then this is the first call to this function.
+            nameChunks=name.split('.')
+        else:
+            #if this function calls itself then name already is a list of nameChunks
+            nameChunks = name
+            
+        return _valueForName(obj, nameChunks, executeCallables=executeCallables)
+    
+    def _valueForName(obj, nameChunks, executeCallables=False):
+        ## go get a binding for the key ##
+        firstKey = nameChunks[0]
         binding = valueForKey(obj, firstKey)
         if executeCallables and callable(binding) and \
            type(binding) not in (InstanceType, ClassType):
@@ -115,33 +136,18 @@ def valueForName(obj, name, executeCallables=False):
             # of classes with __call__() defined
             # and also allows obj.__class__.__name__
             binding = binding()
-        
-        return valueForName(binding, nameChunks[1:],
-                            executeCallables=executeCallables)
-    else:
-        # its a single key like: nestedObject
-        binding =  valueForKey(obj, firstKey)
-        if executeCallables and callable(binding):
-            binding = binding()
-        return binding
-
-
-def valueForKey(obj, key):
-
-    """Get the value of the specified key.  The 'obj' can be a a mapping or any
-    Python object that supports the __getattr__ method. The key can be a mapping
-    item, an attribute or an underscored attribute."""
-
-    if hasattr(obj, key):
-        return getattr(obj, key)
-    try:
-        return obj[key]
-    except:
-        if hasattr(obj, '_' + key):
-            return getattr(obj, '_' + key)
+    
+        if len(nameChunks) > 1:
+            # its a composite name like: nestedObject.item
+            return _valueForName(binding, nameChunks[1:],
+                                executeCallables=executeCallables)
         else:
-            raise NotFound, key
+            # its a single key like: nestedObject
+            return binding
 
+
+##################################################
+    
 PLAIN_ATTRIBUTE = 0
 UNDERSCORED_ATTRIBUTE = 1
 MAPPING_KEY = 2
