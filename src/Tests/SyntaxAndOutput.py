@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.26 2002/03/18 21:47:39 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.27 2002/04/09 18:43:27 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.26 $
+Version: $Revision: 1.27 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/03/18 21:47:39 $
+Last Revision Date: $Date: 2002/04/09 18:43:27 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.26 $"[11:-2]
+__revision__ = "$Revision: 1.27 $"[11:-2]
 
 
 ##################################################
@@ -1817,17 +1817,6 @@ class ExtendsDirective(OutputTest):
         """#extends Cheetah.Templates._SkeletonPage"""
         self.verify("""#from Cheetah.Templates._SkeletonPage import _SkeletonPage
 #extends _SkeletonPage
-#implements respond
-$spacer()
-""",
-                    '<img src="spacer.gif" width="1" height="1" alt="" />\n')
-
-    def test2(self):
-        """multiple inheritance test"""
-        self.verify("""##
-#from Cheetah.Templates._SkeletonPage import _SkeletonPage
-#from Cheetah.DummyTransaction import DummyTransaction
-#extends _SkeletonPage, DummyTransaction
 #implements respond
 $spacer()
 """,
