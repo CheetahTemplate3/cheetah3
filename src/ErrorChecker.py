@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+# $Id: ErrorChecker.py,v 1.1 2001/08/13 22:02:04 tavis_rudd Exp $
+"""ErrorChecker class Cheetah's codeGenerator
+
+Meta-Data
+================================================================================
+Author: Tavis Rudd <tavis@calrudd.com>
+License: This software is released for unlimited distribution under the
+         terms of the Python license.
+Version: $Revision: 1.1 $
+Start Date: 2001/08/01
+Last Revision Date: $Date: 2001/08/13 22:02:04 $
+"""
+__author__ = "Tavis Rudd <tavis@calrudd.com>"
+__version__ = "$Revision: 1.1 $"[11:-2]
+
+##################################################
+## DEPENDENCIES ##
+
+# intra-package imports ...
+from Parser import Parser
+from NameMapper import NotFound
+
+
+##################################################
+## CONSTANTS & GLOBALS ##
+
+True = (1==1)
+False = (0==1)
+
+##################################################
+## CLASSES ##
+
+class Error(Exception):
+    pass
+
+class ErrorChecker(Parser):
+
+    def __init__(self, templateObj):
+        Parser.__init__(self, templateObj)
+        self._entries = {}
+        
+    def set(self, ID, tag, translatedTag):
+        self._entries[ID] = (tag, translatedTag) 
+
+    def get(self, ID, trans=None, localsDict={}):
+        try:
+            val = self.evalPlaceholderString(self._entries[ID][1],
+                                             localsDict=localsDict)
+            return val
+        except NotFound:
+            return self._entries[ID][0]
+
