@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: StopDirective.py,v 1.1 2001/08/11 01:03:16 tavis_rudd Exp $
+# $Id: StopDirective.py,v 1.2 2001/08/11 07:03:22 tavis_rudd Exp $
 """StopDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,19 +7,18 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/11 01:03:16 $
+Last Revision Date: $Date: 2001/08/11 07:03:22 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
 
 # intra-package imports ...
 import TagProcessor
-from Delimiters import delimiters
 ##################################################
 ## CONSTANTS & GLOBALS ##
 

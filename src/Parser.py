@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.5 2001/08/11 05:22:19 tavis_rudd Exp $
+# $Id: Parser.py,v 1.6 2001/08/11 07:03:22 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/11 05:22:19 $
+Last Revision Date: $Date: 2001/08/11 07:03:22 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -42,7 +42,6 @@ def matchTokenOrfail(text, pos):
     if match is None:
         raise SyntaxError(text, pos)
     return match, match.end()
-
 
 def separateTagsFromText(initialText, startTagRE, endTagRE):
     """breaks a string up into a textVsTagsList where the odd items are plain
