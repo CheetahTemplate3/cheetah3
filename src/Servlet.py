@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.27 2002/05/05 00:21:18 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.28 2002/06/08 03:36:43 hierro Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.27 $
+Version: $Revision: 1.28 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2002/05/05 00:21:18 $
+Last Revision Date: $Date: 2002/06/08 03:36:43 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.27 $"[11:-2]
+__revision__ = "$Revision: 1.28 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -52,7 +52,7 @@ except:
 ##################################################
 ## CLASSES
 
-class Servlet(CGIImportMixin, BaseServlet):
+class Servlet(BaseServlet):
     
     """This class is an abstract baseclass for Cheetah.Template.Template.
 

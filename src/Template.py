@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.94 2002/05/13 18:09:33 tavis_rudd Exp $
+# $Id: Template.py,v 1.95 2002/06/08 03:36:43 hierro Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.94 $
+Version: $Revision: 1.95 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/05/13 18:09:33 $
+Last Revision Date: $Date: 2002/06/08 03:36:43 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.94 $"[11:-2]
+__revision__ = "$Revision: 1.95 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -37,7 +37,8 @@ import traceback
 
 # intra-package imports ...
 from SettingsManager import SettingsManager # baseclass for Template
-from Servlet import Servlet             # baseclass for Template
+from Servlet import Servlet                 # baseclass for Template
+from TemplateMisc import TemplateMisc       # baseclass for Template
 
 import ErrorCatchers              # for placeholder tags
 import Filters                          # the output filters
@@ -66,7 +67,7 @@ class NoDefault:
 class Error(Exception):
     pass
     
-class Template(SettingsManager, Servlet):
+class Template(SettingsManager, Servlet, TemplateMisc):
     
     """The core template engine.  It serves as a base class for Template
     servlets and also knows how to compile a template."""
