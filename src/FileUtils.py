@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: FileUtils.py,v 1.2 2001/10/10 06:47:41 tavis_rudd Exp $
+# $Id: FileUtils.py,v 1.3 2001/11/15 06:48:41 tavis_rudd Exp $
 """File utitilies for Python:
 
 This is included with Cheetah for the time-being, but I eventually plan to
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/09/26
-Last Revision Date: $Date: 2001/10/10 06:47:41 $
+Last Revision Date: $Date: 2001/11/15 06:48:41 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -27,8 +27,6 @@ import os.path
 import re
 from types import StringType
 from tempfile import mktemp
-
-from SourceReader import SourceReader
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -142,7 +140,7 @@ class FileFinder:
 
 
 
-class _GenSubberFunc(SourceReader):
+class _GenSubberFunc:
 
     """Converts a 'sub' string in the form that one feeds to re.sub (backrefs,
     groups, etc.) into a function that can be used to do the substitutions in
@@ -152,9 +150,25 @@ class _GenSubberFunc(SourceReader):
     groupRE = re.compile(r'\\g<([a-zA-Z_][a-zA-Z_]*)>')
     
     def __init__(self, replaceStr):
-        SourceReader.__init__(self, replaceStr)
+        self._src = replaceStr
+        self._pos = 0
         self._codeChunks = []
         self.parse()
+
+    def src(self):
+        return self._src
+        
+    def pos(self):
+        return self._pos
+    
+    def setPos(self, pos):
+        self._pos = pos
+
+    def atEnd(self):
+        return self._pos >= len(self._src)
+
+    def advance(self, offset=1):
+        self._pos += offset
 
     ## match and get methods
         
