@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.14 2002/04/15 06:22:53 tavis_rudd Exp $
+# $Id: Filters.py,v 1.15 2002/06/07 02:06:30 hierro Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -10,12 +10,12 @@ would otherwise require a real template object).
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.14 $
+Version: $Revision: 1.15 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/04/15 06:22:53 $
+Last Revision Date: $Date: 2002/06/07 02:06:30 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.14 $"[11:-2]
+__revision__ = "$Revision: 1.15 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -88,7 +88,7 @@ class Filter:
         """Replace None with an empty string.  Reimplement this method if you
         want more advanced filterting."""
         
-        if val == None:
+        if val is None:
             return ''
         return str(val)
 
