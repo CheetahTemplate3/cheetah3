@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.6 2002/07/30 16:59:59 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.7 2002/08/09 01:32:19 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/07/30 16:59:59 $
+Last Revision Date: $Date: 2002/08/09 01:32:19 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.6 $"[11:-2]
+__revision__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -25,6 +25,7 @@ import types
 import __builtin__
 import new
 import imp
+from Threading import Lock
 
 # intra-package imports ...
 import ImportManager
@@ -45,11 +46,15 @@ _installed = False
 ## CLASSES
 
 class CheetahDirOwner(DirOwner):
+    _lock = Lock()
+    _aquireLock = _lock.aquire
+    _releaseLock = _lock.release
+    
 
     def getmod(self, name,
                pathIsDir=os.path.isdir,
                newmod=imp.new_module):
-               
+        
         tmplPath =  os.path.join(self.path, name + '.tmpl')
         mod = DirOwner.getmod(self, name)
         if mod:
@@ -57,6 +62,7 @@ class CheetahDirOwner(DirOwner):
         elif not os.path.exists(tmplPath):
             return None
         else:
+            self._aquireLock()
             ## @@ consider adding an ImportError raiser here
             code = str(Compiler(file=tmplPath, moduleName=name,
                                 mainClassName=name))
@@ -64,6 +70,7 @@ class CheetahDirOwner(DirOwner):
             mod = newmod(name)
             mod.__file__ = co.co_filename
             mod.__co__ = co
+            self._releaseLock()            
             return mod
 
 ##################################################
