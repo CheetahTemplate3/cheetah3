@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.13 2001/11/06 21:52:09 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.14 2001/11/06 21:57:59 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.13 $
+Version: $Revision: 1.14 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2001/11/06 21:52:09 $
+Last Revision Date: $Date: 2001/11/06 21:57:59 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.13 $"[11:-2]
+__version__ = "$Revision: 1.14 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -652,6 +652,7 @@ class ClassCompiler(SettingsManager, GenUtils):
         self.setActiveMethodCompiler(methodCompiler)
 
         if fileName and self.setting('monitorSrcFile'):
+            self._mainCheetahMethID = str(id(self)) + str(time.time()).replace('.','_')
             self.addChunkToInit('self._filePath = ' + repr(fileName))
             self.addChunkToInit('self._fileMtime = ' + str(getmtime(fileName)) )
             
@@ -661,7 +662,8 @@ class ClassCompiler(SettingsManager, GenUtils):
                           ') > self._fileMtime:')
             self.indent()
             self.addChunk('self.compile(file=' + repr(fileName) + ')')
-            self.addChunk('write(self._mainCheetahMethod' + str(id(self)) + '(trans=trans))')            
+            self.addChunk('write(self._mainCheetahMethod' + self._mainCheetahMethID
+                          + '(trans=trans))')            
             self.addStop()
             self.dedent()
 
@@ -717,7 +719,8 @@ class ClassCompiler(SettingsManager, GenUtils):
     def cleanupState(self):
         if self._mainMethodName == 'respond':
             self._generatedAttribs.append('__str__ = respond')
-        self._generatedAttribs.append('_mainCheetahMethod' + str(id(self)) + '= ' + self._mainMethodName)
+        self._generatedAttribs.append('_mainCheetahMethod' + self._mainCheetahMethID +
+                                      '= ' + self._mainMethodName)
         while self._activeMethods:
             methCompiler = self.getActiveMethodCompiler()
             self.swallowMethodCompiler(methCompiler)
