@@ -1,6 +1,10 @@
 Please initial your changes and add a date for each release
 ================================================================================
 
+0.9.8b1 (September ?, 2001)
+   - added a few new language constructs (aka 'directives') to Cheetah (TR)
+     #while ... #end while
+     #try ... #except ... #else ... #finally ... #end try
 
 0.9.8a4 (September 7, 2001)
 
