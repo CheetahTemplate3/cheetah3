@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.27 2002/03/18 21:30:19 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.28 2002/03/18 21:47:09 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.27 $
+Version: $Revision: 1.28 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/03/18 21:30:19 $
+Last Revision Date: $Date: 2002/03/18 21:47:09 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.27 $"[11:-2]
+__revision__ = "$Revision: 1.28 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -163,8 +163,9 @@ class GenUtils:
         firstBit = chunk[0].split('.')[0]
 
         if chunk[0] in self.localVars() or chunk[0] in self.globalVars():
+            # @@TR: note this method won't use autocalling on these vars!!            
             translatedName = chunk[0] + chunk[2]
-        elif  firstBit in self.localVars():
+        elif firstBit in self.localVars() or firstBit in self.globalVars():
             translatedName = ('VFN(' + firstBit +
                               ',"' + '.'.join(chunk[0].split('.')[1:]) +
                               '",' + str(autoCall and chunk[1]) + ')'
