@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.8 2002/08/09 01:33:30 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.9 2002/08/09 01:34:14 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/08/09 01:33:30 $
+Last Revision Date: $Date: 2002/08/09 01:34:14 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.8 $"[11:-2]
+__revision__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -47,7 +47,7 @@ _installed = False
 
 class CheetahDirOwner(DirOwner):
     _lock = Lock()
-    _aquireLock = _lock.aquire
+    _acquireLock = _lock.acquire
     _releaseLock = _lock.release
     
 
@@ -62,7 +62,7 @@ class CheetahDirOwner(DirOwner):
         elif not os.path.exists(tmplPath):
             return None
         else:
-            self._aquireLock()
+            self._acquireLock()
             ## @@ consider adding an ImportError raiser here
             code = str(Compiler(file=tmplPath, moduleName=name,
                                 mainClassName=name))
