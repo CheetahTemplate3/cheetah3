@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.48 2002/04/15 06:22:53 tavis_rudd Exp $
+# $Id: Parser.py,v 1.49 2002/04/22 05:21:01 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.48 $
+Version: $Revision: 1.49 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/04/15 06:22:53 $
+Last Revision Date: $Date: 2002/04/22 05:21:01 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.48 $"[11:-2]
+__revision__ = "$Revision: 1.49 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1425,12 +1425,34 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.getWhiteSpace()
         # change the default mainMethodName from the default 'respond' 
         self.setMainMethodName('writeBody') 
-        baseClass = self.getDottedName()
+        baseClassName = self.getDottedName()
         self.closeDirective(lineClearToStartToken, endOfFirstLine)
         
-        self.setBaseClass(baseClass)
-        mainBaseClass =  self._baseClass
+        ##################################################
+        ## If the #extends directive contains a classname or modulename that isn't
+        #  in self.globalVars() already, we assume that we need to add
+        #  an implied 'from ModName import ClassName' where ModName == ClassName.
+        #  - This is the case in WebKit servlet modules.
+        #  - We also assume that the final . separates the classname from the
+        #    module name.  This might break if people do something really fancy 
+        #    with their dots and namespaces.
 
+        chunks = baseClassName.split('.')
+        if len(chunks) > 1:
+            modName, bareClassName = '.'.join(chunks[:-1]), chunks[-1]
+        else:
+            # baseClassName is either unimported modName
+            # or a previously imported classname
+            modName = bareClassName = baseClassName 
+            
+        if modName not in self.globalVars():
+            if len(chunks) > 1 and bareClassName != chunks[:-1][-1]:
+                modName = '.'.join(chunks)
+            importStatement = "from %s import %s" % (modName, bareClassName)
+            self.addImportStatement(importStatement)
+            self.addGlobalVars( [bareClassName,] )
+
+        self.setBaseClass(bareClassName)
         
         ##################################################
         ## dynamically bind to and __init__ with this new baseclass
@@ -1442,7 +1464,8 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             class newClass:
                 pass
             newClass.__name__ = self._mainClassName
-            newClass.__bases__ = (getattr(mod,self._baseClass), )
+            __bases__ = (getattr(mod, self._baseClass), )
+            newClass.__bases__ = __bases__
             self._templateObj.__class__ = newClass
             # must initialize it so instance attributes are accessible
             newClass.__init__(self._templateObj)
