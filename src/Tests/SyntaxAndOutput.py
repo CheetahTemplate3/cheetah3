@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.50 2004/12/15 23:27:00 jjinux Exp $
+# $Id: SyntaxAndOutput.py,v 1.51 2004/12/17 00:07:48 jjinux Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.50 $
+Version: $Revision: 1.51 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2004/12/15 23:27:00 $
+Last Revision Date: $Date: 2004/12/17 00:07:48 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.50 $"[11:-2]
+__revision__ = "$Revision: 1.51 $"[11:-2]
 
 
 ##################################################
@@ -112,7 +112,7 @@ defaultTestNameSpace = {
         ],
     'nameList': [('john', 'doe'), ('jane', 'smith')],
     'letterList': ['a', 'b', 'c'],
-    '_': lambda x: x,
+    '_': lambda x: 'Translated: ' + x,
     'unicodeData':u'aoeu12345\u1234',
     }
 
@@ -541,13 +541,9 @@ class Placeholders_Vals(OutputTest):
         self.verify("$True $False", "1 0")
 
     def test9(self):
-        """$_ should not do a namespace lookup
+        """$_
         """
-        def test(self=self):
-            self.verify("$_('gettext')", "")
-
-        self.assertRaises(NameError,test)
-            
+        self.verify("$_('foo')", "Translated: foo")
 
 class UnicodeStrings(OutputTest):
     def test1(self):
