@@ -33,6 +33,11 @@ release
   - $hasVar('varName') is an alias for $varExists('varName').  (MO)
   - $_fileDirName and $_filePath are now None rather than missing if
     the template definition did not come from a named file.  (MO)
+  - applied patch on SourceForge for "%" in default arguments of a block (TR)
+  - removed the _underscored attribute lookup step from NameMapper NOTE THIS
+    MIGHT BREAK EXISTING CODE (TR)
+  - Install Cheetah into site-packages/Cheetah/ rather than
+    site-packages/Webware/Cheetah/. Added code to automatically remove the old dir.(TR)
 
 
 0.9.14 (July 14, 2002)
