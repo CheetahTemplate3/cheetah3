@@ -21,7 +21,10 @@ def __init__(self, templateDef, *searchList, **kw):
 \end{verbatim}
 
 The constructor has one required argument: the Template Definition as
-a string.  Any additional arguments are Namespaces for the Search List.  The
+a string.  
+% (To pass a filename instead, see the keyword argument 'file' 
+% below.)  
+Any additional arguments are Namespaces for the Search List.  The
 constructor also accepts keyword arguments.
 
 The constructor builds a Search List as a flat list of Namespaces,
@@ -188,11 +191,19 @@ won't autocall when it should.  For the reason why, see the section
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Other keyword arguments accepted by the constructor)
+\subsection{Other keyword arguments accepted by the constructor}
 
 None of these keyword arguments are necessary for normal usage of a TO.
 
 \begin{description}
+
+% Undocumented pending possible changes to this feature.
+%\item(file) If true, 'templateDef' is a filename rather than the TD itself.
+%      Cheetah will call the TO's .getFileContents method to read the TD.  That 
+%      method reads only physical files by default, but you may override it to
+%      handle URLs or other special "files".  All this happens in the TO's
+%      .__init__ method; afterwards, there is no way to tell that the TD came
+%      from a file or what the filename was.  
 
 \item{macros} Dictionary of macro name (string) -> macro definition (function).
      These macros are defined before the TO is compiled.
@@ -219,7 +230,7 @@ None of these keyword arguments are necessary for normal usage of a TO.
 
 None of these methods are necessary for normal usage of a TO.
 
-\begin{description)
+\begin{description}
 
 \item{.addToSearchList(theNamespace, restart=True)}  Append the given Namespace
      to the Search List.  Leave the optional second argument at its default
