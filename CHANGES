@@ -12,6 +12,10 @@ release
   - fixed bug in the output of the #unless directive that Mike found (TR)
   - added some module constants to clear up a missing name bug that Mike found
     in cases where you use **KW in a Cheetah method definition (TR)
+  - fixed a bug in Parser.py:_LowLevelSemanticsParser.getExpression() that was
+    related to the default enclosures=[] argument.  This arg was unintentionally
+    being shared between calls and thus leading to parsing errors as reported by
+    Greg Czajkowski (TR)
 
 0.9.13 (May 8, 2002)
   - changed Cheetah.Servlet.isRunningFromWebKit to isWebwareInstalled (TR)
