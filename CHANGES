@@ -1,4 +1,4 @@
-Please initial your changes
+Please initial your changes and a date for each release
 ================================================================================
 0.9.7 (not released yet)
   - moved some stuff from __init__.py into CHANGES and TODO 
