@@ -14,19 +14,45 @@ subclasses.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Constructing Template Objects}
 
-Here's the signature for the Template constructor:
+\begin{description}
+
+\item{\code{templateObj = Template("The king is a $placeholder1.")}}
+     Pass the Template Definition as a string.
+
+\item{\code{templateObj = Template(file="fink.tmpl")}}
+     Read the Template Definition from a file named "fink.tmpl".
+     
+\item{\code{templateObj = Template(file=f)}}
+     Read the Template Definition from file-like object 'f'.
+     
+\item{\code{templateObj = Template("The king is a $placeholder1.", dic, obj)}}
+     Pass the Template Definition as a string.  Also pass two Namespaces for the
+     Search List: a dictionary 'dic' and an instance 'obj'.
+     
+\item{\code{templateObj = Template(None, dic, obj, file="fink.txt")}}
+     Same, but pass a filename instead of a string.  The \code{None} is required
+     here to represent the missing Template Definition string--this due to
+     Python's rules for positional parameters.
+     
+\item{\code{templateObj = Template(None, dic, obj, file="fink.txt")}}
+     Same with a file object.
+
+\end{description}
+
+
+You must pass either a Template Definition string or a 'file' keyword argument,
+but not both.  These invocations all raise a TypeError:
 
 \begin{verbatim}
-def __init__(self, templateDef, *searchList, **kw):
+templateObj = Template() 
+templateObj = Template("The king is a $placeholder1", file="fink.txt")
+templateObj = Template("The king is a $placeholder1", file=f)
 \end{verbatim}
 
-The constructor has one required argument: the Template Definition as
-a string.  
-% (To pass a filename instead, see the keyword argument 'file' 
-% below.)  
-Any additional arguments are Namespaces for the Search List.  The
-constructor also accepts keyword arguments.
-
+Certain other keyword arguments are also accepted, see 
+``Keyword arguments accepted by the constructor'' below.
+     
+Any positional arguments besides the first are Namespaces for the Search List.
 The constructor builds a Search List as a flat list of Namespaces,
 concatenated in the following order:
 
@@ -37,13 +63,10 @@ concatenated in the following order:
 \item  The TO itself (its \code{self} attribute), 
 
 \item  The Namespaces in the keyword argument \code{searchList} if present.  
-     This argument must be a \em{tuple}!  
+     The argument value be a list or a tuple.
 
 \end{enumerate}
 
-% I propose we allow the 'searchList' argument to be a list, and the
-% constructor call tuple() on it to convert it to a tuple.  People will want to
-% pass in a list because it's, uh, called a "List".
 
 Every Namespace must have Namespace Keys and Namespace Values.  This means it
 must be an object that supports attribute/value pairs or key/value pairs.  
@@ -116,6 +139,11 @@ the ``Functions and Macros'' chapter, but it's good to know it's available.
 [<Cheetah.Template.Template instance at 0x81a5824>, {'title': 'Hello World Example', 'contents': 'Hello World!'}, <module '__builtin__' (built-in)>]
 \end{verbatim}
 
+Because the current implementation compiles the TO immediately, your Search 
+List must already contain Namespace Values of the appropriate types for all
+Placeholder Names, at least those which are not simple strings or are used
+in Display Logic (that is, in the attribute of an \code{#if} or \code{#for}
+directive).  Otherwise you will likely get an exception.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -191,19 +219,13 @@ won't autocall when it should.  For the reason why, see the section
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Other keyword arguments accepted by the constructor}
+\subsection{Keyword arguments accepted by the constructor}
 
 None of these keyword arguments are necessary for normal usage of a TO.
 
 \begin{description}
 
-% Undocumented pending possible changes to this feature.
-%\item(file) If true, 'templateDef' is a filename rather than the TD itself.
-%      Cheetah will call the TO's .getFileContents method to read the TD.  That 
-%      method reads only physical files by default, but you may override it to
-%      handle URLs or other special "files".  All this happens in the TO's
-%      .__init__ method; afterwards, there is no way to tell that the TD came
-%      from a file or what the filename was.  
+\item(file) Discussed above in ``Constructing Template Objects''.
 
 \item{macros} Dictionary of macro name (string) -> macro definition (function).
      These macros are defined before the TO is compiled.
@@ -213,7 +235,15 @@ None of these keyword arguments are necessary for normal usage of a TO.
 
 % Why would a programmer want to call this?
 
-\item{settings}  Dictionary of configuration settings to merge in.
+\item{settings}  Dictionary of configuration settings to merge in.  This is
+     often useful to specify an alternate behavior for missing Namespace Keys:
+\begin{verbatim}
+from Cheetah import CodeGenerator
+settings = {'varNotFound_handler': CodeGenerator.varNotFound_bigWarning}
+templateObj = Template(file="fink.txt", settings=settings)       # Or:
+templateObj = Template("The king is a $placeholder1.", settings=settings)
+\end{verbatim}
+    
 
 \item{overwriteSettings}  Dictionary of configuration settings.  Any existing
      configuration settings are erased.
@@ -234,7 +264,8 @@ None of these methods are necessary for normal usage of a TO.
 
 \item{.addToSearchList(theNamespace, restart=True)}  Append the given Namespace
      to the Search List.  Leave the optional second argument at its default
-     value so that the template gets recompiled.
+     value so that the template gets recompiled.  (This method is of dubious
+     value and may be removed.)
 
 \item{.defineTemplateBlock(blockName, blockContents)}  Add a named block to the
 template.  Both arguments must be strings.
@@ -274,8 +305,13 @@ Template Definition.  They will no longer show up in Filled Templates.
 
 \item{.startServer()}  Recompile the template.  
 
+\item{.recompile()}  Synonym for \code{.startServer}.
+
 \item{.translatePath()}  ``A hook to enable proper handling of server-side
      paths with Webware.''
+     
+\item{.getUnknowns()}  Return a list of Placeholder Names which are missing in
+     the Search List.
 
 \end{description}
 
@@ -288,9 +324,8 @@ are available to change configuration settings after instantiation.
 \subsection{Debugging}
 
 If the environmental variable \code{CHEETAH\_DEBUG} is True, the TO will
-run in debug mode.
-
-% What does this do?
+run in debug mode.  This provides a more verbose error message if an 
+exception occurs.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
