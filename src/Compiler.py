@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.1 2001/06/13 03:50:39 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.2 2001/07/11 21:42:11 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/13 03:50:39 $
+Last Revision Date: $Date: 2001/07/11 21:42:11 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -31,7 +31,7 @@ from os.path import \
 from glob import glob
 
 #intra-package imports ...
-from Delimeters import delimeters
+from Delimiters import delimiters
 from Version import version
 
 ##################################################
@@ -44,7 +44,7 @@ CHEETAH_EXTENSION = '.tmpl'
 SERVLET_EXTENSION = '.py'
 SERVLET_BACKUP_EXT = '.py_bak'
 
-extendDirectiveRE = delimeters['extendDirective']
+extendDirectiveRE = delimiters['extendDirective']
                     
 ##################################################
 ## FUNCTIONS ##

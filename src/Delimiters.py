@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Delimeters.py,v 1.3 2001/06/28 19:10:59 echuck Exp $
+# $Id: Delimiters.py,v 1.1 2001/07/11 21:42:11 tavis_rudd Exp $
 """A dictionary of delimeter regular expressions that are used in Cheetah
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.1 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/28 19:10:59 $
+Last Revision Date: $Date: 2001/07/11 21:42:11 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.1 $"[11:-2]
 
 
 ##################################################
@@ -27,7 +27,7 @@ escCharLookBehind = r'(?:(?<=\A)|(?<!\\))'
 tagClosure = r'(?:/#|\r\n|\n|\r)'
 lazyTagClosure = r'(?:/#|\r\n|\n|\r)'
 
-delimeters = {
+delimiters = {
     '[%,%]':re.compile(r"\[%(.+?)%\]",re.DOTALL),
     '{,}':re.compile(r"{(.+?)}",re.DOTALL),
 
@@ -55,7 +55,7 @@ delimeters = {
                                             re.MULTILINE),
     'slurpDirective': re.compile(escCharLookBehind + r'#slurp[\t ]*(?:\r\n|\n|\r|\Z)'),
 
-    'singleLineComment':re.compile(r'(?:\A|^)[\t ]*##(.*?)\n|' +
+    'singleLineComment':re.compile(r'(?:\A|^)[\t ]*##(.*?)(?:\r\n|\n|\r|\Z)|' +
                                    escCharLookBehind + r'##(.*?)$', #this one doesn't gobble the \n !!!
                                    re.MULTILINE),
 
@@ -97,7 +97,7 @@ delimeters = {
     'cacheDirectiveEndTag': re.compile(escCharLookBehind +
                                        r'#end cache(.*?)(?:/#|\r\n|\n|\r|\Z)'),
 
-    ## The following directive delimeters are not intended to be used in the same manner
+    ## The following directive delimiters are not intended to be used in the same manner
     # as the rest of the delim structs above. The placeholderRE is the only item of
     # interest here as they are only used in the pre/post-processing stages.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.6 2001/06/18 22:25:09 tavis_rudd Exp $
+# $Id: Template.py,v 1.7 2001/07/11 21:42:11 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/18 22:25:09 $
+Last Revision Date: $Date: 2001/07/11 21:42:11 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 
 ##################################################
@@ -35,7 +35,7 @@ from SearchList import SearchList
 import CodeGenerator as CodeGen
 from PlaceholderProcessor import PlaceholderProcessor
 import ErrorHandlers
-from Delimeters import delimeters as delims
+from Delimiters import delimiters as delims
 from Utilities import \
      removeDuplicateValues, \
      mergeNestedDictionaries, \
@@ -47,16 +47,19 @@ from Utilities import \
 True = (1==1)
 False = (0==1)
 
-RESTART = 0
 ##################################################
 ## CLASSES ##
 
 class Error(Exception):
     pass
 
-class NoDefault:
-    pass
-
+class RESTART:
+    """A token class that the #include directive can use to signal that the
+    codeGenerator needs to restart and parse new stuff that has been included"""
+    
+    def __init__(self, templateDef):
+        self.data = templateDef
+    
 class Template(SettingsManager):
     """The core template engine: parses, compiles, and serves templates."""
 
@@ -77,7 +80,7 @@ class Template(SettingsManager):
         'includeBlockMarkers': False,
 
 
-        'delimeters':{'includeDirective': [delims['includeDirective_gobbleWS'],
+        'delimiters':{'includeDirective': [delims['includeDirective_gobbleWS'],
                                            delims['includeDirective'],
                                            ],
                       'dataDirective': [delims['dataDirective_gobbleWS'],
@@ -184,8 +187,8 @@ class Template(SettingsManager):
                      'errorHandler':ErrorHandlers.Stage4ErrorHandler,
                      },
                   5:{'title':'execute-generated-code',
-                     'description':"the generated code string is executed" + \
-                     "to produce a function that will be bound as a method" + \
+                     'description':"the generated code string is executed\n" + \
+                     "to produce a function that will be bound as a method " + \
                      "of the TemplateServer.",
                      'errorHandler':ErrorHandlers.Stage5ErrorHandler,
                      },
@@ -299,12 +302,11 @@ class Template(SettingsManager):
             if debug: results['stage1'] = []
             for preProcessor in settings['preProcessors']:
                 templateDef = preProcessor[1](self, templateDef)
-                if type(templateDef)==types.TupleType and templateDef[0] == RESTART:
+                if isinstance(templateDef, RESTART):
                     # a parser restart might have been requested for #include's 
-                    return self._codeGenerator(templateDef[1])
+                    return self._codeGenerator(templateDef.data)
                 if debug: results['stage1'].append((preProcessor[0], templateDef))
 
-                            
             ## stage 2 - generate the python code for each of the tokenized tags ##
             #  a) initialize this Template Obj for each processor
             #  b) separate internal tags from text in the template to create
@@ -326,6 +328,7 @@ class Template(SettingsManager):
                 templateDef, settings['internalDelimsRE'])
             if debug:
                 results['stage2'].append(('textVsTagsList', textVsTagsList))
+            
             # c)
             subStage = 'c'
             codePiecesFromTextVsTagsList = CodeGen.processTextVsTagsList(

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.7 2001/07/11 21:36:51 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.8 2001/07/11 21:42:11 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/11 21:36:51 $
+Last Revision Date: $Date: 2001/07/11 21:42:11 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -33,7 +33,7 @@ from Validators import \
      validateMacroDirective, \
      validateSetDirective
 
-from Delimeters import delimeters
+from Delimiters import delimiters
 from Components import Component
 import Template
 from Utilities import lineNumFromPos
@@ -114,8 +114,8 @@ class DisplayLogicProcessor(TagProcessor):
     
     def __init__(self):
         self._tagType = EXEC_TAG_TYPE
-        self._delimRegexs = [delimeters['displayLogic_gobbleWS'],
-                             delimeters['displayLogic']]
+        self._delimRegexs = [delimiters['displayLogic_gobbleWS'],
+                             delimiters['displayLogic']]
         self._token = 'displayLogic'
                     
     def initializeTemplateObj(self, templateObj):
@@ -185,7 +185,7 @@ class SetDirectiveProcessor(TagProcessor):
     
     _token = 'setDirective'
     _tagType = EXEC_TAG_TYPE
-    _delimRegexs = [delimeters['setDirective'],]
+    _delimRegexs = [delimiters['setDirective'],]
     
     def __init__(self):
         self._placeholderProcessor = PlaceholderProcessor.PlaceholderProcessor()
@@ -226,7 +226,7 @@ class SetDirectiveProcessor(TagProcessor):
 class CacheDirectiveProcessor(TagProcessor):
     _tagType = EMPTY_TAG_TYPE
     _token = 'cacheDirective'
-    _delimRegexs = [delimeters['cacheDirectiveStartTag'],]    
+    _delimRegexs = [delimiters['cacheDirectiveStartTag'],]    
         
     def initializeTemplateObj(self, templateObj):
         if not templateObj._codeGeneratorState.has_key('defaultCacheType'):
@@ -245,7 +245,7 @@ class CacheDirectiveProcessor(TagProcessor):
         
 class EndCacheDirectiveProcessor(CacheDirectiveProcessor):
     _token = 'endCacheDirective'
-    _delimRegexs = [delimeters['cacheDirectiveEndTag'],]    
+    _delimRegexs = [delimiters['cacheDirectiveEndTag'],]    
     
     def translateTag(self, templateObj, tag):
         templateObj._codeGeneratorState['defaultCacheType'] = NoDefault
@@ -291,7 +291,7 @@ def preProcessComments(templateObj, templateDef):
         #commentString = match.group(1)
         return ''
     
-    for regex in templateObj._settings['delimeters']['comments']:
+    for regex in templateObj._settings['delimiters']['comments']:
         templateDef = regex.sub(subber, templateDef)
         
     return templateDef
@@ -301,7 +301,7 @@ def preProcessSlurpDirective(templateObj, templateDef):
     def subber(match):
         return ''
     
-    for regex in templateObj._settings['delimeters']['slurp']:
+    for regex in templateObj._settings['delimiters']['slurp']:
         templateDef = regex.sub(subber, templateDef)
     return templateDef
 
@@ -326,7 +326,7 @@ def preProcessDataDirectives(templateObj, templateDef):
             
         return '' # strip the directive from the extension
 
-    for RE in templateObj._settings['delimeters']['dataDirective']:
+    for RE in templateObj._settings['delimiters']['dataDirective']:
         templateDef = RE.sub(dataDirectiveProcessor, templateDef)
     return templateDef
 
@@ -380,7 +380,7 @@ def preProcessMacroDirectives(templateObj, templateDef):
         
         return ''
 
-    for RE in templateObj._settings['delimeters']['macroDirective']:
+    for RE in templateObj._settings['delimiters']['macroDirective']:
         templateDef = RE.sub(handleMacroDefs, templateDef)
     return templateDef
 
@@ -414,7 +414,7 @@ def preProcessLazyMacroCalls(templateObj, templateDef):
             raise Error('The macro ' + macroName + \
                         ' was called, but it does not exist')
 
-    for RE in templateObj._settings['delimeters']['lazyMacroCalls']:
+    for RE in templateObj._settings['delimiters']['lazyMacroCalls']:
         templateDef = RE.sub(handleMacroCalls, templateDef)
     return templateDef
 
@@ -446,7 +446,7 @@ def preProcessExplicitMacroCalls(templateObj, templateDef):
             extendedArgsDict[ match.group('argName') ] = match.group('argValue')
             return ''
 
-        regex = templateObj._settings['delimeters']['callMacroArgs']
+        regex = templateObj._settings['delimiters']['callMacroArgs']
         regex.sub(processExtendedArgs, extendedArgString)
 
         
@@ -464,7 +464,7 @@ def preProcessExplicitMacroCalls(templateObj, templateDef):
             raise Error('The macro ' + macroName + \
                         ' was called, but it does not exist')
         
-    for RE in templateObj._settings['delimeters']['callMacro']:
+    for RE in templateObj._settings['delimiters']['callMacro']:
         templateDef = RE.sub(subber, templateDef)
 
     return templateDef
@@ -482,7 +482,7 @@ def preProcessRawDirectives(templateObj, templateDef):
     if not hasattr(templateObj, '_rawTextBlocks'):
         templateObj._rawTextBlocks = {}
         
-    for RE in templateObj._settings['delimeters']['rawDirective']:
+    for RE in templateObj._settings['delimiters']['rawDirective']:
         templateDef = RE.sub(subber, templateDef)
     return templateDef
 
@@ -539,7 +539,7 @@ def preProcessIncludeDirectives(templateObj, templateDef):
             RESTART[0] = True
             return includeString
 
-    for RE in templateObj._settings['delimeters']['includeDirective']:
+    for RE in templateObj._settings['delimiters']['includeDirective']:
         templateDef = RE.sub(subber, templateDef)
         
     if RESTART[0]:
@@ -575,7 +575,7 @@ def preProcessBlockDirectives(templateObj, templateDef):
 
     ## handle the whitespace-gobbling blocks
 
-    for startTagRE in templateObj._settings['delimeters']['blockDirectiveStart']:
+    for startTagRE in templateObj._settings['delimiters']['blockDirectiveStart']:
 
         while startTagRE.search(templateDef):
             startTagMatch = startTagRE.search(templateDef)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.3 2001/07/09 00:59:23 echuck Exp $
+# $Id: PlaceholderProcessor.py,v 1.4 2001/07/11 21:42:11 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/09 00:59:23 $
+Last Revision Date: $Date: 2001/07/11 21:42:11 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 
 ##################################################
@@ -263,8 +263,7 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
             cacheRefreshInterval = float('.'.join(nameChunks[0].split('_')[1:]))
             del nameChunks[0]
         tag = '.'.join(nameChunks)
-
-
+        
         ## deal with local vars from #set and #for directives
         if tag in templateObj._localVarsList:
             return self.wrapEvalTag(templateObj, 'str(' + tag + ')')
