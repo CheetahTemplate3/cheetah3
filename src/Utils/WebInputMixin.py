@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: WebInputMixin.py,v 1.4 2002/09/12 07:43:24 hierro Exp $
+# $Id: WebInputMixin.py,v 1.5 2002/10/19 23:29:02 hierro Exp $
 """Mixin for Cheetah.Servlet for importing web transaction variables in bulk.
 
 This works for GET/POST fields both in Webware servlets and in CGI scripts, 
@@ -165,12 +165,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2002/03/17
-Last Revision Date: $Date: 2002/09/12 07:43:24 $
+Last Revision Date: $Date: 2002/10/19 23:29:02 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.4 $"[11:-2]
+__revision__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -183,7 +183,7 @@ True, False = (1==1), (1==0)
 import cgi     # Used by WebInputMixin.cgiImport() if this is a CGI script.
 import pprint
 import types
-from Cheetah.Utils.Misc import UseOrRaise
+from Cheetah.Utils.Misc import useOrRaise
 
 ##################################################
 ## EXCEPTIONS
@@ -258,7 +258,7 @@ def _lookup(name, func, multi, converters):
             except (TypeError, ValueError):
                 tup = converter.name, elm
                 errmsg = "%s '%s' contains invalid characters" % tup
-                elm = UseOrRaise(converter.error, errmsg)
+                elm = useOrRaise(converter.error, errmsg)
             values.append(elm)
     # 'values' is now a list of strings, ints or floats.
 
@@ -269,7 +269,7 @@ def _lookup(name, func, multi, converters):
     if   multi:
         return shortName, values
     if len(values) == 0:
-        return shortName, UseOrRaise(converter.default)
+        return shortName, useOrRaise(converter.default)
     return shortName, values[0]
 
     
