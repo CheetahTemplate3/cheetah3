@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.18 2002/08/09 03:07:00 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.19 2005/01/03 20:04:58 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
@@ -9,15 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.18 $
+Version: $Revision: 1.19 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/08/09 03:07:00 $
+Last Revision Date: $Date: 2005/01/03 20:04:58 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.18 $"[11:-2]
-
-##################################################
-## DEPENDENCIES
+__revision__ = "$Revision: 1.19 $"[11:-2]
 
 import sys
 import os.path
@@ -28,23 +25,11 @@ import imp
 from threading import Lock
 import string
 import traceback
-
-# intra-package imports ...
-import ImportManager
-from ImportManager import DirOwner
-from Compiler import Compiler
-
-##################################################
-## CONSTANTS & GLOBALS
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
+import Cheetah.ImportManager
+from Cheetah.ImportManager import DirOwner
+from Cheetah.Compiler import Compiler
 
 _installed = False
-
-
 
 ##################################################
 ## HELPER FUNCS

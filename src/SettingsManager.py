@@ -5,14 +5,14 @@
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.26 $
+Version: $Revision: 1.27 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2003/03/18 04:43:09 $
+Last Revision Date: $Date: 2005/01/03 20:04:13 $
 """
 
-# $Id: SettingsManager.py,v 1.26 2003/03/18 04:43:09 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.27 2005/01/03 20:04:13 tavis_rudd Exp $
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.26 $"[11:-2]
+__revision__ = "$Revision: 1.27 $"[11:-2]
 
 
 ##################################################
@@ -46,11 +46,7 @@ except:
         def release(self):
             pass
 
-## intra-package imports
-try:
-    from Webware.Exceptions import Error as BaseErrorClass
-except ImportError:
-    class BaseErrorClass: pass
+class BaseErrorClass: pass
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
