@@ -179,9 +179,20 @@ database lookup.  \code{\#set} variables are compiled into Python local
 variables, which have by far the fastest lookup time f any Python or Cheetah
 variables.
 
-% @@MO: Tavis had a section here "Moving Code into Python".  What did he
-% mean?  Is that a relic from an older version of Cheetah?
+Moving variable lookups into Python code may provide a speedup in certain
+circumstances.  If you're just reading \code{self} attributes, there's no
+reason to use NameMapper lookup (\$placeholders) for them.  NameMapper does
+a lot more work than simply looking up a \code{self} attribute.  
 
+On the other hand, if you don't know exactly where the value will come from
+(maybe from \code{self}, maybe from the searchList, maybe from a CGI input
+variable, etc), it's easier to just make that an argument to your method, and
+then the template can handle all the NameMapper lookups for you:
+\begin{verbatim}
+#silent $myMethod($arg1, $arg2, $arg3)
+\end{verbatim}
+Otherwise you'd have to call \code{self.getVar('arg1')} etc in your
+method, which is more wordy, and tedious.
 
 
 
