@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.36 2001/12/19 02:10:25 tavis_rudd Exp $
+# $Id: Parser.py,v 1.37 2002/01/07 04:02:50 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.36 $
+Version: $Revision: 1.37 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/12/19 02:10:25 $
+Last Revision Date: $Date: 2002/01/07 04:02:50 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.36 $"[11:-2]
+__revision__ = "$Revision: 1.37 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -143,7 +143,7 @@ nameCharLookAhead = r'(?=[A-Za-z_])'
 
 
 specialVarRE=re.compile(r'([a-zA-z_]+)@') # for matching specialVar comments
-EOLre=re.compile(r'(?:\r\n|\r|\n)'),
+EOLre=re.compile(r'(?:\r\n|\r|\n)')
 
 # e.g. ##author@ Tavis Rudd
 
