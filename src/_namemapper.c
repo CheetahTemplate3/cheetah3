@@ -7,8 +7,7 @@
 
 static PyObject *NotFound;   /* locally-raised exception */
 
-#define notFound(message) \
-    { PyErr_SetString(NotFound, message); return NULL; }
+#define notFound(message) { PyErr_SetString(NotFound, message); return NULL; }
 
 #define MAXCHUNKS 15		/* max num of nameChunks for the arrays */
 
