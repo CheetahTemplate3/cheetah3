@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.50 2002/04/24 06:19:41 tavis_rudd Exp $
+# $Id: Parser.py,v 1.51 2002/05/01 20:36:53 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.50 $
+Version: $Revision: 1.51 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/04/24 06:19:41 $
+Last Revision Date: $Date: 2002/05/01 20:36:53 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.50 $"[11:-2]
+__revision__ = "$Revision: 1.51 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -991,8 +991,8 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
 
             # intructions to the parser and compiler
             'breakpoint':self.eatBreakPoint,
+            'compiler':self.eatCompiler,            
             'compiler-settings':self.eatCompilerSettings,
-            'compiler':self.eatCompiler,
             
             # misc
             'shBang': self.eatShbang,

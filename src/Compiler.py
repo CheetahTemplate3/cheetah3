@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.35 2002/04/26 19:12:25 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.36 2002/05/01 20:36:11 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.35 $
+Version: $Revision: 1.36 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/04/26 19:12:25 $
+Last Revision Date: $Date: 2002/05/01 20:36:11 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.35 $"[11:-2]
+__revision__ = "$Revision: 1.36 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -349,7 +349,8 @@ class MethodCompiler(SettingsManager, GenUtils):
                 self.addWriteChunk( repr(strConst).replace('\\012','\\n'))
             else:
                 self.addWriteChunk(
-                    "'''" + strConst.replace('\\','\\\\').replace("'''","'\'\'\'") + "'''" )
+                    "'''" + strConst.replace('\\','\\\\').replace("'''","'\'\'\'")
+                    + "'''" )
 
     def delLeadingWS(self):
         if self._pendingStrConstChunks:
@@ -824,7 +825,8 @@ class ClassCompiler(SettingsManager, GenUtils):
                                    ' at line, col ' + str(lineCol) + '.') 
         catcherMeth.addChunk('try:')
         catcherMeth.indent()
-        catcherMeth.addChunk("return eval('''" + codeChunk + "''', globals(), localsDict)")
+        catcherMeth.addChunk("return eval('''" + codeChunk +
+                             "''', globals(), localsDict)")
         catcherMeth.dedent()
         catcherMeth.addChunk('except self._errorCatcher.exceptions(), e:')
         catcherMeth.indent()        
@@ -937,7 +939,8 @@ class ModuleCompiler(Parser, GenUtils):
 
         if self._filePath:
             self._fileDirName, self._fileBaseName = os.path.split(self._filePath)
-            self._fileBaseNameRoot, self._fileBaseNameExt = os.path.splitext(self._fileBaseName)
+            self._fileBaseNameRoot, self._fileBaseNameExt = \
+                                    os.path.splitext(self._fileBaseName)
             
         source = str( source )
         # by converting to string here we allow objects such as other Templates
@@ -1137,7 +1140,8 @@ class ModuleCompiler(Parser, GenUtils):
         
         specialVarMatch = specialVarRE.match(comm)
         if specialVarMatch:
-            return self.addSpecialVar(specialVarMatch.group(1), comm[specialVarMatch.end():])
+            return self.addSpecialVar(specialVarMatch.group(1),
+                                      comm[specialVarMatch.end():])
         elif comm.startswith('doc:'):
             addLine = self.addMethDocString
             comm = comm[len('doc:'):].strip()
