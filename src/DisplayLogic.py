@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: DisplayLogic.py,v 1.5 2001/08/30 02:48:57 tavis_rudd Exp $
+# $Id: DisplayLogic.py,v 1.6 2001/09/10 02:37:45 tavis_rudd Exp $
 """DisplayLogic Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/30 02:48:57 $
+Last Revision Date: $Date: 2001/09/10 02:37:45 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -49,11 +49,19 @@ class DisplayLogic(TagProcessor.TagProcessor):
                       r'else[\f\t ]*?|' +
                       r'else[\f\t ]if[\t ]+%(content)s|' +
                       r'elif[\f\t ]+%(content)s|' +
+                      r'end[\f\t ]+if|' +
                       r'for[\f\t ]+%(content)s|' +
+                      r'end[\f\t ]+for|' +
+                      r'while[\f\t ]+%(content)s|' +
+                      r'end[\f\t ]+while|' +
                       r'continue|' +
                       r'break|' +
-                      r'end[\f\t ]+if|' +
-                      r'end[\f\t ]+for|' +
+                      r'try[\f\t ]*?|' +
+                      r'except[\f\t ]*?|' +
+                      r'except[\f\t ]+%(content)s|' +
+                      r'finally[\f\t ]*?|' +
+                      r'end[\f\t ]+try|' +
+                      r'raise[\f\t ]+%(content)s|' +
                       r')[\f\t ]*%(endGrp)s')
             
         plain = re.compile(
@@ -84,26 +92,13 @@ class DisplayLogic(TagProcessor.TagProcessor):
         tag = tag.strip()
         self.validateTag(tag) 
         
-        if tag in ('end if','end for'):
+        if tag.startswith('end'):
             state['indentLevel'] -= 1
             outputCode = indent*state['indentLevel']
-
-        elif tag in ('continue','break'):
-            outputCode = indent*state['indentLevel'] + tag \
-                         + "\n" + \
-                         indent*state['indentLevel']
-        elif tag[0:4] in ('else','elif'):
-            tag = tag.replace('else if','elif')
             
-            if tag[0:4] == 'elif':
-                tag = self.translateRawPlaceholderString(tag)
-                tag = tag.replace('()() ','() ') # get rid of accidental double calls
-            
-            outputCode = indent*(state['indentLevel']-1) + \
-                         tag +":\n" + \
-                         indent*state['indentLevel']
-    
-        elif tag.startswith('if ') or tag.startswith('for '): # it's the start of a new block
+        elif (tag.startswith('if') or tag.startswith('for') or 
+              tag.startswith('while') or tag.startswith('try')):
+            # it's the start of a new block
             state['indentLevel'] += 1
             
             if tag[0:3] == 'for':
@@ -126,10 +121,22 @@ class DisplayLogic(TagProcessor.TagProcessor):
             outputCode = indent*(state['indentLevel']-1) + \
                          tag + ":\n" + \
                          indent*state['indentLevel']
-        
-        else:                           # it's a chunk of plain python code              
-            outputCode = indent*(state['indentLevel']) + \
-                         tag + \
+            
+        elif (tag.startswith('else') or tag.startswith('elif') or
+              tag.startswith('except') or tag.startswith('finally')):
+            
+            tag = tag.replace('else if','elif')
+            tag = self.translateRawPlaceholderString(tag)
+            tag = tag.replace('()() ','() ') # get rid of accidental double calls            
+
+            outputCode = indent*(state['indentLevel']-1) + \
+                         tag +":\n" + \
+                         indent*state['indentLevel']
+    
+        else:
+            # it's a chunk of plain python code: while, continue, raise, etc.
+            tag = self.translateRawPlaceholderString(tag)
+            outputCode = indent*state['indentLevel'] + tag + \
                          "\n" + indent*state['indentLevel']            
             
         return outputCode
