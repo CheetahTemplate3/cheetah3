@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.17 2001/08/08 00:14:37 tavis_rudd Exp $
+# $Id: Test.py,v 1.18 2001/08/09 17:58:05 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.17 $
+Version: $Revision: 1.18 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/08 00:14:37 $
+Last Revision Date: $Date: 2001/08/09 17:58:05 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.17 $"[11:-2]
+__version__ = "$Revision: 1.18 $"[11:-2]
 
 
 ##################################################
@@ -138,6 +138,7 @@ defaultTestNameSpace = {
             },
     'dict2': {'one':'item1', 'two':'item2'},
     'blockToBeParsed':"""$numOne $numTwo""",
+    'includeBlock2':"""$numOne $numTwo $aSetVar""",
     'nestedTDwithMacros':"""
 #macro test2(theTmpl)
  test2 called from $theTmpl
@@ -438,6 +439,12 @@ setTests = [
     ['simple #set + use of var',
      "#set $testVar = 'blarg'\n$testVar",
      "blarg",],
+
+    ['#set + use of #include',
+     """#set $aSetVar = 1234
+#include $includeBlock2
+""",
+     """1 2 1234""",],
 
     ['#set with a dictionary',
      """#set $testDict = {"one":"one1","two":"two2","three":"three3"}
