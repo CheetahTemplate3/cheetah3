@@ -20,6 +20,10 @@ release
     and this is the first "chunk" (component, identifier) in a searchList
     lookup.  this is to prevent $update from matching a dictionary method if
     there happens to be a dictionary container in the searchlist.  (MO)
+  - .webInput() now saves the cgi.FieldStorage() instance in a global
+    variable rather than recreating it each call.  That should allow the
+    method to be called multiple times with POST variables outside Webware.
+    (MO)
 
 0.9.15a3 (Nov 10, 2002)
   - corrected a dictionary bug in the Python version of NameMapper (TR)

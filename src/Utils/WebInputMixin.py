@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: WebInputMixin.py,v 1.6 2002/11/10 20:44:11 hierro Exp $
+# $Id: WebInputMixin.py,v 1.7 2002/11/25 09:23:24 hierro Exp $
 """Mixin for Cheetah.Servlet for importing web transaction variables in bulk.
 
 This works for GET/POST fields both in Webware servlets and in CGI scripts, 
@@ -165,12 +165,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2002/03/17
-Last Revision Date: $Date: 2002/11/10 20:44:11 $
+Last Revision Date: $Date: 2002/11/25 09:23:24 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.6 $"[11:-2]
+__revision__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -193,6 +193,9 @@ class NonNumericInputError(ValueError):
 
 ##################################################
 ## PRIVATE FUNCTIONS AND CLASSES
+
+# Cache of a cgi.FieldStorage() instance, maintained by .webInput().
+_form = None
 
 class _Converter:
     """A container object for info about type converters.
@@ -291,8 +294,10 @@ class WebInputMixin:
         src = src.lower()
         isCgi = not self.isControlledByWebKit
         if   isCgi and src in ('f', 'v'):
-            form = cgi.FieldStorage()
-            source, func = 'field',   form.getvalue
+            global _form
+            if _form is None:
+                _form = cgi.FieldStorage()
+            source, func = 'field',   _form.getvalue
         elif isCgi and src == 'c':
             raise RuntimeError("can't get cookies from a CGI script")
         elif isCgi and src == 's':
