@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.31 2001/11/09 18:15:37 tavis_rudd Exp $
+# $Id: Parser.py,v 1.32 2001/11/09 21:37:55 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.31 $
+Version: $Revision: 1.32 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/11/09 18:15:37 $
+Last Revision Date: $Date: 2001/11/09 21:37:55 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.31 $"[11:-2]
+__version__ = "$Revision: 1.32 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -688,32 +688,49 @@ class _LowLevelSemanticsParser(Lexer):
         return chunks
     
 
-    def getCallArgString(self):
+    def getCallArgString(self,
+                         enclosures=[],  # list of tuples (char, pos), where char is ({ or [ 
+                         ):
 
         """ Get a method/function call argument string. 
 
         This method understands *arg, and **kw
         """
-
-        startPos = self.pos()
-        if not self.peek() == '(':
-            raise ParseError(self, msg="Expected '('")
-            
-        argStringBits = []
+        
+        if enclosures:
+            pass
+        else:
+            if not self.peek() == '(':
+                raise ParseError(self, msg="Expected '('")
+            startPos = self.pos()
+            self.getc()
+            enclosures = [('(', startPos),
+                          ]
+        
+        argStringBits = ['(']
         addBit = argStringBits.append
-        addBit(self.getc())             # get the first (
 
         while 1:
             if self.atEnd():
+                open = enclosures[-1][0]
+                close = closurePairsRev[open]
                 self.setPos(enclosures[-1][1])
                 raise ParseError(
-                    self, msg="EOF was reached before a matching ')'"+
-                    " was found for the '('")
+                    self, msg="EOF was reached before a matching '" + close +
+                    "' was found for the '" + open + "'")
 
             c = self.peek()
-            if c == ")":
-                addBit(self.getc())  # get the last ) and break
-                break
+            if c in ")}]": # get the ending enclosure and break                
+                if not enclosures:
+                    raise ParseError(self)
+                c = self.getc()
+                open = closurePairs[c]
+                if enclosures[-1][0] == open:
+                    enclosures.pop()
+                    addBit(')')  
+                    break
+                else:
+                    raise ParseError(self)
             elif c in " \t\f\r\n":
                 addBit(self.getc())
             elif self.matchCheetahVarStart():
@@ -732,8 +749,6 @@ class _LowLevelSemanticsParser(Lexer):
                     addBit( codeFor1stToken + WS + nextToken )
                 else:
                     addBit( codeFor1stToken + WS)
-                        
-                
             else:
                 token = self.getPyToken()
                 if token in ('{','(','['):
@@ -824,7 +839,7 @@ class _LowLevelSemanticsParser(Lexer):
     
     def getExpression(self,
                       enclosed=False, 
-                      enclosures=[],
+                      enclosures=[], # list of tuples (char, pos), where char is ({ or [ 
                       ):
 
         """ Get a Cheetah expression that includes $CheetahVars and break at
@@ -1075,9 +1090,8 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             enclosures = []
         nameChunks = self.getCheetahVarNameChunks()
         if enclosures:
-            restOfEnclosure = self.getExpression(enclosed=True,
-                                                 enclosures=enclosures,
-                                                 )[:-1]
+            restOfEnclosure = self.getCallArgString(enclosures=enclosures,
+                                                    )[1:-1]
         else:
             restOfEnclosure = ''
 
