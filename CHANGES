@@ -21,6 +21,12 @@ release
       import MyTemplate  # will compile and import MyTemplate.tmpl
   - made my True/False declarations friendly with Python 2.2.1, which already
     includes True/False as builtins (TR)
+  - implemented the #compiler directive that Edmund Lian suggested (TR)
+      e.g.:
+        #compiler commentStartToken = '//'
+        // a comment
+        #compiler reset
+	// no longer a comment
 
 0.9.12 (April 3, 2002)
    - no code changes from beta 2
