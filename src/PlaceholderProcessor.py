@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.8 2001/07/13 18:09:39 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.9 2001/07/13 19:55:18 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/13 18:09:39 $
+Last Revision Date: $Date: 2001/07/13 19:55:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 
 ##################################################
@@ -69,10 +69,20 @@ class SyntaxError(ValueError):
 class PlaceholderProcessor(CodeGenerator.TagProcessor):
     """A class for processing $placeholders in strings."""
 
-    def __init__(self, tagRE = placeholderTagsRE, marker='placeholderTag.',
-           markerEscaped = 'placeholderTag\.',
-           markerLookBehind=r'(?:(?<=placeholderTag\.)|(?<=placeholderTag\.\{))'):
-        """Setup the regexs used by this class"""
+    def __init__(self, tagRE = placeholderTagsRE, marker=' placeholderTag.',
+           markerEscaped = ' placeholderTag\.',
+           markerLookBehind=r'(?:(?<= placeholderTag\.)|(?<= placeholderTag\.\{))'):
+        """Setup the regexs used by this class
+
+        All $placeholders are translated into valid Python code by swapping $
+        for the self._marker.  This marker is then used to find the start of
+        each placeholder and allows $vars in function arg lists to be parsed
+        correctly.
+
+        The marker starts with a space to allow $var$var to be parsed correctly.
+        $a$b is translated to --placeholderTag.a placeholderTag.b-- instead of
+        --placeholderTag.aplaceholderTag.b--, which the parser would mistake for
+        a single $placeholder The extra space is removed by the parser."""
 
         nameCharLookForward = r'(?=[A-Za-z_])'
         cachedTags = re.compile(markerLookBehind + r'\*' + nameCharLookForward)
