@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.11 2001/10/10 06:47:41 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.12 2001/11/04 19:28:41 ianbicking Exp $
 
 """This module implements Cheetah's optional NameMapper syntax.
 
@@ -146,13 +146,13 @@ Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/10/10 06:47:41 $
+Last Revision Date: $Date: 2001/11/04 19:28:41 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__version__ = "$Revision: 1.11 $"[11:-2]
+__version__ = "$Revision: 1.12 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -183,6 +183,8 @@ except:
     C_VERSION = False
 
     class NotFound(Exception):
+        pass
+    class NotFoundInNamespace(NotFound):
         pass
     
     def valueForKey(obj, key):
@@ -215,10 +217,16 @@ except:
             
         return _valueForName(obj, nameChunks, executeCallables=executeCallables)
     
-    def _valueForName(obj, nameChunks, executeCallables=False):
+    def _valueForName(obj, nameChunks, executeCallables=False, passNamespace=False):
         ## go get a binding for the key ##
         firstKey = nameChunks[0]
-        binding = valueForKey(obj, firstKey)
+        if passNamespace:
+            try:
+                binding = valueForKey(obj, firstKey)
+            except NotFound:
+                raise NotFoundInNamespace
+        else:
+            binding = valueForKey(obj, firstKey)
         if executeCallables and callable(binding) and \
            type(binding) not in (InstanceType, ClassType):
             # the type check allows access to the methods of instances
@@ -244,9 +252,9 @@ except:
 
         for namespace in searchList:
             try:
-                val = _valueForName(namespace, nameChunks, executeCallables=executeCallables)
+                val = _valueForName(namespace, nameChunks, executeCallables=executeCallables, passNamespace=True)
                 return val
-            except NotFound:
+            except NotFoundInNamespace:
                 pass           
         raise NotFound(name)
 
