@@ -53,6 +53,8 @@ for building dynamic web sites.
 
 Like its namesake, Cheetah is fast, flexible and powerful.
 
+% @@MO: Repeat picture of cheetah.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{What is the philosophy behind Cheetah?}
@@ -152,66 +154,58 @@ Compare this with PSP:
 </HTML>
 \end{verbatim}
 
+Section \ref{gettingStarted.tutorial} has a more typical example.
 
 %% @@TR: I'm going to extend this and briefly introduce: 
 %% - Template objects vs. .tmpl files.
 %% - how to get data into it 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Who developed Cheetah?}
-\label{intro.developers}
-
-Cheetah is one of several templating frameworks that grew out of a `templates'
-thread on the Webware For Python email list.  Tavis Rudd, Mike Orr, Chuck
-Esterbrook, and Ian Bicking are the core developers.
+%% @@MO: If you do this, reconcile this example and the one in gettingStarted.
+%%   Keep two examples or collapse into one?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{How mature is Cheetah?}
 \label{intro.mature}
 
-Cheetah is alpha software as some aspects of its design are still subject to
-change and the Users' Guide is incomplete.  We plan to release a stable version
-later in 2001.
+Cheetah is in alpha state, but the syntax, semantics and performance have been
+generally stable since an overhaul in mid 2001.  Most development since
+October 2001 has been in response to specific requests by production sites,
+things they need that we hadn't considered.  We are delaying a 1.0 release to
+give more time for these requests to trickle in.  We want to see Cheetah running
+a couple high-traffic public sites before releasing 1.0, preferably sites that
+are willing to make public the details of "how I built this thing using
+Cheetah".
 
-Here's a summary of known issues and aspects of the design that are in flux:
-\begin{itemize}
-\item \#include'd templates currently share the searchList of the main Template.
-     This behaviour might be changed.
-\item Python list comprehensions confuse Cheetah's parser if you put \$ prefixes
-     on local vars.  The work-around is to leave the \$ off.  This limitation is
-     rather obscure so there are no plans to fix this in the short term.  Let us
-     know if this affects you.
-\end{itemize}
-
-The syntax and usage directions described throughout the rest of this guide are
-stable unless noted otherwise.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Where can I get releases?}
-\label{intro.releases}
-
-Download Cheetah releases from
-\url{http://CheetahTemplate.sourceforge.net}
+The {\bf TODO file} in the Cheetah distribution and the {\bf ToDo page} on the
+wiki (see below) show what we're working on now or planning to work on.  Look
+both places for a complete picture.  The {\bf WishList page} on the wiki shows
+requested features we're considering but haven't commited to.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Where can I get news?}
 \label{intro.news}
 
-News and updates can be obtained from the the Cheetah website:
+Cheetah releases and other stuff can be obtained from the the Cheetah 
+{\bf Web site}:
 \url{http://CheetahTemplate.sourceforge.net}
 
-Cheetah discussions take place on the list
-\email{cheetahtemplate-discuss@lists.sourceforge.net}.
+Cheetah discussions take place on the {\bf mailing list}
+\email{cheetahtemplate-discuss@lists.sourceforge.net}.  This is where to hear
+the latest news first.
 
-The Cheetah wiki is becoming an increasingly popular place to list examples of
-Cheetah in use, provide cookbook tips for solving various problems, and
-brainstorm ideas for future versions of Cheetah.
-\url{http://cheetah.colorstudy.net/twiki/bin/view/Cheetah/WebHome}
-
-%% @@MO: \url{http://www.cheetahtemplate.org/wiki}, which is a redirect to ...
+The Cheetah {\bf wiki} is becoming an increasingly popular place to list
+examples of Cheetah in use, provide cookbook tips for solving various problems,
+and brainstorm ideas for future versions of Cheetah.
+\url{http://www.cheetahtemplate.org/wiki}
+(The wiki is actually hosted at
+\url{http://cheetah.colorstudy.net/twiki/bin/view/Cheetah/WebHome}, but the 
+other URL is easier to remember.)
+For those unfamiliar with a wiki, it's a type of Web site that readers can edit
+themselves to make additions or corrections to.  Try it.  Examples and tips 
+from the wiki will also be considered for inclusion in future versions of this
+Users' Guide.
 
 If you encounter difficulties, or are unsure about how to do something,
-please post a detailed message to the list.
+please post a detailed message to the list.  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{How can I contribute?}
@@ -222,7 +216,7 @@ experiences, tricks, customizations, and frustrations.
 
 \subsubsection{Bug reports and patches}
 
-If you think there is a bug in Cheetah, send a message to the email list
+If you think there is a bug in Cheetah, send a message to the e-mail list
 with the following information:
 
 \begin{enumerate}
@@ -235,10 +229,10 @@ with the following information:
 \end{enumerate}
 
 \subsubsection{Example sites and tutorials}
-If you're developing a website with Cheetah, please send a link to the
-email list so we can keep track of Cheetah sites.  Also, if you discover
-new and interesting ways to use Cheetah please share your experience and
-write a quick tutorial about your technique.
+If you're developing a website with Cheetah, please put a link on the wiki on
+the {\bf WhoIsUsingCheetah} page, and mention it on the list.  Also, if you
+discover new and interesting ways to use Cheetah, please put a quick tutorial
+(HOWTO) about your technique on the {\bf CheetahRecipies} page on the wiki.
 
 \subsubsection{Template libraries and function libraries}
 We hope to build up a framework of Template libraries (see section
@@ -260,6 +254,10 @@ Help spread the word ... recommend it to others, write articles about it, etc.
 \subsection{Acknowledgements}
 \label{intro.acknowledgments}
     
+Cheetah is one of several templating frameworks that grew out of a `templates'
+thread on the Webware For Python email list.  Tavis Rudd, Mike Orr, Chuck
+Esterbrook and Ian Bicking are the core developers.
+
 We'd like to thank the following people for contributing valuable advice, code
 and encouragement: Geoff Talvola, Jeff Johnson, Graham Dumpleton, Clark C.
 Evans, Craig Kattner, Franz Geiger, Geir Magnusson, Tom Schwaller, Rober Kuzelj,
@@ -280,8 +278,8 @@ Cheetah is open source, but products developed with Cheetah or derived
 from Cheetah may be open source or closed source.
 
 \subsubsection{Legal terms}
-Copyright \copyright 2001, The Cheetah Development Team: Tavis Rudd, Ian
-Bicking, Mike Orr, Chuck Esterbrook.
+Copyright \copyright 2001, The Cheetah Development Team: Tavis Rudd, Mike Orr,
+Ian Bicking, Chuck Esterbrook.
 
 Permission to use, copy, modify, and distribute this software for any purpose
 and without fee is hereby granted, provided that the above copyright notice
