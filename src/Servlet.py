@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.17 2002/03/13 18:39:07 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.18 2002/03/13 21:07:17 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.17 $
+Version: $Revision: 1.18 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2002/03/13 18:39:07 $
+Last Revision Date: $Date: 2002/03/13 21:07:17 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.17 $"[11:-2]
+__revision__ = "$Revision: 1.18 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -51,6 +51,13 @@ except:
 
 
 class Servlet(BaseServlet):
+    
+    """This class is an abstract baseclass for Cheetah.Template.Template.
+
+    It wraps WebKit.Servlet and provides a few extra convenience methods that
+    are also found in WebKit.Page.  It doesn't do any of the HTTP method
+    resolution that is done in WebKit.HTTPServlet
+    """
     
     transaction = None
     application = None
@@ -94,3 +101,4 @@ class Servlet(BaseServlet):
             return BaseServlet.serverSidePath(self, path)
         except:
             return os.path.normpath(os.path.abspath(path).replace("\\",'/'))
+
