@@ -120,14 +120,14 @@ Here are typical ways to create a template object:
      Read the Template Definition from a file named "fink.tmpl".  
 \item{\code{templateObj = Template(file=f)}}
      Read the Template Definition from file-like object 'f'.
-\item{\code{templateObj = Template("The king is a \$placeholder1.", searchList=\[dict, obj\])}}
+\item{\code{templateObj = Template("The king is a \$placeholder1.", searchList=[dict, obj])}}
      Pass the Template Definition as a string.  Also pass two Namespaces for the
      searchList: a dictionary 'dict' and an instance 'obj'.
-\item{\code{templateObj = Template(file="fink.txt", searchList=\[dict, obj\])}}
+\item{\code{templateObj = Template(file="fink.txt", searchList=[dict, obj])}}
      Same, but pass a filename instead of a string.  The \code{None} is required
      here to represent the missing Template Definition string -- this due to
      Python's rules for positional parameters.
-\item{\code{templateObj = Template(file=f, searchList=\[dict, obj\])}}
+\item{\code{templateObj = Template(file=f, searchList=[dict, obj])}}
      Same with a file object.
 \end{description}
 
