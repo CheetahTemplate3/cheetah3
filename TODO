@@ -123,6 +123,35 @@ Cheetah command revamp
   cheetah-fill etc if desired.
 
 
+#wrapper
+===============================================================================
+Goal: make it more convenient to use templates in programs by providing a
+wrapper function in the .py template module.  The function specifies how
+many arguments it needs and creates a searchList based on those arguments.
+New directives: #wrapper, ##doc-wrapper:, #*doc-wrapper: ... *#
+Usage: #wrapper $func($arg1, $arg2="default", ...)
+This example creates the following function in the .py template module:
+	def func(arg1, arg2="default", ...):
+		"""Function docstring."""
+		sl = {'arg1': arg1, 'arg2': arg2, ...}
+		t = TheTemplate(searchList=[sl])
+		return str(t)
+The doc-wrapper directives append the text to the #wrapper's docstring.
+	Finally, make this function accessible directly from the shell.
+If there are any non-option arguments on the command line, call the function
+instead of filling the template the normal way.  
+	There should be only one #wrapper per template.  We could allow 
+multiple if there's a demand, but #wrapper is mainly intended for templates
+that want to be called one particular way.  If we do have multiple functions,
+we'd need a rule that doc-wrapper's apply to the previous function, and the
+shell command line would have to specify the function name, either as
+        template.py -w func "arg1" "arg2"
+or      template.py func "arg1" "arg2"
+In the latter case, the function name would always have to be specified,
+which I think is undesired.
+	
+
+
 
 Test Suite
 ================================================================================
