@@ -3,6 +3,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 static PyObject *NotFound;   /* locally-raised exception */
 static PyObject *TooManyPeriods;   /* locally-raised exception */
@@ -274,7 +278,8 @@ static struct PyMethodDef namemapper_methods[] = {
 /* *************************************************************************** */
 /* Initialization function (import-time) */
 
-void init_namemapper()
+DL_EXPORT(void)
+init_namemapper(void)
 {
   PyObject *m, *d;
 
@@ -293,4 +298,6 @@ void init_namemapper()
     Py_FatalError("Can't initialize module _namemapper");
 }
 
-
+#ifdef __cplusplus
+}
+#endif
