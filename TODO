@@ -13,7 +13,12 @@ Languague Specification
   should delegate multiple inheritance (mixins, etc.) to pure Python base
   classes.
 
-- revisit parsed #include directives.  Are the necessary at all??
+- revisit parsed #include directives.  Are they necessary at all??
+  (This is a rhetorical question.  They are necessary.  However, the
+  Users' Guide needs better examples about when and when not to use
+  #include.  Also, consider making '#include' do a raw include, and
+  something else do a parsed include ('#include parsed', '#include cheetah'?),
+  so that users get parsing only if they explicitly request it.
 
 - finish the #cache directive's varyBy keyword
 
@@ -31,6 +36,11 @@ Implementation
 
 - implement the #cache directive's varyBy keyword
 
+- split 'cheetah compile' function into two.  'cheetah compile' converts
+  *.tmpl -> *.py and eliminates the -w switch.  Another function does 
+  whatever 'cheetah compile -w' is supposed to do (*.tmpl -> *.html somehow).
+  Audit 'cheetah compile' for bugs and unclear code.
+
 Test Suite
 ================================================================================
 - test cases for the SkeletonPage framework
@@ -39,8 +49,13 @@ Test Suite
 
 Documentation
 ================================================================================
-- finish up the Webware section
-- beginners guide (MO)
+- more examples in the Webware section (MO)
+- more examples/advice all over the Users' Guide about recommended/
+  non-recommended strategies (MO)
+- developers' guide (MO)
+- beginners guide
+- quick reference for template maintainers (MO - someday)
+- HOWTOs (somebody offered to make some)
 
 Website
 ================================================================================
