@@ -79,11 +79,11 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
 }
 
 /* *************************************************************************** */
-/* Now the module functions to export into Python */
+/* Now the wrapper functions to export into the Python module */
 /* *************************************************************************** */
 
 static PyObject *
-namemapper_valueForKey(PyObject *self, PyObject *args)       /* args: (string) */
+namemapper_valueForKey(PyObject *self, PyObject *args)
 {
   PyObject *obj;
   char *key;
@@ -96,14 +96,15 @@ namemapper_valueForKey(PyObject *self, PyObject *args)       /* args: (string) *
 }
 
 static PyObject *
-namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)       /* args: (string) */
+namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)
 {
 
   PyObject *obj;
+  PyObject *res;
   const char *name;
   int executeCallables = 0;
 
-  char *dot = ".";
+  const char *dot = ".";
   char *copyOfName;
   char *nameChunks[MAXCHUNKS];
   int numChunks = 1;
@@ -122,9 +123,9 @@ namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)       
   while ((nextChunk = strtok(NULL, dot)) != NULL) {
     nameChunks[numChunks++] = nextChunk;
   }
-  /* @@ DO I NEED TO: free(copyOfName); */
-
-  return PyNamemapper_valueForName(obj, nameChunks, numChunks, executeCallables);
+  res = PyNamemapper_valueForName(obj, nameChunks, numChunks, executeCallables);
+  free(copyOfName);		/* must do after nameChunks has been used */
+  return res;
 }
 
 /* *************************************************************************** */
