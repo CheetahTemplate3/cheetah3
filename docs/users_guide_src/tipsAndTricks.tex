@@ -1,14 +1,69 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Tips and Tricks}
+\section{Miscellaneous Placeholder and Directive Tips}
 \label{tips}
 
-[{\bf This section is under construction.  Do you have anything to contribute?}]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{ASP-style tags}
+\label{tips.ASP}
 
-This section may be removed because the wiki provides a more dynamic way to
-register tips and provide collaborative feedback about them.
-\url{http://cheetah.colorstudy.net/twiki/bin/view/Cheetah/WebHome}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Placeholder Tips}
+\label{tips.placeholder}
 
-%% @@MO: http://www.cheetahtemplate.org/wiki
+Here's how to do certain important lookups that may not be obvious.
+For each, we show first the Cheetah expression and then the Python equivalent,
+because you can use these either in templates or in pure Python mixin classes.
+The Cheetah examples use NameMapper shortcuts (uniform dotted notation, 
+autocalling) as much as possible.
+
+To verify whether a variable exists in the searchList:
+\begin{verbatim}
+$varExists('theVariable')
+self.varExists('theVariable')
+\end{verbatim}
+This is useful in \code{\#if} or \code{\#unless} constructs to avoid a
+\code{\#NameMapper.NotFound} error if the variable doesn't exist.  For instance,
+a CGI GET parameter that is normally supplied but in this case the user typed
+the URL by hand and forgot the parameter (or didn't know about it).
+
+To look up a variable in the searchList from a Python method:
+\begin{verbatim}
+self.getVar('theVariable')
+self.getVar('theVariable', None)
+self.getVar('theVariable', myDefault)
+\end{verbatim}
+This is the equivalent to \code{\$theVariable} in the template.  \code{getVar}
+returns the second argument (\code{None} or \code{myDefault} if the variable is
+missing; or, if there is no second argument, it raises raises
+\code{NameMapper.NotFound}.  However, it usually easier to write your method
+so that all needed searchList values come in as method arguments.  That way
+the caller can just use a \$placeholder to specify the argument, which is
+less verbose than you writing a getVar call.
+
+To do a ``safe'' placeholder lookup that returns a default value if the
+variable is missing:
+\begin{verbatim}
+$getVar('theVariable', None)
+$getVar('theVariable', $myDefault)
+\end{verbatim}
+
+To get an environmental variable, put \code{os.environ} as one of the
+elements in the searchList.  Or read the envvar in Python code and set a
+placeholder variable for it.
+
+Remember that variables found earlier in the searchList override same-name
+variables located in a later searchList object.  Be careful when adding objects
+containing other variables besides the ones you want (e.g., \code{os.environ},
+CGI parameters).  The "other" variables may override variables your application
+depends on, leading to hard-to-find bugs.  Also, users can inadvertantly or
+maliciously set an environmental variable or CGI parameter you didn't expect,
+screwing up your program.  To avoid all this, know what your namespaces
+contain, and place the namespaces you have the most control over first.  For
+namespaces that could contain user-supplied "other" variables, don't put the
+namespace itself in the searchList; instead, copy the needed variables into
+your own "safe" namespace.
+
+% @@ MO: If getVar() is called from Python, does errorCatcher apply?
 
 
 % Local Variables:

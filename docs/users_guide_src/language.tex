@@ -3,49 +3,46 @@
 
 
 Cheetah's basic syntax was inspired by the Java-based template engines Velocity
-and WebMacro. It has two types of tags: {\bf placeholders} and {\bf directives}.
-Both types are case-sensitive.  
+and WebMacro. It has two types of tags: {\bf \$placeholders} and {\bf
+\#directives}.  Both types are case-sensitive.  
 
 Placeholder tags begin with a dollar sign (\code{\$varName}) and are similar to
-data fields in a form letter or the \code{\%(key)s} fields Python's \code{\%}
-operator uses. When a template is processed, placeholders are replaced with the
-value they refer to.
+data fields in a form letter or to the \code{\%(key)s} fields on the left side
+of Python's \code{\%} operator. When the template is filled, the placeholders
+are replaced with the values they refer to.
 
 Directive tags begin with a hash character (\#) and are used for comments,
 loops, conditional blocks, includes, and all other advanced features. Cheetah
 uses a Python-like syntax inside directive tags and understands any valid
-Python expression.  Some of the main differences from pure Python syntax are
-that variable names are prefaced with a dollar sign (\$), colons (:) are
-not used to mark the beginning of a code block, and indentation is not
-significant.  See section \ref{language.namemapper} below for details of
-another important difference. Most of the directive tags listed below are
-direct mirrors of Python statements.
+Python expression.  However, unlike Python, Cheetah does not use colons (:) and
+indentation to mark off multi-line directives.  That doesn't work in an
+environment where whitespace is significant as part of the text.  Instead,
+multi-line directives like \code{\#for}, have  corresponding closing tags
+ (\code{\#end for}).  Most directive tags are direct
+mirrors of Python statements.
 
 Cheetah does not use HTML/XML-style tags like some other template languages for
 the following reasons:
-\begin{itemize}
-\item Cheetah is not limited to HTML
-\item HTML-style tags are hard to distinguish from real HTML tags
-\item HTML-style tags are not visible in rendered HTML when something goes wrong
-\item HTML-style tags often lead to invalid HTML, as with
-     \code{<img src=''<template-directive>''>}
-\item Cheetah tags are less verbose and easier to understand than
-     HTML-style tags
-\item HTML-style tags aren't compatible with most WYSIWYG editors
-\end{itemize}
+ Cheetah is not limited to HTML,
+ HTML-style tags are hard to distinguish from real HTML tags,
+ HTML-style tags are not visible in rendered HTML when something goes wrong,
+ HTML-style tags often lead to invalid HTML (e.g., 
+\code{<img src=''<template-directive>''>}),
+Cheetah tags are less verbose and easier to understand than HTML-style tags, 
+and HTML-style tags aren't compatible with most WYSIWYG editors
 
 Besides being much more compact, Cheetah also has some advantages over
 languages that put information inside the HTML tags, such as Zope Page
 Templates or PHP:
-
-\begin{itemize}
-\item HTML or XML-bound languages do not work well with other languages.
-\item While ZPT-like syntaxes work well in many ways with WYSIWYG HTML editors,
+ HTML or XML-bound languages do not work well with other languages,
+ While ZPT-like syntaxes work well in many ways with WYSIWYG HTML editors,
      they also give up a significant advantage of those editors -- concrete
      editing of the document.  When logic is hidden away in (largely
      inaccessible) tags it is hard to understand a page simply by viewing it,
      and it is hard to confirm or modify that logic.
-\end{itemize}
+
+Placeholders and directives can be escaped by putting a backslash before them.
+\code{\\\$var} and \code{\\\#if} will be output as literal text.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Language Constructs -- Summary}
@@ -116,7 +113,8 @@ Templates or PHP:
      \item \code{\#assert}
      \item \code{\#raise}
      \item \code{\#try} \ldots \code{\#except} \ldots \code{\#else} \ldots
-          \code{\#end try} and  \code{\#finally}
+          \code{\#end try} 
+     \item \code{\#try} \ldots \code{\#finally} \ldots \code{\#end try}
      \item \code{\#errorCatcher} \ldots sets a default exception catcher/handler for
           exceptions raised by \$placeholder calls.
      \end{enumerate}
@@ -137,8 +135,12 @@ These tags may not be used inside other Cheetah tags.
 \item execute code and discard output: \code{<\%} \ldots \code{\%>}
 \end{enumerate}
 
+The use of all these directives will be covered in the next few chapters.
+
 %% @@MO: TODO: reconcile the order of this summary with the order in the
 %% detail sections.
+
+% @@MO: ASP chapter with examples.  What does write() do?  Print?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Placeholder Syntax Rules}
@@ -149,7 +151,7 @@ These tags may not be used inside other Cheetah tags.
 \item Placeholder names consist of one or more identifiers separated by periods.
      Each identifier follows the same rules as a Python variable name or
      attribute name: it must start with a letter or an underscore, and the
-     subsequent characters must be letters, numbers or underscores.  An
+     subsequent characters must be letters, digits or underscores.  An
      identifier may be followed by argument sets enclosed in ``()'' and/or
      key/subscript arguments in ``[]''.
 
@@ -161,7 +163,7 @@ These tags may not be used inside other Cheetah tags.
      
 \item All variable names inside argument sets should be prefixed with a \$.
      Use \$func(\$var) instead of \$func(var).  Python's builtin functions also
-     follow this rule.
+     follow this rule: \code{\$hex(\$myVar)}.
 
 \item All argument names inside argument sets should be prefixed with a \$.
      Use \$func(\$arg=1234) instead of \$func(arg=1234).  This rule also applies
@@ -220,22 +222,29 @@ You can use compiler settings to change the placeholder delimeters if
 \code{\$}, \code{\{} and \code{\}} are not suitable.  This will be documented
 in the future.  None of the examples in this Guide use this feature.
 
+Why all the \$s in directives and expressions?  Think of an \$-prefixed
+variable as a ``smart variable''.  At compile time, Cheetah checks whether the
+name corresponds to a known local variable or Python builtin.  If so, it puts
+a bare variable name in the generated method.  If not, Cheetah puts in a 
+function call that will look up the value in the searchList.  Sometimes you
+will see templates where people have omitted some of the \$s in directives or
+expressions.  These may work if the name is a local variable or builtin.
+They will {\em not} work if the value comes from the searchList.  It's easier
+and less error-prone to just use the \$ everywhere and let Cheetah figure out
+the Best Thing To Do.  With ordinary placeholders in the text, of course, you
+{\em must} use the \$, because otherwise the name will be considered normal 
+text.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Directive Syntax Rules}
-\label{language.directives}
-
-Directives tags are used for all functionality that cannot be handled with
-simple placeholders. Some directives consist of a single tag while others
-consist of a pair of {\bf start} and {\bf end} tags that surround a chunk of
-text.  End tags are written in the form \code{\#end [directive-name]}.
-Directives are case-sensitive.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Escaping directives}
-\label{language.directives.escaping}
-
-Directives can be escaped by placing a backslash before them.  Escaped
-directives will be printed verbatim.
+% @@MO: deleted, no new information.
+%\subsection{Directive Syntax Rules}
+%\label{language.directives}
+%
+%Directives tags are used for all functionality that cannot be handled with
+%simple placeholders. Some directives consist of a single tag while others
+%consist of a pair of {\bf start} and {\bf end} tags that surround a chunk of
+%text.  End tags are written in the form \code{\#end [directive-name]}.
+%Directives are case-sensitive.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Directive closures and whitespace handling}
@@ -257,7 +266,7 @@ block directive
 #end block testBlock
 \end{verbatim}
 
-When a directive tag is closed explicitly it can be followed with other text on
+When a directive tag is closed explicitly, it can be followed with other text on
 the same line:
 
 \begin{verbatim}
@@ -289,7 +298,7 @@ bar
 \end{verbatim}
 
 When a directive tag is closed implicitly AND there is no other text on the
-line, the ENTIRE line will be gobbled up including any preceeding whitespace:
+line, the ENTIRE line is gobbled up including any preceeding whitespace:
 \begin{verbatim}
 """
 foo 
@@ -318,11 +327,59 @@ foo
 The \code{\#slurp} directive (section
 \ref{directives.slurp}) also gobbles up whitespace.
 
+To place a comment after a directive on the same line, or to place two
+directives back to back, the first directive must be closed explicitly.
+Beware of spaces between the directives: they will be output as literal text,
+and will not allow the line-gobbling mentioned above (unless you use
+\code{\#slurp}).  Here are some examples:
+
+\begin{verbatim}
+#attr $animals = ('horse', 'donkey')
+First pass:
+#for $animal in $animals ### La la!
+The zoo contains $animal.
+#end for# ## $animal.
+******************************************
+Second pass:
+#for $animal in $animals
+The zoo contains $animal.
+#end for
+******************************************
+Third pass:
+#for $animal in $animals##slurp### La la!
+The zoo contains $animal.
+#end for##slurp### $animal.
+*****************************************
+\end{verbatim}
+
+And the output:
+
+\begin{verbatim}
+First pass:
+
+The zoo contains horse.
+
+The zoo contains donkey.
+ 
+******************************************
+Second pass:
+The zoo contains horse.
+The zoo contains donkey.
+******************************************
+Third pass:
+The zoo contains horse.
+The zoo contains donkey.
+*****************************************
+
+\end{verbatim}
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Variables in directives}
 \label{language.directives.variables}
 
-Variable names used inside a directive tag should be prefaced by \$, as in this
+Variable names used inside a directive tag should be prefaced by \$ as in this
 example:
 
 \begin{verbatim}
@@ -340,14 +397,15 @@ One of our core aims for Cheetah was to make it easy for non-programmers to
 use. Therefore, Cheetah uses a simplified syntax for mapping variable
 names in Cheetah to values in Python. It's known as the{\bf NameMapper syntax}
 and allows for non-programmers to use Cheetah without knowing (a)
-what the difference is between an object and a dictionary, (b) what functions
+the difference between an object and a dictionary, (b) what functions
 and methods are, and (c) what 'self' is. A side benefit is that NameMapper
 syntax insulates the code in Cheetah templates from changes in the implementation
 of the Python data structures behind them.
 
 NameMapper syntax is used for all variables in Cheetah placeholders and
 directives. If desired, it can be turned off via the \code{Template} class'
-\code{'useNameMapper'} compiler setting.
+\code{'useNameMapper'} compiler setting.  But it's doubtful you'd ever want to
+turn it off.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Example}
@@ -417,10 +475,14 @@ This works only with dictionary keys that are also valid Python identifiers.
 \subsubsection{Autocalling}
 \label{language.namemapper.autocalling}
 
-Cheetah automatically detects functions and methods in Cheetah \$variables and calls
-them if the parentheses have been left off.  
+Cheetah automatically detects functions and methods in Cheetah \$variables and
+calls them if the parentheses have been left off.  Our previous example can be
+further simplified to:
+\begin{verbatim}
+  $customers.kerr.address
+\end{verbatim}
 
-For example if 'a' is an object, 'b' is a method
+As another example, if 'a' is an object, 'b' is a method
 \begin{verbatim}
   $a.b
 \end{verbatim}
@@ -439,9 +501,10 @@ where 'c' is a key in the dictionary that a.b() returns.
 
 Further notes:
 \begin{itemize}
-\item Cheetah autocalls the function or method without any arguments.  Thus
-autocalling can be used only with functions or methods that either have no
-arguments or have default values for all arguments.
+\item When Cheetah autocalls a function/method, it calls it without any
+arguments.  Thus, the function/method must have been declared without arguments
+(except \code{self} for methods) or to provide default values for all arguments.
+If the function requires arguments, you must use the \code{()}.
 
 \item Cheetah autocalls only functions and methods.  Classes and other callable
 objects are not autocalled.  
@@ -464,18 +527,19 @@ from an underscored attribute.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Namespace cascading and the searchList}
-\label{language.namemapper.searchList}
+\subsection{Namespace cascading and the searchList}
+\label{language.searchList}
 
-When Cheetah maps variable name in a template to a Python value, it searches
+When Cheetah maps a variable name in a template to a Python value, it searches
 through a list of namespaces known as the Template object's \code{searchList}.
 By default, the only namespace in the \code{searchList} is the template object
 itself. This means that its attributes or methods can be accessed in templates
 via \code{\$placeholders} without needing to include 'self' in the reference as
 you do in Python. 
 
-(Note: the values looked up are called ``namespace values'' or 
-``placeholder values'' interchangeably.)
+The looked-up values are called {\bf placeholder values}, because they are what
+a placeholder evaluates to.  If the value comes from the searchList, it's called
+a \code{searchList} variable.
 
 The \code{searchList} can be used to override or supplement the variables in the
 template object's namespace without needing to create a subclass.  When Cheetah
@@ -495,13 +559,18 @@ The\code{\_\_init\_\_} method of the \code{Template} class, and the subclasses
 generated by the Cheetah compiler, accept a list of namespaces that will be
 added to the start of the \code{searchList}.  Extra namespaces can be added to
 the end of the searchList at at any time using the
-\code{Template.addToSearchList()} method.
+\code{.addToSearchList()} method, and to the beginning by
+\code{.prependToSearchList()}, both defined in \code{Template}.
+
+Note that if you place an object on the searchList, you cannot look up that
+object itself by name.  You can only look up the attributes/keys {\em inside}
+that object.
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Local variables}
-\label{language.namemapper.localVariables}
+\label{language.localVariables}
 
 The following names are accessible by \code{\$placeholders}, even though they
 are not in the searchList:  
@@ -511,7 +580,7 @@ are not in the searchList:
 \item \code{\#for} loop counters.
 \item the template object's \code{self} (i.e., \code{\$self.attrib1}).
 \item Python's built-in functions and objects (everything in module
-     \code{\_\_builtin\_\_}).
+     \code{\_\_builtin\_\_}, \code{None}, etc).
 \end{enumerate}
 
 These are in fact local variables in the generated class method.  The compiler
@@ -531,10 +600,22 @@ autocallable.  So the compiler generates the appropriate Python code.
 
 If you want to make absolutely sure that you are accessing an attribute or
 method of the template object, include 'self' in the reference:
-\code{\$self.attrib1} instead of \code{\$attrib1}.  (With \code{self.}, it's
-a local variable lookup.  Without \code{self.}, Cheetah consults the 
-searchList.  Since \code{self} is the {\em last} element in the searchList,
-any other 'attrib1' in the searchList will override that one.
+\code{\$self.attrib1} instead of \code{\$attrib1}.  (\code{\$self.attrib1}, it's
+a local variable lookup followed by universal dotted notation.  But for
+\code{\$attrib1}, Cheetah consults the searchList.  Since \code{self} is the
+{\em last} element in the searchList, any other 'attrib1' in the searchList
+will override that one.
+
+Note that you cannot override builtin variables and functions; that is, you
+cannot access a searchList value of the same name.  This sometimes causes
+surprises when Python adds a new builtin to the language.  For instance, Python
+2.2 added a new builtin \code{property}.  This tripped up a user with a 
+\code{\$property} variable in his application.  Not only did Cheetah look up
+the wrong variable, but it raised an error because the \code{property} function
+requires arguments.  Since we do not know what builtins might be added to future
+versions of Python, the best one can do is to be aware of the situation and to
+be on the lookout for new builtins that might cause a name conflict in your
+templates.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Missing values}
@@ -542,74 +623,10 @@ any other 'attrib1' in the searchList will override that one.
 
 If NameMapper can not find a Python value for a Cheetah variable name, it will
 raise the NameMapper.NotFound exception.  You can use the \code{\#errorCatcher}
-directive (section \ref{errorHandling.errorCatcher}) or {\bf errorCatcher }
-constructor argument (section \ref{howWorks.constructing}) to specify an
-alternate behaviour.
+directive (section \ref{errorHandling.errorCatcher}) or {\bf errorCatcher}
+Template constructor argument (section \ref{howWorks.constructing}) to specify
+an alternate behaviour.
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Variable tips}
-\label{language.namemapper.tips}
-
-%% @@TR: These should be put somewhere else.  This chapter is supposed to
-%% provide only a summary of the language.
-
-Here's how to do certain important lookups that may not be obvious.
-Forms beginning with \code{\$} are placeholders.  Forms beginning with
-\code{self.} do the equivalent in Python, assuming you are in a method 
-inherited by the template object.
-
-To verify whether a variable exists in the searchList:
-\begin{verbatim}
-$varExists('theVariable')
-self.varExists('theVariable')
-\end{verbatim}
-This is useful in \code{\#if} or \code{\#unless} constructs to avoid a
-\code{\#NameMapper.NotFound} error if the variable doesn't exist.  For instance,
-a CGI GET parameter that is normally supplied but in this case the user typed
-the URL by hand and forgot the parameter (or didn't know about it).
-
-To look up a variable in the searchList from a Python method:
-\begin{verbatim}
-self.getVar('theVariable')
-self.getVar('theVariable', None)
-self.getVar('theVariable', myDefault)
-\end{verbatim}
-This is the equivalent to \code{\$theVariable} in the template.  \code{getVar}
-returns the second argument (\code{None} or \code{myDefault} if the variable is
-missing; or, if there is no second argument, it raises raises
-\code{NameMapper.NotFound}.  However, it usually easier to write your method
-so that all needed searchList values come in as method arguments.  That way
-the caller can just use a \$placeholder to specify the argument, which is
-less verbose than you writing a getVar call.
-
-To do a ``safe'' placeholder lookup that returns a default value if the
-variable is missing:
-\begin{verbatim}
-$getVar('theVariable', None)
-$getVar('theVariable', $myDefault)
-\end{verbatim}
-
-To get an environmental variable, put \code{os.environ} as one of the
-elements in the searchList.  Or read the envvar in Python code and set a
-placeholder variable for it.
-
-Remember that variables found earlier in the searchList override same-name
-variables located in a later searchList object.  Be careful when adding objects
-containing other variables besides the ones you want (e.g., \code{os.environ},
-CGI parameters).  The "other" variables may override variables your application
-depends on, leading to hard-to-find bugs.  Also, users can inadvertantly or
-maliciously set an environmental variable or CGI parameter you didn't expect,
-screwing up your program.  To avoid all this, know what your namespaces
-contain, and place the namespaces you have the most control over first.  For
-namespaces that could contain user-supplied "other" variables, don't put the
-namespace itself in the searchList; instead, copy the needed variables into
-your own "safe" namespace.
-
-Webware-specific placeholder tips are in the Webware chapter (section
-\ref{webware}.
-
-% @@ MO: If getVar() is called from Python, does errorCatcher apply?
 
 % Local Variables:
 % TeX-master: "users_guide"
