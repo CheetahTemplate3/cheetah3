@@ -10,7 +10,6 @@ Cheetah TODO list
 
 Requirements for 1.0
 =========================================================================
-- CheetahWrapper bugs: suppress verbose output if --stdout/-p. (MO)
 - NameMapper attributes before keys, both Python and C versions.  NM should
   look for a key first, then an attribute.  But if (1) this is the first
   component after $, and (2) isinstance(OBJ, dictTypes), *ignore the

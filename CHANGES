@@ -24,7 +24,7 @@ release
     variable rather than recreating it each call.  That should allow the
     method to be called multiple times with POST variables outside Webware.
     (MO)
-  - CheetahWrapper: no verbose output on stdout with --stdin/-p.
+  - CheetahWrapper: no verbose output on stdout with --stdout/-p.
 
 0.9.15a3 (Nov 10, 2002)
   - corrected a dictionary bug in the Python version of NameMapper (TR)
