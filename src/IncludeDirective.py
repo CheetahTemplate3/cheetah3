@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: IncludeDirective.py,v 1.9 2001/08/16 23:24:52 tavis_rudd Exp $
+# $Id: IncludeDirective.py,v 1.10 2001/08/17 15:48:55 tavis_rudd Exp $
 """IncludeDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/16 23:24:52 $
+Last Revision Date: $Date: 2001/08/17 15:48:55 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.9 $"[11:-2]
+__version__ = "$Revision: 1.10 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -65,7 +65,7 @@ class IncludeDirective(TagProcessor.TagProcessor):
         #include <ARGS> file = <EXPR> 
         ... uses the value of EXPR as the path of the file to  include.
 
-        where <ARGS> is 'raw' or 'direct
+        where <ARGS> is 'raw' or 'direct'
         """
         
         import Template

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.45 2001/08/16 23:28:01 tavis_rudd Exp $
+# $Id: Template.py,v 1.46 2001/08/17 15:48:55 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.45 $
+Version: $Revision: 1.46 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/16 23:28:01 $
+Last Revision Date: $Date: 2001/08/17 15:48:55 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.45 $"[11:-2]
+__version__ = "$Revision: 1.46 $"[11:-2]
 
 
 ##################################################
@@ -77,65 +77,6 @@ class RESTART:
     
 class Template(SettingsManager, Parser):
     """The core template engine: parses, compiles, and serves templates."""
-    _settings = {
-        'formatter':None,         # string - which formatter from Cheetah.Formatters
-        'formatterClass':None,    # class that overrides the 'formatter' setting
-        'errorChecker':None,      # string - which errorChecker from Cheetah.ErrorCheckers
-        'errorCheckerClass': None,# class that overrides the 'errorChecker' setting
-        
-        'placeholderStartToken':'$',
-        'directiveStartToken':'#',
-        'directiveEndToken':'/#',
-        'singleLineComment':'##',
-        'multiLineComment':('#*','*#'),
-
-        'delayedCompile': False,  # if True, then __init__ won't compile auto-Template
-        'plugins':[],
-        'useAutocalling': True,
-        'debug': False,          
-
-        'includeBlockMarkers': False,   # should output from #block's be wrapped in a comment
-        'blockMarkerStart':('<!-- START BLOCK: ',' -->'),
-        'blockMarkerEnd':('<!-- END BLOCK: ',' -->'),
-        
-        ## The rest of this stuff is mainly for internal use
-        'placeholderMarker':' placeholderTag.', # the space is intentional!
-        'internalDelims':["<Cheetah>","</Cheetah>"],
-        'tagTokenSeparator': '__@__',
-        'indentationStep': ' '*4, # 4 spaces - used in the generated code
-        'initialIndentLevel': 2,  # 1 for def respond(): -- 1 for try:
-                                
-        'codeGenErrorHandler':ErrorHandlers.CodeGeneratorErrorHandler,
-        'responseErrorHandler': ErrorHandlers.ResponseErrorHandler,
-
-        'stages':{1:{'title':'pre-processing',
-                     'description':"the raw template is filtered using\n" + \
-                     "the pre-processors specified in the TemplateServer settings.",
-                     'errorHandler':ErrorHandlers.Stage1ErrorHandler,
-                     },
-                  2:{'title':'convert-tags-to-code',
-                     'description':"the tags that have been translated to\n" + \
-                     "the internal format are converted into chunks of python code.",
-                     'errorHandler':ErrorHandlers.Stage2ErrorHandler,
-                     },
-                  3:{'title':'wrap-code-in-function-definition',
-                     'description':"the chunks of python code from stage 2\n" + \
-                     "are wrapped up in a code string of a function definition.",
-                     'errorHandler':ErrorHandlers.Stage3ErrorHandler,
-                     },
-                  4:{'title':'filter-generated-code',
-                     'description':"the generated code string is filtered\n" + \
-                     "using the filters defined in the TemplateServer settings.",
-                     'errorHandler':ErrorHandlers.Stage4ErrorHandler,
-                     },
-                  5:{'title':'execute-generated-code',
-                     'description':"the generated code string is executed\n" + \
-                     "to produce a function that will be bound as a method " + \
-                     "of the TemplateServer.",
-                     'errorHandler':ErrorHandlers.Stage5ErrorHandler,
-                     },
-                  },
-        }
 
     def __init__(self, templateDef=None, *searchList, **kw):
         
@@ -183,7 +124,11 @@ class Template(SettingsManager, Parser):
         # by converting to string here we allow objects such as other Templates
         # to be passed in
 
+
         ## process the settings
+        self._initializeSettings()      # create the basic dictionary,
+                                        # which must NOT be a class attribute!
+        
         if kw.has_key('overwriteSettings'):
             # this is intended to be used internally by Nested Templates in #include's
             self._settings = kw['overwriteSettings']
@@ -236,9 +181,6 @@ class Template(SettingsManager, Parser):
         else:
             self._cheetahBlocks = {}
 
-        ## hook for calculated settings before the tagProcessors have been setup 
-        self._initializeSettings()
-
         ## Setup the Parser base-class
         Parser.__init__(self) # do this before calling self._setupTagProcessors()
 
@@ -289,6 +231,70 @@ class Template(SettingsManager, Parser):
         ## Now, start compile if we're meant to
         if not self.setting('delayedCompile'):
             self.compileTemplate()
+
+
+    def _initializeSettings(self):
+        self._settings = {
+            'formatter':None,         # string - which formatter from Cheetah.Formatters
+            'formatterClass':None,    # class that overrides the 'formatter' setting
+            'errorChecker':None,      # string - which errorChecker from Cheetah.ErrorCheckers
+            'errorCheckerClass': None,# class that overrides the 'errorChecker' setting
+            
+            'placeholderStartToken':'$',
+            'directiveStartToken':'#',
+            'directiveEndToken':'/#',
+            'singleLineComment':'##',
+            'multiLineComment':('#*','*#'),
+            
+            'delayedCompile': False,  # if True, then __init__ won't compile auto-Template
+            'plugins':[],
+            'useAutocalling': True,
+            'debug': False,          
+            
+            'includeBlockMarkers': False,   # should output from #block's be wrapped in a comment
+            'blockMarkerStart':('<!-- START BLOCK: ',' -->'),
+            'blockMarkerEnd':('<!-- END BLOCK: ',' -->'),
+            
+            ## The rest of this stuff is mainly for internal use
+            'placeholderMarker':' placeholderTag.', # the space is intentional!
+            'internalDelims':["<Cheetah>","</Cheetah>"],
+            'tagTokenSeparator': '__@__',
+            'indentationStep': ' '*4, # 4 spaces - used in the generated code
+            'initialIndentLevel': 2,  # 1 for def respond(): -- 1 for try:
+            
+            'codeGenErrorHandler':ErrorHandlers.CodeGeneratorErrorHandler,
+            'responseErrorHandler': ErrorHandlers.ResponseErrorHandler,
+            
+            'stages':{1:{'title':'pre-processing',
+                         'description':"the raw template is filtered using\n" + \
+                         "the pre-processors specified in the TemplateServer settings.",
+                         'errorHandler':ErrorHandlers.Stage1ErrorHandler,
+                         },
+                      2:{'title':'convert-tags-to-code',
+                         'description':"the tags that have been translated to\n" + \
+                         "the internal format are converted into chunks of python code.",
+                         'errorHandler':ErrorHandlers.Stage2ErrorHandler,
+                         },
+                      3:{'title':'wrap-code-in-function-definition',
+                         'description':"the chunks of python code from stage 2\n" + \
+                         "are wrapped up in a code string of a function definition.",
+                         'errorHandler':ErrorHandlers.Stage3ErrorHandler,
+                         },
+                      4:{'title':'filter-generated-code',
+                         'description':"the generated code string is filtered\n" + \
+                         "using the filters defined in the TemplateServer settings.",
+                         'errorHandler':ErrorHandlers.Stage4ErrorHandler,
+                         },
+                      5:{'title':'execute-generated-code',
+                         'description':"the generated code string is executed\n" + \
+                         "to produce a function that will be bound as a method " + \
+                         "of the TemplateServer.",
+                         'errorHandler':ErrorHandlers.Stage5ErrorHandler,
+                         },
+                      },
+            }
+        # end _initializeSettings
+
         
     def compileTemplate(self):
         """Process and parse the template, then compile it into a function definition
