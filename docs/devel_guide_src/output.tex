@@ -3,7 +3,7 @@
 \label{output}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\#echo}
+\subsection{\#echo}
 \label{output.echo}
 
 The template:
@@ -24,7 +24,7 @@ write(' example\n')
 \end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\#silent}
+\subsection{\#silent}
 \label{output.silent}
 
 The template:
@@ -48,11 +48,11 @@ OK, it's not quite covert because that extra space gives it away, but it
 almost succeeds.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Caching placeholders and \#cache}
+\subsection{Caching placeholders and \#cache}
 \label{output.cache}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Dynamic placeholder -- no cache}
+\subsubsection{Dynamic placeholder -- no cache}
 \label{output.cache.dynamic}
 
 The template:
@@ -76,7 +76,7 @@ write('\n')
 Just what we expected, like any other dynamic placeholder.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Static placeholder}
+\subsubsection{Static placeholder}
 \label{output.cache.static}
 
 The template:
@@ -139,7 +139,7 @@ temporary file-like object to divert the \code{write} object into, then read
 the result and stuff it into the cache.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Timed-refresh placeholder}
+\subsubsection{Timed-refresh placeholder}
 \label{output.cache.timed}
 
 The template:
@@ -217,6 +217,191 @@ The docstring tells only that ``something'' will be refreshed every 60.0
 seconds, but doesn't reveal {\em which} placeholder that is.  Only if you
 know the relative order of the placeholders in the template can you figure
 that out.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Timed-refresh placeholder with braces}
+\label{output.cache.timed.braces}
+
+This example is the same but with the long placeholder syntax.  It's here 
+because it's a Cheetah FAQ whether to put the cache interval inside or outside
+the braces.  (It's also here so I can look it up because I frequently forget.)
+The answer is: outside.  The braces go around only the placeholder name (and
+perhaps some output-filter arguments.)
+
+The template:
+\begin{verbatim}
+Timed with {}:  $*.5m*{voom}
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+Timed with {}:  Voom!
+\end{verbatim}
+
+The generated code differs only in the comment.  Inside the cache-refresh
+if-block:
+\begin{verbatim}
+write(filter(VFS(SL,"voom",1))) # generated from '$*.5m*{voom}' at line 1, 
+    #col 17.
+\end{verbatim}
+
+The reason this example is here is because it's a Cheetah FAQ whether to
+put the cache interval inside or outside the \verb+{}+.  (Also so I can look
+it up when I forget, as I frequently do.)  The answer is: outside.  The
+\verb+{}+ go around only the placeholder name and arguments.  If you do it
+this way:
+\begin{verbatim}
+Timed with {}:  ${*.5m*voom}      ## Wrong!
+\end{verbatim}
+you get:
+\begin{verbatim}
+Timed with {}:  ${*.5m*voom}
+\end{verbatim}
+because \verb+${+ is not a valid placeholder, so it's treated as ordinary text.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{\#cache}
+\label{output.cache.directive}
+
+The template:
+\begin{verbatim}
+#cache
+This is a cached region.  $voom
+#end cache
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+This is a cached region.  Voom!
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+ 1  ## START CACHE REGION: at line, col (1, 1) in the source.
+ 2  RECACHE = True
+ 3  if not self._cacheData.has_key('23711421'):
+ 4      pass
+ 5  else:
+ 6      RECACHE = False
+ 7  if RECACHE:
+ 8      orig_trans = trans
+ 9      trans = cacheCollector = DummyTransaction()
+10      write = cacheCollector.response().write
+11      write('This is a cached region.  ')
+12      write(filter(VFS(SL,"voom",1))) # generated from '$voom' at line 2, 
+            # col 27.
+13      write('\n')
+14      trans = orig_trans
+15      write = trans.response().write
+16      self._cacheData['23711421'] = cacheCollector.response().getvalue()
+17      del cacheCollector
+18  write(self._cacheData['23711421'])
+19  ## END CACHE REGION
+\end{verbatim}
+
+This is the same as the \code{\$*voom} example, except that the plain text
+around the placeholder is inside the second if-block.  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{\#cache with timer and id}
+\label{output.cache.directive.timer}
+
+The template:
+\begin{verbatim}
+#cache timer='.5m' id='cache1'
+This is a cached region.  $voom
+#end cache
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{\#cache with test: expression and method conditions}
+\label{output.cache.directive.test}
+
+The template:
+\begin{verbatim}
+#cache test=$isDBUpdated
+This is a cached region.  $voom
+#end cache
+\end{verbatim}
+
+(Analysis postponed: bug in Cheetah produces invalid Python.)
+
+%The output:
+%\begin{verbatim}
+%\end{verbatim}
+
+%The generated code:
+%\begin{verbatim}
+%\end{verbatim}
+
+
+The template:
+\begin{verbatim}
+#cache id='cache1', test=($isDBUpdated or $someOtherCondition)
+This is a cached region.  $voom
+#end cache
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+This is a cached region.  Voom!
+\end{verbatim}
+
+The first if-block in the generated code:
+\begin{verbatim}
+RECACHE = True
+if not self._cacheData.has_key('36798144'):
+    self._cacheIndex['cache1'] = '36798144'
+elif (VFS(SL,"isDBUpdated",1) or VFS(SL,"someOtherCondition",1)):
+    RECACHE = True
+else:
+    RECACHE = False
+\end{verbatim}
+The second if-block is the same as in the previous example.  If you leave
+out the \code{()} around the test expression, the result is the same, although
+it may be harder for the template maintainer to read.
+
+You can even combine arguments, although this is of questionable value.
+
+The template:
+\begin{verbatim}
+#cache id='cache1', timer='30m', test=$isDBUpdated or $someOtherCondition
+This is a cached region.  $voom
+#end cache
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+This is a cached region.  Voom!
+\end{verbatim}
+
+The first if-block:
+\begin{verbatim}
+RECACHE = True
+if not self._cacheData.has_key('88939345'):
+    self._cacheIndex['cache1'] = '88939345'
+    self.__cache88939345__refreshTime = currentTime() + 1800.0
+elif currentTime() > self.__cache88939345__refreshTime:
+    self.__cache88939345__refreshTime = currentTime() + 1800.0
+elif VFS(SL,"isDBUpdated",1) or VFS(SL,"someOtherCondition",1):
+    RECACHE = True
+else:
+    RECACHE = False
+\end{verbatim}
+
+We are planning to add a \code{'varyBy'} keyword argument in the future that
+will allow a separate cache instances to be created for a variety of conditions,
+such as different query string parameters or browser types. This is inspired by
+ASP.net's varyByParam and varyByBrowser output caching keywords.  Since this is
+not implemented yet, I cannot provide examples here.
 
 % Local Variables:
 % TeX-master: "devel_guide"
