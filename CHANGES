@@ -27,6 +27,8 @@ release
   - CheetahWrapper: no verbose output on stdout with --stdout/-p.
   - "#indent" is now undocumented.  The existing code remains intact for now.
     See the TODO file for our future plans. (MO)
+  - Apply 2 unicode-support patches from Rodrigo B. de Oliveira (rodrigobamboo)
+    that affected the Template and ModuleCompiler classes. (TR)
 
 0.9.15a3 (Nov 10, 2002)
   - corrected a dictionary bug in the Python version of NameMapper (TR)
