@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.26 2001/10/25 21:10:51 tavis_rudd Exp $
+# $Id: Parser.py,v 1.27 2001/11/01 09:38:21 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.26 $
+Version: $Revision: 1.27 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/10/25 21:10:51 $
+Last Revision Date: $Date: 2001/11/01 09:38:21 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.26 $"[11:-2]
+__version__ = "$Revision: 1.27 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1494,7 +1494,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         theFilter = self.getIdentifier()
         if self._templateObj:
             self._templateObj._currentFilter = \
-                   getattr(Filters,theFilter)(self._templateObj).format
+                   getattr(Filters,theFilter)(self._templateObj).filter
             
         self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
         self.addChunk('if self._filters.has_key("' + theFilter+ '"):')
