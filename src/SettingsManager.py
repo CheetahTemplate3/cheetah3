@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SettingsManager.py,v 1.10 2001/08/17 15:48:55 tavis_rudd Exp $
-"""Provides a mixin class for managing application settings 
+# $Id: SettingsManager.py,v 1.11 2001/08/30 18:37:18 tavis_rudd Exp $
+"""Provides a mixin/base class for managing application settings 
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2001/08/17 15:48:55 $
+Last Revision Date: $Date: 2001/08/30 18:37:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.10 $"[11:-2]
+__version__ = "$Revision: 1.11 $"[11:-2]
 
 
 ##################################################
@@ -19,7 +19,7 @@ __version__ = "$Revision: 1.10 $"[11:-2]
 import sys
 import os.path
 from copy import deepcopy, copy
-from ConfigParser import ConfigParser as ConfigParserBase
+from ConfigParser import ConfigParser 
 import re
 from tokenize import Intnumber, \
      Floatnumber, \
@@ -34,20 +34,18 @@ from types import StringType, \
      DictType
 import types
 from StringIO import StringIO
-import imp                  # used by SettingsManager.updateFromPySrcFile()
+import imp                 # used by SettingsManager.updateFromPySrcFile()
 
 try:
     import threading
     from threading import Lock  # used for thread lock on sys.path manipulations
 except:
+    ## provide a dummy for non-threading Python systems
     class Lock:
         def acquire(self):
             pass
         def release(self):
             pass
-
-#intra-package imports ...
-from Utilities import mergeNestedDictionaries  #@@ consider moving this to here
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
@@ -65,6 +63,22 @@ convertableToStrTypes = (StringType, IntType, FloatType,
 ##################################################
 ## FUNCTIONS ##
 
+def mergeNestedDictionaries(dict1, dict2):
+    """Recursively merge the values of dict2 into dict1.
+
+    This little function is very handy for selectively overriding settings in a
+    settings dictionary that has a nested structure.  """
+    
+    newDict = dict1.copy()
+    for key,val in dict2.items():
+        if newDict.has_key(key) and type(val) == types.DictType and \
+           type(newDict[key]) == types.DictType:
+            
+            newDict[key] = mergeNestedDictionaries(newDict[key], val)
+        else:
+            newDict[key] = val
+    return newDict
+    
 def stringIsNumber(theString):
     """Return True if theString represents a Python number, False otherwise.
     This also works for complex numbers."""
@@ -91,7 +105,7 @@ class Error(Exception):
 class NoDefault:
     pass
 
-class ConfigParser(ConfigParserBase):
+class ConfigParserCaseSensitive(ConfigParser):
     """A case sensitive version of the standard Python ConfigParser."""
     def optionxform(self, optionstr):
         return optionstr
@@ -109,17 +123,25 @@ class SettingsManager:
       might want to substitute one class for another.
     - allow sections in .ini config files to be extended by settings in Python
       src files
+    - allow python literals to be used values in .ini config files
     - maintain the case of setting names, unlike the ConfigParser module
-    
+
+    This method must be called by subclasses.
     """
 
     _sysPathLock = Lock()   # used by the updateFromPySrcFile() method
+
+    _ConfigParserClass = ConfigParserCaseSensitive #incase __init__ isn't called
     
-    def __init__(self):
-        """Create the settings dictionary.  You mustn't define it as part of the
-        class!"""
-        
+    def __init__(self, caseSensitive=True):
         self._settings = {}
+        if caseSensitive:
+            self.setConfigParserClass(ConfigParserCaseSensitive)
+        else:
+            self.setConfigParserClass(ConfigParser)
+
+    def setConfigParserClass(self, klass):
+        self._ConfigParserClass = klass
         
     def _initializeSettings(self):
         """A hook that allows for complex setting initialization sequences that
@@ -153,7 +175,7 @@ class SettingsManager:
                             merge=newSettings.get('mergeSettings',merge) )
 
     def readFromPySrcFile(self, path):
-        """Update the settings from variables in a Python source file.
+        """Return new settings dict from variables in a Python source file.
 
         This method will temporarily add the directory of src file to sys.path so
         that import statements relative to that dir will work properly."""
@@ -163,11 +185,12 @@ class SettingsManager:
 
         self._sysPathLock.acquire()
         sys.path.insert(0, dirName)
-        
+
+        # I'm not doing this using execfile on purpose!
         fp = open(path)
         pySrc = fp.read()
-        newSettings = self.readFromPySrcStr(pySrc)
         fp.close()
+        newSettings = self.readFromPySrcStr(pySrc)
         
         if sys.path[0] == path:   # it might have modified by another thread
             del sys.path[0]
@@ -183,28 +206,40 @@ class SettingsManager:
         return newSettings
 
     def updateFromConfigFile(self, path, **kw):
-        """See the docstring for updateConfigFileObj()"""
+        
+        """Update the settings from a text file using the syntax accepted by
+        Python's standard ConfigParser module (like Windows .ini files). NOTE:
+        this method maintains case unlike the ConfigParser module, unless this
+        class was initialized with the 'caseSensitive' keyword set to False.
+
+        All setting values are initially parsed as strings. However, If the
+        'convert' arg is True this method will do the following value
+        conversions:
+        
+        * all Python numeric literals will be coverted from string to number
+        
+        * The string 'None' will be converted to the Python value None
+        
+        * The string 'True' will be converted to a Python truth value
+        
+        * The string 'False' will be converted to a Python false value
+        
+        * Any string starting with 'python:' will be treated as a Python literal
+          or expression that needs to be eval'd. This approach is useful for
+          declaring lists and dictionaries.
+
+        If a config section titled 'Globals' is present the options defined
+        under it will be treated as top-level settings.
+        """
+        
         path = self.normalizePath(path)
         fp = open(path)
         self.updateFromConfigFileObj(fp, **kw)
         fp.close()
 
     def updateFromConfigFileObj(self, inFile, convert=True, merge=True):
-        """Update the settings from a text file using the syntax accepted by
-        Python's standard ConfigParser module (like Windows .ini files). NOTE:
-        this method maintains case unlike the ConfigParser module.
-
-        If the keyword arg 'convert' is True then the strings in the ini file
-        that represent numbers or 'True'/'False' will be converted into the
-        proper Python types.
-
-        If a config section titled 'Globals' is present the options defined
-        under it will be treated as top-level settings.
-
-        The ini format doesn't handle nesting well and has many
-        other limitations so it is not the recommended format for config files.
-        In some cases it is better to use standard Python syntax and the
-        SettingsManager.updateFromPySrcFile() method.
+        
+        """See the docstring for .updateFromConfigFile()
 
         The caller of this method is responsible for closing the inFile file
         object."""
@@ -216,8 +251,11 @@ class SettingsManager:
     def readFromConfigFileObj(self, inFile, convert=True):
         """Return the settings from a config file that uses the syntax accepted by
         Python's standard ConfigParser module (like Windows .ini files).
+
+        See .updateFromConfigFile() for more information.
         """
-        p = ConfigParser()
+        
+        p = self._ConfigParserClass()
         p.readfp(inFile)
         sects = p.sections()
         newSettings = {}
@@ -237,6 +275,8 @@ class SettingsManager:
         for sect, subDict in newSettings.items():
             for key, val in subDict.items():
                 if convert:
+                    if val.lower().startswith('python:'):
+                        subDict[key] = eval(val[7:],{},{})
                     if val.lower() == 'none':
                         subDict[key] = None
                     if val.lower() == 'true':
