@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: _SkeletonPage.py,v 1.9 2002/08/05 00:02:33 tavis_rudd Exp $
+# $Id: _SkeletonPage.py,v 1.10 2002/08/05 00:07:02 tavis_rudd Exp $
 """A baseclass for the SkeletonPage template
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2002/08/05 00:02:33 $
+Last Revision Date: $Date: 2002/08/05 00:07:02 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.9 $"[11:-2]
+__revision__ = "$Revision: 1.10 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -201,12 +201,12 @@ class _SkeletonPage(Template):
         metaTagsTxt = []
         if metaTags.has_key('HTTP-EQUIV'):
             for http_equiv, contents in metaTags['HTTP-EQUIV'].items():
-                metaTagsTxt += ['<meta http-equiv="', str(http_equiv), '" contents="',
+                metaTagsTxt += ['<meta http-equiv="', str(http_equiv), '" content="',
                                 str(contents), '" />\n']
                 
         if metaTags.has_key('NAME'):
             for name, contents in metaTags['NAME'].items():
-                metaTagsTxt += ['<meta name="', str(name), '" contents="', str(contents),
+                metaTagsTxt += ['<meta name="', str(name), '" content="', str(contents),
                                 '" />\n']
         return ''.join(metaTagsTxt)
     
