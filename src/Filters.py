@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.5 2001/11/08 07:12:11 hierro Exp $
-"""Output Filters Cheetah's $placeholders
+# $Id: Filters.py,v 1.6 2001/11/10 19:50:02 hierro Exp $
+"""Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/11/08 07:12:11 $
+Last Revision Date: $Date: 2001/11/10 19:50:02 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -33,11 +33,31 @@ webSafeEntities = {' ': '&nbsp;', '"': '&quot;'}
 class Error(Exception):
     pass
 
+class NoDefault:
+    pass
+
+
+class DummyTemplate:
+    """Fake template class to allow filters to be used standalone.
+    """
+    def setting(self, name, default=NoDefault):
+        if default is NoDefault:
+            raise KeyError(name)
+        else:
+            return default
+
+    def settings(self):
+        return {}
+
+_dummyTemplateObj = DummyTemplate()
+
+
 class Filter:
     """A baseclass for the Cheetah Filters."""
     
-    def __init__(self, templateObj):
-        """Setup a ref to the templateObj.  Subclasses should call this method."""
+    def __init__(self, templateObj=_dummyTemplateObj):
+        """Setup a ref to the templateObj.  Subclasses should call this method.
+        """
         self.setting = templateObj.setting
         self.settings = templateObj.settings
 
@@ -73,8 +93,8 @@ class MaxLen(Filter):
 
 
 class Pager(Filter):
-    def __init__(self, templateObj):
-        BaseClass.__init__(self, templateObj)
+    def __init__(self, templateObj=_dummyTemplateObj):
+        Filter.__init__(self, templateObj)
         self._IDcounter = 0
         
     def buildQString(self,varsDict, updateDict):
@@ -141,5 +161,20 @@ class WebSafe(Filter):
         # Return the puppy.
         return s
 
+
+class Strip(Filter):
+    """Strip leading/trailing whitespace but preserve trailing newline.
+    """
+    def filter(self, val, **kw):
+        if val[-1:] == '\n':
+            val = val[:-1]
+            eol = '\n'
+        else:
+            eol = ''
+        return val.strip() + eol
+
+
+# class StripSqueeze -- same as strip but also convert newlines -> ' '.
+# Implementation delayed till we decide if there's a use for it.
 
 # vim: shiftwidth=4 tabstop=4 expandtab
