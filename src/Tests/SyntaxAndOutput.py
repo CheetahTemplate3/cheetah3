@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.17 2001/12/05 18:03:59 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.18 2001/12/07 08:30:36 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.17 $
+Version: $Revision: 1.18 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/12/05 18:03:59 $
+Last Revision Date: $Date: 2001/12/07 08:30:36 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.17 $"[11:-2]
+__version__ = "$Revision: 1.18 $"[11:-2]
 
 
 ##################################################
@@ -1102,6 +1102,31 @@ class DefDirective(OutputTest):
             "  #def testMeth($*args, $**KWs)   \n1234-$args-$KWs.a\n  #end def\n$testMeth(1,2, a=1)",
             "1234-(1, 2)-1\n")
 
+
+    def test11(self):
+        """single line #def with extra WS"""
+        self.verify(
+            "#def testMeth:   aoeuaoeu  \n- $testMeth -",
+            "- aoeuaoeu -")
+
+    def test12(self):
+        """single line #def with extra WS and nested $placeholders"""
+        self.verify(
+            "#def testMeth:   $anInt $aFunc(1234)  \n- $testMeth -",
+            "- 1 1234 -")
+
+    def test13(self):
+        """single line #def escaped $placeholders"""
+        self.verify(
+            "#def testMeth: \$aFunc(\$anInt) \n- $testMeth -",
+            "- $aFunc($anInt) -")
+
+    def test14(self):
+        """single line #def 1 escaped $placeholders"""
+        self.verify(
+            "#def testMeth: \$aFunc($anInt) \n- $testMeth -",
+            "- $aFunc(1) -")
+
 class BlockDirective(OutputTest):
 
     def test1(self):
@@ -1148,6 +1173,30 @@ inner
 """,
                     "this is a test block\nouter\ninner\n---\n")
 
+
+    def test6(self):
+        """single line #block """
+        self.verify(
+            "#block testMeth: This is my block",
+            "This is my block")
+
+    def test7(self):
+        """single line #block with WS"""
+        self.verify(
+            "#block testMeth:    This is my block      ",
+            "This is my block")
+
+    def test8(self):
+        """single line #block 1 escaped $placeholders"""
+        self.verify(
+            "#block testMeth: \$aFunc($anInt)",
+            "$aFunc(1)")
+
+    def test9(self):
+        """single line #block 1 escaped $placeholders + WS"""
+        self.verify(
+            "#block testMeth:   \$aFunc( $anInt )     ",
+            "$aFunc( 1 )")
 
 
 class IncludeDirective(OutputTest):
