@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.53 2001/09/10 19:07:36 tavis_rudd Exp $
+# $Id: Template.py,v 1.54 2001/09/15 19:32:31 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.53 $
+Version: $Revision: 1.54 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/09/10 19:07:36 $
+Last Revision Date: $Date: 2001/09/15 19:32:31 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.53 $"[11:-2]
+__version__ = "$Revision: 1.54 $"[11:-2]
 
 
 ##################################################
@@ -130,9 +130,9 @@ class Template(SettingsManager, Parser):
         self._initializeSettings()      # create the basic dictionary,
                                         # which must NOT be a class attribute!
         
-        if kw.has_key('overwriteSettings'):
+        if kw.has_key('_overwriteSettings'):
             # this is intended to be used internally by Nested Templates in #include's
-            self._settings = kw['overwriteSettings']
+            self._settings = kw['_overwriteSettings']
         elif kw.has_key('settings'):
             self.updateSettings(kw['settings'])
            
@@ -143,13 +143,13 @@ class Template(SettingsManager, Parser):
         # + setup a dict of #set directive vars - include it in the searchList
         self._setVars = {}
 
-        if kw.has_key('setVars'):
+        if kw.has_key('_setVars'):
             # this is intended to be used internally by Nested Templates in #include's
-            self._setVars = kw['setVars']
+            self._setVars = kw['_setVars']
             
-        if kw.has_key('preBuiltSearchList'):
+        if kw.has_key('_preBuiltSearchList'):
             # happens with nested Template obj creation from #include's
-            self._searchList = list(kw['preBuiltSearchList'])
+            self._searchList = list(kw['_preBuiltSearchList'])
         else:
             # create our own searchList
             self._searchList = list(searchList)
@@ -178,11 +178,11 @@ class Template(SettingsManager, Parser):
         if not hasattr(self, '_macros'):
             self._macros = {}
         
-        if kw.has_key('macros'):
-            self._macros = kw['macros']
+        if kw.has_key('_macros'):
+            self._macros = kw['_macros']
 
-        if kw.has_key('cheetahBlocks'):
-            self._cheetahBlocks = kw['cheetahBlocks']
+        if kw.has_key('_cheetahBlocks'):
+            self._cheetahBlocks = kw['_cheetahBlocks']
         else:
             self._cheetahBlocks = {}
 
@@ -806,11 +806,11 @@ class Template(SettingsManager, Parser):
                 if not raw:
                     nestedTemplate = Template(templateDef=None,
                                               file=path,
-                                              overwriteSettings=self.settings(),
-                                              preBuiltSearchList=self.searchList(),
-                                              setVars = self._setVars,
-                                              cheetahBlocks=self._cheetahBlocks,
-                                              macros=self._macros,
+                                              _overwriteSettings=self.settings(),
+                                              _preBuiltSearchList=self.searchList(),
+                                              _setVars = self._setVars,
+                                              _cheetahBlocks=self._cheetahBlocks,
+                                              _macros=self._macros,
                                               )
                     if not hasattr(nestedTemplate, 'respond'):
                         nestedTemplate.compileTemplate()
@@ -821,11 +821,11 @@ class Template(SettingsManager, Parser):
                 if not raw:
                     nestedTemplate = Template(
                         templateDef=srcArg,
-                        overwriteSettings=self.settings(),
-                        preBuiltSearchList=self.searchList(),
-                        setVars = self._setVars,
-                        cheetahBlocks=self._cheetahBlocks,
-                        macros=self._macros,
+                        _overwriteSettings=self.settings(),
+                        _preBuiltSearchList=self.searchList(),
+                        _setVars = self._setVars,
+                        _cheetahBlocks=self._cheetahBlocks,
+                        _macros=self._macros,
                         )
                     if not hasattr(nestedTemplate, 'respond'):
                         nestedTemplate.compileTemplate()
