@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: _SkeletonPage.py,v 1.7 2002/02/26 02:20:52 tavis_rudd Exp $
+# $Id: _SkeletonPage.py,v 1.8 2002/08/01 20:09:39 tavis_rudd Exp $
 """A baseclass for the SkeletonPage template
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2002/02/26 02:20:52 $
+Last Revision Date: $Date: 2002/08/01 20:09:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.7 $"[11:-2]
+__revision__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -32,48 +32,41 @@ False = (0==1)
         
 class _SkeletonPage(Template):
     """A baseclass for the SkeletonPage template"""
+
+    docType = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" ' + \
+              '"http://www.w3.org/TR/html4/loose.dtd">'
+    
+    # docType = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' + \
+    #'"http://www.w3.org/TR/xhtml1l/DTD/transitional.dtd">'
+        
+    title = ''
+    siteDomainName = 'www.example.com'
+    siteCredits = 'Designed & Implemented by Tavis Rudd'
+    siteCopyrightName = "Tavis Rudd"
+    htmlTag = '<html>'
     
     def __init__(self, *args, **KWs):
         Template.__init__(self, *args, **KWs)
-        self._initializeSettings()
-        self.addToSearchList(self.settings())
-        
-    def _initializeSettings(self):
-        ## Default values for the names embedded in the template ##
-        docType = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" ' + \
-                  '"http://www.w3.org/TR/html4/loose.dtd">'
-
-        #docType = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' + \
-        #'"http://www.w3.org/TR/xhtml1l/DTD/transitional.dtd">'
-        
-        title = ''
-        siteDomainName = 'www.example.com'
-        siteCredits = 'Designed & Implemented by Tavis Rudd'
-        siteCopyrightName = "Tavis Rudd"
-    
-        metaTags = {}
+        self._metaTags = {'HTTP_EQUIV':{'keywords':'Cheetah,'}, 
+                    'NAME':{'generator':'Cheetah: The Python-Powered Template Engine'}
+                    }
         # metaTags = {'HTTP_EQUIV':{'test':1234}, 'NAME':{'test':1234,'test2':1234} }
-        stylesheets = {}
+        self._stylesheets = {}
         # stylesheets = {'.cssClassName':'stylesheetCode'}
-        stylesheetsOrder = []
+        self._stylesheetsOrder = []
         # stylesheetsOrder = ['.cssClassName',]
-        stylesheetLibs = {}
+        self._stylesheetLibs = {}
         # stylesheetLibs = {'libName':'libSrcPath'}
-        javascriptLibs = {}
-        javascriptTags = {}
-        # javascriptLibs = {'libName':'libSrcPath'}
-        bodyTagAttribs = {}
-   
-        defaults = locals().copy()
-        del defaults['self']
-        self.updateSettings(defaults)
-   
+        self._javascriptLibs = {}
+        self._javascriptTags = {}
+        # self._javascriptLibs = {'libName':'libSrcPath'}
+        self._bodyTagAttribs = {}
 
     def metaTags(self):
         """Return a formatted vesion of the self._metaTags dictionary, using the
         formatMetaTags function from Cheetah.Macros.HTML"""
         
-        return self.formatMetaTags(self.setting('metaTags'))
+        return self.formatMetaTags(self._metaTags)
     
     def stylesheetTags(self):
         """Return a formatted version of the self._stylesheetLibs and
@@ -83,22 +76,22 @@ class _SkeletonPage(Template):
         the correct order."""
         
         stylesheetTagsTxt = ''
-        for title, src in self.setting('stylesheetLibs').items():
+        for title, src in self._stylesheetLibs.items():
             stylesheetTagsTxt += '<link rel="stylesheet" type="text/css" href="' + str(src) + '" />\n'
 
-        if not self.setting('stylesheetsOrder'):
+        if not self._stylesheetsOrder:
             return stylesheetTagsTxt
         
         stylesheetTagsTxt += '<style type="text/css"><!--\n'
-        for identifier in self.setting('stylesheetsOrder'):
-            if not self.setting('stylesheets').has_key(identifier):
+        for identifier in self._stylesheetsOrder:
+            if not self._stylesheets.has_key(identifier):
                 warning = '# the identifier ' + identifier + \
                           'was in stylesheetsOrder, but not in stylesheets'
                 print warning
                 stylesheetTagsTxt += warning
                 continue
                     
-            attribsDict = self.setting('stylesheets')[identifier]
+            attribsDict = self._stylesheets[identifier]
             cssCode = ''
             attribCode = ''
             for k, v in attribsDict.items():
@@ -121,7 +114,7 @@ class _SkeletonPage(Template):
         SRC filename rather than a code string."""
         
         javascriptTagsTxt = []
-        for key, details in self.setting('javascriptTags').items():
+        for key, details in self._javascriptTags.items():
             if type(details) not in (types.ListType, types.TupleType):
                 details = ['',details]
 
@@ -129,7 +122,7 @@ class _SkeletonPage(Template):
                                       '" ><!--\n', str(details[0]), '\n//--></script>\n']
 
 
-        for key, details in self.setting('javascriptLibs').items():
+        for key, details in self._javascriptLibs.items():
             if type(details) not in (types.ListType, types.TupleType):
                 details = ['',details]
 
@@ -139,7 +132,7 @@ class _SkeletonPage(Template):
     
     def bodyTag(self):
         """Create a body tag from the entries in the dict bodyTagAttribs."""
-        return self.formHTMLTag('body', self.setting('bodyTagAttribs'))
+        return self.formHTMLTag('body', self._bodyTagAttribs)
 
 
     def imgTag(self, src, alt='', width=None, height=None, border=0):

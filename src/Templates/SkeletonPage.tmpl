@@ -1,20 +1,7 @@
 ##doc-module: A Skeleton HTML page template, that provides basic structure and utility methods.
 ################################################################################
-#from Cheetah.Templates._SkeletonPage import _SkeletonPage
-#extends _SkeletonPage
+#extends Cheetah.Templates._SkeletonPage
 #implements respond
-################################################################################
-#settings python
-title = 'Skeleton Page Template'
-siteDomainName = 'www.CheetahTemplate.org'
-siteCopyrightName = 'Tavis Rudd'
-siteCredits = 'Designed & Implemented by Tavis Rudd'
-metaTags = {'HTTP_EQUIV':{'keywords':'Cheetah,'}, 
-            'NAME':{'generator':'Cheetah: The Python-Powered Template Engine'}
-            }
-bodyTagAttribs = {'text':'black'}
-htmlTag = '<html>'
-#end settings
 ################################################################################
 #cache id='header'
 $docType
@@ -30,7 +17,7 @@ $siteCredits
 
 -->
 
-################################################################################
+
 #block writeHeadTag
 <head>
 <title>$title</title>
@@ -41,6 +28,7 @@ $javascriptTags
 #end block writeHeadTag
 
 #end cache header
+#################
 
 $bodyTag
 
