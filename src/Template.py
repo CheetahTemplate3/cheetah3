@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.114 2005/01/03 19:25:46 tavis_rudd Exp $
+# $Id: Template.py,v 1.115 2005/02/28 23:45:23 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.114 $
+Version: $Revision: 1.115 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/01/03 19:25:46 $
+Last Revision Date: $Date: 2005/02/28 23:45:23 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.114 $"[11:-2]
+__revision__ = "$Revision: 1.115 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import sys                        # used in the error handling code
@@ -134,16 +134,6 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         Servlet.__init__(self)
         self._compilerSettings = compilerSettings
 
-        ##################################################
-        ## Now, compile if we're meant to
-        self._cacheIndex = {}
-        self._cacheData = {}
-        self._generatedModuleCode = None
-        self._generatedClassCode = None
-        if source is not None or file is not None:
-            self.compile(source, file)
-
-        
         ##################################################           
         ## Setup the searchList of namespaces in which to search for $placeholders
         # + setup a dict of #set directive vars - include it in the searchList
@@ -164,6 +154,15 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             self._searchList.extend(list(searchList))
             self._searchList.append( self )
 
+        ##################################################
+        ## Now, compile if we're meant to
+        self._cacheIndex = {}
+        self._cacheData = {}
+        self._generatedModuleCode = None
+        self._generatedClassCode = None
+        if source is not None or file is not None:
+            self.compile(source, file)
+        
         ##################################################
         ## setup the ouput filters
         self._filtersLib = filtersLib
