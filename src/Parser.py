@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.46 2002/04/09 18:57:12 tavis_rudd Exp $
+# $Id: Parser.py,v 1.47 2002/04/15 06:12:38 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.46 $
+Version: $Revision: 1.47 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/04/09 18:57:12 $
+Last Revision Date: $Date: 2002/04/15 06:12:38 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.46 $"[11:-2]
+__revision__ = "$Revision: 1.47 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -55,9 +55,11 @@ def maybe(*choices): return apply(group, choices) + '?'
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
-
-True = (1==1)
-False = (0==1)
+try:
+    True = (1==1)
+    False = (0==1)
+except:
+    pass
 
 NO_CACHE = 0
 STATIC_CACHE = 1

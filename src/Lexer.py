@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Lexer.py,v 1.3 2001/12/19 02:10:25 tavis_rudd Exp $
+# $Id: Lexer.py,v 1.4 2002/04/15 06:12:38 tavis_rudd Exp $
 """Lexer base-class for Cheetah's Parser
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/12/19 02:10:25 $
+Last Revision Date: $Date: 2002/04/15 06:12:38 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.3 $"[11:-2]
+__revision__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -24,8 +24,11 @@ from SourceReader import SourceReader
 ##################################################
 ## CONSTANTS & GLOBALS
 
-True = (1==1)
-False = (0==1)
+try:
+    True = (1==1)
+    False = (0==1)
+except:
+    pass
 
 ##################################################
 ## CLASSES

@@ -5,14 +5,14 @@
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.19 $
+Version: $Revision: 1.20 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2002/04/08 04:49:42 $
+Last Revision Date: $Date: 2002/04/15 06:12:38 $
 """
 
-# $Id: SettingsManager.py,v 1.19 2002/04/08 04:49:42 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.20 2002/04/15 06:12:38 tavis_rudd Exp $
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.19 $"[11:-2]
+__revision__ = "$Revision: 1.20 $"[11:-2]
 
 
 ##################################################
@@ -55,8 +55,11 @@ except ImportError:
 ##################################################
 ## CONSTANTS & GLOBALS ##
 
-True = (1==1)
-False = (1==0)
+try:
+    True = (1==1)
+    False = (1==0)
+except:
+    pass
 
 numberRE = re.compile(Number)
 complexNumberRE = re.compile('[\(]*' +Number + r'[ \t]*\+[ \t]*' + Number + '[\)]*')

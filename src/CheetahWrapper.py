@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.2 2002/03/13 03:21:27 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.3 2002/04/15 06:12:38 tavis_rudd Exp $
 """A command line interface to everything about Cheetah.
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/03/13 03:21:27 $
+Last Revision Date: $Date: 2002/04/15 06:12:38 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.2 $"[11:-2]
+__revision__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -29,8 +29,11 @@ from _properties import Version
 ##################################################
 ## GLOBALS & CONSTANTS
 
-True = (1==1)
-False = (1==0)
+try:
+    True = (1==1)
+    False = (1==0)
+except:
+    pass
 
 class Error(Exception):
     pass

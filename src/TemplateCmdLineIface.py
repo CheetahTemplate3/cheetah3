@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: TemplateCmdLineIface.py,v 1.6 2001/12/19 02:10:25 tavis_rudd Exp $
+# $Id: TemplateCmdLineIface.py,v 1.7 2002/04/15 06:12:38 tavis_rudd Exp $
 
 """Provides a command line interface to compiled Cheetah template modules.
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/12/06
-Last Revision Date: $Date: 2001/12/19 02:10:25 $
+Last Revision Date: $Date: 2002/04/15 06:12:38 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.6 $"[11:-2]
+__revision__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -33,8 +33,11 @@ from _properties import Version
 ##################################################
 ## GLOBALS & CONTANTS
 
-True = (1==1)
-False = (1==0)
+try:
+    True = (1==1)
+    False = (1==0)
+except:
+    pass
 
 class Error(Exception):
     pass
