@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.13 2002/11/10 09:36:22 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.14 2002/11/26 05:12:52 hierro Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -9,12 +9,12 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.13 $
+Version: $Revision: 1.14 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/11/10 09:36:22 $
+Last Revision Date: $Date: 2002/11/26 05:12:52 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.13 $"[11:-2]
+__revision__ = "$Revision: 1.14 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -39,6 +39,19 @@ except NameError:
 optionDashesRx = re.compile(  R"^-{1,2}"  )
 moduleNameRx = re.compile(  R"^[a-zA-Z_][a-zA-Z_0-9]*$"  )
    
+def fprintfMessage(stream, format, *args):
+    if format[-1:] == '^':
+        format = format[:-1]
+    else:
+        format += '\n'
+    if args:
+        message = format % args
+    else:
+        message = format
+    stream.write(message)
+
+die = sys.exit
+
 class Error(Exception):
     pass
 
@@ -79,7 +92,7 @@ def usage(usageMessage, errorMessage="", out=sys.stderr):
         out.write('\n')
         out.write("*** USAGE ERROR ***: %s\n" % errorMessage)
         exitStatus = 1
-    sys.exit(exitStatus)
+    die(exitStatus)
              
 
 WRAPPER_TOP = """\
@@ -141,16 +154,32 @@ class CheetahWrapper:
         self.searchList = []
 
     ##################################################
+    ## VERBOSITY METHODS
+
+    def chatter(self, format, *args):
+        """Print a verbose message to stdout.  But don't if .opts.stdout is
+           true or .opts.verbose is false.
+        """
+        if self.opts.stdout or not self.opts.verbose:
+            return
+        fprintfMessage(sys.stdout, format, *args)
+
+
+    def debug(self, format, *args):
+        """Print a debugging message to stderr, but don't if .debug is
+           false.
+        """
+        if self.opts.debug:
+            fprintfMessage(sys.stderr, format, *args)
+    
+    def warn(self, format, *args):
+        """Always print a warning message to stderr.
+        """
+        fprintfMessage(sys.stderr, format, *args)
+
+
+    ##################################################
     ## HELPER METHODS
-
-    def backup(self, dst):
-        """Back up a destination file and return the backup path."""
-
-        if not os.path.exists(dst):
-            return None
-        backup = dst + self.BACKUP_SUFFIX
-        shutil.copyfile(dst, backup)
-        return backup
 
     def _fixExts(self):
         assert self.opts.oext, "oext is empty!"
@@ -162,6 +191,7 @@ class CheetahWrapper:
     
 
     def parseOpts(self, args):
+        C, D, W = self.chatter, self.debug, self.warn
         self.isCompile = isCompile = self.command[0] == 'c'
         defaultOext = isCompile and ".py" or ".html"
         parser = MyOptionParser()
@@ -178,11 +208,11 @@ class CheetahWrapper:
         pao("--flat", action="store_true", dest="flat", default=0)
         pao("--nobackup", action="store_true", dest="nobackup", default=0)
         self.opts, self.files = opts, files = parser.parse_args(args)
-        if opts.debug:
-            print >>sys.stderr, "cheetah compile", args
-            print >>sys.stderr, "Options are"
-            print >>sys.stderr, pprint.pformat(vars(opts))
-            print >>sys.stderr, "Files are", files
+        D("""\
+cheetah compile %s
+Options are
+%s
+Files are %s""", args, pprint.pformat(vars(opts)), files)
         self._fixExts()
         if opts.env:
             self.searchList.append(os.environ)
@@ -191,6 +221,7 @@ class CheetahWrapper:
             unpickled = pickle.load(f)
             f.close()
             self.searchList.append(unpickled)
+        opts.verbose = not opts.stdout
 
 
     def compileOrFillStdin(self):
@@ -203,19 +234,20 @@ class CheetahWrapper:
 
 
     def compileOrFillBundle(self, b):
+        C, D, W = self.chatter, self.debug, self.warn
         src = b.src
         dst = b.dst
         base = b.base
         basename = b.basename
         dstDir = os.path.dirname(dst)
         what = self.isCompile and "Compiling" or "Filling"
-        print what, src, "->", dst, # No trailing newline.
+        C("%s %s -> %s^", what, src, dst) # No trailing newline.
         if os.path.exists(dst) and not self.opts.nobackup:
             bak = b.bak
-            print "(backup %s)" % bak # On same line as previous message.
+            C("(backup %s)", bak) # On same line as previous message.
         else:
             bak = None
-            print
+            C("")
         if self.isCompile:
             if not moduleNameRx.match(basename):
                 tup = basename, src
@@ -245,6 +277,7 @@ be named according to the same rules as Python modules.""" % tup)
         """Check for multiple source paths writing to the same destination
            path.
         """
+        C, D, W = self.chatter, self.debug, self.warn
         isError = False
         dstSources = {}
         for b in bundles:
@@ -261,14 +294,13 @@ be named according to the same rules as Python modules.""" % tup)
                 sources.sort()
                 fmt = \
 "Collision: multiple source files %s map to one destination file %s"
-                print fmt % (sources, dst)
+                W(fmt, sources, dst)
         if isError:
             what = self.isCompile and "Compilation" or "Filling"
-            sys.exit("%s aborted due to collisions" % what)
+            die("%s aborted due to collisions" % what)
                 
 
     def getBundles(self, sourceFiles):
-        debug = self.opts.debug
         flat = self.opts.flat
         idir = self.opts.idir
         iext = self.opts.iext
@@ -314,14 +346,13 @@ be named according to the same rules as Python modules.""" % tup)
         """Calculate source paths from 'files' by applying the 
            command-line options.
         """
+        C, D, W = self.chatter, self.debug, self.warn
         idir = self.opts.idir
         iext = self.opts.iext
-        debug = self.opts.debug
         ret = [] 
         for fil in self.files:
             oldRetLen = len(ret)
-            if debug:
-                print "Expanding", fil
+            D("Expanding %s", fil)
             path = os.path.join(idir, fil)
             pathWithExt = path + iext # May or may not be valid.
             if os.path.isdir(path):
@@ -336,23 +367,23 @@ be named according to the same rules as Python modules.""" % tup)
                 ret.append(pathWithExt)
                 # Do not recurse directories discovered by iext appending.
             elif os.path.exists(path):
-                print "Skipping source file '%s', not a plain file." % path
+                W("Skipping source file '%s', not a plain file.", path)
             else:
-                print "Skipping source file '%s', not found." % path
-            if debug and len(ret) > oldRetLen:
-                print "  ... found", ret[oldRetLen:]
+                W("Skipping source file '%s', not found.", path)
+            if len(ret) > oldRetLen:
+                D("  ... found %s", ret[oldRetLen:])
         return ret
 
 
     def compileOrFill(self):
+        C, D, W = self.chatter, self.debug, self.warn
         opts, files = self.opts, self.files
-        debug = self.opts.debug
         if files == ["-"]: 
             self.compileOrFillStdin()
             return
         elif not files and opts.recurse:
             which = opts.idir and "idir" or "current"
-            print "Drilling down recursively from %s directory." % which
+            C("Drilling down recursively from %s directory.", which)
             sourceFiles = []
             dir = os.path.join(self.opts.idir, os.curdir)
             os.path.walk(dir, self._expandSourceFilesWalk, sourceFiles)
@@ -361,11 +392,9 @@ be named according to the same rules as Python modules.""" % tup)
         else:
             sourceFiles = self.expandSourceFiles(files, opts.recurse, True)
         sourceFiles = [os.path.normpath(x) for x in sourceFiles]
-        if debug:
-            print "All source files found:", sourceFiles
+        D("All source files found:", sourceFiles)
         bundles = self.getBundles(sourceFiles)
-        if debug:
-            print "All bundles:", pprint.pformat(bundles)
+        D("All bundles: %s", pprint.pformat(bundles))
         if self.opts.flat:
             self._checkForCollisions(bundles)
         for b in bundles:
