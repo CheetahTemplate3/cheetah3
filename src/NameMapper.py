@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.22 2002/11/07 18:33:01 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.23 2002/11/12 07:16:47 hierro Exp $
 
 """This module implements Cheetah's optional NameMapper syntax.
 
@@ -63,8 +63,8 @@ Details
 ================================================================================
 The parenthesized letters below correspond to the aims in the second paragraph.
 
-DICTIONARY ACCESS (a)
----------------------
+UNIFIED DOTTED NOTATION (a)
+---------------------------
 
 NameMapper allows access to items in a dictionary using the same dotted notation
 used to access object attributes in Python.  This aspect of NameMapper is known
@@ -81,8 +81,8 @@ This only works with dictionary keys that are also valid python identifiers:
 AUTOCALLING (b,d)
 -----------------
 
-NameMapper automatically detects functions and methods in Cheetah $vars and calls
-them if the parentheses have been left off.  
+NameMapper automatically detects functions and methods in Cheetah $vars and
+calls them if the parentheses have been left off.  
 
 For example if 'a' is an object, 'b' is a method
   $a.b
@@ -98,8 +98,8 @@ Further notes:
 autocalling can only be used with functions or methods that either have no
 arguments or have default values for all arguments.
 
-* NameMapper only autocalls functions and methods.  Classes and callable objects
-will not be autocalled.  
+* NameMapper autocalls only functions and methods.  Classes, instances and
+other callable objects will not be autocalled.
 
 * Autocalling can be disabled using Cheetah's 'useAutocalling' setting.
 
@@ -133,22 +133,27 @@ been compiled, or falls back automatically to the Python version if not.
 Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@damnsimple.com>,
-         Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.22 $
+         Chuck Esterbrook <echuck@mindspring.com>,
+     Mike Orr <iron@mso.oz.net>
+Version: $Revision: 1.23 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2002/11/07 18:33:01 $
+Last Revision Date: $Date: 2002/11/12 07:16:47 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
-             "\nChuck Esterbrook <echuck@mindspring.com>"
-__revision__ = "$Revision: 1.22 $"[11:-2]
+             "\nChuck Esterbrook <echuck@mindspring.com>" +\
+         "\nMike Orr <iron@mso.oz.net>"
+__revision__ = "$Revision: 1.23 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
 
 import types
-from types import StringType, InstanceType, ClassType, TypeType
+from types import ClassType, DictType, InstanceType, StringType, TypeType
 import re
-# it uses the string methods and list comprehensions added in recent versions of python
+from UserDict import UserDict
+
+# This module requires Python >= 2.0 due to its use of string methods and
+# list comprehensions.
 
 ##################################################
 ## GLOBALS AND CONSTANTS
@@ -161,93 +166,103 @@ except NameError:
 class NoDefault:
     pass
 
+C_VERSION = False # Has _namemapper.c overridden functions in this module?
+                  # Updated below.
+
 ##################################################
 ## FUNCTIONS
 
-try:
-    from _namemapper import NotFound, valueForKey, valueForName, valueFromSearchList
-    # it is possible, with Jython for example, that _namemapper.c hasn't been compiled
-    C_VERSION = True
-except:
-    C_VERSION = False
+class NotFound(LookupError):
+    pass
+class NotFoundInNamespace(NotFound):
+    pass
+    
 
-    class NotFound(LookupError):
-        pass
-    class NotFoundInNamespace(NotFound):
-        pass
-    
-    def valueForKey(obj, key):
-    
-        """Get the value of the specified key.  The 'obj' can be a a mapping or any
-        Python object that supports the __getattr__ method. The key can be a mapping
-        item, or an attribute."""
-    
-        if hasattr(obj, key):
-            return getattr(obj, key)
-        elif hasattr(obj, '__getitem__'):
-            try:
-                return obj[key]
-            except KeyError:
-                raise NotFound, key
-        else:
-            raise NotFound, key
-                
-
-
-    def valueForName(obj, name, executeCallables=False):
-        """Get the value for the specified name.  This function can be called
-        recursively.  """
-    
-        if type(name)==StringType:
-            # then this is the first call to this function.
-            nameChunks=name.split('.')
-        else:
-            #if this function calls itself then name already is a list of nameChunks
-            nameChunks = name
+def valueForKey(obj, key, searchAttrIfKeys=True):
+    """Get the value of the specified key.  The 'obj' can be a a mapping or
+       any Python object that supports the __getattr__ method. The key can
+       be a mapping item, or an attribute/method.
+       searchAttrIfKeys should be True for the first or only chunk, and
+       False for subsequent chunks.
+    """
+    hasKeys = hasattr(obj, '__getitem__')
+    searchAttrs = (not hasKeys) or searchAttrIfKeys
+    if   hasKeys:
+        try:
+            return obj[key]
+        except (KeyError, TypeError):
+            # KeyError if key not found
+            # TypeError if keys are restricted to a certain type (eg. lists)
+            pass
+    if searchAttrs and hasattr(obj, key):
+        return getattr(obj, key)
+    raise NotFound, key
             
-        return _valueForName(obj, nameChunks, executeCallables=executeCallables)
-    
-    def _valueForName(obj, nameChunks, executeCallables=False, passNamespace=False):
-        ## go get a binding for the key ##
-        firstKey = nameChunks[0]
-        if passNamespace:
-            try:
-                binding = valueForKey(obj, firstKey)
-            except NotFound:
-                raise NotFoundInNamespace
-        else:
-            binding = valueForKey(obj, firstKey)
-        if executeCallables and callable(binding) and \
-           type(binding) not in (InstanceType, ClassType, TypeType):
-            # the type check allows access to the methods of instances
-            # of classes with __call__() defined
-            # and also allows obj.__class__.__name__
-            binding = binding()
-    
-        if len(nameChunks) > 1:
-            # its a composite name like: nestedObject.item
-            return _valueForName(binding, nameChunks[1:],
-                                executeCallables=executeCallables)
-        else:
-            # its a single key like: nestedObject
-            return binding
 
-    def valueFromSearchList(searchList, name, executeCallables=False):
-        if type(name)==StringType:
-            # then this is the first call to this function.
-            nameChunks=name.split('.')
-        else:
-            #if this function calls itself then name already is a list of nameChunks
-            nameChunks = name
 
-        for namespace in searchList:
-            try:
-                val = _valueForName(namespace, nameChunks,
-                                    executeCallables=executeCallables, passNamespace=True)
-                return val
-            except NotFoundInNamespace:
-                pass           
-        raise NotFound(name)
+def valueForName(obj, name, executeCallables=False):
+    """Get the value for the specified name.  
+       TR says function can be called recursively but MO doesn't believe him.
+    """
+
+    if type(name)==StringType:
+        # then this is the first call to this function.
+        nameChunks=name.split('.')
+    else:
+    # if this function calls itself then name already is a list of
+    # nameChunks
+        nameChunks = name
+        
+    return _valueForName(obj, nameChunks, executeCallables=executeCallables,
+        searchAttrIfKeys=True)
+
+
+def _valueForName(obj, nameChunks, executeCallables=False, 
+    passNamespace=False, searchAttrIfKeys=True):
+    ## go get a binding for the key ##
+    firstKey = nameChunks[0]
+    if passNamespace:
+        try:
+            binding = valueForKey(obj, firstKey, searchAttrIfKeys)
+        except NotFound:
+            raise NotFoundInNamespace
+    else:
+        binding = valueForKey(obj, firstKey, searchAttrIfKeys)
+    if executeCallables and callable(binding) and \
+       type(binding) not in (InstanceType, ClassType, TypeType):
+        # the type check allows access to the methods of instances
+        # of classes with __call__() defined
+        # and also allows obj.__class__.__name__
+        binding = binding()
+
+    if len(nameChunks) > 1:
+        # it's a composite name like: nestedObject.item
+        return _valueForName(binding, nameChunks[1:],
+                             executeCallables=executeCallables,
+                             searchAttrIfKeys=True)
+    else:
+        # its a single key like: nestedObject
+        return binding
+
+
+def valueFromSearchList(searchList, name, executeCallables=False):
+    if type(name)==StringType:
+        # then this is the first call to this function.
+        nameChunks=name.split('.')
+    else:
+        # if this function calls itself then name already is a list of
+        # nameChunks
+        nameChunks = name
+
+    for namespace in searchList:
+        try:
+            val = _valueForName(namespace, nameChunks,
+                                executeCallables=executeCallables, 
+                                passNamespace=True, searchAttrIfKeys=False)
+            return val
+        except NotFoundInNamespace:
+            pass           
+    raise NotFound(name)
 
 
 ##################################################
@@ -269,6 +284,13 @@ def hasName(obj, name):
         return True
     except NotFound:
         return False
+
+try:
+    from _namemapper import NotFound, valueForKey, valueForName
+    from _namemapper import valueFromSearchList
+    C_VERSION = True
+except ImportError:
+    pass
 
 ##################################################
 ## CLASSES
@@ -328,5 +350,4 @@ def example():
 if __name__ == '__main__':
     example()
 
-
-
+# vim: shiftwidth=4 tabstop=4 expandtab

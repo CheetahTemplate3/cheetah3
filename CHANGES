@@ -1,6 +1,16 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
+0.9.15a4 (unreleased)
+  - The Cheetah version of unittest now prints a blank line after each 
+    traceback to separate them.  (MO)
+  - The NameMapper (Python version) looks for a key first, then an 
+    attribute/method.  But it ignores the attributes/methods if (1)
+    the object has keys (i.e., .__getitem__() is defined) and (2) this
+    is the first "chunk" (component, identifier) in a searchList lookup.
+    This is to prevent $update from matching a dictionary method if there
+    happens to be a dictionary container in the searchList.  (MO)
+
 0.9.15a3 (Nov 10, 2002)
   - corrected a dictionary bug in the Python version of NameMapper (TR)
   - Rewrote the "cheetah" command (CheetahWrapper.py) again and added test
@@ -13,8 +23,6 @@ release
     to the containers, and modify the containers directly.  Generic libraries
     that want to add a new kind of information to the searchList (e.g.,
     web variables) should do "self.searchList().insert(0, myContainer)". (MO)
-  - The Cheetah version of unittest now prints a blank line after each 
-    traceback to separate them.  (MO)
 
 0.9.15a2 (Nov 4th, 2002)
   - Filters now have access to the name of the placeholder they're filtering.
