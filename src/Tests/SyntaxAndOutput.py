@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.45 2002/10/28 08:07:04 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.46 2002/11/14 06:08:18 hierro Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.45 $
+Version: $Revision: 1.46 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/10/28 08:07:04 $
+Last Revision Date: $Date: 2002/11/14 06:08:18 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.45 $"[11:-2]
+__revision__ = "$Revision: 1.46 $"[11:-2]
 
 
 ##################################################
@@ -32,6 +32,7 @@ import os.path
 import new
 
 from Cheetah.NameMapper import NotFound
+from Cheetah.NameMapper import C_VERSION as NameMapper_C_VERSION
 from Cheetah.Template import Template
 from Cheetah.Parser import ParseError
 from Cheetah.Compiler import Compiler
@@ -803,6 +804,15 @@ class NameMapper(OutputTest):
         self.verify("$anObj.methWithPercentSignDefaultArg",
                     "110%")
 
+
+class NameMapperDict(OutputTest):
+
+    _searchList = [{"update": "Yabba dabba doo!"}]
+
+    def test1(self):
+        if NameMapper_C_VERSION:
+            return # This feature is not in the C version yet.
+        self.verify("$update", "Yabba dabba doo!")
 
 
 class CacheDirective(OutputTest):
