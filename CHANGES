@@ -1,30 +1,14 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
-0.9.15a4 (unreleased)
+0.9.15b1 (Mar 17, 2003)
   - The Cheetah version of unittest now prints a blank line after each 
     traceback to separate them.  (MO)
-  - The NameMapper (Python version, version 2) looks for a key first, then an 
-    attribute/method.  But it ignores the attributes/methods if (1)
-    the object has keys (i.e., .__getitem__() is defined) and (2) this
-    is the first "chunk" (component, identifier) in a searchList lookup.
-    this is to prevent $update from matching a dictionary method if there
-    happens to be a dictionary container in the searchlist.  
-        COMPATIBILITY NOTE: NameMapper used to look for an attribute first.
-    So if $a has both an attribute 'foo' and a key 'foo', $a.foo now finds
-    a['foo'] instead of a.foo.  To get the attribute, you must do 
-    $getattr($a, 'foo') or turn NameMapper off. (MO)
-  - The NameMapper (Python version, version 3) again looks for an attribute
-    first, then a key.  But now it ignores the attributes/methods if the
-    object is a dictionary (a built-in Python dictionary, not a subclass)
-    and this is the first "chunk" (component, identifier) in a searchList
-    lookup.  this is to prevent $update from matching a dictionary method if
-    there happens to be a dictionary container in the searchlist.  (MO)
   - .webInput() now saves the cgi.FieldStorage() instance in a global
     variable rather than recreating it each call.  That should allow the
     method to be called multiple times with POST variables outside Webware.
     (MO)
-  - CheetahWrapper: no verbose output on stdout with --stdout/-p.
+  - CheetahWrapper: no verbose output on stdout with --stdout/-p. (MO)
   - "#indent" is now undocumented.  The existing code remains intact for now.
     See the TODO file for our future plans. (MO)
   - Apply 2 unicode-support patches from Rodrigo B. de Oliveira (rodrigobamboo)
