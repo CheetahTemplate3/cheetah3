@@ -2,7 +2,7 @@
 \label{output}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Output From Simple Expressions: Placeholders}
+\subsection{Output from simple expressions: placeholders}
 \label{output.placeholders}
 
 Placeholders are like 'primaries' in Python (see section 5.3 of Python's
@@ -14,16 +14,19 @@ When a template is processed each placeholder will be replaced with the string
 representation of its value.  These string representations are identical to
 those returned by Python's str() function, with the exception of \code{None}.
 \code{None} is replaced with an empty string, or in other words nothing.
+(This is with the default output filter.  You can customize the string
+representation via the \code{\#filter} directive, section \ref{output.filter}.)
 
-Cheetah finds the values for Placeholders in several places.  First, the
-placeholder name can be one of Python's builtins, like \code{\$range} or
-\code{\$len}.  Second, the name can refer to a variable in Cheetah's
-\code{``searchList''}.  Third, the name can refer to a local variable, such as
-\code{\$i} in a for loop, or an imported module name, such as \code{\#import
-math \ldots \$math.sin(0.5)}.
+Cheetah finds the values for placeholders in several places.  The most obvious
+place is in the searchList.  But placeholders can also refer to local variables
+(created by \code{\#set}), global variables (created by \code{\#set global}, 
+\code{\#import}, methods of the generated class (created by 
+\code{\#def} and \code{\#block} or inherited from the \code{Template} class),
+attributes of the generated class (created by \code{\#attr} or inherited), or
+Python builtins like \code{\$range} or \code{\$len}.  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Output From Complex Expressions: \#echo}
+\subsection{Output from complex expressions: \#echo}
 \label{output.echo}
 
 The \code{\#echo} directive is used to echo the output from expressions that
@@ -35,18 +38,24 @@ $<$\%=EXPR\%$>$ tag.
 % placing them inside '$$' worked.
 
 \begin{verbatim}
-Here is my #echo ','.join(['silly']*5) # example 
+Here is my #echo ', '.join(['silly']*5) # example 
+\end{verbatim}
+
+This produces:
+
+\begin{verbatim}
+Here is my silly, silly, silly, silly, silly example.
 \end{verbatim}
 
 In this example, the second \code{\#} serves to end the \code{\#echo} directive,
 allowing plain text to follow it.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Silencing The Output From Expressions: \#silent}
+\subsection{Executing expressions without output: \#silent}
 \label{output.silent}
 
-The \code{\#silent} directive is used to silence the output from any
-expressions that must be excuted.  It is similar to ASP's $<$\% EXPR \%$>$ tag.
+\code{\#silent} is the opposite of \code{\#echo}.  It executes an expression
+but discards the output.  It's similar to ASP's $<$\% EXPR \%$>$ tag.
 
 \begin{verbatim}
 #silent $myList.reverse()
@@ -54,6 +63,10 @@ expressions that must be excuted.  It is similar to ASP's $<$\% EXPR \%$>$ tag.
 Here is #silent $covertOperation() # nothing
 \end{verbatim}
 
+If your template requires some Python code to be executed at the beginning;
+(e.g., to calculate placeholder values, access a database, etc), you can put
+it in a "doEverything" method you inherit, and call this method using
+\code{\#silent} at the top of the template.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Caching Output}
@@ -63,17 +76,21 @@ Here is #silent $covertOperation() # nothing
 \subsubsection{Caching individual placeholders}
 \label{output.caching.placeholders}
 
-By default, the values of each \code{\$placeholder} is retrieved and
-interpolated for every request. It is possible to cache the values individual
-\code{\$placeholders}
+By default, the values of each \$placeholder is retrieved and
+interpolated for every request. However, it's possible to cache the values
+of individual placeholders if they don't change very often, in order to 
+speed up the template filling.
                          
-If you want to cache the value of a single \code{\$placeholder} during the first
-request, add an asterisk after the \$ sign.  \code{\$var} becomes \code{\$*var}.
+To cache the value of a single \code{\$placeholder}, add an asterisk after the
+\$; e.g.,  \code{\$*var}.  The first time the template is
+filled, \code{\$var} is looked up.  Then whenever the template is filled again,
+the cached value is used instead of doing another lookup.  
 
-If you only need to update the cache at specific time intervals use this form:
-\code{\$*<interval>*variable} , where \code{<interval>} is the interval.  The
-time interval can be specified in seconds (5s), minutes (15m), hours (3h), days
-(2d) or weeks (1.5w). The default is minutes.
+The \code{\$*} format caches ``forever''; that is, as long as the template
+instance remains in memory.  It's also possible to cache for a certain time
+period using the form \code{\$*<interval>*variable}, where \code{<interval>} is
+the interval.  The time interval can be specified in seconds (5s), minutes
+(15m), hours (3h), days (2d) or weeks (1.5w). The default is minutes.
 
 \begin{verbatim}
 <HTML>
@@ -82,20 +99,33 @@ time interval can be specified in seconds (5s), minutes (15m), hours (3h), days
 
 $var ${var}           ## dynamic - will be reinterpolated for each request
 $*var2 $*{var2}       ## static - will be interpolated only once at start-up
-$*5*var3 $*5*{var3}   ## timed refresh - will be updated every 5 minutes.
+$*5*var3 $*5*{var3}   ## timed refresh - will be updated every five minutes.
 
 </BODY>
 </HTML>
 \end{verbatim}
 
+Note that ``every five minutes'' in the example really means every five
+minutes: the variable is looked up again when the time limit is reached,
+whether the template is being filled that frequently or not.  Keep this in
+mind when setting refresh times for CPU-intensive or I/O intensive 
+operations.
+
+% @@MO: Is it $*5*{var} or ${*5*var}?  We should mention.
+
+Sometimes it's preferable to explicitly invalidate a cached item whenever
+you say so rather than at certain time intervals.  You can't do this with
+individual placeholders, but you can do it with cached regions, which will
+be described next.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Caching entire regions}
 \label{output.caching.regions}
 
-The \code{\#cache} directive is used to cache a region of content in a template.
-It accepts several keyword arguments, which are demonstrated in the examples
-below.  Cached regions can be given an 'id', which can be used to
-programmatically refresh a region with the \code{Template.refreshCache(id)}
+The \code{\#cache \ldots \#end cache} directive is used to cache a region of
+content in a template.  It accepts several keyword arguments as demonstrated in
+the examples below.  Cached regions can be given an 'id', which can be used to
+programmatically refresh a region with the \code{.refreshCache(id)}
 method.  Cached regions can also be invalidated according to a user-specified
 \code{test} conditions.
 
@@ -118,6 +148,16 @@ $cust.street - $cust.city
 #end cache
 \end{verbatim}
 
+Note that placeholders lose their identity inside a \code{\#cache} region.
+That is, we do not cache \code{\$cust.name} and the \code{\#for} loop above
+individually.  Instead, the region is placed in the cache as plain text
+{\em after} the placeholders and directives have been evaluated.  When/if
+the cached item is invalidated, the placeholders and directives are evaluated
+again.  A corollary of this is that placeholders inside \code{\#cache}
+regions cannot use the \code{\$*var} or \code{\$*<interval>*var} form,
+because they cannot be cached under a different policy than the region 
+they're in.
+
 The \code{\#cache} directive cannot be nested.
 
 We are planning to add a \code{'varyBy'} keyword argument in the future that
@@ -125,17 +165,22 @@ will allow a separate cache instances to be created for a variety of conditions,
 such as different query string parameters or browser types. This is inspired by
 ASP.net's varyByParam and varyByBrowser output caching keywords.
 
+% @@MO: Can we cache by Webware sessions?  What about sessions where the
+% session ID is encoded as a path prefix in the URI?  Need examples.
+
+% @@MO: Are cache parameters case sensitive?  If so, correct "id" and "ID"
+% above.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#raw}
 \label{output.raw}
 
-Any section of a Template Definition that is inside a \code{\#raw} ...
-\code{\#end raw} tag pair will be printed verbatim without any parsing of
+Any section of a template definition that is inside a \code{\#raw \ldots
+\#end raw} tag pair will be printed verbatim without any parsing of
 \$placeholders or other directives. This can be very useful for debugging, or
 for Cheetah examples and tutorials.
 
-\code{\#raw} may appear similar to HTML's \code{<PRE>} tag and LaTeX's
+\code{\#raw} is conceptually similar to HTML's \code{<PRE>} tag and LaTeX's
 \code{\\verbatim\{\}} tag, but unlike those tags, \code{\#raw} does not cause
 the body to appear in a special font or typeface.  It can't, because Cheetah
 doesn't what a font is.  
@@ -146,11 +191,11 @@ doesn't what a font is.
 \label{output.include}
 
 The \code{\#include} directive is  used to include text from outside the
-template definition.  The text can come from external files or from
-\code{\$placeholder} variables.  When working with external files Cheetah will
+template definition.  The text can come from an external file or from a
+\code{\$placeholder} variable.  When working with external files, Cheetah will
 monitor for changes to the included file and update as necessary.  
 
-This demonstrates its use with external files:
+This example demonstrates its use with external files:
 \begin{verbatim}
 #include "includeFileName.txt"
 \end{verbatim}
@@ -162,7 +207,7 @@ And this example demonstrates use with \code{\$placeholder} variables:
 \end{verbatim}
 The value of \code{\$myParseText} will be parsed for Cheetah syntax. This is not
 the same as simple placing the \$placeholder tag ``\code{\$myParseText}'' in
-your template definition.  In the latter case, the value of \$myParseText would
+the template definition.  In the latter case, the value of \$myParseText would
 not be parsed.
 
 By default, included text will be parsed for Cheetah tags.  The argument
@@ -174,13 +219,22 @@ By default, included text will be parsed for Cheetah tags.  The argument
 \end{verbatim}
 
 Cheetah wraps each chunk of \code{\#include} text inside a nested
-\code{Template} object.  These nested templates share the same \code{searchList}
-as the top-level template. But, unlike PHP, their Cheetah code must be
-self-contained.  For example, all \code{\#for} and \code{\#if} blocks started
-inside an \code{\#include} must be terminated in that include. \code{\#set}
-variables are only visible across includes if the \code{\#set global} keyword is
-used.
+\code{Template} object.  Each nested template has a copy of the main
+template's searchList.  However, \code{\#set} variables are visible
+across includes only if the defined using the \code{\#set global} keyword.
 
+All directives must be balanced in the include file.  That is, if you start
+a \code{\#for} or \code{\#if} block inside the include, you must end it in
+the same include.  (This is unlike PHP, which allows unbalanced constructs
+in include files.)
+
+% @@MO: What did we decide about #include and the searchList?  Does it really
+% use a copy of the searchList, or does it share the searchList with the
+% parent?
+
+% @@MO: deleted
+%These nested templates share the same \code{searchList}
+%as the top-level template. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#slurp}
@@ -206,9 +260,10 @@ outputs:
 \subsection{Ouput Filtering and \#filter}
 \label{output.filter}
 
-Output from \code{\$placeholders} is passed through an ouput filter.  By default
-the filter just returns a string representation of the placeholder's value,
-unless it is \code{'None'}, in which case it returns an empty string. 
+Output from \$placeholders is passed through an ouput filter.  The default
+filter merely returns a string representation of the placeholder value,
+unless the value is \code{None}, in which case the filter returns an empty
+string. 
 
 Certain filters take optional arguments to modify their behaviour.  To pass
 arguments, use the long placeholder syntax and precede each filter argument by
@@ -222,9 +277,9 @@ ${functionCall($functionArg), maxlen=$myMaxLen}
 \end{verbatim}
 
 To change the output filter, use the \code{'filter'} keyword to the
-\code{Template} class' constructor, or the \code{\#filter}
+\code{Template} class constructor, or the \code{\#filter}
 directive at runtime (details below).  You may use \code{\#filter} as often as
-you want to switch between several filters, if certain \code{\$placeholders}
+you wish to switch between several filters, if certain \code{\$placeholders}
 need one filter and other \code{\$placeholders} need another.
 
 The standard filters are in the module \code{Cheetah.Filters}.  Cheetah
@@ -282,14 +337,17 @@ The filtersLib is a module containing filter classes, by default
 another module, pass the module object as the {\bf filtersLib} argument to the
 Template constructor.
 
-You may always switch back to the default filter this way:
+You can always switch back to the default filter this way:
 \code{\#filter None}.  This is easy to remember because "no filter" means the
 default filter, and because None happens to be the only object the default
 filter treats specially.
 
 We are considering additional filters; see
-http://cheetah.colorstudy.net/twiki/bin/edit/Cheetah/OutputFilters
+\url{http://webware.colorstudy.net/twiki/bin/view/Cheetah/MoreFilters}
 for the latest ideas.
+
+%% @@MO: Is '#end filter' implemented?  Will it be?  Can filters nest?
+%% Will '#end filter' and '#filter None' be equivalent?
 
 %% @@MO: Tavis TODO: fix the description of the Pager filter.  It needs a howto.
 

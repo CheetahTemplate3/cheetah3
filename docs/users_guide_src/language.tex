@@ -246,6 +246,7 @@ text.
 %text.  End tags are written in the form \code{\#end [directive-name]}.
 %Directives are case-sensitive.
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Directive closures and whitespace handling}
 \label{language.directives.closures}
@@ -324,54 +325,11 @@ foo
 """
 \end{verbatim}
 
-The \code{\#slurp} directive (section
-\ref{directives.slurp}) also gobbles up whitespace.
+The \code{\#slurp} directive (section \ref{directives.slurp}) also gobbles up
+whitespace.
 
-To place a comment after a directive on the same line, or to place two
-directives back to back, the first directive must be closed explicitly.
-Beware of spaces between the directives: they will be output as literal text,
-and will not allow the line-gobbling mentioned above (unless you use
-\code{\#slurp}).  Here are some examples:
-
-\begin{verbatim}
-#attr $animals = ('horse', 'donkey')
-First pass:
-#for $animal in $animals ### La la!
-The zoo contains $animal.
-#end for# ## $animal.
-******************************************
-Second pass:
-#for $animal in $animals
-The zoo contains $animal.
-#end for
-******************************************
-Third pass:
-#for $animal in $animals##slurp### La la!
-The zoo contains $animal.
-#end for##slurp### $animal.
-*****************************************
-\end{verbatim}
-
-And the output:
-
-\begin{verbatim}
-First pass:
-
-The zoo contains horse.
-
-The zoo contains donkey.
- 
-******************************************
-Second pass:
-The zoo contains horse.
-The zoo contains donkey.
-******************************************
-Third pass:
-The zoo contains horse.
-The zoo contains donkey.
-*****************************************
-
-\end{verbatim}
+Whitespace handling around comment directives is discussed in section
+\ref{comments.whitespace}.
 
 
 

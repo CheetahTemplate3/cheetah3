@@ -65,6 +65,44 @@ your own "safe" namespace.
 
 % @@ MO: If getVar() is called from Python, does errorCatcher apply?
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{All Template methods}
+\label{tips.allMethods}
+
+Here is a list of all the standard methods inherited by \code{Template} objects
+and attributes.  Some of them exist for you to call, others are mainly used by
+Cheetah but you can call them if you wish, and others are only for internal use
+by Cheetah.  Do not use these method names in mixin classes (\code{\#extends},
+section \ref{inheritanceEtc.extends}) unless you intend to override the
+standard method.  
+
+If you do override the standard method, remember to call the
+superclass method when/if appropriate.  The most common method to override is
+\code{.awake()}.  It's a convenient place to put any initialization needed 
+by your template because Webware automatically calls \code{.awake()} when it
+begins processing the request.  You'll definitely want to call the superclass
+\code{.awake()} method as your first statement, because the superclass method
+sets up many wonderful features like access to the CGI fields.  For 
+Python >= 2.2, you simply do:
+\begin{verbatim}
+class MyMixin:
+	def awake(self, trans):
+		super(MyMixin, self).awake(trans)
+		... great and exciting features written by me ...
+\end{verbatim}
+For Python < 2.2, you have to know which class \code{.awake()} is inherited
+from (it's \code{Servlet}, which \code{Template} inherits) and call that method
+directly as an unbound method:
+\begin{verbatim}
+from Cheetah.Servlet import Servlet
+class MyMixin:
+	def awake(self, trans):
+		Servlet.awake(self, trans)
+		... great and exciting features written by me ...
+\end{verbatim}
+
+[Method list not written yet.]
+
 
 % Local Variables:
 % TeX-master: "users_guide"

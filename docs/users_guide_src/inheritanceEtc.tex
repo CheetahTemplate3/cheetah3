@@ -33,48 +33,107 @@ $sin(8)                       ## Raises NameMapper.NotFound error at fill time.
 \subsection{\#extends}
 \label{inheritanceEtc.extends}
 
-The \code{\#extends} directive is used to specify the base classes that the
-generated servlet class should inherit from.  It is equivalent to PSP's
-\code{``@page extends=''} directive.
+Normally, the generated template class is a subclass of
+\code{Cheetah.Template.Template}.  This gives it standard \code{Template}
+functionality as well as making it usable as a Webware servlet.  However,
+sometimes you want to inherit from a more general template (e.g., one
+containing your generic site framework), or from a pure Python class (so you
+can call its methods and attributes as placeholders.  The \code{\#extends}
+directive allows you to specify which parent class to inherit from.  It is
+equivalent to PSP's \code{``@page extends=''} directive. 
 
 \begin{verbatim}
 #from Cheetah.Templates.SkeletonPage import SkeletonPage
 #extends SkeletonPage
 \end{verbatim}
 
-Multiple inheritance is allowed, provided that the last base class is a
-subclass of Cheetah.Template.Template:
-
-\begin{verbatim}
-#from Cheetah.Templates.SkeletonPage import SkeletonPage
-#from MyMixin import MyMixin
-#extends MyMixin, SkeletonPage
-\end{verbatim}
-
-{\em Note:} In Cheetah 0.9.12 and earler, one listed the \code{Template} subclass
-first rather than last.  The order was changed to allow mixin classes to override
-standard methods like \code{.awake()}.  One caveat is that now it's possible to
-accidentally override methods you weren't aware of.  Section ?? (not written yet)
-lists all the standard methods \code{Template} objects have.
-
 In the very near future, you won't need those \code{\#from ... import}
 directives because \code{\#extends} will implicitly import whatever 
 classes it needs, but for now the explicit imports are necessary.
 
-(There is a discussion about removing multiple inheritance from Cheetah.
-If that happens, you'll be able to list only one class in the 
-\code{\#extends} directive.  Each template would then inherit from its
-pure Python class if any (a class that provides attributes and methods
-needed by the particular template) or from its parent template if none.
-Each Python class would inherit from its parent template.  If the top of
-the hierarchy (the most general superclass) is a Cheetah template, it would not
-have an \code{\#extends} directive.  If the top of the hierarchy is a Python
-class, it would have to subclass \code{Cheetah.Template.Template} explicitly.
-Python classes in the inheritance chain would be free to do multiple
-inheritance if they wish--only templates would be prohibited from doing
-multiple inheritance.  The Cheetah developers are divided over whether to keep
-or remove multiple inheritance, so it's too early to say which way it will
-go.)
+Three rules: (A) you may inherit from only one superclass (no multiple
+inheritance), (B) there may be at most one \code{\#extends} directive per
+template, and (C) the highest-level superclass in the chain must be
+\code{Cheetah.Template.Template}.  
+
+Here's an example for a large web site that has not only a general site
+template, but also a template for this section of the site, and several pure
+Python classes too.  We'll begin with the highest-level superclass and
+end with the specific page template:
+
+\begin{verbatim}
+1.  SiteLogic.py (pure Python class containing methods for the site)
+        from Cheetah.Template import Template
+	class SiteLogic(Template):
+
+2.  Site.tmpl/py  (template containing the general site framework)
+        #from SiteLogic import SiteLogic
+	#extends SiteLogic
+
+3.  SectionLogic.py  (pure Python class with helper code for the section)
+        from Site import Site
+	class SectionLogic(Site)
+
+4.  Section.tmpl/py  (template with '#def' overrides etc. for the section)
+	#from SectionLogic import SectionLogic
+	#extends SectionLogic
+
+5.  page1Logic.py  (pure Python class with helper code for the page)
+        from Section import Section
+	class indexLogic(Section):
+
+6.  page1.tmpl/py  (template for a certain page on the site)
+        #from page1Logic import page1Logic
+	#extends page1Logic
+\end{verbatim}
+
+You may omit any files you don't need, or insert extra files as necessary, and
+of course you may name the classes anything you want.  If your highest-level
+site template (Site.tmpl/py) doesn't need a pure Python class (Site.py), it's
+even easier: just omit the \code{\#from ...  import} and \code{\#extends} lines
+in \code{Site.tmpl}, and it will automatically inherit from \code{Template}.
+
+Pure Python classes with \code{.\_\_init\_\_()} methods should call their
+parent's \code{.\_\_init\_\_()} method before doing anything else.  In Python
+>= 2.2, it's easier:
+\begin{verbatim}
+# SiteLogic.py
+from Cheetah.Template import Template
+class SiteLogic(Template):
+	def __init__(self):
+		super(SiteLogic, self).__init__()
+		... everything else you want to do ...
+\end{verbatim}
+
+In older versions of Python you must do this:
+\begin{verbatim}
+# SiteLogic.py
+from Cheetah.Template import Template
+class SiteLogic(Template):
+	def __init__(self):
+		Template.__init__(self)
+		... everything else you want to do ...
+\end{verbatim}
+
+Section ?? has a function you can use to avoid hardcoding the name of the
+superclass into your \code{.\_\_init\_\_()} method.
+
+In older versions of Cheetah (until 0.9.12), you could list multiple classes
+in the \code{\#extends} directive, thus doing multiple inheritance.  This 
+feature was removed because it caused too much confusion, user errors and
+Cheetah bugs.  However, your pure Python classes {\em may} do multiple
+inheritance, as long as they properly initialize the template superclass 
+(the one leading up toward \code{Template}) if they have an
+\code{.\_\_init\_\_()} method.
+
+For Webware servlets, it's easier to omit the \code{.\_\_init\_\_()} method
+and override \code{.awake()} instead, since Webware automatically calls
+\code{.awake()} at the beginning of the request.  But you'd have to call
+the parent's \code{.awake()} in that case.  See section ??.
+
+See the next section, \code{\#implements}, for an important issue to be aware
+of when using \code{\#extends}, namely how it affects the generated class's
+main method.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
