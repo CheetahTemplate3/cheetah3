@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.67 2001/11/10 22:44:56 tavis_rudd Exp $
+# $Id: Template.py,v 1.68 2001/11/10 22:47:26 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.67 $
+Version: $Revision: 1.68 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/10 22:44:56 $
+Last Revision Date: $Date: 2001/11/10 22:47:26 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.67 $"[11:-2]
+__version__ = "$Revision: 1.68 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -114,13 +114,11 @@ class Template(SettingsManager, Servlet):
             # this function rather than in some utility function.
             raise TypeError(reason)
         if source is None and file is None:
-            raise TypeError("""\
-you must supply either a source string or the 'file' keyword argument""")
+            raise TypeError(
+                "you must supply either a source string or the 'file' keyword argument")
         elif source is not None and file is not None:
-            raise TypeError("""\
-you must supply either a source string or the 
-'file' keyword argument, but not both""")
-
+            raise TypeError("you must supply either a source string or the" + 
+                            " 'file' keyword argument, but not both")
 
         
         ##################################################           
@@ -151,19 +149,16 @@ you must supply either a source string or the
                 
         ##################################################
         ## setup the ouput filters
-        outputFilter = filter # Kludge: this existing stanza assumes the
-                # keyword argument is 'outputFilter' and uses local var 'filter'
-                # for a conflicting purpose.
         self._filtersLib = filtersLib
         self._filters = {}
-        if outputFilter:
-            if type(outputFilter) == StringType:
-                filter = outputFilter
-                klass = getattr(self._filtersLib, filter)
+        if filter:
+            if type(filter) == StringType:
+                filterName = filter
+                klass = getattr(self._filtersLib, filterName)
             else:
-                klass = outputFilter
-                filter = klass.__name__
-            self._currentFilter = self._filters[filter] = klass(self).filter
+                klass = filter
+                filterName = klass.__name__
+            self._currentFilter = self._filters[filterName] = klass(self).filter
         else:
             self._currentFilter = str
 
