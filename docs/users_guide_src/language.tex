@@ -1,10 +1,6 @@
 \section{Language Overview}
 \label{language}
 
-{\em Note:} there are some square brackets and backslashes missing from this
-chapter because I can't get \LaTeX\ to display them properly outside program
-listings.  Hopefully, this is just a temporary situation.
-
 Cheetah's basic syntax was inspired by the Java-based template engines Velocity
 and WebMacro. It has two types of tags: {\bf \$placeholders} and {\bf
 \#directives}.  Both types are case-sensitive.  
@@ -44,17 +40,12 @@ Templates or PHP:
      and it is hard to confirm or modify that logic.
 
 Placeholders and directives can be escaped by putting a backslash before them.
-\code{\\\$var} and \code{\\\#if} will be output as literal text.
+\verb+\$var+ and \verb+\#if+ will be output as literal text.
 
 A placeholder or directive can span multiple physical lines, following the same
-rules as Python source code: put a backslash (\code{\\}) at the end of all
+rules as Python source code: put a backslash (\verb+\+) at the end of all
 lines except the last line.  However, if there's an unclosed parenthesis,
 bracket or brace pending, you don't need the backslash.
-
-% @@MO: I don't know how to put a literal [ inside \code{} without making
-% LaTeX puke.  
-%However, if there's an unclosed \code{\\(},
-%\code{\\[} or \code{\{} pending, you don't need the backslash.
 
 \begin{verbatim}
 #if $this_is_a_very_long_line and $has_lots_of_conditions \
@@ -182,8 +173,9 @@ ${var2.abc['def']('gh', $subplaceholder, 2)}
      We recommend \code{\$} in simple cases, and \code{\$\{\}} when followed
      directly by a letter or when Cheetah or a human template maintainer might
      get confused about where the placeholder ends.  Cheetah also allows you
-     to enclose the placeholder in \code{\$()} or \$[], although this may make
-     it harder for the maintainer to see where the placeholder begins and ends:
+     to enclose the placeholder in \verb+$()+ or \verb+$[]+, although this may
+     make it harder for the maintainer to see where the placeholder begins and
+     ends:
 \begin{verbatim}
 $(var)                                      
 $[var]                                      
@@ -195,20 +187,20 @@ $[var2.abc['def']('gh', $subplaceholder, 2)]
 
 \item To reiterate Python's rules, placeholders consist of one or more
      components separated by periods.  Each component must start with a letter
-     or an underscore, and the subsequent characters must be letters, digits or
+     or an underCheetah Developers' Guidescore, and the subsequent characters must be letters, digits or
      underscores.  Any component may be followed by argument sets enclosed in
-     ``()'' and/or key/subscript arguments in ``$[]$''.
+     \verb+()+ and/or key/subscript arguments in \verb+[]$+.
 
 \item Components are case sensitive. \code{\$var} does not equal \code{\$Var}
      or \code{\$vAr} or \code{\$VAR}.     
      
-\item Arguments inside ``()'' or ``$[]$'' are just like in Python.  Strings may
-     be quoted using any Python quoting style.  Each argument is an expression
-     and may use any of Python's expression operators.  Variables used in
-     argument expressions are placeholders and should be prefixed with 
-     \code{\$}.  This also applies to the *arg and **kw forms.  
-     However, you do {\em not} need the \code{\$} with the special Python
-     constants \code{None}, \code{True} and \code{False}.
+\item Arguments inside \verb+()+ or \verb+$[]$+ are just like in Python.
+    Strings may be quoted using any Python quoting style.  Each argument is an
+    expression and may use any of Python's expression operators.  Variables
+    used in argument expressions are placeholders and should be prefixed with
+    \code{\$}.  This also applies to the *arg and **kw forms.  However, you do
+    {\em not} need the \code{\$} with the special Python constants \code{None},
+    \code{True} and \code{False}.
      Examples:
 \begin{verbatim}
 $hex($myVar)
@@ -241,14 +233,9 @@ $myList[$mySubscript]
      the list comprehension: if you type \code{\$x}, Cheetah will miscompile it.
 
 \item Cheetah ignores all dollar signs (\code{\$}) that are not followed by a
-     letter or an underscore.  Cheetah also ignores any placeholder escaped by a
-     backslash. 
+     letter or an underscore.
      
 \end{itemize} 
-
-% @@MO: Removed example (\code{$\backslash$\$placeholderName}) because
-% the HTML version didn't show the backslash.
-
 
 The following are valid \$placeholders:
 \begin{verbatim}
@@ -278,7 +265,7 @@ placeholder tags (i.e., a placeholder inside a placeholder), and in several
 directive tags.
 
 {\em LVALUE position} means naming a variable which will be written to.  LVALUE
-is a computer-science term that means ``the left side of an assignment 
+is a computer science term meaning ``the left side of an assignment 
 statement''.  The first argument of directives \code{\#set}, \code{\#for},
 \code{\#def}, \code{\#block} and \code{\#attr} is an LVALUE.
 
@@ -287,7 +274,7 @@ in \code{courier}, expression position is {\em italic}, and LVALUE position is
 {\bf bold}.
 
 \begin{quote}
-\#for {\bf \$count} in {\em \$range}({\em \$ninetyNine}), 0, -1)\\
+\#for {\bf \$count} in {\em \$range}({\em \$ninetyNine}, 0, -1)\\
 \#set {\bf \$after} = {\em \$count} - 1\\
 \code{\$count} bottles of beer on the wall.  \code{\$count} bottles of beer!\\
 ~~~~Take one down, pass it around.  \code{\$after} bottles of beer on the wall.\\
