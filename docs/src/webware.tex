@@ -118,7 +118,7 @@ $contents
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using .py servlet files}
-\label{webware.inheritance}
+\label{webware.py}
 
 When you manually create your Webware \code{.py servlet files} you need to
 include some boiler-plate code that is handled automatically in \code{.tmpl
@@ -166,6 +166,7 @@ class hello_world(TemplateServlet):
         return 'Hello World!'
 \end{verbatim}
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The SkeletonPage framework}
 \label{webware.skeletonPage}
@@ -179,6 +180,54 @@ is well worth the time spent learning how to use it.
 \subsection{Using the Containment approach}
 \label{webware.containment}
 
+With the containment approach your template obj does not repond directly to a
+request from Webware's AppServer. Rather, you use a non-Cheetah-specific servlet
+to handle the request and use one or more Cheetah template objects inside the
+servlet's \code{.respond()} method and send their output via the 
+\code{response.write()} method.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using \#include with the containment approach}
+\label{webware.includes}
+
+Webware's \code{current working directory} probably isn't the directory that
+your servlet files are sitting in.  All relative paths need to be adjusted so
+they are relative to the servlet's directory and not Webware's \code{current
+  working directory}.  Webware uses the \code{Servlet.serverSidePath()} method
+for this purpose. 
+
+The \code{TemplateServlet} class of the inheritance approach does the adjusment
+automatically for all relative paths fed to \code{\#include} directive.  When
+using the containment approach you need to take a few extra steps to make
+\code{\#include} directives work properly with relative paths. First, you need
+to map \code{<yourTemplateObj>.normalizePath} to
+\code{<yourServletObj>.serverSidePath}. Second, you need to make sure that
+\code{<yourTemplateObj>} is compiled by your servlet's \code{awake()} method or
+its \code{respond()} method as \code{.serverSidePath()} only works during
+Webware's \code{awake-response-sleep} cycle.  It cannot be compiled by you
+servlet's \code{__init__()} method as \code{Servlet.serverSidePath()} doesn't
+work there.  Also note that due to a bug in Webware your servlet class must
+inherit from \code{WebKit.Page} rather than just \code{HTTPServlet} for
+\code{.serverSidePath()} to work.
+
+\begin{verbatim}
+<yourServlet>.__init__():
+    # ... after setting up your 'templateDef' and 'nameSpace'
+    self.T = Template(templateDef, nameSpace, settings={'delayedCompile':1})
+    self.T.normalizePath = self.serverSidePath
+    self._templateCompiled = 0
+
+<yourServlet>.awake(trans):
+    <yourServlet's BaseClass>.awake(trans)
+    if not self._templateCompiled
+        self.T.compileTemplate()
+        self._templateCompiled = 1
+
+<yourServlet>.respond(trans):
+    if not self._templateCompiled
+        self.T.compileTemplate()
+\end{verbatim}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{User interaction in either approach}
@@ -186,11 +235,12 @@ is well worth the time spent learning how to use it.
 
 By {\bf user interaction} we mean the use of forms, query strings or sessions to
 create interactive pages that allow user interation with a website.
+[{\bf This section is under construction. Check back later.}]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Components}
 \label{webware.components}
-
+[{\bf This section is under construction. Check back later.}]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Using components}
@@ -199,4 +249,5 @@ create interactive pages that allow user interation with a website.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Building components}
 \label{webware.components.building}
+
 
