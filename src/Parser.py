@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.38 2002/01/07 04:18:57 tavis_rudd Exp $
+# $Id: Parser.py,v 1.39 2002/01/23 20:20:20 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.38 $
+Version: $Revision: 1.39 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/01/07 04:18:57 $
+Last Revision Date: $Date: 2002/01/23 20:20:20 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.38 $"[11:-2]
+__revision__ = "$Revision: 1.39 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -530,13 +530,19 @@ class _LowLevelSemanticsParser(Lexer):
             raise ParseError(self, msg='Expected assignment operator')
         return self.readTo( match.end() )
 
-    def isDirective(self):
+    def isDirective(self, directiveKeyChars=identchars+'-'):
         startPos = self.pos()
         if not self.matchDirectiveStartToken():
             return False
 
         self.getDirectiveStartToken()
-        directiveKey = self.getNonWhiteSpace()
+        directiveKey = ''
+        while self.pos() < self._breakPoint:
+            c = self.getc()
+            if not c in directiveKeyChars:
+                break
+            directiveKey += c
+            
         if not directiveKey in self.directiveEaters.keys():
             directiveKey= False
         self.setPos(startPos)
