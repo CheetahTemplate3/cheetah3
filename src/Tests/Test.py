@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Tests.py,v 1.2 2001/06/18 17:26:01 tavis_rudd Exp $
+# $Id: Test.py,v 1.1 2001/06/28 19:19:17 echuck Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,33 +12,47 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.1 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/18 17:26:01 $
+Last Revision Date: $Date: 2001/06/28 19:19:17 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.1 $"[11:-2]
 
 
 ##################################################
 ## DEPENDENCIES ##
 
 import sys
-import types                      
+import types
 import re
 from copy import deepcopy
 import os.path
 
+
+# We exist in src/Tests (uninstalled) or Cheetah/Tests (installed)
+# Here we fix up sys.path to make sure we get the Cheetah we
+# belong to and not some other Cheetah.
+
+newPath = os.path.abspath(os.path.join(os.pardir, os.pardir))
+sys.path.insert(1, newPath)
+
+if os.path.exists(os.path.join(newPath, 'src')):
+	import src.NameMapper as NameMapper
+	from src.Template import Template
+	from src.Delimeters import *
+elif os.path.exists(os.path.join(newPath, 'Cheetah')):
+	import Cheetah.NameMapper as NameMapper
+	from Cheetah.Template import Template
+	from Cheetah.Delimeters import *
+else:
+	raise Exception, "Not sure where to find Cheetah. I do not see src/ or Cheetah/ two directories up."
 
 try:
     import unittest
 except:
     import unittest_local_copy as unittest
 
-# intra-package imports ...
-import NameMapper as NameMapper
-from Template import Template
-from Delimeters import delimeters
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
@@ -53,7 +67,7 @@ False = (0==1)
 class AbstractTestCase(unittest.TestCase):
     def nameSpace(self):
         return self._nameSpace
-       
+
     def __init__(self, title, template, expectedOutput, nameSpace):
         self.testTitle = title
         self.template = template
@@ -61,14 +75,14 @@ class AbstractTestCase(unittest.TestCase):
         self._nameSpace = nameSpace
         unittest.TestCase.__init__(self, "runTest")
 
-class VerifyTemplateOutput(AbstractTestCase):          
+class VerifyTemplateOutput(AbstractTestCase):
     def runTest(self):
         servlet = Template(self.template, self.nameSpace())
         output = servlet.respond()
 
         assert output == self.expectedOutput, \
-               ('Template output mismatch\n\tTest Title: ' + self.testTitle + 
-                '\n\tInput Template = %(template)s\n\tExpected Output = ' + 
+               ('Template output mismatch\n\tTest Title: ' + self.testTitle +
+                '\n\tInput Template = %(template)s\n\tExpected Output = ' +
                 '%(expected)s---\n\tActual Output = %(actual)s---\n' ) \
                % {'template':self.template, 'expected':self.expectedOutput,
                   'actual':output}
@@ -80,7 +94,7 @@ class VerifyTemplateOutput(AbstractTestCase):
 class DummyClass:
     def __str__(self):
         return 'object'
-        
+
     def meth(self, arg="arff"):
         return str(arg)
 
@@ -140,7 +154,7 @@ $meth $meth. $meth(). $meth(5). $meth('y'). $meth("y"). $meth("y"*2). $meth(arg=
 $obj $obj.
 $obj.meth $obj.meth. $obj.meth(). $obj.meth(6).
 $obj.meth('z'). $obj.meth("z"). $obj.meth("z"*2). $obj.meth(arg="z"). $obj.meth(arg='z').""",
-     
+
      """
 $ $500 $. $var
 '''
@@ -153,7 +167,7 @@ object object.
 arff arff. arff. 6.
 z. z. zz. z. z."""
               ],
-    
+
     ]
 
 
@@ -202,7 +216,7 @@ commentTests = [
     ['simple ## comment - with #if directive',
      "##if 0\nblarg\n##end if\n",
      "blarg\n",],
-    
+
     ['simple #* comment *# - no whitespace',
      "#* \naoeuaoeu\naoeuaoeu\n *#",
      "",],
@@ -226,7 +240,7 @@ forLoopTests = [
     ['simple #for loop with explicit closures',
      """#for $i in range(5)/#$i#end for/#""",
      """01234""",],
-    
+
     ['simple #for loop using another $var',
      """#for $i in range($numFive)\n$i\n#end for\n""",
      """0\n1\n2\n3\n4\n""",],
@@ -237,7 +251,7 @@ forLoopTests = [
     ['simple #for loop using $dict2, with $ on $key,$val',
      """#for key, val in $dict2.items\n$key - $val\n#end for\n""",
      """one - item1\ntwo - item2\n""",],
-    
+
     ['simple #for loop using $dict2 and another $var ($c)',
      "#for $key, $val in $dict2.items\n$key - $val - $c\n#end for\n",
      "one - item1 - blarg\ntwo - item2 - blarg\n",],
@@ -267,11 +281,11 @@ ifBlockTests = [
     ['simple #if block with explicit closures',
      "#if 1/#$c#end if/#",
      "blarg",],
-    
+
     ['simple #if block using $numOne',
      "#if $numOne\n$c\n#end if\n",
      "blarg\n",],
-    
+
     ['simple #if block using a $numZero',
      "#if $numZero\n$c\n#end if\n",
      "",],
@@ -295,7 +309,7 @@ ifBlockTests = [
     ['simple #if block using a $*emptyString',
      "#if $*emptyString\n$c\n#end if\n",
      "",],
-    
+
     ]
 posixCases += ifBlockTests
 
@@ -426,13 +440,22 @@ includeTests = [
      "\n#include $blockToBeParsed\n",
      "\n1 2",],
 
-    ['simple #include of file - with no whitespace',
+    ['simple #include of file - with no whitespace & single quotes',
      "#include 'parseTest.txt'",
      "1 2",],
 
-    ['simple #include of file - with whitespace',
+    ['simple #include of file - with no whitespace & double quotes',
+     '#include "parseTest.txt"',
+     "1 2",],
+
+    ['simple #include of file - with extra whitespace',
      "#include  'parseTest.txt'",
      "1 2",],
+
+    ['complex #include of file - preceding and trailing html and \r',
+     """<HTML>\r#include "parseTest.txt"\r</html>""",
+     """<HTML>\r1 2</html>""",
+    ],
 
     ]
 posixCases += includeTests
@@ -477,7 +500,7 @@ bloggs
 #end callMacro
 """,
      "this is a\ntest block 9876 joe bloggs",],
-    
+
     ]
 posixCases += callMacroTests
 
@@ -497,7 +520,7 @@ for case in windowsCases:
     case[1] = case[1].replace("\n","\r\n")
     case[2] = case[2].replace("\n","\r\n")
 
-# the dataDirectiveTests must be added after the windows line ending conversion 
+# the dataDirectiveTests must be added after the windows line ending conversion
 # as \r\n appears to be an invalid line ending for python code chunks that are
 # exec'd on Posix systems
 
@@ -531,7 +554,7 @@ def allSuites():
     suitesList = []
     for testSuite in suiteData:
         suitesList.append( buildTestSuite(testSuite[0], testSuite[1]) )
-        
+
     return unittest.TestSuite(suitesList)
 
 def runTests():
