@@ -596,6 +596,17 @@ To get an environmental variable, put \code{os.environ} as one of the
 elements in the searchList.  Or read the envvar in Python code and set a
 placeholder variable for it.
 
+Remember that variables found earlier in the searchList override same-name variables
+located in a later searchList object.  Be careful when adding objects containing other
+variables besides the ones you want (e.g., \code{os.environ}, CGI parameters).
+The "other" variables may override variables your application depends on, leading to
+hard-to-find bugs.  Also, users can inadvertantly or maliciously set an environmental
+variable or CGI parameter you didn't expect, screwing up your program.  To
+avoid all this, know what your namespaces contain, and place the namespaces you
+have the most control over first.  For namespaces that could contain
+user-supplied "other" variables, don't put the namespace itself in the
+searchList; instead, copy the needed variables into your own "safe" namespace.
+
 {\bf Tips for templates that are Webware servlets}
 
 [Note: these are currenty untested.]
