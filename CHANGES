@@ -11,6 +11,12 @@ Please initial your changes (there's a key at bottom) and add a date for each re
      #else# to not match, while #else # was matching. + added a test for it.(TR)
    - fixed bug in a regex that was preventing bare $'s followed by whitespace and
      then valid varname chars from parsing as just $ instead of as a placeholder (TR)
+   - added some code to break reference cycles after the compilation is
+     complete. This helps prevent memory leaks when a process in creating then
+     discarding lots of Templates.  You also need to manually call
+     "template.shutdown()" to clear the remaining reference cycles.
+     (TR)
+
 
 0.9.9 (Dec 14, 2001)
    - implemented one-line #def's and #block's (TR)
