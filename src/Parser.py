@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.18 2001/09/16 00:05:57 tavis_rudd Exp $
+# $Id: Parser.py,v 1.19 2001/09/16 05:51:09 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.18 $
+Version: $Revision: 1.19 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/09/16 00:05:57 $
+Last Revision Date: $Date: 2001/09/16 05:51:09 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.18 $"[11:-2]
+__version__ = "$Revision: 1.19 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -20,7 +20,7 @@ __version__ = "$Revision: 1.18 $"[11:-2]
 import re
 from re import DOTALL, MULTILINE
 from types import StringType
-from tokenize import tokenprog
+from tokenize import tokenprog, pseudoprog, endprogs
 
 # intra-package imports ...
 from Utilities import lineNumFromPos
@@ -34,14 +34,35 @@ False = (0==1)
 ##################################################
 ## FUNCTIONS ##
 
-def escapeRegexChars(string):
-    return re.sub(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])', r'\\\1' , string)
+def escapeRegexChars(txt,
+                     escapeRE=re.compile(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])')):
+    
+    """Return a txt with all special regular expressions chars escaped."""
+    
+    return escapeRE.sub(r'\\\1' , txt)
 
-def matchTokenOrfail(text, pos):
-    match = tokenprog.match(text, pos)
-    if match is None:
-        raise SyntaxError(text, pos)
-    return match, match.end()
+def matchTokenOrFail(text, pos):
+    
+    """Attempt to match a Python token.  Return the start and end position
+    or raise an exception if no token is found."""
+    
+    match = pseudoprog.match(text, pos)
+    if match is not None and match.group() in \
+               ("'''", '"""',               # triple-quoted
+                "r'''", 'r"""', "R'''", 'R"""',
+                "u'''", 'u"""', "U'''", 'U"""',
+                "ur'''", 'ur"""', "Ur'''", 'Ur"""',
+                "uR'''", 'uR"""', "UR'''", 'UR"""'):
+        endmatch = endprogs[match.group()].match(text, match.end())
+        if endmatch:
+            return pos, endmatch.end()
+        else:
+            raise SyntaxError(text, pos)
+    else:
+        match = tokenprog.match(text, pos)
+        if match is None:
+            raise SyntaxError(text, pos)
+        return pos, match.end()
 
 def separateTagsFromText(initialText, startTagRE, endTagRE):
     """breaks a string up into a textVsTagsList where the odd items are plain
@@ -237,9 +258,8 @@ class Parser:
                 pos = markerPos + MARKER_LENGTH + 1
                 level = 1
                 while level:
-                    match, pos = matchTokenOrfail(txt, pos)
-                    tstart, tend = match.regs[3]
-                    token = txt[tstart:tend]
+                    tokenStart, pos = matchTokenOrFail(txt, pos)
+                    token = txt[tokenStart: pos]
 
                     if token == "{":
                         level = level+1
@@ -249,19 +269,18 @@ class Parser:
 
             elif nextchar in namechars:
                 chunks.append((0, txt[pos:markerPos]))
-                match, pos = matchTokenOrfail(txt, markerPos + MARKER_LENGTH)
+                tokenStart, pos = matchTokenOrFail(txt, markerPos + MARKER_LENGTH)
 
                 while pos < len(txt):
                     if txt[pos] == "." and \
                         pos+1 < len(txt) and txt[pos+1] in namechars:
 
-                        match, pos = matchTokenOrfail(txt, pos+1)
+                        tokenStart, pos = matchTokenOrFail(txt, pos+1)
                     elif txt[pos] in "([":
                         pos, level = pos+1, 1
                         while level:
-                            match, pos = matchTokenOrfail(txt, pos)
-                            tstart, tend = match.regs[3]
-                            token = txt[tstart:tend]
+                            tokenStart, pos = matchTokenOrFail(txt, pos)
+                            token = txt[tokenStart:pos]
                             if token[0] in "([":
                                 level = level+1
                             elif token[0] in ")]":
