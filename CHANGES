@@ -3,6 +3,9 @@ release
 ================================================================================
 0.9.15b1 (unreleased)
   - fixed a package-relative import bug in ImportHooks.py (TR)
+  - set 'monitorSrcFile' to false as it was causing problems with the
+    ImportHooks ... This might be temporary as the problem needs more thought
+    (TR)
 
 0.9.14 (July 14, 2002)
   - Precompiled template Templates/SkeletonPage.py added to CVS.  This file is
