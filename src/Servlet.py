@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.8 2001/10/10 06:47:41 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.9 2001/12/04 09:00:00 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2001/10/10 06:47:41 $
+Last Revision Date: $Date: 2001/12/04 09:00:00 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -27,43 +27,42 @@ import os.path
 
 isRunningFromWebKit = False
 try: 
-    from WebKit.HTTPServlet import HTTPServlet
+    from WebKit.Servlet import Servlet as BaseServlet
     isRunningFromWebKit = True
 except:
-    ## for testing from the commandline or with TR's experimental rewrite of WebKit
-    try:
-        from Webware.HTTPServlet import HTTPServlet
-    except:
-        class HTTPServlet: 
-            _reusable = 1
-            _threadSafe = 0
+    class BaseServlet: 
+        _reusable = 1
+        _threadSafe = 0
     
-            def __init__(self):
-                pass
+        def __init__(self):
+            pass
             
-            def awake(self, transaction):
-                pass
+        def awake(self, transaction):
+            pass
             
-            def sleep(self, transaction):
-                pass
+        def sleep(self, transaction):
+            pass
 
 ##################################################
 ## CLASSES
 
 
-class Servlet(HTTPServlet):
+class Servlet(BaseServlet):
 
     def __init__(self):
-        HTTPServlet.__init__(self)
+        BaseServlet.__init__(self)
         
     ## methods called by Webware during the request-response
         
     def awake(self, transaction):
-        self._transaction = transaction
-        self._response    = transaction.response()
-        self._request     = transaction.request()
+        self.transaction = transaction        
+        self.application = transaction.application()
+        self.response    = response = transaction.response()
+        self.request     = transaction.request()
         self._session     = None  # don't create unless needed
-
+        self.write = response.write
+        self.writeln = response.writeln
+        
     def respond(self, trans=None):
         return ''
     
@@ -71,21 +70,9 @@ class Servlet(HTTPServlet):
 
     def sleep(self, transaction):
         self._session = None
-        self._request  = None
-        self._response = None
-        self._transaction = None
-
-    def application(self):
-        return self._transaction.application()
-
-    def transaction(self):
-        return self._transaction
-
-    def request(self):
-        return self._request
-
-    def response(self):
-        return self._response
+        self.request  = None
+        self.response = None
+        self.transaction = None
 
     def session(self):
         if not self._session:
@@ -97,6 +84,6 @@ class Servlet(HTTPServlet):
 
     def serverSidePath(self, path):
         try:
-            return HTTPServlet.serverSidePath(self, path)
+            return BaseServlet.serverSidePath(self, path)
         except:
             return os.path.normpath(os.path.abspath(path).replace("\\",'/'))
