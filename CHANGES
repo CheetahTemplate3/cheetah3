@@ -1,9 +1,11 @@
 Please initial your changes (there's a key at bottom) and add a date for each release
 ================================================================================
 0.9.12 (unreleased)
-   - $request().field(args) now works, identical to $request.field(args).
-     The request object is now self.request() instead of self.request.
-     This is all for compatibility with Webware usage.  Modified Servlet.py.
+   - $request().field(args) now works, identical to $request.field(args)
+     to implement this, the request object is now self.request() instead of
+     self.request.  This provides compatibility with Webware's servlet API.
+     (self.session already was an accessor method).  New read-only attribute
+     self.isRunningFromWebKit is boolean.  All changes are in Servlet.py. (MO)
 
 0.9.11 (Mar 07, 2002)
    - fixed a careless bug in cheetah-compile (TR)
