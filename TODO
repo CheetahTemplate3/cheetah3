@@ -16,8 +16,6 @@ Languague Specification
   something else do a parsed include ('#include parsed', '#include cheetah'?),
   so that users get parsing only if they explicitly request it.
 
-- finish the #cache directive's varyBy keyword
-
 - write a formalized grammar for Cheetah in BNF 
 
 Implementation
@@ -27,7 +25,8 @@ Implementation
   etc.  At the moment these errors are not caught until Python executes the
   code.
 
-- implement the #cache directive's varyBy keyword
+- finish the #cache directive's varyBy keyword (tied to Tavis' proposed caching
+  framework for Webware)
 
 - Remove the -w option from 'cheetah compile'.  New command 'cheetah fill'
   replaces the -w switch and more: it fills the template into *.html, another
@@ -37,13 +36,14 @@ Implementation
   -p (stdout) and -p (pickle); we'll have to rename -p (stdout) to something
   else, both in 'cheetah fill' and 'cheetah compile'.
 
-- 'python setup.py uninstall'.  This may require hacking an uninstall feature
-  into distutils.
-
 - Delete whitespace before comments.  If the rest of the line consists
   of only non-outputting directives and whitespace, delete the line from the
   output.  The only outputting directives I see are #echo, #block and
-  #include.
+  #include. -- MO
+
+- 'python setup.py uninstall'.  This may require hacking an uninstall feature
+  into distutils.
+
 
 Test Suite
 ================================================================================
