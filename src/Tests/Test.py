@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.24 2001/08/31 23:12:58 tavis_rudd Exp $
+# $Id: Test.py,v 1.25 2001/09/11 04:05:49 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.24 $
+Version: $Revision: 1.25 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/31 23:12:58 $
+Last Revision Date: $Date: 2001/09/11 04:05:49 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.24 $"[11:-2]
+__version__ = "$Revision: 1.25 $"[11:-2]
 
 
 ##################################################
@@ -139,6 +139,7 @@ defaultTestNameSpace = {
     'blockToBeParsed':"""$numOne $numTwo""",
     'includeBlock2':"""$numOne $numTwo $aSetVar""",
     'includeFileName':'parseTest.txt',
+    'listOfLambdas':[lambda x: x, lambda x: x, lambda x: x,],
     'nestedTDwithMacros':"""
 #macro test2(theTmpl)
  test2 called from $theTmpl#end macro
@@ -314,7 +315,14 @@ forLoopTests = [
     ['simple #for loop using $dict2 and a method of the local var',
      "#for $key, $val in $dict2.items\n$func($key) - $val.upper\n#end for\n",
      "one - ITEM1\ntwo - ITEM2\n",],
+    
+    ['test methods in for loops',
+    "#for $func in $listOfLambdas\n$func($numFive)\n#end for",
+    "5\n5\n5\n",],
+    
     ]
+
+
 posixCases += forLoopTests
 
 
