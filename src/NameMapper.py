@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.17 2002/04/15 06:22:53 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.18 2002/05/10 21:20:23 tavis_rudd Exp $
 
 """This module implements Cheetah's optional NameMapper syntax.
 
@@ -146,19 +146,19 @@ Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.17 $
+Version: $Revision: 1.18 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2002/04/15 06:22:53 $
+Last Revision Date: $Date: 2002/05/10 21:20:23 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__revision__ = "$Revision: 1.17 $"[11:-2]
+__revision__ = "$Revision: 1.18 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
 
 import types
-from types import StringType, InstanceType, ClassType 
+from types import StringType, InstanceType, ClassType, TypeType
 import re
 # it uses the string methods and list comprehensions added in recent versions of python
 
@@ -229,7 +229,7 @@ except:
         else:
             binding = valueForKey(obj, firstKey)
         if executeCallables and callable(binding) and \
-           type(binding) not in (InstanceType, ClassType):
+           type(binding) not in (InstanceType, ClassType, TypeType):
             # the type check allows access to the methods of instances
             # of classes with __call__() defined
             # and also allows obj.__class__.__name__

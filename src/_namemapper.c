@@ -144,7 +144,7 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
       Py_DECREF(currentVal);
     }
     if (executeCallables && PyCallable_Check(nextVal) && (!PyInstance_Check(nextVal)) 
-	&& (!PyClass_Check(nextVal)) ) {
+	&& (!PyClass_Check(nextVal)) && (!PyType_Check(nextVal)) ) {
       if (!(currentVal = PyObject_CallObject(nextVal, NULL))){
 	Py_DECREF(nextVal);
 	return NULL;
