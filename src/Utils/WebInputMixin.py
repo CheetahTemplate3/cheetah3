@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: WebInputMixin.py,v 1.5 2002/10/19 23:29:02 hierro Exp $
+# $Id: WebInputMixin.py,v 1.6 2002/11/10 20:44:11 hierro Exp $
 """Mixin for Cheetah.Servlet for importing web transaction variables in bulk.
 
 This works for GET/POST fields both in Webware servlets and in CGI scripts, 
@@ -165,12 +165,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2002/03/17
-Last Revision Date: $Date: 2002/10/19 23:29:02 $
+Last Revision Date: $Date: 2002/11/10 20:44:11 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -332,7 +332,7 @@ class WebInputMixin:
         # and then the code below.
         if debug:
            print "<PRE>\n" + pprint.pformat(dic) + "\n</PRE>\n\n"
-        self.prependToSearchList(dic)
+        self.searchList().insert(0, dic)
         return dic
 
 

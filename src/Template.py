@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.106 2002/10/19 23:29:21 hierro Exp $
+# $Id: Template.py,v 1.107 2002/11/10 20:44:10 hierro Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.106 $
+Version: $Revision: 1.107 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/10/19 23:29:21 $
+Last Revision Date: $Date: 2002/11/10 20:44:10 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.106 $"[11:-2]
+__revision__ = "$Revision: 1.107 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -266,14 +266,6 @@ class Template(SettingsManager, Servlet, WebInputMixin):
     def searchList(self):
         """Return a reference to the searchlist"""
         return self._searchList
-
-    def addToSearchList(self, object):
-        """Append an object to the end of the searchlist.""" 
-        self._searchList.append(object)
-
-    def prependToSearchList(self, object):
-        """Prepend an object to the end of the searchlist.""" 
-        self._searchList.insert(0, object)
 
     def errorCatcher(self):
         """Return a reference to the current errorCatcher"""

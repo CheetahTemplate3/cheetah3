@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: TemplateCmdLineIface.py,v 1.10 2002/10/01 17:52:02 tavis_rudd Exp $
+# $Id: TemplateCmdLineIface.py,v 1.11 2002/11/10 20:44:11 hierro Exp $
 
 """Provides a command line interface to compiled Cheetah template modules.
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/12/06
-Last Revision Date: $Date: 2002/10/01 17:52:02 $
+Last Revision Date: $Date: 2002/11/10 20:44:11 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.10 $"[11:-2]
+__revision__ = "$Revision: 1.11 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -77,16 +77,16 @@ class CmdLineIface:
                 print self.usage()
                 sys.exit()
             if o == '--env':
-                self._template.prependToSearchList(os.environ)
+                self._template._searchList.insert(0, os.environ)
             if o == '--pickle':
                 if a == '-':
                     unpickled = load(sys.stdin)
-                    self._template.prependToSearchList(unpickled)
+                    self._template._searchList.insert(0, unpickled)
                 else:
                     f = open(a)
                     unpickled = load(f)
                     f.close()
-                    self._template.prependToSearchList(unpickled)
+                    self._template._searchList.insert(0, unpickled)
 
     def usage(self):
         return """Cheetah %(Version)s template module command-line interface
