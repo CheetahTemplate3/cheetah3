@@ -1,60 +1,9 @@
-\section{Directive Tags}
-
-{\em Readers: this chapter is {\bf UNTESTED}.  There may be mistakes below, and
-there may be more details about the Directives which should be added.  Read the
-comments in the source of this chapter (docs/src/directives.tex) to see which
-points are still uncertain or what will probably be added after it's verified.}
-
-Directives Tags (\#D's) are used for all functionality that cannot be handled
-with simple placeholders.  All directives begin with \code{\#}, and end with
-\code{/\#} or the end of the line.
-
-Cheetah does not use HTML/XML-style tags as they are hard to 
-distinguish in a file containing real HTML/XML tags.  In addition, Cheetah tags
-show up on screen when the Template Definition is viewed in a web browser,
-which aids debugging.  HTML-style tags would be invisible.
-
-Some tags have additional words after the
-command name.  (These words are called ``arguments'', but don't confuse them
-with function arguments and macro arguments, which are different things.)
-
-Some Directives consist of a single tag, while others have a matching end tag
-that looks like this: \code{\#end theDirective/\#}.  The text between a tag and
-its matching end tag is called the {\em body} of the tag or a {\em block}.  Note
-that the body does not include any part of either tag: it's the text
-{\em outside} the tags.  However, a directive body may have other directives
-inside it.
-
-To escape something that looks like a \#D so that Cheetah will treat it as
-ordinary text, place a backslash before the initial \code{\#} (e.g.
-$\backslash$\#raw).
-
-Examples:
-
-\begin{verbatim}
-#block MyBlock /#
-Text in the contents area of the
-block directive
-#end block /#
-\end{verbatim}
-or
-\begin{verbatim}
-#block MyBlock2
-Text in the contents area of the
-block directive
-#end block
-\end{verbatim}
-
-\subsection{Whitespace handling}
-%% @@ TR: This is an important topic and needs a section of its own.  We need to
-%% provide examples and refer to the #slurp directive
-
-%If there is nothing on a line except Directive(s) and whitespace, the line is
-%not included in the output.
-
+\section{Directive Tags Reference}
+\label{directives}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Comment directives}
+\label{directives.comments}
 
 Comment directives are used to mark notes, explanations, and decorative text
 that should not appear in the output.  There are two forms of the comment
@@ -65,162 +14,145 @@ All text in a Template Definition that lies between 2 hash characters
 will not show up in the output, unless the 2 hash characters are escaped with a
 backslash.
 \begin{verbatim}
-<HTML>
-<HEAD><TITLE>$title</TITLE></HEAD>
-<BODY>
-##====================================  a decorative comment
-$contents                               ## an end-of-line comment
-##====================================
-</BODY>
-</HTML>
+##=============================  this is a decorative comment-bar
+$var    ## this is an end-of-line comment
+##=============================
 \end{verbatim}
 
 Any text between \code{\#*} and \code{*\#} will be treated as a multi-line
 comment.
 \begin{verbatim}
-<HTML>
-<HEAD><TITLE>$title</TITLE></HEAD>
-<BODY>
 #*
    Here is some multiline
    comment text
 *#
-##====================================  a decorative comment
-$contents                               ## an end-of-line comment
-##====================================
-</BODY>
-</HTML>
 \end{verbatim}
 
-% What about "#comment ... #end comment"?  Was it rejected?
-% @@ TR: yep
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\#block ... \#end block}
+\subsection{\#raw}
+\label{directives.raw}
 
-\code{\#block} assigns a name to the portion of the TD that is the body of the
-directive.   The result is a {\em named block}.  One argument is required: the
-block name.  It must follow
-the same naming rules as an Identifier.
+Any section of a Template Definition that is inside a \code{\#raw} ...
+\code{\#end raw} tag pair will be printed verbatim without any parsing of
+\$placeholders or other directives.  This can be very useful for debugging, or
+writing Cheetah examples and tutorials.
 
-A named block will appear in the output as if it were ordinary text, but a
-later \code{\#redefine} directive can override it.  This replaces the content of
-the block with something else at the location where the original block was
-defined.  In other words, the original block serves to show where the
-\code{\#redefine}'d text should go, and to be a fallback to display if there is
-no \code{\#redefine}.  \code{\#redefine} also requires one argument, again the
-block name.
-
-A frequent use of \code{\#block} and \code{\#redefine} is to combine a pair of
-templates, one a general site framework with the common header and footer, and
-the second providing the specific page content.  The general template has a
-block called ``pageContent'' with some filler text like, "This page is under
-construction."  The specific template mostly consists of one huge
-\code{\#redefine}.  (examples/webware\_examples/hello\_world.py shows how to
-extend one template with another.)
-
-% Is it possible to retrieve the block's content using $theBlockName?
-%% @@TR: yep
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\#cache ... \#end cache}
-
-\code{\#cache} changes the default caching policy for placeholders inside the
-directive body.  This affects only Placeholder Tags without their own caching
-instruction (i.e., those without a ``*'').
-
-\begin{verbatim}
-<HTML>
-<HEAD><TITLE>$title</TITLE></HEAD>
-<BODY>
-
-\$var                ## dynamic - will be reinterpolated for each request
-\$*var2              ## static - will be interpolated only once at start-up
-\$*5*var3            ## timed refresh - will be updated every 5 minutes.
-
-#cache
-\$var                ## static
-\$*var2              ## static
-\$*5*var3            ## timed refresh
-#end cache
-
-#cache 0.5
-\$var                ## timed refresh every 30 seconds (0.5 minutes)
-\$*var2              ## static
-\$*5*var3            ## timed refresh every 5 minutes
-#end cache
-
-
-</BODY>
-</HTML>
-\end{verbatim}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\#data ... \#end data}
-
-\code{\#data} lets you include Python code directly in your Template 
-Definition.  The code is in full Python syntax.  It is run in the namespace of
-the Template Object (that is, its \code{self} attribute).  Since the Template
-Object is always a Namespace in the Search List, any variable assignments in a
-\code{\#data} section may be referred to in Placeholder Tags!
-
-You must use Python variable names inside a \code{\#data} section--you may not
-use placeholders.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\#extend}
-
-\code{\#extend} is related to but separate from 
-\code{.extendTemplate(newTemplateDef)}.  More documentation to come later.
-
-Essentially, \code{\#extend parentTemplateClass} allows you to inherit from
-a more general template definition.  You may then \code{\#redefine} some of its
-named blocks.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#for ... \#end for}
+\label{directives.for}
 
-\code{\#for} is one of two display logic Directives Cheetah has (the other is
-\code{\#if}).  \code{\#for} works like in Python: it loops over the Directive
-body, each time setting a placeholder to the next element in a list, from first
-to last.  Each iteration appends text to the output and executes any
-Directives encountered.  If the list is empty, the loop is not run at all.
+The \code{\#for} directive iterates through a set of data.
 
-The syntax of the opening tag is: \code{\#for \$lvaluePlaceholder in
-EXPRESSION}.  The \code{\$lvaluePlaceholder} is created in a special namespace
-that is searched before the Search List.  EXPRESSION is usually a 
-Placeholder Tag that evaluates to a list, but it can be any expression that
-returns a list.  As always in Template Definition expressions, you must use
-Placeholder Tags instead of variable names.
+Here's how to create list of numbers separated by hyphens. This ``\#end for''
+tag shares the last line to avoid introducing a newline character after each
+hyphen.  
+\begin{verbatim}
+#for $i in range(15)
+$i - #end for
+\end{verbatim}
 
-There are no 'break' or 'continue' Directives in Cheetah.  A \code{\#for} loop
-always goes through every element in the list once.  You should have set up the
-list in Python code so that it has exactly the elements you wish to loop through
-now.
+The previous example will put an extra hyphen after last number.  Here's how to
+get around that problem, using the \code{\#set} directive, which will be dealt
+with in more detail below.
+\begin{verbatim}
+#set $sep = '' 
+#for $name in $names 
+$sep$name 
+#set $sep = ', ' 
+#end for 
+\end{verbatim}
 
-%%@@TR: we should add break and continue in
+Here's how to loop through a dictionaries keys and values:
+\begin{verbatim}
+#for $key, $value in $dict
+$key - $value
+#end for
+\end{verbatim}
 
-One trick is to make EXPRESSION a list of instances or a list of dictionaries,
-and then use Uniform Dotted Notation to access the object's attributes or keys.
-See the example in the \code{\#if} section.
+Here's how to create a simple client listing:
+\begin{verbatim}
+<TABLE>
+#for $client in $service.clients
+<TR>
+<TD>$client.surname, $client.firstname</TD>
+<TD><A HREF="mailto:$client.email" >$client.email</A></TD>
+</TR>
+#end for
+</TABLE>
+\end{verbatim}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{\#if ... \#else if ... \#else ... \#end if}
+\subsection{\#slurp}
+\label{directives.slurp}
 
-\code{\#if} is one of two display-logic Directives Cheetah has (the other is
-\code{\#for}).  Its use is just like in any programming language: to display
-a portion of text if some condition is true.  
-\code{\#if}, \code{\#else if} and \code{\#else} all have one required argument:
-a boolean expression.  Any Python expression is allowed, including operators.
-However, your expression may not use variables:  use Placeholder Tags instead.
-As in Python, the expression is true unless it evaluates to zero, '', None, an
-empty list, or an empty dictionary.
+The \code{\#slurp} directive comes in handy for {\bf slurping up} extra newline
+characters in for loops:
+\begin{verbatim}
+#for $i in range(15)
+$i - #slurp
+#end for
+\end{verbatim}
 
-\code{\#elif} is accepted as a synonym for {\#else if}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#break and \#continue}
+\label{directives.break}
+
+These directives are use as they are used in Python. \code{\#break} will
+prematurely exit a \code{\#for} loop, while \code{\#continue} will immediately
+jump to the next step in the \code{\#for} loop.
+
+In this example the output list will not contain ``10 - ''. 
+\begin{verbatim}
+#for $i in range(15)
+#if $i == 10
+  #continue
+#end if
+$i - #slurp
+#end for
+\end{verbatim}
+
+In this example the loop will exit if it finds a name that equals 'Joe':
+\begin{verbatim}
+#for $name in $names
+#if $name == 10
+  #break
+#end if
+$name - #slurp
+#end for
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#if ... \#else if ... \#else ... \#end if}
+\label{directives.if}
+
+The \code{\#if} directives and its kin are used to display a portion of text
+conditionally. \code{\#if} and \code{\#else if} should be followed by a
+True/False expression, while \code{\#else} should not.  Any Python valid
+expression is allowed.  As in Python, the expression is true unless it evaluates
+to 0, '', None, an empty list, or an empty dictionary. \code{\#elif} is accepted
+as a synonym for {\#else if}.
+
+Here are some examples:
+\begin{verbatim}
+#if $size >= 1500
+It's big
+#else if $size < 1500 and $size > 0 
+It's small
+#else
+It's not there
+#end if
+\end{verbatim}
+
+\begin{verbatim}
+#if $testItem($item)
+The item $item.name is OK.
+#end if
+\end{verbatim}
 
 Here's an example that combines an \code{\#if} tag with a \code{\#for} tag.
-
 \begin{verbatim}
 #if $people
 <TABLE>
@@ -242,10 +174,43 @@ Here's an example that combines an \code{\#if} tag with a \code{\#for} tag.
 #end if
 \end{verbatim}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#set}
+\label{directives.set}
+
+\code{\#set} allows you to assign a value for a placeholder from inside the
+Template Definition.  One use for this is to assign a short alias to what would
+otherwise be a long Placeholder Name. 
+
+The syntax is: \code{\#set \$var = EXPRESSION}
+
+The expression may be any Python expression. Remember to preface variable names
+with \$, unless it is part of an intermediate result in a list comprehension.
+
+Here are some examples:
+\begin{verbatim}
+#set $size = $length * 1096
+#set $buffer = $size + 1096
+#set $area = $length * $width
+#set $namesList = ['Mo','Larry','Curly']
+#set $sizeSteps = [i*15 for i in range(10)]
+\end{verbatim}
+
+It is probably most useful in conjunction with the \code{\#if} directive, but
+remember that more complex logical routines should be coded in Python, not in
+Cheetah!
+\begin{verbatim}
+#if $size > 1500
+  #set $adj = 'large'
+#else
+  #set $adj = 'small'
+#end if
+\end{verbatim}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#include}
+\label{directives.include}
 
 \code{\#include} directives are used to include text from outside the template
 definition.  The text can come from \code{\$placeholder} variables or from
@@ -270,42 +235,468 @@ parsing.
 #include raw "includeFileName.txt"
 \end{verbatim}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#cache ... \#end cache}
+\label{directives.cache}
+
+\code{\#cache} changes the default caching policy for placeholders inside the
+directive body.  This affects only Placeholder Tags without their own caching
+instruction (i.e., those without a ``*'').
+
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+
+$var                ## dynamic - will be reinterpolated for each request
+$*var2              ## static - will be interpolated only once at start-up
+$*5*var3            ## timed refresh - will be updated every 5 minutes.
+
+#cache
+$var                ## static
+$*var2              ## static
+$*5*var3            ## timed refresh
+#end cache
+
+#cache 0.5
+$var                ## timed refresh every 30 seconds (0.5 minutes)
+$*var2              ## static
+$*5*var3            ## timed refresh every 5 minutes
+#end cache
+
+</BODY>
+</HTML>
+\end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\#raw}
+\subsection{Macros}
+\label{directives.macros}
 
-Any section of a Template Definition that is inside a \code{\#raw} ...
-\code{\#end raw} tag pair will be printed verbatim without any parsing of
-\$placeholders or other directives.  This can be very useful for debugging, or
-writing Cheetah examples and tutorials.
 
+{\bf Macros} allow template designers to define a repeated segment of a Cheetah
+syntax.  Their sole purpose is the saving keystrokes and minimizing typographic
+errors.  They are simply functions that are called once-off at compile-time to
+insert a chunk of Cheetah code to be parsed.  Cheetah's macros are different
+from the macro concept in Java's Velocity template engine.
+
+The output from a macro may contain any Cheetah syntax except the \code{\#macro}
+directive which is used to define macros (see below).  Macros may insert
+placeholders, display logic, other directives, etc.  \$placeholder() functions
+may not.  If the output from a \$placeholder() function contains any Cheetah
+syntax it will be included without parsing.
+
+A macro is usually defined using the \code{\#macro} directive.  However, it is
+possible to write a Python function and register it as a Cheetah macro.
+Examples of both are below.  Using the \code{\#macro} directive is more
+convenient if your macro consists mostly of text to be inserted with occasional
+placeholders.  Loading it from a function is the only choice if you need to do
+any calculations.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Calling macros}
+\label{directives.macros.calling}
+
+To call a macro that has already been defined, use the following syntax:
+\code{\#MyMacro(ARGUMENTS)}.  The argument syntax is the same as for
+\$placeholder arguments: Python expressions separated by commas with variable
+names prefaced with \$.  The ``()'' are required even if there are no arguments.
+Unlike other directives, there is no such thing as an explicit tag closure
+(\code{\/\#}) for macro calls.
+
+The argument set in a macro call may not contain \$placeholders that have been
+defined locally in a \code{\#for} directive, as such \$placeholders are not
+available at compile-time.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Defining macros inplace using \#macro}
+\label{directives.macros.defining}
+
+An inplace macro definition looks like this:
+
+\begin{verbatim}
+#macro <macroName>(<arg set>)
+<macro contents>
+#end macro
+
+#macro testMacro(a, b)
+This is the body of a test macro
+$a and $b are interpoloted once-once at compile-time
+$otherPlaceholder1 and $otherPlaceholder2 are interpolated for every request
+#end macro
+
+#macro tablerows($color)
+#for $something in $somelist
+    <tr><td bgcolor=$color>$something</td></tr>
+#end for
+#end macro
+\end{verbatim}
+
+When the macro is called, it will insert the body of the macro in the template.
+\$placeholders referring to macro arguments are expanded, as are
+permanently-cached placeholders.  Dynamic or timed-refresh placeholders are left
+as is to be expanded when the template object is filled.  Macros inside macros are
+recursively expanded.  Other directives are left alone, to be evaluated when the
+template is parsed and compiled.
+
+The formal arguments in a macro definition are defined in regular Python syntax:
+The ARE NOT prefaced with \$.  Default values for arguments
+may be provided in the usual Python manner.
+
+Here's a large example of a macro definition from the file
+{\bf examples/webware\_examples/cheetahSite/SiteTemplate.tmpl}:
+
+\begin{verbatim}
+#macro insetBox(width=170, boxTitle='', boxContents='')
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$width>
+  <TR>
+    <TD COLSPAN=3 HEIGHT=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
+  </TR>
+  <TR>
+    <TD WIDTH=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
+    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD> ## force full width 
+    <TD WIDTH=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
+  </TR>
+  <TR>
+    <TD WIDTH=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
+    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$mainTbl.innerFrameColor">  ## force full width 
+       <DIV CLASS="insetBoxTitleContainer"><DIV CLASS="insetBoxTitle">$boxTitle</DIV></DIV>
+    </TD>
+    <TD WIDTH=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
+  </TR>
+  <TR>
+    <TD WIDTH=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
+    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD> ## force full width 
+    <TD WIDTH=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
+  </TR>
+  <TR>
+    <TD COLSPAN=3 HEIGHT=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
+  </TR>
+</TABLE>
+            
+<TABLE VALIGN="top" WIDTH=$*width BORDER=0 CELLPADDING=0 CELLSPACING=0>
+  <TR>
+    <TD WIDTH=1 bgcolor="$*insetBoxes.frameColor">#spacer()</TD>
+    <TD WIDTH=900 BGCOLOR="$*insetBoxes.bgcolor">  ## force to full width 
+    ## now begin the contents cell of the insetBox
+    $boxContents
+    ## end insetBox     
+    </TD>
+    <TD WIDTH=1 BGCOLOR="$*insetBoxes.frameColor">#spacer()</TD>
+  </TR>
+</TABLE>
+
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$width>
+  <TR>
+    <TD HEIGHT=1 BGCOLOR="$*insetBoxes.frameColor">#spacer()</TD>
+  </TR>
+</TABLE>
+#end macro
+\end{verbatim}
+
+All the formal arguments in the \code{\#insetBox} macro have default values, so
+they don't have to be specified when the macro is called.  Notice how the author
+uses different \$placeholder styles according to the placeholder.  Most
+placeholders have a ``*'' for permanent caching.  Those referring to macro
+arguments don't have a ``*'' (that would be silly), as do a few dynamic
+placeholders (e.g., \code{\$insetBoxes.titleFrameColor}, which is not defined in
+the macro but is assumed to exist when the template is filled.  Notice also how
+the author calls macros inside macros (e.g., \code{\#spacer()}).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using existing functions as macros}
+
+Existing functions or object methods may registered as Cheetah macros.  To do
+this, execute one of these statements in your Template subclass or inside a
+\code{\#data} directive.  
+
+\begin{verbatim}
+# Create a macro called 'macroName' that uses 'function'.
+self.loadMacro('macroName', function)
+
+# Create macros from functions named 'spacer' and 'formHTMLTag'.  Each macro
+# will have the same name as its function.
+self.loadMacros(spacer, formHTMLTag)
+
+# Create macros from all the callable objects in module 'Cheetah.Macros.HTML'.
+# If the module has the attribute '_exclusionList' the variable names contained
+# in the list will not be registered as macros.
+self.loadMacrosFromModule(Cheetah.Macros.HTML)
+\end{verbatim}
+
+The \code{Template.loadMacrosFromModule()} method is especially useful for
+packaging a group of functions as a macro library.  The \code{Cheetah.Macros}
+package contains some examples.
+
+Because the functions these macros are loaded from really {\em are} functions,
+they can also be loaded into the Search List and used as placeholder functions:
+
+\begin{verbatim}
+templateObj = Template(templateDef, Cheetah.Macros.HTML)
+\end{verbatim}
+
+There's no confusion here because \code{\$spacer(50)} will get the function and
+\code{\#spacer(50)} will get the macro.  Just remember that if the macro outputs
+embedded macros, directives or placeholders it cannot be used as a placeholder
+function.  Or rather it can, but the embedded \code{\$placeholders} and
+\code{\#directives} won't be parsed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{\#callMacro(): an extended syntax for calling macros}
+\label{directives.macros.callMacro}
+
+The \code{\#macroName(<arg set>)} syntax is great for macros with small strings for
+arguments, but it gets messy when you want to feed in larger chunks of text as
+arguments.  
+
+For example:
+\begin{verbatim}
+#macro tableMacro(width, cell1, cell2, cell3)
+<TABLE WIDTH=$width>
+  <TR>
+    <TD>$cell1</TD>
+    <TD>$cell2</TD>
+    <TD>$cell3</TD>
+  </TR>
+</TABLE>
+#/macro
+\end{verbatim}
+
+The cell contents will probably be way to large to use the macro in the normal
+fashion: \code{\#tableMacro(200, ``...'', ``...'', ``...'')}.
+
+The \code{\#callMacro()} directive makes it easier to use macros that accept
+large chunks of text as arguments.  You would define the macros exactly like
+normal macros, but when you call them you could do the following:
+
+\begin{verbatim}
+#callMacro tableMacro(width=200)
+#arg cell1
+sahoeusnthao u
+aoesthaothu
+aoenthaothu
+ashushu
+#end arg
+
+#arg cell2
+sahoeusnthao u
+aoesthaothu
+aoenthaothu
+ashushu
+#end arg
+
+#arg cell3
+sahoeusnthao u
+aoesthaothu
+aoenthaothu
+ashushu
+#end arg 
+
+#end callMacro
+
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Redefinition of macros in subclasses}
+\label{directives.macros.redefine}
+
+The \code{Template.loadMacro('macroName', function)} method may be used to
+redefine a macro in an extended template.  See sections \ref{directives.extend}
+and \ref{directives.extend} for more information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Macro libraries}
+\label{directives.macros.libraries}
+
+Cheetah comes ``batteries included'', with a library of useful macros in the
+\code{Cheetah.Macros} package.  
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#data ... \#end data}
+\label{directives.data}
+
+The \code{\#data} directive is a shortcut means of defining variables than be
+used by \$placeholders in your template. It's contents can be any valid Python
+code.  The code contained in a \#data directive is exec'd in an empty namespace
+and that namespace is then merged into the attribute list of the Template
+object, which is always part the searchList that \$placeholder values are
+extracted from.  Don't preface you variables with \$ inside the data directive!
+
+Here's an example:
+
+\begin{verbatim}
+#data
+title = "Cheetah - The Python-Powered Template Engine"
+siteDomainName = "cheetahtemplate.sourceforge.net"
+siteCopyrightName= "The Cheetah Development Team" 
+# Python comments can be used
+bodyTagAttribs = {"bgcolor": "black",
+                  "text":"#000033", 
+                  }
+navBar = {"bgcolor":"#3366CC", 
+          }
+locationBar = {"bgcolor":"#3366CC",
+               "frameColor":"#CCCCCC",
+              }
+mainTbl = {"width":"90%",
+           "align":"center",
+           "contentsBgColor":"white",
+           "outerFrameColor":"#6699FF", 
+           "innerFrameColor":"#3366CC",
+           "innerFrameWidth":8,
+           }
+#end data
+\end{verbatim}
+
+\subsubsection{Dictionary merging}
+
+Dictionaries that are defined in a \code{\#data} directive and already exist as
+attributes of the Template object will be merged.  Here's an example:
+
+\begin{verbatim}
+from Cheetah.Template import Template
+
+class mySubclass(Template):
+    bodyTagAttribs = {"link":"blue"}
+
+templateDef = """
+#data 
+bodyTagAttribs = {"bgcolor": "black",
+                  "text":"#000033", 
+                  }
+#end data
+$bodyTagAttribs
+"""
+print mySubclass(templateDef)
+\end{verbatim}
+
+This will output:
+\begin{verbatim}
+{'link': 'blue', 'text': '#000033', 'bgcolor': 'black'} 
+\end{verbatim}
+
+Dictionary merging can be incredibly useful for selectively changing single
+aspects of the cascading style sheet attributes defined by your site-wide
+template.  See examples in appendix \ref{examples} for more information on this.
+
+If you want it can be disabled with the \code{nomerge} keyword like this:
+\begin{verbatim}
+#data nomerge
+bodyTagAttribs = {"bgcolor": "black",
+                  "text":"#000033", #333333
+                  }
+#end data
+\end{verbatim}
+
+Dictionary merging is recursive.  If a dictionary is contains nested
+dictionaries in both the Template object and in the \code{\#data} directive the
+entire nested structure will be merged recursively.  You can find more
+information on dictionary merging by looking at the source code for
+\code{mergeNestedDictionaries} in the \code{Cheetah.Utilities module}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#block ... \#end block}
+\label{directives.block}
+
+The \code{\#block} directive allows you to delimit sections of your template
+that can be selectively reimplemented by sub-classes of the template.  It is
+very useful for selectively changing part of a template without having to
+copy-paste-and-edit the entire thing.  The output from a template definition
+that uses blocks will be identical to the output from the same template with the 
+\code{\#block and \#end block} tags removed. 
+
+\begin{verbatim}
+#block [blockName] 
+[block contents] 
+#end block [blockName]
+
+#block testBlock
+Text in the contents 
+area of the block directive
+#if $testIt
+$getFoo() 
+#end if
+#end block testBlock
+\end{verbatim}
+
+\code{\#block} directives can be nested to any depth.
+
+\begin{verbatim}
+#block outerBlock
+Outer block contents 
+
+#block innerBlock1
+inner block1 contents 
+#end block innerBlock1
+
+#block innerBlock2
+inner block2 contents 
+#end block innerBlock2
+
+#end block outerBlock
+\end{verbatim}
+
+The implementation of \#block is quite simple.  Each block is the template
+definition is replaced with \code{\#include \$cheetahBlocks.<blockName>} and it's
+contents are stored in the dictionary Template._cheetahBlocks using the
+'blockName' as the dictionary key.  To {\bf redefine} the contents of a block
+Cheetah just replaces the blockName's entry in Template._cheetahBlocks.  The
+Template class' \code{redefineBlock(blockName, contents)} or
+\code{killBlock(blockName)} methods provide a easy way to redefine blocks.
+
+Appendix \ref{examples} contains extended examples of how blocks can be used to
+simplify the creation and maintenance of large websites.
+
+Blocks are powerful and unique feature of Cheetah!
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#redefine ... \#end redefine}
+\label{directives.redefine}
 
-%% @@TR: this definitely needs explanation by itself
+When working with a large number of blocks it can be useful to write all the
+redefinitions in one {\bf template extension} string and just feed this string
+to the \code{Template.extendTemplate(extensionStr)} method at startup rather
+than individually \code{Template.redefineBlock()} for each and every block.
 
-%See \code{\#block}.
+\begin{verbatim}
+#redefine [blockName]
+[new contents]
+#end redefine [blockName]
 
+#redefine footer
+<HR>
+<P>$copyrightNotice<P>
+<div align="center">$companyName<BR>
+$address. Phone: $phone, Fax: $fax. Email: $email</div>
+#end redefine footer
+\end{verbatim}
+
+\code{\#redefine} directives may not be nested.  However, the new contents of
+the \code{\#redefine} directives may contain other \code{\#blocks}, even nested
+ones, and any other Cheetah syntax, except \code{\#data}, \code{\#macro}, and
+\code{\#extend}. Extension strings fed to
+\code{Template.extendTemplate(extensionStr)} may also contain \code{\#data} and
+\code{\#macro} directives at the top-level, that is outside the
+\code{\#redefine} directives.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\#set}
+\subsection{\#extend}
+\label{directives.extend}
 
-\code{\#set} allows you to assign a value for a placeholder from inside the
-Template Definition.  One use for this is to assign a short alias to what would
-otherwise be a long Placeholder Name. 
+The \code{\#extend} directive is a wrapper around
+\code{Template.extendTemplate(extensionStr)} that is used with .tmpl and Webware
+(see section \ref{webware} for more). If your .tmpl file contains needs to
+\code{\#redefine} blocks and \code{\#data} from a parent Template, rather than
+define a new top-level template use this directive to specify the Python module
+or .tmpl file that contains the parent Template. 
 
-The syntax is: \code{\#set \$lvaluePlaceholder = EXPRESSION}
+\code{\#extend <parentTemplateModule>}
 
-The expression may be any Python expression. but you must use Placeholder Tags
-instead of variable names within it.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\#slurp}
-
-\code{\#slurp} has a simple little job: it eats the whitespace and end-of-line
-character from the current line so that they will not appear in the output.
-Instead, the following line will be joined onto this one.
+Appendix \ref{examples} contains extended examples of how \code{\#extend} is
+used.
 
 

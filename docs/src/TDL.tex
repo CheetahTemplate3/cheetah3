@@ -1,13 +1,5 @@
 \section{The Template Definition Language}
-
-%% @@MO:
-% This chapter is for any information related to the TDL as a whole.
-% Since the vocabulary page already says the TDL consists of $P and #D,
-% and the details are fully explained in the next three chapters
-% ("Placeholder Tags", "Directive Tags", "Functions and Macros"), I don't
-% know what if anything needs to go in this chapter.
-
-%% @@TR: I disagree.
+\label{TDL}
 
 {\bf Template definitions} are text strings, or files, that have been marked up
 with Cheetah's {\bf Template Definition Language} for special processing.  This
@@ -17,10 +9,351 @@ code-generation in general, easy enough for non-programmers to understand and
 programmers to love.  It is purposefully limited and leaves complex tasks to
 Python, where they belong.
 
+Cheetah does not use HTML/XML style tags as they are hard to distinguish from
+real HTML tags and are not be visible in rendered HTML when something goes
+wrong.
+
 Cheetah's Template Definition Language has 2 primary types of tags: {\bf
   placeholders} and {\bf directives}. Placeholder tags begin with a dollar sign
 (\code{\$varName}) and are replaced with the value of the variable they refer to
 when the template is filled. Directives begin with a hash character (\#) and are
 used for everything else: for loops, conditional blocks, comments, includes, and
-other advanced features. The following chapters deal with these tags in detail.
+other advanced features. The following sections deal with these tags in detail.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Placeholder Tags}
+\label{TDL.placeholders}
+Placeholder Tags are equivalent to data fields in a form letter, or to the
+\code{\%(key)s} fields used with Python's \code{\%} operator. Here's an example:
+
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+$contents
+</BODY>
+</HTML>
+\end{verbatim}
+
+When this template is filled in, \code{\$title} and \code{\$content} will be
+replaced with the values for \code{title} and \code{content}.  
+
+Although these values are strings, they could be any type.  Cheetah converts all
+\$placeholder values to strings via Python's \code{str()} function each time a
+request is processed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Rules for placeholder names}
+\label{TDL.placeholders.rules}
+
+\begin{itemize} 
+     
+\item Placeholder names consist of one or more identifiers separated by periods.
+     Each identifier follows the same rules as a Python variable name or
+     attribute name: it must start with a letter or an underscore, and the
+     subsequent characters must be letters, numbers or underscores.  An
+     identifier may be followed by argument sets enclosed in ``()'' and/or
+     key/subscript arguments in ``[]''.
+
+\item Identifiers are case-sensitive. \code{\$var} does not equal \code{\$Var}
+     or \code{\$vAr} or \code{\$VAR}.     
+     
+\item String literals inside argument sets must be quoted, just like in Python.
+     All Python quoting styles are allowed.
+     
+\item All variable names inside argument sets should be prefixed with a \$.  Use
+     \$func(\$var) instead of \$func(var).
+    
+\item Trailing periods are ignored.  Cheetah will recognize that
+     placeholder name in \code{\$varName.} is \code{varName} and the period will
+     be left alone in the filled template output.
+     
+\item Placeholders can also be written in the form \code{\$\{placeholderName\}}.
+     This is useful for cases where there is no whitespace between the
+     placeholder and surrounding text (\code{surrounding\$\{embeddedVar\}text}).
+   
+\item Cheetah ignores all dollar signs (\code{\$}) that are not followed by a
+     letter or an underscore.  Dollar amounts (\code{\$2.50})are output
+     literally as they should be.  Cheetah also ignores any placeholder escaped
+     by a backslash (\code{$\backslash$\$placeholderName}).
+
+\end{itemize} 
+
+The following are valid \$placeholders:
+\begin{verbatim}
+$a $_ $var $_var $var1 $_1var $var2_ $dict.key $list[3]
+$object.method $object.method() $*object.method
+${*20*a.b1.c('A', 1, $federico + 1).d['-']}
+$nest($nest($var))
+\end{verbatim}
+
+These are not valid:
+\begin{verbatim}
+$var@2 $^var
+\end{verbatim}
+          
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Uniform Dotted Notation}
+\label{TDL.placeholders.unifiedDottedNotation}
+
+Cheetah lets you subscript objects and dictionaries in the same way, using
+dotted notation.  This is far easier for non-programmers to understand and it
+insulates you from changes in the API behind the template's \$placeholders.
+
+\$a.b.c will work with "a = \{'b':\{'c':1234\}\}" or "a = myClass(); a.b =
+anotherClass()". You can still write \$a\['b'\]\['c'\] if you want to.
+
+To use Uniform Dotted Notation with dictionaries, the key must be a legal
+identifier.  That is, it must start with a letter or an underscore, and contain
+only letters, digits and underscores.  If your dictionary key isn't a valid
+identifier you must use the \code{\$a['key 1234a*98']} syntax instead.
+
+Among Template-engines, Uniform Dotted Notation is unique to Cheetah.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Auto-calling}
+\label{TDL.placeholders.autocalling}
+
+Cheetah allows 'auto-calling' of methods and functions embedded as
+\$placeholders in the template definition.  If this feature is enabled
+(it is by default) then \$func and \$obj.meth will translated to \$func() and
+\$obj.meth().  If the function or method require args then you still
+have to do it like in Python \$func('foo', 1234)
+
+Only functions and methods are autocalled.  Other callable types -- in
+particular classes and instances -- are never auto-called.  So if you want to
+call a class or instance or another type, you must use ``()''.
+
+Section \ref{customizing} has instructions on how turn this feature off.
+
+Auto-calling is also unique to Cheetah.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{The searchList}
+\label{TDL.placeholders.searchList}
+
+A {\bf namespace} is a Python dictionary that links names to values. Each
+template definition that has been loaded into a \code{Template} object is
+associated with an ordered list of namespaces in which values for \$placeholder
+variable names can be stored.  This list is called the {\bf searchList}.
+
+The searchList can contain one or more namespaces.  In most cases only one
+namespace will be in the searchList unless you explicitly load extra ones.  When
+Cheetah fills in \code{\$content} in previous example it searchs sequentially
+through the searchList until it finds a value for \code{content}.  Thus, if
+three namespaces are loaded and two of them contain a value for
+\code{\$content}, the value for \code{content} from the namespace that is
+closest to the start of the searchList will be returned.
+
+If you add a Python object to the searchList, its attributes and methods will be
+accessible as \$placeholder names.  For example, \code{myObject} contains
+\code{myAttrib} and \code{myMethod}.  If \code{myObject} is added to the
+searchList, \code{\$myAttrib} and \code{\$myMethod} can be used as placeholder
+names.  
+
+The default namespace in every searchList is the \code{Template} object itself.
+This means that any attributes or methods that are added to classes that inherit
+from \code{Template} can be accessed in templates via \code{\$placeholders}.  New
+namespaces can be added to the searchList at any time using the
+\code{Template.addToSearchList()} method.  See section \ref{webware} for more
+information on how to use namespaces and the searchList.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Missing values}
+\label{TDL.placeholders.missing}
+
+If there is no value defined in the searchList for a placeholder name,
+Cheetah will search for an leading underscore version of the name.  For
+example, if it can't find \code{\$varName} it will attempt to find
+\code{\$\_varName}.  
+
+If all attempts to find a value fail, Cheetah inserts the placeholder tag
+verbatim in the filled template output.  This behaviour can be customized and a
+default value set for names that are not found.  See section
+\ref{customizing} for more details.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Placeholder values}
+\label{TDL.placeholders.values}
+
+Placeholder names can map to Python text strings, numbers, dictionaries, lists
+(arrays), functions, objects, or even nested Cheetah templates.  
+
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+
+$aString                        ## these names are chosen to indicate what
+$aNumber                        ## type of value they map to.  They could be
+$aList                          ## any valid placeholder name.
+$aDictionary
+$aFunction
+$aFunction()
+$aFunction(myArg=1234)
+$anObject
+
+</BODY>
+</HTML>
+\end{verbatim}
+
+Templates can be nested.  A \$placeholder may be another Template object.  When
+your template object is filled, the inner template object will automatically be
+filled, and any template object's {\em it} contains will also be filled, ad
+infinitum.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Caching}
+\label{TDL.placeholders.caching}
+
+By default the value of each \code{\$placeholder} is updated for each request.
+Cheetah can be told to cache individual \code{\$placeholders} or even entire
+sections of a template definition.
+                         
+If you want to statically cache the value of a single \code{\$placeholder} upon
+startup, add an asterisk after the \$ sign.  \code{\$var} becomes \code{\$*var}.
+
+If you only need to update the value of the \code{\$placeholders} at specific
+time intervals use this form: \code{\$variable} becomes \code{\$*2.5*variable} ,
+where 2.5 is the time interval in minutes.  
+
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+
+$var ${var}           ## dynamic - will be reinterpolated for each request
+$*var2 ${*var2}       ## static - will be interpolated only once at start-up
+$*5*var3 ${*5*var3}   ## timed refresh - will be updated every 5 minutes.
+
+</BODY>
+</HTML>
+\end{verbatim}
+
+To cache entire sections of a template definition use the \code{\#cache ...
+  \#end cache} directive tags:
+\begin{verbatim}
+#cache
+$var ${var}
+#end cache 
+
+#cache 2.5
+$var ${var}            ## These are re-cached every 2.5 minutes
+#end cache 
+\end{verbatim}
+
+There is more information on the \code{\#cache} directive in section
+\ref{directives.cache}.
+
+This simple, but powerful, caching mechanism is unique to Cheetah.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Directive tags}
+\label{TDL.directives}
+Directives tags are used for all functionality that cannot be handled with
+simple placeholders. Section \ref{directives} provides a reference guide to the
+various directives.  Some directives consist of a single tag while others
+consist of a pair of {\bf start} and {\bf end} tags that surround a chunk of
+text.  End tags are written in the form \code{\#end nameOfTheDirective}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Escaping directives}
+\label{TDL.directives.escaping}
+
+Directives can be escaped by placing a backslash ($\backslash$) before them.
+Escaped directives will be printed verbatim.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Tag closures and whitespace handling}
+\label{TDL.directives.closures}
+Directive tags can closed explicitly with \code{/\#} or implicitly with the end
+of the line if you're feeling lazy.
+
+\begin{verbatim}
+#block testBlock /#
+Text in the contents area of the
+block directive
+#end block testBlock/#
+\end{verbatim}
+is identical to:
+\begin{verbatim}
+#block testBlock
+Text in the contents area of the
+block directive
+#end block testBlock
+\end{verbatim}
+
+When a directive tag is closed explicitly it can be followed with other text on
+the same line:
+
+\begin{verbatim}
+bah, bah, #if $sheep.color == 'black'/# black#end if/# sheep.
+\end{verbatim}
+
+When a directive tag is closed implicitly with the end of the line all trailing
+whitespace is gobbled, including the newline character:
+\begin{verbatim}
+"""
+foo #set $x = 2 
+bar
+"""
+outputs 
+"""
+foo bar
+"""
+
+while 
+"""
+foo #set $x = 2 /#
+bar
+"""
+outputs 
+"""
+foo 
+bar
+"""
+\end{verbatim}
+
+When a directive tag is closed implicitly AND there is no other text on the
+line, the ENTIRE line will be gobbled up including any preceeding whitespace:
+\begin{verbatim}
+"""
+foo 
+   #set $x = 2 
+bar
+"""
+outputs 
+"""
+foo
+bar
+"""
+
+while 
+"""
+foo 
+ - #set $x = 2
+bar
+"""
+outputs 
+"""
+foo 
+ - bar
+"""
+\end{verbatim}
+
+The \code{\#slurp} directive, which is covered in more depth in section
+\ref{directives.slurp} is a dummy directive that exists only to facilitate
+gobbling of whitespace.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{Function and class libraries}
+%
+%Cheetah comes ``batteries included'' with functions, classes, packages and
+%other objects you can use in your program.  Functions and constants that are
+%also used by Cheetah itself are in the \code{Cheetah.Utilities} module.
+%Functions, classes and packages contributed by third parties are in the
+%\code{Cheetah.Tools} package.  
+
+
 

@@ -1,43 +1,76 @@
 \section{Customizing and extending Cheetah}
 \label{customizing}
 
-Template objects have a \code{\_settings} attribute. This is a dictionary of
-configuration settings that control the core behaviour of Cheetah.  
-
-The Template object's constructor method has a keyword argument 'settings' that
-accepts a dictionary to override the default settings.  Many of these settings
-are for internal use and are of little interest to end-users.  Some, however,
-can be quite useful. This chapter explains how to use them.
+To extend and customize Cheetah you can create a {\bf sub-class} of Template that
+reimplements some of its methods, you can use {\bf settings}, or you can use
+{\bf plugins}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Unknown placeholder names}
-%% handlers
+\subsection{Sub-classes of the Template class}
 
-Here's 
-Example:
+This is an advanced topic that is difficult to explain without full code
+examples.  It's best to learn how to do this by looking at existing sub-classes
+of the \code{Template} class.  The Cheetah.Servlet module and the
+Cheetah.Templates package contain examples.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Settings}
+
+\code{Template} objects have a \code{\_settings} attribute. This is a dictionary of
+configuration settings that control most of Cheetah's core behaviour.  The
+Template object's constructor method has a keyword argument 'settings' that
+accepts a dictionary to override the default settings.  Many of these settings
+are for internal use and are of little interest to end-users.  Some, however,
+can be quite useful.  This section explains how to use them.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using tokens other than the dollar sign for placeholders}
+
+It is possible to use any character sequence to signal the start of a
+\$placeholder.  The \code{placeholderStartToken} setting controls this.
+
+\begin{verbatim}
+myTemplateDef = "Here's my @@adj template."
+myNamespace = {'adj': 'silly'}
+from Cheetah.Template import Template
+templateObj = Template(myTemplateDef, myNamespace, 
+                 settings={'placeholderStartToken':'@@'})
+\end{verbatim}
+
+\code{placeholderStartToken} can be any character sequence of any length
+provided that it doesn't end or start with \code{\#} as this is used by the
+\#directives.  In the future we'd like to soft-code the
+\code{directiveStartToken} as well.  You can't use a sequence of spaces as
+the token, although you can have spaces mixed with other characters.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Disabling 'auto-calling'}
+
+%% @@ TR: insert a \ref{} in the next line
+Cheetah's auto-calling behaviour (see Section \#\#\#) can be 
 
 \begin{verbatim}
 from Cheetah.Template import Template
 templateObj = Template(myTemplateDef, myNamespace, 
-                 settings={'useAutocalling':0,
-                           'placeholderStartToken':'$'})
+                 settings={'useAutocalling':0,})
 \end{verbatim}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Unknown placeholder names}
+\subsubsection{Unknown placeholder names}
 %% handlers
 
-The 'varNotFound\_handler' setting controls what happens when a Placeholder
-Name is not found in the Search List.  The default setting simply places the
+The 'varNotFound\_handler' setting controls what happens when a \$placeholder
+is not found in the searchList.  The default setting simply places the
 Placeholder Tag in the output.  The ``Big Warning'' handler puts some
 harder-to-miss decorations around it.  To switch to the Big Warning handler:
 
 \begin{verbatim}
 from Cheetah import CodeGenerator, Template
-templateObj = Template(myTemplateDef, 
-        varNotFound_handler=CodeGenerator.varNotFound\_echo)
-# Of course, you can add any number of Namespaces after myTemplateDef.
+templateObj = Template(templateDef, namespace
+                settings={'varNotFound_handler':CodeGenerator.varNotFound\_bigWarning})
 \end{verbatim}
 
 Defining your own handler is easy too, as you can see from the reprint of
@@ -55,17 +88,28 @@ def varNotFound_bigWarning(templateObj, tag):
     
 \end{verbatim}
 
-% Not committed yet:
-%def varNotFound_KeyError(templateObj, tag):
-%    raise KeyError("no '%s' in this Template Object's Search List" % tag)
-
-% You can also get a list of Placeholder Names missing in the Search List:
-% \code{templateObj.getUnknowns()}.
-
-%% default vars
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Plugins}
+
+Plugins are objects that are scripted to automatically configure and extend the
+Template object.  They are used to make it easy to complex modifications of
+Cheetah's behaviour that would be awkward or too repetitive to do with {\bf
+  settings} alone. This section explains how to use pre-built plugins. If you
+want to build your own plugin please read the documented source code in the
+Cheetah.Plugins package.
+
+Cheetah.Template.Template() 'plugins' argument accepts a list of plugins. To use
+a plugin import its class from the module that contains it and feed Template()
+a list containing an instance of the class. Here's an example:
+
+\begin{verbatim}
+from Cheetah.Template import Template
+from Cheetah.Plugins.MyPlugin import MyPlugin
+...
+TO = Template(templateDef, namespace, plugins=[MyPlugin(),])
+\end{verbatim}
+
+
 \subsubsection{The PSP plugin}
 Cheetah ships with a plugin that enables pure PSP-style code to be used along
 with Cheetah \$placeholders and \#directives.  PSP syntax can also be used
@@ -73,7 +117,7 @@ alone without \$placeholders and \#directives.
 
 Here's a trivial example of how to use it:
 \begin{verbatim}
-from Cheetah.Template import Cheetah
+from Cheetah.Template import Template
 from Cheetah.Plugins.PSP import PSPplugin
 
 templateDef = """
@@ -92,8 +136,3 @@ print Template(templateDef, {'testVar':1234}, plugins=[PSPplugin()])
 
 \end{verbatim}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Custom variable-tags}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Custom directives}

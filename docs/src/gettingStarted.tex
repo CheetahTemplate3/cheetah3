@@ -3,11 +3,14 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Requirements}
+\label{gettingStarted.requirements}
+
 Cheetah requires Python release 2.0 or greater and should run on any
 operating system that Python 2.0 runs on.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Installation}
+\label{gettingStarted.install}
 
 To install Cheetah for a single user:
 \begin{enumerate}
@@ -30,9 +33,10 @@ command-line compiler program, cheetah-compile, to the "bin/" directory of your
 Python distribution.  Depending on your system, you may want to copy or symlink
 this file to a directory on your system path for easy access.
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Testing your installation}
+\label{gettingStarted.test}
+
 You can run the test suite to insure that your installation is correct by
 following these steps:
 \begin{enumerate}
@@ -52,4 +56,55 @@ the test output and the following details about your installation:
 \item your operating system
 \item whether you have changed anything in the Cheetah installation
 \end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quickstart tutorial}
+\label{gettingStarted.tutorial}
+
+This tutorial briefly introduces the basic usage of Cheetah.  See the
+following chapters for more detailed explanations.  
+
+{\bf This tutorial will be fleshed out further at later date.} 
+
+The core of Cheetah is the \code{Template} class in the \code{Cheetah.Template}
+module. The following example shows how to use the \code{Template} class from an
+interactive Python session. Lines prefixed with \code{>>>} and \code{...} are
+user input.  The remaining lines are Python output.
+
+\begin{verbatim}
+>>> from Cheetah.Template import Template
+>>> templateDef = """
+... <HTML>
+... <HEAD><TITLE>$title</TITLE></HEAD>
+... <BODY>
+... $contents
+... ## this is a single-line Cheetah comment and won't appear in the output
+... #* This is a multi-line comment
+...    blah, blah, blah 
+... *#
+... </BODY>
+... </HTML>"""
+>>> nameSpace = {'title': 'Hello World Example', 'contents': 'Hello World!'}
+>>> templateObj = Template(templateDef, nameSpace)
+>>> print templateObj
+ 
+<HTML>
+<HEAD><TITLE>Hello World Example</TITLE></HEAD>
+<BODY>
+Hello World!
+</BODY>
+</HTML>
+>>> print templateObj  # templateObj can be printed as many times as you need
+ 
+<HTML>
+<HEAD><TITLE>Hello World Example</TITLE></HEAD>
+<BODY>
+Hello World!
+</BODY>
+</HTML>
+
+\end{verbatim}
+
+
+
 

@@ -1,4 +1,4 @@
-\section{For Cheetah Developers}
+\section{Developers Information}
 \label{developer}
 
 This chapter is for people on the Cheetah development team, and for those who
@@ -15,6 +15,8 @@ Whenever you add a feature to Cheetah, follow these steps:
 
 \begin{enumerate}
 
+\item  Discuss its need and design on the email list and get approval.
+
 \item  Add the feature.
 
 \item  Write a regression test for it.  Verify the test suite does not break.
@@ -27,6 +29,8 @@ Whenever you add a feature to Cheetah, follow these steps:
 
 \item  Commit it all.
 
+\item  Notify the list and ask for people to test it.
+
 \end{enumerate}
 
 
@@ -38,12 +42,12 @@ To run the tests:
 
 \begin{enumerate}
 
-\item  \code{cd} into {\bf src/Cheetah/Tests} in the Cheetah source distribution 
+\item  \code{cd} into {\bf src/Tests} in the Cheetah source distribution 
      or {\bf site-packages/Cheetah/Tests} in your Python library directory.
      
 \item  Run the command:  \code{python Test.py}
 
-\item  It will run 15-30 seconds and then print either "OK" or an error message.
+\item  It will run for 10-30 seconds and then print either "OK" or an error message.
 
 \end{enumerate}
 
@@ -71,7 +75,7 @@ element is a list of three strings.  The subscripts are:
 \end{description}
 
 
-``Posix cases} means tests which should work on all platforms.  For
+``Posix cases'' means tests which should work on all platforms.  For
 platform-specific tests, there are two other lists \code{windowsCases} and
 \code{macintoshCases}. 
 separate lists 

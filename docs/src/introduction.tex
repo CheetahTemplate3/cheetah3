@@ -5,12 +5,12 @@
 \subsection{What is Cheetah?}
 \label{intro.whatIs}
 
-Cheetah is a Python-powered template engine and code generator.  It can be used as
-a standalone utility for generating source code, HTML, reports, or it can be
-combined with other systems to provide template services.  Cheetah has many
-potential uses -- generating SQL, SGML or LaTeX source, PostScript, form emails,
-etc. -- but web developers looking for a viable alternative to ASP, JSP, PHP and
-PSP are expected to be its principle user group.
+Cheetah is a Python-powered template engine and code generator.  It can be used
+as a standalone utility or it can be combined with other systems to provide
+template services.  Cheetah has many potential uses -- generating SQL, SGML or
+LaTeX source, PostScript, form emails, etc. -- but web developers looking for a
+viable alternative to ASP, JSP, PHP and PSP are expected to be its principle
+user group.
 
 Cheetah:
 \begin{itemize}        
@@ -171,20 +171,16 @@ Here's a summary of known issues and aspects of the design that are in flux:
 
 \item The parsing of macros is currently being worked on to make it more
      robust.  However, the macro interface is stable.
-
-\item The current rules for the autocall feature are brand new and need
-     testing.
-
-\item Quoted string literals in arguments/expressions are supposed to follow
-     the same rules as Python, but there are some bugs.  
-     'string\'s' stops at the second '.  (Believed to be an easy fix.)
-     """ ... """ and ''' ... ''' fail when spanning multiple lines.
+     
+\item Quoted string literals in \$placeholder argument sets is supposed to
+     follow the same rules as Python, but there are some bugs.  'string\'s'
+     stops at the second '.  (Believed to be an easy fix.)  """ ... """ and '''
+     ... ''' fail when spanning multiple lines.
 
 \end{itemize}
 
 The syntax and usage directions described throughout the rest of this guide are
 stable unless noted otherwise.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Where can I get releases?}
