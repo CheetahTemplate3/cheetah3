@@ -63,6 +63,9 @@ Requirements for 1.0
   if specified) at the beginning of each fill.  Currently, filter changes
   leak from one fill to the next.
 
+- Webware example template has obsolete #settings directive.  Replace
+  with #attr for each variable.
+
 Other TODO Items
 ================================================================================
 
