@@ -1,39 +1,32 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.3 2002/04/18 23:55:08 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.4 2002/04/27 01:37:26 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
 
-This code is based on Andrew Kuchling's import hooks for Quixote.
-
-Note: there's some unpleasant incompatibility between ZODB's import
-trickery and the import hooks here.  Bottom line: if you're using ZODB,
-import it *before* installing these import hooks.
-
 Meta-Data
 ================================================================================
-Author: Tavis Rudd <tavis@calrudd.com>
+Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/04/18 23:55:08 $
+Last Revision Date: $Date: 2002/04/27 01:37:26 $
 """ 
-__author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.3 $"[11:-2]
+__author__ = "Tavis Rudd <tavis@damnsimple.com>"
+__revision__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
 
 import sys
 import os.path
-import marshal
-import stat
+import types
 import __builtin__
-import imp
-import ihooks
 import new
-
+import imp
+import ImportManager
+from ImportManager import DirOwner
 # intra-package imports ...
 from Compiler import Compiler
 
@@ -45,66 +38,61 @@ try:
 except NameError:
     True, False = (1==1),(1==0)
 
-TMPL_EXT = '.tmpl'
-# Constant used to signal a TMPL files
-TMPL_FILE = 129
-
 _installed = False
 
 ##################################################
 ## CLASSES
 
-class CheetahHooks (ihooks.Hooks):
-    def get_suffixes (self):
-        L = imp.get_suffixes()
-        return L + [(TMPL_EXT, 'r', TMPL_FILE)]
-    
-class CheetahLoader (ihooks.ModuleLoader):
-    def load_module (self, name, stuff):
-        file, filename, info = stuff
-        (suff, mode, type) = info
-        if type == TMPL_FILE:
-            return self._loadCheetahTemplate(name, filename, file)
-        else:
-            # Otherwise, use the default handler for loading
-            return ihooks.ModuleLoader.load_module( self, name, stuff)
-        
-    def _loadCheetahTemplate(self, name, filename, file=None):
-        if not file:
-            try:
-                file = open(filename, "r")
-            except IOError:
-                return None
-        path, ext = os.path.splitext(filename)
-        basename = os.path.split(path)[1]
-        
-        ## @@ consider adding an ImportError raiser here
-        code = str(Compiler(file=file, moduleName=basename, mainClassName=basename))
-        return self._newModule(code, name, filename)
+class CheetahDirOwner(DirOwner):
 
-    def _newModule(self, code, name, filename):
-        new_mod = new.module(name)
-        new_mod.__file__ = filename
-        new_mod.__name__ = name
-        sys.modules[name] = new_mod
-        exec code in new_mod.__dict__
-        return new_mod
+    def getmod(self, name,
+               pathIsDir=os.path.isdir,
+               newmod=imp.new_module):
+               
+        tmplPath =  os.path.join(self.path, name + '.tmpl')
+        mod = DirOwner.getmod(self, name)
+        if mod:
+            return mod
+        elif not os.path.exists(tmplPath):
+            return None
+        else:
+            ## @@ consider adding an ImportError raiser here
+            code = str(Compiler(file=tmplPath, moduleName=name, mainClassName=name))
+            mod = new.module(name)
+            mod.__file__ = tmplPath
+            mod.__name__ = name
+            sys.modules[name] = mod
+            exec code in mod.__dict__
+            ##print name, tmplPath, new_mod
+            return mod
 
 ##################################################
 ## FUNCTIONS
 
-def install ():
+def install():
+    """Install the Cheetah Import Hooks"""
     global _installed
     if not _installed:
-        try:
-            import ZODB
-        except ImportError:
-            pass
-        hooks = CheetahHooks()
-        loader = CheetahLoader(hooks)
-        importer = ihooks.ModuleImporter(loader)
-        ihooks.install(importer)
-        _installed = True
+        import __builtin__
+        if type(__builtin__.__import__) == types.BuiltinFunctionType:
+            global __oldimport__
+            __oldimport__ = __builtin__.__import__
+            ImportManager._globalOwnerTypes.insert(0, CheetahDirOwner)
+            #ImportManager._globalOwnerTypes.append(CheetahDirOwner)            
+            global _manager
+            _manager=ImportManager.ImportManager()
+            _manager.setThreaded()
+            _manager.install()
+        
+def uninstall():
+    """Uninstall the Cheetah Import Hooks"""    
+    global _installed
+    if not _installed:
+        import __builtin__
+        if type(__builtin__.__import__) == types.MethodType:
+            __builtin__.__import__ = __oldimport__
+            global _manager
+            del _manager
 
 if __name__ == '__main__':
     install()
