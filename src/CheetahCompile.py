@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.15 2001/12/05 20:30:33 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.16 2001/12/11 04:38:32 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.15 $
+Version: $Revision: 1.16 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/12/05 20:30:33 $
+Last Revision Date: $Date: 2001/12/11 04:38:32 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.15 $"[11:-2]
+__version__ = "$Revision: 1.16 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -189,11 +189,10 @@ class CheetahCompile:
         print \
 """Cheetah %(version)s command-line compiler by %(author)s
 
-Compiles Cheetah files (.tmpl) into Webware servlet files (.py)
+Compiles Cheetah files (.tmpl) into Webware servlet modules (.py)
 
 Usage:
-  %(scriptName)s [OPTION] FILES
-  %(scriptName)s [OPTION] {-R|-d} FILES/DIRECTORIES
+  %(scriptName)s [OPTIONS] FILES/DIRECTORIES
 
   -R                          Recurse subdirectories
   -p                          Print generated Python code to stdout
@@ -201,11 +200,9 @@ Usage:
   -v                          Be verbose
 """ % {'scriptName':self._scriptName,
        'version':version,
-       'author':'Tavis Rudd',
+       'author':'Tavis Rudd and Ian Bicking',
        }
-
-
-    
+   
 ##################################################
 ## if run from the command line
 if __name__ == '__main__':
