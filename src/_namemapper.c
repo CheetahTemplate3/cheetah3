@@ -19,7 +19,7 @@ static PyObject *ErrorObject;   /* locally-raised exception */
 static PyObject *
 PyNamemapper_valueForKey(PyObject *obj, char *key)
 {
-  PyObject *theValue;
+  PyObject *theValue = NULL;
   const char *underscore = "_";
   static char * underscoreKey = NULL;
   static int bufSize = 0;
@@ -60,29 +60,21 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
 			  int executeCallables)
 {
   char *firstKey;
-  PyObject *binding;
+  PyObject *theValue = NULL;
 
   firstKey = nameChunks[0];
-
-  if (! (binding = PyNamemapper_valueForKey(obj, firstKey))){
-    return NULL;
-  }
-  
-  if (executeCallables && PyCallable_Check(binding) && (!PyInstance_Check(binding)) 
-      && (!PyClass_Check(binding)) ) {
-    binding = PyObject_CallObject(binding, NULL);
+  theValue = PyNamemapper_valueForKey(obj, firstKey);
+    
+  if (executeCallables && PyCallable_Check(theValue) && (!PyInstance_Check(theValue)) 
+      && (!PyClass_Check(theValue)) ) {
+    theValue = PyObject_CallObject(theValue, NULL);
   }
   
   if (numChunks > 1) {
-
-    if (!(binding = PyNamemapper_valueForName(binding, nameChunks+1, 
-					      numChunks - 1, executeCallables))) {
-      return NULL;
-    }
-    return binding;
-  } else {
-    return binding;
-  }
+    theValue = PyNamemapper_valueForName(theValue, nameChunks+1, 
+					numChunks - 1, executeCallables);
+      }
+  return theValue;
 }
 
 static PyObject *
@@ -92,7 +84,7 @@ PyNamemapper_valueFromSearchList(PyObject *searchList,
 				 int executeCallables)
 {
   PyObject *nameSpace;
-  PyObject *theValue;
+  PyObject *theValue = NULL;
   int i;
   int listLen;
 
