@@ -1,12 +1,10 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.8 2001/11/02 16:51:52 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.9 2001/11/05 06:40:34 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
 - test escaping slashes when read from file
 
-- #else if / #elif
-- #implement
 - #finally
 - #filter (output filtering, was #formatter)
 - #errorCatcher
@@ -15,12 +13,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/02 16:51:52 $
+Last Revision Date: $Date: 2001/11/05 06:40:34 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 
 ##################################################
@@ -1762,10 +1760,14 @@ $sep$letter#slurp
 ## TO FINISH
 
 class FilterDirective(OutputTest):
-    """was called #formatter originally"""
-    pass
+    
+    def test1(self):
+        """#filter ReplaceNone
+        """
+        self.verify("#filter ReplaceNone",
+                    "")
 
-class ErrorCheckerDirective(OutputTest):
+class ErrorCatcherDirective(OutputTest):
     pass
 
 ##################################################
