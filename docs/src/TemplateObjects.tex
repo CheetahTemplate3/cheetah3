@@ -209,7 +209,7 @@ All the Namespace Values above are strings, but they can actually be any Python
 type.  You may even change values from one type to another.  However, if you
 change a value from an autocalled type (a function or method) to a
 non-autocalled type (any other type) or vice-versa, you must recompile the
-TO by calling the \code{.startServer()} method {\em before filling it}.
+TO by calling the \code{.compileTemplate()} method {\em before filling it}.
 Otherwise, Cheetah will autocall when it shouldn't or
 won't autocall when it should.  For the reason why, see the section
 ``Autocalling'' in the chapter ``Placeholder Tags''.
@@ -300,12 +300,12 @@ Template Definition.  They will no longer show up in Filled Templates.
 
 \item{.searchList()}  Return the Search List.  It's a UserList subclass, so you
      can use Python's standard list operations on it.  If you add or delete
-     namespaces, call \code{.startServer()} afterwards to recompile the template
+     namespaces, call \code{.compileTemplate()} afterwards to recompile the template
      {\em before trying to fill it}.
 
-\item{.startServer()}  Recompile the template.  
+\item{.compileTemplate()}  Recompile the template.  
 
-\item{.recompile()}  Synonym for \code{.startServer}.
+\item{.recompile()}  Synonym for \code{.compileTemplate}.
 
 \item{.translatePath()}  ``A hook to enable proper handling of server-side
      paths with Webware.''
