@@ -23,6 +23,12 @@ After the above imports, \code{\$math}, \code{\$mathModule},
 \code{\$sin}, \code{\$cos} and \code{\$\_sin} may be used in 
 \code{\$placeholders} and expressions.
 
+The wildcard form \code{from MODULE import *} is not supported:
+\begin{verbatim}
+#from math import *         # ## No!  
+$sin(8)                       ## Raises NameMapper.NotFound error at fill time.
+\end{verbatim}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#extends}
 \label{inheritanceEtc.extends}
@@ -36,14 +42,20 @@ generated servlet class should inherit from.  It is equivalent to PSP's
 #extends SkeletonPage
 \end{verbatim}
 
-Multiple inheritance is allowed, provided that the first base class is a
+Multiple inheritance is allowed, provided that the last base class is a
 subclass of Cheetah.Template.Template:
 
 \begin{verbatim}
 #from Cheetah.Templates.SkeletonPage import SkeletonPage
 #from MyMixin import MyMixin
-#extends SkeletonPage, MyMixin
+#extends MyMixin, SkeletonPage
 \end{verbatim}
+
+{\em Note:} In Cheetah 0.9.12 and earler, one listed the \code{Template} subclass
+first rather than last.  The order was changed to allow mixin classes to override
+standard methods like \code{.awake()}.  One caveat is that now it's possible to
+accidentally override methods you weren't aware of.  Section ?? (not written yet)
+lists all the standard methods \code{Template} objects have.
 
 In the very near future, you won't need those \code{\#from ... import}
 directives because \code{\#extends} will implicitly import whatever 
