@@ -5,6 +5,8 @@ release
 0.9.13b1 (unreleased)
   - fixed a silly buglet that resulted in StringIO being used instead of
     cStringIO (TR)
+  - Backed out the above change (in DummyTransaction.py only) because it
+    caused the unittests to fail. (MO)
   - Utils.Misc.CheckKeywords(): prevent misspelled keyword arguments,
     used by Template constructor. (MO)
   - With an #extends listing multiple superclasses, the one that's a
