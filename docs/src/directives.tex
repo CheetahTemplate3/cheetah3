@@ -243,33 +243,13 @@ parsing.
 #include raw source=$myParseText
 \end{verbatim}
 
-By default, Cheetah wraps each chunk of \code{\#include} text inside a nested
+Cheetah wraps each chunk of \code{\#include} text inside a nested
 \code{Template} object.  These nested templates share the same \code{searchList}
-and macros as the top-level template. But, unlike PHP, their Cheetah code must be
-self-contained.  For example, all \code{\#for} and \code{\#if} blocks started
+and macros as the top-level template. But, unlike PHP, their Cheetah code must
+be self-contained.  For example, all \code{\#for} and \code{\#if} blocks started
 inside an \code{\#include} must be terminated in that include.  The same applies
-for \code{\#data}, \code{\#macro} and \code{\#raw}.  Furthermore, \code{\#set}
-values are only visible inside the included code and \code{\#set} values from
-the top-level template are not visible in the included code.
-
-The argument ``\code{direct}'' can be used to tell Cheetah to parse the included
-code as part the top-level template rather than inside a nested \code{Template}
-object.  In this case, there is no requirement that the included Cheetah code be
-self-contained and \code{\#set} values are visible throughout.  Direct includes
-are also slightly faster.  Note that direct includes cannot monitor for changes
-to the include src file.
-
-\begin{verbatim}
-#include direct includeFileName.txt"
-#include direct source=$myParseText
-\end{verbatim}
-
-Please note that \code{\#include} directives are processed at compile-time not
-run-time.  Therefore, any \$placeholders used in them must be available at
-compile-time.  The \code{\#set} directive is a run-time directive so you can't
-use it to specify the path of a file to include.  If you need to do something
-like this please remember the philosophy behind Cheetah: Python for the complex
-tasks, Cheetah for the simple ones!  Do it in Python.
+for \code{\#data}, \code{\#macro} and \code{\#raw}.  \code{\#set}
+values are visible across includes.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#cache ... \#end cache}
@@ -284,9 +264,9 @@ instruction (i.e., those without a ``*'').
 <HEAD><TITLE>$title</TITLE></HEAD>
 <BODY>
 
-$var                ## dynamic - will be reinterpolated for each request
-$*var2              ## static - will be interpolated only once at start-up
-$*5*var3            ## timed refresh - will be updated every 5 minutes.
+$var                ## dynamic - reinterpolated for each request
+$*var2              ## static - interpolated only once during 1st request
+$*5*var3            ## timed refresh - updated every 5 minutes
 
 #cache
 $var                ## static
@@ -598,6 +578,9 @@ information.
 \subsection{\#data ... \#end data}
 \label{directives.data}
 
+[{\bf The syntax and semantics of this directive are currently under
+  review. They may change before the 1.0 release. }]
+
 The \code{\#data} directive is a shortcut means of defining variables than be
 used by \$placeholders in your template. It's contents can be any valid Python
 code.  The code contained in a \#data directive is exec'd in an empty namespace
@@ -682,6 +665,9 @@ information on dictionary merging by looking at the source code for
 \subsection{\#block ... \#end block}
 \label{directives.block}
 
+[{\bf The syntax and semantics of this directive are currently under
+  review. They may change before the 1.0 release. }]
+
 The \code{\#block} directive allows you to delimit sections of your template
 that can be selectively reimplemented by sub-classes of the template.  It is
 very useful for selectively changing part of a template without having to
@@ -737,6 +723,9 @@ Blocks are powerful and unique feature of Cheetah!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#redefine ... \#end redefine}
 \label{directives.redefine}
+
+[{\bf The syntax and semantics of this directive are currently under
+  review. They may change before the 1.0 release. }]
 
 When working with a large number of blocks it can be useful to write all the
 redefinitions in one {\bf template extension} string and just feed this string
