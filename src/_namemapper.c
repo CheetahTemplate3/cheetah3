@@ -8,12 +8,61 @@
 static PyObject *NotFound;   /* locally-raised exception */
 
 #define notFound(message) { PyErr_SetString(NotFound, message); return NULL; }
-
 #define MAXCHUNKS 15		/* max num of nameChunks for the arrays */
+#define TRUE 1
+#define FALSE 0
 
 /* *************************************************************************** */
 /* First the c versions of the functions */
 /* *************************************************************************** */
+
+
+static int getNameChunks(char *nameChunks[], char *name) 
+{
+  char c;
+  char *currChunk;
+  int currChunkNum = 0;
+  
+  currChunk = name;
+  while ((c = *name) != '\0'){
+    if (c == '.') {
+      *name ='\0';
+      nameChunks[currChunkNum++] = currChunk;
+      name++;
+      currChunk = name;
+    } else 
+      name++;
+  }
+  if (name > currChunk) 
+    nameChunks[currChunkNum++] = currChunk;
+  return currChunkNum;
+} /* end - getNameChunks */
+
+static int 
+hasKey(PyObject *obj, char *key)
+{
+  const char *underscore = "_";
+  char *underscoreKey = NULL;
+
+  if (PyObject_HasAttrString(obj, key)) {
+    return TRUE;
+  } else if (PyMapping_Check(obj) && PyMapping_HasKeyString(obj, key)) {
+    return TRUE;
+  } else {
+    underscoreKey = malloc(strlen(key) + 2); /* 1 for \0 and 1 for '_' */
+    strcpy(underscoreKey, underscore);
+    strcat(underscoreKey, key);
+
+    if (PyObject_HasAttrString(obj, underscoreKey)) {
+      free(underscoreKey);
+      return TRUE;
+    } else {
+      free(underscoreKey);
+      return FALSE;
+    }
+  }
+} /* end - hasKey */
+
 
 static PyObject *
 PyNamemapper_valueForKey(PyObject *obj, char *key)
@@ -41,7 +90,7 @@ PyNamemapper_valueForKey(PyObject *obj, char *key)
     }
   }
   return theValue;
-}
+} /* end - PyNamemapper_valueForKey */
 
 static PyObject *
 PyNamemapper_valueForName(PyObject *obj, char *nameChunks[], 
@@ -96,30 +145,8 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
   }
 
   return currentVal;
-} /* end - valueForName */
+} /* end - PyNamemapper_valueForName */
 
-
-static int getNameChunks(char *nameChunks[], char *name) 
-{
-  char c;
-  char *currChunk;
-  int currChunkNum = 0;
-  
-  currChunk = name;
-  while ((c = *name) != '\0'){
-    if (c == '.') {
-      *name ='\0';
-      nameChunks[currChunkNum++] = currChunk;
-      name++;
-      currChunk = name;
-    } else 
-      name++;
-  }
-  if (name > currChunk) 
-    nameChunks[currChunkNum++] = currChunk;
-  return currChunkNum;
-}
- 
 
 /* *************************************************************************** */
 /* Now the wrapper functions to export into the Python module */
@@ -207,16 +234,11 @@ namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
   listLen = PyList_Size(searchList);
   for (i=0; i < listLen; i++){
     nameSpace = PyList_GetItem(searchList, i);
-    theValue = PyNamemapper_valueForName(nameSpace, nameChunks, numChunks, executeCallables);
-    if (theValue) {		/* it might be NULL */
-      PyErr_Clear();		/* clear possible NotFound errors */
+    if ( hasKey(nameSpace, nameChunks[0]) ) {
+      theValue = PyNamemapper_valueForName(nameSpace, nameChunks, numChunks, executeCallables);
       free(nameCopy);
       return theValue;
-    } else if (PyErr_Occurred() != NotFound) {
-      free(nameCopy);
-      return NULL;
     } 
-    PyErr_Clear();		/* clear possible NotFound errors */
   }
   free(nameCopy);
   notFound(name);
