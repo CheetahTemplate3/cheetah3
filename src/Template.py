@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.68 2001/11/10 22:47:26 tavis_rudd Exp $
+# $Id: Template.py,v 1.69 2001/11/10 22:54:43 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.68 $
+Version: $Revision: 1.69 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/10 22:47:26 $
+Last Revision Date: $Date: 2001/11/10 22:54:43 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.68 $"[11:-2]
+__version__ = "$Revision: 1.69 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -113,10 +113,8 @@ class Template(SettingsManager, Servlet):
             # Re-raise the exception here so that the traceback will end in
             # this function rather than in some utility function.
             raise TypeError(reason)
-        if source is None and file is None:
-            raise TypeError(
-                "you must supply either a source string or the 'file' keyword argument")
-        elif source is not None and file is not None:
+        
+        if source is not None and file is not None:
             raise TypeError("you must supply either a source string or the" + 
                             " 'file' keyword argument, but not both")
 
