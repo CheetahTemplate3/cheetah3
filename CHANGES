@@ -5,6 +5,21 @@ release
 0.9.13 (May ??, 2002)
   - changed Cheetah.Servlet.isRunningFromWebKit to isWebwareInstalled (TR)
 
+  - fixed parsing bug that would exit an expression if the directiveEndToken was a
+    valid Python token and was found inside the directive.  (TR)
+    E.g.:
+    #compiler-settings
+    directiveStartToken = .
+    directiveEndToken = :
+    commentStartToken = #
+    #end compiler-settings
+    
+    .for a in [1,2,3,4][2:3]:
+    blag
+    .end for
+
+
+
 0.9.13b2 (May 3, 2002)
   - fixed the bug in Cheetah.Servlet.Servlet.serverSidePath that Jeff Johnson
     found. (TR)
