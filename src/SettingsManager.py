@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SettingsManager.py,v 1.13 2001/10/10 06:47:41 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.14 2001/11/25 19:54:25 tavis_rudd Exp $
 """Provides a mixin/base class for managing application settings 
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.13 $
+Version: $Revision: 1.14 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2001/10/10 06:47:41 $
+Last Revision Date: $Date: 2001/11/25 19:54:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.13 $"[11:-2]
+__version__ = "$Revision: 1.14 $"[11:-2]
 
 
 ##################################################
@@ -325,7 +325,7 @@ class SettingsManager:
     def normalizePath(self, path):
         """A hook for any neccessary path manipulations.
 
-        For example, when this is used with Webware servlets all relative paths
+        For example, when this is used with WebKit servlets all relative paths
         must be converted so they are relative to the servlet's directory rather
         than relative to the program's current working dir.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SetupTools.py,v 1.2 2001/10/10 06:59:45 tavis_rudd Exp $
+# $Id: SetupTools.py,v 1.3 2001/11/25 19:53:57 tavis_rudd Exp $
 """Some tools for extending and working with distutils
 
 CREDITS: This module borrows code and ideas from M.A. Lemburg's excellent setup
@@ -8,7 +8,7 @@ tools for the mxBase package.
 """
 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 
 ##################################################
@@ -22,6 +22,7 @@ False = (1==0)
 
 from distutils.core import setup
 from distutils.core import Command
+from distutils.command.install import install
 from distutils.command.install_data import install_data
 from distutils.command.sdist import sdist
 
@@ -39,23 +40,19 @@ from src.FileUtils import findFiles
 
 ##################################################
 ## CLASSES ##
-                
+   
 class mod_install_data(install_data):
     
-    """A copy of M.A Lemburg's modified version of the disutils install_data
-    command that allows data files to be included directly in the installed
-    Python package tree.
-
-    Note that it expects that data_files argument to the disutils.setup()
-    commmand to be a list of strings rather than a list of tuples as is the
-    default.  Each of these string entries can be a real file name or a glob
-    pattern representing the files to match."""
+    """A modified version of the disutils install_data command that allows data
+    files to be included directly in the installed Python package tree.
+    """
 
     def finalize_options(self):
 
         if self.install_dir is None:
             installobj = self.distribution.get_command_obj('install')
-            self.install_dir = installobj.install_platlib
+            #self.install_dir = installobj.install_platlib
+            self.install_dir = installobj.install_lib
         install_data.finalize_options(self)
 
     def run (self):
@@ -288,15 +285,17 @@ def run_setup(configurations):
                                types.ListType,
                                types.TupleType,
                                types.DictType,
+                               types.IntType,
                                ):
             del kws[name]
 
     # Add setup extensions
-    cmdclasses = {'install_data': mod_install_data,
-                  'uninstall':uninstall,
-                  'contrib':contrib,
-                  'sdist_docs':sdist_docs,
-                  }
+    cmdclasses = {
+        'install_data': mod_install_data,
+        'uninstall':uninstall,
+        'contrib':contrib,
+        'sdist_docs':sdist_docs,
+        }
 
     kws['cmdclass'] = cmdclasses
 

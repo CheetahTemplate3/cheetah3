@@ -11,7 +11,6 @@ packages = ['Cheetah',
             'Cheetah.Tools',
             'Cheetah.Utils',
             ]
-
 package_dir = {'Cheetah':'src'}
 
 import os
