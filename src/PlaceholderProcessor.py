@@ -1,19 +1,18 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.16 2001/08/03 17:20:10 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.17 2001/08/03 19:20:50 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
-
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.16 $
+Version: $Revision: 1.17 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/03 17:20:10 $
+Last Revision Date: $Date: 2001/08/03 19:20:50 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.16 $"[11:-2]
+__version__ = "$Revision: 1.17 $"[11:-2]
 
 
 ##################################################
@@ -36,7 +35,9 @@ from Utilities import lineNumFromPos
 True = (1==1)
 False = (1==0)
 
-placeholderTagsRE = re.compile(r'(?:(?<=\A)|(?<!\\))\$(?=[A-Za-z_\*\{])')
+# define some RE chunks for use in PlaceholderProcessor.setTagStartToken()
+escCharLookBehind = r'(?:(?<=\A)|(?<!\\))'
+validSecondCharsLookAhead = r'(?=[A-Za-z_\*\{])'
 
 # cacheType's for $placeholders
 NO_CACHE = 0
@@ -68,15 +69,16 @@ class SyntaxError(ValueError):
 class PlaceholderProcessor(TagProcessor):
     """A class for processing $placeholders in strings."""
 
-    def __init__(self, tagRE = placeholderTagsRE, marker=' placeholderTag.',
+    def __init__(self, tagStartToken = '$', marker=' placeholderTag.',
            markerEscaped = ' placeholderTag\.',
            markerLookBehind=r'(?:(?<= placeholderTag\.)|(?<= placeholderTag\.\{))'):
         """Setup the regexs used by this class
 
-        All $placeholders are translated into valid Python code by swapping $
-        for the self._marker.  This marker is then used to find the start of
-        each placeholder and allows $vars in function arg lists to be parsed
-        correctly.  '$x()' becomes  ' placeholderTag.x()' when it's marked.
+        All $placeholders are translated into valid Python code by swapping
+        'tagStartToken' ($) for 'marker'.  This marker is then used by the
+        parser (i.e. self.splitTxt()) to find the start of each placeholder and
+        allows $vars in function arg lists to be parsed correctly.  '$x()'
+        becomes ' placeholderTag.x()' when it's marked.
 
         The marker starts with a space to allow $var$var to be parsed correctly.
         $a$b is translated to --placeholderTag.a placeholderTag.b-- instead of
@@ -89,7 +91,7 @@ class PlaceholderProcessor(TagProcessor):
                                  r'\s*\*([0-9\.]+?)\*' +
                                  nameCharLookForward)
 
-        self._tagRE = tagRE
+        self.setTagStartToken(tagStartToken)
         self._marker = marker
         self._markerEscaped = markerEscaped
         self._markerLookBehind = markerLookBehind
@@ -98,7 +100,52 @@ class PlaceholderProcessor(TagProcessor):
         self._nameRE = re.compile(
             marker + r'(?:CACHED\.|REFRESH_[0-9]+(?:_[0-9]+){0,1}\.){0,1}([A-Za-z_0-9\.]+)')
 
+    def setTagStartToken(self, theToken):
+        """Change the token used to identify the beginning of a
+        placeholderTag. The default is '$'."""
+        
+        self._tagStartToken = theToken        
+        theTokenEsc = re.sub(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])', r'\\\1' , theToken)
+        self.setTagStartTokenRE(re.compile(escCharLookBehind +
+                                           theTokenEsc +
+                                           validSecondCharsLookAhead))
 
+    def tagStartToken(self):
+        return self._tagStartToken
+    def setTagStartTokenRE(self, tagTokenRE):
+        """Change the regular expression used to identify the beginning of a
+        placeholderTag."""
+        
+        self._tagStartTokenRE = tagTokenRE
+
+    def escapePlaceholders(self, theString):
+        """Escape any escaped placeholders in the string."""
+
+        return theString.replace(self._tagStartToken, '\\' + self._tagStartToken)
+
+    def unescapePlaceholders(self, templateObj, theString):
+        """Unescape any escaped placeholders in the string.
+        
+        This method is called by the Template._codeGenerator() in stage 1, which
+        is why the first arg is 'templateObj.  self.escapePlaceholders() isn't
+        called by Template._codeGenerator() so it doesn't take a templateObj arg."""
+
+        return theString.replace('\\' + self._tagStartToken, self._tagStartToken)
+
+    def mark(self, txt):
+        """Swap the $'s for a marker that can be parsed as valid python code.
+        Default is 'placeholder.'
+
+        Also mark whether the placeholder is to be statically cached or
+        timed-refresh cached"""
+        
+        txt = self._tagStartTokenRE.sub(self._marker, txt)
+        txt = self._cachedTags.sub('CACHED.', txt)
+        def refreshSubber(match):
+            return 'REFRESH_' + match.group(1).replace('.','_') + '.'
+        txt = self._refreshTags.sub(refreshSubber, txt)
+        return txt
+    
     def initializeTemplateObj(self, templateObj):
         """Initialize the templateObj so that all the necessary attributes are
         in place for the tag-processing stage"""
@@ -128,20 +175,6 @@ class PlaceholderProcessor(TagProcessor):
             templateObj._componentsDict = {}       # you get the idea...
             templateObj._timedRefreshList = []
             templateObj._checkForCacheRefreshes = False
-
-    def mark(self, txt):
-        """Swap the $'s for a marker that can be parsed as valid python code.
-        Default is 'placeholder.'
-
-        Also mark whether the placeholder is to be statically cached or
-        timed-refresh cached"""
-        
-        txt = self._tagRE.sub(self._marker, txt)
-        txt = self._cachedTags.sub('CACHED.', txt)
-        def refreshSubber(match):
-            return 'REFRESH_' + match.group(1).replace('.','_') + '.'
-        txt = self._refreshTags.sub(refreshSubber, txt)
-        return txt
 
     def splitTxt(self, txt):
         

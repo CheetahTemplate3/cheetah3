@@ -13,19 +13,19 @@
 #end macro
 
 #macro insetBox(width=170, boxTitle='', boxContents='')
-<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$width>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$*width>
   <TR>
     <TD COLSPAN=3 HEIGHT=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
   </TR>
   <TR>
     <TD WIDTH=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
-    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD> ## force full width 
+    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$*mainTbl.outerFrameColor">#spacer()</TD> ## force full width 
     <TD WIDTH=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
   </TR>
   <TR>
     <TD WIDTH=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
-    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$mainTbl.innerFrameColor">  ## force full width 
-       <DIV CLASS="insetBoxTitleContainer"><DIV CLASS="insetBoxTitle">$boxTitle</DIV></DIV>
+    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$*mainTbl.innerFrameColor">  ## force full width 
+       <DIV CLASS="insetBoxTitleContainer"><DIV CLASS="insetBoxTitle">$*boxTitle</DIV></DIV>
     </TD>
     <TD WIDTH=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
   </TR>
@@ -51,7 +51,7 @@
   </TR>
 </TABLE>
 
-<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$width>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$*width>
   <TR>
     <TD HEIGHT=1 BGCOLOR="$*insetBoxes.frameColor">#spacer()</TD>
   </TR>

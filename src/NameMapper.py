@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.4 2001/07/13 18:09:39 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.5 2001/08/03 19:20:50 tavis_rudd Exp $
 
 """Utilities for accessing the members of an object via string representations
 of those members.  Template processing is its primary intended use.
@@ -58,13 +58,13 @@ Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
 License: This software is released for unlimited distribution
          under the terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/07/13 18:09:39 $
+Last Revision Date: $Date: 2001/08/03 19:20:50 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -127,8 +127,10 @@ def valueForName(obj, name, default=NoDefault, executeCallables=False):
 
 
 def valueForKey(obj, key, default=NoDefault):
-    """Get the value of the specified key.  The key can be a mapping item, an
-    attribute or an underscored attribute."""
+
+    """Get the value of the specified key.  The 'obj' can be a a mapping or any
+    Python object that supports the __getattr__ method. The key can be a mapping
+    item, an attribute or an underscored attribute."""
 
     if hasattr(obj, key):
         binding = getattr(obj, key)

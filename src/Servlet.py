@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.1 2001/06/13 03:50:39 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.2 2001/08/03 19:20:50 tavis_rudd Exp $
 """An abstract base class for Cheetah Servlets that can be used with Webware
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/06/13 03:50:39 $
+Last Revision Date: $Date: 2001/08/03 19:20:50 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -25,8 +25,16 @@ import CodeGenerator as CodeGen
 try: 
     from WebKit.HTTPServlet import HTTPServlet
 except:
-    class HTTPServlet:
-        pass
+    ## for testing from the commandline or with TR's experimental rewrite of WebKit
+    class HTTPServlet: 
+        _reusable = 1
+        _threadSafe = 0
+        
+        def awake(self, transaction):
+            pass
+        
+        def sleep(self, transaction):
+            pass
 
 ##################################################
 ## GLOBALS AND CONSTANTS ##
@@ -40,7 +48,7 @@ False = (0==1)
 class TemplateServlet(Template, HTTPServlet):
     """An abstract base class for Cheetah servlets that can be used with
     Webware"""
-
+   
     def __init__(self, template='', *searchList, **kw):
         """ """
         if not kw.has_key('settings'):

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.15 2001/08/02 19:50:11 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.16 2001/08/03 19:20:50 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.15 $
+Version: $Revision: 1.16 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/02 19:50:11 $
+Last Revision Date: $Date: 2001/08/03 19:20:50 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.15 $"[11:-2]
+__version__ = "$Revision: 1.16 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -93,7 +93,8 @@ class DisplayLogicProcessor(TagProcessor.TagProcessor):
             if tag[0:3] == 'for':
                 ##translate this #for $i in $list/# to this #for i in $list/#
                 INkeywordPos = tag.find(' in ')
-                tag = tag[0:INkeywordPos].replace('$','') + \
+                tag = tag[0:INkeywordPos].replace(
+                    templateObj.setting('placeholderStartToken'),'') + \
                                tag[INkeywordPos:]
     
                 ## register the local vars in the loop with the templateObj  ##
@@ -130,7 +131,8 @@ class SetDirectiveProcessor(TagProcessor.TagProcessor):
         validateSetDirective(templateObj, tag)
         
         firstEqualSign = tag.find('=')
-        varName = tag[0: firstEqualSign].replace('$','').strip()
+        varName = tag[0: firstEqualSign].replace(
+            templateObj.setting('placeholderStartToken'),'').strip()
         valueString = tag[firstEqualSign+1:]
         valueString = templateObj.translatePlaceholderVars(valueString,
                                                            executeCallables=True)
@@ -273,7 +275,8 @@ def preProcessMacroDirectives(templateObj, templateDef):
                 
         macroBody = match.group(2).replace("'''","\'\'\'")
 
-        def handleArgsUsedInBody(match, argNamesList=argNamesList):
+        def handleArgsUsedInBody(match, argNamesList=argNamesList,
+                                 templateObj=templateObj):
             """check each $var in the macroBody to see if it is in this macro's
             argNamesList and needs substituting"""
 
@@ -281,7 +284,8 @@ def preProcessMacroDirectives(templateObj, templateDef):
             if argName in argNamesList:
                 return "''' + str(" + argName + ") + '''"
             else:
-                return '${' + match.group(1) + '}'
+                return templateObj.setting('placeholderStartToken') + \
+                       '{' + match.group(1) + '}'
 
         processor = templateObj.placeholderProcessor
         macroBody = processor.wrapPlaceholders(
@@ -324,7 +328,7 @@ def preProcessLazyMacroCalls(templateObj, templateDef):
             
         except NameMapper.NotFound, name:
             line = lineNumFromPos(match.string, match.start())
-            raise Error('Undeclared variable $' + str(name) + \
+            raise Error('Undeclared variable ' + str(name) + \
                         ' used in macro call #'+ macroSignature + ' on line ' +
                         str(line))       
             
@@ -356,7 +360,7 @@ def preProcessExplicitMacroCalls(templateObj, templateDef):
             
         except NameMapper.NotFound, name:
             line = lineNumFromPos(match.string, match.start())
-            raise Error('Undeclared variable $' + str(name) + 
+            raise Error('Undeclared variable ' + str(name) + 
                         ' used in macro call #'+ macroSignature + 
                         ' on line ' + str(line))
 
@@ -399,7 +403,8 @@ def preProcessRawDirectives(templateObj, templateDef):
         unparsedBlock = match.group(1)
         blockID = '_' + str(id(unparsedBlock))
         templateObj._rawTextBlocks[blockID] = unparsedBlock
-        return '#include raw $rawTextBlocks.' + blockID + '/#' 
+        return '#include raw ' + templateObj.setting('placeholderStartToken') \
+               + 'rawTextBlocks.' + blockID + '/#' 
     
     if not hasattr(templateObj, '_rawTextBlocks'):
         templateObj._rawTextBlocks = {}
@@ -436,7 +441,7 @@ def preProcessIncludeDirectives(templateObj, templateDef):
             raw = True
             args= ' '.join(args.split()[1:])
 
-        if args[0] == '$':
+        if args[0] == templateObj.setting('placeholderStartToken'):
             searchList = templateObj.searchList()
             translatedArgs = templateObj.translatePlaceholderVars(args)
             includeString = eval( translatedArgs )
@@ -449,7 +454,8 @@ def preProcessIncludeDirectives(templateObj, templateDef):
         if raw:            
             includeID = '_' + str(id(includeString))
             templateObj._rawIncludes[includeID] = includeString
-            return '${rawIncludes.' + includeID + '}'
+            return templateObj.setting('placeholderStartToken') + \
+                   '{rawIncludes.' + includeID + '}'
         elif autoUpdate:
             includeID = '_' + str(id(includeString))
             nestedTemplate = Template.Template(
@@ -461,7 +467,8 @@ def preProcessIncludeDirectives(templateObj, templateDef):
             templateObj._parsedIncludes[includeID] = nestedTemplate
             if not hasattr(nestedTemplate, 'respond'):
                 nestedTemplate.startServer()
-            return '${parsedIncludes.' + includeID + '}'
+            return templateObj.setting('placeholderStartToken') + \
+                   '{parsedIncludes.' + includeID + '}'
         else:
             RESTART[0] = True
             return includeString
@@ -492,10 +499,12 @@ def preProcessBlockDirectives(templateObj, templateDef):
             markerEnd = templateObj._settings['blockMarkerEnd']
         
             replaceString = markerStart[0] + blockName + markerStart[1] + \
-                   '#include $cheetahBlocks.' + blockName + '/#' + \
+                   '#include ' + templateObj.setting('placeholderStartToken') + \
+                   'cheetahBlocks.' + blockName + '/#' + \
                    markerEnd[0] + blockName + markerEnd[1]
         else:
-            replaceString = '#include $cheetahBlocks.' + blockName + '/#'
+            replaceString = '#include ' + templateObj.setting('placeholderStartToken') + \
+                            'cheetahBlocks.' + blockName + '/#'
 
         return templateDef[0:startTagMatch.start()] + replaceString + \
                    templateDef[endTagMatch.end():]
@@ -553,10 +562,11 @@ def removeEmptyStrings(templateObj, generatedCode):
     
 ## varNotFound handlers ##
 def varNotFound_echo(templateObj, tag):
-    return "$" + tag
+    return templateObj.setting('placeholderStartToken') + tag
 
 def varNotFound_bigWarning(templateObj, tag):
-    return "="*15 + "&lt;$" + tag + " could not be found&gt;" + "="*15
+    return "="*15 + "&lt;" + templateObj.setting('placeholderStartToken') \
+           + tag + " could not be found&gt;" + "="*15
 
 def varNotFound_KeyError(templateObj, tag):
     raise KeyError("no '%s' in this Template Object's Search List" % tag)
