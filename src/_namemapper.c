@@ -5,10 +5,10 @@
 #include <stdlib.h>
 
 
-static PyObject *ErrorObject;   /* locally-raised exception */
+static PyObject *NotFound;   /* locally-raised exception */
 
 #define onError(message) \
-    { PyErr_SetString(ErrorObject, message); return NULL; }
+    { PyErr_SetString(NotFound, message); return NULL; }
 
 #define MAXCHUNKS 25		/* max num of nameChunks for the arrays */
 #define MAXNAMELEN 200		/* max num of chars in name */
@@ -75,7 +75,7 @@ PyNamemapper_valueFromSearchList(PyObject *searchList,
 				 int numChunks, 
 				 int executeCallables)
 {
-  PyObject *nameSpace;
+  PyObject *nameSpace = NULL;
   PyObject *theValue = NULL;
   int i;
   int listLen;
@@ -89,6 +89,8 @@ PyNamemapper_valueFromSearchList(PyObject *searchList,
     if (theValue) {		/* it might be NULL */
       PyErr_Clear();		/* clear possible NotFound errors */
       return theValue;
+    } else if (PyErr_Occurred() != NotFound) {
+      return NULL;
     }
   }
   return NULL;
@@ -202,8 +204,8 @@ void init_namemapper()
   
   /* add symbolic constants to the module */
   d = PyModule_GetDict(m);
-  ErrorObject = Py_BuildValue("s", "namemapper.error");   /* export exception */
-  PyDict_SetItemString(d, "NotFound", ErrorObject);       /* add more if need */
+  NotFound = Py_BuildValue("s", "namemapper.NotFound");   /* export exception */
+  PyDict_SetItemString(d, "NotFound", NotFound);       /* add more if need */
   
   /* check for errors */
   if (PyErr_Occurred())
