@@ -498,7 +498,8 @@ doesn't autocall instances.  If you {\em do} want to call the instance, do
 rename the method to \code{.\_\_str\_\_}, and it will be invoked any time 
 \code{\$myInstance} is used as a placeholder.  Note, however, that if
 \code{\$myInstance} is in an expression rather than being a placeholder,
-\code{.\_\_str\_\_} will not be invoked.
+\code{.\_\_str\_\_} will not be invoked.  Of course, you can always use
+\code{()} to force the calling in any case: \code{\$myInstance()}.
 
 \item Autocalling can be disabled via Cheetah's 'useAutocalling' compiler
 setting.
