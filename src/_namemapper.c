@@ -1,3 +1,16 @@
+/* ***************************************************************************
+This is the C language version of NameMapper.py.  See the comments and
+DocStrings in NameMapper for details on the purpose and interface of this
+module.
+
+===============================================================================
+$Id: _namemapper.c,v 1.29 2002/11/28 22:17:41 tavis_rudd Exp $
+Authors: Tavis Rudd <tavis@damnsimple.com>
+Version: $Revision: 1.29 $
+Start Date: 2001/08/07
+Last Revision Date: $Date: 2002/11/28 22:17:41 $
+*/
+
 /* *************************************************************************** */
 #include "Python.h"             /* Python header files */
 #include <string.h>
