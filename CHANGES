@@ -8,10 +8,7 @@ release
     support, which cStringIO does not provide. (TR/MO)
   - Utils.Misc.CheckKeywords(): prevent misspelled keyword arguments,
     used by Template constructor. (MO)
-  - "And the first shall be last": you must put the Template subclass last in
-    an #extends directive; e.g., '#extends MyMixIn, SiteTemplate'.  Previously,
-    one put the Template subclass first, but that prevented one from overriding
-    standard methods like .awake(). (Change in Compiler.py.) (MO)
+  - removed support for multiple inheritance (TR)
 
 0.9.12 (April 3, 2002)
    - no code changes from beta 2
