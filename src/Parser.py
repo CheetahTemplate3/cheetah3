@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.24 2001/10/11 03:39:39 tavis_rudd Exp $
+# $Id: Parser.py,v 1.25 2001/10/12 02:57:01 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.24 $
+Version: $Revision: 1.25 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/10/11 03:39:39 $
+Last Revision Date: $Date: 2001/10/12 02:57:01 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.24 $"[11:-2]
+__version__ = "$Revision: 1.25 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -937,11 +937,13 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             'cache': self.eatCache,
             'filter': self.eatFilter,
 
-            'attribute':self.eatAttribute,
+            'attr':self.eatAttr,
             'def': self.eatDef,
             'block': self.eatBlock,
 
-            'call': self.eatCall,
+            'silent': self.eatSilent,
+            'echo': self.eatEcho,
+            
             'set': self.eatSet,
             
             'while': self.eatWhile,
@@ -1221,12 +1223,12 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
                 self._templateObj.updateSettingsFromConfigStr(settingsStr, merge=merge)
 
 
-    def eatAttribute(self):
+    def eatAttr(self):
         lineClearToStartToken = self.lineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         startPos = self.pos()
         self.getDirectiveStartToken()
-        self.advance(len('attribute'))
+        self.advance(len('attr'))
         self.getWhiteSpace()
         
         if self.matchCheetahVarStart():
@@ -1362,15 +1364,23 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.closeDirective(lineClearToStartToken, endOfFirstLine)
 
 
-    def eatCall(self):
+    def eatSilent(self):
         lineClearToStartToken = self.lineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         self.getDirectiveStartToken()
-        self.advance(len('call'))
+        self.advance(len('silent'))
         self.getWhiteSpace()
         expr = self.getExpression()
         self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
-        self.addCall(expr)
+        self.addSilent(expr)
+
+    def eatEcho(self):
+        self.getDirectiveStartToken()
+        self.advance(len('silent'))
+        self.getWhiteSpace()
+        expr = self.getExpression()
+        self.closeDirective(False, self.pos())
+        self.addFilteredChunk(expr)
 
     def eatSet(self):
         lineClearToStartToken = self.lineClearToStartToken()
