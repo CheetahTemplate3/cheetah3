@@ -19,6 +19,8 @@ release
   - lots of work on the Users' Guide (MO)
   - implemented and tested an import hook for .tmpl files (TR):
       import MyTemplate  # will compile and import MyTemplate.tmpl
+  - made my True/False declarations friendly with Python 2.2.1, which already
+    includes True/False as builtins (TR)
 
 0.9.12 (April 3, 2002)
    - no code changes from beta 2

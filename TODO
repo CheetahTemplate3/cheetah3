@@ -9,10 +9,6 @@ Cheetah TODO list
 Languague Specification
 ================================================================================
 
-- decide if #extends should continue to work with multiple inheritance or if we
-  should delegate multiple inheritance (mixins, etc.) to pure Python base
-  classes.
-
 - revisit parsed #include directives.  Are they necessary at all??
   (This is a rhetorical question.  They are necessary.  However, the
   Users' Guide needs better examples about when and when not to use
@@ -24,19 +20,12 @@ Languague Specification
 
 - write a formalized grammar for Cheetah in BNF 
 
-
 Implementation
 ================================================================================
 
 - implement some better error handling for misformed #for, #if, #try directives,
   etc.  At the moment these errors are not caught until Python executes the
   code.
-
-- implement the automatic importing behaviour for the #extends directive
-
-- redesign and implement the Servlet Factory for Webware so the #extend
-  directive will work with .tmpl files as well as .py files.  This will require
-  a custom import method using python import hooks.
 
 - implement the #cache directive's varyBy keyword
 
@@ -48,17 +37,6 @@ Implementation
   -p (stdout) and -p (pickle); we'll have to rename -p (stdout) to something
   else, both in 'cheetah fill' and 'cheetah compile'.
 
-- Make template filling more thread safe.  .__init__ initializes self.mutex.
-  .respond acquires lock at beginning, and unlocks at end.  Do not compile the
-  template without acquiring the lock.  Remember to unlock in a try/finally
-  clause in case there's an exception.
-     This will not be completely sufficient.  If the user changes a 'self'
-  variable or searchList variable, it will leak into the other threads.  How
-  to avoid this while still giving multithreaded applications the benefit of
-  Cheetah caching?  Add a second mutex the threads can explicitly lock before
-  setting their variables?  This could affect performance if the threads take
-  a long time to do that.
-
 - 'python setup.py uninstall'.  This may require hacking an uninstall feature
   into distutils.
 
@@ -66,10 +44,6 @@ Implementation
   of only non-outputting directives and whitespace, delete the line from the
   output.  The only outputting directives I see are #echo, #block and
   #include.
-
-- Change all True/False definitions to try blocks that don't override
-  the built-in names if they exist.  (True & False were added to Python
-  2.2.1.)
 
 Test Suite
 ================================================================================
