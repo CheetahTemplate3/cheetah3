@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Misc.py,v 1.4 2002/06/23 19:32:10 hierro Exp $
+# $Id: Misc.py,v 1.5 2002/10/19 23:27:57 hierro Exp $
 """Miscellaneous functions/objects used by Cheetah but also useful standalone.
 
 Meta-Data
@@ -7,17 +7,26 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/11/07
-Last Revision Date: $Date: 2002/06/23 19:32:10 $
+Last Revision Date: $Date: 2002/10/19 23:27:57 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.4 $"[11:-2]
+__revision__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
 
-import types       # Used in UseOrRaise.
+import os          # Used in mkdirsWithPyInitFile.
+import types       # Used in useOrRaise.
+
+##################################################
+## CONSTANTS
+
+try:
+    True, False
+except NameError:
+    True, False = (1==1),(1==0)
 
 ##################################################
 ## PRIVATE FUNCTIONS
@@ -27,7 +36,7 @@ import types       # Used in UseOrRaise.
 ## MISCELLANEOUS FUNCTIONS
 
 #!/usr/bin/env python
-# $Id: Misc.py,v 1.4 2002/06/23 19:32:10 hierro Exp $
+# $Id: Misc.py,v 1.5 2002/10/19 23:27:57 hierro Exp $
 """Miscellaneous functions/objects used by Cheetah but also useful standalone.
 
 Meta-Data
@@ -35,17 +44,18 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/11/07
-Last Revision Date: $Date: 2002/06/23 19:32:10 $
+Last Revision Date: $Date: 2002/10/19 23:27:57 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.4 $"[11:-2]
+__revision__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
 
-import types       # Used in UseOrRaise.
+import sys         # Used in die.
+import types       # Used in useOrRaise.
 
 ##################################################
 ## PRIVATE FUNCTIONS
@@ -54,7 +64,12 @@ import types       # Used in UseOrRaise.
 ##################################################
 ## MISCELLANEOUS FUNCTIONS
 
-def UseOrRaise(thing, errmsg=''):
+def die(reason):
+    sys.stderr.write(reason + '\n')
+    sys.exit(1)
+
+
+def useOrRaise(thing, errmsg=''):
     """Raise 'thing' if it's a subclass of Exception.  Otherwise return it.
 
     Called by: Cheetah.Servlet.cgiImport()
@@ -63,7 +78,8 @@ def UseOrRaise(thing, errmsg=''):
         raise thing(errmsg)
     return thing
 
-def CheckKeywords(dic, legalKeywords, what='argument'):
+
+def checkKeywords(dic, legalKeywords, what='argument'):
     """Verify no illegal keyword arguments were passed to a function.
 
     in : dic, dictionary (**kw in the calling routine).
@@ -77,6 +93,34 @@ def CheckKeywords(dic, legalKeywords, what='argument'):
     for k in dic.keys(): # Can be dic.iterkeys() if Python >= 2.2.
         if k not in legalKeywords: 
             raise TypeError("'%s' is not a valid %s" % (k, what))
+
+
+def removeFromList(list_, *elements):
+    """Save as list_.remove(each element) but don't raise an error if
+       element is missing.  Modifies 'list_' in place!  Returns None.
+    """
+    for elm in elements:
+        try:
+            list_.remove(elm)
+        except ValueError:
+            pass
+
+
+def mkdirsWithPyInitFiles(path):
+    """Same as os.makedirs (mkdir 'path' and all missing parent directories)
+       but also puts a Python '__init__.py' file in every directory it
+       creates.  Does nothing (without creating an '__init__.py' file) if the
+       directory already exists.  
+    """
+    dir, fil = os.path.split(path)
+    if not os.path.exists(dir):
+        mkdirsWithPyInitFiles(dir)
+    if not os.path.exists(path):
+        os.mkdir(path)
+        init = os.path.join(path, "__init__.py")
+        f = open(init, 'w') # Open and close to produce empty file.
+        f.close()
+
 
 
 # vim: shiftwidth=4 tabstop=4 expandtab
