@@ -22,6 +22,8 @@ Requirements for 1.0
 - Add an example in the distribution of a simplified SkeletonPage
   that used #block but does not have fancy esoteric methods like
   style stuff. (MO)
+- fix the --stdout option of CheetahWrapper so that it only prints
+  the generated python code.(TR)
 
 
 Other TODO Items
