@@ -41,8 +41,15 @@ Other TODO Items
     method(s) to stdout, with line numbers based on the .py template module.  
     Make a Template method to do the same thing, a la .generatedModuleCode().
   * Refactor, make compile/fill/code routines callbacks using a bundle arg.
+  * If an input file ends in a dot, intelligently add the input extension if
+    not found.
 
 - Debugging tools.  See section below.
+
+- Add --error option to compiled templates and "cheetah fill".  It would
+  activate the Echo error catcher for debugging.  (Maybe --list-errors to
+  suppress output and instead list the not found placeholders?  Less
+  important.)
 
 - Provide a utility to list the names of all placeholders in the template.
   Requested by Tracy Ruggles on Feb 21, 2003.
@@ -81,8 +88,8 @@ Other TODO Items
   http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx
   http://www.owlfish.com/software/simpleTAL/index.html
 
-Dump Tools
-==========
+Debugging Tools (Dump Tools)
+============================
 It would be nice to provide debugging tools for users who can't figure
 out why a certain placeholder value isn't found or is being overridden.  
 My idea is to define $dumpSearchList() and $dumpSearchListFlat() in
