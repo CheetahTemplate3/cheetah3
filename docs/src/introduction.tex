@@ -77,9 +77,9 @@ Cheetah aims:
      on each other's toes and polluting each other's work.  The HTML framework
      and the content it contains are two separate things, and analytical
      calculations (program code) is a third thing.  Each team member should be
-     able to concentrate on her specialty and to implement her changes without
-     having to go through one of the others (i.e., the ``webmaster
-     bottleneck'').
+     able to concentrate on their specialty and to implement their changes
+     without having to go through one of the others (i.e., the dreaded
+     ``webmaster bottleneck'').
 
      Other advantages to separation include:
      \begin{itemize}
@@ -191,7 +191,21 @@ Esterbrook, Ian Bicking and Tom Schwaller are the core developers.
 \subsection{How mature is Cheetah?}
 \label{intro.mature}
 
-Cheetah is alpha-level software because the user interface is still evolving.
+Cheetah is alpha/beta software as this Users' Guide is incomplete and several
+aspects of the design are still subject to change. We are hoping to release
+production version 1.0 in the summer of 2001.
+
+Here's a summary of known issues and aspects of the design that are in flux.
+\begin{itemize}
+\item The \#include directive is not working with relative path file includes
+     when used with Webware. This should be resolved soon.
+\item The \#include directive is being reworked to monitor for changes in the
+     included file at run-time. It currently does the include once-off at
+     compile-time.
+\item The parsing of macros is currently being worked on to make it more
+     robust.  However, the macro interface is stable.
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Where can I get releases?}
