@@ -251,3 +251,25 @@ to change configuration settings after instantiation.
 
 If the environmental variable \code{CHEETAH\_DEBUG} is True, the template will
 run in debug mode.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Subclasses}
+
+\begin{description}
+
+\item{Cheetah.Servlet.TemplateServlet}  ``An asbstract base class for Cheetah
+     servlets that can be used with Webware.''  The constructor is the same.
+     There is an \code{.initializeTemplate()} method you can override to do
+     setup before the template is compiled.  This class also inherits from
+     \code{WebKit.HTTPServlet.HTTPServlet} if Webware is available.  (If not,
+     it fakes it with an empty class called HTTPServlet.)
+
+\item{Cheetah.Templates.SkeletonPage}  A TemplateServlet subclass suitable as
+     a \code{WebKit.Page}-like superclass for your site.  The Template 
+     Definition encompasses an entire HTML page, with blocks for the content,
+     page header/footer, sidebars, etc, features for stylesheed dictionaries,
+     HEAD tags, BODY attributes, etc.  An example of a site using this is in
+     the \bf{examples/webware\_examples/} directory.
+
+\end{description}
