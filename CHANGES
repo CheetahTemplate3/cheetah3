@@ -45,7 +45,9 @@ release
     implementation uses 
      valueFromSearchList([locals()] + searchList + [globals()], rest of the args) 
     for all lookups. (TR)
-
+  - removed the #settings directive (TR)
+  - added the #del directive, for using Python's del statement (TR)
+   
 
 0.9.14 (July 14, 2002)
   - Precompiled template Templates/SkeletonPage.py added to CVS.  This file is
