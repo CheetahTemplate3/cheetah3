@@ -4,8 +4,8 @@ release
 
 0.9.13b1 (unreleased)
   - Was going to import cStringIO instead of StringIO, but it made the 
-    DummyTransaction.py unittest fail so I undid it.  Cheetah requires Unicode
-    support, which cStringIO does not provide. (TR/MO)
+    DummyTransaction.py unittest fail so I undid it.  Cheetah aims to provide
+    Unicode support, which cStringIO does not provide. (TR/MO)
   - Utils.Misc.CheckKeywords(): prevent misspelled keyword arguments,
     used by Template constructor. (MO)
   - removed support for multiple inheritance (TR)
@@ -28,7 +28,8 @@ release
         // a comment
         #compiler reset
 	// no longer a comment
-  - fixed the bug that Edmund Lian found in .addSet() when useNameMapper = 0 (TR)
+  - fixed the bug that Edmund Lian found in .addSet() when useNameMapper = 0
+  (TR)
   - fixed bug in comment creation using lineCol that Mike found (TR)
 
 0.9.12 (April 3, 2002)
