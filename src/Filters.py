@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.21 2003/11/25 08:17:56 tavis_rudd Exp $
+# $Id: Filters.py,v 1.22 2003/11/25 08:44:55 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -10,12 +10,12 @@ would otherwise require a real template object).
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.21 $
+Version: $Revision: 1.22 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2003/11/25 08:17:56 $
+Last Revision Date: $Date: 2003/11/25 08:44:55 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.21 $"[11:-2]
+__revision__ = "$Revision: 1.22 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -266,6 +266,8 @@ def test():
     print "       Strip:", `Strip().filter(s2)`
     print "StripSqueeze:", `StripSqueeze().filter(s2)`
 
+    print "Unicode:", `EncodeUnicode().filter(u'aoeu12345\u1234')`
+    
 if __name__ == "__main__":  test()
     
 # vim: shiftwidth=4 tabstop=4 expandtab
