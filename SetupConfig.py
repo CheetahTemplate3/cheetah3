@@ -10,6 +10,7 @@ packages = ['Cheetah',
             'Cheetah.Tests',
             'Cheetah.Tools',
             'Cheetah.Utils',
+	    'Cheetah.Utils.optik',
             ]
 extra_path = 'Webware'
 package_dir = {'Cheetah':'src'}
