@@ -5,14 +5,14 @@
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.22 $
+Version: $Revision: 1.23 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2002/07/31 16:55:03 $
+Last Revision Date: $Date: 2002/09/16 03:26:36 $
 """
 
-# $Id: SettingsManager.py,v 1.22 2002/07/31 16:55:03 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.23 2002/09/16 03:26:36 hierro Exp $
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.22 $"[11:-2]
+__revision__ = "$Revision: 1.23 $"[11:-2]
 
 
 ##################################################
@@ -557,9 +557,7 @@ class SettingsManager(_SettingsCollector):
     def updateSettingsFromConfigStr(self, configStr, convert=True, merge=True):
         
         """See the docstring for .updateSettingsFromConfigFile()
-
-        The caller of this method is responsible for closing the inFile file
-        object."""
+        """
 
         configStr = '[globals]\n' + configStr
         inFile = StringIO(configStr)
@@ -570,14 +568,18 @@ class SettingsManager(_SettingsCollector):
 
     ## methods for output representations of the settings
 
-    def _createConfigFile(self, outFile=StringIO()):
+    def _createConfigFile(self, outFile=None):
         
-        """Write all the settings that can be represented as strings to an .ini
+        """
+        Write all the settings that can be represented as strings to an .ini
         style config string.
 
         This method can only handle one level of nesting and will only work with
-        numbers, strings, and None."""
+        numbers, strings, and None.
+	    """
 
+        if outFile is None:
+            outFile = StringIO()
         iniSettings = {'Globals':{}}
         globals = iniSettings['Globals']
         
@@ -622,4 +624,4 @@ class SettingsManager(_SettingsCollector):
         
         return self._createConfigFile().getvalue()
 
-
+# vim: shiftwidth=4 tabstop=4 expandtab
