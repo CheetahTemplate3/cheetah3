@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.8 2001/07/13 18:09:39 tavis_rudd Exp $
+# $Id: Template.py,v 1.9 2001/07/13 22:52:01 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/13 18:09:39 $
+Last Revision Date: $Date: 2001/07/13 22:52:01 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 
 ##################################################
@@ -529,6 +529,10 @@ class Template(SettingsManager):
    
 
     ## utility functions ##
+    def translatePath(self, path):
+        """A hook to enable proper handling of server-side paths with Webware """
+        return path
+    
     def getFileContents(self, fileName):
         fp = open(fileName,'r')
         output = fp.read()
