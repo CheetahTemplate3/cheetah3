@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.2 2002/10/20 19:55:24 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.3 2002/11/10 09:08:16 hierro Exp $
 """Tests for the 'cheetah' command.
 
-Besides unittest usage, recognizes the following options:
+Besides unittest usage, recognizes the following command-line options:
     --list CheetahWrapper.py
         List all scenarios that are tested.  The argument is the path
         of this script.
@@ -14,12 +14,12 @@ Besides unittest usage, recognizes the following options:
 Meta-Data
 ================================================================================
 Author: Mike Orr <iron@mso.oz.net>,
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2002/10/20 19:55:24 $
+Last Revision Date: $Date: 2002/11/10 09:08:16 $
 """
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.2 $"[11:-2]
+__revision__ = "$Revision: 1.3 $"[11:-2]
 
 
 ##################################################
@@ -29,6 +29,7 @@ import commands, os, shutil, sys, tempfile
 import unittest_local_copy as unittest
 
 import re                                     # Used by listTests.
+from Cheetah.CheetahWrapper import CheetahWrapper  # Used by NoBackup.
 from Cheetah.Utils.optik import OptionParser  # Used by main.
 
 ##################################################
@@ -42,6 +43,8 @@ except NameError:
 DELETE = True # True to clean up after ourselves, False for debugging.
 OUTPUT = False # Normally False, True for debugging.
 
+BACKUP_SUFFIX = CheetahWrapper.BACKUP_SUFFIX
+
 def warn(msg):
     sys.stderr.write(msg + '\n')
 
@@ -51,8 +54,10 @@ def warn(msg):
 class CFBase(unittest.TestCase):
     """Base class for "cheetah compile" and "cheetah fill" unit tests.
     """
+    srcDir = '' # Nonblank to create source directory.
     subdirs = ('child', 'child/grandkid') # Delete in reverse order.
     srcFiles = ('a.tmpl', 'child/a.tmpl', 'child/grandkid/a.tmpl')
+    expectError = False # Used by --list option.
 
     def inform(self, message):
         if self.verbose:
@@ -68,6 +73,8 @@ class CFBase(unittest.TestCase):
         os.mkdir(scratchDir)
         self.origCwd = os.getcwd()
         os.chdir(scratchDir)
+        if self.srcDir:
+            os.mkdir(self.srcDir)
         # Step 2: Create source subdirectories.
         for dir in self.subdirs:
             os.mkdir(dir)
@@ -145,6 +152,14 @@ Found %(result)r"""
         msg = "destination init file missing: %s" % initPath
         self.failUnless(exists, msg)
 
+
+    def checkNoBackup(self, path):
+        """Verify 'path' does not exist.  (To check --nobackup.)
+        """
+        exists = os.path.exists(path)
+        msg = "backup file exists in spite of --nobackup: %s" % path
+        self.failIf(exists, msg)
+
     
     def go(self, cmd, expectedStatus=0, expectedOutputSubstring=None):
         """Run a "cheetah compile" or "cheetah fill" subcommand.
@@ -192,9 +207,9 @@ Found %(result)r"""
         exit, output = commands.getstatusoutput(cmd)
         status, signal = divmod(exit, 256)
         msg = "subcommand killed by signal %s: %s" % (signal, cmd)
-        self.failUnlessEqual(signal, 0, msg)
+        self.failUnlessEqual(signal, 0, msg) # Signal must be 0.
         msg = "subcommand exit status %s: %s" % (status, cmd)
-        self.failUnlessEqual(status, 0, msg)
+        self.failIfEqual(status, 0, msg) # Status must *not* be 0.
         if OUTPUT:
             if output.endswith("\n"):
                 output = output[:-1]
@@ -202,6 +217,15 @@ Found %(result)r"""
             print "SUBCOMMAND:", cmd
             print output
             print
+
+
+class CFIdirBase(CFBase):
+    """Subclass for tests with --idir.
+    """
+    srcDir = 'SRC'
+    subdirs = ('SRC/child', 'SRC/child/grandkid') # Delete in reverse order.
+    srcFiles = ('SRC/a.tmpl', 'SRC/child/a.tmpl', 'SRC/child/grandkid/a.tmpl')
+
 
 
 ##################################################
@@ -346,12 +370,169 @@ class VarietyWithOdir(CFBase):
         self.checkFill("DEST/child/grandkid/a.txt")
 
 
+class RecurseExplicit(CFBase):
+    def testCompile(self):
+        self.go("cheetah compile -R child")
+        self.checkCompile("child/a.py")
+        self.checkCompile("child/grandkid/a.py")
+
+    def testFill(self):
+        self.go("cheetah fill -R child")
+        self.checkFill("child/a.html")
+        self.checkFill("child/grandkid/a.html")
+
+    def testText(self):
+        self.go("cheetah fill -R --oext txt child")
+        self.checkFill("child/a.txt")
+        self.checkFill("child/grandkid/a.txt")
+
+
+class RecurseImplicit(CFBase):
+    def testCompile(self):
+        self.go("cheetah compile -R")
+        self.checkCompile("child/a.py")
+        self.checkCompile("child/grandkid/a.py")
+
+    def testFill(self):
+        self.go("cheetah fill -R")
+        self.checkFill("a.html")
+        self.checkFill("child/a.html")
+        self.checkFill("child/grandkid/a.html")
+
+    def testText(self):
+        self.go("cheetah fill -R --oext txt")
+        self.checkFill("a.txt")
+        self.checkFill("child/a.txt")
+        self.checkFill("child/grandkid/a.txt")
+
+
+class RecurseExplicitWIthOdir(CFBase):
+    def testCompile(self):
+        self.go("cheetah compile -R --odir DEST child")
+        self.checkSubdirPyInit("DEST/child")
+        self.checkSubdirPyInit("DEST/child/grandkid")
+        self.checkCompile("DEST/child/a.py")
+        self.checkCompile("DEST/child/grandkid/a.py")
+
+    def testFill(self):
+        self.go("cheetah fill -R --odir DEST child")
+        self.checkFill("DEST/child/a.html")
+        self.checkFill("DEST/child/grandkid/a.html")
+
+    def testText(self):
+        self.go("cheetah fill -R --odir DEST --oext txt child")
+        self.checkFill("DEST/child/a.txt")
+        self.checkFill("DEST/child/grandkid/a.txt")
+
+
+class Flat(CFBase):
+    def testCompile(self):
+        self.go("cheetah compile --flat child/a.tmpl")
+        self.checkCompile("a.py")
+
+    def testFill(self):
+        self.go("cheetah fill --flat child/a.tmpl")
+        self.checkFill("a.html")
+
+    def testText(self):
+        self.go("cheetah fill --flat --oext txt child/a.tmpl")
+        self.checkFill("a.txt")
+
+
+class FlatRecurseCollision(CFBase):
+    expectError = True
+
+    def testCompile(self):
+        self.goExpectError("cheetah compile -R --flat")
+
+    def testFill(self):
+        self.goExpectError("cheetah fill -R --flat")
+
+    def testText(self):
+        self.goExpectError("cheetah fill -R --flat")
+
+
+class IdirRecurse(CFIdirBase):
+    def testCompile(self):
+        self.go("cheetah compile -R --idir SRC child")
+        self.checkSubdirPyInit("child")
+        self.checkSubdirPyInit("child/grandkid")
+        self.checkCompile("child/a.py")
+        self.checkCompile("child/grandkid/a.py")
+
+    def testFill(self):
+        self.go("cheetah fill -R --idir SRC child")
+        self.checkFill("child/a.html")
+        self.checkFill("child/grandkid/a.html")
+
+    def testText(self):
+        self.go("cheetah fill -R --idir SRC --oext txt child")
+        self.checkFill("child/a.txt")
+        self.checkFill("child/grandkid/a.txt")
+
+
+class IdirOdirRecurse(CFIdirBase):
+    def testCompile(self):
+        self.go("cheetah compile -R --idir SRC --odir DEST child")
+        self.checkSubdirPyInit("DEST/child")
+        self.checkSubdirPyInit("DEST/child/grandkid")
+        self.checkCompile("DEST/child/a.py")
+        self.checkCompile("DEST/child/grandkid/a.py")
+
+    def testFill(self):
+        self.go("cheetah fill -R --idir SRC --odir DEST child")
+        self.checkFill("DEST/child/a.html")
+        self.checkFill("DEST/child/grandkid/a.html")
+
+    def testText(self):
+        self.go("cheetah fill -R --idir SRC --odir DEST --oext txt child")
+        self.checkFill("DEST/child/a.txt")
+        self.checkFill("DEST/child/grandkid/a.txt")
+
+
+class IdirFlatRecurseCollision(CFIdirBase):
+    expectError = True
+
+    def testCompile(self):
+        self.goExpectError("cheetah compile -R --flat --idir SRC")
+
+    def testFill(self):
+        self.goExpectError("cheetah fill -R --flat --idir SRC")
+
+    def testText(self):
+        self.goExpectError("cheetah fill -R --flat --idir SRC --oext txt")
+
+
+class NoBackup(CFBase):
+    """Run the command twice each time and verify a backup file is 
+       *not* created.
+    """
+    def testCompile(self):
+        self.go("cheetah compile --nobackup a.tmpl")
+        self.go("cheetah compile --nobackup a.tmpl")
+        self.checkNoBackup("a.py" + BACKUP_SUFFIX)
+
+    def testFill(self):
+        self.go("cheetah fill --nobackup a.tmpl")
+        self.go("cheetah fill --nobackup a.tmpl")
+        self.checkNoBackup("a.html" + BACKUP_SUFFIX)
+
+    def testText(self):
+        self.go("cheetah fill --nobackup --oext txt a.tmpl")
+        self.go("cheetah fill --nobackup --oext txt a.tmpl")
+        self.checkNoBackup("a.txt" + BACKUP_SUFFIX)
+
+
+
+
 
 ##################################################
 ## LIST TESTS ##
 
 def listTests(cheetahWrapperFile):
     """cheetahWrapperFile, string, path of this script.
+
+       XXX TODO: don't print test where expectError is true.
     """
     rx = re.compile( R'self\.go\("(.*?)"\)' )
     f = open(cheetahWrapperFile)
