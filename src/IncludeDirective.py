@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: IncludeDirective.py,v 1.14 2001/09/17 06:04:40 tavis_rudd Exp $
+# $Id: IncludeDirective.py,v 1.15 2001/09/18 03:04:17 tavis_rudd Exp $
 """IncludeDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.14 $
+Version: $Revision: 1.15 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/09/17 06:04:40 $
+Last Revision Date: $Date: 2001/09/18 03:04:17 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.14 $"[11:-2]
+__version__ = "$Revision: 1.15 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -82,11 +82,7 @@ class IncludeDirective(TagProcessor.TagProcessor):
         ## deal with any extra args to the #include directive
         if EXPR.split()[0] == 'raw':
             raw = True
-            EXPR= ' '.join(EXPR.split()[1:])
-        elif EXPR.split()[0] == 'direct':
-            directInclude = True
-            EXPR= ' '.join(EXPR.split()[1:])
-            
+            EXPR= ' '.join(EXPR.split()[1:])         
 
         if EXPR.startswith('source'): # include the value of the EXPR 
             includeFrom = 'str'
@@ -102,15 +98,3 @@ class IncludeDirective(TagProcessor.TagProcessor):
             ', trans, includeFrom="' + includeFrom + '", raw=' + str(raw) + ')\n'
             + indent*self.state()['indentLevel'] )
     
-    def __processTag(self, templateDef):
-        import Template                         # import it here to avoid circ. imports
-        self.RESTART = False
-
-        for RE in self._delimRegexs:
-            templateDef = RE.sub(self.handleInclude, templateDef)
-            
-        if self.RESTART:
-            self.RESTART = False
-            return Template.RESTART(templateDef)
-        else:
-            return templateDef
