@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.38 2001/08/13 22:01:28 tavis_rudd Exp $
+# $Id: Template.py,v 1.39 2001/08/14 06:04:13 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.38 $
+Version: $Revision: 1.39 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/13 22:01:28 $
+Last Revision Date: $Date: 2001/08/14 06:04:13 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.38 $"[11:-2]
+__version__ = "$Revision: 1.39 $"[11:-2]
 
 
 ##################################################
@@ -33,11 +33,8 @@ import os.path                    # used in Template.normalizePath()
 from SettingsManager import SettingsManager
 from Parser import Parser, processTextVsTagsList
 from NameMapper import valueFromSearchList, valueForName # this is used in the generated code
-import CodeGenerator as CodeGen
-
 from TagProcessor import TagProcessor
-
-from ErrorChecker import ErrorChecker
+import ErrorCheckers
 
 from PlaceholderProcessor import PlaceholderProcessor
 from DisplayLogic import DisplayLogic
@@ -80,22 +77,29 @@ class RESTART:
 class Template(SettingsManager, Parser):
     """The core template engine: parses, compiles, and serves templates."""
     _settings = {
-        'formatter':str,
-        'interactiveFormatter':False,
-        'useAutocalling': True,
-        'delayedCompile': False,            
-        'plugins':[],
-        'errorCheckerClass': None,#ErrorChecker,#None,
-        'debug': False,
-        'keepCodeGeneratorResults': False,
-        'blockMarkerStart':['<!-- START BLOCK: ',' -->'],
-        'blockMarkerEnd':['<!-- END BLOCK: ',' -->'],
-        'includeBlockMarkers': False,
+        'delayedCompile': False,
+        
         'placeholderStartToken':'$',
         'directiveStartToken':'#',
         'directiveEndToken':'/#',
         'singleLineComment':'##',
         'multiLineComment':['#*','*#'],
+
+        'formatter':str,
+        'interactiveFormatter':False,
+        
+        'useAutocalling': True,
+
+        'plugins':[],
+
+        'errorChecker':None,
+        'errorCheckerClass': None,
+        'debug': False,
+        'keepCodeGeneratorResults': False,        
+
+        'blockMarkerStart':['<!-- START BLOCK: ',' -->'],
+        'blockMarkerEnd':['<!-- END BLOCK: ',' -->'],
+        'includeBlockMarkers': False,
         
         ## The rest of this stuff is mainly for internal use
         'placeholderMarker':' placeholderTag.',
@@ -222,25 +226,69 @@ class Template(SettingsManager, Parser):
         if os.environ.get('CHEETAH_DEBUG'):
             self._settings['debug'] = True
 
+        ## Now, start compile if we're meant to
+        if not self.setting('delayedCompile'):
+            self.compileTemplate()
 
-        ##  a hook for calculated settings    
-        self.initializeSettings()       
 
-        ## create theFormatters dict now for storing refs to the formatter functions
-        self._theFormatters = {}
+    
+    def compileTemplate(self):
+        """Process and parse the template, then compile it into a function definition
+        that is bound to self.__str__() and self.respond()"""
+
+        self._errorMsgStack = []
+
+        ## hook for calculated settings before the tagProcessors have been setup 
+        self.initializeSettings()
 
         ## Setup the Parser base-class and the various TagProcessors
         Parser.__init__(self) # do this before calling self.setupTagProcessors()
+        
+        ## create theFormatters dict now for storing refs to the formatter functions
+        self._theFormatters = {}
+        self._defaultFormatter = self.setting('formatter')
+        self._theFormatters['default'] = self._defaultFormatter
+
+        ## handle 'errorChecker' if neccessary
+        if self.setting('errorChecker') and not self.setting('errorCheckerClass'):
+            try:
+                klass = getattr(ErrorCheckers, self.setting('errorChecker'))
+                self.setSetting('errorCheckerClass', klass)
+            except:
+                ## @@once we've implemented the error-logging framework implement this
+                pass
+
+        if self.setting('errorCheckerClass'):
+            errorChecker = self.setting('errorCheckerClass')(self)
+            self._errorChecker = errorChecker
+        else:
+            self._errorChecker = None
+
+        ## Setup the various TagProcessors
         self.setupTagProcessors()
+
+        ## hook for calculated settings after the tagProcessors have been setup 
+        self.finalizeSettings()       
 
         ## register the Plugins after everything else has been done, but
         #  before the template has been compiled.
         for plugin in self._settings['plugins']:
             self._registerCheetahPlugin(plugin)
+        
+        generatedFunction = self._codeGenerator( self._templateDef )
+        self.__str__ = self._bindFunctionAsMethod( generatedFunction )
+        self.respond = self._bindFunctionAsMethod( generatedFunction )
+        
+        if not self._settings['keepCodeGeneratorResults']:
+            self._codeGeneratorResults = {}       
 
-        ## Now, start compile if we're meant to
-        if not self.setting('delayedCompile'):
-            self.compileTemplate()
+    ## make an alias
+    recompile = compileTemplate
+
+    def finalizeSettings(self):
+        """A hook for calculated settings. This method is called by
+        self.compileTemplate() after it calls self.setupTagProcessors."""
+        pass
 
     def setupTagProcessors(self):
         """Setup the tag processors."""
@@ -328,47 +376,11 @@ class Template(SettingsManager, Parser):
                                  'formatterDirective':formatterDirective,
                                  },
             
-            'generatedCodeFilters':[('addPerResponseCode',
-                                     CodeGen.addPerResponseCode),
-                                    ],
+            'generatedCodeFilters':[],
             }
                             ) # self.updateSettings(...
         
-        #end of self.initializeSettings()
-
-        
-    def searchList(self):
-        """Return a reference to the searchlist"""
-        return self._searchList
-    
-    def addToSearchList(self, object, restart=False):
-        """Append an object to the end of the searchlist.""" 
-        self._searchList.append(object)
-        
-        if restart:
-            ## @@ change the restart default to False once we implement run-time
-            # $placeholder translation.
-            self.compileTemplate()
-
-    def compileTemplate(self):
-        """Process and parse the template, then compile it into a function definition
-        that is bound to self.__str__() and self.respond()"""
-        
-        self._errorMsgStack = []
-        generatedFunction = self._codeGenerator( self._templateDef )
-        self.__str__ = self._bindFunctionAsMethod( generatedFunction )
-        self.respond = self._bindFunctionAsMethod( generatedFunction )
-        
-        if not self._settings['keepCodeGeneratorResults']:
-            self._codeGeneratorResults = {}       
-
-    ## make an alias
-    recompile = compileTemplate
-
-    def state(self):
-        """Return a reference to self._codeGeneratorState. This is used by the
-        tag processors."""
-        return self._codeGeneratorState
+        #end of self.setupTagProcessors()
     
     def _codeGenerator(self, templateDef):
         
@@ -401,18 +413,10 @@ class Template(SettingsManager, Parser):
         results = self._codeGeneratorResults = {}
         state = self._codeGeneratorState = {}
         self._localVarsList = []   # used to track vars from #set and #for
-        
-        self._defaultFormatter = self.setting('formatter')
-        self._theFormatters['default'] = self._defaultFormatter
+
         state['currFormatter'] = 'default'
         state['interactiveFormatter'] = self.setting('interactiveFormatter')
-        
-        if self.setting('errorCheckerClass'):
-            errorChecker = self.setting('errorCheckerClass')(self)
-            self._errorChecker = errorChecker
-        else:
-            self._errorChecker = None
-        
+                       
         try:
             ## stage 1 - preProcessing of the template string ##
             stage = 1
@@ -474,13 +478,13 @@ class Template(SettingsManager, Parser):
             indent = settings['indentationStep']
             generatedCode = \
                           "def generatedFunction(self, trans=None, iAmNested=False," + \
-                          "format=self._defaultFormatter, " + \
+                          "format=self._defaultFormatter,\n " + \
                           "searchList=self._searchList, " + \
-                          "setVars=self._setVars, " + \
+                          "setVars=self._setVars,\n " + \
                           "checkForCacheRefreshes=self._checkForCacheRefreshes, " + \
-                          "timedRefreshCache=self._timedRefreshCache, " + \
+                          "timedRefreshCache=self._timedRefreshCache,\n " + \
                           "timedRefreshList=self._timedRefreshList, " + \
-                          "timedRefresh=self._timedRefresh, " + \
+                          "timedRefresh=self._timedRefresh,\n " + \
                           "errorChecker=self._errorChecker" + \
                           "):\n" \
                           + indent * 1 + "try:\n" \
@@ -502,11 +506,20 @@ class Template(SettingsManager, Parser):
                           + indent * 1 + "except:\n" \
                           + indent * 2 + "print self._settings['responseErrorHandler']()\n" \
                           + indent * 2 + "raise\n" \
+
             
+            perResponseSetupCode = ''
+            for tagProcessor, codeChunk in self._perResponseSetupCodeChunks.items():
+                perResponseSetupCode += codeChunk
+            def insertCode(match, perResponseSetupCode=perResponseSetupCode):
+                return match.group() + perResponseSetupCode
+            generatedCode = re.sub(r'#setupCodeInsertMarker\n', insertCode , generatedCode)
+
             if debug: results['stage3'].append( ('generatedCode', generatedCode) )
 
             
             ## stage 4 - final filtering of the generatedCode  ##
+            # - this is an unused hook as of Aug 2001
             stage = 4
             if debug: results['stage4'] = []
             for filter in settings['generatedCodeFilters']:
@@ -529,8 +542,29 @@ class Template(SettingsManager, Parser):
             ## call masterErrorHandler, which in turn calls the ErrorHandler ##
             # for the stage in which the error occurred
             print settings['masterErrorHandler']()
-            raise
-            
+            raise          
+        
+    def searchList(self):
+        """Return a reference to the searchlist"""
+        return self._searchList
+    
+    def addToSearchList(self, object, restart=False):
+        """Append an object to the end of the searchlist.""" 
+        self._searchList.append(object)
+        
+        if restart:
+            ## @@ change the restart default to False once we implement run-time
+            # $placeholder translation.
+            self.compileTemplate()
+
+    def state(self):
+        """Return a reference to self._codeGeneratorState. This is used by the
+        tag processors."""
+        return self._codeGeneratorState
+
+    def errorChecker(self):
+        """Return a reference to the errorChecker"""
+        return self._errorChecker
 
     def mergeNewTemplateData(self, newDataDict):
         """Merge the newDataDict into self.__dict__. This is a recursive merge
@@ -551,7 +585,7 @@ class Template(SettingsManager, Parser):
         This method is called automatically by __init__() method and should not
         be called by end-users."""
         
-        plugin.bindToTemplate(self)
+        plugin(self)
         
     def _bindFunctionAsMethod(self, function):
         """Used to dynamically bind a plain function as a method of the
@@ -708,38 +742,6 @@ class Template(SettingsManager, Parser):
         output = fp.read()
         fp.close()
         return output
-        
-    def getUnknowns(self):
-        """
-        Returns a sorted list of Placeholder Names which are missing in the
-        Search List.
-        """
-        class Accumulator:
-            """
-            Accumulate unique values.  This is essentially a set class.
-            The 'include' method returns '' as a side effect so that it may
-            be used as a CodeGenerator.varNotFound_* replacement.
-            """
-            def __init__(self):
-                self.data = {}
-            def include(self, templateObj, tag):
-                """Add a tag to the set."""
-                self.data[tag] = 1
-                return ''
-            def result(self):
-                """Return the list of tags in the set, sorted."""
-                ret = self.data.keys()
-                ret.sort()
-                return ret
-        originalHandler = self.setting('varNotFound_handler')
-        accum = Accumulator()
-        self.setSetting('varNotFound_handler', accum.include)
-        try:
-            str(self) # Fill the Template Object and throw away the result.
-            unknowns = accum.result()
-        finally:
-            self.setSetting('varNotFound_handler', originalHandler)
-        return unknowns
             
     
     def runAsMainProgram(self):
