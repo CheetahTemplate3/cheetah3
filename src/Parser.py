@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.28 2001/11/06 03:49:43 tavis_rudd Exp $
+# $Id: Parser.py,v 1.29 2001/11/07 18:18:05 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.28 $
+Version: $Revision: 1.29 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/11/06 03:49:43 $
+Last Revision Date: $Date: 2001/11/07 18:18:05 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.28 $"[11:-2]
+__version__ = "$Revision: 1.29 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1509,9 +1509,9 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
                 self.addChunk('filter = self._initialFilter')
             else:
                 # is string representing the name of builtin filter
+                self.addChunk('filterName = ' + repr(theFilter))
                 self.addChunk('if self._filters.has_key("' + theFilter + '"):')
                 self.indent()
-                self.addChunk('filterName = ' + repr(theFilter))
                 self.addChunk('filter = self._currentFilter = self._filters[filterName]')
                 self.dedent()
                 self.addChunk('else:')
