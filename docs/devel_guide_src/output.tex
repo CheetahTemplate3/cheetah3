@@ -1,6 +1,140 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Directives: Output}
 \label{output}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\#echo}
+\label{output.echo}
+
+The template:
+\begin{verbatim}
+Here is my #echo ', '.join(['silly']*5) # example
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+Here is my silly, silly, silly, silly, silly example
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+write('Here is my ')
+write(filter(', '.join(['silly']*5) ))
+write(' example\n')
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\#silent}
+\label{output.silent}
+
+The template:
+\begin{verbatim}
+Here is my #silent ', '.join(['silly']*5) # example
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+Here is my  example
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+        write('Here is my ')
+        ', '.join(['silly']*5) 
+        write(' example\n')
+\end{verbatim}
+
+OK, it's not quite covert because that extra space gives it away, but it 
+almost succeeds.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Caching placeholders and \#cache}
+\label{output.cache}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dynamic placeholder -- no cache}
+\label{output.cache.dynamic}
+
+The template:
+\begin{verbatim}
+Dynamic variable:  $voom
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+Dynamic variable:  Voom!
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+write('Dynamic variable:  ')
+write(filter(VFS(SL,"voom",1))) # generated from '$voom' at line 1, col 20.
+write('\n')
+\end{verbatim}
+
+Just what we expected, like any other dynamic placeholder.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Static placeholder}
+\label{output.cache.static}
+
+The template:
+\begin{verbatim}
+Cached variable:  $*voom
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+Cached variable:  Voom!
+\end{verbatim}
+
+The generated code, with line numbers:
+\begin{verbatim}
+ 1  write('Cached variable:  ')
+ 2  ## START CACHE REGION: at line, col (1, 19) in the source.
+ 3  RECACHE = True
+ 4  if not self._cacheData.has_key('19760169'):
+ 5      pass
+ 6  else:
+ 7      RECACHE = False
+ 8  if RECACHE:
+ 9      orig_trans = trans
+10      trans = cacheCollector = DummyTransaction()
+11      write = cacheCollector.response().write
+12      write(filter(VFS(SL,"voom",1))) # generated from '$*voom' at line 1,
+            # col 19.
+13      trans = orig_trans
+14      write = trans.response().write
+15      self._cacheData['19760169'] = cacheCollector.response().getvalue()
+16      del cacheCollector
+17  write(self._cacheData['19760169'])
+18  ## END CACHE REGION
+    
+19  write('\n')
+\end{verbatim}
+
+That one little star generated a whole lotta code.  First, instead of an 
+ordinary \code{VFS} lookup (searchList) lookup, it converted the
+placeholder to a lookup in the \code{.\_cacheData} dictionary.  Cheetah also
+generated a unique key (\code{'19760169'}) for our cached item -- this is its
+cache ID.
+
+Second, Cheetah put a pair of if-blocks before the \code{write}.  The first
+(lines 3-7) determine whether the cache value is missing or out of date, and
+sets local variable \code{RECHARGE} true or false.
+This stanza may look unnecessarily verbose -- lines 3-7 could be eliminated if
+line 8 was changed to
+\begin{verbatim}
+if not self._cacheData.has_key('19760169'):
+\end{verbatim}
+-- but this model is expandable for some of the cache features we'll see below.
+
+The second if-block, lines 8-16, do the cache updating if necessary.
+Clearly, the programmer is trying to stick as close to normal (dynamic)
+workflow as possible.  Remember that \code{write}, even though it looks like a
+local function, is actually a method of a file-like object.  So we create a
+temporary file-like object to divert the \code{write} object into, then read
+the result and stuff it into the cache.
 
 % Local Variables:
 % TeX-master: "devel_guide"

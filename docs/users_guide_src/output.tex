@@ -33,10 +33,6 @@ The \code{\#echo} directive is used to echo the output from expressions that
 can't be written as simple \$placeholders.  It serves the same purpose as ASP's
 $<$\%=EXPR\%$>$ tag.
 
-% @@MSO: The '<' and '>' on the previous line are showing up as Spanish
-% inverted '?' and '!' in my gv.  Backslashing them caused an error.  Only
-% placing them inside '$$' worked.
-
 \begin{verbatim}
 Here is my #echo ', '.join(['silly']*5) # example 
 \end{verbatim}
@@ -111,7 +107,8 @@ whether the template is being filled that frequently or not.  Keep this in
 mind when setting refresh times for CPU-intensive or I/O intensive 
 operations.
 
-% @@MO: Is it $*5*{var} or ${*5*var}?  We should mention.
+If you're using the long placeholder syntax, \verb+${}+, the braces go only
+around the placeholder name: \verb+$*.5h*{var.func('arg')}+.
 
 Sometimes it's preferable to explicitly invalidate a cached item whenever
 you say so rather than at certain time intervals.  You can't do this with

@@ -11,20 +11,20 @@ placeholder and directive in terms of the changes it creates in the module.
 \subsection{An example}
 \label{pyModules.example}
 
-Our first template, following a long noble tradition in computer tutorials,
-produces a familiar, friendly greeting.  Here's the template:
+Our first template follows a long noble tradition in computer tutorials.
+It produces a familiar, friendly greeting.  Here's the template:
 
 \begin{verbatim}
 Hello, world!
 \end{verbatim}
 
-... here's the output:
+... the output:
 
 \begin{verbatim}
 Hello, world!
 \end{verbatim}
 
-... and here's the .py template module cheetah-compile produced, with line
+... and the .py template module cheetah-compile produced, with line
 numbers added:
 
 % @@MO: Is it possible to print the line numbers gray instead of black?
@@ -210,7 +210,7 @@ a string or file object.  The stanza recompiles the template if the source
 file has changed.  Lines 70-74 seem to be redundant with 75-83: both 
 fill the template and send the output.  The reason the first set of lines
 exists is because the second set may become invalid when the template is
-recompiled.  (This is for \em{re}\ compilation only.  The initial compilation
+recompiled.  (This is for {\em re}\ compilation only.  The initial compilation
 happened in the \code{.\_\_init\_\_} method if the template wasn't 
 precompiled.)
 
