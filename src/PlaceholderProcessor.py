@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.11 2001/07/13 23:24:09 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.12 2001/08/02 05:29:40 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/13 23:24:09 $
+Last Revision Date: $Date: 2001/08/02 05:29:40 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.11 $"[11:-2]
+__version__ = "$Revision: 1.12 $"[11:-2]
 
 
 ##################################################
@@ -95,6 +95,37 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
         self._refreshTags = refreshTags
         self._nameRE = re.compile(
             marker + r'(?:CACHED\.|REFRESH_[0-9]+(?:_[0-9]+){0,1}\.){0,1}([A-Za-z_0-9\.]+)')
+
+
+    def initializeTemplateObj(self, templateObj):
+        """Initialize the templateObj so that all the necessary attributes are
+        in place for the tag-processing stage"""
+
+        CodeGenerator.TagProcessor.initializeTemplateObj(self, templateObj)
+        
+        if not templateObj._perResponseSetupCodeChunks.has_key('placeholders'):
+            ## setup the code to be included at the beginning of each response ##
+            indent = templateObj._settings['indentationStep']
+            baseInd = indent  * \
+                   templateObj._settings['initialIndentLevel']
+
+            templateObj._perResponseSetupCodeChunks['placeholders'] = \
+                      baseInd + "if self._checkForCacheRefreshes:\n"\
+                      + baseInd + indent + "timedRefreshCache = self._timedRefreshCache\n" \
+                      + baseInd + indent + "currTime = currentTime()\n"\
+                      + baseInd + indent + "self._timedRefreshList.sort()\n"\
+                      + baseInd + indent + "if currTime >= self._timedRefreshList[0][0]:\n"\
+                      + baseInd + indent * 2 +  " self._timedRefresh(currTime)\n"\
+                      + baseInd + indent + "                                   \n" \
+                      + baseInd + "nestedTemplates = self._nestedTemplatesCache\n" \
+                      + baseInd + "components = self._componentsDict\n"
+
+            ## initialize the caches, the localVarsList, and the timedRefreshList
+            templateObj._timedRefreshCache = {} # caching timedRefresh vars
+            templateObj._nestedTemplatesCache = {} # caching references to nested templates
+            templateObj._componentsDict = {}       # you get the idea...
+            templateObj._timedRefreshList = []
+            templateObj._checkForCacheRefreshes = False
 
     def mark(self, txt):
         """Swap the $'s for a marker that can be parsed as valid python code.
@@ -302,47 +333,6 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
             self.mark(txt), searchList, prefix=prefix, templateObj=templateObj,
             executeCallables=executeCallables)
 
-    def initializeTemplateObj(self, templateObj):
-        """Initialize the templateObj so that all the necessary attributes are
-        in place for the tag-processing stage"""
-        
-        if not templateObj._codeGeneratorState.has_key('indentLevel'):
-            templateObj._codeGeneratorState['indentLevel'] = \
-                          templateObj._settings['initialIndentLevel']
-
-        if not hasattr(templateObj,'_perResponseSetupCodeChunks'):
-            templateObj._perResponseSetupCodeChunks = {}
-        if not templateObj._perResponseSetupCodeChunks.has_key('placeholders'):
-            ## setup the code to be included at the beginning of each response ##
-            indent = templateObj._settings['indentationStep']
-            baseInd = indent  * \
-                   templateObj._settings['initialIndentLevel']
-
-            templateObj._perResponseSetupCodeChunks['placeholders'] = \
-                      baseInd + "if self._checkForCacheRefreshes:\n"\
-                      + baseInd + indent + "timedRefreshCache = self._timedRefreshCache\n" \
-                      + baseInd + indent + "currTime = currentTime()\n"\
-                      + baseInd + indent + "self._timedRefreshList.sort()\n"\
-                      + baseInd + indent + "if currTime >= self._timedRefreshList[0][0]:\n"\
-                      + baseInd + indent * 2 +  " self._timedRefresh(currTime)\n"\
-                      + baseInd + indent + "                                   \n" \
-                      + baseInd + "nestedTemplates = self._nestedTemplatesCache\n" \
-                      + baseInd + "components = self._componentsDict\n"
-
-            ## initialize the caches, the localVarsList, and the timedRefreshList
-            templateObj._timedRefreshCache = {} # caching timedRefresh vars
-            templateObj._nestedTemplatesCache = {} # caching references to nested templates
-            templateObj._componentsDict = {}       # you get the idea...
-            templateObj._timedRefreshList = []
-            templateObj._checkForCacheRefreshes = False
-
-        if not hasattr(templateObj, '_localVarsList'):
-            # may have already been set by #set or #for
-            templateObj._localVarsList = ['trans', 'self']
-
-        if not templateObj._codeGeneratorState.has_key('defaultCacheType'):
-            templateObj._codeGeneratorState['defaultCacheType'] = None
-
     def getValueAtRuntime(self, templateObj, tag):
         searchList = templateObj.searchList()
         try:
@@ -388,10 +378,11 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
         try:
             translatedTag = self.translatePlaceholderString(
                 self._marker + tag, searchList, templateObj)
+
         except NameMapper.NotFound:
             return self.wrapEvalTag(
                 templateObj,
-                'self.placeholderProcessor.getValueAtRuntime(self, """' + \
+                'self.placeholderProcessor.getValueAtRuntime(self, r"""' + \
                 tag + '""")')
 
 
