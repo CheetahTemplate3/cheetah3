@@ -5,7 +5,7 @@
 %\subsection{Differences between macros and functions}
 %\label{macros.whatAre}
 
-Since Macros (#M) share some superficial similarities with functions--both
+Since Macros (\#M) share some superficial similarities with functions--both
 accept arguments and return a string value that replaces the function call or
 macro call in the Filled Template--let's look first at their differences.
 
@@ -30,12 +30,12 @@ a template definition, in a subclass of Template (as a method), or in the
 module that uses the template.  The function should have a \code{return}
 statement that returns the text to be inserted into the Filled Template.
 
-A macro is usually defined using the \code{#macro} directive.  However, it is
+A macro is usually defined using the \code{\#macro} directive.  However, it is
 possible to write a Python function and register it as a Cheetah macro.
 Examples of both are below.  Using the \code{\#macro} directive is more
 convenient if your macro consists mostly of text to be inserted with occasional
 placeholders.  Loading it from a function is the only choice if you must do
-calculations, because you cannot do calculations inside a \code{#macro}
+calculations, because you cannot do calculations inside a \code{\#macro}
 directive body.
 
 
@@ -47,12 +47,12 @@ To call a macro that has already been defined, use the following syntax:
 \code{\#MyMacro(ARGUMENTS)}.  The argument syntax is the same as for function
 arguments: Python expressions separated by commas, using placeholders instead
 of variable names.  The ``()'' are required even if there are no arguments.
-Unlike other directives, a \code{#M} ends immediately at the closing ``$\)$'';
-there is no such thing as a ``/#'' after a macro call.
+Unlike other directives, a \code{\#M} ends immediately at the closing \code{()};
+there is no such thing as a \code{\/\#} after a macro call.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Defining macros using \code{#macro}}
+\subsection{Defining macros using \#macro}
 \label{macros.definingMacros}
 
 A macro definition looks like this:
@@ -77,7 +77,7 @@ The formal arguments in a macro definition are in Python syntax.  This means
 provided in the usual Python manner.
 
 Here's a longish example of a macro definition from 
-\bf{examples/webware\examples/cheetahSite/SiteTemplate.tmpl}:
+\bf{examples/webware/examples/cheetahSite/SiteTemplate.tmpl}:
 
 \begin{verbatim}
 #macro insetBox(width=170, boxTitle='', boxContents='')
@@ -106,14 +106,14 @@ Here's a longish example of a macro definition from
     <TD COLSPAN=3 HEIGHT=1 BGCOLOR="$*insetBoxes.titleFrameColor">#spacer()</TD>
   </TR>
 </TABLE>
-	    
+            
 <TABLE VALIGN="top" WIDTH=$*width BORDER=0 CELLPADDING=0 CELLSPACING=0>
   <TR>
     <TD WIDTH=1 bgcolor="$*insetBoxes.frameColor">#spacer()</TD>
     <TD WIDTH=900 BGCOLOR="$*insetBoxes.bgcolor">  ## force to full width 
     ## now begin the contents cell of the insetBox
     $boxContents
-    ## end insetBox	
+    ## end insetBox     
     </TD>
     <TD WIDTH=1 BGCOLOR="$*insetBoxes.frameColor">#spacer()</TD>
   </TR>
@@ -134,7 +134,7 @@ placeholders have a ``*'' for permanent caching.  Those referring to macro
 arguments don't have a ``*'' (that would be silly), as do a few dynamic
 placeholders (e.g., \code{\$insetBoxes.titleFrameColor}, which is not defined in
 the macro but is assumed to exist when the template is filled.  Notice also
-how the author calls macros inside macros (e.g., \code{#spacer()}).
+how the author calls macros inside macros (e.g., \code{\#spacer()}).
 
 % Can a macro be redefined?
 
@@ -174,7 +174,7 @@ templateObj = Template(Cheetah.Macros.HTML)
 \end{verbatim}
 
 There's no confusion here because \code{\$spacer(50)} will get the function and
-\code{#spacer(50)} will get the macro.  Just remember that if the macro
+\code{\#spacer(50)} will get the macro.  Just remember that if the macro
 outputs embedded macros, directives or placeholders (except the placeholders
 representing the macro's arguments), it cannot be used as a placeholder
 function.  Or rather it can, but the \code{\$P}, \code{\#D} and \code{\#M}

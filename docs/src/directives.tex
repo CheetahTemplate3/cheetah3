@@ -6,7 +6,7 @@ comments in the source of this chapter (docs/src/directives.tex) to see which
 points are still uncertain or what will probably be added after it's verified.}
 
 
-Directives Tags (#D's) are used for all functionality that cannot be handled
+Directives Tags (\#D's) are used for all functionality that cannot be handled
 with simple placeholders.  All directives begin with \code{\#}, and end with
 \code{/\#}, the end of the line, or another directive on that line.  
 
@@ -27,11 +27,11 @@ that looks like this: \code{\#end theDirective/\#}.  The text between a tag and
 its matching end tag is called the \em{body} of the tag or a \em{block}.  Note
 that the body does not include any part of either tag: it's the text
 \em{outside} the tags.  However, a directive body may have other directives
-inside \em{it|.
+inside \em{it|}.
 
-To escape something that looks like a #D so that Cheetah will treat it as
-ordinary text, place a backslash before the ``#'':
-($\backslash$#raw) 
+To escape something that looks like a \#D so that Cheetah will treat it as
+ordinary text, place a backslash before the ``\#'':
+($\backslash$\#raw) 
 
 Examples:
 
@@ -56,7 +56,7 @@ not included in the output.
 
 % True?
 
-Most #D's are commands, which are described in this chapter.  Directives
+Most \#D's are commands, which are described in this chapter.  Directives
 relating to macros are in the next chapter, ``Macros''.
 
 
@@ -110,10 +110,10 @@ block name.  It must follow
 the same naming rules as an Identifier.
 
 A named block will appear in the output as if it were ordinary text, but a
-later \code{#redefine} directive can override it.  This replaces the content of
+later \code{\#redefine} directive can override it.  This replaces the content of
 the block with something else \em{at the location where the original block was
 defined}.  In other words, the original block serves to show \em{where} the
-\code{#redefine}'d text should go, and to be a fallback to display if there is
+\code{\#redefine}'d text should go, and to be a fallback to display if there is
 no \code{\#redefine}.  \code{\#redefine} also requires one argument, again the
 block name.
 
@@ -177,11 +177,11 @@ use placeholders.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#extend}
 
-\code{#extend} is related to but separate from 
+\code{\#extend} is related to but separate from 
 \code{.extendTemplate(newTemplateDef)}.  More documentation to come later.
 
-Essentially, \code{#extend parentTemplateClass} allows you to inherit from
-a more general template definition.  You may then \code{#redefine} some of its
+Essentially, \code{\#extend parentTemplateClass} allows you to inherit from
+a more general template definition.  You may then \code{\#redefine} some of its
 named blocks.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -210,18 +210,18 @@ and then use Uniform Dotted Notation to access the object's attributes or keys.
 See the example in the \code{\#if} section.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{\#if ... \#elif ... \#else ... \#end if}
+\subsubsection{\#if ... \#else if ... \#else ... \#end if}
 
 \code{\#if} is one of two display-logic Directives Cheetah has (the other is
 \code{\#for}).  Its use is just like in any programming language: to display
 a portion of text if some condition is true.  
-\code{\#if}, \code{\#elif} and \code{\#else} all have one required argument:
+\code{\#if}, \code{\#else if} and \code{\#else} all have one required argument:
 a boolean expression.  Any Python expression is allowed, including operators.
 However, your expression may not use variables:  use Placeholder Tags instead.
 As in Python, the expression is true unless it evaluates to zero, '', None, an
 empty list, or an empty dictionary.
 
-\code{\#else if} is accepted as a synonym for {\elif}.
+\code{\#elif} is accepted as a synonym for {\#else if}.
 
 Here's an example that combines an \code{\#if} tag with a \code{\#for} tag.
 

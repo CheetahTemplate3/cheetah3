@@ -230,7 +230,7 @@ as well as bugs in the implementation.
      testing.
 
 \item Straightforward use of function arguments, macro arguments, and
-     #if and #for expressions is supported, but the limits of what kind of
+     \#if and \#for expressions is supported, but the limits of what kind of
      expressions are allowed has not been well defined yet, and unanticipated
      expression styles may cause breakage.  Macro arguments will soon follow
      the same rules as function arguments, which will only be a minor change.
@@ -265,11 +265,11 @@ articulated yet, but probably includes:
       Autocalling.  The caching rules are "stable unless something comes up".
       Fuction arguments in (); keys/subscripts in [].
 
-\item  Directive tag syntax, /# or newline to end a directive tag, #end tags 
-      to terminate multiline directives.  The existence and intent of ##,
-      #comment, #raw, #include, #cache, #for, #if, #set, #block, #redefine,
-      #slurp.  Macro defining and calling is pretty stable, except for the
-      argument syntax.  #longmacro will remain for calling macros with
+\item  Directive tag syntax, /\# or newline to end a directive tag, \#end tags 
+      to terminate multiline directives.  The existence and intent of \#\#,
+      \#comment, \#raw, \#include, \#cache, \#for, \#if, \#set, \#block, \#redefine,
+      \#slurp.  Macro defining and calling is pretty stable, except for the
+      argument syntax.  \#longmacro will remain for calling macros with
       multi-line arguments, although the argument syntax may change.
 
 \end{itemize}

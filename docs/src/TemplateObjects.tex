@@ -16,7 +16,7 @@ subclasses.
 
 \begin{description}
 
-\item{\code{templateObj = Template("The king is a $placeholder1.")}}
+\item{\code{templateObj = Template("The king is a \$placeholder1.")}}
      Pass the Template Definition as a string.
 
 \item{\code{templateObj = Template(file="fink.tmpl")}}
@@ -25,7 +25,7 @@ subclasses.
 \item{\code{templateObj = Template(file=f)}}
      Read the Template Definition from file-like object 'f'.
      
-\item{\code{templateObj = Template("The king is a $placeholder1.", dic, obj)}}
+\item{\code{templateObj = Template("The king is a \$placeholder1.", dic, obj)}}
      Pass the Template Definition as a string.  Also pass two Namespaces for the
      Search List: a dictionary 'dic' and an instance 'obj'.
      
@@ -142,7 +142,7 @@ the ``Functions and Macros'' chapter, but it's good to know it's available.
 Because the current implementation compiles the TO immediately, your Search 
 List must already contain Namespace Values of the appropriate types for all
 Placeholder Names, at least those which are not simple strings or are used
-in Display Logic (that is, in the attribute of an \code{#if} or \code{#for}
+in Display Logic (that is, in the attribute of an \code{\#if} or \code{\#for}
 directive).  Otherwise you will likely get an exception.
 
 

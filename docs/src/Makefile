@@ -1,11 +1,11 @@
 # You must change PYTHONSRC to the path of your Python source distributon.
-PYTHONSRC=/EDITME/Python-2.1
+PYTHONSRC=/home/tavis/tmp/Python-2.1
 
 DOCNAME=users_guide
 MKHOWTO=$(PYTHONSRC)/Doc/tools/mkhowto
 MAIN_TEX_FILE= users_guide.tex
 
-all: pdf ps html text
+all: ps pdf html text
 
 pdf:
 	$(MKHOWTO) --pdf $(MAIN_TEX_FILE)

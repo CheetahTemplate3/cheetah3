@@ -69,7 +69,7 @@ expressions in the following ways:
 
 \item  String literals inside argument sets must be quoted, just like in
      Python.  All Python quoting styles are allowed:  \code{'string'},
-     \code{"string\n"}, \code{"""string"""}, \code{r'''string'''}.  (However,
+     \code{"string\\n"}, \code{"""string"""}, \code{r'''string'''}.  (However,
      two bugs currently exist: Cheetah misparses \code{'Fred\'s'}, and Python's
      \code{tokenize} module misparses triple-quoted strings with embedded
      newlines.)
@@ -188,7 +188,7 @@ For best results, process your TO in this order:
 \begin{enumerate}
 
 \item   Create your Namespaces and assign values for each of your placeholders.
-     For \code{#for} loops, build a list of objects to be looped over and
+     For \code{\#for} loops, build a list of objects to be looped over and
      assign this list as a Namespace Value.
 
 \item   Create the TO, passing it the Template Definition and the Namespaces in
