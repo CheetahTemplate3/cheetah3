@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.52 2002/05/06 20:19:49 tavis_rudd Exp $
+# $Id: Parser.py,v 1.53 2002/05/08 17:52:16 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.52 $
+Version: $Revision: 1.53 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/05/06 20:19:49 $
+Last Revision Date: $Date: 2002/05/08 17:52:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.52 $"[11:-2]
+__revision__ = "$Revision: 1.53 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -31,6 +31,7 @@ import sys
 import re
 from re import DOTALL, MULTILINE
 from types import StringType, ListType, TupleType
+import time
 
 # intra-package imports ...
 from Lexer import Lexer
@@ -1610,9 +1611,11 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         expr = self.getExpression()
             
         self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
-        self.addWriteChunk('self._includeCheetahSource(' + expr + ', trans=trans, ' +
-                           'includeFrom="' + includeFrom + '", raw=' + str(raw) +
-                           ')')
+        self.addWriteChunk('self._includeCheetahSource(' + expr +
+                           ', trans=trans, ' +
+                           'includeFrom="' + includeFrom + '", raw=' +
+                           str(raw) + ', includeID="' +
+                           str(self.pos()) + str(time.time()) + '")')
 
     def eatCache(self):
         lineClearToStartToken = self.lineClearToStartToken()
