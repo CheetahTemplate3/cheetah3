@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.11 2001/07/30 04:15:28 hierro Exp $
+# $Id: Test.py,v 1.12 2001/07/31 07:15:33 hierro Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/30 04:15:28 $
+Last Revision Date: $Date: 2001/07/31 07:15:33 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.11 $"[11:-2]
+__version__ = "$Revision: 1.12 $"[11:-2]
 
 
 ##################################################
@@ -574,6 +574,10 @@ posixCases += importantExampleCases
 ### *** ADD NEW TYPES OF POSIX CASES ABOVE HERE. ***  ###
 
 ### *** BEGIN TODO: These cases don't have test suites yet. *** ###
+# Template.__init__ 'file' keyword arg.  (Tested manually.)
+# Template.getUnknowns().  (Tested manually.)
+# CodeGenerator.varNotFound_KeyError().  (Tested manually.)
+# Template.__init__ 'searchList' keyword arg no longer has to be a tuple.
 ### *** END TODO. *** ###
 
 windowsCases = deepcopy(posixCases)
