@@ -10,63 +10,25 @@ Cheetah TODO list
 
 Requirements for 1.0
 =========================================================================
-FIXED 
-- "cheetah test" problem: Python 2.3(b1) causes 16 failures in
-  SyntaxAndOutput.py because the result of boolean expressions is now True and
-  False instead of 1 and 0 (or 'True' and 'False' instead of '1' and '0' when
-  used as placeholders).  The same thing happens with $True and $False.  Add a
-  preprocessing step to convert output to '1' and '0' before comparing to the
-  control string. 
-
 - "cheetah test" problem: subcommands fail mysteriously on Windows.  Rewrite
   to avoid using subcommands.  Instead, set sys.argv and call the appropriate
   main() for each test.
 
-FIXED IN BOTH THE PY AND C VERSIONS
-- Simplify NameMapper.py while maintaining new behavior (ignore dictionary
-  attributes/methods when searching for match of first chunk in searchList
-  lookup).  Modify _namemapper.c to conform.  Make valueForKey error
-  messages more meaningful: for $placeholder.html it raises "NotFound: html";
-  it should raise "NotFound: 'html' in $placeholder.html". Consider passing
-  the entire unparsed placeholder tag to all NameMapper functions for use in
-  a potential error message, the same way we're passing it to the output
-  filter.  Also consider passing it to the errorCatcher.  (TR)
-
-- One-line #if broken.  It's recognized only if 'else' is present, otherwise
-  it miscompiles as an unclosed and incorrect multi-line #if.  The presence
-  of 'else' should trigger the one-line #if.
-
-- Documentation: document #encoding.  Explain problems with one-line #if and
-  "cheetah test" if they haven't been fixed yet.
+- Documentation: document #encoding.  Explain problems "cheetah test" if they
+  haven't been fixed yet.
 
 - There's a kludge in CheetahWrapper.py to abort with a helpful error message
   if the user runs 'cheetah test' but doesn't have write permission in the
   current directory.  The tests should instead put their temporary files
   under the system tmp directory.
 
-- update User's Guide about changes to SkeletonPage (no more #settings,
-  etc) (TR)
-
 - Decide on Cheetah's 1.0 license and update the Users' Guide.  Cheetah
   will remain open source, and derived works (open or closed source) will be
   allowed.  The issue is how to make the second part more explicit. (TR)
 
-- Add an example in the distribution of a simplified SkeletonPage
-  that used #block but does not have fancy esoteric methods like
-  style stuff. (MO)
-
-- Eliminate obsolete #settings directive from 
-  examples/webware_examples/cheetahSite/siteTemplate.tmpl  (TR)
-
-- Recognize the exception value as a local variable inside the
-  '#except Exception, ex' clause.  Currently $ex raises NotFound.
-
 - Reset the current filter to the default (or to the constructor's filter
   if specified) at the beginning of each fill.  Currently, filter changes
   leak from one fill to the next.
-
-- Webware example template has obsolete #settings directive.  Replace
-  with #attr for each variable.
 
 Other TODO Items
 ================================================================================
@@ -87,13 +49,15 @@ Other TODO Items
 - Split out the code needed to run the generated
   python into a base class of Template, and derive the compiled Python class
   from that?  This would allow precompiled templates to be loaded much more
-  quickly.
+  quickly. @@TR: I've done some of the refactoring neccessary to support this as
+  part of the 0.9.16 release.
 
 - A further 'nice to have' optimisation would be to be able to specify at
-  compile time that you are not using filters, Webware transactions etc, and
-  not generate code that uses them.  This would remove the need to import
-  DummyTransaction and the Filters module.  It would also simplify the code
-  and function calls in the compiled template module.
+  compile time that you are not using filters, Webware transactions etc, and not
+  generate code that uses them.  This would remove the need to import
+  DummyTransaction and the Filters module.  It would also simplify the code and
+  function calls in the compiled template module. @@TR: I've done some of the
+  refactoring neccessary to support this as part of the 0.9.16 release.
 
 - Debugging tools.  See section below.
 
@@ -108,14 +72,7 @@ Other TODO Items
 - implement some better error handling for misformed #for, #if, #try directives,
   etc.  At the moment these errors are not caught until Python executes the
   code. @@TR: not a high priority as the python barfs suffice.
-
-FIXED
-- create better error message for bad code such as:
-  ##cache
-  This is a cached region.  $voom
-  #end cache
-  
-
+ 
 - create a better error message for invalid syntax when a $var inside a 
   directive is enclosed in ${} or $(). E.g.:
      #include raw source=${x}
@@ -124,6 +81,7 @@ FIXED
   Parser.eatComment() and Parser.eatMultiLineComment().  It's already
   working if the line contains 'STUFF#slurp   ## comment'.  Need to make
   it work for 'STUFF    ## comment' (but retain the EOL newline).  
+  @@TR: is this really needed?  It seems a bit 'magic' to me.
 
 - 'errorCatcher None' to stop catching errors in the middle of a template.
 
