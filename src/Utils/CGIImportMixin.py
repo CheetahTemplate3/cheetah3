@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CGIImportMixin.py,v 1.1 2002/03/17 21:04:46 hierro Exp $
+# $Id: CGIImportMixin.py,v 1.2 2002/03/18 00:57:48 hierro Exp $
 """Mixin for Cheetah.Servlet for importing web transaction variables in bulk.
 
 The public method provided is:
@@ -63,7 +63,7 @@ on a form, and the user chose "Monday", "Tuesday" and "Thursday".
 
 Both these examples print:  "The days you chose are: Monday Tuesday Thursday".
 
-By default, missing strings are replaced by "" and mising/bad numbers by zero.
+By default, missing strings are replaced by "" and missing/bad numbers by zero.
 (A "bad number" means the converter raised an exception for it, usually because
 of non-numeric characters in the value.)  This mimics Perl/PHP behavior, and
 simplifies coding for many applications where missing/bad values *should* be
@@ -75,7 +75,7 @@ blank/zero.  In those relatively few cases where you must distinguish between
     * $NonNumericInputError/self.NonNumericInputError
     * $ValueError/ValueError
 (NonNumericInputError is defined in this class and is useful for
-distinguishing between true bad input vs a TypeError/ValueError
+distinguishing between bad input vs a TypeError/ValueError
 thrown for some other rason.)
 
 Here's an example using multiple values to schedule newspaper deliveries.
@@ -153,12 +153,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2002/03/17
-Last Revision Date: $Date: 2002/03/17 21:04:46 $
+Last Revision Date: $Date: 2002/03/18 00:57:48 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.1 $"[11:-2]
+__revision__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
