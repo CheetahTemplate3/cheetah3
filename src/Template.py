@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.71 2001/11/24 04:32:47 tavis_rudd Exp $
+# $Id: Template.py,v 1.72 2001/11/24 04:40:43 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.71 $
+Version: $Revision: 1.72 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/24 04:32:47 $
+Last Revision Date: $Date: 2001/11/24 04:40:43 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.71 $"[11:-2]
+__version__ = "$Revision: 1.72 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -263,7 +263,7 @@ class Template(SettingsManager, Servlet):
         raises NameMapper.NotFound."""
         
         try:
-            return VFS(self.searchList(), varName.replace('$',''))
+            return VFS(self.searchList(), varName.replace('$',''), 1)
         except NotFound:
             if default != NoDefault:
                 return default
