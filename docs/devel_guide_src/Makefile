@@ -1,10 +1,12 @@
 # You must change PYTHONSRC to the path of your Python source distributon.
-PYTHONSRC=/home/iron/nobackup/PYTHON/Python-2.2b1
+PYTHONSRC=/home/iron/nobackup/PYTHON/Python-2.2
 DOCNAME=devel_guide
 MKHOWTO=$(PYTHONSRC)/Doc/tools/mkhowto
 MAIN_TEX_FILE= devel_guide.tex
 
 all: ps pdf html htmlMultiPage text
+
+almost-all: ps html htmlMultiPage text
 
 pdf:
 	$(MKHOWTO) --pdf $(MAIN_TEX_FILE)

@@ -2,10 +2,10 @@
 \usepackage{moreverb}                   %% Verbatim Code Listings
 
 \title{Cheetah Developers' Guide}
-\release{0.9.12 post b2}
+\release{0.9.12}
 
-\author{The Cheetah Development Team}
-\authoraddress{\email{cheetahtemplate-discuss@lists.sourceforge.net}}
+\author{Mike Orr}
+\authoraddress{\email{iron@mso.oz.net}}
 
 \begin{document}
 \maketitle
@@ -13,21 +13,14 @@
 
 %\tableofcontents
 
-\copyright{Copyright 2002, The Cheetah Development Team.
+\copyright{Copyright 2002, Mike Orr.
       This document may be copied and modified under the terms of the
       {\bf Open Publication License} \url{http://www.opencontent.org/openpub/} }
 
-This document is not written yet.  It is intended to accomplish the following:
+This document is still being written.  Material to include:
 
-** A sample small .tmpl file and its corresponding .py template module.
-
-** Show how cheetah-compile translates placeholders into Python, as well as
-caching, filter, the other directives, and comments.
-
-** Show how placeholders which are local/global/builtin variables get
-translated to bare variable names, while other placeholders are turned into a
-searchList lookup.  This is what '\$' does: besides marking the beginning of a
-placeholder, it intelligently converts it to one or the other.
+** Show how cheetah-compile translates caching, filter, the other directives,
+and comments.
 
 ** List all the methods accessible via 'self'.  (Some of this may belong in the
 Users' Guide.)
@@ -41,32 +34,44 @@ test suite works.
 ** History of Cheetah (including the WebOnions image).  Describe major
 milestone changes from the changelog.
 
-% @@MO: WebOnions logo.
+% @@MO: WebOnions logo.  (Goes with history.)
 
 ** Design decisions and tradeoffs that have been made.
 
 ** How to build the documentation.  Why LaTeX, a minimum LaTeX reference, etc.
 
-** Show where you can omit the '\$' and where you can't.
+** Show where you can omit the '\$' (leniency) and where you can't.
+
+** Appendix A will be a formal BNF grammar of Cheetah.
 
 % Two files placeholders.tex and safeDelegation.tex contain material to be
 %incorporated into this guide.
 
-% Why all the \$s?  "Smart" variable disposition.  Where you have to use them
-% in expressions.
-
-% Canadian spelling in honour of Cheetah's creator.
-
-%% @@MO: VFS=... is a common Python speed hack.
 
     %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %\include{whoShouldRead}
-    %\include{introduction}
-    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %\appendix
-    %\include{glossary}
-    %\include{grammar}
-    %\include{APIref}
+    \include{introduction}
+    \include{files}
+    \include{template}
+    \include{compiler}
+    \include{pyModules}
+    \include{placeholders}
+    \include{comments}
+    \include{output}
+    \include{inheritanceEtc}
+    \include{flowControl}
+    \include{errorHandling}
+    \include{parserInstructions}
+
+    \include{parser}
+    \include{compiler2}
+    \include{design}
+    \include{patching}
+    \include{documenting}
+    
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \appendix
+    \include{bnf}
+    \include{safeDelegation}
 \end{document}
 
 % Local Variables:
