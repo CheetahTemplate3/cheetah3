@@ -111,15 +111,15 @@ Cheetah aims:
      website.  In particular, it should be easy:
 
      \begin{itemize}
-     \item for \bf{programmers} to create reusable components and functions
+     \item for {\bf programmers} to create reusable components and functions
           that are accessible and understandable to designers.
-     \item for \bf{designers} to mark out placeholders for content and 
+     \item for {\bf designers} to mark out placeholders for content and 
           dynamic components in their templates.
-     \item for \bf{designers} to soft-code aspects of their design that are
+     \item for {\bf designers} to soft-code aspects of their design that are
           either repeated in several places or are subject to change.
-     \item for \bf{designers} to extend and customize existing templates and
+     \item for {\bf designers} to extend and customize existing templates and
           thus minimize duplication of effort and code.
-     \item and, of course, for \bf{content writers} to use the templates that
+     \item and, of course, for {\bf content writers} to use the templates that
           designers have created.
      \end{itemize}
 
@@ -168,7 +168,7 @@ Cheetah achieves these aims by:
 \end{itemize}
 
 Cheetah's Template Definition Language is robust but limited.  It's
-\bf{robust} because your templates can have named portions (``blocks'') which
+{\bf robust} because your templates can have named portions (``blocks'') which
 you can override individually, conditional portions (displayed only if X is
 true), and repeated portions (equivalent to ``for'' loops).  While the
 \code{\%} operator looks up placeholders in a single flat dictionary, Cheetah
@@ -176,7 +176,7 @@ looks them up in a user-supplied list of objects (the SearchList).  The
 searchable objects can be instances or dictionaries--Cheetah will search
 attributes and/or keys as appropriate.  A neat trick is to subclass the
 template object, assign your data values as attributes, and put `self' in the
-SearchList!  But the language is \bf{limited} because it's meant to complement
+SearchList!  But the language is {\bf limited} because it's meant to complement
 Python, not replace it.  A placeholder may be a method call or an
 attribute.subattribute, but it may not be an expression with operators.
 Complex calculations should be done outside the template and the results
@@ -208,8 +208,6 @@ Esterbrook, Ian Bicking and Tom Schwaller are the core developers.
 Cheetah is alpha software as some aspects of its design are
 still subject to change and the Users' Guide is incomplete.
 We plan to release a stable version later in 2001.
-
-
 
 Here's a summary of known issues and aspects of the design that are in flux,
 as well as bugs in the implementation.
@@ -248,7 +246,7 @@ as well as bugs in the implementation.
 
 \end{itemize}
 
-What \em{is} stable and permanent about Cheetah's API?  This list is not
+What {\em is} stable and permanent about Cheetah's API?  This list is not
 articulated yet, but probably includes:
 
 \begin{itemize}

@@ -1,6 +1,6 @@
 \section{Directive Tags}
 
-\em{Readers: this chapter is \bf{UNTESTED}.  There may be mistakes below, and
+{\em Readers: this chapter is {\bf UNTESTED}.  There may be mistakes below, and
 there may be more details about the Directives which should be added.  Read the
 comments in the source of this chapter (docs/src/directives.tex) to see which
 points are still uncertain or what will probably be added after it's verified.}
@@ -10,10 +10,10 @@ Directives Tags (\#D's) are used for all functionality that cannot be handled
 with simple placeholders.  All directives begin with \code{\#}, and end with
 \code{/\#}, the end of the line, or another directive on that line.  
 
-(Cheetah does not use HTML/XML-style tags because those would be hard to 
+Cheetah does not use HTML/XML-style tags they are hard to 
 distinguish in a file containing real HTML/XML tags.  In addition, Cheetah tags
 show up on screen when the Template Definition is viewed in a web browser,
-which aids debugging.  HTML-style tags would be invisible.)
+which aids debugging.  HTML-style tags would be invisible.
 
 Some tags have additional words after the
 command name.  (These words are called ``arguments'', but don't confuse them
@@ -24,14 +24,14 @@ with function arguments and macro arguments, which are different things.)
 
 Some Directives consist of a single tag, while others have a matching end tag
 that looks like this: \code{\#end theDirective/\#}.  The text between a tag and
-its matching end tag is called the \em{body} of the tag or a \em{block}.  Note
+its matching end tag is called the {\em body} of the tag or a {\em block}.  Note
 that the body does not include any part of either tag: it's the text
-\em{outside} the tags.  However, a directive body may have other directives
-inside \em{it|}.
+{\em outside} the tags.  However, a directive body may have other directives
+inside it.
 
 To escape something that looks like a \#D so that Cheetah will treat it as
-ordinary text, place a backslash before the ``\#'':
-($\backslash$\#raw) 
+ordinary text, place a backslash before the initial \code{\#} (e.g.
+$\backslash$\#raw).
 
 Examples:
 
@@ -49,8 +49,9 @@ block directive
 #end block
 \end{verbatim}
 
-%\subsubsection{Whitespace handling}
-
+\subsection{Whitespace handling}
+%% @@ TR: This is an important topic and needs a section of its own.  We need to
+%% provide examples and refer to the #slurp directive
 If there is nothing on a line except Directive(s) and whitespace, the line is
 not included in the output.
 
@@ -100,19 +101,20 @@ $contents                               ## an end-of-line comment
 \end{verbatim}
 
 % What about "#comment ... #end comment"?  Was it rejected?
+% @@ TR: yep
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#block ... \#end block}
 
 \code{\#block} assigns a name to the portion of the TD that is the body of the
-directive.   The result is a \em{named block}.  One argument is required: the
+directive.   The result is a {\em named block}.  One argument is required: the
 block name.  It must follow
 the same naming rules as an Identifier.
 
 A named block will appear in the output as if it were ordinary text, but a
 later \code{\#redefine} directive can override it.  This replaces the content of
-the block with something else \em{at the location where the original block was
-defined}.  In other words, the original block serves to show \em{where} the
+the block with something else at the location where the original block was
+defined.  In other words, the original block serves to show where the
 \code{\#redefine}'d text should go, and to be a fallback to display if there is
 no \code{\#redefine}.  \code{\#redefine} also requires one argument, again the
 block name.
@@ -126,7 +128,7 @@ construction."  The specific template mostly consists of one huge
 extend one template with another.)
 
 % Is it possible to retrieve the block's content using $theBlockName?
-
+%% @@TR: yep
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#cache ... \#end cache}
@@ -204,6 +206,8 @@ There are no 'break' or 'continue' Directives in Cheetah.  A \code{\#for} loop
 always goes through every element in the list once.  You should have set up the
 list in Python code so that it has exactly the elements you wish to loop through
 now.
+
+%%@@TR: we should add break and continue in
 
 One trick is to make EXPRESSION a list of instances or a list of dictionaries,
 and then use Uniform Dotted Notation to access the object's attributes or keys.

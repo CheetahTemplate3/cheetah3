@@ -2,7 +2,7 @@
 \label{vocabulary}
 
 To avoid repetition, all Cheetah-specific terms are defined here.  Terms are in
-\bf{boldface} at their main definition, and abbreviations are in (parentheses)
+{\bf boldface} at their main definition, and abbreviations are in (parentheses)
 immediately afterward.  
 
 If you are a new user, you do not need to learn all these terms now.
@@ -16,7 +16,7 @@ Just come back to this page when you encounter a term you don't recognize.
 \item{Template Object (TO, template)}  An instance of the class
      \code{Cheetah.Template.Template} or one of its subclasses.  A 
      TO contains a Template Definition and a SearchList.  Informally, 
-     \bf{``the template''} means a certain TO.
+     {\bf ``the template''} means a certain TO.
 
 \item{Template Definition (TD)}  A string which is the source of the template.
      People sometimes incorrectly call this ``the template'', but it's better
@@ -24,16 +24,16 @@ Just come back to this page when you encounter a term you don't recognize.
 
 \item{Template Definition Language (TDL)}  The markup language used for
      Template Definitions.  This language defines Placeholder Tags and
-     Directive Tags for the \bf{changeable data} in the template.
+     Directive Tags for the {\bf changeable data} in the template.
 
 \item{Search List (SL)}  A list of Python objects which will be searched to find
      values for the placeholders in the TO.  Each object is called a
-     \bf{Namespace (NS)} and must contain attributes, keys or subscripts to
+     {\bf Namespace (NS)} and must contain attributes, keys or subscripts to
      search in.  
 
 \item{Filled Template (FT)}  A string which is the result of filling in the
      changeable data in the TO with their current values.
-     Creating a Filled Template is called ``\bf{filling} the TO'' or 
+     Creating a Filled Template is called ``{\bf filling} the TO'' or 
      informally ``filling in the template''.
 
 \item{Setting}  A configuration value in the configuration file or elsewhere.
@@ -49,16 +49,16 @@ Just come back to this page when you encounter a term you don't recognize.
 \begin{description}
 
 \item{Directive Tag (\#D, directive)}  All tags that begin with ``\#''; e.g.,
-     \code{\#if}.  These are commands or \bf{macros (\#M)}.  (See the
+     \code{\#if}.  These are commands or {\bf macros (\#M)}.  (See the
      ``Functions and Macros'' chapter for a definition of macros.)
-     \bf{Display logic tags} is an informal term for the tags 
+     {\bf Display logic tags} is an informal term for the tags 
      \code{\#if} and \code{\#for}.
 
 \item{Placeholder Tag (\$P, placeholder)}  All tags that begin with ``\$''.
-     These contain a \bf{Placeholder Name (name)} which is looked up in the
+     These contain a {\bf Placeholder Name (name)} which is looked up in the
      Search List.  A Placeholder Name may consist of one or more
-     \bf{Identifiers} separated by periods, called \bf{Dotted Notation}.
-     Identifiers may be followed by \bf{arguments} in ``()'' or ``[]''.  See
+     {\bf Identifiers} separated by periods, called {\bf Dotted Notation}.
+     Identifiers may be followed by {\bf arguments} in ``()'' or ``[]''.  See
      the chapter ``Placeholder Tags'' for more details.  Note: this syntax is
      very similar to Python's although not identical.
 
@@ -73,9 +73,9 @@ Just come back to this page when you encounter a term you don't recognize.
      conversions have been done.
 
 \item{function/method (FM)}  A Python function or method.  These are the only
-     types which may be \bf{autocalled}.  See the definition of ``compile''
+     types which may be {\bf autocalled}.  See the definition of ``compile''
      below for the reason.  Note: other callable objects
-     (especially classes and instances) are \em{not} FMs and are never
+     (especially classes and instances) are {\em not} FMs and are never
      autocalled.
 
 \item{compile}  When you instantiate a TO or call its \code{.startServer()}

@@ -1,6 +1,5 @@
 # You must change PYTHONSRC to the path of your Python source distributon.
 PYTHONSRC=/home/tavis/tmp/Python-2.1
-
 DOCNAME=users_guide
 MKHOWTO=$(PYTHONSRC)/Doc/tools/mkhowto
 MAIN_TEX_FILE= users_guide.tex
