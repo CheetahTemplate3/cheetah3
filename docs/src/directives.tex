@@ -1,40 +1,61 @@
 \section{Directive Tags}
 
-% Will promote subsubsections to subsections.
+\em{Readers: this chapter is \bf{UNTESTED}.  There may be mistakes below, and
+there may be more details about the Directives which should be added.  Read the
+comments in the source rather than trusting everything you read here.}
 
 
-Directives tags are used for all functionality that cannot be handled with
-simple placeholders and are enclosed in \code{\#} and \code{/\#}.
-Cheetah does not use HTML/XML style tags because they would be hard to
-distinguish from real HTML tags and would not be visible in rendered HTML when
-something goes wrong.
+Directives Tags (#D's) are used for all functionality that cannot be handled
+with simple placeholders.  All directives begin with \code{\#}, and end with
+\code{/\#}, the end of the line, or another directive on that line.  
 
-Some directives consist of a single tag while others have {\bf start} and
-{\bf end} tags that surround a chunk of text.  End tags are written in the form
-\code{\#end nameOfTheDirective/\#}.
+(Cheetah does not use HTML/XML-style tags because those would be hard to 
+distinguish in a file containing real HTML/XML tags.  In addition, Cheetah tags
+show up on screen when the Template Definition is viewed in a web browser,
+which aids debugging.  HTML-style tags would be invisible.)
 
-\subsubsection{Escaping directives}
-Directives can be escaped by placing a backslash ($\backslash$) before them.
-Escaped directives will be printed verbatim.
+Some tags have additional words after the
+command name.  (These words are called ``arguments'', but don't confuse them
+with function arguments and macro arguments, which are different things.)
 
-\subsubsection{Tag closures: explicit and implicit}
-Directive tags can closed explicitly with \code{/\#} or implicitly with the end
-of the line if you're feeling lazy.
+% I would have called them "attributes", but that term is also ambiguous and
+% harder to explain.
+
+Some Directives consist of a single tag, while others have a matching end tag
+that looks like this: \code{\#end theDirective/\#}.  The text between a tag and
+its matching end tag is called the \em{body} of the tag.  Note that the body
+does not include any part of either tag: it's the text \em{outside} the tags.
+However, a directive body may have other directives inside \em{it|.
+
+To escape something that looks like a #D so that Cheetah will treat it as
+ordinary text, place a backslash before the ``#'':
+($\backslash$#raw) 
+
+Examples:
+
 \begin{verbatim}
-#block /#
+#block MyBlock /#
 Text in the contents area of the
 block directive
 #end block /#
 \end{verbatim}
 or
 \begin{verbatim}
-#block
+#block MyBlock2
 Text in the contents area of the
 block directive
 #end block
 \end{verbatim}
 
-\subsubsection{Whitespace handling}
+%\subsubsection{Whitespace handling}
+
+If there is nothing on a line except Directive(s) and whitespace, the line is
+not included in the output.
+
+% True?
+
+Most #D's are commands, which are described in this chapter.  Directives
+relating to macros are in the next chapter, ``Macros''.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -44,7 +65,7 @@ Comment directives are used to mark notes, explanations, and decorative text
 that should not appear in the output.  There are two forms of the comment
 directive: single-line and multi-line.
 
-All text in a template definition that lies between 2 hash characters
+All text in a Template Definition that lies between 2 hash characters
 (\code{\#\#}) and the end of the line is treated as a single-line comment and
 will not show up in the output, unless the 2 hash characters are escaped with a
 backslash.
@@ -76,15 +97,149 @@ $contents                               ## an end-of-line comment
 </HTML>
 \end{verbatim}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\#raw directives}
-Any section of a template definition that is delimeted by \code{\#raw} and
-\code{\#end raw} will be printed verbatim without any parsing of
-\$placeholders or other directives.  This can be very useful for debugging or
-writing Cheetah examples and tutorials.
+% What about "#comment ... #end comment"?  Was it rejected?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\#include directives}
+\subsection{\#block ... \#end block}
+
+\code{\#block} assigns a name to the portion of the TD that is the body of the
+directive.  \code{\#block} takes one attribute, That named portion is called a
+``block''.  One argument is required: the block name.  It must follow the same
+naming rules as an Identifier.
+
+The only thing you can do with a block is to \#redefine it.  This replaces
+the content of the block with something else \em{at the location where the
+original block was defined}.  In other words, the original block serves to
+show \em{where} the \code{#redefine}'d text should go, and to be a fallback to
+display if there is no \code{\#redefine}.  \code{\#redefine} also requires one
+argument, again the block name.
+
+A frequent use of \code{\#block} and \code{\#redefine} is to combine a pair of
+templates, one a general site framework with the common header and footer, and
+the second providing the specific page content.  The general template has a
+block called ``pageContent'' with some filler text like, "This page is under
+construction."  The specific template mostly consists of one huge
+\code{\#redefine}.  (examples/webware\_examples/hello\_world.py shows how to
+extend one template with another.)
+
+% Is it possible to retrieve the block's content using $theBlockName?
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#cache ... \#end cache}
+
+\code{\#cache} changes the default caching policy for placeholders inside the
+directive body.  This affects only Placeholder Tags without their own caching
+instruction (i.e., those without a ``*'').
+
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+
+$var                ## dynamic - will be reinterpolated for each request
+$*var2              ## static - will be interpolated only once at start-up
+$*5*var3            ## timed refresh - will be updated every 5 minutes.
+
+#cache
+$var                ## static
+$*var2              ## static
+$*5*var3            ## timed refresh
+#end cache
+
+#cache 0.5
+$var                ## timed refresh every 30 seconds (0.5 minutes)
+$*var2              ## static
+$*5*var3            ## timed refresh every 5 minutes
+#end cache
+
+
+</BODY>
+</HTML>
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#data ... \#end data}
+
+\code{\#data} lets you include Python code directly in your Template 
+Definition.  The code is in full Python syntax.  It is run in the namespace of
+the Template Object (that is, its \code{self} attribute).  Since the Template
+Object is always a Namespace in the Search List, any variable assignments in a
+\code{\#data} section may be referred to in Placeholder Tags!
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#extend}
+
+% Is this directive still valid?  What is it supposed to do?
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#for ... \#end for}
+
+\code{\#for} is one of two display logic Directives Cheetah has (the other is
+\code{\#if}).  \code{\#for} works like in Python: it loops over the Directive
+body, each time setting a placeholder to the next element in a list, from first
+to last.  Each iteration appends text to the output and executes any
+Directives encountered.  If the list is empty, the loop is not run at all.
+
+The syntax of the opening tag is: \code{\#for \$lvaluePlaceholder in
+EXPRESSION}.  The \code{\$lvaluePlaceholder} is created in a special namespace
+that is searched before the Search List.  EXPRESSION is usually a 
+Placeholder Tag that evaluates to a list, but it can be any expression that
+returns a list.  As always in Template Definition expressions, you must use
+Placeholder Tags instead of variable names.
+
+There are no 'break' or 'continue' Directives in Cheetah.  A \code{\#for} loop
+always goes through every element in the list once.  You should have set up the
+list in Python code so that it has exactly the elements you wish to loop through
+now.
+
+One trick is to make EXPRESSION a list of instances or a list of dictionaries,
+and then use Uniform Dotted Notation to access the object's attributes or keys.
+See the example in the \code{\#if} section.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{\#if ... \#elif ... \#else ... \#end if}
+
+\code{\#if} is one of two display-logic Directives Cheetah has (the other is
+\code{\#for}).  Its use is just like in any programming language: to display
+a portion of text if some condition is true.  
+\code{\#if}, \code{\#elif} and \code{\#else} all have one required argument:
+a boolean expression.  Any Python expression is allowed, including operators.
+However, your expression may not use variables:  use Placeholder Tags instead.
+As in Python, the expression is true unless it evaluates to zero, '', None, an
+empty list, or an empty dictionary.
+
+\code{\#else if} is accepted as a synonym for {\elif}.
+
+Here's an example that combines an \code{\#if} tag with a \code{\#for} tag.
+
+\begin{verbatim}
+#if $people
+<TABLE>
+<TR>
+<TH>Name</TH>
+<TH>Address</TH>
+<TH>Phone</TH>
+</TR>
+#for $p in $people
+<TR>
+<TD>$p.name</TD>
+<TD>$p.address</TD>
+<TD>$p.phone</TD>
+</TR>
+#end for
+</TABLE>
+#else
+<P> Sorry, the search did not find any people. </P>
+#end if
+\end{verbatim}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#include}
 
 \code{\#include} directives are used to include text from outside the template
 definition.  The text can come from \code{\$placeholder} variables or from
@@ -100,7 +255,7 @@ This example demonstrates its use with external files.
 #include "includeFileName.txt"
 \end{verbatim}
 
-By default, included text will be parsed for Cheetah tags.  The keyword
+By default, included text will be parsed for Cheetah tags.  The argument
 {\bf raw} can be used to mark the text for verbatim inclusion without any tag
 parsing.
 
@@ -109,26 +264,48 @@ parsing.
 #include raw "includeFileName.txt"
 \end{verbatim}
 
-\code{Template} uses its .getFileContents(fileName) method to locate the file to
-be included.  This method can be overriden in subclasses if you want to modify
-or extend its behaviour.  It is possible to implement the logic for getting 
-remote files such as \code{http://myserver.com/file.txt}.
+Cheetah currently has two bugs regarding \code{\#include}.  It is not working
+with relative paths when used in conjunction with Webware.  (Webware has some
+specific rules regarding what the current directory and the Python path must be
+when it is running.)  Second, Cheetah will not notice if an included file is
+updated after the TO has been created; it will continue to use the old version.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#raw}
+Any section of a Template Definition that is inside a \code{\#raw} ...
+\code{\#end raw} tag pair will be printed verbatim without any parsing of
+\$placeholders or other directives.  This can be very useful for debugging, or
+writing Cheetah examples and tutorials.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\#cache directives}
+\subsection{\#redefine ... \#end redefine}
+
+See \code{\#block}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Display logic directives}
+\subsection{\#set}
 
-\subsubsection{Conditional blocks}
+\code{\#set} allows you to assign a value for a placeholder from inside the
+Template Definition.  One use for this is to assign a short alias to what would
+otherwise be a long Placeholder Name.  (Note that the \code{\#set} value will
+not automatically change if the original value changes.)
 
-\subsubsection{For loops}
+The syntax is: \code{\#set \$lvaluePlaceholder = EXPRESSION}
+
+The \code{\$lvaluePlaceholder} is stored in a special namespace that is searched
+before the Search List.  The expression may be any Python expression, but you
+must use Placeholder Tags instead of variable names within it.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\#block directives}
+\subsection{\#slurp}
 
-\subsubsection{\#redefine directives}
+\code{\#slurp} has a simple little job: it eats the whitespace and end-of-line
+character from the current line so that they will not appear in the output.
+Instead, the following line will be joined onto this one.
 
+\code{\#slurp} is useful when you want something on a separate line in the
+source for readability, but don't want it on a separate line in the output.
 
