@@ -32,7 +32,8 @@ Other TODO Items
 - CheetahWrapper stuff: (MO)
   * "cheetah compile --shbang '#!/usr/bin/python2.2'"
   * "cheetah code [options] [FILES]"  print template-specific portion of main
-    method(s) to stdout, with line numbers.
+    method(s) to stdout, with line numbers.  May want a Template method to do
+    this too.
   * Refactor, make compile/fill/code routines callbacks using a bundle arg.
 
 - Debugging tools.  See section below.
@@ -150,18 +151,18 @@ when called via str(), str() cannot take arguments.
         
 #indent
 ========================================================================
-The current indenter is a kludge that has an indentation object, with
-implicit placeholder calls added at each line to generate the indentation,
-and #silent calls to adjust the object.  It should be reimplemented to
-generate code to call the indentation object directly.  Also, the user
-interface should be cleaned up, the implementation and Users' Guide
+The current indenter (which exists but is undocumented) is a kludge that has an
+indentation object, with implicit placeholder calls added at each line to
+generate the indentation, and #silent calls to adjust the object.  It should be
+reimplemented to generate code to call the indentation object directly.  Also,
+the user interface should be cleaned up, the implementation and Users' Guide
 synchronized, and test cases built.
 
 The desired implementation revolves around self._indenter, which knows the
 current indentation level (a non-negative integer), chars (the string output
 per level, default four spaces), and stack (the previous indentation levels).
 The .indent() method returns the indentation string currently appropriate.
-The desired interface so far:
+The desired interface for phase 1 (subject to change):
   #indent strip    ; strip leading whitespace from input lines
   #indent add      ; add indentation to output lines as appropriate
   #indent on       ; do both
@@ -176,9 +177,29 @@ The desired interface so far:
   #indent debug    ; dump level, chars and stack to template output
 
 Possible extensions:
-  #indent =EXPR    ; set level to N
+  #indent =EXPR    ; set level to N  (likely to be added to phase 1)
   #indent +EXPR    ; add N to level (not very necessary)
   #indent -EXPR    ; subtract N from level (not very necessary)
+  #indent balance BOOL ; require all indent changes in a #def/#block to be
+                       ; popped before exiting the method.  (difficult to
+		       ; implement)
+  #indent implicitPop BOOL ; automatically pop indent changes within a 
+                       ; #def/block when that method exits.  (difficult to
+		       ; implement)
+  #indent ??       ; a 3-way switch that combines unbalanced, balanced and
+                   ; implicit pop.  (difficult to implement)
+  #indent ??       ; smart stripping: strip input indentation according to
+                   ; nested directive level; e.g., 
+                   ; 01: #if foo=1
+                   ; 02:     public int foo()
+                   ; 03:     {
+                   ; 04:       return FOO;
+                   ; 05:     }
+                   ; 06: #end if
+                   ; With smart stripping, line 4 would be indented and the
+                   ; others not.  With "on" or "strip" stripping, all lines
+                   ; 2-5 would be unindented.  With "off" stripping, 
+                   ; lines 2-5 would not be stripped.
 
 There should be one indentation object per Template instance, shared by
 methods and include files.
