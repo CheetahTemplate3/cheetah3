@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Misc.py,v 1.5 2002/10/19 23:27:57 hierro Exp $
+# $Id: Misc.py,v 1.6 2002/10/20 09:20:42 hierro Exp $
 """Miscellaneous functions/objects used by Cheetah but also useful standalone.
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/11/07
-Last Revision Date: $Date: 2002/10/19 23:27:57 $
+Last Revision Date: $Date: 2002/10/20 09:20:42 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -36,7 +36,7 @@ except NameError:
 ## MISCELLANEOUS FUNCTIONS
 
 #!/usr/bin/env python
-# $Id: Misc.py,v 1.5 2002/10/19 23:27:57 hierro Exp $
+# $Id: Misc.py,v 1.6 2002/10/20 09:20:42 hierro Exp $
 """Miscellaneous functions/objects used by Cheetah but also useful standalone.
 
 Meta-Data
@@ -44,12 +44,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/11/07
-Last Revision Date: $Date: 2002/10/19 23:27:57 $
+Last Revision Date: $Date: 2002/10/20 09:20:42 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -113,7 +113,7 @@ def mkdirsWithPyInitFiles(path):
        directory already exists.  
     """
     dir, fil = os.path.split(path)
-    if not os.path.exists(dir):
+    if dir and not os.path.exists(dir):
         mkdirsWithPyInitFiles(dir)
     if not os.path.exists(path):
         os.mkdir(path)

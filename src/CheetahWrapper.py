@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.10 2002/10/20 03:29:01 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.11 2002/10/20 09:20:42 hierro Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -8,12 +8,12 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/10/20 03:29:01 $
+Last Revision Date: $Date: 2002/10/20 09:20:42 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.10 $"[11:-2]
+__revision__ = "$Revision: 1.11 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -25,6 +25,7 @@ from _properties import Version
 from Compiler import Compiler
 from Template import Template
 from Cheetah.Utils.dualglob import dualglob
+from Cheetah.Utils.Misc import mkdirsWithPyInitFiles
 from Cheetah.Utils.optik import OptionParser
 
 ##################################################
@@ -214,8 +215,11 @@ class CheetahWrapper:
             print "(backup %s)" % bak # On same line as previous message.
         else:
             print # Print pending newline.
-        #if not os.path.exists(dstDir):
-        #    os.makedirs(dstDir) # XXX Commented, buggy.
+        if dstDir and not os.path.exists(dstDir):
+            if self.isCompile:
+                mkdirsWithPyInitFiles(dstDir)
+            else:
+                os.makedirs(dstDir)
         f = open(dst, 'w')
         f.write(output)
         f.close()
@@ -227,7 +231,8 @@ class CheetahWrapper:
             self.compileOrFillStdin()
             return
         elif not files and opts.recurse:
-            print "Drilling down recursively from current directory."
+            which = opts.idir and "idir" or "current"
+            print "Drilling down recursively from %s directory." % which
             files = [os.curdir]
         elif not files:
             usage(HELP_PAGE1, "Neither files nor -R specified!")
