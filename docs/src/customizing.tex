@@ -1,150 +1,30 @@
 \section{Customizing and extending Cheetah}
 \label{customizing}
 
+Template objects have a \code{\_settings} attribute. This is a dictionary of
+configuration settings that control the core behaviour of Cheetah.  The Template
+object's constructor method has a keyword argument 'settings' that accepts a
+dictionary to override the default settings.  Many of these settings are for
+internal use and are of little interest to end-users.  Some, however, can be
+quite useful. This chapter explains how to use them.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Configuration Settings}
+\subsection{Unknown placeholder names}
+%% handlers
 
-Any keyword arguments passed to the Template constructor will override the
-default configuration settings below.  Example:
-
-\begin{verbatim}
-from Cheetah import CodeGen, Template
-templateObj = Template(myTemplateDef, myNamespace1, myNamespace2, debug=True,
-	useAutocalling=False, varNotFound_handler=)
-\end{verbatim}
+Here's 
+Example:
 
 \begin{verbatim}
-    \_settings = {
-        'useAutocalling': True,
-        'delayedStart': False,            
-        'plugins':[],
-        'varNotFound_handler': CodeGen.varNotFound_echo,
-        'debug': False,
-        'keepCodeGeneratorResults': False,
-        'blockMarkerStart':['<!-- START BLOCK: ',' -->'],
-        'blockMarkerEnd':['<!-- END BLOCK: ',' -->'],
-        'includeBlockMarkers': False,
-
-
-        'delimiters':{'includeDirective': [delims['includeDirective_gobbleWS'],
-                                           delims['includeDirective'],
-                                           ],
-                      'dataDirective': [delims['dataDirective_gobbleWS'],
-                                        delims['dataDirective'],
-                                        ],
-                      'macroDirective': [delims['macroDirective'],
-                                         ],
-                      'blockDirectiveStart': [delims['blockDirectiveStart_gobbleWS'],
-                                              delims['blockDirectiveStart'],
-                                              ],
-                      'lazyMacroCalls': [delims['lazyMacroCalls'],],
-                      'callMacro': [delims['callMacro'],],
-                      'callMacroArgs': delims['callMacroArgs'],
-                      'rawDirective': [delims['rawDirective'],],
-                      'comments': [delims['multiLineComment'],
-                                   delims['singleLineComment']],
-                      'slurp': [delims['slurpDirective_gobbleWS'],
-                                delims['slurpDirective'],
-                                ],
-                      },
-       
-        'internalDelims':["<Cheetah>","</Cheetah>"],
-        'internalDelimsRE': re.compile(r"<Cheetah>(.+?)</Cheetah>",
-                                     re.DOTALL),
-        'tagTokenSeparator': '__@__',
-        'indentationStep': ' '*4, # 4 spaces - used in the generated code
-        'initialIndentLevel': 2, 
-            
-        'preProcessors': [('rawDirectives',
-                           CodeGen.preProcessRawDirectives),
-                          ('comments',
-                           CodeGen.preProcessComments),
-                          ('setDirectives',
-                           setDirectiveProcessor.preProcess),
-                          ('dataDirectives',
-                           CodeGen.preProcessDataDirectives),
-                          ('blockDirectives',
-                           CodeGen.preProcessBlockDirectives),
-                          ('macroDirectives',
-                           CodeGen.preProcessMacroDirectives),
-                          ('lazyMacroCalls',
-                           CodeGen.preProcessLazyMacroCalls),
-                          ('lazyMacroCalls',
-                           CodeGen.preProcessLazyMacroCalls),
-                          ('explicitMacroCalls',
-                           CodeGen.preProcessExplicitMacroCalls),
-                          ('comments',
-                           CodeGen.preProcessComments),
-                          ('rawDirectives',
-                           CodeGen.preProcessRawDirectives),
-                          ('setDirectives',
-                           setDirectiveProcessor.preProcess),
-                          ('includeDirectives',
-                           CodeGen.preProcessIncludeDirectives),
-                          ('cacheDirective',
-                           cacheDirectiveProcessor.preProcess),
-                          ('endCacheDirective',
-                           endCacheDirectiveProcessor.preProcess),
-                          ('slurpDirectives',
-                           CodeGen.preProcessSlurpDirective),
-                          ('display logic directives',
-                           displayLogicProcessor.preProcess),
-                          ('placeholders',
-                           placeholderProcessor.preProcess),
-                          ('unescapePlaceholders',
-                           lambda obj, TD: TD.replace(r'\$','$') ),
-                          ],
-                 
-        'tagProcessors':{'placeholders':placeholderProcessor,
-                         'displayLogic':displayLogicProcessor,
-                         'setDirective':setDirectiveProcessor,
-                         'cacheDirective':cacheDirectiveProcessor,
-                         'endCacheDirective':endCacheDirectiveProcessor,
-                         },
-            
-                    
-        'generatedCodeFilters':[('removeEmptyStrings',
-                                 CodeGen.removeEmptyStrings),
-                                ('addPerResponseCode',
-                                 CodeGen.addPerResponseCode),
-                                ],
-                    
-        'masterErrorHandler':ErrorHandlers.CodeGeneratorErrorHandler,
-        'responseErrorHandler': ErrorHandlers.ResponseErrorHandler,
-
-        'stages':{1:{'title':'pre-processing',
-                     'description':"the raw template is filtered using\n" + \
-                     "the pre-processors specified in the TemplateServer settings.",
-                     'errorHandler':ErrorHandlers.Stage1ErrorHandler,
-                     },
-                  2:{'title':'convert-tags-to-code',
-                     'description':"the tags that have been translated to\n" + \
-                     "the internal format are converted into chunks of python code.",
-                     'errorHandler':ErrorHandlers.Stage2ErrorHandler,
-                     },
-                  3:{'title':'wrap-code-in-function-definition',
-                     'description':"the chunks of python code from stage 2\n" + \
-                     "are wrapped up in a code string of a function definition.",
-                     'errorHandler':ErrorHandlers.Stage3ErrorHandler,
-                     },
-                  4:{'title':'filter-generated-code',
-                     'description':"the generated code string is filtered\n" + \
-                     "using the filters defined in the TemplateServer settings.",
-                     'errorHandler':ErrorHandlers.Stage4ErrorHandler,
-                     },
-                  5:{'title':'execute-generated-code',
-                     'description':"the generated code string is executed\n" + \
-                     "to produce a function that will be bound as a method " + \
-                     "of the TemplateServer.",
-                     'errorHandler':ErrorHandlers.Stage5ErrorHandler,
-                     },
-                  },
-        }
+from Cheetah.Template import Template
+templateObj = Template(myTemplateDef, myNamespace, 
+                 settings={'useAutocalling':0,
+                           'placeholderStartToken':'$'})
 \end{verbatim}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Unknown placeholder names}
+\subsection{Unknown placeholder names}
 %% handlers
 
 The 'varNotFound\_handler' setting controls what happens when a Placeholder
@@ -155,7 +35,7 @@ harder-to-miss decorations around it.  To switch to the Big Warning handler:
 \begin{verbatim}
 from Cheetah import CodeGenerator, Template
 templateObj = Template(myTemplateDef, 
-	varNotFound_handler=CodeGenerator.varNotFound\_echo)
+        varNotFound_handler=CodeGenerator.varNotFound\_echo)
 # Of course, you can add any number of Namespaces after myTemplateDef.
 \end{verbatim}
 
@@ -186,13 +66,33 @@ def varNotFound_bigWarning(templateObj, tag):
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Plugins}
 \subsubsection{The PSP plugin}
+Cheetah ships with a plugin that enables pure PSP-style code to be used along
+with Cheetah \$placeholders and \#directives.  PSP syntax can also be used
+alone without \$placeholders and \#directives.
+
+Here's a trivial example of how to use it:
+\begin{verbatim}
+from Cheetah.Template import Cheetah
+from Cheetah.Plugins.PSP import PSPplugin
+
+templateDef = """
+Testing Cheetah's PSP plugin:
+ 
+$testVar
+<% pspVar = 'X' %>
+#set $list = [1,2,3]
+ 
+#for $i in map(lambda x: x*x*x, $list)
+$i
+<%for j in range(15):%> <%=j*15%><%=pspVar%><%end%>
+#end for
+"""
+print Template(templateDef, {'testVar':1234}, plugins=[PSPplugin()])
+
+\end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Custom variable-tags}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Custom directives}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Custom error handlers}
-
