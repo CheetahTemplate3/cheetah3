@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.6 2001/11/05 06:38:40 ianbicking Exp $
+# $Id: CheetahCompile.py,v 1.7 2001/11/05 07:25:33 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/05 06:38:40 $
+Last Revision Date: $Date: 2001/11/05 07:25:33 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -132,20 +132,12 @@ class CheetahCompile:
         className = os.path.split(fileNameMinusExt)[1]
         genCode = str(Compiler(file=srcFile, moduleName=className, mainClassName=className))
 
-        if not self.printGenerated \
-           or self.writeGenerated:
+        if not self.printGenerated or self.writeGenerated:
             fp = open(fileNameMinusExt + self.SERVLET_EXTENSION,'w')
             fp.write(genCode)
             fp.close()
         if self.printGenerated:
             print genCode
-    
-        if self.makeGenFile and not os.path.exists(fileNameMinusExt +
-                                            self.SERVLET_EXTENSION):
-            code = self.inheritFromGenFile(fileNameMinusExt)
-            fp = open(fileNameMinusExt + self.SERVLET_EXTENSION, "w")
-            fp.write(code)
-            fp.close()
 
     def generate(self, fileNameMinusExt):
         ## @@: this sys.path is a hack
