@@ -4,11 +4,11 @@ DocStrings in NameMapper for details on the purpose and interface of this
 module.
 
 ===============================================================================
-$Id: _namemapper.c,v 1.30 2005/01/03 19:10:10 tavis_rudd Exp $
+$Id: _namemapper.c,v 1.31 2005/01/06 15:13:16 tavis_rudd Exp $
 Authors: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.30 $
+Version: $Revision: 1.31 $
 Start Date: 2001/08/07
-Last Revision Date: $Date: 2005/01/03 19:10:10 $
+Last Revision Date: $Date: 2005/01/06 15:13:16 $
 */
 
 /* *************************************************************************** */
@@ -347,7 +347,6 @@ namemapper_valueFromFrameOrSearchList(PyObject *self, PyObject *args, PyObject *
   char *tmpPntr2 = NULL;
   char *nameChunks[MAXCHUNKS];
   int numChunks;
-  int i;
 
   PyObject *nameSpace = NULL;
   PyObject *theValue = NULL;
