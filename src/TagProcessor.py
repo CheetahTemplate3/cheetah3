@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: TagProcessor.py,v 1.4 2001/08/10 19:26:02 tavis_rudd Exp $
+# $Id: TagProcessor.py,v 1.5 2001/08/10 22:44:36 tavis_rudd Exp $
 """Tag Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,19 +7,18 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/10 19:26:02 $
+Last Revision Date: $Date: 2001/08/10 22:44:36 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
 
-import re
-
 # intra-package imports ...
+from Parser import Parser
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
@@ -38,23 +37,11 @@ EMPTY_TAG_TYPE = 2
 class Error(Exception):
     pass
 
-class TagProcessor:
+class TagProcessor(Parser):
     _tagType = EVAL_TAG_TYPE
+    #_token is only used by the coreTagProcessors such as PlaceholderProcessor
 
-    def __init__(self, templateObj):
-        """Setup some internal references to the templateObj. This method must
-        be called by subclasses."""
-
-        self._templateObj = templateObj
-        ## setup some method mappings for convenience
-        self.state = templateObj._getCodeGeneratorState
-        self.settings = templateObj.settings
-        self.setting = templateObj.setting
-        self.searchList = templateObj.searchList
-        
-    def templateObj(self):
-        """Return a reference to the templateObj that controls this processor"""
-        return self._templateObj
+    ## Methods called automatically by the Template object   ##
 
     def preProcess(self, templateObj, templateDef):
         delims = self.setting('internalDelims')
@@ -99,6 +86,9 @@ class TagProcessor:
     def processTag(self, tag):
         return self.wrapTagCode( self.translateTag(tag) )
 
+
+
+    ## generic methods used internally  ##
     def validateTag(self, tag):
         """A hook for doing security and syntax checks on a tag"""
         pass

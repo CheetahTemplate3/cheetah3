@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.28 2001/08/10 19:26:02 tavis_rudd Exp $
+# $Id: Template.py,v 1.29 2001/08/10 22:44:36 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.28 $
+Version: $Revision: 1.29 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/10 19:26:02 $
+Last Revision Date: $Date: 2001/08/10 22:44:36 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.28 $"[11:-2]
+__version__ = "$Revision: 1.29 $"[11:-2]
 
 
 ##################################################
@@ -68,7 +68,6 @@ class Template(SettingsManager):
     """The core template engine: parses, compiles, and serves templates."""
 
     _settings = {
-        'placeholderStartToken':'$',
         'useAutocalling': True,
         'delayedCompile': False,            
         'plugins':[],
@@ -78,9 +77,11 @@ class Template(SettingsManager):
         'blockMarkerStart':['<!-- START BLOCK: ',' -->'],
         'blockMarkerEnd':['<!-- END BLOCK: ',' -->'],
         'includeBlockMarkers': False,
+        'placeholderStartToken':'$',
         
         ## The rest of this stuff is mainly for internal use
-
+        'placeholderMarker':' placeholderTag.',
+        
         'delimiters':{'includeDirective': [delims['includeDirective_gobbleWS'],
                                            delims['includeDirective'],
                                            ],
@@ -181,6 +182,7 @@ class Template(SettingsManager):
             raise TypeError("'file' argument must be a filename or file-like object")
 
         self._templateDef = str( templateDef )
+        self._placeholderREs = {} # must exist before calling self.initializeSettings()
         # by converting to string here we allow other objects such as other Templates
         # to be passed in
 
@@ -191,8 +193,6 @@ class Template(SettingsManager):
             self._settings = kw['overwriteSettings']
         elif kw.has_key('settings'):
             self.updateSettings(kw['settings'])
-        self.placeholderProcessor.setTagStartToken(self.setting('placeholderStartToken'))
-
 
         ## Setup the searchList of namespaces in which to search for $placeholders
         # + setup a dict of #set directive vars - include it in the searchList
@@ -213,7 +213,7 @@ class Template(SettingsManager):
             if kw.has_key('searchList'):
                 tup = tuple(kw['searchList'])
                 self._searchList.extend(tup) # .extend requires a tuple.
-
+       
         ## deal with other keywd args 
         # - these are for internal use by Nested Templates in #include's
         if kw.has_key('macros'):
@@ -230,6 +230,11 @@ class Template(SettingsManager):
             self._registerCheetahPlugin(plugin)
 
 
+        ## Setup the placeholderRE's for the Parser class
+        # - this may have to be moved up if the TagProcessors require them in their
+        # __init__() methods - they probably won't
+        self.createPlaceholderREs()
+        
         ## Now, start compile if we're meant to
         if not self.setting('delayedCompile'):
             self.compileTemplate()
@@ -315,6 +320,48 @@ class Template(SettingsManager):
                             ) # self.updateSettings(...
         
         #end of self.initializeSettings()
+
+
+    def createPlaceholderREs(self):
+        
+        """Setup the regexs for placeholder parsing.  Do it here so all the
+        TagProcessors don't have to create them for themselves.
+
+        All $placeholders are translated into valid Python code by swapping
+        'placeholderStartToken' ($) for 'marker'.  This marker is then used by
+        the parser to find the start of each placeholder and allows $vars in
+        function arg lists to be parsed correctly.  '$x()' becomes '
+        placeholderTag.x()' when it's marked.
+
+        The marker starts with a space to allow $var$var to be parsed correctly.
+        $a$b is translated to --placeholderTag.a placeholderTag.b-- instead of
+        --placeholderTag.aplaceholderTag.b--, which the parser would mistake for
+        a single $placeholder The extra space is removed by the parser."""
+
+        from Parser import escCharLookBehind, \
+             validSecondCharsLookAhead, \
+             nameCharLookAhead
+        from Utilities import escapeRegexChars
+        
+        REs = self._placeholderREs
+        marker = self.setting('placeholderMarker')
+        REs['nameMapperChunk'] = re.compile(
+            marker +
+            r'(?:CACHED\.|REFRESH_[0-9]+(?:_[0-9]+){0,1}\.){0,1}([A-Za-z_0-9\.]+)')
+
+        markerEscaped = escapeRegexChars(marker)
+        markerLookBehind= r'(?:(?<=' + markerEscaped + ')|(?<=' + markerEscaped + '\{))'
+        
+        REs['cachedTags'] = re.compile(
+            markerLookBehind + r'\*' + nameCharLookAhead)
+        REs['refreshTag'] = re.compile(markerLookBehind +
+                                                    r'\s*\*([0-9\.]+?)\*' +
+                                                    nameCharLookAhead)
+        REs['startToken'] = re.compile(
+            escCharLookBehind +
+            escapeRegexChars(self.setting('placeholderStartToken')) +
+            validSecondCharsLookAhead)
+
         
     def searchList(self):
         """Return a reference to the searchlist"""
@@ -448,6 +495,7 @@ class Template(SettingsManager):
                           + indent * 1 + "try:\n" \
                           + indent * 2 + "#setupCodeInsertMarker\n" \
                           + indent * 2 + "searchList = self.searchList()\n" \
+                          + indent * 2 + "searchList_getMeth = searchList.get\n" \
                           + indent * 2 + "setVars = self._setVars\n" \
                           + indent * 2 + "outputList = []\n" \
                           + indent * 2 + "outputList.extend( ['''" + \
@@ -527,12 +575,17 @@ class Template(SettingsManager):
         processedTag = settings['coreTagProcessors'][tagToken].processTag(tag)
         return processedTag
 
-    
+
+    def evalPlaceholderString(self, txt):
+        """Return the value of a placeholderstring. This doesn't work with localVars."""
+        searchList = self.searchList()
+        searchList_getMeth = searchList.get # shortcut-namebing in the eval
+        return eval(txt)
+        
     def _setTimedRefresh(self, translatedTag, interval):
         """Setup a cache refresh for a $*[time]*placeholder."""
         self._checkForCacheRefreshes = True
-        searchList = self.searchList()
-        tagValue = eval(translatedTag)
+        tagValue = self.evalPlaceholderString(translatedTag)
         self._timedRefreshCache[translatedTag] = str(tagValue)
         nextUpdateTime = currentTime() + interval * 60 
         self._timedRefreshList.append(
