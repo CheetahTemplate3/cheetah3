@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.14 2001/09/11 03:44:13 tavis_rudd Exp $
+# $Id: Parser.py,v 1.15 2001/09/11 04:05:20 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.14 $
+Version: $Revision: 1.15 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/09/11 03:44:13 $
+Last Revision Date: $Date: 2001/09/11 04:05:20 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.14 $"[11:-2]
+__version__ = "$Revision: 1.15 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -369,8 +369,8 @@ class Parser:
                 safeToAutoCall = False
             
             ## deal with local vars from #set and #for directives
-            if name in self._localVarsList:
-                return name
+            if nameMapperPartOfName in self._localVarsList:
+                return nameMapperPartOfName + remainderOfName
             elif nameChunks[0] in self._localVarsList:
                 translatedName = 'valueForName(' + nameChunks[0] + ',"""' + \
                            '.'.join(nameChunks[1:]) + '""", ' + \
