@@ -10,8 +10,8 @@ module. It serves two purposes. First, its constructor method accepts a
 \code{template definition} in a string or a file (filename or file object).
 Cheetah compiles the template definition into a Python class (the 'generated
 class'). Second, it is used as the base class for the generated classes.
-Template subclasses Webware's Template class when it is available. Thus, the
-generated classes can be used as Webware servlets.
+\code{Template} subclasses Webware's \code{HTTPServlet} class when it is
+available. Thus, the generated classes can be used as Webware servlets.
 
 Generated template classes can either be used immediately or written to a Python
 module file for future use. In the former case, the methods and attributes of
@@ -128,14 +128,6 @@ Here are some examples of the various ways to create a template object:
 \item{\code{templateObj = Template(file=f, searchList=[dict, obj])}}
      Same with a file object.
 \end{description}
-
-The following usage examples are not valid:
-\begin{verbatim}
-templateObj = Template() 
-templateObj = Template("The king is a $placeholder1", file="fink.txt")
-templateObj = Template("The king is a $placeholder1", file=f)
-\end{verbatim}
-
 
 % Local Variables:
 % TeX-master: "users_guide"
