@@ -38,6 +38,10 @@ that is packaged with Cheetah is a simple command line tool that facilitates
 batch compilation of Cheetah source files. This script will be installed in a
 system directory when Cheetah is installed.
 
+To improve performance, Cheetah does "lazy compilation".  The compiling step is
+delayed until the first time it is needed; e.g., the first time the template is
+filled.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Object-Oriented Documents}
 \label{howWorks.objoriented}
@@ -176,7 +180,7 @@ So check your spelling!
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Converting .tmpl files into .py files}
+\subsection{cheetah-compile: converting .tmpl files into .py files}
 \label{howWorks.tmpl2py}
 \label{howWorks.cheetah-compile}
 
@@ -205,6 +209,13 @@ FILENAME.py contains.  For this reason, you should make changes to the
 \code{.tmpl} version of the template rather than the \code{.py} version.  Any
 \code{.py servlet files} that are about to be overwritten will are
 automatically backed up with the extension \code{.py\_bak}.
+
+One of the advantages of \code{cheetah-compile} is that you don't lose any
+flexibility.  The generated class contains all \code{\#attr} values and
+\code{\#def}/\code{\#block} values as ordinary attributes and methods of the
+template class, so you can read the values individually from other Python
+tools for any kind of custom processing you want.  For instance, if you want to
+put the titles of all your servlets into a database.
 
 For the same reason, if your template requires custom Python methods or
 other Python code, don't put it in the \code{FILENAME.py} file.  Instead, put

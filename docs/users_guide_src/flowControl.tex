@@ -7,35 +7,10 @@
 \subsection{\#for ... \#end for}
 \label{flowControl.for}
 
-The \code{\#for} directive iterates through a set of data.
+The \code{\#for} directive iterates through a sequence.  The syntax is very
+similar to Python.  Remember the \code{\$} before variables.
 
-Here's how to create list of numbers separated by hyphens. This ``\#end for''
-tag shares the last line to avoid introducing a newline character after each
-hyphen.  
-\begin{verbatim}
-#for $i in range(15)
-$i - #end for
-\end{verbatim}
-
-The previous example will put an extra hyphen after last number.  Here's how to
-get around that problem, using the \code{\#set} directive, which will be dealt
-with in more detail below.
-\begin{verbatim}
-#set $sep = '' 
-#for $name in $names 
-$sep$name 
-#set $sep = ', ' 
-#end for 
-\end{verbatim}
-
-Here's how to loop through a dictionaries keys and values:
-\begin{verbatim}
-#for $key, $value in $dict
-$key - $value
-#end for
-\end{verbatim}
-
-Here's how to create a simple client listing:
+Here's a simple client listing:
 \begin{verbatim}
 <TABLE>
 #for $client in $service.clients
@@ -47,6 +22,48 @@ Here's how to create a simple client listing:
 </TABLE>
 \end{verbatim}
 
+Here's how to loop through the  keys and values of a dictionary:
+\begin{verbatim}
+<PRE>
+#for $key, $value in $dict.items()
+$key: $value
+#end for
+</PRE>
+\end{verbatim}
+
+Here's how to create list of numbers separated by hyphens. This ``\#end for''
+tag shares the last line to avoid introducing a newline character after each
+hyphen.  
+\begin{verbatim}
+#for $i in range(15)
+$i - #end for
+\end{verbatim}
+
+If the location of the \code{\#end for} offends your sense of indentational
+propriety, you can do this instead:
+\begin{verbatim}
+#for $i in range(15)
+$i - #slurp
+#end for
+\end{verbatim}
+
+%% @@MSO: I thought builtins require a preceding $ but it only worked without it
+
+The previous two examples will put an extra hyphen after last number.  Here's
+how to get around that problem, using the \code{\#set} directive, which will be
+dealt with in more detail below.
+\begin{verbatim}
+#set $sep = '' 
+#for $name in $names 
+$sep$name 
+#set $sep = ', ' 
+#end for 
+\end{verbatim}
+
+%% @@MSO: This doesn't work:
+%% (If you don't like that \code{\#set} variable, you can replace the
+%% \code{\#for} loop with this Python trick:
+%% \code{\#echo ', '.join(\$names)}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#repeat ... \#end repeat}
@@ -58,7 +75,7 @@ Do something a certain number of times.
 My bonnie lies over the ocean
 #end repeat
 O, bring back my bonnie to me!
-\begin{verbatim}
+\end{verbatim}
 
 The argument may be any numeric expression:
 \begin{verbatim}
@@ -74,7 +91,7 @@ Inside the loop, there's no way to tell which iteration you're on.  If you
 need a counter variable, use \code{\#for} instead with Python's \code{range}
 function.  Since Python's ranges are base 0 by default, there are two ways
 to start counting at 1.  Say we want to count from 1 to 5, and that
-<CODE>\$count</CODE> is 5.
+\code{\$count} is 5.
 \begin{verbatim}
 #for $i in $range($count)
 #set $step = $i + 1
@@ -89,15 +106,30 @@ $i.  Counting from 1 to $count.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#while ... \#end while}
+\label{flowControl.while}
+
+\code{\#while} is the same as Python's \code{while} statement.  It may be
+followed by any boolean expression:
+\begin{verbatim}
+#while $someCondition('arg1', $arg2)
+The condition is true.
+#end while
+\end{verbatim}
+
+Be careful not to create an infinite loop.  \code{\#while 1} will loop until
+the computer runs out of memory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#if ... \#else if ... \#else ... \#end if}
 \label{flowControl.if}
 
-The \code{\#if} directives and its kin are used to display a portion of text
+The \code{\#if} directive and its kin are used to display a portion of text
 conditionally. \code{\#if} and \code{\#else if} should be followed by a
-True/False expression, while \code{\#else} should not.  Any Python valid
+True/False expression, while \code{\#else} should not.  Any valid Python 
 expression is allowed.  As in Python, the expression is true unless it evaluates
-to 0, '', None, an empty list, or an empty dictionary. \code{\#elif} is accepted
-as a synonym for {\#else if}.
+to 0, '', None, an empty list, or an empty dictionary.  In deference to Python,
+\code{\#elif} is accepted as a synonym for {\#else if}.
 
 Here are some examples:
 \begin{verbatim}
@@ -156,14 +188,14 @@ THIS IS AN EX-PARROT!!
 \end{verbatim}
 
 You cannot use \code{\#else if} or \code{\#else} inside an \code{\#unless}
-construct.  If you need these, you should use \code{\#if} instead.
+construct.  If you need those, use \code{\#if} instead.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#break and \#continue}
 \label{flowControl.break}
 
-These directives are use as they are used in Python. \code{\#break} will
-prematurely exit a \code{\#for} loop, while \code{\#continue} will immediately
+These directives are used as in Python. \code{\#break} will
+exit a \code{\#for} loop prematurely, while \code{\#continue} will immediately
 jump to the next step in the \code{\#for} loop.
 
 In this example the output list will not contain ``10 - ''. 
@@ -213,11 +245,14 @@ In this example the output list will not contain ``10 - ''.
 \label{flowControl.stop}
 
 The \code{\#stop} directive is used to stop processing of a template at a
-certain point and return ONLY what has been processed up to that point.  When a
-\code{\#stop} is called inside an \code{\#include} it will only stop the
-processing of the included code.  Likewise, when \code{\#stop} is called inside
-a \code{\#def} or \code{\#block}, it stops only the \code{\#def} or
-\code{\#block}.
+certain point.  The output will show {\em only} what has been processed up to
+that point.  
+
+When \code{\#stop} is called inside an \code{\#include} it skips the rest of
+the included code and continues on from after the \code{\#include} directive.
+stop the processing of the included code.  Likewise, when \code{\#stop} is
+called inside a \code{\#def} or \code{\#block}, it stops only the \code{\#def}
+or \code{\#block}.
 
 \begin{verbatim}
 the beginning

@@ -7,12 +7,12 @@ handling statements. The second is with Cheetah's \code{ErrorCatcher}
 framework. These are described below.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Directives}
+\subsection{\#try ... \#except ... \#end try, \#finally, and \#assert}
 \label{errorHandling.directives}
 
-Cheetah's exception handling directives are exact mirrors Python's exception
-handling statements.  See Python's documentation for details.  The following
-Cheetah code demonstrates their use:
+Cheetah's exception-handling directives are exact mirrors Python's 
+exception-handling statements.  See Python's documentation for details.  The
+following Cheetah code demonstrates their use:
 
 
 \begin{verbatim}
@@ -53,8 +53,11 @@ Cheetah code demonstrates their use:
 
 \end{verbatim}    
 
-The indentation in these examples was for clarity purposes only.  Remember,
-Cheetah doesn't use indentation like Python does.
+The indentation in these examples is for clarity purposes only.  In a
+production template, you wouldn't indent unless you wanted the indentation to
+show up in the output.
+
+%% @@MSO: If we add #sed or #slurp, mention it here.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{ErrorCatcher}
@@ -62,11 +65,11 @@ Cheetah doesn't use indentation like Python does.
 
 \code{ErrorCatcher} is a debugging tool that catchs exceptions that occur inside
 \code{\$placeholder} tags and provides a customizable warning to the developer.
-Without it, the first exception raised in a placeholder tag would immediately
-halt execution of the template. Thus, the developer would have to resolve all
-the exceptions one-by-one. With it, the developer can be warned about all the
-exceptions at once and the rest of the template output will still work.
-
+Normally, the first missing namespace value raises a \code{NameMapper.NotFound}
+error and halts the filling of the template. This requires the developer to
+resolve the exceptions in order without seeing the subsequent output. When an
+\code{ErrorCatcher} is enabled, the developer can see all the exceptions at
+once as well as the template output around them.
 
 The \code{Cheetah.ErrorCatchers} module defines the base class for
 ErrorCatchers:
@@ -87,15 +90,14 @@ class ErrorCatcher:
 
 This ErrorCatcher catches \code{NameMapper.NotFound} exceptions and leaves the
 offending placeholder visible in its raw form in the template output.  If the
-following template is executed 
+following template is executed:
 \begin{verbatim}
 #set $iExist = 'Here I am!'
 Here's a good placeholder: $iExist
 Here's bad placeholder: $iDontExist
 \end{verbatim}    
 
-the output will be 
-
+the output will be:
 \begin{verbatim}
 Here's a good placeholder: Here I am!
 Here's bad placeholder: $iDontExist
@@ -124,7 +126,6 @@ way through a template.
 \code{Echo} while maintaining a list of the errors that can be retrieved later.
 To retrieve the list, use the \code{Template} class' \code{'errorCatcher'} method
 to retrieve the errorCatcher and then call its \code{listErrors} method.
-
 
 ErrorCatcher doesn't catch exceptions raised inside directives. 
 

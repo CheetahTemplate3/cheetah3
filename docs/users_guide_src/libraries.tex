@@ -2,21 +2,159 @@
 \section{Template and other libraries}
 \label{libraries}
 
-Cheetah comes ``batteries included'' with libraries of macros, templates and
-other objects you can use in your own programs. If you develop your own, please
-consider posting them on the mailing list so others can benefit. 
+Cheetah comes ``batteries included'' with libraries of templates, functions,
+classes and other objects you can use in your own programs.  The different
+types are listed alphabetically below, followed by a longer description of
+the SkeletonPage framework.  Some of the objects are classes for specific
+purposes (e.g., filters or error catchers), while others are standalone and
+often can be used without Cheetah.
 
-Some useful functions, and other objects, used by Cheetah are in the
-\code{Cheetah.Utilities} module.  All utility modules contributed by third
-parties are in the \code{Cheetah.Tools} package.
+If you develop any objects which are generally useful for Cheetah sites,
+please consider posting them on the mailing list so that we can incorporate
+them into the standard library.  That way, all Cheetah users will benefit, and
+it will encourage others to contribute their objects, which might include
+something you want.
+
+%% @@MSO: If sed-filters get added to Cheetah, mention them here.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Template libraries}
+\subsection{ErrorCatchers}
+\label{libraries.ErrorCatchers}
+
+Module \code{Cheetah.ErrorCatchers} contains error-handling classes
+suitable for the \code{\#errorCatcher} directive.
+See section \ref{errorHandling.errorCatcher} for a description of the 
+error catchers bundled with Cheetah.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{FileUtils}
+\label{libraries.FileUtils}
+
+Module \code{Cheetah.FileUtils} contains generic functions and classes for 
+doing bulk search-and-replace on several files, and for finding all the files
+in a directory hierarchy whose names match a glob pattern.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Filters}
+\label{libraries.Filters}
+
+Module \code{Filters} contains filters suitable for the \code{\#Filter}
+directive.  See section \ref{output.filter} for a description of the
+filters bundled with Cheetah.
+
+As of Cheetah 0.9.9a6, the set of filters is rapidly changing.  While this is
+mostly a case of more filters and more features, it is possible that some 
+filers may be removed in the future or be changed in backward-incompatible ways.
+If you are depending on a filter besides the default filter, and you can not
+risk it changing in the next version of Cheetah, make yourself a separate copy
+of it outside the Cheetah directory and use that.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{SettingsManager}
+\label{libraries.SettingsManager}
+
+The \code{SettingsManager} class in the \code{Cheetah.SettingsManager} module is
+a mixin class that provides facilities for managing application settings.  
+SettingsManager is designed to:
+\begin{itemize}
+\item work well with nested settings dictionaries of any depth
+\item read/write \code{.ini style config files} (or strings)
+\item read settings from Python source files (or strings) so that
+     complex Python objects can be stored in the application's settings
+     dictionary.  For example, you might want to store references to various
+     classes that are used by the application, and plugins to the application
+     might want to substitute one class for another.
+\item allow sections in \code{.ini config files} to be extended by settings in
+     Python src files.  If a section contains a setting like
+     ``\code{importSettings=mySettings.py}'', \code{SettingsManager} will merge
+     all the settings defined in ``\code{mySettings.py}'' with the settings for
+     that section that are defined in the \code{.ini config file}.
+\item maintain the case of setting names, unlike the ConfigParser module
+\end{itemize}
+
+Cheetah uses \code{SettingsManager} to manage its configuration settings.
+\code{SettingsManager} might also be useful in your own applications. See the
+source code and docstrings in the file \code{src/SettingsManager.py} for more
+information. If there is sufficient interest in \code{SettingsManager}, we will
+release it as a standalone module.
+
+Note that there are two Cheetah directives that deal with settings:
+\code{\#compiler-settings} affects the behaviour of Cheetah's parser and 
+compiler.  \code{\#settings} affects the behaviour of certain filters and
+error catchers (see \code{\#filter} and \code{\#errorCatcher}, and may also be
+used in your own template applications and and templates.
+
+By default, both kinds of settings are also visible in the searchList, so they
+may be referred to by \code{\$placeholders}.  They are at the very end of the
+searchList, so any same-name anywhere else in the searchList will override
+what the \code{\$placeholder} sees.
+
+%% @@MSO: Alternate wording:
+%% Class \code{Cheetah.SettingsManager.SettingsManager} facilitates the use of
+%% user-supplied configuration files to fine tune an application.  A setting is
+%% a key/value pair that an application or component (e.g., a filter, or your 
+%% own servlets) looks up and treats as a configuration value to modify its (the
+%% component's) behaviour.  For more information, see section
+%% \ref{inheritanceEtc.settings} and the class source.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Templates}
 \label{libraries.templates}
 
-The \code{Cheetah.Templates} package contains stock templates that you can
+Package \code{Cheetah.Templates} contains stock templates that you can
 either use as is, or extend by using the \code{\#def} directive to redefine
-specific {\bf blocks}.
+specific {\bf blocks}.  Currently, the only template in here is SkeletonPage,
+which is described in detail below.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Tools}
+\label{libraries.Tools}
+
+Package \code{Cheetah.Tools} contains functions and classes contributed by third
+parties.  Some are Cheetah-specific but others are generic and can be used
+standalone.  None of them are imported by any other Cheetah component; you can 
+delete the Tools/ directory and Cheetah will function normally.  
+
+Some of the items in Tools/ are experimental and have been placed there just to
+see how useful they will be, and whether they attract enough users to make 
+refining them worthwhile (the tools, not the users :).
+
+Nothing in Tools/ is guaranteed to be: (A) tested, (B) reliable, (C) immune from
+being deleted in a future Cheetah version, or (D) immune from having 
+backwards-incompatable changes made to it.  If you depend on something in Tools/
+on a production system, consider making a copy of it outside the Cheetah/
+directory so that this version won't be lost when you upgrade Cheetah.  Also,
+learn enough about Python and about the Tool so that you can maintain it and
+bugfix it if necessary.
+
+If anything in Tools/ is found to be necessary to Cheetah's operation (i.e., if
+another Cheetah component starts importing it), it will be moved to the
+\code{Cheetah.Utils} package.
+
+Current Tools include:
+\begin{itemize}
+\item {\bf Cheetah.Tools.RecursiveNull} -- Nothing, but in a friendly way.  Good
+     for filling in for objects you want to hide.  If \code{\$form.f1} is a
+     RecursiveNull object, then \code{\$form.f1.anything["you"].might("use")}
+     will resolve to the empty string. Contributed by Ian Bicking.
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Utils}
+\label{libraries.Utils}
+
+Package \code{Cheetah.Utils} contains non-Cheetah-specific functions and
+classes that are imported by other Cheetah components.  Many of these utils can
+be used standalone in other applications too.  
+
+Current Utils include:
+\begin{itemize}
+\item {\bf Cheetah.Utils.VerifyType} -- Functions to verify the type of a
+     user-supplied function argument.
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Cheetah.Templates.SkeletonPage}
@@ -72,18 +210,27 @@ This skeleton page has no flesh. Its body needs to be implemented.
 \end{verbatim}
 
 You can redefine any of the blocks defined in this template by writing a new
-template that \code{\#extends} SkeletonPage.  
+template that \code{\#extends} SkeletonPage.  (As you remember, using 
+\code{\#extends} makes your template implement the \code{.writeBody()}
+method instead of \code{.respond()} -- which happens to be the same method
+SkeletonPage expects the page content to be (note the writeBody block in
+SkeletonPage).)
 
 \begin{verbatim}
-#def 
+#def bodyContents
 Here's my new body. I've got some flesh on my bones now.
-#end redefine bodyContents
+#end def bodyContents
 \end{verbatim}
+
+%% @@MO: Is this still accurate?  Does the child template really need to put a
+%% #def around its whole content?  Or by implementing .writeBody() does it
+%% automatically insert itself as the writeBody portion of
+%% SkeletonPage?
 
 All of the \$placeholders used in the \code{SkeletonPage} template definition
 are attributes or methods of the \code{SkeletonPage} class.  You can reimplement
 them as you wish in your subclass.  Please read the source code of the file
-\code{src/Templates/SkeletonPage.py} before doing so.  
+\code{src/Templates/\_SkeletonPage.py} before doing so.  
 
 You'll need to understand how to use the following methods of the
 \code{SkeletonPage} class: \code{\$metaTags()}, \code{\$stylesheetTags()},
@@ -91,23 +238,26 @@ You'll need to understand how to use the following methods of the
 define in various attributes and renders them into HTML tags.
 
 \begin{itemize}
-\item {\bf metaTags()} -- Returns a formatted vesion of the self._metaTags
-     dictionary, using the formatMetaTags function from \code{Cheetah.Macros.HTML}
+\item {\bf metaTags()} -- Returns a formatted vesion of the self.\_metaTags
+     dictionary, using the formatMetaTags function from
+     \code{Cheetah.Macros.HTML}.
 \item {\bf stylesheetTags()} -- Returns a formatted version of the
-     \code{self._stylesheetLibs} and \code{self._stylesheets} dictionaries.  The
-     keys in \code{self._stylesheets} must be listed in the order that they
-     should appear in the list \code{self._stylesheetsOrder}, to ensure that the
-     style rules are defined in the correct order.
+     \code{self.\_stylesheetLibs} and \code{self.\_stylesheets} dictionaries.
+     The keys in \code{self.\_stylesheets} must be listed in the order that
+     they should appear in the list \code{self.\_stylesheetsOrder}, to ensure
+     that the style rules are defined in the correct order.
 \item {\bf javascriptTags()} -- Returns a formatted version of the
-     \code{self._javascriptTags} and \code{self._javascriptLibs} dictionaries.
-     Each value in \code{self._javascriptTags} should be a either a code string
+     \code{self.\_javascriptTags} and \code{self.\_javascriptLibs} dictionaries.
+     Each value in \code{self.\_javascriptTags} should be a either a code string
      to include, or a list containing the JavaScript version number and the code
      string. The keys can be anything.  The same applies for
-     \code{self._javascriptLibs}, but the string should be the SRC filename
+     \code{self.\_javascriptLibs}, but the string should be the SRC filename
      rather than a code string.
 \item {\bf bodyTag()} -- Returns an HTML body tag from the entries in the dict
-     \code{self._bodyTagAttribs}.
+     \code{self.\_bodyTagAttribs}.
 \end{itemize}
+
+%% @@MO: (item 1 above) Macros don't exist any more.  What should this say?
 
 The class also provides some convenience methods that can be used as
 \$placeholders in your template definitions:
@@ -124,8 +274,8 @@ The class also provides some convenience methods that can be used as
      directory structure.
 \end{itemize}
 
-See the file \code{examples/webware_examples/cheetahSite/SiteTemplate.tmpl} for
-an extended example of how \code{SkeletonPage} can be used.
+See the file \code{examples/webware\_examples/cheetahSite/SiteTemplate.tmpl}
+for an extended example of how \code{SkeletonPage} can be used.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Cheetah.Tools}
@@ -134,41 +284,6 @@ an extended example of how \code{SkeletonPage} can be used.
 As mentiond above, utility modules contributed by third parties are stored in
 the \code{Cheetah.Tools} package. It currently contains:
 
-\begin{itemize}
-\item {\bf Cheetah.Tools.RecursiveNull} -- Nothing, but in a friendly way.  Good
-     for filling in for objects you want to hide.  If \code{\$form.f1} is a
-     RecursiveNull object, then \code{\$form.f1.anything["you"].might("use")} will
-     resolve to the empty string. Contributed by Ian Bicking.
-\end{itemize}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Cheetah.SettingsManager}
-\label{libraries.SettingsManager}
-
-The \code{SettingsManager} class in the \code{Cheetah.SettingsManager} module is
-a mixin class that provides facilities for managing application settings.  
-SettingsManager is designed to:
-\begin{itemize}
-\item work well with nested settings dictionaries of any depth
-\item be able to read/write \code{.ini style config files} (or strings)
-\item be able to read settings from Python src files (or strings) so that
-     complex Python objects can be stored in the application's settings
-     dictionary.  For example, you might want to store references to various
-     classes that are used by the application and plugins to the application
-     might want to substitute one class for another.
-\item allow sections in \code{.ini config files} to be extended by settings in
-     Python src files.  If a section contains a setting like
-     ``\code{importSettings=mySettings.py}'', \code{SettingsManager} will merge
-     all the settings defined in ``\code{mySettings.py}'' with the settings for
-     that section that are defined in the \code{.ini config file}.
-\item maintain the case of setting names, unlike the ConfigParser module
-\end{itemize}
-
-Cheetah uses \code{SettingsManager} to manage its configuration settings.
-\code{SettingsManager} might also be useful in your own applications. See the
-source code and docstrings in the file \code{src/SettingsManager.py} for more
-information. If there is sufficient interest in \code{SettingsManager} we will
-release it as a standalone module.
 
 
 % Local Variables:

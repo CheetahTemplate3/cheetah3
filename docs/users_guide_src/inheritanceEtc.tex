@@ -217,11 +217,19 @@ inner block2 contents
 
 Note that the name of the block is optional for the \code{\#end block} tag.
 
-Technically, \code{\#block} directive is equivalent to a \code{\#def} directive followed
-immediately by a \code{\#placeholder} for the same name.  In fact, that's what Cheetah does.
-So \code{\#block} creates a method as well as defining a block, and you may call this method
-using a placeholder if you want its output to appear in other locations too.
+Technically, \code{\#block} directive is equivalent to a \code{\#def} directive
+followed immediately by a \code{\#placeholder} for the same name.  In fact,
+that's what Cheetah does.  So \code{\#block} creates a method as well as
+defining a block, and you may call this method using a placeholder if you want
+its output to appear in other locations too.
 
+Sometimes Cheetahites use the term "block" to refer to any multiline directive
+(e.g., \code{\#for ... \#end for}).  Thus, the terms "for-blocks", "if-blocks",
+etc.  These have nothing to do with the blocks described in this section, which
+are methods created by the \code{\#block} directive.  It's just a coincidence
+that the English language uses the same term for both things.  (Did you know 
+that "run" has over fifty meanings in the dictionary?  And "take" has
+seventy-three.  That's not counting phrases like "take off" and "run-in".)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

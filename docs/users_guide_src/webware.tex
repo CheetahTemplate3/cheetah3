@@ -6,132 +6,209 @@
 \subsection{Background}
 \label{webware.background}
 
-{\bf Webware} is a 'Python-Powered Internet Platform' that uses servlets in a
-manner similar to Java servlets.  {\bf WebKit} is the name of Webware's
-application server.  For more details please visit
+{\bf Webware for Python} is a 'Python-Powered Internet Platform' that uses
+servlets in a manner similar to Java servlets.  {\bf WebKit} is the name of
+Webware's application server.  For more details, please visit
 \url{http://webware.sourceforge.net}.
 
-As Cheetah's core is flexible there are many ways to use it with Webware
-servlets.  There are two broad categories: the {\bf Inheritance} approach and
-the {\bf Containment} approach.  In the Inheritance approach the Template object
-{\em IS} the servlet and its \code{.respond()} method is automatically called by
-WebKit for each request.  All pre-request processing is handled via Cheetah.
+Because Cheetah's core is flexible, there are many ways to integrate it with
+Webware servlets.  There are two broad strategies: the {\bf Inheritance}
+approach and the {\bf Containment} approach.  The difference between the two is
+that in the Inheritance approach, your template object \code{\em is} the
+servlet, whereas in the Containment approach, the servlet is not a template but
+merely {\em uses} template(s) for portion(s) of its work.
 
-In the Containment approach an instance of the Template class is contained
-inside of a Webware servlet.  The servlet must explicitly call the Template
-object's \code{.respond()}, or \code{.\_\_str\_\_()}, method for each request.  In
-this case the servlet class can handle whatever per-request processing needs to
-be done before it calls Cheetah.respond().
+The Inheritance approach is recommended for new sites because it's simpler, and
+because it scales well for large sites with a
+site->section->subsection->servlet hierarchy.  The Containment approach is
+better for existing servlets that you don't want to restructure.  For instance,
+you can use the Containment approach to embed a discussion-forum table at the
+bottom of a web page.
 
-The Inheritance approach is the simplest and is best suited for building sites
-from scratch. The Containment approach is slightly more complex and is best
-suited for use with existing Webware servlets.  It is also ideal for cases where
-you wish to use Cheetah for only a portion of the servlet's output, such as a
-discussion-forum table at the bottom of a webpage.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Containment Approach}
+\label{webware.containment}
+
+In the Containment approach, your servlet is not a template.  Instead, it 
+it makes its own arrangements to create and use template object(s) for whatever
+it needs.  The servlet must explicitly call the template objects'
+\code{.respond()} (or \code{.\_\_str\_\_()}) method each time it needs to fill
+the template.  This does not present the output to the user; it merely gives
+the output to the servlet.  The servlet then calls its
+\code{\#self.response().write()} method to send the output to the user.
+
+The developer has several choices for managing her templates.  She can store the
+template definition in a string, file or database and call
+\code{\#Cheetah.Template.Template} manually on it.  Or she can put the
+template definition in a *.tmpl file and use {\bf cheetah-compile} (section
+\ref{howWorks.cheetah-compile}) to convert it to a Python class in a *.py
+module, and then import it into her servlet.
+
+Because template objects are probably not thread safe, you should not store a
+template object in a module variable and allow multiple servlets to fill it
+simultaneously.  Instead, each servlet should instantiate its own template
+object.
+
+One warning about using the \code{\#include} directive in the Containment
+approach: the current directory while your servlet is running is probably not
+the directory the servlet resides in, but instead some other directory
+Webware's ``\code{current working directory}'' probably isn't the AppServer has
+chosen.  This means that relative paths relative to the servlet directory
+won't work.  Instead, you should prefix your paths with whatever Webware's
+\code{self.serverSidePath()} returns (aka \code{Servlet.serverSidePath()}, a
+method that exists for just this purpose.
+
+%% @@MSO: Do we really want to say "#include" in the previous paragraph?
+%% This really applies to all paths, any file the servlet might open or
+%% refer to.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Inheritance Approach}
+\label{webware.inheritance}
+
+In the Inheritance approach, your template object doubles as as Webware 
+servlet.  {\bf cheetah-compile} (section \ref{howWorks.cheetah-compile}) 
+automatically creates modules containing valid Webware servlets.  A servlet is
+a subclass of Webware's \code{WebKit.HTTPServlet} class, contained in a module
+having the same name as the servlet.  Webware's AppServer uses the request URL
+to find the module, and then instantiates the servlet/template.  The servlet
+must have a \code{.respond()} method (or \code{.respondToGet()},
+\code{.respondToPut()}, etc., but the Cheetah default is \code{.respond()}).
+Servlets created by cheetah-compile meet all these requirements.
 
 There are two ways to use the Inheritance approach: automatically by creating
-{\bf \code{.tmpl servlet files}} (e.g. ``myTemplate.tmpl'') or manually by
-creating {\bf \code{.py servlet files}} (e.g. ``myServlet.py''). \code{.py
-  servlet files} are Webware's default type of servlet file.  A \code{.tmpl
-  servlet file} is a Cheetah specific type of servlet file that is converted
-automatically into a \code{.py servlet file} that Webware understands.
+{\bf *.tmpl servlet files} (e.g. ``myTemplate.tmpl'') and running
+cheetah-compile, or manually by creating {\bf .py servlet files} (e.g.
+``myServlet.py'').
+
+Working with *.tmpl servlet files is recommended because it hides a lot of
+extraneous details.  It's a good idea for Cheetah users who don't have a deep
+understanding of Python, but even Python gurus will enjoy the convenience.
+
+(Cheetah has a Webware plugin that automatically converts a \code{.tmpl servlet
+file} into a \code{.py servlet file} when the \code{.tmpl servlet file} is
+requested by a browser.  However, that plugin is currently unavailable because
+it's being redesigned.  Until the 0.9.9 release of Cheetah, use
+\code{cheetah-compile} instead.)
+
+What about logic code?  Cheetah promises to keep content (the placeholder
+values), graphic design (the template definition and is display logic), and
+algorithmic logic (complex calculations and side effects) separate.  How?
+Where do you do form processing?
+
+The answer is that your template class can inherit from a class containing
+the analytical logic.  You can either use the \code{\#extends} directive in
+Cheetah to indicate the superclass(es), or write a Python \code{\#class}
+statement to do the same thing.  Of course, the \code{\#extends} strategy is
+easier, and makes your template definition self-documenting about who its
+parent is.  See the template \code{Cheetah.Templates.SkeletonPage.tmpl} and its
+logic class \code{Cheetah.Templates.\_SkeletonPage.py} for an example of 
+a template inheriting logic code.
+
+If you write inherit from a mixin class containing \code{.awake()} and 
+\code{.sleep()} methods, Webware will automatically call those methods before
+and after it calls \code{.respond()} to fill the template.  So 
+\code{.awake()} is a good place to put calculations, side effects and 
+form processing that must be done before the template is filled.
+\code{.awake()} can even redirect to another servlet if you discover that this
+isn't the appropriate servlet for the situation (e.g., in case of user errors
+on a form).  
+
+(Note: if \code{\#WebKit.Servlet} is not available, Cheetah fakes it with a
+dummy class to satisfy the dependency.  This allows servlets to be tested on
+the command line even on systems where Webware is not installed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Using .tmpl servlet files}
-\label{webware.tmpl}
+\subsection{Form processing}
+\label{webware.form}
 
-As mentioned above a \code{.tmpl servlet file} is a Cheetah specific type of
-servlet file that is converted automatically, or semi-automatically, into a
-\code{.py servlet file} that Webware understands.  Working with \code{.tmpl
-  servlet files} hides alot of extraneous details and is recommended for Cheetah
-users who don't have a deep understanding of Python.
+There are several ways to display and process HTML forms with Cheetah, but 
+because not many forms-using Cheetah sites have been deployed yet, we're not
+sure which strategy is the best.  So we'll just mention all the strategies we
+know about and let you experiment.  If you find a strategy that works or doesn't
+work, let us know so we can incorporate it into this Guide.
 
-Section \ref{howWorks.tmpl2py} discussed how to convert .tmpl files to
-.py files using the \code{cheetah-compile} command.
+Form processing involves two steps.  
+\begin{enumerate}
+\item{} Display the form.  
+\item{} In the next web request, read the parameters the user submitted,
+check for user errors, perform any side effects (e.g., reading/writing a
+database or session data) and present the user an HTML response or another
+form.  
+\end{enumerate}
 
-Cheetah has a Webware plugin that automatically converts a
-\code{.tmpl servlet file} into a \code{.py servlet
-  file} when the 
-\code{.tmpl servlet file} is requested by a browser.  However, that plugin
-is currently unavailable because it's being redesigned.  Until the 0.9.9
-release of Cheetah, use \code{cheetah-compile} instead.
+The second step may involve choosing between several templates to fill (or
+several servlets to redirect to), or a big if-elif-elif-else construct to
+display a different portion of the template depending on the situation.
 
+In the oldest web applications, step 1 and step 2 were handled by separate
+objects.  Step 1 was a static HTML file, and step 2 was a CGI script.
+Frequently, a better strategy is to have a single servlet handle both steps.
+The servlet can use the presence or absence of certain CGI parameters
+(e.g., the submit button, or a hidden mode field) to determine which step to
+take.  This also allows the servlet to redisplay the form with "try again"
+error messages in case of user error.  
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Writing .tmpl servlet files}
-\label{webware.tmpl.writing}
+Reading the CGI parameters and doing the side effects are more of a Webware 
+issue and a Python issue than a Cheetah issue, so we don't have much to say
+about that here.  We'll just reiterate that the \code{.awake()} method in a
+mixin class is an excellent place to do these activities.  
 
-Here's an example \code{.tmpl servlet file} with no Cheetah syntax in it:
+(Another way would be to put a \code{\#silent \$doEverything()} call in your
+template to ensure the side effects get done, but that's ugly.  It also
+requires you to remember to put that line in your templates.)
 
-\begin{verbatim}
-## FILE: hello_world.tmpl ##
-<HTML>
-<HEAD><TITLE>Hello World - Test Servlet</TITLE></HEAD>
-<BODY>
-Hello World!
-</BODY>
-</HTML>
-\end{verbatim}
-
-Here's the previous example with some Cheetah syntax.  Note that all lines that begin with
-\code{\#\#} are comment lines.
-
-\begin{verbatim}
-## FILE: hello_world.tmpl ##
-#def title
-Hello World!
-#end def
-#def contents
-Hello World!
-#end def
-
-<HTML>
-<HEAD><TITLE>$title</TITLE></HEAD>
-<BODY>
-$contents
-</BODY>
-</HTML>
-\end{verbatim}
+\code{FunFormKit} is a third-party Webware package that makes it easier to
+produce forms and handle their logic.  It has been successfully been used with
+Cheetah.  You can download FunFormKit from
+\url{http://colorstudy.net/software/funformkit/} and try it out for yourself.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The SkeletonPage framework}
 \label{webware.skeletonPage}
 
-Sect \ref{libraries.templates.skeletonPage} contains information on a stock
+Section \ref{libraries.templates.skeletonPage} contains information on a stock
 template that greatly simplifies defining the basic HTML structure of your web
 page templates.  It is equivalent to Webware's \code{WebKit.Page} servlet and
 is well worth the time spent learning how to use it.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Using the Containment approach}
-\label{webware.containment}
+Other alternatives include subclassing \code{Cheetah.Servlet} or
+\code{WebKit.Page}.  
 
-With the containment approach your template obj does not repond directly to a
-request from Webware's AppServer. Rather, you use a non-Cheetah-specific servlet
-to handle the request and use one or more Cheetah template objects inside the
-servlet's \code{.respond()} method and send their output via the 
-\code{response.write()} method.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Using \#include with the containment approach}
-\label{webware.containment.includes}
+\subsection{Caveats about \#implements}
+\label{webware.implements}
 
-Webware's ``\code{current working directory}'' probably isn't the directory that
-your servlet files are sitting in.  All relative paths need to be adjusted so
-they are relative to the servlet's directory and not Webware's \code{current
-  working directory}.  Use Webware's \code{Servlet.serverSidePath()} method for
-this purpose.
+A template object has several methods, but there is always one most important
+method, the method you call to fill the template.  By default, this method is
+called \code{.respond()}.  However, you can use the \code{\#implements}
+directive to change the name of that method.  You have to do this if you're
+integrating Cheetah with an existing system, and the calling routine thinks the
+method it should call is named something else besides \code{.respond()}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{User interaction in either approach}
-%\label{webware.userInteraction}
-%
-%By {\bf user interaction} we mean the use of forms, query strings or sessions to
-%create interactive pages that allow user interation with a website.
-%[{\bf This section is under construction. Check back later.}]
-%
+Where this matters is with \code{\#extends}.  If your template definition 
+contains \code{\#extends}, Cheetah sets the main method name to 
+\code{.writeBody()} instead of \code{.respond()}.  Why?  Because Webware's
+\code{WebKit.Page} class calls \code{.writeBody()} to produce the content 
+portion of the page.  Which is great if your servlet/template is subclassing
+\code{WebKit.Page} or reimplementing a block called \code{writeBody} in a
+parent template, but is useless otherwise.
 
+So you must think about what your main method should be called and set
+\code{\#implements} accordingly if necessary.
+
+%% @@ MSO: Is the term "main method" too confusing, since interactive programs
+%% use the word "main" to mean their "do everything" method?
+
+In any case, \code{\/\_\_str\_\_()} will be an alias for the main method, no
+matter what it's called.  So you can always call \code{str(t)} to fill your
+template, or \code{print t} to fill and print it, no matter what the main
+method is called.  But of course, in a Webware servlet you never use the
+\code{print} statement directly except for debugging.
 
 % Local Variables:
 % TeX-master: "users_guide"
