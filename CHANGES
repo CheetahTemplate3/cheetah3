@@ -1,5 +1,10 @@
 Please initial your changes (there's a key at bottom) and add a date for each release
 ================================================================================
+0.9.12 (unreleased)
+   - $request().field(args) now works, identical to $request.field(args).
+     The request object is now self.request() instead of self.request.
+     This is all for compatibility with Webware usage.  Modified Servlet.py.
+
 0.9.11 (Mar 07, 2002)
    - fixed a careless bug in cheetah-compile (TR)
    - implemented the new 'cheetah' wrapper script (TR)
@@ -12,8 +17,9 @@ Please initial your changes (there's a key at bottom) and add a date for each re
    - added test cases for single-line #defs and #blocks with args (TR)
    - fixed a silly typo bug in Parser.py where a comma was left at the end of
      regex definition, make it a tuple rather than a regex
-   - fixed the directive matching bug that Jeff Johnson reported.  It was causing
-     #else# to not match, while #else # was matching. + added a test for it.(TR)
+   - fixed the directive matching bug that Jeff Johnson reported.  It was
+     causing #else# to not match, while #else # was matching. + added a test
+     for it.(TR)
    - fixed bug in a regex that was preventing bare $'s followed by whitespace and
      then valid varname chars from parsing as just $ instead of as a placeholder (TR)
    - added some code to break reference cycles after the compilation is
