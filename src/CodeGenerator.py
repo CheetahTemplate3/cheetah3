@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.23 2001/08/08 02:35:31 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.24 2001/08/08 06:31:29 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.23 $
+Version: $Revision: 1.24 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/08 02:35:31 $
+Last Revision Date: $Date: 2001/08/08 06:31:29 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.23 $"[11:-2]
+__version__ = "$Revision: 1.24 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -445,9 +445,9 @@ def preProcessRawDirectives(templateObj, templateDef):
 
 
 def preProcessIncludeDirectives(templateObj, templateDef):
-    """replace any #include statements with their substitution value.  This method
-    can handle includes from file (absolute paths only at the moment) and from
-    placeholders such as $getBodyTemplate"""
+    """Replace any #include statements with their substitution value.  This
+    method can handle includes from file and from placeholders such as
+    $getBodyTemplate"""
 
     import Template                         # import it here to avoid circ. imports
     
@@ -456,36 +456,46 @@ def preProcessIncludeDirectives(templateObj, templateDef):
     if not hasattr(templateObj, '_parsedIncludes'):
         templateObj._parsedIncludes = {}
 
-    def subber(match, templateObj=templateObj, Template=Template):
+    RESTART = [False,]
+    def subber(match, templateObj=templateObj, RESTART=RESTART, Template=Template):
         args = match.group(1).strip()
         # do a safety/security check on this tag
         validateIncludeDirective(templateObj, args)
-        includeString = match.group(1).strip()        
-        raw = False
-
-        #@@ autoUpdate behaviour needs to be implemented
-        #autoUpdate = True
+        includeString = match.group(1).strip()
         
+        raw = False
+        directInclude = False
+
+        ## deal with any extra args to the #include directive
         if args.split()[0] == 'raw':
             raw = True
             args= ' '.join(args.split()[1:])
-
+        elif args.split()[0] == 'direct':
+            directInclude = True
+            args= ' '.join(args.split()[1:])
+            
+        ## get the Cheetah code to be included
         if args[0] == templateObj.setting('placeholderStartToken'):
             searchList = templateObj.searchList()
             translatedArgs = templateObj.translatePlaceholderVars(args)
             includeString = eval( translatedArgs )
-            
         elif args.startswith('"') or args.startswith("'"):
             fileName = args[1:-1]
             fileName = templateObj.normalizePath( fileName )
             includeString = templateObj.getFileContents( fileName )
 
+
+        ## now process finish include
         if raw:            
             includeID = '_' + str(id(includeString))
             templateObj._rawIncludes[includeID] = includeString
             return templateObj.setting('placeholderStartToken') + \
                    '{rawIncludes.' + includeID + '}'
+        elif directInclude:
+            RESTART[0] = True
+            return includeString
         else:
+            #@@ autoUpdate behaviour needs to be implemented
             includeID = '_' + str(id(includeString))
             nestedTemplate = Template.Template(
                 templateDef=includeString,
@@ -502,7 +512,10 @@ def preProcessIncludeDirectives(templateObj, templateDef):
     for RE in templateObj._settings['delimiters']['includeDirective']:
         templateDef = RE.sub(subber, templateDef)
         
-    return templateDef
+    if RESTART[0]:
+        return Template.RESTART(templateDef)
+    else:
+        return templateDef
 
 
 def preProcessBlockDirectives(templateObj, templateDef):
@@ -517,16 +530,16 @@ def preProcessBlockDirectives(templateObj, templateDef):
         if not templateObj._cheetahBlocks.has_key(blockName):
             templateObj._cheetahBlocks[blockName] = blockContents
 
-        if templateObj._settings['includeBlockMarkers']:
+        if templateObj.setting('includeBlockMarkers'):
             markerStart = templateObj._settings['blockMarkerStart']
             markerEnd = templateObj._settings['blockMarkerEnd']
         
             replaceString = markerStart[0] + blockName + markerStart[1] + \
-                   '#include ' + templateObj.setting('placeholderStartToken') + \
+                   '#include direct ' + templateObj.setting('placeholderStartToken') + \
                    'cheetahBlocks.' + blockName + '/#' + \
                    markerEnd[0] + blockName + markerEnd[1]
         else:
-            replaceString = '#include ' + templateObj.setting('placeholderStartToken') + \
+            replaceString = '#include direct ' + templateObj.setting('placeholderStartToken') + \
                             'cheetahBlocks.' + blockName + '/#'
 
         return templateDef[0:startTagMatch.start()] + replaceString + \
@@ -534,7 +547,7 @@ def preProcessBlockDirectives(templateObj, templateDef):
 
     ## handle the whitespace-gobbling blocks
 
-    for startTagRE in templateObj._settings['delimiters']['blockDirectiveStart']:
+    for startTagRE in templateObj.setting('delimiters')['blockDirectiveStart']:
 
         while startTagRE.search(templateDef):
             startTagMatch = startTagRE.search(templateDef)
