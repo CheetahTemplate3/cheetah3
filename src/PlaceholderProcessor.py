@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.6 2001/07/12 17:41:54 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.7 2001/07/12 19:07:42 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/12 17:41:54 $
+Last Revision Date: $Date: 2001/07/12 19:07:42 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 
 ##################################################
@@ -272,7 +272,18 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
         if not templateObj._codeGeneratorState.has_key('defaultCacheType'):
             templateObj._codeGeneratorState['defaultCacheType'] = None
 
+    def getValueAtRuntime(self, templateObj, tag):
+        searchList = templateObj.searchList()
+        try:
+            translatedTag = self.translatePlaceholderString(self._marker + tag, searchList, templateObj)
+            value = eval(translatedTag)
+            if callable(value):
+                value = value()
+            return value
+        except NameMapper.NotFound:
+            return templateObj._settings['varNotFound_handler'](templateObj, tag)
 
+        
     def processTag(self, templateObj, tag):
 
         """This method is called by the Template class for every $placeholder
@@ -286,8 +297,15 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
                         templateObj._codeGeneratorState['cacheRefreshInterval']
         else:
             cacheType = NO_CACHE
+        
+        if tag.find('[') != -1:         # NameMapper can't handle brackets
+            nameMapperPartOfName, remainderOfName = tag.split('[')
+            remainderOfName = '[' + remainderOfName
+        else:
+            nameMapperPartOfName = tag
+            remainderOfName = ''
 
-        nameChunks = tag.split('.')
+        nameChunks = nameMapperPartOfName.split('.')
         if nameChunks[0] == 'CACHED':
             del nameChunks[0]
             cacheType = STATIC_CACHE
@@ -295,22 +313,25 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
             cacheType = TIMED_REFRESH_CACHE
             cacheRefreshInterval = float('.'.join(nameChunks[0].split('_')[1:]))
             del nameChunks[0]
-        tag = '.'.join(nameChunks)
+        tag = '.'.join(nameChunks) + remainderOfName
         
         ## deal with local vars from #set and #for directives
-        if tag in templateObj._localVarsList:
+        if nameMapperPartOfName in templateObj._localVarsList:
             return self.wrapEvalTag(templateObj, 'str(' + tag + ')')
 
         elif nameChunks[0] in templateObj._localVarsList:
             translatedTag = 'valueForName(' + nameChunks[0] + ',"""' + \
-                       '.'.join(nameChunks[1:]) + '""", exectuteCallables=True)'
+                       '.'.join(nameChunks[1:]) + '""", exectuteCallables=True)' + \
+                       remainderOfName
             return self.wrapEvalTag(templateObj, "str(" + translatedTag + ")")
-
 
         searchList = templateObj.searchList()
         try:
             translatedTag = self.translatePlaceholderString(self._marker + tag, searchList, templateObj)
         except NameMapper.NotFound:
+            self.wrapEvalTag(templateObj,
+                             'self.placeholderProcessor.getValueAtRuntime(' +
+                             tag + ')')
             return templateObj._settings['varNotFound_handler'](templateObj, tag)
 
         if tag.find('(') == -1:

@@ -1,6 +1,6 @@
 Please initial your changes and a date for each release
 ================================================================================
-0.9.7 (not released yet)
+0.9.7 (July 12, 2001)
   - reimplemented the parsing of $placeholders using the Python tokenizer module (TR)
     - now translates into Python code instead of going through NameMapper for
       each request
@@ -17,6 +17,11 @@ Please initial your changes and a date for each release
     being used between $placeholders (TR)
   - generalized the line ending regex for single-line comments (TR)
   - corrected the spelling of 'Delimiters' throughout Cheetah (TR)
+  - made insertLines in Utilities.py more robust (Chuck)
+  - added key argument to raising some NotFound exceptions in NameMapper (Chuck)
+  - fixed strange bug involving missing templateObj parameter 
+    in PlaceholderProcessor.py(Chuck)
+  - expanded on the docs (Mike)
 
 0.9.6 (June 12, 2001)
   - fixed a bug in NameMapper that was preventing 'obj.__class__.__name__' from mapping (TR)
