@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.8 2001/11/05 07:26:39 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.9 2001/11/25 03:04:32 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/05 07:26:39 $
+Last Revision Date: $Date: 2001/11/25 03:04:32 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -20,13 +20,10 @@ import sys
 import re
 import os
 import getopt
-from os.path import \
-     walk as pathWalk, \
-     split as pathSplit, \
-     splitext as pathSplitext, \
-     exists
+import os.path
 
 from glob import glob
+import shutil
 
 #intra-package imports ...
 from Version import version
@@ -38,6 +35,9 @@ from Compiler import Compiler
 
 True = (1==1)
 False = (1==0)
+
+class Error(Exception):
+    pass
     
 class CheetahCompile:
     """A command-line compiler for Cheetah .tmpl files."""
@@ -106,26 +106,18 @@ class CheetahCompile:
                     self.processFile(file)
         else:
             baseName = os.path.splitext(fileName)[0]
+            if not re.match(r'[a-zA-Z_][a-zA-Z_0-9]*$',baseName):
+                raise Error(
+                    "The filename %s contains invalid characters.  It must" +
+                    " be named according to the same rules as Python modules."
+                    % fileName)
+            
             self.compileFile(baseName)
-
-    
-    def recursiveCompile(self, dir='.', backupServletFiles=True):
-        """Recursively walk through a directory tree and compile Cheetah files."""
-        pending = [dir]
-        while pending:
-            dir = pending.pop()
-            ## add sub-dirs
-            for shortname in os.listdir(dir):
-                path = os.path.join(dir, shortname)
-                if os.path.isdir(path):
-                    pending.append(path)
-                    
-            ## do it!
-            self.compileDir(dir, backupServletFiles=backupServletFiles) 
 
             
     def compileFile(self, fileNameMinusExt):
         """Compile an single Cheetah file.  """
+
 
         self.compiledFiles.append(fileNameMinusExt)
         srcFile = fileNameMinusExt + self.CHEETAH_EXTENSION
@@ -134,9 +126,14 @@ class CheetahCompile:
                                mainClassName=className))
 
         if not self.printGenerated or self.writeGenerated:
-            fp = open(fileNameMinusExt + self.SERVLET_EXTENSION,'w')
+            outputModuleFilename = fileNameMinusExt + self.SERVLET_EXTENSION
+            if os.path.exists(outputFilename):
+                shutil.copyfile(outputModuleFilename,
+                                fileNameMinusExt + self.SERVLET_BACKUP_EXT)
+            fp = open(outputModuleFilename,'w')
             fp.write(genCode)
             fp.close()
+            
         if self.printGenerated:
             print genCode
 
@@ -155,24 +152,7 @@ class CheetahCompile:
             fp.write(value)
             fp.close()
 
-    
-    def compileDir(self, dirName='.', backupServletFiles=True):
-        """Compile all the Cheetah files in a directory."""
         
-        cheetahFiles = glob(dirName + '/*' + self.CHEETAH_EXTENSION)
-        namesMinusExt = [pathSplitext(fileName)[0] for fileName in cheetahFiles] 
-    
-        if backupServletFiles:
-            for i in range(len(namesMinusExt)):
-                if exists( namesMinusExt[i] + self.SERVLET_EXTENSION):
-                    print 'backing up', namesMinusExt[i] + \
-                          self.SERVLET_EXTENSION
-                    os.rename(namesMinusExt[i] + self.SERVLET_EXTENSION,
-                              namesMinusExt[i] + self.SERVLET_BACKUP_EXT)
-    
-        for name in namesMinusExt:
-            self.compileFile(name)
-    
     def usage(self):
         print \
 """Cheetah %(version)s command-line compiler by %(author)s
