@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.97 2002/06/23 19:30:39 hierro Exp $
+# $Id: Template.py,v 1.98 2002/07/29 22:19:58 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.97 $
+Version: $Revision: 1.98 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/06/23 19:30:39 $
+Last Revision Date: $Date: 2002/07/29 22:19:58 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.97 $"[11:-2]
+__revision__ = "$Revision: 1.98 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -421,6 +421,12 @@ class Template(SettingsManager, Servlet, WebInputMixin):
 
 
     def _genTmpFilename(self):
+        
+        """Generate a temporary file name.  This is used internally by the
+        Compiler to do correct importing from Cheetah templates when the
+        template is compiled via the Template class' interface rather than via
+        'cheetah compile'."""
+       
         return (
             os.path.split(mktemp())[0] + '/__CheetahTemp_' +
             ''.join(map(lambda x: '%02d' % x, time.localtime(time.time())[:6])) + 
@@ -432,7 +438,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
 
         """Used by the Compiler to do correct importing from Cheetah templates
         when the template is compiled via the Template class' interface rather
-        than via 'cheetah-compile'.
+        than via 'cheetah compile'.
         """
         
         tmpFilename = self._genTmpFilename()
@@ -475,6 +481,11 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         return packageName
         
     def _impModFromDummyPackage(self, packageName, pathToImport):
+        
+        """Imports a python .py module as if it were part of the package given
+        by 'packageName'.  The package doesn't need to exist.
+        """
+        
         moduleFileName = os.path.basename(pathToImport)
         moduleDir = os.path.dirname(pathToImport)
         moduleName, ext = os.path.splitext(moduleFileName)
