@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.19 2001/11/07 16:51:04 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.20 2001/11/09 19:18:33 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.19 $
+Version: $Revision: 1.20 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2001/11/07 16:51:04 $
+Last Revision Date: $Date: 2001/11/09 19:18:33 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.19 $"[11:-2]
+__version__ = "$Revision: 1.20 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -161,7 +161,7 @@ class GenUtils:
 
         chunk = nameChunks.pop()
         firstBit = chunk[0].split('.')[0]
-        
+
         if chunk[0] in self.localVars() or chunk[0] in self.importedVars():
             translatedName = chunk[0] + chunk[2]
         elif  firstBit in self.localVars():
@@ -240,9 +240,9 @@ class MethodCompiler(SettingsManager, GenUtils):
         self._pendingStrConstChunks = []
         self._localVars = ['self']
         if self.setting('recognize__builtins__'):
-            self._localVars.extend( dir(__builtins__) )
-        
-        
+            import __builtin__
+            self._localVars.extend( dir(__builtin__) )
+
         self._methodSignature = None
         self._methodDef = None
         self._docStringLines = []
@@ -534,17 +534,16 @@ class AutoMethodCompiler(MethodCompiler):
 
     def setupState(self):
         MethodCompiler.setupState(self)
-        self._localVars = ['self',
-                           'trans',
-                           'dummyTrans',
-                           'VFS',
-                           'VFN',
-                           'SL',
-                           'globalSetVars',
-                           'write',
-                           'filter',
-                           'currentTime',
-                           ]
+        self._localVars.extend(['trans',
+                                'dummyTrans',
+                                'VFS',
+                                'VFN',
+                                'SL',
+                                'globalSetVars',
+                                'write',
+                                'filter',
+                                'currentTime',
+                                ])
         self._argStringList = [ ("self",None) ]
         self._streamingEnabled = True
         
