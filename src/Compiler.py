@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.23 2002/02/26 22:02:04 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.24 2002/02/27 23:21:41 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.23 $
+Version: $Revision: 1.24 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/02/26 22:02:04 $
+Last Revision Date: $Date: 2002/02/27 23:21:41 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.23 $"[11:-2]
+__revision__ = "$Revision: 1.24 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -799,10 +799,16 @@ class ClassCompiler(SettingsManager, GenUtils):
         self._initMethChunks.append(chunk)
 
     def addAttribute(self, attribExpr):
+        ## first test to make sure that the user hasn't used any fancy Cheetah syntax
+        #  (placeholders, directives, etc.) inside the expression 
+        if attribExpr.find('VFN(') != -1 or attribExpr.find('VFS(SL,') != -1:
+            raise ParseError(self,
+                             'Invalid #attr directive.' +
+                             ' It should only contain simple Python literals.')
+        ## now add the attribute
         self._generatedAttribs.append(attribExpr)
         if self._templateObj:
             exec('self._templateObj.' + attribExpr.strip())
-            
 
     def addSettingsToInit(self, settingsStr, settingsType='ini'):
         if settingsType=='python':
