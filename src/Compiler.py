@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.60 2004/12/27 23:11:33 jjinux Exp $
+# $Id: Compiler.py,v 1.61 2004/12/28 21:23:17 jjinux Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.60 $
+Version: $Revision: 1.61 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2004/12/27 23:11:33 $
+Last Revision Date: $Date: 2004/12/28 21:23:17 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.60 $"[11:-2]
+__revision__ = "$Revision: 1.61 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -108,7 +108,7 @@ class GenUtils:
         
         
     def genCheetahVar(self, nameChunks, plain=False):
-        if nameChunks[0][0] in ["_", "N_", "ngettext"]:
+        if nameChunks[0][0] in self.setting('gettextTokens'):
             self.addGetTextVar(nameChunks)
         if self.setting('useNameMapper') and not plain:
             return self.genNameMapperVar(nameChunks)
@@ -116,7 +116,12 @@ class GenUtils:
             return self.genPlainVar(nameChunks)
 
     def addGetTextVar(self, nameChunks):
-        """Leave something for gettext to recognize--a harmless side effect."""
+        """Output something that gettext can recognize.
+        
+        This is a harmless side effect necessary to make gettext work when it
+        is scanning compiled templates for strings marked for translation.
+        
+        """
         self.addChunk("if False:")
         self.indent()
         self.addChunk(self.genPlainVar(nameChunks[:]))

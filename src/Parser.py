@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.65 2004/04/07 01:30:12 tavis_rudd Exp $
+# $Id: Parser.py,v 1.66 2004/12/28 21:23:17 jjinux Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.65 $
+Version: $Revision: 1.66 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2004/04/07 01:30:12 $
+Last Revision Date: $Date: 2004/12/28 21:23:17 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.65 $"[11:-2]
+__revision__ = "$Revision: 1.66 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -259,6 +259,7 @@ class _LowLevelSemanticsParser(Lexer):
             'directiveEndToken':'#',
             'PSPStartToken':'<%',
             'PSPEndToken':'%>',
+            'gettextTokens': ["_", "N_", "ngettext"],
             }
         if not hasattr(self, '_settings'):
             self._settings = defaults
