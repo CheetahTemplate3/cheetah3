@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.4 2001/10/12 02:56:16 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.5 2001/10/25 21:10:09 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -15,12 +15,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/10/12 02:56:16 $
+Last Revision Date: $Date: 2001/10/25 21:10:09 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 
 ##################################################
@@ -975,6 +975,33 @@ class ForDirective(OutputTest):
                     "AA,BB\nCC,DD\n")
 
 
+class RepeatDirective(OutputTest):
+
+    def test1(self):
+        """basic #repeat"""
+        self.verify("#repeat 3\n1\n#end repeat",
+                    "1\n1\n1\n")
+
+    def test2(self):
+        """#repeat with numeric expression"""
+        self.verify("#repeat 3*3/3\n1\n#end repeat",
+                    "1\n1\n1\n")
+    
+    def test3(self):
+        """#repeat with placeholder"""
+        self.verify("#repeat $numTwo\n1\n#end repeat",
+                    "1\n1\n")
+    
+    def test4(self):
+        """#repeat with placeholder * num"""
+        self.verify("#repeat $numTwo*1\n1\n#end repeat",
+                    "1\n1\n")
+        
+    def test5(self):
+        """#repeat with placeholder and WS"""
+        self.verify("   #repeat $numTwo   \n1\n   #end repeat   ",
+                    "1\n1\n")
+
 class AttrDirective(OutputTest):
 
     def test1(self):
@@ -1331,6 +1358,34 @@ class IfDirective(OutputTest):
         Same as test 8 but using else if instead of elif"""
         self.verify("#if $emptyString\n$c\n#else if $numOne\n$numOne\n#else\n$c - $c\n#end if",
                     "1\n")
+
+
+class UnlessDirective(OutputTest):
+    
+    def test1(self):
+        """#unless 1"""
+        self.verify("#unless 1\n 1234 \n#end unless",
+                    "")
+
+    def test2(self):
+        """#unless 0"""
+        self.verify("#unless 0\n 1234 \n#end unless",
+                    " 1234 \n")
+
+    def test3(self):
+        """#unless $none"""
+        self.verify("#unless $none\n 1234 \n#end unless",
+                    " 1234 \n")
+
+    def test4(self):
+        """#unless $numTwo"""
+        self.verify("#unless $numTwo\n 1234 \n#end unless",
+                    "")
+
+    def test5(self):
+        """#unless $numTwo with WS"""
+        self.verify("   #unless $numTwo   \n 1234 \n    #end unless   ",
+                    "")
 
 class PSP(OutputTest):
     
