@@ -2,59 +2,220 @@
 #extends SiteTemplate
 #implements writeMainContentsCell
 
-<P>
-<B>Cheetah</B> is a $Python-powered template engine and code-generator. It aims to:
-<ul>
-    <li> make it easy to separate content, graphic design, and program code.
-    <li> make it easy to integrate content, graphic design, and program code.
-    <li> provide template designers with a small set of <i>display
-    logic</i> programming structures such as conditional blocks and for loops
-    <li> be equally well-suited for any text format including HTML,
-	SGML, XML, SQL, Postscript, e-mail and LaTeX
-    <li> achieve all these aims in a manner that is efficient, flexible, and extendable.
-</ul>
-</P>
+
 
 <P>
-<B>Cheetah</B> achieves these aims by:
+Cheetah is a Python-powered template engine and code generator.  It can be used
+as a standalone utility or it can be combined with other tools.  Cheetah has
+many potential uses, but web developers looking for a viable alternative to ASP,
+JSP, PHP and PSP are expected to be its principle user group.
+
+<P>
+Cheetah:
 
 <UL>
-<LI>blending the power and flexibility of Python with the simplicity of a
-     small Template Definition language that non-programmers can understand.
-<LI>giving template designers a simple way of accessing Python variables,
-     objects, and functions in their templates.
+<LI>generates HTML, SGML, XML, SQL, Postscript, form email, LaTeX, or any
+     other text-based format.
 
-<LI>providing a modular, object-orientated framework that makes it easy to
-     create and maintain large websites.
-
-<LI>compiling 'Template Definitions' into native Python code at startup.
-     Thereafter this code is executed for each request.  This approach is
-     dramatically faster than the string substitution approach used by many
-     templating engines.
-
+<P>
 </LI>
-<LI>providing a very simple, yet powerful, caching mechanism that can
-     significantly increase the responsiveness of a dynamic website.
+<LI>cleanly separates content, graphic design, and program code.  This leads
+     to highly modular, flexible, and reusable site architectures; faster
+     development time; and HTML and program code that is easier to understand
+     and maintain. It is particularly well suited for team efforts.
+
+<P>
+</LI>
+<LI>blends the power and flexibility of Python with a simple template language
+     that non-programmers can understand.
+
+<P>
+</LI>
+<LI>gives template writers full access to any Python data structure, module,
+     function, object, or method in their templates.
+
+<P>
+</LI>
+<LI>makes code reuse easy by providing an object-orientated interface to
+     templates that is accessible from Python code or other Cheetah templates.
+     One template can subclass another and selectively reimplement sections of
+     it.
+
+<P>
+</LI>
+<LI>provides a simple, yet powerful, caching mechanism that can dramatically
+     improve the performance of a dynamic website.
+
+<P>
+</LI>
+<LI>compiles templates into optimized, yet readable, Python code.
 </LI>
 </UL>
 
-<P><B>Cheetah</B> requires $Python 2.0 or greater. It can be used from ordinary Python
-programs, but also provides integration with <a
-href=http://webware.sourceforge.net/>Webware for Python</a>.</P>
+<P>
+Cheetah integrates tightly with <B>Webware for Python</B>
+(<a class="url" href="http://webware.sourceforge.net/">http://webware.sourceforge.net/</a>): a Python-powered application server and
+persistent servlet framework. Webware provides automatic session, cookie, and
+user management and can be used with almost any operating-system, web server, or
+database. Through Python, it works with XML, SOAP, XML-RPC, CORBA, COM, DCOM,
+LDAP, IMAP, POP3, FTP, SSL, etc.. Python supports structured exception handling,
+threading, object serialization, unicode, string internationalization, advanced
+cryptography, and more. It can also be extended with code and libraries written
+in C, C++, Java and other languages.
 
-<P><B>Cheetah</B> is Open Source Software, released under the terms of the Python
-License.
+<P>
+Like Python, Cheetah and Webware are Open Source Software and are supported by
+active user communities.  Together, they are a powerful and elegant framework
+for building dynamic web sites.
 
-<P><B>Cheetah</B> is alpha software as some aspects of its design are still subject to
-change.  We plan to release a stable version later this summer.
 
-<P> The discussion list is 
-<a href=mailto:cheetahtemplate-discuss@lists.sourceforge.net
->cheetahtemplate-discuss@lists.sourceforge.net</a>. 
-You can join <a href=http://lists.sourceforge.net/mailman/listinfo/cheetahtemplate-discuss>here</a>
-and view the archives <a
-href=http://www.geocrawler.com/redir-sf.php3?list=cheetahtemplate-discuss>here</a>.
-</P>
+<P>
+Like its namesake, Cheetah is fast, flexible and powerful.
+
+<P>
+
+<H2><A NAME="SECTION000220000000000000000">&nbsp;</A>
+<BR>
+Give me an example!
+</H2>
+
+<P>
+Here's a very simple example that illustrates some of Cheetah's basic syntax:
+
+<P>
+<dl><dd><pre class="verbatim">
+&lt;HTML&gt;
+&lt;HEAD&gt;&lt;TITLE&gt;$title&lt;/TITLE&gt;&lt;/HEAD&gt;
+&lt;BODY&gt;
+
+&lt;TABLE&gt;
+#for $client in $clients
+&lt;TR&gt;
+&lt;TD&gt;$client.surname, $client.firstname&lt;/TD&gt;
+&lt;TD&gt;&lt;A HREF="mailto:$client.email"&gt;$client.email&lt;/A&gt;&lt;/TD&gt;
+&lt;/TR&gt;
+#end for
+&lt;/TABLE&gt;
+
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre></dl>
+
+<P>
+Compare this with PSP:
+
+<P>
+<dl><dd><pre class="verbatim">
+&lt;HTML&gt;
+&lt;HEAD&gt;&lt;TITLE&gt;&lt;%=title%&gt;&lt;/TITLE&gt;&lt;/HEAD&gt;
+&lt;BODY&gt;
+
+&lt;TABLE&gt;
+&lt;% for client in clients: %&gt;
+&lt;TR&gt;
+&lt;TD&gt;&lt;%=client['surname']%&gt;, &lt;%=client'[firstname']%&gt;&lt;/TD&gt;
+&lt;TD&gt;&lt;A HREF="mailto:&lt;%=client['email']%&gt;"&gt;
+&lt;%=client['email']%&gt;&lt;/A&gt;&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;%end%&gt;
+&lt;/TABLE&gt;
+
+&lt;/BODY&gt;
+&lt;/HTML&gt;
+</pre></dl>
+
+<P>
+
+<H2><A NAME="SECTION000230000000000000000">&nbsp;</A>
+<BR>
+What is the philosophy behind Cheetah?
+</H2>
+
+<P>
+Cheetah's design was guided by these principles:
+
+<UL>
+<LI>Python for the back end, Cheetah for the front end.  Cheetah was
+     designed to complement Python, not replace it.
+
+<P>
+</LI>
+<LI>Cheetah's core syntax should be easy for non-programmers to learn.
+
+<P>
+</LI>
+<LI>Cheetah should make code reuse easy by providing an object-oriented
+     interface to templates that is accessible from Python code or other
+     Cheetah templates.
+
+<P>
+</LI>
+<LI>Python objects, functions, and other data structures should be fully
+     accessible in Cheetah.
+
+<P>
+</LI>
+<LI>Cheetah should provide flow control and error handling.  Logic
+     that belongs in the front end shouldn't be relegated to the
+     back end simply because it's complex.
+
+<P>
+</LI>
+<LI>It should be easy to <B>separate</B> content, graphic design, and program
+     code, but also easy to <B>integrate</B> them.
+
+<P>
+A clean separation makes it easier for a team of content writers,
+     HTML/graphic designers, and programmers to work together without stepping
+     on each other's toes and polluting each other's work.  The HTML framework
+     and the content it contains are two separate things, and analytical
+     calculations (program code) is a third thing.  Each team member should be
+     able to concentrate on their specialty and to implement their changes
+     without having to go through one of the others (i.e., the dreaded
+     ``webmaster bottleneck'').
+
+<P>
+While it should be easy to develop content, graphics and program
+     code separately, it should be easy to integrate them together into a
+     website.  In particular, it should be easy:
+
+<P>
+
+<UL>
+<LI>for <B>programmers</B> to create reusable components and functions
+          that are accessible and understandable to designers.
+</LI>
+<LI>for <B>designers</B> to mark out placeholders for content and
+          dynamic components in their templates.
+</LI>
+<LI>for <B>designers</B> to soft-code aspects of their design that are
+          either repeated in several places or are subject to change.
+</LI>
+<LI>for <B>designers</B> to reuse and extend existing templates and thus
+          minimize duplication of effort and code.
+</LI>
+<LI>and, of course, for <B>content writers</B> to use the templates that
+          designers have created.
+
+</LI>
+</UL>
+
+<P>
+</LI>
+</UL>
+
+<P>
+
+<P>
+<H2><A NAME="SECTION000260000000000000000">&nbsp;</A>
+<BR>
+How mature is Cheetah?
+</H2>
+
+<P>
+Cheetah is alpha software as some aspects of its design are
+still subject to change and the Users' Guide is incomplete.
+We plan to release a stable version later in 2001.
 
 ################################################################################
 ## reimplement a few other methods from SiteTemplate
@@ -65,7 +226,6 @@ href=http://www.geocrawler.com/redir-sf.php3?list=cheetahtemplate-discuss>here</
 #def writeLeftSideBar
 <BR>
 <a href=http://lists.sourceforge.net/mailman/listinfo/cheetahtemplate-discuss><B>Mailing&nbsp;List</B></a>
-<BR>
 <BR>
 <A HREF="http://sourceforge.net/cvs/?group_id=28961"><B>CVS</B></A><BR>
 #end def 

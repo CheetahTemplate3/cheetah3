@@ -1,69 +1,20 @@
 #from Cheetah.Templates.SkeletonPage import SkeletonPage
 #extends SkeletonPage
-##============================================================================##
+##################################################################################
 #def navDivider
 $spacer(35)|$spacer(35)
 #end def
 
-#def Python
-<A HREF="http://www.python.org">Python</A>
-#end def
+#attribute Python = '<A HREF="http://www.python.org">Python</A>'
 
-#def insetBox(width=170, boxTitle='', boxContents='')
-<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$width>
-  <TR>
-    <TD COLSPAN=3 HEIGHT=1 BGCOLOR="$insetBoxes.titleFrameColor">$spacer</TD>
-  </TR>
-  <TR>
-    <TD WIDTH=1 BGCOLOR="$insetBoxes.titleFrameColor">$spacer</TD>
-    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$mainTbl.outerFrameColor">$spacer</TD> ## force full width 
-    <TD WIDTH=1 BGCOLOR="$insetBoxes.titleFrameColor">$spacer</TD>
-  </TR>
-  <TR>
-    <TD WIDTH=1 BGCOLOR="$insetBoxes.titleFrameColor">$spacer</TD>
-    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$mainTbl.innerFrameColor">  ## force full width 
-       <DIV CLASS="insetBoxTitleContainer"><DIV CLASS="insetBoxTitle">$boxTitle</DIV></DIV>
-    </TD>
-    <TD WIDTH=1 BGCOLOR="$insetBoxes.titleFrameColor">$spacer</TD>
-  </TR>
-  <TR>
-    <TD WIDTH=1 BGCOLOR="$insetBoxes.titleFrameColor">$spacer</TD>
-    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$mainTbl.outerFrameColor">$spacer</TD> ## force full width 
-    <TD WIDTH=1 BGCOLOR="$insetBoxes.titleFrameColor">$spacer</TD>
-  </TR>
-  <TR>
-    <TD COLSPAN=3 HEIGHT=1 BGCOLOR="$insetBoxes.titleFrameColor">$spacer</TD>
-  </TR>
-</TABLE>
-	    
-<TABLE VALIGN="top" WIDTH=$width BORDER=0 CELLPADDING=0 CELLSPACING=0>
-  <TR>
-    <TD WIDTH=1 bgcolor="$insetBoxes.frameColor">$spacer</TD>
-    <TD WIDTH=900 BGCOLOR="$insetBoxes.bgcolor">  ## force to full width 
-    ## now begin the contents cell of the insetBox
-    $boxContents
-    ## end insetBox	
-    </TD>
-    <TD WIDTH=1 BGCOLOR="$insetBoxes.frameColor">$spacer</TD>
-  </TR>
-</TABLE>
+##################################################################################
 
-<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$width>
-  <TR>
-    <TD HEIGHT=1 BGCOLOR="$insetBoxes.frameColor">$spacer</TD>
-  </TR>
-</TABLE>
-#end def
-##============================================================================##
-
-
-##============================================================================##
+##################################################################################
 #settings python
 
 title = "Cheetah - The Python-Powered Template Engine"
 siteDomainName = "cheetahtemplate.sourceforge.net"
 siteCopyrightName= "The Cheetah Development Team"
-
 
 bodyTagAttribs = {"bgcolor": "black",
                   "text":"#000033", #333333
@@ -174,7 +125,7 @@ stylesheetsOrder = ["H1.mainText",
                      ]
 
 #end settings
-##============================================================================##
+##################################################################################
 
 #####################
 #block writeHeader
