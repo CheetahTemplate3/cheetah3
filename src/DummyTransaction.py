@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: DummyTransaction.py,v 1.3 2001/08/30 20:37:57 tavis_rudd Exp $
+# $Id: DummyTransaction.py,v 1.4 2001/10/10 06:47:41 tavis_rudd Exp $
 
 """Provides dummy Transaction and Response classes is used by Cheetah in place
 of real Webware transactions when the Template obj is not used directly as a
@@ -8,15 +8,15 @@ Webware servlet.
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/08/30
-Last Revision Date: $Date: 2001/08/30 20:37:57 $
+Last Revision Date: $Date: 2001/10/10 06:47:41 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
-## DEPENDENCIES ##
+## DEPENDENCIES
 
 try:
     from StringIO import StringIO
@@ -24,13 +24,13 @@ except:
     from cStringIO import StringIO
 
 ##################################################
-## CONSTANTS & GLOBALS ##
+## CONSTANTS & GLOBALS
 
 True = (1==1)
 False = (1==0)
 
 ##################################################
-## CLASSES ##
+## CLASSES
 
 class DummyResponse:
     

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.57 2001/09/17 06:04:40 tavis_rudd Exp $
+# $Id: Template.py,v 1.58 2001/10/10 06:47:41 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,807 +8,293 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.57 $
+Version: $Revision: 1.58 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/09/17 06:04:40 $
+Last Revision Date: $Date: 2001/10/10 06:47:41 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.57 $"[11:-2]
-
+__version__ = "$Revision: 1.58 $"[11:-2]
 
 ##################################################
-## DEPENDENCIES ##
+## DEPENDENCIES
 
 import os                         # used to get environ vars, etc.
 import sys                        # used in the error handling code
 import re                         # used to define the internal delims regex
 import new                        # used to bind the compiled template code
 import types                      # used in the mergeNewTemplateData method
+from types import StringType, ClassType
 import time                       # used in the cache refresh code
 from time import time as currentTime # used in the cache refresh code
 import types                      # used in the constructor
 import os.path                    # used in Template.normalizePath()
+from os.path import getmtime, exists
+from random import randrange
+from tempfile import mktemp
+import imp
+import traceback
 
 # intra-package imports ...
 from SettingsManager import SettingsManager # baseclass for Template
-from Parser import Parser, processTextVsTagsList # baseclass for Template + util func
-from Utilities import mergeNestedDictionaries 
-from NameMapper import valueFromSearchList, valueForName # this is used in the generated code
-import ErrorHandlers              # for the code-generator
-import ErrorCheckers              # for placeholder tags
-import Formatters
+from Servlet import Servlet             # baseclass for Template
+
+import ErrorCatchers              # for placeholder tags
+import Filters                          # the output filters
 from DummyTransaction import DummyTransaction
-
-#coreTagProcessors
-from PlaceholderProcessor import PlaceholderProcessor
-from DisplayLogic import DisplayLogic
-from SetDirective import SetDirective
-from CacheDirective import CacheDirective, EndCacheDirective
-from StopDirective import StopDirective
-from FormatterDirective import FormatterDirective
-
-#preProcessing only TagProcessors
-from CommentDirective import CommentDirective
-from SlurpDirective import SlurpDirective
-from RawDirective import RawDirective
-from DataDirective import DataDirective
-from IncludeDirective import IncludeDirective
-from BlockDirective import BlockDirective
-from MacroDirective import MacroDirective, \
-     LazyMacroCall, CallMacroDirective
+from NameMapper import NotFound, valueFromSearchList, valueForName # this is used in the generated code
+VFS = valueFromSearchList; VFN = valueForName
 
 ##################################################
-## CONSTANTS & GLOBALS ##
+## CONSTANTS & GLOBALS
 
 True = (1==1)
 False = (0==1)
 
 ##################################################
-## CLASSES ##
+## CLASSES
+
+class NoDefault:
+    pass
 
 class Error(Exception):
     pass
-
-class RESTART:
-    """A token class that the #include directive can use to signal that the
-    codeGenerator needs to restart and parse new stuff that has been included"""
     
-    def __init__(self, templateDef):
-        self.data = templateDef
-    
-class Template(SettingsManager, Parser):
+class Template(SettingsManager, Servlet):
     """The core template engine: parses, compiles, and serves templates."""
 
-    def __init__(self, templateDef=None, *searchList, **kw):
+    def __init__(self, source=None, searchList=[], file=None,
+                 settings={},           # user settings that are visible in templates
+                 outputFilter='ReplaceNone', # which filter from Cheetah.Filters
+                 errorCatcher=None,
+                 
+                 compilerSettings = {}, # control the behaviour of the compiler
+                 **KWs        # used internally for #include'd templates
+                 ):
         
-        """Read in the template definition, setup the namespace searchList,
-        process settings, then call self._compileTemplate() to parse/compile the
-        template and prepare the self.__str__() and self.respond() methods for
-        serving the template.
+        """Reads in the template definition, sets up the namespace searchList,
+        processes settings, then compiles.
 
         Configuration settings should be passed in as a dictionary via the
         'settings' keyword.
         
-        If the environment var CHEETAH_DEBUG is set to True the internal
-        debug setting will also be set to True."""
+        """
         
         SettingsManager.__init__(self)
+        Servlet.__init__(self)
+        self._compilerSettings = compilerSettings
         
-        ## Read in the Template Definition
-        #  unravel whether the user passed in a string, filename or file object.
-        self._filePath = None
-        self._fileMtime = None
-        file = kw.get('file', None)
-        if templateDef and file:
-            raise TypeError("cannot specify both Template Definition and file")
-        elif (not templateDef) and (not file):
-            raise("must pass Template Definition string, or 'file' keyword arg")
-        elif templateDef:   # it's a string templateDef
-            pass
-        elif type(file) == types.StringType: # it's a filename.
-            file = self.normalizePath(file)
-            f = open(file) # Raises IOError.
-            templateDef = f.read()
-            f.close()
-            self._filePath = file
-            self._fileMtime = os.path.getmtime(file)
-            ## @@ add the code to do file modification checks and updates
-            
-        elif hasattr(file, 'read'):
-            templateDef = file.read()
-            # Can't set filename or mtime--they're not accessible.
-        else:
-            raise TypeError("'file' argument must be a filename or file-like object")
-
-
-        self._templateDef = str( templateDef )
-        # by converting to string here we allow objects such as other Templates
-        # to be passed in
-
-
-        ## process the settings
-        self._initializeSettings()      # create the basic dictionary,
-                                        # which must NOT be a class attribute!
-        
-        if kw.has_key('_overwriteSettings'):
-            # this is intended to be used internally by Nested Templates in #include's
-            self._settings = kw['_overwriteSettings']
-        elif kw.has_key('settings'):
-            self.updateSettings(kw['settings'])
-           
-        if os.environ.get('CHEETAH_DEBUG'):
-            self._settings['debug'] = True
-       
+        ##################################################           
         ## Setup the searchList of namespaces in which to search for $placeholders
         # + setup a dict of #set directive vars - include it in the searchList
-        self._setVars = {}
 
-        if kw.has_key('_setVars'):
+        self._globalSetVars = {}
+
+        if KWs.has_key('_globalSetVars'):
             # this is intended to be used internally by Nested Templates in #include's
-            self._setVars = kw['_setVars']
+            self._globalSetVars = KWs['_globalSetVars']
             
-        if kw.has_key('_preBuiltSearchList'):
+        if KWs.has_key('_preBuiltSearchList'):
             # happens with nested Template obj creation from #include's
-            self._searchList = list(kw['_preBuiltSearchList'])
+            self._searchList = list(KWs['_preBuiltSearchList'])
         else:
             # create our own searchList
-            self._searchList = list(searchList)
-            self._searchList.insert(0, self._setVars)
+            self._searchList = [self._globalSetVars]            
+            self._searchList.extend(list(searchList))
             self._searchList.append( self )
-            if kw.has_key('searchList'):
-                tup = tuple(kw['searchList'])
-                self._searchList.extend(tup) # .extend requires a tuple.
-
-        self._errorMsgStack = []
-        self._localVarsList = []   # used to track vars from #set and #for
-        self._timedRefreshCache = {} # caching timedRefresh vars
-        self._timedRefreshList = []
-        self._checkForCacheRefreshes = False
-        self._perResponseSetupCodeChunks = {}
-        self._rawTextBlocks ={}
-
-        ## setup the include dictionaries for run-time includes
-        self._cheetahIncludes = {}
-
-        
-        ## deal with other keywd args 
-        # - these are for internal use by Nested Templates in #include's
-        if not hasattr(self, '_macros'):
-            self._macros = {}
-        
-        if kw.has_key('_macros'):
-            self._macros = kw['_macros']
-
-        if kw.has_key('_cheetahBlocks'):
-            self._cheetahBlocks = kw['_cheetahBlocks']
+                
+        ##################################################
+        ## setup the ouput filters
+        self._filters = {}
+        if outputFilter:
+            filter = outputFilter
+            klass = getattr(Filters, filter)
+            self._currentFilter = self._filters[filter] = klass(self).filter
         else:
-            self._cheetahBlocks = {}
+            self._currentFilter = str
 
-        ## Setup the Parser base-class
-        Parser.__init__(self) # do this before calling self._setupTagProcessors()
+        self._initialFilter = self._currentFilter
 
-        ## create theFormatters dict now for storing refs to the formatter functions
-        if self.setting('formatter') and not self.setting('formatterClass'):
-            try:
-                klass = getattr(Formatters, self.setting('formatter'))
-                self.setSetting('formatterClass', klass)
-            except:
-                ## @@once we've implemented the error-logging framework implement this
-                pass
+        ##################################################
+        ## setup the errorChecker
+        self._errorCatchers = {}
+        if errorCatcher:
+            if type(errorCatcher) == StringType:
+                errorCatcherClass = getattr(ErrorCatchers, errorCatcher)
+            elif type(errorCatcher) == ClassType:
+                errorCatcherClass = errorCatcher
 
-        self._theFormatters = {}
-        if self.setting('formatterClass'):
-            self._initialFormatter = self.setting('formatterClass')(self)
+
+            self._errorCatcher = self._errorCatchers[errorCatcher.__class__.__name__] = \
+                                 errorCatcherClass(self)
+
         else:
-            self._initialFormatter = str
+            self._errorCatcher = None
+        self._initErrorCatcher = self._errorCatcher
+        
+        ##################################################
+        ## Now, compile if we're meant to
+        self._cacheIndex = {}
+        self._cacheData = {}
+        self._generatedModuleCode = None
+        self._generatedClassCode = None
+        if source or file:
+            self.compile(source, file)
+
             
-        self._theFormatters['initial'] = self._initialFormatter
+    def compile(self, source=None, file=None,
+                moduleName=None,
+                mainMethodName='respond'):
+        
+        """Compile the template. This method is automatically called by __init__
+        when __init__ is fed a file or source string."""
+        
+        from Compiler import Compiler
+        
+        if file and type(file) == StringType and not moduleName:
+            moduleName = os.path.splitext(os.path.split(file)[1])[0]
+        elif not moduleName:
+            moduleName='GenTemplate'
 
+        self._fileMtime = None
+        if file and type(file) == StringType:
+            file = self.serverSidePath(file)
+            self._fileMtime = os.path.getmtime(file)
+        self._filePath = file
 
-        ## handle 'errorChecker' if neccessary
-        if self.setting('errorChecker') and not self.setting('errorCheckerClass'):
-            try:
-                klass = getattr(ErrorCheckers, self.setting('errorChecker'))
-                self.setSetting('errorCheckerClass', klass)
-            except:
-                ## @@once we've implemented the error-logging framework implement this
-                pass
+            
+        compiler = Compiler(source, file,
+                            moduleName=moduleName,
+                            mainMethodName=mainMethodName,
+                            templateObj=self,
+                            settings=self._compilerSettings,
+                            )
+        compiler.compile()
+        self._generatedModuleCode = str(compiler)
+        self._generatedClassCode = str(compiler._finishedClassIndex[moduleName])
 
-        if self.setting('errorCheckerClass'):
-            errorChecker = self.setting('errorCheckerClass')(self)
-            self._errorChecker = errorChecker
+    def generatedModuleCode(self):
+        
+        """Return the module code the compiler generated, or None if no
+        compilation took place."""
+        
+        return self._generatedModuleCode
+    
+    def generatedClassCode(self):
+        
+        """Return the class code the compiler generated, or None if no
+        compilation took place."""
+
+        return self._generatedClassCode
+    
+    def searchList(self):
+        """Return a reference to the searchlist"""
+        return self._searchList
+
+    def addToSearchList(self, object):
+        """Append an object to the end of the searchlist.""" 
+        self._searchList.append(object)
+
+    def errorCatcher(self):
+        """Return a reference to the current errorCatcher"""
+        return self._errorCatcher
+
+    def refreshCache(self, cacheKey=None):
+        
+        """Refresh a cache item."""
+        
+        if not cacheKey:
+            self._cacheData.clear()
         else:
-            self._errorChecker = None
-
-        ## register the Plugins after everything else has been done, but
-        #  before the template has been compiled.
-        for plugin in self._settings['plugins']:
-            self._registerCheetahPlugin(plugin)
-
-        ## Setup the various TagProcessors
-        self._setupTagProcessors()
-
-        ## hook for calculated settings after the tagProcessors have been setup 
-        self._finalizeSettings()       
-
-        ## Now, start compile if we're meant to
-        if not self.setting('delayedCompile'):
-            self.compileTemplate()
-
-
-    def _initializeSettings(self):
-        self._settings = {
-            'formatter':None,         # string - which formatter from Cheetah.Formatters
-            'formatterClass':None,    # class that overrides the 'formatter' setting
-            'errorChecker':None,      # string - which errorChecker from Cheetah.ErrorCheckers
-            'errorCheckerClass': None,# class that overrides the 'errorChecker' setting
+            del self._cacheData[ self._cacheIndex[cacheKey] ]
             
-            'placeholderStartToken':'$',
-            'directiveStartToken':'#',
-            'directiveEndToken':'/#',
-            'singleLineComment':'##',
-            'multiLineComment':('#*','*#'),
             
-            'delayedCompile': False,  # if True, then __init__ won't compile auto-Template
-            'plugins':[],
-            'useAutocalling': True,
-            'debug': False,          
-            
-            'includeBlockMarkers': False,   # should output from #block's be wrapped in a comment
-            'blockMarkerStart':('<!-- START BLOCK: ',' -->'),
-            'blockMarkerEnd':('<!-- END BLOCK: ',' -->'),
-            
-            ## The rest of this stuff is mainly for internal use
-            'placeholderMarker':' placeholderTag.', # the space is intentional!
-            'internalDelims':["<Cheetah>","</Cheetah>"],
-            'tagTokenSeparator': '__@__',
-            'indentationStep': ' '*4, # 4 spaces - used in the generated code
-            'initialIndentLevel': 2,  # 1 for def respond(): -- 1 for try:
-            
-            'codeGenErrorHandler':ErrorHandlers.CodeGeneratorErrorHandler,
-            'responseErrorHandler': ErrorHandlers.ResponseErrorHandler,
-            
-            'stages':{1:{'title':'pre-processing',
-                         'description':"the raw template is filtered using\n" + \
-                         "the pre-processors specified in the TemplateServer settings.",
-                         'errorHandler':ErrorHandlers.Stage1ErrorHandler,
-                         },
-                      2:{'title':'convert-tags-to-code',
-                         'description':"the tags that have been translated to\n" + \
-                         "the internal format are converted into chunks of python code.",
-                         'errorHandler':ErrorHandlers.Stage2ErrorHandler,
-                         },
-                      3:{'title':'wrap-code-in-function-definition',
-                         'description':"the chunks of python code from stage 2\n" + \
-                         "are wrapped up in a code string of a function definition.",
-                         'errorHandler':ErrorHandlers.Stage3ErrorHandler,
-                         },
-                      4:{'title':'filter-generated-code',
-                         'description':"the generated code string is filtered\n" + \
-                         "using the filters defined in the TemplateServer settings.",
-                         'errorHandler':ErrorHandlers.Stage4ErrorHandler,
-                         },
-                      5:{'title':'execute-generated-code',
-                         'description':"the generated code string is executed\n" + \
-                         "to produce a function that will be bound as a method " + \
-                         "of the TemplateServer.",
-                         'errorHandler':ErrorHandlers.Stage5ErrorHandler,
-                         },
-                      },
-            }
-        # end _initializeSettings
+    ## utility functions ##   
 
+    def getVar(varName, default=NoDefault):
         
-    def compileTemplate(self):
-        """Process and parse the template, then compile it into a function definition
-        that is bound to self.__str__() and self.respond()"""
-                        
-        generatedFunction = self._codeGenerator( self._templateDef )
-        self.__str__ = self._bindFunctionAsMethod( generatedFunction )
-        self.respond = self._bindFunctionAsMethod( generatedFunction )
+        """Get a variable from the searchList.  If the variable can't be found
+        in the searchList, it returns the default value if one was given, or
+        raises NameMapper.NotFound."""
         
-        if not self._settings['debug']:
-            del self._codeGeneratorResults
-            del self._templateDef
-            # self._cheetahBlocks.clear() # not for the moment
-            # but don't delete self._generatedCode
-
-    def recompileFromFile(self, path):
+        try:
+            return VFS(self.searchList(), varName)
+        except NotFound:
+            if default != NoDefault:
+                return default
+            else:
+                raise
+    
+    def varExists(self, varName):
+        """Test if a variable name exists in the searchList."""
+        try:
+            VFS(self.searchList(), varName)
+            return True
+        except NotFound:
+            return False
+    
+    def getFileContents(self, path):
+        """A hook for getting the contents of a file.  The default
+        implementation just uses the Python open() function to load local files.
+        This method could be reimplemented to allow reading of remote files via
+        various protocols, as PHP allows with its 'URL fopen wrapper'"""
         
-        """Get an updated templateDef from the specified file. This method is
-        used when a file the templateObj is bound to is updated."""
-
-        path = self.normalizePath(path)
-        f = open(path) # Raises IOError.
-        self._templateDef = f.read()
-        f.close()
-        self._filePath = path
-        self._fileMtime = os.path.getmtime(path)
-        self.compileTemplate()
+        fp = open(path,'r')
+        output = fp.read()
+        fp.close()
+        return output
+    
+    def runAsMainProgram(self):
+        """An abstract method that can be reimplemented to enable the Template
+        to function as a standalone command-line program for static page
+        generation."""
+        
+        print self
         
     ##################################################
     ## internal methods -- not to be called by end-users
-            
-    def _finalizeSettings(self):
-        """A hook for calculated settings. This method is called by
-        self.compileTemplate() after it calls self._setupTagProcessors().
-        It should always be called by subclasses.
-
-        If you want to do calculated settings before self._setupTagProcessors()
-        use self._initializeSettings()."""
-        
-        pass
-
-    def _setupTagProcessors(self):
-        """Setup the tag processors."""
-        
-        commentDirective = CommentDirective(self)
-        slurpDirective = SlurpDirective(self)
-        rawDirective = RawDirective(self)
-        includeDirective = IncludeDirective(self)
-        blockDirective = BlockDirective(self)
-        dataDirective = DataDirective(self)
-        macroDirective = MacroDirective(self)
-        callMacroDirective = CallMacroDirective(self)
-        lazyMacroCall = LazyMacroCall(self)
-        
-        placeholderProcessor =  PlaceholderProcessor(self)
-        displayLogic = DisplayLogic(self)
-        setDirective = SetDirective(self)        
-        stopDirective = StopDirective(self)
-        cacheDirective = CacheDirective(self)
-        endCacheDirective = EndCacheDirective(self)
-        formatterDirective = FormatterDirective(self)
-        
-        ##store references to them in a dict
-        self._processors = {}
-        self._processors.update(locals())
-        del self._processors['self']
-               
-        self._codeGenSettings = {
-            'preProcessors': [('rawDirective',
-                               rawDirective),
-                              ('comment',
-                               commentDirective),
-                              ('setDirective',
-                               setDirective),
-                              ('dataDirective',
-                               dataDirective),
-                              ('blockDirective',
-                               blockDirective),
-                              ('macroDirective',
-                               macroDirective),
-
-                              # do includes before macro calls
-                              ('includeDirective',
-                               includeDirective),
-
-                              ('lazyMacroCall',
-                               lazyMacroCall),
-                              ('CallMacro',
-                               callMacroDirective),
-                              ('lazyMacroCall', # check again after #callMacro directive
-                               lazyMacroCall),
-                             
-                              ('rawDirective',
-                               rawDirective),
-                              ('comments',
-                               commentDirective),
-                              ('setDirective',
-                               setDirective),
-                              # + do includes after macro calls
-                              ('includeDirective',
-                               includeDirective),
-                              
-                              ('cacheDirective',
-                               cacheDirective),
-                              ('endCacheDirective',
-                               endCacheDirective),
-                              ('slurpDirective',
-                               slurpDirective),
-                              ('display logic directives',
-                               displayLogic),
-                              ('stop directives',
-                               stopDirective),
-                              ('formatterDirective',
-                              formatterDirective),
-                              ('placeholders',
-                               placeholderProcessor),
-                              ],
-            
-            'coreTagProcessors':{'placeholders':placeholderProcessor,
-                                 'displayLogic':displayLogic,
-                                 'setDirective':setDirective,
-                                 'cacheDirective':cacheDirective,
-                                 'endCacheDirective':endCacheDirective,
-                                 'stopDirective':stopDirective,
-                                 'includeDirective':includeDirective,
-                                 'formatterDirective':formatterDirective,
-                                 },
-            
-            'generatedCodeFilters':[],
-            }
-        
-        #end of self._setupTagProcessors()
-
-    def _cleanupProcessors(self):
-        
-        """Cleanup after the tag processors.  Don't call this before shutdown if
-        you want to be able to recompile with a new templateDef or monitor for
-        file updates."""
-        
-        for key, processor in self._processors.items():
-            processor.shutdown()
-        self._processors.clear()
-
-    
-    def _codeGenerator(self, templateDef):
-        
-        """Parse the template definition, generate a python code string from it,
-        then execute the code string to create a python function which can be
-        bound as a method of the Template.  Returns a reference to the function.
-        
-        stage 1 - the raw template is filtered using the pre-processors
-        specified in the TemplateServer settings
-
-        stage 2 - convert the $placeholder tags, display logic directives, #set
-        directives, #cache diretives, etc. (all the internal-state dependent
-        tags) into chunks of python code
-
-        stage 3 - the chunks of python code and the chunks of plain text from
-        the 2nd stage are wrapped up in a code string of a function definition
-
-        stage 4 - the generated code string is filtered using the filters
-        defined in the TemplateServer settings. -- a currently unused hook --
-
-        stage 5 - the generated code string is executed to produce a python
-        function, that will become a method of the Template object. 
-
-        These stages are contained in a try: ... except: ... block that will
-        provide helpful information for debugging if an error is caught."""
-        
-        settings = self._settings
-        stageSettings = settings['stages']
-        debug = settings['debug']
-        results = self._codeGeneratorResults = {}
-        state = self._codeGeneratorState = {}
-        codeGenSettings = self._codeGenSettings
-        
-        state['currFormatterID'] = 'initial'
-        if not self._theFormatters['initial'] == str:
-            state['interactiveFormatter'] = True
-        else:
-            state['interactiveFormatter'] = False
-                       
-        try:
-            ## stage 1 - preProcessing of the template string ##
-            stage = 1
-            if debug: results['stage1'] = []
-            for name, preProcessor in codeGenSettings['preProcessors']:
-                assert hasattr(preProcessor, 'preProcess'), \
-                       'The Processor class ' + name + ' is not valid.'
-                templateDef = preProcessor.preProcess(templateDef)
-                    
-                if isinstance(templateDef, RESTART):
-                    # a parser restart might have been requested for direct #include's 
-                    return self._codeGenerator(templateDef.data)
-                if debug: results['stage1'].append((name, templateDef))
-
-            ## stage 2 - generate the python code for each of the tokenized tags ##
-            #  a) initialize this Template Obj for each processor
-            #  b) separate internal tags from text in the template to create
-            #     textVsTagsList 
-            #  c) send textVsTagsList through self._tagTokenProcessor to generate
-            #     the code pieces
-            #  d) merge the code pieces into a single string
-            stage = 2
-            if debug: results['stage2'] = []
-            
-            # a)
-            subStage = 'a'
-            for processor in codeGenSettings['coreTagProcessors'].values():
-                processor.initializeTemplateObj()
-                
-            # b)
-            subStage = 'b'
-            chunks = templateDef.split(settings['internalDelims'][0])
-            textVsTagsList = []
-            for chunk in chunks:
-                textVsTagsList.extend(chunk.split(settings['internalDelims'][1]))
-
-            for i in range(0,len(textVsTagsList),2):
-                ## ''' must be escaped in the text chunks (odd indices)
-                textVsTagsList[i] = textVsTagsList[i].replace("'''",r"\'\'\'")
-            if debug:
-                results['stage2'].append(('textVsTagsList', textVsTagsList))
-            
-            # c)
-            subStage = 'c'
-            codePiecesFromTextVsTagsList = processTextVsTagsList(
-                textVsTagsList,
-                self._coreTagProcessor)
-            
-            # d)
-            subStage = 'd'
-            codeFromTextVsTagsList = "".join(codePiecesFromTextVsTagsList)
-            if debug:
-                results['stage2'].append(('codeFromTextVsTagsList',
-                                          codeFromTextVsTagsList))
-
-            ## stage 3 - wrap the code up in a function definition ##
-            stage = 3
-            if debug: results['stage3'] = []
-            indent = settings['indentationStep']
-            generatedCode = (
-                "def generatedFunction(self, trans=None, dummyTrans=False,\n " + 
-                "joinListAsStr=''.join,\n " + 
-                "filePath=self._filePath,\n " + 
-                "fileMtime=self._fileMtime,\n " + 
-                "getmtime=os.path.getmtime,\n " + 
-                "currentTime=currentTime,\n " + 
-                "valueFromSearchList=valueFromSearchList,\n " + 
-                "valueForName=valueForName,\n " + 
-                "format=self._initialFormatter,\n " + 
-                "searchList=self._searchList,\n " + 
-                "theFormatters=self._theFormatters,\n " + 
-                "setVars=self._setVars,\n " + 
-                "checkForCacheRefreshes=self._checkForCacheRefreshes,\n " + 
-                "timedRefreshCache=self._timedRefreshCache,\n " + 
-                "timedRefreshList=self._timedRefreshList,\n " + 
-                "timedRefresh=self._timedRefresh,\n " + 
-                "includeCheetahSource=self._includeCheetahSource,\n " + 
-                "errorChecker=self._errorChecker,\n " + 
-                "):\n" +
-                indent * 1 + "try:\n" +
-                indent * 2 + "#setupCodeInsertMarker\n" +
-                indent * 2 + "if filePath and getmtime(filePath) > fileMtime:\n" +
-                indent * 3 + "self.recompileFromFile(filePath)\n" +
-                indent * 3 + "return self.respond(trans=trans)\n" +
-                indent * 2 + "if checkForCacheRefreshes:\n" +
-                indent * 3 + "currTime = currentTime()\n" +
-                indent * 3 + "timedRefreshList.sort()\n" +
-                indent * 3 + "if currTime >= timedRefreshList[0][0]:\n" +
-                indent * 4 + "timedRefresh(currTime)\n" +
-                indent * 2 + "if not trans:\n" +
-                indent * 3 + "trans = DummyTransaction()\n" +
-                indent * 3 + "dummyTrans = True\n" +
-                indent * 2 + "write = trans.response().write\n" +
-                indent * 2 + "write('''" + codeFromTextVsTagsList + "''')\n" +
-                indent * 2 + "if dummyTrans:\n" +
-                indent * 3 + "return trans.response().getvalue()\n" +
-                indent * 2 + "else: return ''\n" +
-                indent * 1 + "except:\n" +
-                indent * 2 + "print self._settings['responseErrorHandler'](self)\n" +
-                indent * 2 + "raise\n"
-                )
-                
-            perResponseSetupCode = ''
-            for tagProcessor, codeChunk in self._perResponseSetupCodeChunks.items():
-                perResponseSetupCode += codeChunk
-            def insertCode(match, perResponseSetupCode=perResponseSetupCode):
-                return match.group() + perResponseSetupCode
-            generatedCode = re.sub(r'#setupCodeInsertMarker\n', insertCode , generatedCode)
-
-            if debug: results['stage3'].append( ('generatedCode', generatedCode) )
-
-            
-            ## stage 4 - final filtering of the generatedCode  ##
-            # - this is an unused hook as of Aug 2001
-            stage = 4
-            if debug: results['stage4'] = []
-            for filter in codeGenSettings['generatedCodeFilters']:
-                generatedCode = filter[1](self, generatedCode)
-                if debug: results['stage4'].append( (filter[0], generatedCode) )
-
-            ## stage 5 - create "generatedFunction" in this namespace ##
-            stage = 5
-            if debug: results['stage5'] = []
-            exec generatedCode
-            if debug:
-                results['stage5'].append(('generatedFunction', generatedFunction))
-
-
-            ##
-            self._generatedCode = generatedCode
-                
-            return generatedFunction
-                
-        except:
-            ## call codeGenErrorHandler, which in turn calls the ErrorHandler ##
-            # for the stage in which the error occurred
-            print settings['codeGenErrorHandler'](self)
-            
-            self._cleanupProcessors()  
-            #self.shutdown() #@@ should we cleanup after an exception?
-            
-            raise          
-
-
-    def _coreTagProcessor(self, tag):
-        """An abstract tag processor that will identify the tag type from its
-        tagToken prefix and call the appropriate processor for that type of tag.
-        This used for the core tags that are sensitive to state values such as
-        the indentation level."""
-        
-        tagToken, tag = tag.split(self.setting('tagTokenSeparator'))
-        processedTag = self._codeGenSettings['coreTagProcessors'][tagToken].processTag(tag)
-        return processedTag
-
-    def _state(self):
-        """Return a reference to self._codeGeneratorState. This is for internal
-        use by the tag processors only."""
-        
-        return self._codeGeneratorState
-   
-    def _registerCheetahPlugin(self, plugin):
-        
-        """Register a plugin that extends the functionality of the Template.
-        This method is called automatically by them __init__() method and should
-        not be called by end-users."""
-        
-        plugin(self)
-        
+          
     def _bindFunctionAsMethod(self, function):
         """Used to dynamically bind a plain function as a method of the
         Template instance"""
         return new.instancemethod(function, self, self.__class__)
-        
-    def _setTimedRefresh(self, ID, translatedTag, interval):
-        """Setup a cache refresh for a $*[time]*placeholder."""
-        self._checkForCacheRefreshes = True
-        tagValue = self.evalPlaceholderString(translatedTag)
-        self._timedRefreshCache[ID] = str(tagValue)
-        nextUpdateTime = currentTime() + interval * 60 
-        self._timedRefreshList.append(
-            [nextUpdateTime, translatedTag, interval, ID])
 
 
-    def _timedRefresh(self, currTime):
-        """Refresh all the cached NameMapper vars that are scheduled for a
-        refresh at this time, and reschedule them for their next update.
-
-        the entries in the recache list are in the format [nextUpdateTime, name,
-        interval, ID] """
-
-        refreshList = self._timedRefreshList
-        for i in range(len(refreshList)):
-            if refreshList[i][0] < currTime:
-                translatedTag = refreshList[i][1]
-                interval = refreshList[i][2]
-                ID = refreshList[i][3]
-                self._setTimedRefresh(ID, translatedTag, interval)
-                del refreshList[i]
-                refreshList.sort()
-
-
-    ##################################################
-    ## methods that can only be used before a template has been compiled
-
-
-    def defineTemplateBlock(self, blockName, blockContents):
-        """Define a block.  See the user's guide for info on blocks.  Only call
-        this method before the template has been Compiled."""
-        
-        self._cheetahBlocks[blockName]= blockContents
-
-    # make an alias
-    redefineTemplateBlock = defineTemplateBlock
-    
-    def killTemplateBlock(self, *blockNames):
-        
-        """Fill a block with an empty string so it won't appear in the filled
-        template output. Only call this method before the template has been
-        compiled."""
-        
-        for blockName in blockNames:
-            self._cheetahBlocks[blockName]= ''
-
-    def loadMacro(self, macroName, macro):
-        
-        """Load a macro into the macros dictionary, using the specified
-        macroName.  Only call this method before the template has been
-        compiled."""
-        
-        if not hasattr(self, '_macros'):
-            self._macros = {}
-
-        self._macros[macroName] = macro
-
-    def loadMacros(self, *macros):
-        
-        """Create macros from any number of functions and/or bound methods.  For
-        each macro, the function/method name is used as the macro name. Only
-        call this method before the template has been compiled."""
-        
-        if not hasattr(self, '_macros'):
-            self._macros = {}
-
-        for macro in macros:
-            self.loadMacro(macro.__name__, macro)
-        
-    def loadMacrosFromModule(self, module):
-        
-        """Load all the macros from a module into the macros dictionary. Only
-        call this method before the template has been compiled."""
-        
-        if not hasattr(self, '_macros'):
-            self._macros = {}
-
-        if hasattr(module,'_exclusionList'):
-            exclusionList = module._exclusionList
-        else:
-            exclusionList = ()
+    def _bindCompiledMethod(self, methodCompiler):
+        genCode = str(methodCompiler).strip() + '\n'
+        methodName  = methodCompiler.methodName()
+        try:
+            exec genCode                    # in this namespace!!
+        except:
+            err = sys.stderr
+            print >> err, 'Cheetah was trying to execute the ' + \
+                  'following code but Python found a syntax error in it:'
+            print >> err
+            print >> err,  genCode
+            raise
             
-        macrosList = []
-        for obj in module.__dict__.values():
-            if callable(obj) and obj not in exclusionList:
-                macrosList.append( (obj.__name__, obj) )
-            
-        for macro in macrosList:
-            self.loadMacro(macro[0], macro[1])
 
-
-    def extendTemplate(self, extensionStr):
-        """This method is used to extend an existing Template object with
-        #redefine's of the existing blocks.  See the Users' Guide for more
-        details on #redefine.  The 'extensionStr' argument should be a string
-        that contains #redefine directives.  It can also contain #macro
-        definitions and #data directives.
-
-        The #extend directive that is used with .tmpl files calls this method
-        automatically, feeding the contents of .tmpl file to this method as
-        'extensionStr'.
-
-        #redefine and #data directives MUST NOT be nested!!
-
-        Only call this method before the template has been Compiled."""
+        genMeth = self._bindFunctionAsMethod(locals()[methodName])
         
-        bits = self._directiveREbits
-
-        redefineDirectiveRE = re.compile(
-            bits['start'] + r'redefine[\f\t ]+' +
-            r'(?P<blockName>[A-Za-z_][A-Za-z_0-9]*?)' +
-            bits['endGrp'],re.DOTALL)
-                                         
-        while redefineDirectiveRE.search(extensionStr):
-            startTagMatch = redefineDirectiveRE.search(extensionStr)
-            blockName = startTagMatch.group('blockName')
-            endTagRE = re.compile(bits['startTokenEsc'] +
-                                  r'end redefine[\t ]+' + blockName +
-                                  r'[\f\t ]*' + bits['endGrp'],
-                                  re.DOTALL | re.MULTILINE)
-            endTagMatch = endTagRE.search(extensionStr)
-            blockContents = extensionStr[startTagMatch.end() : endTagMatch.start()]
-            self.defineTemplateBlock(blockName, blockContents)
-            extensionStr = extensionStr[0:startTagMatch.start()] + \
-                        extensionStr[endTagMatch.end():]
-                   
-        ## process the #data and #macro definition directives
-        # after removing comments
-        extensionStr = self._processors['commentDirective'].preProcess(extensionStr)
-        self._processors['dataDirective'].preProcess(extensionStr)
-        self._processors['macroDirective'].preProcess(extensionStr) 
-
-
-    ##################################################
-    ## methods that can be called at any time
+        setattr(self,methodName, genMeth)
+        if methodName == 'respond':
+            self.__str__ = genMeth
 
     def _includeCheetahSource(self, srcArg, trans=None, includeFrom='file', raw=False):
         
         """This is the method that #include directives translate into."""
+
+        if not hasattr(self, '_cheetahIncludes'):
+            self._cheetahIncludes = {}
         
         includeID = id(srcArg)
         if not self._cheetahIncludes.has_key(includeID):
             if includeFrom == 'file':
-                path = self.normalizePath(srcArg)
+                path = self.serverSidePath(srcArg)
                 if not raw:
-                    nestedTemplate = Template(templateDef=None,
+                    nestedTemplate = Template(source=None,
                                               file=path,
-                                              _overwriteSettings=self.settings(),
                                               _preBuiltSearchList=self.searchList(),
-                                              _setVars = self._setVars,
-                                              _cheetahBlocks=self._cheetahBlocks,
-                                              _macros=self._macros,
+                                              _globalSetVars = self._globalSetVars,
                                               )
                     if not hasattr(nestedTemplate, 'respond'):
                         nestedTemplate.compileTemplate()
@@ -818,12 +304,9 @@ class Template(SettingsManager, Parser):
             else:                       # from == 'str'
                 if not raw:
                     nestedTemplate = Template(
-                        templateDef=srcArg,
-                        _overwriteSettings=self.settings(),
+                        source=srcArg,
                         _preBuiltSearchList=self.searchList(),
-                        _setVars = self._setVars,
-                        _cheetahBlocks=self._cheetahBlocks,
-                        _macros=self._macros,
+                        _globalSetVars = self._globalSetVars,
                         )
                     if not hasattr(nestedTemplate, 'respond'):
                         nestedTemplate.compileTemplate()
@@ -836,74 +319,75 @@ class Template(SettingsManager, Parser):
             self._cheetahIncludes[includeID].respond(trans)
         else:
             trans.response().write(self._cheetahIncludes[includeID])
-        
-    def searchList(self):
-        """Return a reference to the searchlist"""
-        return self._searchList
-    
-    def addToSearchList(self, object):
-        """Append an object to the end of the searchlist.""" 
-        self._searchList.append(object)
-
-    def errorChecker(self):
-        """Return a reference to the errorChecker"""
-        return self._errorChecker
-
-    def mergeNewTemplateData(self, newDataDict):
-        """Merge the newDataDict into self.__dict__. This is a recursive merge
-        that handles nested dictionaries in the same way as
-        Template.updateServerSettings()"""
-        
-        for key, val in newDataDict.items():
-            if type(val) == types.DictType and hasattr(self,key) \
-               and type(getattr(self,key)) == types.DictType:
-                
-                setattr(self,key, mergeNestedDictionaries(getattr(self,key), val))
-            else:
-                setattr(self,key,val)
 
 
-    def shutdown(self):
-        """Make sure all reference cycles have been broken this object is
-        deleted. """
-        self._cleanupProcessors()
-        
-        for key in dir(self):
-            setattr(self, key, None)
-            delattr(self, key)
+    def _genTmpFilename(self):
+        return (
+            os.path.split(mktemp())[0] + '/__CheetahTemp_' +
+            ''.join(map(lambda x: '%02d' % x, time.localtime(time.time())[:6])) + 
+            str(randrange(10000, 99999)) +
+            '.py')
 
+    def _makeDummyPackageForDir(self, dirName):
+        packageName = 'Cheetah.Temp.' + dirName.replace('\\', '/').replace('/', '_')
+        baseDirName, finalDirName = os.path.split(dirName)
+        self._importModuleFromDirectory(
+            packageName, finalDirName, baseDirName,
+            isPackageDir=1,forceReload=1)
+        return packageName
 
-    ## utility functions ##   
-    def normalizePath(self, path):
-        """A hook for any neccessary path manipulations.
-
-        For example, when this is used with Webware servlets all relative paths
-        must be converted so they are relative to the servlet's directory rather
-        than relative to the program's current working dir.
-
-        The default implementation just normalizes the path for the current
-        operating system."""
-        
-        return os.path.normpath(path.replace("\\",'/'))
-    
-    def getFileContents(self, path):
-        """A hook for getting the contents of a file.  The default
-        implementation just uses the Python open() function to load local files.
-        This method could be reimplemented to allow reading of remote files via
-        various protocols, as PHP allows with its 'URL fopen wrapper'"""
-        
-        fp = open(path,'r')
-        output = fp.read()
+    def _importAsDummyModule(self, contents):
+        tmpFilename = self._genTmpFilename()
+        fp = open(tmpFilename,'w')
+        fp.write(contents)
         fp.close()
-        return output
-            
-    
-    def runAsMainProgram(self):
-        """An abstract method that can be reimplemented to enable the Template
-        to function as a standalone command-line program for static page
-        generation and testing/debugging.
-
-        The debugging facilities will be provided by a plugin to Template, at
-        some later date."""
+        if self._filePath:
+            packageName = self._makeDummyPackageForDir(self._fileDirName)
+        else:
+            packageName = self._makeDummyPackageForDir(os.getcwd())
+        mod = self._impModFromDummyPackage(packageName, tmpFilename)            
+        os.remove(tmpFilename)
+        return mod
         
-        print self
+    def _impModFromDummyPackage(self, packageName, pathToImport):
+        moduleFileName = os.path.basename(pathToImport)
+        moduleDir = os.path.dirname(pathToImport)
+        moduleName, ext = os.path.splitext(moduleFileName)
+        fullModName = packageName + '.' + moduleName
+        return self._importModuleFromDirectory(fullModName, moduleName,
+                                           moduleDir, forceReload=1)
+
+    def _importModuleFromDirectory(self, fullModuleName, moduleName,
+                                   directory, isPackageDir=0, forceReload=0):
+        
+        """ Imports the given module from the given directory.  fullModuleName
+        should be the full dotted name that will be given to the module within
+        Python (including the packages, etc.).  moduleName should be the name of
+        the module in the filesystem, which may be different from the name given
+        in fullModuleName.  Returns the module object.  If forceReload is true
+        then this reloads the module even if it has already been imported.
+        
+        If isPackageDir is true, then this function creates an empty __init__.py
+        if that file doesn't already exist.  """
+                
+        if not forceReload:
+            module = sys.modules.get(fullModuleName, None)
+            if module is not None:
+                return module
+        fp = None
+        try:
+            if isPackageDir:
+                # Check if __init__.py is in the directory -- if not, make an empty one.
+                packageDir = os.path.join(directory, moduleName)
+                initPy = os.path.join(packageDir, '__init__.py')
+                if not os.path.exists(initPy):
+                    file = open(initPy, 'w')
+                    file.write('#')
+                    file.close()
+            fp, pathname, stuff = imp.find_module(moduleName, [directory])
+            module = imp.load_module(fullModuleName, fp, pathname, stuff)
+        finally:
+            if fp is not None:
+                fp.close()
+                
+        return module

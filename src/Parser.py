@@ -1,39 +1,45 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.20 2001/09/17 06:04:40 tavis_rudd Exp $
-"""Parser base-class for Cheetah's TagProcessor class and for the Template class
+# $Id: Parser.py,v 1.21 2001/10/10 06:47:41 tavis_rudd Exp $
+"""Parser classes for Cheetah's Compiler
+
+Classes:
+  ParseError( Exception )
+  _LowLevelSemanticsParser( Lexer )
+  _HighLevelSemanticsParser( _LowLevelSemanticsParser )
+  Parser === _HighLevelSemanticsParser (an alias)
+
+where:
+  Lexer ===  Cheetah.Lexer.Lexer(
+                                 Cheetah.SettingsManager.SettingsManager,
+                                 Cheetah.SourceReader.SourceReader
+                                )
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-License: This software is released for unlimited distribution under the
-         terms of the Python license.
-Version: $Revision: 1.20 $
+Version: $Revision: 1.21 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/09/17 06:04:40 $
+Last Revision Date: $Date: 2001/10/10 06:47:41 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.20 $"[11:-2]
+__version__ = "$Revision: 1.21 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
-
+import os
+import sys
 import re
 from re import DOTALL, MULTILINE
-from types import StringType
-from tokenize import tokenprog, pseudoprog, endprogs
+from types import StringType, ListType, TupleType
 
 # intra-package imports ...
-from Utilities import lineNumFromPos
-from NameMapper import valueFromSearchList, valueForName
-##################################################
-## CONSTANTS & GLOBALS ##
-
-True = (1==1)
-False = (0==1)
-
+from Lexer import Lexer
+import Formatters
+import ErrorCheckers
 ##################################################
 ## FUNCTIONS ##
 
+# re tools
 def escapeRegexChars(txt,
                      escapeRE=re.compile(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])')):
     
@@ -41,50 +47,6 @@ def escapeRegexChars(txt,
     
     return escapeRE.sub(r'\\\1' , txt)
 
-def matchTokenOrFail(text, pos):
-    
-    """Attempt to match a Python token.  Return the start and end position
-    or raise an exception if no token is found."""
-    
-    match = pseudoprog.match(text, pos)
-    if match is not None and match.group() in \
-               ("'''", '"""',               # triple-quoted
-                "r'''", 'r"""', "R'''", 'R"""',
-                "u'''", 'u"""', "U'''", 'U"""',
-                "ur'''", 'ur"""', "Ur'''", 'Ur"""',
-                "uR'''", 'uR"""', "UR'''", 'UR"""'):
-        endmatch = endprogs[match.group()].match(text, match.end())
-        if endmatch:
-            return pos, endmatch.end()
-        else:
-            raise SyntaxError(text, pos)
-    else:
-        match = tokenprog.match(text, pos)
-        if match is None:
-            raise SyntaxError(text, pos)
-        return pos, match.end()
-
-def separateTagsFromText(initialText, startTagRE, endTagRE):
-    """breaks a string up into a textVsTagsList where the odd items are plain
-    text and the even items are the contents of the tags."""
-
-    chunks = startTagRE.split(initialText)
-    textVsTagsList = []
-    for chunk in chunks:
-        textVsTagsList.extend(endTagRE.split(chunk))
-    return textVsTagsList
-
-def processTextVsTagsList(textVsTagsList, tagProcessorFunction):
-    """loops through textVsTagsList - the output from separateTagsFromText() -
-    and filters all the tag items with the tagProcessorFunction"""
-    
-    ## odd items are plain text, even ones are tags
-    processedList = textVsTagsList[:]
-    for i in range(1, len(processedList), 2):
-        processedList[i] = tagProcessorFunction(processedList[i])
-    return processedList
-
-# re tools
 def group(*choices): return '(' + '|'.join(choices) + ')'
 def nongroup(*choices): return '(?:' + '|'.join(choices) + ')'
 def namedGroup(name, *choices): return '(P:<' + name +'>' + '|'.join(choices) + ')'
@@ -92,373 +54,1584 @@ def any(*choices): return apply(group, choices) + '*'
 def maybe(*choices): return apply(group, choices) + '?'
 
 ##################################################
-## Regex chunks for the parser ##
+## CONSTANTS & GLOBALS ##
 
+True = (1==1)
+False = (0==1)
+
+NO_CACHE = 0
+STATIC_CACHE = 1
+REFRESH_CACHE = 2
+
+##################################################
+## Tokens for the parser ##
 
 #generic
-namechars = "abcdefghijklmnopqrstuvwxyz" \
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+identchars = "abcdefghijklmnopqrstuvwxyz" \
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+namechars = identchars + "0123456789"
+
+#operators
+powerOp = '**'
+unaryArithOps = ('+', '-', '~')
+binaryArithOps = ('+', '-', '/', '//','%')
+shiftOps = ('>>','<<')
+bitwiseOps = ('&','|','^')
+assignOp = '='
+augAssignOps = ('+=','-=','/=','*=', '**=','^=','%=',
+          '>>=','<<=','&=','|=', )
+assignmentOps = (assignOp,) + augAssignOps
+
+compOps = ('<','>','==','!=','<=','>=', '<>', 'is', 'in',)
+booleanOps = ('and','or','not')
+operators = (powerOp,) + unaryArithOps + binaryArithOps \
+            + shiftOps + bitwiseOps + assignmentOps \
+            + compOps + booleanOps
+
+delimeters = ('(',')','{','}','[',']',
+              ',','.',':',';','=','`') + augAssignOps
 
 
-WS = r'[ \f\t]*'                        # Whitespace
+keywords = ('and',       'del',       'for',       'is',        'raise',    
+            'assert',    'elif',      'from',      'lambda',    'return',   
+            'break',     'else',      'global',    'not',       'try',      
+            'class',     'except',    'if',        'or',        'while',    
+            'continue',  'exec',      'import',    'pass',
+            'def',       'finally',   'in',        'print',
+            )
+
+single3 = "'''"
+double3 = '"""'
+
+tripleQuotedStringStarts =  ("'''", '"""', 
+                             "r'''", 'r"""', "R'''", 'R"""',
+                             "u'''", 'u"""', "U'''", 'U"""',
+                             "ur'''", 'ur"""', "Ur'''", 'Ur"""',
+                             "uR'''", 'uR"""', "UR'''", 'UR"""')
+
+tripleQuotedStringPairs = {"'''": single3, '"""': double3,
+                        "r'''": single3, 'r"""': double3,
+                        "u'''": single3, 'u"""': double3,
+                        "ur'''": single3, 'ur"""': double3,
+                        "R'''": single3, 'R"""': double3,
+                        "U'''": single3, 'U"""': double3,
+                        "uR'''": single3, 'uR"""': double3,
+                        "Ur'''": single3, 'Ur"""': double3,
+                        "UR'''": single3, 'UR"""': double3,
+                        }
+
+closurePairs= {')':'(',']':'[','}':'{'}
+closurePairsRev= {'(':')','[':']','{':'}'}
+
+##################################################
+## Regex chunks for the parser ##
+
+tripleQuotedStringREs = {}
+def makeTripleQuoteRe(start, end):
+    start = escapeRegexChars(start)
+    end = escapeRegexChars(end)
+    return re.compile(r'(?:' + start + r').*?' + r'(?:' + end + r')', re.DOTALL)
+
+for start, end in tripleQuotedStringPairs.items():
+    tripleQuotedStringREs[start] = makeTripleQuoteRe(start, end)
+
+WS = r'[ \f\t]*'  
 EOL = r'\r\n|\n|\r'
 EOLZ = EOL + r'|\Z'
 escCharLookBehind = nongroup(r'(?<=\A)',r'(?<!\\)')
-name = r'[a-zA-Z_]\w*'
 nameCharLookAhead = r'(?=[A-Za-z_])'
 
-#placeholder-specific
-validSecondCharsLookAhead = r'(?=[A-Za-z_\*\{])'
 
+specialVarRE=re.compile(r'([a-zA-z_]+)@') # for matching specialVar comments
+EOLre=re.compile(r'(?:\r\n|\r|\n)'),
 
+# e.g. ##author@ Tavis Rudd
 
 ##################################################
 ## CLASSES ##
 
-class SyntaxError(ValueError):
-    def __init__(self, text, pos):
-        self.text = text
-        self.pos = pos
+class ParseError(ValueError):
+    def __init__(self, stream, msg='Invalid Syntax', extMsg=''):
+        self.stream = stream
+        if stream.pos() >= len(stream):
+            stream.setPos(len(stream) -1)
+        self.msg = msg
+        self.extMsg = extMsg
+        
     def __str__(self):
-        lineNum = lineNumFromPos(self.text, self.pos)
-        return "unfinished expression on line %d (char %d) in: \n%s " % (
-            lineNum, self.pos, self.text)
-        # @@ augment this to give the line number and show a normal version of the txt
+        return self.report()
 
-class Error(Exception):
-    pass
+    def report(self):
+        stream = self.stream
+        if stream.filename():
+            f = " in file %s" % stream.filename()
+        else:
+            f = ''
+        report = ''
+        row, col, line = self.stream.getRowColLine()
 
-class Parser:
-    """This is an abstract base-class that is inherited by both the Template and
-    TagProcessor classes.  It provides universal access to Cheetah's generic
-    parsing tools, the $placeholder parsing tools, and a few tools for
-    #directive parsing.
 
-    When it is inherited by TagProcessor and all TagProcessor's subclasses a
-    reference to the master templateObj must be supplied as the 'templateObj'
-    argument.  This is done automatically when the Template class sets up its
-    TagProcessors.  This approach allows the methods of 'Template' and the
-    methods of this class to coexist seemlessly."""
+        ## get the surrounding lines
+        lines = stream.splitlines()
+        prevLines = []                  # (rowNum, content)
+        for i in range(1,4):
+            if row-1-i <=0:
+                break
+            prevLines.append( (row-i,lines[row-1-i]) )
+
+        nextLines = []                  # (rowNum, content)
+        for i in range(1,4):
+            if not row-1+i < len(lines):
+                break
+            nextLines.append( (row+i,lines[row-1+i]) )
+        nextLines.reverse()
+        
+        ## print the main message
+        report += "\n\n%s at line %i, column %i%s\n\n" % (self.msg, row, col, f)
+        report += 'Line|Line contents\n'
+        report += '----|-------------------------------------------------------------\n'
+        while prevLines:
+            lineInfo = prevLines.pop()
+            report += "%(row)-4d|%(line)s\n"% {'row':lineInfo[0], 'line':lineInfo[1]}
+        report += "%(row)-4d|%(line)s\n"% {'row':row, 'line':line}
+        report += ' '*5 +' '*(col-1) + "^\n"
+        
+        while nextLines:
+            lineInfo = nextLines.pop()
+            report += "%(row)-4d|%(line)s\n"% {'row':lineInfo[0], 'line':lineInfo[1]}
+        ## add the extra msg
+        if self.extMsg:
+            report += self.extMsg + '\n'
+            
+        return report
+
+
+class ArgList:
+
+    """Used by _LowLevelSemanticsParser.getArgList()"""
+
+    def __init__(self):
+        self.argNames = []
+        self.defVals = []
+        self.i = 0
+
+    def addArgName(self, name):
+        self.argNames.append( name )
+        self.defVals.append( None )
+
+    def next(self):
+        self.i += 1
+
+    def addToDefVal(self, token):
+        i = self.i
+        if self.defVals[i] == None:
+            self.defVals[i] = ''
+        self.defVals[i] += token
     
-    def __init__(self, templateObj=None):
-        """This method sets up some internal references to the master
-        templateObj if a reference is supplied. Otherwise, it will assume that it
-        IS the master templateObj and will setup the regex's the parser
-        uses. This method must be called by subclasses."""
+    def merge(self):
+        return map(None, self.argNames, self.defVals)
+    
+    def __str__(self):
+        return str(self.merge())
+    
+class _LowLevelSemanticsParser(Lexer):
 
-        if templateObj:            
-            ## setup some method mappings for convenience
-            self.settings = templateObj.settings
-            self.setting = templateObj.setting
-            self.searchList = templateObj.searchList
+    def _initializeSettings(self):
+        defaults = {
+            'cheetahVarStartToken':'$',
+            
+            #'placeholderStartToken':'$',   
+            #'placeholderEndToken':None,
+            # These will be used when placeholder parsing is separated from cheetahVar parsing
+            
+            'commentStartToken':'##',
+            'multiLineCommentStartToken':'#*',
+            'multiLineCommentEndToken':'*#',
+            
+            'directiveStartToken':'#',
+            'directiveEndToken':'#',
+            'PSPStartToken':'<%',
+            'PSPEndToken':'%>',
+            }
+        if not hasattr(self, '_settings'):
+            self._settings = defaults
+        else:
+            self.updateSettings(defaults)
 
-            ## setup some attribute mappings
-            self._placeholderREs = templateObj._placeholderREs
-            self._directiveREbits = templateObj._directiveREbits
-            self._localVarsList = templateObj._localVarsList
-            self._theFormatters = templateObj._theFormatters
-            self._errorChecker = templateObj._errorChecker
-
-        else:                           # iAmATemplateObj
-            self.makePlaceholderREs()       # inherited from the Parser class
-            self.makeDirectiveREbits()
+    def configureParser(self):
+        self.makeCheetahVarREs()
+        self.makeCommentREs()
+        self.makeMultiLineCommentREs()
+        self.makeDirectiveREs()
+        self.makePspREs()
+        self._possibleNonStrConstantChars = (
+            self.setting('commentStartToken')[0] +
+            self.setting('multiLineCommentStartToken')[0] + 
+            self.setting('cheetahVarStartToken')[0] +
+            self.setting('directiveStartToken')[0] +
+            self.setting('PSPStartToken')[0])
+        self._nonStrConstMatchers = [
+            self.matchCommentStartToken,
+            self.matchMultiLineCommentStartToken,
+            self.matchCheetahVarStart,
+            self.isDirective,
+            self.matchPSPStartToken
+            ]
 
     ## regex setup ##
 
-    def makePlaceholderREs(self):
+    def makeCheetahVarREs(self):
         
-        """Setup the regexs for placeholder parsing.  Do it here so all the
-        TagProcessors don't have to create them for themselves.
+        """Setup the regexs for Cheetah $var parsing."""
 
-        All $placeholders are translated into valid Python code by swapping
-        'placeholderStartToken' ($) for 'marker'.  This marker is then used by
-        the parser to find the start of each placeholder and allows $vars in
-        function arg lists to be parsed correctly.  '$x()' becomes '
-        placeholderTag.x()' when it's marked.
-
-        The marker starts with a space to allow $var$var to be parsed correctly.
-        $a$b is translated to --placeholderTag.a placeholderTag.b-- instead of
-        --placeholderTag.aplaceholderTag.b--, which the parser would mistake for
-        a single $placeholder The extra space is removed by the parser."""
+        num = r'[0-9\.]+'
+        interval =   (r'(?P<interval>' + 
+                      num + r's|' +
+                      num + r'm|' +
+                      num + r'h|' +
+                      num + r'd|' +
+                      num + r'w|' +
+                      num + ')' 
+                      )
+    
+        cacheToken = (r'(?:' +
+                      r'(?P<REFRESH_CACHE>\*' + interval + '\*)'+
+                      '|' +
+                      r'(?P<STATIC_CACHE>\*)' +
+                      '|' +
+                      r'(?P<NO_CACHE>)' +
+                      ')')
+        self.cacheTokenRE = re.compile(cacheToken)
         
-        REs = self._placeholderREs = {}
-        marker = self.setting('placeholderMarker')
-        REs['nameMapperChunk'] = re.compile(
-            marker +
-            r'(?:CACHED\.|REFRESH_[0-9]+(?:_[0-9]+){0,1}\.){0,1}([A-Za-z_0-9\.]+)')
-
-        markerEscaped = escapeRegexChars(marker)
-        markerLookBehind= r'(?:(?<=' + markerEscaped + ')|(?<=' + markerEscaped + '\{))'
-        
-        REs['cachedTags'] = re.compile(
-            markerLookBehind + r'\*' + nameCharLookAhead)
-        REs['refreshTag'] = re.compile(markerLookBehind +
-                                                    r'\s*\*([0-9\.]+?)\*' +
-                                                    nameCharLookAhead)
-        REs['startToken'] = re.compile(
+        self.cheetahVarStartRE = re.compile(
             escCharLookBehind +
-            escapeRegexChars(self.setting('placeholderStartToken')) +
-            validSecondCharsLookAhead)
+            r'(?P<startToken>' +
+            escapeRegexChars(self.setting('cheetahVarStartToken')) +
+            ')' +
+            r'(?P<cacheToken>' +
+            cacheToken +
+            ')' +
+            r'(?P<enclosure>(?:|\{|\(|\[|)[ \t\f]*)' + # allow WS after enclosure
+            r'(?=[A-Za-z_])')
+        validCharsLookAhead = r'(?=[A-Za-z_\*!\{\(\[])'
+        self.cheetahVarStartToken = self.setting('cheetahVarStartToken')
+        self.cheetahVarStartTokenRE = re.compile(
+            escCharLookBehind +
+            escapeRegexChars(self.setting('cheetahVarStartToken')) +
+            validCharsLookAhead)
 
+    def makeCommentREs(self):
+        startTokenEsc = escapeRegexChars(self.setting('commentStartToken'))
+        self.commentStartTokenRE = re.compile(escCharLookBehind + startTokenEsc)
         
-    def makeDirectiveREbits(self):
+    def makeMultiLineCommentREs(self):
+        startTokenEsc = escapeRegexChars(
+            self.setting('multiLineCommentStartToken'))
+        endTokenEsc = escapeRegexChars(
+            self.setting('multiLineCommentEndToken'))
+        self.multiLineCommentTokenStartRE = re.compile(escCharLookBehind +
+                                                       startTokenEsc)
+        self.multiLineCommentEndTokenRE = re.compile(escCharLookBehind +
+                                                     endTokenEsc)
+        
+    def makeDirectiveREs(self):
+        
         """Construct the regex bits that are used in directive parsing."""
+        
         startToken = self.setting('directiveStartToken')
         endToken = self.setting('directiveEndToken')
         startTokenEsc = escapeRegexChars(startToken)
         endTokenEsc = escapeRegexChars(endToken)
-        endTokenEscGrp = nongroup(endTokenEsc)
-        start = escCharLookBehind + startTokenEsc
-        start_gobbleWS = '(?:\A|^)' + WS + startTokenEsc
         
-        endGrp = nongroup(endTokenEsc, EOLZ)
-        lazyEndGrp = nongroup(EOLZ)
+        validSecondCharsLookAhead = r'(?=[A-Za-z_])'
+        self.directiveStartTokenRE = re.compile(escCharLookBehind + startTokenEsc
+                                                + validSecondCharsLookAhead)
+        self.directiveEndTokenRE = re.compile(escCharLookBehind + endTokenEsc)
 
-        bits = self._directiveREbits = locals().copy()
-        del bits['self']
-
-    def simpleDirectiveReList(self, directiveReChunk):
+    def makePspREs(self):
         
-        """Return a list of two regexs for a simple directive: one
-        whitespace-gobbling and one plain.  A simple directive one that only has
-        a start-tag, such as #cache, #stop, or #include."""
+        """Setup the regexs for PSP parsing."""
         
-        bits = self._directiveREbits
-        plainRE = re.compile(bits['start']  +
-                             directiveReChunk +
-                             bits['endGrp'])
-        gobbleRE = re.compile(bits['start_gobbleWS']  +
-                             directiveReChunk +
-                             bits['lazyEndGrp'], MULTILINE)
-        return [gobbleRE, plainRE]
+        startToken = self.setting('PSPStartToken')
+        startTokenEsc = escapeRegexChars(startToken)
+        self.PSPStartTokenRE = re.compile(escCharLookBehind + startTokenEsc)
+        
+        endToken = self.setting('PSPEndToken')
+        endTokenEsc = escapeRegexChars(endToken)
+        self.PSPEndTokenRE = re.compile(escCharLookBehind + endTokenEsc)
 
-
+        
     ## generic parsing methods ##
+    #  - the gen* methods and add* methods are implemented by subclasses.
+
+    def matchNonStrConst(self):
+        if self.peek() in self._possibleNonStrConstantChars:
+            for matcher in self._nonStrConstMatchers:
+                if matcher():
+                    return True
+        return False
+
+    def matchCommentStartToken(self):
+        return self.commentStartTokenRE.match(self.src(), self.pos())
     
-    def splitExprFromTxt(self, txt, MARKER):
+    def getCommentStartToken(self):
+        match = self.matchCommentStartToken()
+        if not match:
+            raise ParseError(self, msg='Invalid single-line comment start token')
+        return self.readTo(match.end())
 
-        """Split a text string containing marked placeholders
-        (e.g. self.mark(txt)) into a list of plain text VS placeholders.
+    def matchMultiLineCommentStartToken(self):
+        return self.multiLineCommentTokenStartRE.match(self.src(), self.pos())
+    
+    def getMultiLineCommentStartToken(self):
+        match = self.matchMultiLineCommentStartToken()
+        if not match:
+            raise ParseError(self, msg='Invalid multi-line comment start token')
+        return self.readTo(match.end())
 
-        This is the core of the placeholder parsing!
+    def matchMultiLineCommentEndToken(self):
+        return self.multiLineCommentEndTokenRE.match(self.src(), self.pos())
+    
+    def getMultiLineCommentEndToken(self):
+        match = self.matchMultiLineCommentEndToken()
+        if not match:
+            raise ParseError(self, msg='Invalid multi-line comment end token')
+        return self.readTo(match.end())
 
-        Modified from code written by Ka-Ping Yee for his itpl module.
+    def lineClearToStartToken(self, pos=None):
+        if pos == None:
+            pos = self.pos()
+        self.checkPos(pos)            
+        src = self.src()
+        BOL = self.findBOL()
+        return BOL == pos or src[BOL:pos].isspace()
+
+    def readToThisEndDirective(self, directiveKey):
+        finalPos = endRawPos = startPos = self.pos()
+        directiveChar = self.setting('directiveStartToken')[0]
+        lineClearToStartToken = False
+        while not self.atEnd():
+            if self.peek() == directiveChar:
+                if self.isDirective() == 'end':
+                    endRawPos = self.pos()
+                    self.getDirectiveStartToken()
+                    self.advance(3)                 # to end of 'end'
+                    self.getWhiteSpace()
+                    if self.startswith(directiveKey):
+                        if self.lineClearToStartToken(endRawPos):
+                            lineClearToStartToken = True
+                            endRawPos = self.findBOL(endRawPos)
+                        self.advance(len(directiveKey)) # to end of directiveKey
+                        self.getWhiteSpace()
+                        finalPos = self.pos()
+                        break
+            self.advance()
+            finalPos = endRawPos = self.pos()
+
+        theBlock = self.readTo(endRawPos, start=startPos)
+        self.setPos(finalPos)
+        
+        endOfFirstLinePos = self.findEOL()
+        
+        if self.matchDirectiveEndToken():
+            self.getDirectiveEndToken()
+        elif lineClearToStartToken and (not self.atEnd()) and self.peek() in '\r\n':
+            self.readToEOL(gobble=True)
+            
+        if lineClearToStartToken and self.pos() > endOfFirstLinePos:
+            self.delLeadingWS()
+        return theBlock
+
+    def matchWhiteSpace(self, WSchars=' \f\t'):
+        return (not self.atEnd()) and  self.peek() in WSchars
+
+    def getWhiteSpace(self, WSchars=' \f\t'):
+        if not self.matchWhiteSpace(WSchars):
+            return ''
+        start = self.pos()
+        while self.pos() < self._breakPoint:
+            self.advance()
+            if not self.matchWhiteSpace(WSchars):
+                break
+        return self._src[start:self.pos()]
+
+    def matchNonWhiteSpace(self, WSchars=' \f\t\n\r'):
+        return self.atEnd() or not self.peek() in WSchars
+
+    def getNonWhiteSpace(self, WSchars=' \f\t\n\r'):
+        if not self.matchNonWhiteSpace(WSchars):
+            return ''
+        start = self.pos()
+        while self.pos() < self._breakPoint:
+            self.advance()
+            if not self.matchNonWhiteSpace(WSchars):
+                break
+        return self._src[start:self.pos()]
+    
+    def getDottedName(self):
+        srcLen = len(self)
+        nameChunks = []
+        
+        if not self.peek() in identchars:
+            raise ParseError(self)
+    
+        while self.pos() < srcLen:
+            c = self.peek()
+            if c in namechars:
+                nameChunk = self.getIdentifier()
+                nameChunks.append(nameChunk)
+            elif c == '.':
+                if self.pos()+1 <srcLen and self.peek(1) in identchars:
+                    nameChunks.append(self.getc())
+                else:
+                    break
+            else:
+                break
+
+        return ''.join(nameChunks)
+
+    def matchIdentifier(self,
+                     identRE=re.compile(r'[a-zA-Z_][a-zA-Z_0-9]*')):
+        return identRE.match(self.src(), self.pos())
+    
+    def getIdentifier(self):
+        match = self.matchIdentifier()
+        if not match:
+            raise ParseError(self, msg='Invalid identifier')
+        return self.readTo(match.end())
+
+    def matchOperator(self):
+        match = self.matchPyToken()
+        if match and match.group() not in operators:
+            match = None
+        return match
+
+    def getOperator(self):
+        match = self.matchOperator()
+        if not match:
+            raise ParseError(self, msg='Expected operator')
+        return self.readTo( match.end() )
+
+    def matchAssignmentOperator(self):
+        match = self.matchPyToken()
+        if match and match.group() not in assignmentOps:
+            match = None
+        return match
+        
+    def getAssignmentOperator(self):
+        match = self.matchAssignmentOperator()
+        if not match:
+            raise ParseError(self, msg='Expected assignment operator')
+        return self.readTo( match.end() )
+
+    def isDirective(self):
+        startPos = self.pos()
+        if not self.matchDirectiveStartToken():
+            return False
+
+        self.getDirectiveStartToken()
+        directiveKey = self.getNonWhiteSpace()
+        if not directiveKey in self.directiveEaters.keys():
+            directiveKey= False
+        self.setPos(startPos)
+                                        # DEBUG: print directiveKey, self.src()
+        return directiveKey        
+            
+    def matchDirectiveStartToken(self):
+        return self.directiveStartTokenRE.match(self.src(), self.pos())
+    
+    def getDirectiveStartToken(self):
+        match = self.matchDirectiveStartToken()
+        if not match:
+            raise ParseError(self, msg='Invalid directive start token')
+        return self.readTo(match.end())
+
+    def matchDirectiveEndToken(self):
+        return self.directiveEndTokenRE.match(self.src(), self.pos())
+    
+    def getDirectiveEndToken(self):
+        match = self.matchDirectiveEndToken()
+        if not match:
+            raise ParseError(self, msg='Invalid directive end token')
+        return self.readTo(match.end())
+
+    def matchPSPStartToken(self):
+        return self.PSPStartTokenRE.match(self.src(), self.pos())
+
+    def matchPSPEndToken(self):
+        return self.PSPEndTokenRE.match(self.src(), self.pos())
+
+    def getPSPStartToken(self):
+        match = self.matchPSPStartToken()
+        if not match:
+            raise ParseError(self, msg='Invalid psp start token')
+        return self.readTo(match.end())
+
+    def getPSPEndToken(self):
+        match = self.matchPSPEndToken()
+        if not match:
+            raise ParseError(self, msg='Invalid psp end token')
+        return self.readTo(match.end())
+
+    def matchCheetahVarStart(self):
+        """includes the enclosure and cache token"""
+        return self.cheetahVarStartRE.match(self.src(), self.pos())
+        
+    def getCheetahVarStartToken(self):
+        """just the start token, not the enclosure or cache token"""
+        match = self.matchCheetahVarStart()
+        if not match:
+            raise ParseError(self, msg='Expected Cheetah $var start token')            
+        return self.readTo( match.end('startToken') )
+
+    def getCacheToken(self):
+        try:
+            token = self.cacheTokenRE.match(self.src(), self.pos())
+            self.setPos( token.end() )
+            return token.group()
+        except:
+            raise ParseError(self, msg='Expected cache token')
+
+
+    def getTargetVarsList(self):
+        varnames = []
+        while not self.atEnd():
+            if self.peek() in ' \t\f':
+                self.getWhiteSpace()
+            elif self.peek() in '\r\n':
+                break
+            elif self.startswith(','):
+                self.advance()
+            elif self.startswith('in ') or self.startswith('in\t'):
+                break
+            elif self.matchCheetahVarStart():
+                self.getCheetahVarStartToken()
+                self.getCacheToken()
+                varnames.append( self.getDottedName() )
+            elif self.matchIdentifier():
+                varnames.append( self.getDottedName() )
+            else:
+                break
+        return varnames
+        
+    def getCheetahVar(self, plain=False):
+        """discards the cache info"""
+        self.getCheetahVarStartToken()           
+        self.getCacheToken()
+        return self.getCheetahVarBody(plain=plain)
+            
+    def getCheetahVarBody(self, plain=False):
+        return self.genCheetahVar(self.getCheetahVarNameChunks(), plain=plain)
+        
+    def getCheetahVarNameChunks(self):
+        
+        """
+        nameChunks = list of Cheetah $var subcomponents represented as tuples
+          [ (namemapperPart,autoCall,restOfName),
+          ]
+        where:
+          namemapperPart = the dottedName base
+          autocall = where NameMapper should use autocalling on namemapperPart
+          restOfName = any arglist, index, or slice
+
+        If restOfName contains a call arglist (e.g. '(1234)') then autocall is
+        False, otherwise it defaults to True.
+
+        EXAMPLE
+        ------------------------------------------------------------------------
+
+        if the raw CheetahVar is
+          $a.b.c[1].d().x.y.z
+          
+        nameChunks is the list
+          [ ('a.b.c',1,'[1]'),
+            ('d',0,'()'),     
+            ('x.y.z',1,''),   
+          ]
+
         """
         
         chunks = []
-        pos = 0
-
-        MARKER_LENGTH = len(MARKER)
-
-        while 1:
-            markerPos = txt.find(MARKER, pos)
-            if markerPos < 0:
+        while self.pos() < len(self):
+            rest = ''
+            autoCall = True
+            if not self.peek() in identchars + '.':
                 break
-            nextchar = txt[markerPos + MARKER_LENGTH]
-
-            if nextchar == "{":
-                chunks.append((0, txt[pos:markerPos]))
-                pos = markerPos + MARKER_LENGTH + 1
-                level = 1
-                while level:
-                    tokenStart, pos = matchTokenOrFail(txt, pos)
-                    token = txt[tokenStart: pos]
-
-                    if token == "{":
-                        level = level+1
-                    elif token == "}":
-                        level = level-1
-                chunks.append((1, txt[markerPos + MARKER_LENGTH + 1 : pos-1]))
-
-            elif nextchar in namechars:
-                chunks.append((0, txt[pos:markerPos]))
-                tokenStart, pos = matchTokenOrFail(txt, markerPos + MARKER_LENGTH)
-
-                while pos < len(txt):
-                    if txt[pos] == "." and \
-                        pos+1 < len(txt) and txt[pos+1] in namechars:
-
-                        tokenStart, pos = matchTokenOrFail(txt, pos+1)
-                    elif txt[pos] in "([":
-                        pos, level = pos+1, 1
-                        while level:
-                            tokenStart, pos = matchTokenOrFail(txt, pos)
-                            token = txt[tokenStart:pos]
-                            if token[0] in "([":
-                                level = level+1
-                            elif token[0] in ")]":
-                                level = level-1
-                    else:
-                        break
-                chunks.append((1, txt[markerPos + MARKER_LENGTH:pos]))
-
-            else:
-                raise SyntaxError(txt[pos:markerPos+MARKER_LENGTH], pos)
-                ## @@ we shouldn't have gotten here
-
-        if pos < len(txt):
-            chunks.append((0, txt[pos:]))
+            elif self.peek() == '.':
+                
+                if self.pos()+1 < len(self) and self.peek(1) in identchars:
+                    self.advance()  # discard the period as it isn't needed with NameMapper
+                else:
+                    break
+                
+            dottedName = self.getDottedName()
+            if not self.atEnd() and self.peek() in '([':
+                if self.peek() == '(':
+                    rest = self.getCallArgString()
+                else:
+                    rest = self.getExpression(enclosed=True)
+                
+                period = max(dottedName.rfind('.'), 0)
+                if period:
+                    chunks.append( (dottedName[:period], autoCall, '') )
+                    dottedName = dottedName[period+1:]
+                if rest and rest[0]=='(':
+                    autoCall = False
+            chunks.append( (dottedName, autoCall, rest) )
 
         return chunks
+    
 
-    def wrapExpressionsInStr(self, txt, marker, before, after):
-        
-        """Wrap all marked expressions in a string with the strings 'before' and
-        'after'."""
-        
-        result = []
-        resAppend = result.append
-        for live, chunk in self.splitExprFromTxt(txt, marker):
-            if live:
-                resAppend( before + chunk + after )
-            else:
-                resAppend(chunk)
+    def getCallArgString(self):
 
-        return ''.join(result)
+        """ Get a method/function call argument string. 
 
-
-    ## placeholder-specific parsing methods ##
-
-    def markPlaceholders(self, txt):
-        """Swap the $'s for a marker that can be parsed as valid python code.
-        Default is 'placeholder.'
-
-        Also mark whether the placeholder is to be statically cached or
-        timed-refresh cached"""
-        REs = self._placeholderREs
-        
-        txt = REs['startToken'].sub(
-            self.setting('placeholderMarker'), txt)
-        txt = REs['cachedTags'].sub('CACHED.', txt)
-        def refreshSubber(match):
-            return 'REFRESH_' + match.group(1).replace('.','_') + '.'
-        txt = REs['refreshTag'].sub(refreshSubber, txt)
-        return txt
-
-    def unmarkPlaceholders(self, txt):
-        MARKER = self.setting('placeholderMarker')
-        token = self.setting('placeholderStartToken')
-        txt = re.sub(MARKER + 'CACHED\.' , token + '*', txt)
-        def refreshSubber(match, token=token):
-            return token + '*' + match.group(1).replace('_','.') + '*'
-        txt = re.sub(MARKER + r'REFRESH_(.*)\.', refreshSubber, txt)
-        txt = re.sub(MARKER, token, txt)
-        return txt
-        
-    def translateRawPlaceholderString(self, txt, autoCall=True):
-        """Translate raw $placeholders in a string directly into valid Python code.
-
-        This method is used for handling $placeholders in #directives
+        This method understands *arg, and **kw
         """
-        return self.translatePlaceholderString(self.markPlaceholders(txt),
-                                               autoCall=autoCall)
 
-
-    def translatePlaceholderString(self, txt, autoCall=True):
-        """Translate a marked placeholder string into valid Python code."""
-
-        searchList = self.searchList()
-        
-        def translateName(name, self=self,
-                          autoCall=autoCall,
-                          firstSpecialCharRE=re.compile(r'\(|\['),
-                          ):
+        startPos = self.pos()
+        if not self.peek() == '(':
+            raise ParseError(self, msg="Expected '('")
             
-            ## get rid of the 'cache-type' tokens
-            # - these are handled by the tag-processor instead
-            nameChunks = name.split('.')
-            if nameChunks[0] == 'CACHED':
-                    del nameChunks[0]
-            if nameChunks[0].startswith('REFRESH'):
-                del nameChunks[0]
-            name = '.'.join(nameChunks)
+        argStringBits = []
+        addBit = argStringBits.append
+        addBit(self.getc())             # get the first (
 
-            ## split the name into a part that NameMapper can handle and the rest
-            firstSpecialChar = firstSpecialCharRE.search(name)
-            if firstSpecialChar:         # NameMapper can't handle [] or ()
-                firstSpecialChar = firstSpecialChar.start()
-                nameMapperPartOfName, remainderOfName = \
-                                      name[0:firstSpecialChar], name[firstSpecialChar:]
-                remainderOfName = remainderOfName
-                nameChunks = nameMapperPartOfName.split('.')
-            else:
-                nameMapperPartOfName = name
-                remainderOfName = ''
+        while 1:
+            if self.atEnd():
+                self.setPos(enclosures[-1][1])
+                raise ParseError(
+                    self, msg="EOF was reached before a matching ')'"+
+                    " was found for the '('")
 
-            ## only do autocalling on names that have no () in them
-            # @@TR: finish this off so that it works with the type of calls Chuck uses
-            if autoCall and name.find('(') == -1 \
-               and self.setting('useAutocalling'):
-                safeToAutoCall = True
+            c = self.peek()
+            if c == ")":
+                addBit(self.getc())  # get the last ) and break
+                break
+            elif c in " \t\f\r\n":
+                addBit(self.getc())
+            elif self.matchCheetahVarStart():
+                startPos = self.pos()
+                codeFor1stToken = self.getCheetahVar()
+                WS = self.getWhiteSpace()
+                if not self.atEnd() and self.peek() == '=':
+                    nextToken = self.getPyToken()
+                    if nextToken == '=':
+                        endPos = self.pos()
+                        self.setPos(startPos)
+                        codeFor1stToken = self.getCheetahVar(plain=True)
+                        self.setPos(endPos)
+                        
+                    ## finally
+                    addBit( codeFor1stToken + WS + nextToken )
+                else:
+                    addBit( codeFor1stToken + WS)
+                        
+                
             else:
-                safeToAutoCall = False
+                token = self.getPyToken()
+                if token in ('{','(','['):
+                    self.rev()
+                    token = self.getExpression(enclosed=True)
+                addBit(token)
+
+        return ''.join(argStringBits)
+    
+    def getDefArgList(self, exitPos=None, useNameMapper=False):
+
+        """ Get an argument list. Can be used for method/function definition
+        argument lists or for #directive argument lists. Returns a list of
+        tuples in the form (argName, defVal=None) with one tuple for each arg
+        name.
+
+        These defVals are always strings, so (argName, defVal=None) is safe even
+        with a case like (arg1, arg2=None, arg3=1234*2), which would be returned as
+        [('arg1', None),
+         ('arg2', 'None'),
+         ('arg3', '1234*2'),         
+        ]
+
+        This method understands *arg, and **kw
+
+        """
+
+        if self.peek() == '(':
+            self.advance()
+        else:
+            exitPos = self.findEOL()  # it's a directive so break at the EOL
+        argList = ArgList()
+        onDefVal = False
+        useNameMapper_orig = self.setting('useNameMapper')
+        self.setSetting('useNameMapper', useNameMapper)
+
+        while 1:
+            if self.atEnd():
+                self.setPos(enclosures[-1][1])
+                raise ParseError(
+                    self, msg="EOF was reached before a matching ')'"+
+                    " was found for the '('")
+
+            if self.pos() == exitPos:
+                break
+
+            c = self.peek()
+            if c == ")" or self.matchDirectiveEndToken():
+                break
+            elif c in " \t\f\r\n":
+                if onDefVal:
+                    argList.addToDefVal(c)
+                self.advance()
+            elif c == '=':
+                onDefVal = True
+                self.advance()
+            elif c == ",":
+                argList.next()
+                onDefVal = False
+                self.advance()
+            elif self.startswith(self.cheetahVarStartToken) and not onDefVal:
+                self.advance(len(self.cheetahVarStartToken))
+            elif self.matchIdentifier() and not onDefVal:
+                argList.addArgName( self.getIdentifier() )
+            elif onDefVal:
+                if self.matchCheetahVarStart():
+                    token = self.getCheetahVar()
+                else:
+                    token = self.getPyToken()
+                    if token in ('{','(','['):
+                        self.rev()
+                        token = self.getExpression(enclosed=True)
+                argList.addToDefVal(token)
+            elif c == '*' and not onDefVal:
+                varName = self.getc()
+                if self.peek() == '*':
+                    varName += self.getc()
+                if not self.matchIdentifier():
+                    raise ParseError(self)
+                varName += self.getIdentifier()
+                argList.addArgName(varName)
+            else:
+                raise ParseError(self)
+
+                
+        self.setSetting('useNameMapper', useNameMapper_orig)
+        return argList.merge()
+    
+    def getExpression(self,
+                      enclosed=False, 
+                      enclosures=[],
+                      ):
+
+        """ Get a Cheetah expression that includes $CheetahVars and break at
+        directive end tokens."""
+
+        
+        srcLen = len(self)
+        exprBits = []
+        while 1:
+            if self.atEnd():
+                if enclosures:
+                    open = enclosures[-1][0]
+                    close = closurePairsRev[open]
+                    self.setPos(enclosures[-1][1])
+                    raise ParseError(
+                        self, msg="EOF was reached before a matching '" + close +
+                        "' was found for the '" + open + "'")
+                else:
+                    break
+
+            c = self.peek()
             
-            ## deal with local vars from #set and #for directives
-            if nameMapperPartOfName in self._localVarsList:
-                return nameMapperPartOfName + remainderOfName
-            elif nameChunks[0] in self._localVarsList:
-                translatedName = 'valueForName(' + nameChunks[0] + ',"""' + \
-                           '.'.join(nameChunks[1:]) + '""", ' + \
-                           str(safeToAutoCall) + ')' + remainderOfName
-                return translatedName
-
-            ## Translate the NameMapper part of the Name
-            translatedName = 'valueFromSearchList(searchList, "' + \
-                           nameMapperPartOfName + '", ' + \
-                           str(safeToAutoCall) + ')' + remainderOfName
-            return translatedName
-
-        ##########################
-        resultList = []
-        for live, chunk in self.splitExprFromTxt(txt, self.setting('placeholderMarker')):
-            if live:
-                if self._placeholderREs['nameMapperChunk'].search(chunk):
-                    chunk = self.translatePlaceholderString(chunk)
-                resultList.append( translateName(chunk) ) # using the function from above
+            if c in "{([":
+                exprBits.append(c)
+                enclosures.append( (c, self.pos()) )
+                self.advance()
+                
+            elif enclosed and not enclosures:
+                break
+                
+            elif c in "])}":
+                if not enclosures:
+                    raise ParseError(self)
+                open = closurePairs[c]
+                if enclosures[-1][0] == open:
+                    enclosures.pop()
+                    exprBits.append(c)
+                else:
+                    open = enclosures[-1][0]
+                    close = closurePairsRev[open]
+                    row, col = self.getRowCol()
+                    self.setPos(enclosures[-1][1])
+                    raise ParseError(
+                        self, msg= "A '" + c + "' was found at line " + str(row) +
+                        ", col " + str(col) +
+                        " before a matching '" + close +
+                        "' was found\nfor the '" + open + "'")
+                self.advance()
+                                
+            elif c in " \f\t":
+                exprBits.append(self.getWhiteSpace())
+            
+            elif self.matchDirectiveEndToken():
+                break
+            
+            elif c == "\\" and self.pos()+1 < srcLen:
+                eolMatch = EOLre.match(self.src(), self.pos()+1)
+                if not eolMatch:
+                    self.advance()
+                    raise ParseError(self, msg='Line ending expected')
+                self.setPos( eolMatch.end() )
+            elif c in '\r\n':
+                if enclosures:
+                    self.advance()                    
+                else:
+                    break
+                
+            elif self.matchIdentifier():
+                token = self.getIdentifier()
+                exprBits.append(token)
+                if token == 'for':
+                    targetVars = self.getTargetVarsList()
+                    exprBits.append(' ' + ', '.join(targetVars) + ' ')
+                    if not enclosures:
+                        self.addLocalVars(targetVars)
+                else:
+                    exprBits.append(self.getWhiteSpace())
+                    if not self.atEnd() and self.peek() == '(':
+                        exprBits.append(self.getCallArgString())
+                        
+                    
+            elif self.matchCheetahVarStart():
+                token = self.getCheetahVar()
+                exprBits.append(token)
             else:
-                resultList.append(chunk)
+                token = self.getPyToken()
+                exprBits.append(token)                    
+                                        
+        expression = ''.join(exprBits)
+        return expression
 
-        return ''.join(resultList)
     
+class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
 
-    def escapePlaceholders(self, theString):
-        """Escape any escaped placeholders in the string."""
+    def initDirectives(self):
+        self.directiveEaters = {
+            'breakpoint':self.eatBreakPoint,
+            'compiler-settings':self.eatCompilerSettings,
+            'settings':self.eatSettings,
+            
+            'shBang': self.eatShbang,
+            'import':self.eatImport,
+            'from':self.eatImport,
+            'extends': self.eatExtends,
+            'implements': self.eatImplements,
+            
+            'slurp': self.eatSlurp,
+            'raw': self.eatRaw,
+            'include': self.eatInclude,
+            
+            'cache': self.eatCache,
+            'filter': self.eatFilter,
 
-        token = self.setting('placeholderStartToken')
-        return theString.replace(token, '\\' + token)
+            'attribute':self.eatAttribute,
+            'def': self.eatDef,
+            'block': self.eatBlock,
 
-    def unescapePlaceholders(self, theString):
-        """Unescape any escaped placeholders in the string.
+            'call': self.eatCall,
+            'set': self.eatSet,
+            
+            'while': self.eatWhile,
+            'for': self.eatFor,
+            'if': self.eatIf,
+            'else': self.eatElse,
+            'elif': self.eatElse,
+
+            'pass': self.eatPass,
+            'break': self.eatBreak,
+            'continue': self.eatContinue,
+            'stop': self.eatStop,
+
+            'assert': self.eatAssert,
+            'raise': self.eatRaise,
+            'try': self.eatTry,
+            'except': self.eatExcept,
+            'finally': self.eatFinally,
+            'errorCatcher':self.eatErrorCatcher,
+            
+            'end': self.eatEndDirective,
+            }
+
+
+        self.directiveEndEaters = {
+            'def': self.eatEndDef,
+            'block': self.eatEndBlock,
+            
+            'cache': self.eatEndCache,
+            'filter': self.eatEndFilter,
+            'errorCatcher':self.eatEndErrorCatcher,
+            
+            'while': self.eatEndWhile,
+            'for': self.eatEndFor,
+            'if': self.eatEndIf,
+            'try': self.eatEndIf,
+            }
+
+    ## main parse loop
+
+    def parse(self):
+        while not self.atEnd():
+            if self.matchCommentStartToken():
+                self.eatComment()
+            elif self.matchMultiLineCommentStartToken():
+                self.eatMultiLineComment()
+            elif self.matchCheetahVarStart():
+                self.eatPlaceholder()
+            elif self.isDirective():
+                self.eatDirective()
+            elif self.matchPSPStartToken():
+                self.eatPSP()
+            else:
+                self.eatStrConstant()
+                
+    ## eat methods    
+                
+    def eatStrConstant(self):
+        startPos = self.pos()
+        while not self.atEnd():
+            if self.matchNonStrConst():
+                break
+            else:
+                self.advance()
+        strConst = self.readTo(self.pos(), start=startPos)
+        self.addStrConst(strConst)
+
+    def eatComment(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        if lineClearToStartToken:
+            self.delLeadingWS()
+        self.getCommentStartToken()            
+        comm = self.readToEOL(gobble=lineClearToStartToken)
+        specialVarMatch = specialVarRE.match(comm)
+        self.addComment(comm)
+
+    def eatMultiLineComment(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLine = self.findEOL()
+
+        self.getMultiLineCommentStartToken()
+        endPos = startPos = self.pos()
+        level = 1
+        while 1:
+            endPos = self.pos()
+            if self.atEnd():
+                break
+            if self.matchMultiLineCommentStartToken():
+                self.getMultiLineCommentStartToken()
+                level += 1
+            elif self.matchMultiLineCommentEndToken():
+                self.getMultiLineCommentEndToken()
+                level -= 1
+            if not level:
+                break
+            self.advance()
+        comm = self.readTo(endPos, start=startPos)
+        if not self.atEnd():
+            self.getMultiLineCommentEndToken()
+        # don't gobble
+        self.addComment(comm)
+
+    def eatPlaceholder(self):
+        startPos = self.pos()
+        startToken = self.getCheetahVarStartToken()
+        cacheToken = self.getCacheToken()
         
-        This method is called by the Template._codeGenerator() in stage 1, which
-        is why the first arg is 'templateObj.  self.escapePlaceholders() isn't
-        called by Template._codeGenerator() so it doesn't take a templateObj arg."""
+        cacheInfo = self.genCacheInfo(cacheToken)
         
-        token = self.setting('placeholderStartToken')
-        return theString.replace('\\' + token, token)
+        if self.peek() in '({[':
+            pos = self.pos()
+            enclosures = [ (self.getc(), pos) ]
+            self.getWhiteSpace()
+        else:
+            enclosures = []
+        nameChunks = self.getCheetahVarNameChunks()
+        if enclosures:
+            restOfEnclosure = self.getExpression(enclosed=True,
+                                                 enclosures=enclosures,
+                                                 )[:-1]
+        else:
+            restOfEnclosure = ''
 
-    def evalPlaceholderString(self, txt, globalsDict={}, localsDict={'trans':None}):
-        #the trans in the localsDict is there for the formatters
-        """Return the value of a placeholderstring. This doesn't work with localVars."""
+        rawPlaceholder = self[startPos: self.pos()]
+        lineCol = self.getRowCol(startPos)
         
-        localsDict.update({'theFormatters':self._theFormatters,
-                           'searchList':self.searchList(),
-                           'valueFromSearchList':valueFromSearchList,
-                           'valueForName':valueForName,
-                           'True':1,
-                           'False':0})
-        return eval(txt, globalsDict, localsDict)
+        codeChunk  = self.genCheetahVar(nameChunks)
+
+        ## deal with the cache
+        if cacheInfo:
+            cacheInfo['ID'] = repr(rawPlaceholder)[1:-1]
+            self.startCacheRegion(cacheInfo, lineCol)
+            
+        if self.errorCatcherIsOn():            
+            methodName = self.addErrorCatcher(codeChunk,
+                                              rawCode=rawPlaceholder,
+                                              lineCol=lineCol,
+                                              )
+            codeChunk = 'self.' + methodName + '(localsDict=locals())'
+
+        self.addFilteredChunk( codeChunk + restOfEnclosure )
+        self.appendToPrevChunk(' # generated from ' + repr(rawPlaceholder) )
+        if self.setting('outputRowColComments'):
+            self.appendToPrevChunk(' at line, col '+ str(lineCol) + '.')
+        if cacheInfo:
+            self.endCacheRegion()
+
+    def eatPSP(self):
+        self.getPSPStartToken()
+        endToken = self.setting('PSPEndToken')
+        startPos = self.pos()            
+        while not self.atEnd():
+            if self.peek() == endToken[0]:
+                if self.matchPSPEndToken():
+                    break
+            self.advance()
+        pspString = self.readTo(self.pos(), start=startPos).strip()
+        self.addPSP(pspString)
+        self.getPSPEndToken()
+
+
+    ## generic directive eat methods
+
+    def eatDirective(self):
+        directiveKey = self.isDirective()
+        self.directiveEaters[directiveKey]()
+
+    def eatEndDirective(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        self.getDirectiveStartToken()
+        self.advance(3)                 # to end of 'end'
+        self.getWhiteSpace()
+        pos = self.pos()
+        directiveKey = False
+        for key in self.directiveEndEaters.keys():
+            if self.find(key) == pos:
+                directiveKey = key
+                break
+        if not directiveKey:
+            raise ParseError(self, msg='Invalid end directive')
+                    
+        self.directiveEndEaters[directiveKey](
+            lineClearToStartToken=lineClearToStartToken)
+
+
+    def eatSimpleExprDirective(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLine = self.findEOL()
+        self.getDirectiveStartToken()
+        expr = self.getExpression().strip()
+        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+        return expr
+
+    ## specific directive eat methods
     
-    def execPlaceholderString(self, code, globalsDict={}, localsDict={'trans':None}):
-        """Exec a placeholderString and return a tuple of the globalsDict, and
-        the localsDict. This doesn't work with localVars."""
+    def eatBreakPoint(self):
+        self.setBreakPoint(self.pos())
+
+    def eatShbang(self):
+        self.getDirectiveStartToken()
+        self.advance(len('shBang'))
+        self.getWhiteSpace()
+        shBang = self.readToEOL()
+        self.addShBang(shBang.strip())
+
+    def eatCompilerSettings(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLine = self.findEOL()
+        self.getDirectiveStartToken()
+        self.advance(len('compiler-settings'))   # to end of 'settings'
         
-        localsDict.update({'theFormatters':self._theFormatters,
-                           'searchList':self.searchList(),
-                           'valueFromSearchList':valueFromSearchList,
-                           'valueForName':valueForName,
-                           'True':1,
-                           'False':0})
-        exec code in globalsDict, localsDict
-        return (globalsDict,localsDict)
+        KWs = self.getTargetVarsList()
+        self.getExpression()            # gobble any garbage
+            
+        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+        
+        merge = True
+        if 'nomerge' in KWs:
+            merge = False
+            
+        if 'reset' in KWs:
+            self._initializeSettings()
+            self.configureParser()
+            return
+        elif 'python' in KWs:
+            settingsReader = self.updateSettingsFromPySrcStr
+        else:
+            settingsReader = self.updateSettingsFromConfigStr
+
+        settingsStr = self.readToThisEndDirective('compiler-settings')            
+        
+        try:
+            settingsReader(settingsStr)
+        except:
+            out = sys.stderr
+            print >> out, 'An error occurred while processing the following compiler settings.'
+            print >> out, '-'*80
+            print >> out, settingsStr.strip()
+            print >> out, '-'*80
+            print >> out, 'Please check the syntax of these settings.'
+            print >> out, 'A full Python exception traceback follows.'
+            raise
+        self.configureParser()
     
+    def eatSettings(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLine = self.findEOL()
+        self.getDirectiveStartToken()
+        self.advance(len('settings'))   # to end of 'settings'
+
+        KWs = self.getTargetVarsList()
+        self.getExpression()            # gobble any garbage
+        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+
+        
+        merge = True
+        if 'nomerge' in KWs:
+            merge = False
+            
+        if 'reset' in KWs:
+            self._initializeSettings()
+            self.configureParser()
+            return
+        elif 'python' in KWs:
+            settingsType = 'python'
+        else:
+            settingsType = 'ini'
+        
+        settingsStr = self.readToThisEndDirective('settings')
+        self.addSettingsToInit(settingsStr, settingsType=settingsType)
+        
+        if self._templateObj:
+            # note that these settings won't affect the compiler/parser settings!
+            if settingsType == 'python':
+                self._templateObj.updateSettingsFromPySrcStr(settingsStr, merge=merge)
+            else:
+                self._templateObj.updateSettingsFromConfigStr(settingsStr, merge=merge)
+
+
+    def eatAttribute(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        startPos = self.pos()
+        self.getDirectiveStartToken()
+        self.advance(len('attribute'))
+        self.getWhiteSpace()
+        
+        if not self.matchCheetahVarStart():
+            raise ParseError(self, msg='CheetahVar expected')
+        self.getCheetahVarStartToken()
+        attribName = self.getIdentifier()
+        self.getWhiteSpace()
+        self.getAssignmentOperator()
+        expr = self.getExpression()
+        self.addAttribute(attribName + ' =' + expr)
+        val = eval(expr,{},{})
+        if self._templateObj:
+            setattr(self._templateObj, attribName, val)
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        
+    def eatDef(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        startPos = self.pos()
+        self.getDirectiveStartToken()
+        self.advance(len('def'))
+        methodName, rawDef = self.startDef(startPos, lineClearToStartToken)
+        
+    def eatBlock(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        startPos = self.pos()
+        self.getDirectiveStartToken()
+        self.advance(len('block'))
+
+        methodName, rawDef = self.startDef(startPos, lineClearToStartToken)
+        self._blockMetaData[methodName] = {'raw':rawDef,
+                                           'lineCol':self.getRowCol(startPos),
+                                           }
+
+        if self.setting('includeBlockMarkers'):
+            startMarker = self.setting('blockMarkerStart')
+            self.addStrConst(startMarker[0] + methodName + startMarker[1])
+            
+        
+    def startDef(self, startPos, lineClearToStartToken=False):
+        ## get some info on the method
+        self.getWhiteSpace()
+        methodName = self.getIdentifier()
+        self.getWhiteSpace()
+        if self.peek() == '(':
+            argsList = self.getDefArgList()
+            self.advance()              # past the closing ')'
+            if argsList and argsList[0][0] == 'self':
+                del argsList[0]
+        else:
+            argsList=[]
+
+        rawDef = self[startPos:self.pos()]
+        self.getExpression()            # slurp up any garbage left at the end
+        signature = self[startPos:self.pos()]
+        endOfFirstLinePos = self.findEOL()
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        ## create the method compiler and register it
+        
+        from Compiler import AutoMethodCompiler
+        methodCompiler = self.spawnMethodCompiler(methodName, klass=AutoMethodCompiler)
+        self.setActiveMethodCompiler(methodCompiler)
+        
+        ## deal with the method's argstring
+        for argName, defVal in argsList:
+            methodCompiler.addMethArg(argName, defVal)
+
+        methodCompiler.addMethDocString('Generated from ' + signature +
+                                        ' at line, col ' +
+                                        str(self.getRowCol(startPos)) +
+                                        '.')            
+        return methodName, rawDef
+
+    def eatImport(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLine = self.findEOL()
+        self.getDirectiveStartToken()
+        impStatement = self.getExpression()
+        self.addImportStatement(impStatement)
+        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+
+        ## this doesn't work with from math import *, etc.
+        importVarNames = impStatement[impStatement.find('import') + len('import'):].split(',')
+        importVarNames = [var.split()[-1] for var in importVarNames]
+        self.addImportedVars(importVarNames)
+
+        if self._templateObj:
+            import Template as TemplateMod
+            mod = self._templateObj._importAsDummyModule(impStatement)
+            for varName in importVarNames:
+                val = getattr(mod, varName.split('.')[0])
+                setattr(TemplateMod, varName, val)
+    
+    def eatExtends(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLine = self.findEOL()
+        self.getDirectiveStartToken()
+        self.advance(len('extends'))
+        self.getWhiteSpace()
+        self.setMainMethodName('writeBody') # change from the default 'respond'
+        self.setBaseClasses( self.getTargetVarsList() )
+        mainBaseClass =  self._baseClasses[0]
+        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+        
+        ##################################################
+        ## dynamically bind to and __init__ with this new baseclass
+        #  - this is required for COMPILE_TIME_CACHE to work properly
+        #    and for dynamic use of templates compiled directly from file
+        #  - also necessary for the 'monitorSrc' fileMtime triggered recompiles
+        
+        if self._templateObj:
+            mod = self._templateObj._importAsDummyModule('\n'.join(self._importStatements))
+            newBaseClasses = []
+            for baseClass in self._baseClasses:
+                newBaseClasses.append( getattr(mod, baseClass))
+
+            class newClass:
+                pass
+            newClass.__name__ = self._mainClassName
+            newClass.__bases__ = tuple(newBaseClasses)
+            self._templateObj.__class__ = newClass
+            # must initialize it so instance attributes are accessible
+            newClass.__init__(self._templateObj)
+            
+    def eatImplements(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLine = self.findEOL()
+        self.getDirectiveStartToken()
+        self.advance(len('implements'))
+        self.getWhiteSpace()
+        self.setMainMethodName(self.getIdentifier())
+        self.getExpression()  # throw away and unwanted crap that got added in
+        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+
+
+    def eatCall(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        self.getDirectiveStartToken()
+        self.advance(len('call'))
+        self.getWhiteSpace()
+        expr = self.getExpression()
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.addCall(expr)
+
+    def eatSet(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLine = self.findEOL()
+
+        self.getDirectiveStartToken()
+        self.advance(3)
+        self.getWhiteSpace()
+        if self.startswith('local'):
+            self.getIdentifier()
+            self.getWhiteSpace()
+            isGlobal = False
+        elif self.startswith('global'):
+            self.getIdentifier()
+            self.getWhiteSpace()
+            isGlobal = True
+        else:
+            isGlobal = False
+        
+        if not self.matchCheetahVarStart():
+            raise ParseError(self, msg='CheetahVar expected')
+        
+        cheetahVar = self.getCheetahVar(plain=True)
+        
+        self.getWhiteSpace()
+        OP = self.getAssignmentOperator()
+        expr = self.getExpression()
+        
+        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+        self.addSet(cheetahVar, OP, expr, isGlobal)
+    
+    def eatSlurp(self):
+        if self.lineClearToStartToken():
+            self.delLeadingWS()
+        self.commitStrConst()
+        self.readToEOL(gobble=True)
+
+    def eatRaw(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        self.getDirectiveStartToken()
+        self.getExpression()
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+
+        rawBlock = self.readToThisEndDirective('raw')
+        self.addStrConst(rawBlock)
+    
+    def eatInclude(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        self.getDirectiveStartToken()
+        self.advance(len('include'))
+
+        self.getWhiteSpace()
+        includeFrom = 'file'
+        raw = False
+        if self.startswith('raw'):
+            self.advance(3)
+            raw=True
+            
+        self.getWhiteSpace()            
+        if self.startswith('source'):
+            self.advance(len('source'))
+            includeFrom = 'str'
+            self.getWhiteSpace()
+            if not self.peek() == '=':
+                raise ParseError(self)
+            self.advance()
+            
+        expr = self.getExpression()
+            
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.addWriteChunk('self._includeCheetahSource(' + expr + ', trans=trans, ' +
+                           'includeFrom="' + includeFrom + '", raw=' + str(raw) +
+                           ')')
+
+    def eatCache(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        lineCol = self.getRowCol()
+        self.getDirectiveStartToken()
+        self.advance(len('cache'))
+        startPos = self.pos()
+        argList = self.getDefArgList(useNameMapper=True)
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        cacheInfo = self.genCacheInfoFromArgList(argList)
+        self.startCacheRegion(cacheInfo, lineCol)
+
+
+    def eatFilter(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+
+        self.getDirectiveStartToken()
+        self.advance(len('filter'))
+        self.getWhiteSpace()
+        theFilter = self.getIdentifier()
+        if self._templateObj:
+            self._templateObj._currentFilter = \
+                   getattr(Filters,theFilter)(self._templateObj).format
+            
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.addChunk('if self._filters.has_key("' + theFilter+ '"):')
+        self.indent()
+        self.addChunk(
+            'filter = self._currentFilter = self._filters["' +
+            theFilter + '"]')
+        self.dedent()
+        self.addChunk('else:')
+        self.indent()
+        self.addChunk('filter = self._currentFilter = \\\n\t\t\tself._filters["'
+                      + theFilter + '"] = Filters.'
+                      + theFilter + '(self).filter'
+                      )
+        self.dedent()
+        
+    def eatErrorCatcher(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+
+        self.getDirectiveStartToken()
+        self.advance(len('errorCatcher'))
+        self.getWhiteSpace()
+        self.turnErrorCatcherOn()
+        theChecker = self.getIdentifier()
+        if self._templateObj:
+            self._templateObj._errorCatcher = \
+                   getattr(ErrorCatchers, theChecker)(self._templateObj)
+            
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.addChunk('if self._errorCatchers.has_key("' + theChecker + '"):')
+        self.indent()
+        self.addChunk('self._errorCatcher = self._errorCatchers["' +
+            theChecker + '"]')
+        self.dedent()
+        self.addChunk('else:')
+        self.indent()
+        self.addChunk('self._errorCatcher = self._errorCatchers["'
+                      + theChecker + '"] = ErrorCatchers.'
+                      + theChecker + '(self)'
+                      )
+        self.dedent()
+        
+    def eatWhile(self):
+        self.addWhile(self.eatSimpleExprDirective())
+
+    def eatFor(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+
+        self.getDirectiveStartToken()
+        expr = self.getExpression()
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.addFor(expr)
+        
+    def eatIf(self):
+        self.addIf(self.eatSimpleExprDirective())
+    
+    def eatElse(self):
+        """else, elif and else if"""
+        self.addElse(self.eatSimpleExprDirective())
+
+    def eatTry(self):
+        self.addTry(self.eatSimpleExprDirective())
+
+    def eatExcept(self):
+        self.addExcept(self.eatSimpleExprDirective())
+
+    def eatFinally(self):
+        self.addFinally(self.eatSimpleExprDirective())
+
+
+    def eatPass(self):
+        self.addChunk(self.eatSimpleExprDirective())
+
+    def eatAssert(self):
+        self.addChunk(self.eatSimpleExprDirective())
+
+    def eatRaise(self):
+        self.addChunk(self.eatSimpleExprDirective())
+
+    def eatBreak(self):
+        self.addChunk(self.eatSimpleExprDirective())
+
+    def eatContinue(self):
+        self.addChunk(self.eatSimpleExprDirective())
+
+    def eatStop(self):
+        self.addStop(self.eatSimpleExprDirective())
+
+    ## end directive eaters
+
+    def eatDedentDirective(self, lineClearToStartToken=False):        
+        endOfFirstLinePos = self.findEOL()
+        self.getExpression()
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.commitStrConst()            
+        self.dedent()
+
+    def eatEndDef(self, lineClearToStartToken=False):
+        endOfFirstLinePos = self.findEOL()
+        self.getExpression()
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.commitStrConst()
+        methCompiler = self.getActiveMethodCompiler()
+        self.swallowMethodCompiler(methCompiler)
+
+    def eatEndBlock(self, lineClearToStartToken=False):
+        endOfFirstLinePos = self.findEOL()
+        self.getExpression()
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        
+        methCompiler = self.getActiveMethodCompiler()
+        methodName = methCompiler.methodName()
+        if self.setting('includeBlockMarkers'):
+            endMarker = self.setting('blockMarkerEnd')
+            methCompiler.addStrConst(endMarker[0] + methodName + endMarker[1])
+        self.commitStrConst()
+        self.swallowMethodCompiler(methCompiler)
+
+        metaData = self._blockMetaData[methodName] 
+        rawDirective = metaData['raw']
+        lineCol = metaData['lineCol']
+        
+        ## insert the code to call the block, caching if #cache directive is on
+        codeChunk = 'self.' + methodName + '(trans=trans)'
+        self.addWriteChunk(codeChunk)
+        
+        self.appendToPrevChunk(' # generated from ' + repr(rawDirective) )
+        if self.setting('outputRowColComments'):
+            self.appendToPrevChunk(' at line, col '+ str(lineCol) + '.')
+
+
+
+    def eatEndCache(self, lineClearToStartToken=False):
+        endOfFirstLinePos = self.findEOL()
+        self.getExpression()
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.endCacheRegion()
+
+    def eatEndFilter(self, lineClearToStartToken=False):
+        endOfFirstLinePos = self.findEOL()
+        self.getExpression()
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.addChunk('filter = self._initialFilter')        
+
+    def eatEndErrorCatcher(self, lineClearToStartToken=False):
+        endOfFirstLinePos = self.findEOL()
+        self.getExpression()
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.turnErrorCatcherOff()
+
+    def eatEndWhile(self, lineClearToStartToken=False):
+        self.eatDedentDirective(lineClearToStartToken=lineClearToStartToken)
+    
+    def eatEndIf(self, lineClearToStartToken=False):
+        self.eatDedentDirective(lineClearToStartToken=lineClearToStartToken)
+
+    def eatEndFor(self, lineClearToStartToken=False):
+        self.eatDedentDirective(lineClearToStartToken=lineClearToStartToken)
+
+    def eatEndTry(self, lineClearToStartToken=False):
+        self.eatDedentDirective(lineClearToStartToken=lineClearToStartToken)
+
+
+##################################################
+## Make an alias to export        
+Parser = _HighLevelSemanticsParser

@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SettingsManager.py,v 1.12 2001/08/30 19:32:21 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.13 2001/10/10 06:47:41 tavis_rudd Exp $
 """Provides a mixin/base class for managing application settings 
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2001/08/30 19:32:21 $
+Last Revision Date: $Date: 2001/10/10 06:47:41 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.12 $"[11:-2]
+__version__ = "$Revision: 1.13 $"[11:-2]
 
 
 ##################################################
@@ -39,7 +39,7 @@ try:
 except:
     from cStringIO import StringIO
 
-import imp                 # used by SettingsManager.updateFromPySrcFile()
+import imp                 # used by SettingsManager.updateSettingsFromPySrcFile()
 
 try:
     import threading
@@ -74,15 +74,14 @@ def mergeNestedDictionaries(dict1, dict2):
     This little function is very handy for selectively overriding settings in a
     settings dictionary that has a nested structure.  """
     
-    newDict = dict1.copy()
     for key,val in dict2.items():
-        if newDict.has_key(key) and type(val) == types.DictType and \
-           type(newDict[key]) == types.DictType:
+        if dict1.has_key(key) and type(val) == types.DictType and \
+           type(dict1[key]) == types.DictType:
             
-            newDict[key] = mergeNestedDictionaries(newDict[key], val)
+            dict1[key] = mergeNestedDictionaries(dict1[key], val)
         else:
-            newDict[key] = val
-    return newDict
+            dict1[key] = val
+    return dict1
     
 def stringIsNumber(theString):
     """Return True if theString represents a Python number, False otherwise.
@@ -134,7 +133,7 @@ class SettingsManager:
     This method must be called by subclasses.
     """
 
-    _sysPathLock = Lock()   # used by the updateFromPySrcFile() method
+    _sysPathLock = Lock()   # used by the updateSettingsFromPySrcFile() method
 
     _ConfigParserClass = ConfigParserCaseSensitive #incase __init__ isn't called
     
@@ -160,26 +159,26 @@ class SettingsManager:
     def updateSettings(self, newSettings, merge=True):
         """Update the settings with a selective merge or a complete overwrite."""
         if merge:
-            self._settings = mergeNestedDictionaries(self._settings, newSettings)
+            mergeNestedDictionaries(self._settings, newSettings)
         else:
-            self._settings = newSettings
+            self._settings.update(newSettings)
 
-    def updateFromPySrcStr(self, theString, merge=True):
+    def updateSettingsFromPySrcStr(self, theString, merge=True):
         """Update the settings from a code in a Python src string."""
-        newSettings = self.readFromPySrcStr(theString)
+        newSettings = self.readSettingsFromPySrcStr(theString)
         self.updateSettings(newSettings,
                             merge=newSettings.get('mergeSettings',merge) )
         
-    def updateFromPySrcFile(self, path, merge=True):
+    def updateSettingsFromPySrcFile(self, path, merge=True):
         """Update the settings from variables in a Python source file.
 
         This method will temporarily add the directory of src file to sys.path so
         that import statements relative to that dir will work properly."""
-        newSettings = self.readFromPySrcFile(path)
+        newSettings = self.readSettingsFromPySrcFile(path)
         self.updateSettings(newSettings,
                             merge=newSettings.get('mergeSettings',merge) )
 
-    def readFromPySrcFile(self, path):
+    def readSettingsFromPySrcFile(self, path):
         """Return new settings dict from variables in a Python source file.
 
         This method will temporarily add the directory of src file to sys.path so
@@ -195,7 +194,7 @@ class SettingsManager:
         fp = open(path)
         pySrc = fp.read()
         fp.close()
-        newSettings = self.readFromPySrcStr(pySrc)
+        newSettings = self.readSettingsFromPySrcStr(pySrc)
         
         if sys.path[0] == path:   # it might have modified by another thread
             del sys.path[0]
@@ -203,14 +202,14 @@ class SettingsManager:
 
         return newSettings
         
-    def readFromPySrcStr(self, theString):
+    def readSettingsFromPySrcStr(self, theString):
         """Return a dictionary of the settings in a Python src string."""
         newSettings = {'self':self}
         exec theString in {}, newSettings
         del newSettings['self']
         return newSettings
 
-    def updateFromConfigFile(self, path, **kw):
+    def updateSettingsFromConfigFile(self, path, **kw):
         
         """Update the settings from a text file using the syntax accepted by
         Python's standard ConfigParser module (like Windows .ini files). NOTE:
@@ -239,25 +238,38 @@ class SettingsManager:
         
         path = self.normalizePath(path)
         fp = open(path)
-        self.updateFromConfigFileObj(fp, **kw)
+        self.updateSettingsFromConfigFileObj(fp, **kw)
         fp.close()
 
-    def updateFromConfigFileObj(self, inFile, convert=True, merge=True):
+    def updateSettingsFromConfigFileObj(self, inFile, convert=True, merge=True):
         
-        """See the docstring for .updateFromConfigFile()
+        """See the docstring for .updateSettingsFromConfigFile()
 
         The caller of this method is responsible for closing the inFile file
         object."""
 
-        newSettings = self.readFromConfigFileObj(inFile, convert=convert)
+        newSettings = self.readSettingsFromConfigFileObj(inFile, convert=convert)
         self.updateSettings(newSettings,
                             merge=newSettings.get('mergeSettings',merge))
 
-    def readFromConfigFileObj(self, inFile, convert=True):
+    def updateSettingsFromConfigStr(self, configStr, convert=True, merge=True):
+        
+        """See the docstring for .updateSettingsFromConfigFile()
+
+        The caller of this method is responsible for closing the inFile file
+        object."""
+
+        configStr = '[globals]\n' + configStr
+        inFile = StringIO(configStr)
+        newSettings = self.readSettingsFromConfigFileObj(inFile, convert=convert)
+        self.updateSettings(newSettings,
+                            merge=newSettings.get('mergeSettings',merge))
+
+    def readSettingsFromConfigFileObj(self, inFile, convert=True):
         """Return the settings from a config file that uses the syntax accepted by
         Python's standard ConfigParser module (like Windows .ini files).
 
-        See .updateFromConfigFile() for more information.
+        See .updateSettingsFromConfigFile() for more information.
         """
         
         p = self._ConfigParserClass()
@@ -294,11 +306,11 @@ class SettingsManager:
                 ## now deal with any 'importSettings' commands
                 if key.lower() == 'importsettings':
                     if val.find(';') < 0:
-                        importedSettings = self.readFromPySrcFile(val)
+                        importedSettings = self.readSettingsFromPySrcFile(val)
                     else:
                         path = val.split(';')[0]
                         rest = ''.join(val.split(';')[1:]).strip()
-                        parentDict = self.readFromPySrcFile(path)
+                        parentDict = self.readSettingsFromPySrcFile(path)
                         importedSettings = eval('parentDict["' + rest + '"]')
                         
                     subDict.update(mergeNestedDictionaries(subDict,

@@ -1,35 +1,29 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.7 2001/08/16 22:15:18 tavis_rudd Exp $
-"""An abstract base class for Cheetah Servlets that can be used with Webware
+# $Id: Servlet.py,v 1.8 2001/10/10 06:47:41 tavis_rudd Exp $
+"""Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
 ================================================================================
-Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.7 $
-Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/08/16 22:15:18 $
-"""
+Author: Tavis Rudd <tavis@calrudd.com>
+License: This software is released for unlimited distribution under the
+         terms of the Python license.
+Version: $Revision: 1.8 $
+Start Date: 2001/10/03
+Last Revision Date: $Date: 2001/10/10 06:47:41 $
+""" 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
-## DEPENDENCIES ##
-
-import types
-
-# intra-package imports ...
-from Template import Template
-from Utilities import mergeNestedDictionaries
-
-##################################################
-## GLOBALS AND CONSTANTS ##
+## CONSTANTS & GLOBALS
 
 True = (1==1)
 False = (0==1)
 
 ##################################################
-## CLASSES ##
+## DEPENDENCIES
 
+import os.path
 
 isRunningFromWebKit = False
 try: 
@@ -37,53 +31,43 @@ try:
     isRunningFromWebKit = True
 except:
     ## for testing from the commandline or with TR's experimental rewrite of WebKit
+    try:
+        from Webware.HTTPServlet import HTTPServlet
+    except:
+        class HTTPServlet: 
+            _reusable = 1
+            _threadSafe = 0
     
-    class HTTPServlet: 
-        _reusable = 1
-        _threadSafe = 0
+            def __init__(self):
+                pass
+            
+            def awake(self, transaction):
+                pass
+            
+            def sleep(self, transaction):
+                pass
 
-        def __init__(self):
-            pass
-        
-        def awake(self, transaction):
-            pass
-        
-        def sleep(self, transaction):
-            pass
+##################################################
+## CLASSES
 
-class TemplateServlet(Template, HTTPServlet):
-    """An abstract base class for Cheetah servlets that can be used with
-    Webware"""
-   
-    def __init__(self, template='', *searchList, **kw):
-        """ """
-        if not kw.has_key('settings'):
-            kw['settings']={}
-        kw['settings']['delayedCompile'] = True
-        Template.__init__(self, template, *searchList, **kw)
+
+class Servlet(HTTPServlet):
+
+    def __init__(self):
         HTTPServlet.__init__(self)
-        self.initializeTemplate()
-        self._isCompiled = False
         
-        if not isRunningFromWebKit:
-            self._isCompiled = True
-            self.compileTemplate()
-
-
-    def initializeTemplate(self):
-        """a hook that can be used by subclasses to do things after the
-        Template has been initialized, but before it has been compiled
-        (i.e. before the codeGeneration process starts) """
-        pass
-
+    ## methods called by Webware during the request-response
+        
     def awake(self, transaction):
         self._transaction = transaction
         self._response    = transaction.response()
         self._request     = transaction.request()
         self._session     = None  # don't create unless needed
-        if not self._isCompiled:
-            self._isCompiled = True
-            self.compileTemplate()
+
+    def respond(self, trans=None):
+        return ''
+    
+    __str__ = respond
 
     def sleep(self, transaction):
         self._session = None
@@ -107,20 +91,12 @@ class TemplateServlet(Template, HTTPServlet):
         if not self._session:
             self._session = self._transaction.session()
         return self._session
-            
-    def normalizePath(self, path):
-        """A hook for any neccessary path manipulations.
 
-        For example, when this is used with Webware servlets all relative paths
-        must be converted so they are relative to the servlet's directory rather
-        than relative to the program's current working dir.
+    def shutdown(self):
+        pass
 
-        The default implementation just normalizes the path for the current
-        operating system."""
-
-        if hasattr(self,'serverSidePath'):
-            return self.serverSidePath(path)
-        else:
-            return os.path.normpath(path.replace("\\",'/'))
-
-
+    def serverSidePath(self, path):
+        try:
+            return HTTPServlet.serverSidePath(self, path)
+        except:
+            return os.path.normpath(os.path.abspath(path).replace("\\",'/'))

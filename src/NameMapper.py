@@ -1,73 +1,161 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.10 2001/08/15 17:49:51 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.11 2001/10/10 06:47:41 tavis_rudd Exp $
 
-"""Utilities for accessing the members of an object via string representations
-of those members.  Template processing is its primary intended use.
+"""This module implements Cheetah's optional NameMapper syntax.
 
-Description
+Overview
+================================================================================
+NameMapper is a simple syntax for accessing Python data structures, functions,
+and methods from Cheetah. It's called NameMapper because it 'maps' simple
+'names' in Cheetah templates to complex objects in Python.
+
+Its purpose is to make working with Cheetah easy for non-programmers.
+Specifically, non-programmers using Cheetah should NOT need to be taught (a)
+what the difference is between an object and a dictionary, (b) what functions
+and methods are, and (c) what 'self' is.  A further aim (d) is to buffer the
+code in Cheetah templates from changes in the implementation of the Python data
+structures behind them.
+
+Consider this scenario.
+
+You've been hired as a consultant to design and implement a customer information
+system for your client. The class you create has a 'customers' method that
+returns a dictionary of all the customer objects.  Each customer object has an
+'address' method that returns the a dictionary with information about the
+customer's address.
+
+The designers working for your client want to use information from your system
+on the client's website --AND-- they want to understand the display code and so
+they can maintian it themselves.
+
+
+Using PSP, the display code for the website would look something like the
+following, assuming your servlet subclasses the class you created for managing
+customer information:
+
+  <%= self.customer()[ID].address()['city'] %>   (42 chars)
+
+Using Cheetah's NameMapper syntax it could be any of the following:
+
+   $self.customers()[$ID].address()['city']       (39 chars)
+   --OR--                                         
+   $customers()[$ID].address()['city']           
+   --OR--                                         
+   $customers()[$ID].address().city              
+   --OR--                                         
+   $customers()[$ID].address.city                
+   --OR--                                         
+   $customers()[$ID].address.city
+   --OR--
+   $customers[$ID].address.city                   (27 chars)                   
+   
+   
+Which of these would you prefer to explain to the designers, who have no
+programming experience?  The last form is 15 characters shorter than the PSP
+and, conceptually, is far more accessible. With PHP or ASP, the code would be
+even messier than the PSP
+
+This is a rather extreme example and, of course, you could also just implement
+'$customer($ID).city' and obey the Law of Demeter (search Google for more on that).
+But good object orientated design isn't the point here.
+
+Details
+================================================================================
+The parenthesized letters below correspond to the aims in the second paragraph.
+
+DICTIONARY ACCESS (a)
+---------------------
+
+NameMapper allows access to items in a dictionary using the same dotted notation
+used to access object attributes in Python.  This aspect of NameMapper is known
+as 'Unified Dotted Notation'.
+
+For example, with Cheetah it is possible to write:
+   $customers()['kerr'].address()  --OR--  $customers().kerr.address()
+where the second form is in NameMapper syntax.
+
+This only works with dictionary keys that are also valid python identifiers:
+  regex = '[a-zA-Z_][a-zA-Z_0-9]*'
+
+
+AUTOCALLING (b,d)
+-----------------
+
+NameMapper automatically detects functions and methods in Cheetah $vars and calls
+them if the parentheses have been left off.  
+
+For example if 'a' is an object, 'b' is a method
+  $a.b
+is equivalent to
+  $a.b()
+
+If b returns a dictionary, then following variations are possible
+  $a.b.c  --OR--  $a.b().c  --OR--  $a.b()['c']
+where 'c' is a key in the dictionary that a.b() returns.
+
+Further notes:
+* NameMapper autocalls the function or method without any arguments.  Thus
+autocalling can only be used with functions or methods that either have no
+arguments or have default values for all arguments.
+
+* NameMapper only autocalls functions and methods.  Classes and callable objects
+will not be autocalled.  
+
+* Autocalling can be disabled using Cheetah's 'useAutocalling' setting.
+
+LEAVING OUT 'self' (c,d)
+------------------------
+
+NameMapper makes it possible to access the attributes of a servlet in Cheetah
+without needing to include 'self' in the variable names.  See the NAMESPACE
+CASCADING section below for details.
+
+
+UNDERSCORED ATTRIBUTES (d)
+--------------------------
+
+If a 'name' in cheetah doesn't correspond to a valid object attribute name in
+Python, but there is an attribute in the form '_<name>' NameMapper will return
+the underscored attribute.
+
+Thus, it removes the need to change all placeholders like $clients.list to
+$clients._list when the 'list' attribute of 'clients' is changed to underscored
+attribute, and vice-versa.
+
+NAMESPACE CASCADING (d)
+--------------------
+
+Implementation details
 ================================================================================
 
-This module is similar to Webware's NamedValueAccess, but with the following
-basic differences:
+* NameMapper's search order is object attributes, then underscored attributes,
+  and finally dictionary items.
 
-- you don't need to inherit the NamedValueAccess mixin to use it
+* NameMapper.NotFound is raised if a value can't be found for a name.
 
-- the functionality of NamedValueAccess was abstracted into two standalone
-  functions: valueForName() and valueForKey().  valueForName() is recursive and
-  relies on valueForKey.
-
-- the mappings aren't cached in this version.  We are investigating ways of
-  caching mappings for mutatible objects only.
-
-- any mapping object or object that works with python's getattr() builtin
-  function can be searched (classes, instances, dictionaries, btrees?, etc.),
-  therefore locals(), globals(), and __builtins__ all work
-
-- NamedValueAccess only works with methods.  NameMapper works with any callable
-  object, such as plain functions or classes.
-
-- if a name maps to a callable object (function, method, class, etc.)
-  valueForName returns a reference to the object is returned instead of the
-  object's return value.  The caller is responsible for dealing with it. This
-  allows the caller to cache the reference and execute it when ever needed.
-
-and some extra features:
-
-- nested objects can be descended into, for any depth, so long as nested objects
-  are dicts or work with getattr().  NamedValueAccess was limited to ojects that
-  inherited the NamedValueAccess mixin.
-
-Like NamedValueAccess:
-
-- you can provide a default value to substitute for names that can't be found.
-  If you don't provide a default and the name can't be found the exception
-  NameMapper.NotFound will be raised. This is similar to the .get() method of
-  dictionaries.
-
-
-Usage
+Performance and the C version
 ================================================================================
-This module is not safe for 'from NameMapper import *'!
+Cheetah comes with both a C version and a Python version of NameMapper.  The C
+version is up to 6 times faster.  It's slightly slower than standard Python
+syntax, but you won't notice the speed difference in normal usage scenarios.
 
-See the example at the bottom of this file.
-The Cheetah package implements a less trivial example.
+Cheetah uses the optimized C version (_namemapper.c) if it has
+been compiled, or falls back automatically to the Python version if not.
 
 Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-License: This software is released for unlimited distribution
-         under the terms of the Python license.
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/08/15 17:49:51 $
+Last Revision Date: $Date: 2001/10/10 06:47:41 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__version__ = "$Revision: 1.10 $"[11:-2]
+__version__ = "$Revision: 1.11 $"[11:-2]
 
 ##################################################
-## DEPENDENCIES ##
+## DEPENDENCIES
 
 import types
 from types import StringType, InstanceType, ClassType 
@@ -75,7 +163,7 @@ import re
 # it uses the string methods and list comprehensions added in recent versions of python
 
 ##################################################
-## GLOBALS AND CONSTANTS ##
+## GLOBALS AND CONSTANTS
 
 True = (1==1)
 False = (0==1)
@@ -84,13 +172,16 @@ class NoDefault:
     pass
 
 ##################################################
-## FUNCTIONS ##
+## FUNCTIONS
 
 try:
     #0/0
     from _namemapper import NotFound, valueForKey, valueForName, valueFromSearchList
     # it is possible, with Jython for example, that _namemapper.c hasn't been compiled
+    C_VERSION = True
 except:
+    C_VERSION = False
+
     class NotFound(Exception):
         pass
     
@@ -160,26 +251,8 @@ except:
         raise NotFound(name)
 
 
-
 ##################################################
-    
-PLAIN_ATTRIBUTE = 0
-UNDERSCORED_ATTRIBUTE = 1
-MAPPING_KEY = 2
-
-def determineKeyType(obj, key):
-    """Determine what type of key 'key' is to 'obj': PLAIN_ATTRIBUTE,
-    UNDERSCORED_ATTRIBUTE or MAPPING_KEY.
-
-    Raises NotFound exception if the obj doesn't have the key."""
-
-    if hasattr(obj, key):
-        return PLAIN_ATTRIBUTE
-    elif hasattr(obj, '_' + key):
-        return UNDERSCORED_ATTRIBUTE
-    elif hasattr(obj,'has_key') and obj.has_key(key):
-        return MAPPING_KEY
-    raise NotFound, key
+# these functions are not in the c version
 
 def hasKey(obj, key):
     """Determine if 'obj' has 'key' """
@@ -189,7 +262,8 @@ def hasKey(obj, key):
         return True
     elif hasattr(obj,'has_key') and obj.has_key(key):
         return True
-    return False
+    else:
+        return False
 
 def hasName(obj, name):
     """Determine if 'obj' has the 'name' """
@@ -199,37 +273,8 @@ def hasName(obj, name):
     except NotFound:
         return False
 
-
-def translateNameToCode(obj, name, executeCallables=True):
-    """Translate a namemapper name to Python code."""
-    if type(name)==StringType:
-        nameChunks=name.split('.')
-    else:
-        nameChunks = name
-
-    codeChunks = []
-    for name in nameChunks:
-        lastItem = eval('obj' + ''.join(codeChunks))
-        keyType = determineKeyType(lastItem, name)
-        if keyType == PLAIN_ATTRIBUTE:
-            code = '.' + name
-        if keyType == UNDERSCORED_ATTRIBUTE:
-            code = '._' + name
-        if keyType == MAPPING_KEY:
-            code = '["' + name + '"]'
-
-        currentItem = eval('obj' + ''.join(codeChunks) + code)
-        if executeCallables and callable(currentItem) and \
-           type(currentItem) not in (InstanceType, ClassType):
-            code = code + '()'
-            
-        codeChunks.append(code)
-
-    return ''.join(codeChunks)
-
-
 ##################################################
-## CLASSES ##
+## CLASSES
 
 class Mixin:
     """@@ document me"""
@@ -238,12 +283,6 @@ class Mixin:
 
     def valueForKey(self, key):
         return valueForKey(self, key)
-
-##################################################
-## TEST ROUTINES ##
-def test():
-    import NameMapper.Tests
-    NameMapper.Tests.run_tests()
 
 ##################################################
 ## if run from the command line ##
@@ -285,17 +324,14 @@ def example():
         }
     b = 'this is local b'
 
-    alist = ['item0','item1','item2']
-
-    print valueForKey(a.dic,'subDict','NotFound')
-    print valueForName(a, 'dic.item','NotFound')
-    print valueForName(vars(), 'b','NotFound')
-    print valueForName(__builtins__, 'dir','NotFound')()
-    print valueForName(vars(), 'a.classVar','NotFound')
-    print valueForName(vars(), 'B.underScoreVar','NotFound')
-    print valueForName(vars(), 'a.dic.func','NotFound')
-    print valueForName(vars(), 'a.method2.item1','NotFound')
-    print valueForName(vars(), 'alist.0','NotFound')
+    print valueForKey(a.dic,'subDict')
+    print valueForName(a, 'dic.item')
+    print valueForName(vars(), 'b')
+    print valueForName(__builtins__, 'dir')()
+    print valueForName(vars(), 'a.classVar')
+    print valueForName(vars(), 'B.underScoreVar')
+    print valueForName(vars(), 'a.dic.func', executeCallables=True)
+    print valueForName(vars(), 'a.method2.item1', executeCallables=True)
 
 if __name__ == '__main__':
     example()

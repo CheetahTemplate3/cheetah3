@@ -254,3 +254,4 @@ void init_namemapper()
     Py_FatalError("can't initialize module _namemapper");
 }
 
+

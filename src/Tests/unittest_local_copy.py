@@ -1,5 +1,37 @@
 #!/usr/bin/env python
-'''
+
+""" This is a hacked version of PyUnit that extends its reporting capabilities
+with optional meta data on the test cases.  It also makes it possible to
+separate the standard and error output streams in TextTestRunner.
+
+It's a hack rather than a set of subclasses because a) Steve had used double
+underscore private attributes for some things I needed access to, and b) the
+changes affected so many classes that it was easier just to hack it.
+
+The changes are in the following places:
+TestCase:
+   - minor refactoring of  __init__ and __call__ internals
+   - added some attributes and methods for storing and retrieving meta data
+
+_TextTestResult
+   - refactored the stream handling
+   - incorporated all the output code from TextTestRunner
+   - made the output of FAIL and ERROR information more flexible and
+     incorporated the new meta data from TestCase
+   - added a flag called 'explain' to __init__ that controls whether the new '
+     explanation'   meta data from TestCase is printed along with tracebacks
+   
+TextTestRunner
+   - delegated all output to _TextTestResult
+   - added 'err' and 'explain' to the __init__ signature to match the changes
+     in _TextTestResult
+   
+TestProgram
+   - added -e and --explain as flags on the command line
+
+-- Tavis Rudd (Sept 28th, 2001)
+
+---------------------------------------------------------------------------
 Python unit testing framework, based on Erich Gamma's JUnit and Kent Beck's
 Smalltalk testing framework.
 
@@ -42,11 +74,15 @@ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 PARTICULAR PURPOSE.  THE CODE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 AND THERE IS NO OBLIGATION WHATSOEVER TO PROVIDE MAINTENANCE,
 SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
-'''
+"""
 
 __author__ = "Steve Purcell"
 __email__ = "stephen_purcell at yahoo dot com"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
+
+
+##################################################
+## DEPENDENCIES ##
 
 import time
 import sys
@@ -55,9 +91,16 @@ import string
 import os
 import types
 
+##################################################
+## CONSTANTS & GLOBALS
+
+True = (1==1)
+False = (0==1)
+
 ##############################################################################
 # Test framework core
 ##############################################################################
+
 
 class TestResult:
     """Holder for test result information.
@@ -108,8 +151,7 @@ class TestResult:
         return "<%s run=%i errors=%i failures=%i>" % \
                (self.__class__, self.testsRun, len(self.errors),
                 len(self.failures))
-
-
+        
 class TestCase:
     """A class whose instances are single test cases.
 
@@ -138,90 +180,171 @@ class TestCase:
 
     failureException = AssertionError
 
+    # the name of the fixture.  Used for displaying meta data about the test
+    name = None
+    
     def __init__(self, methodName='runTest'):
         """Create an instance of the class that will use the named test
-           method when executed. Raises a ValueError if the instance does
-           not have a method with the specified name.
+        method when executed. Raises a ValueError if the instance does
+        not have a method with the specified name.
         """
+        self._testMethodName = methodName
+        self._setupTestMethod()
+        self._setupMetaData()
+
+    def _setupTestMethod(self):
         try:
-            self.__testMethodName = methodName
-            testMethod = getattr(self, methodName)
-            self.__testMethodDoc = testMethod.__doc__
+            self._testMethod = getattr(self, self._testMethodName)
         except AttributeError:
             raise ValueError, "no such test method in %s: %s" % \
-                  (self.__class__, methodName)
+                  (self.__class__, self._testMethodName)
+        
+    ## meta data methods
+        
+    def _setupMetaData(self):
+        """Setup the default meta data for the test case:
 
-    def setUp(self):
-        "Hook method for setting up the test fixture before exercising it."
-        pass
+        - id: self.__class__.__name__ + testMethodName OR self.name + testMethodName
+        - description: 1st line of Class docstring + 1st line of method docstring
+        - explanation: rest of Class docstring + rest of method docstring
+        
+        """
 
-    def tearDown(self):
-        "Hook method for deconstructing the test fixture after testing it."
-        pass
+        
+        testDoc = self._testMethod.__doc__ or '\n'
+        testDocLines = testDoc.splitlines()
+        
+        testDescription = testDocLines[0].strip() 
+        if len(testDocLines) > 1:
+            testExplanation = '\n'.join(
+                [ln.strip() for ln in testDocLines[1:]]
+                ).strip()
+        else:
+            testExplanation = ''
+            
+        fixtureDoc = self.__doc__ or '\n'
+        fixtureDocLines = fixtureDoc.splitlines()
+        fixtureDescription = fixtureDocLines[0].strip()
+        if len(fixtureDocLines) > 1:
+            fixtureExplanation = '\n'.join(
+                [ln.strip() for ln in fixtureDocLines[1:]]
+                ).strip()
+        else:
+            fixtureExplanation = ''
+        
+        if not self.name:
+            self.name = self.__class__
+        self._id = "%s.%s" % (self.name, self._testMethodName)
+        
+        if not fixtureDescription:
+            self._description = testDescription
+        else:
+            self._description = fixtureDescription + ', ' + testDescription
 
-    def countTestCases(self):
-        return 1
+        if not fixtureExplanation:
+            self._explanation = testExplanation
+        else:
+            self._explanation = ['Fixture Explanation:',
+                                 '--------------------',
+                                 fixtureExplanation,
+                                 '',
+                                 'Test Explanation:',
+                                 '-----------------',
+                                 testExplanation
+                                 ]
+            self._explanation = '\n'.join(self._explanation)
 
-    def defaultTestResult(self):
-        return TestResult()
+    def id(self):
+        return self._id
 
-    def shortDescription(self):
+    def setId(self, id):
+        self._id = id
+
+    def describe(self):
         """Returns a one-line description of the test, or None if no
         description has been provided.
 
         The default implementation of this method returns the first line of
         the specified test method's docstring.
         """
-        doc = self.__testMethodDoc
-        return doc and string.strip(string.split(doc, "\n")[0]) or None
+        return self._description
 
-    def id(self):
-        return "%s.%s" % (self.__class__, self.__testMethodName)
+    shortDescription = describe
+    
+    def setDescription(self, descr):
+        self._description = descr
+    
+    def explain(self):
+        return self._explanation
 
-    def __str__(self):
-        return "%s (%s)" % (self.__testMethodName, self.__class__)
+    def setExplanation(self, expln):
+        self._explanation = expln
 
-    def __repr__(self):
-        return "<%s testMethod=%s>" % \
-               (self.__class__, self.__testMethodName)
+    ## core methods
 
+    def setUp(self):
+        "Hook method for setting up the test fixture before exercising it."
+        pass
+    
     def run(self, result=None):
         return self(result)
-
-    def __call__(self, result=None):
-        if result is None: result = self.defaultTestResult()
-        result.startTest(self)
-        testMethod = getattr(self, self.__testMethodName)
-        try:
-            try:
-                self.setUp()
-            except:
-                result.addError(self,self.__exc_info())
-                return
-
-            ok = 0
-            try:
-                testMethod()
-                ok = 1
-            except self.failureException, e:
-                result.addFailure(self,self.__exc_info())
-            except:
-                result.addError(self,self.__exc_info())
-
-            try:
-                self.tearDown()
-            except:
-                result.addError(self,self.__exc_info())
-                ok = 0
-            if ok: result.addSuccess(self)
-        finally:
-            result.stopTest(self)
+        
+    def tearDown(self):
+        "Hook method for deconstructing the test fixture after testing it."
+        pass
 
     def debug(self):
         """Run the test without collecting errors in a TestResult"""
         self.setUp()
-        getattr(self, self.__testMethodName)()
+        self._testMethod()
         self.tearDown()
+
+    ## internal methods
+
+    def defaultTestResult(self):
+        return TestResult()
+    
+    def __call__(self, result=None):
+        if result is None:
+            result = self.defaultTestResult()
+        
+        result.startTest(self)
+        try:
+            try:
+                self.setUp()
+            except:
+                result.addError(self, self.__exc_info())
+                return
+            
+            ok = 0
+            try:
+                self._testMethod()
+                ok = 1
+            except self.failureException, e:
+                result.addFailure(self, self.__exc_info())
+            except:
+                result.addError(self, self.__exc_info())
+            try:
+                self.tearDown()
+            except:
+                result.addError(self, self.__exc_info())
+                ok = 0
+            if ok:
+                result.addSuccess(self)
+        finally:
+            result.stopTest(self)
+            
+        return result
+        
+    def countTestCases(self):
+        return 1
+       
+    def __str__(self):
+        return "%s (%s)" % (self._testMethodName, self.__class__)
+
+    def __repr__(self):
+        return "<%s testMethod=%s>" % \
+               (self.__class__, self._testMethodName)
 
     def __exc_info(self):
         """Return a version of sys.exc_info() with the traceback frame
@@ -235,6 +358,8 @@ class TestCase:
         if newtb is None:
             return (exctype, excvalue, tb)
         return (exctype, excvalue, newtb)
+
+    ## methods for use by the test cases
 
     def fail(self, msg=None):
         """Fail immediately, with the given message."""
@@ -279,6 +404,8 @@ class TestCase:
         if first == second:
             raise self.failureException, (msg or '%s == %s' % (first, second))
 
+    ## aliases
+
     assertEqual = assertEquals = failUnlessEqual
 
     assertNotEqual = assertNotEquals = failIfEqual
@@ -288,6 +415,51 @@ class TestCase:
     assert_ = failUnless
 
 
+class FunctionTestCase(TestCase):
+    """A test case that wraps a test function.
+
+    This is useful for slipping pre-existing test functions into the
+    PyUnit framework. Optionally, set-up and tidy-up functions can be
+    supplied. As with TestCase, the tidy-up ('tearDown') function will
+    always be called if the set-up ('setUp') function ran successfully.
+    """
+
+    def __init__(self, testFunc, setUp=None, tearDown=None,
+                 description=None):
+        TestCase.__init__(self)
+        self.__setUpFunc = setUp
+        self.__tearDownFunc = tearDown
+        self.__testFunc = testFunc
+        self.__description = description
+
+    def setUp(self):
+        if self.__setUpFunc is not None:
+            self.__setUpFunc()
+
+    def tearDown(self):
+        if self.__tearDownFunc is not None:
+            self.__tearDownFunc()
+
+    def runTest(self):
+        self.__testFunc()
+
+    def id(self):
+        return self.__testFunc.__name__
+
+    def __str__(self):
+        return "%s (%s)" % (self.__class__, self.__testFunc.__name__)
+
+    def __repr__(self):
+        return "<%s testFunc=%s>" % (self.__class__, self.__testFunc)
+
+
+    def describe(self):
+        if self.__description is not None: return self.__description
+        doc = self.__testFunc.__doc__
+        return doc and string.strip(string.split(doc, "\n")[0]) or None
+    
+    ## aliases
+    shortDescription = describe
 
 class TestSuite:
     """A test suite is a composite test consisting of a number of TestCases.
@@ -335,49 +507,185 @@ class TestSuite:
         for test in self._tests: test.debug()
 
 
-class FunctionTestCase(TestCase):
-    """A test case that wraps a test function.
+##############################################################################
+# Text UI
+##############################################################################
 
-    This is useful for slipping pre-existing test functions into the
-    PyUnit framework. Optionally, set-up and tidy-up functions can be
-    supplied. As with TestCase, the tidy-up ('tearDown') function will
-    always be called if the set-up ('setUp') function ran successfully.
-    """
+class StreamWrapper:
+    def __init__(self, out=sys.stdout, err=sys.stderr):
+        self._streamOut = out
+        self._streamErr = err
 
-    def __init__(self, testFunc, setUp=None, tearDown=None,
-                 description=None):
-        TestCase.__init__(self)
-        self.__setUpFunc = setUp
-        self.__tearDownFunc = tearDown
-        self.__testFunc = testFunc
-        self.__description = description
+    def write(self, txt):
+        self._streamOut.write(txt)
+    
+    def writeln(self, *lines):
+        for line in lines:
+            self.write(line + '\n')
+        if not lines:
+            self.write('\n')
 
-    def setUp(self):
-        if self.__setUpFunc is not None:
-            self.__setUpFunc()
-
-    def tearDown(self):
-        if self.__tearDownFunc is not None:
-            self.__tearDownFunc()
-
-    def runTest(self):
-        self.__testFunc()
-
-    def id(self):
-        return self.__testFunc.__name__
-
-    def __str__(self):
-        return "%s (%s)" % (self.__class__, self.__testFunc.__name__)
-
-    def __repr__(self):
-        return "<%s testFunc=%s>" % (self.__class__, self.__testFunc)
-
-    def shortDescription(self):
-        if self.__description is not None: return self.__description
-        doc = self.__testFunc.__doc__
-        return doc and string.strip(string.split(doc, "\n")[0]) or None
+    def writeErr(self, txt):
+        self._streamErr.write(txt)
+    
+    def writelnErr(self, *lines):
+        for line in lines:
+            self.writeErr(line + '\n')
+        if not lines:
+            self.writeErr('\n')
 
 
+class _TextTestResult(TestResult, StreamWrapper):
+    _separatorWidth = 70
+    _sep1 = '='
+    _sep2 = '-'
+    _errorSep1 = '*'
+    _errorSep2 = '-'
+    
+    def __init__(self,
+                 stream=sys.stdout,
+                 errStream=sys.stderr,
+                 verbosity=1,
+                 explain=False):
+        
+        TestResult.__init__(self)
+        StreamWrapper.__init__(self, out=stream, err=errStream)        
+
+        self._verbosity = verbosity
+        self._showAll = verbosity > 1
+        self._dots = (verbosity == 1)
+        self._explain = explain
+
+    ## startup and shutdown methods
+        
+    def beginTests(self):
+        self._startTime = time.time()
+
+    def endTests(self):
+        self._stopTime = time.time()
+        self._timeTaken = float(self._stopTime - self._startTime)
+
+    def stop(self):
+        self.shouldStop = 1
+        
+    ## methods called for each test
+        
+    def startTest(self, test):
+        TestResult.startTest(self, test)
+        if self._showAll:
+            self.write("%s (%s)" %( test.id(), test.describe() ) )
+            self.write(" ... ")
+
+    def addSuccess(self, test):
+        TestResult.addSuccess(self, test)
+        if self._showAll:
+            self.writeln("ok")
+        elif self._dots:
+            self.write('.')
+
+    def addError(self, test, err):
+        TestResult.addError(self, test, err)
+        if self._showAll:
+            self.writeln("ERROR")
+        elif self._dots:
+            self.write('E')
+        if err[0] is KeyboardInterrupt:
+            self.stop()
+
+    def addFailure(self, test, err):
+        TestResult.addFailure(self, test, err)
+        if self._showAll:
+            self.writeln("FAIL")
+        elif self._dots:
+            self.write('F')
+
+    ## display methods
+
+    def summarize(self):
+        self.printErrors()
+        self.writeSep2()
+        run = self.testsRun
+        self.writeln("Ran %d test%s in %.3fs" %
+                            (run, run == 1 and "" or "s", self._timeTaken))
+        self.writeln()
+        if not self.wasSuccessful():
+            self.writeErr("FAILED (")
+            failed, errored = map(len, (self.failures, self.errors))
+            if failed:
+                self.writeErr("failures=%d" % failed)
+            if errored:
+                if failed: self.writeErr(", ")
+                self.writeErr("errors=%d" % errored)
+            self.writelnErr(")")
+        else:
+            self.writelnErr("OK")
+
+    def writeSep1(self):
+        self.writeln(self._sep1 * self._separatorWidth)
+
+    def writeSep2(self):
+        self.writeln(self._sep2 * self._separatorWidth)
+
+    def writeErrSep1(self):
+        self.writeln(self._errorSep1 * self._separatorWidth)
+
+    def writeErrSep2(self):
+        self.writeln(self._errorSep2 * self._separatorWidth)
+
+    def printErrors(self):
+        if self._dots or self._showAll:
+            self.writeln()
+        self.printErrorList('ERROR', self.errors)
+        self.printErrorList('FAIL', self.failures)
+
+    def printErrorList(self, flavour, errors):
+        for test, err in errors:
+            self.writeErrSep1()
+            self.writelnErr("%s %s (%s)" % (flavour, test.id(), test.describe() ))
+            if self._explain:
+                expln = test.explain()
+                if expln:
+                    self.writeErrSep2()
+                    self.writeErr( expln )
+                    self.writelnErr()
+
+            self.writeErrSep2()
+            for line in apply(traceback.format_exception, err):
+                for l in line.split("\n")[:-1]:
+                    self.writelnErr(l)
+
+class TextTestRunner:
+    def __init__(self, 
+                 stream=sys.stdout,
+                 errStream=sys.stderr,
+                 verbosity=1,
+                 explain=False,
+                 ):
+
+        self._out = stream
+        self._err = errStream
+        self._verbosity = verbosity
+        self._explain = explain
+        
+    ## main methods
+
+    def run(self, test):
+        result = self._makeResult()
+        result.beginTests()
+        test( result )
+        result.endTests()       
+        result.summarize()
+        
+        return result
+    
+    ## internal methods
+
+    def _makeResult(self):
+        return _TextTestResult(stream=self._out,
+                               errStream=self._err,
+                               verbosity=self._verbosity,
+                               explain=self._explain
+                               )
 
 ##############################################################################
 # Locating and loading tests
@@ -495,132 +803,6 @@ def makeSuite(testCaseClass, prefix='test', sortUsing=cmp, suiteClass=TestSuite)
 def findTestCases(module, prefix='test', sortUsing=cmp, suiteClass=TestSuite):
     return _makeLoader(prefix, sortUsing, suiteClass).loadTestsFromModule(module)
 
-
-##############################################################################
-# Text UI
-##############################################################################
-
-class _WritelnDecorator:
-    """Used to decorate file-like objects with a handy 'writeln' method"""
-    def __init__(self,stream):
-        self.stream = stream
-
-    def __getattr__(self, attr):
-        return getattr(self.stream,attr)
-
-    def writeln(self, *args):
-        if args: apply(self.write, args)
-        self.write('\n') # text-mode streams translate to \r\n if needed
-
-
-class _TextTestResult(TestResult):
-    """A test result class that can print formatted text results to a stream.
-
-    Used by TextTestRunner.
-    """
-    separator1 = '=' * 70
-    separator2 = '-' * 70
-
-    def __init__(self, stream, descriptions, verbosity):
-        TestResult.__init__(self)
-        self.stream = stream
-        self.showAll = verbosity > 1
-        self.dots = verbosity == 1
-        self.descriptions = descriptions
-
-    def getDescription(self, test):
-        if self.descriptions:
-            return test.shortDescription() or str(test)
-        else:
-            return str(test)
-
-    def startTest(self, test):
-        TestResult.startTest(self, test)
-        if self.showAll:
-            self.stream.write(self.getDescription(test))
-            self.stream.write(" ... ")
-
-    def addSuccess(self, test):
-        TestResult.addSuccess(self, test)
-        if self.showAll:
-            self.stream.writeln("ok")
-        elif self.dots:
-            self.stream.write('.')
-
-    def addError(self, test, err):
-        TestResult.addError(self, test, err)
-        if self.showAll:
-            self.stream.writeln("ERROR")
-        elif self.dots:
-            self.stream.write('E')
-        if err[0] is KeyboardInterrupt:
-            self.shouldStop = 1
-
-    def addFailure(self, test, err):
-        TestResult.addFailure(self, test, err)
-        if self.showAll:
-            self.stream.writeln("FAIL")
-        elif self.dots:
-            self.stream.write('F')
-
-    def printErrors(self):
-        if self.dots or self.showAll:
-            self.stream.writeln()
-        self.printErrorList('ERROR', self.errors)
-        self.printErrorList('FAIL', self.failures)
-
-    def printErrorList(self, flavour, errors):
-        for test, err in errors:
-            self.stream.writeln(self.separator1)
-            self.stream.writeln("%s: %s" % (flavour,self.getDescription(test)))
-            self.stream.writeln(self.separator2)
-            for line in apply(traceback.format_exception, err):
-                for l in string.split(line,"\n")[:-1]:
-                    self.stream.writeln("%s" % l)
-
-
-class TextTestRunner:
-    """A test runner class that displays results in textual form.
-
-    It prints out the names of tests as they are run, errors as they
-    occur, and a summary of the results at the end of the test run.
-    """
-    def __init__(self, stream=sys.stderr, descriptions=1, verbosity=1):
-        self.stream = _WritelnDecorator(stream)
-        self.descriptions = descriptions
-        self.verbosity = verbosity
-
-    def _makeResult(self):
-        return _TextTestResult(self.stream, self.descriptions, self.verbosity)
-
-    def run(self, test):
-        "Run the given test case or test suite."
-        result = self._makeResult()
-        startTime = time.time()
-        test(result)
-        stopTime = time.time()
-        timeTaken = float(stopTime - startTime)
-        result.printErrors()
-        self.stream.writeln(result.separator2)
-        run = result.testsRun
-        self.stream.writeln("Ran %d test%s in %.3fs" %
-                            (run, run == 1 and "" or "s", timeTaken))
-        self.stream.writeln()
-        if not result.wasSuccessful():
-            self.stream.write("FAILED (")
-            failed, errored = map(len, (result.failures, result.errors))
-            if failed:
-                self.stream.write("failures=%d" % failed)
-            if errored:
-                if failed: self.stream.write(", ")
-                self.stream.write("errors=%d" % errored)
-            self.stream.writeln(")")
-        else:
-            self.stream.writeln("OK")
-        return result
-
-
-
 ##############################################################################
 # Facilities for running tests from the command line
 ##############################################################################
@@ -655,6 +837,7 @@ Examples:
         if argv is None:
             argv = sys.argv
         self.verbosity = 1
+        self.explain = 0
         self.defaultTest = defaultTest
         self.testRunner = testRunner
         self.testLoader = testLoader
@@ -670,8 +853,8 @@ Examples:
     def parseArgs(self, argv):
         import getopt
         try:
-            options, args = getopt.getopt(argv[1:], 'hHvq',
-                                          ['help','verbose','quiet'])
+            options, args = getopt.getopt(argv[1:], 'hHvqe',
+                                          ['help','verbose','quiet','explain'])
             for opt, value in options:
                 if opt in ('-h','-H','--help'):
                     self.usageExit()
@@ -679,6 +862,8 @@ Examples:
                     self.verbosity = 0
                 if opt in ('-v','--verbose'):
                     self.verbosity = 2
+                if opt in ('-e','--explain'):
+                    self.explain = True
             if len(args) == 0 and self.defaultTest is None:
                 self.test = self.testLoader.loadTestsFromModule(self.module)
                 return
@@ -696,7 +881,8 @@ Examples:
 
     def runTests(self):
         if self.testRunner is None:
-            self.testRunner = TextTestRunner(verbosity=self.verbosity)
+            self.testRunner = TextTestRunner(verbosity=self.verbosity,
+                                             explain=self.explain)
         result = self.testRunner.run(self.test)
         sys.exit(not result.wasSuccessful())
 

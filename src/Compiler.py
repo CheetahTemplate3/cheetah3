@@ -1,265 +1,1279 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.6 2001/08/30 04:45:14 hierro Exp $
-"""A command line compiler for turning Cheetah files (.tmpl) into Webware
-servlet files (.py).
+# $Id: Compiler.py,v 1.7 2001/10/10 06:47:41 tavis_rudd Exp $
+"""Compiler classes for Cheetah:
+ModuleCompiler aka 'Compiler'
+ClassCompiler
+MethodCompiler
+
+If you are trying to grok this code start with ModuleCompiler.__init__,
+ModuleCompiler.compile, and ModuleCompiler.__getattr__.
+
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-License: This software is released for unlimited distribution under the
-         terms of the Python license.
-Version: $Revision: 1.6 $
-Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/30 04:45:14 $
+Version: $Revision: 1.7 $
+Start Date: 2001/09/19
+Last Revision Date: $Date: 2001/10/10 06:47:41 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
-## DEPENDENCIES ##
+## DEPENDENCIES
+
 
 import sys
-import re
 import os
-import getopt
-from os.path import \
-     walk as pathWalk, \
-     split as pathSplit, \
-     splitext as pathSplitext, \
-     exists
+import os.path
+from os.path import getmtime, exists
+import re
+import types
+import time
+import random
 
-from glob import glob
-
-#intra-package imports ...
+# intra-package imports ...
 from Version import version
+from SettingsManager import SettingsManager
+from Parser import Parser, ParseError, specialVarRE, STATIC_CACHE, REFRESH_CACHE
 
 ##################################################
-## GLOBALS & CONTANTS ##
+## CONSTANTS & GLOBALS 
 
 True = (1==1)
-False = (1==0)
+False = (0==1)
 
-CHEETAH_EXTENSION = '.tmpl'
-SERVLET_EXTENSION = '.py'
-SERVLET_BACKUP_EXT = '.py_bak'
-GEN_EXTENSION = 'Gen'
-
-
-
-escCharLookBehind = r'(?:(?<=\A)|(?<!\\))'
-tagClosure = r'(?:/#|\r\n|\n|\r)'
-lazyTagClosure = r'(?:\r\n|\n|\r)'
-extendDirectiveRE = re.compile(escCharLookBehind +
-                               r'#extend[\f\t ]+(?P<parent>.*?)' +
-                               r'[\f\t ]*' + tagClosure, re.DOTALL)
-
-                    
 ##################################################
-## FUNCTIONS ##
-    
-def wrapTemplateCode(templateExt, name, appendGen=False):
-    """Wrap a template definition string in the boiler-plate code needed to create a
-    Webware servlet."""
+## CLASSES 
 
-    if appendGen: gen_ext = GEN_EXTENSION
-    else: gen_ext = ''
-    parentTemplate = [False,]
-    def extendDirectiveProcessor(match, parentTemplate=parentTemplate):
-        """process any #redefine directives that are found in the template extension""" 
-        parentTemplate[0] = match.group('parent').strip()
-        return '' # strip the directive from the extension
-    
-    templateExt = extendDirectiveRE.sub(extendDirectiveProcessor, templateExt)
-    parentTemplate = parentTemplate[0]
-    
-    if parentTemplate:
-        parentServlet = parentTemplate.split('.')[-1]
-        servletCode = "templateExt = r'''" + templateExt
-        servletCode += """'''
-from %(parentModule)s import %(parentServlet)s
-
-class %(name)s%(gen_ext)s(%(parentServlet)s):
-    def initializeTemplate(self):
-        %(parentServlet)s.initializeTemplate(self)
-        self.extendTemplate(templateExt)
-
-""" %  {'parentModule': parentTemplate,
-        'parentServlet': parentServlet,
-        'name': name,
-        'gen_ext': gen_ext,
-        }
-    else:
-        servletCode = "templateExt = r'''" + templateExt
-        servletCode += """'''
-from Cheetah.Servlet import TemplateServlet
-
-class %(name)s%(gen_ext)s(TemplateServlet):
-    def __init__(self):
-        TemplateServlet.__init__(self, template=templateExt)
-
-""" % {'name': name,
-       'gen_ext': gen_ext,
-       }
-
-    return servletCode
-
-
-def inheritServletCode(filenameMinusExt):
-    return '''from %(name)s%(gen_ext)s import %(name)s%(gen_ext)s
-
-class %(name)s(%(name)s%(gen_ext)s):
+class Error(Exception):
     pass
-''' % {'name': os.path.basename(filenameMinusExt),
-       'gen_ext': GEN_EXTENSION,
-       }
 
-def compileDir(dirName='.', backupServletFiles=True, appendGen=False):
-    """Compile all the Cheetah files in a directory."""
-    
-    cheetahFiles = glob(dirName + '/*' + CHEETAH_EXTENSION)
-    namesMinusExt = [pathSplitext(fileName)[0] for fileName in cheetahFiles] 
 
-    if appendGen:
-        gen_ext = GEN_EXTENSION
-    else:
-        gen_ext = ""
-    if backupServletFiles:
-        for i in range(len(namesMinusExt)):
-            if exists( namesMinusExt[i] + gen_ext + SERVLET_EXTENSION):
-                print 'backing up', namesMinusExt[i] + gen_ext + \
-                      SERVLET_EXTENSION
-                os.rename(namesMinusExt[i] + gen_ext + SERVLET_EXTENSION,
-                          namesMinusExt[i] + gen_ext + SERVLET_BACKUP_EXT)
+class GenUtils:
 
-    for name in namesMinusExt:
-        compileFile(name, appendGen=appendGen)
+    """An abstract baseclass for the Compiler classes that provides methods that
+    perform generic utility functions or generate pieces of output code from
+    information passed in by the Parser baseclass.  These methods don't do any
+    parsing themselves."""
+
+
+    def genTimeInterval(self, timeString):
+        if timeString[-1] == 's':
+            interval = float(timeString[:-1])
+        elif timeString[-1] == 'm':
+            interval = float(timeString[:-1])*60
+        elif timeString[-1] == 'h':
+            interval = float(timeString[:-1])*60*60
+        elif timeString[-1] == 'd':
+            interval = float(timeString[:-1])*60*60*24
+        elif timeString[-1] == 'w':
+            interval = float(timeString[:-1])*60*60*24*7
+        else:                       # default to minutes
+            interval = float(timeString)*60
+
+        return interval
         
-def compileFile(fileNameMinusExt, appendGen=False):
-    """Compile an single Cheetah file.  """
-    
-    if appendGen: gen_ext = GEN_EXTENSION
-    else: gen_ext = ''
+    def genCacheInfo(self, cacheToken):
+        
+        """Decipher a placeholder cachetoken
+        """
+        
+        match = self.cacheTokenRE.match(cacheToken)
+        subGrpDict = match.groupdict()
+        cacheInfo = {}
+        if subGrpDict['REFRESH_CACHE']:
+            cacheInfo['type'] = REFRESH_CACHE
+            cacheInfo['interval'] = self.genTimeInterval(subGrpDict['interval'])
+        elif subGrpDict['STATIC_CACHE']:
+            cacheInfo['type'] = STATIC_CACHE
+        return cacheInfo                # is empty if no cache
 
-    fp = open(fileNameMinusExt + CHEETAH_EXTENSION)
-    templateExt = fp.read()
-    fp.close()
-    servletName = pathSplit(fileNameMinusExt)[1]
-    servletCode = wrapTemplateCode(templateExt, servletName,
-                                   appendGen=appendGen)
-    print 'compiled ', fileNameMinusExt + CHEETAH_EXTENSION, 'to', fileNameMinusExt + gen_ext + SERVLET_EXTENSION
-     
-    fp = open(fileNameMinusExt + gen_ext + SERVLET_EXTENSION,'w')
-    fp.write("""## This module was compiled from
-##   %(name)s%(CHEETAH_EXTENSION)s
-""" % {"name": fileNameMinusExt, "CHEETAH_EXTENSION": CHEETAH_EXTENSION})
-    if appendGen:
-        fp.write("""## You should not make changes to this file.  Instead, you should make
-## changes to the file %(name)s.py, which will not be overwritten on recompile.
-""" % {"name": fileNameMinusExt})
-    else:
-        fp.write("""## If you make changes to this file they will be overwritten if you recompile
-## the .tmpl file, and the old version of the file will be in %(name)s.py_bak
-""" % {"name": fileNameMinuxExt})
-	
-    fp.write(servletCode)
-    fp.close()
+    def genCacheInfoFromArgList(self, argList):
+        cacheInfo = {'type':REFRESH_CACHE}
+        for key, val in argList:
+            if val[0] in '"\'':
+                val = val[1:-1]
 
-    if appendGen and not os.path.exists(fileNameMinusExt +
-                                        SERVLET_EXTENSION):
-        code = inheritServletCode(fileNameMinusExt)
-        fp = open(fileNameMinusExt + SERVLET_EXTENSION, "w")
-        fp.write(code)
-        fp.close()
-
-
-def recursiveCompile(dir='.', backupServletFiles=True, appendGen=False):
-    """Recursively walk through a directory tree and compile Cheetah files."""
-    pending = [dir]
-    while pending:
-        dir = pending.pop()
-        ## add sub-dirs
-        for shortname in os.listdir(dir):
-            path = os.path.join(dir, shortname)
-            if os.path.isdir(path):
-                pending.append(path)
+            if key == 'timer':
+                key = 'interval'
+                val = self.genTimeInterval(val)
                 
-        ## do it!
-        compileDir(dir, backupServletFiles=backupServletFiles,
-                   appendGen=appendGen) 
+            cacheInfo[key] = val
+        return cacheInfo
+        
+        
+    def genCheetahVar(self, nameChunks, plain=False):
+        if self.setting('useNameMapper') and not plain:
+            return self.genNameMapperVar(nameChunks)
+        else:
+            return self.genPlainVar(nameChunks)
     
-class MainProgram:
-    """A command line interface class."""
+    def genNameMapperVar(self, nameChunks):
+        
+        """Generate valid Python code for a Cheetah $var, using NameMapper
+        (Unified Dotted Notation with the SearchList).
+
+        nameChunks = list of var subcomponents represented as tuples
+          [ (namemapperPart,autoCall,restOfName),
+          ]
+        where:
+          namemapperPart = the dottedName base
+          autocall = where NameMapper should use autocalling on namemapperPart
+          restOfName = any arglist, index, or slice
+
+        If restOfName contains a call arglist (e.g. '(1234)') then autocall is
+        False, otherwise it defaults to True. It is overridden by the global
+        setting 'useAutocalling' if this setting is False.
+
+        EXAMPLE
+        ------------------------------------------------------------------------
+        if the raw Cheetah Var is
+          $a.b.c[1].d().x.y.z
+          
+        nameChunks is the list
+          [ ('a.b.c',1,'[1]'), # A
+            ('d',0,'()'),      # B
+            ('x.y.z',1,''),    # C
+          ]
+        
+        When this method is fed the list above it returns
+          VFN(VFN(VFS(SL, 'a.b.c',1)[1], 'd',0)(), 'x.y.z',1)
+        which can be represented as
+          VFN(B`, C[0], str(ACS and C[1]))C[2]
+        where:
+          ACS = self.setting('useAutocalling') = 1 in this example
+          VFN = NameMapper.valueForName
+          VFS = NameMapper.valueFromSearchList
+          SL = self.searchList()
+
+          A = ('a.b.c',1,'[1]')
+          B = ('d',0,'()')
+          C = ('x.y.z',1,'')
+
+          B` = VFN(A`, B[0], str(ACS and B[1]))B[2]
+          A` = VFS(SL, A[0], str(ACS and A[1]))A[2]
+          
+        """
+
+        autoCall = self.setting('useAutocalling')
+        nameChunks.reverse()
+
+        chunk = nameChunks.pop()
+        firstBit = chunk[0].split('.')[0]
+        
+        if chunk[0] in self.localVars() or chunk[0] in self.importedVars():
+            translatedName = chunk[0] + chunk[2]
+        elif  firstBit in self.localVars():
+            translatedName = ('VFN(' + firstBit +
+                              ',"' + '.'.join(chunk[0].split('.')[1:]) +
+                              '",' + str(autoCall and chunk[1]) + ')'
+                              + chunk[2])            
+        else:
+            alreadyDone = False
+            for varName in  self.importedVars():
+                if chunk[0].startswith(varName):
+                    firstBit = chunk[0][:len(varName)]
+                    rest = chunk[0][len(varName)+1:] # +1 for the dot
+                    translatedName = ('VFN(' + firstBit +
+                                      ',"' + rest +
+                                      '",' + str(autoCall and chunk[1]) + ')'
+                                      + chunk[2]) 
+                    alreadyDone = True
+                    break
+
+            if not alreadyDone:
+                translatedName = ('VFS(SL,"' + chunk[0] +
+                                  '",' + str(autoCall and chunk[1]) + ')'
+                                  + chunk[2])
+
+        
+        while nameChunks:
+            chunk = nameChunks.pop()
+            translatedName = ('VFN(' + translatedName +
+                              ',"' + chunk[0] +
+                              '",' + str(autoCall and chunk[1]) + ')'
+                              + chunk[2])
+        return translatedName
+
+    def genPlainVar(self, nameChunks):
+        
+        """Generate Python code for a Cheetah $var without using NameMapper
+        (Unified Dotted Notation with the SearchList)."""
+        
+        nameChunks.reverse()
+        chunk = nameChunks.pop()
+        translatedName = chunk[0] + chunk[2]
+        
+        while nameChunks:
+            chunk = nameChunks.pop()
+            translatedName = (translatedName + '.' + chunk[0] + chunk[2])
+                    
+        return translatedName
     
-    def run(self):
-        """The main program controller."""
-        try:
-            opts, args = getopt.getopt( sys.argv[1:], 'd:R:g', [])
+    ## utility methods 
 
-        except getopt.GetoptError, v:
-            # print help information and exit:
-            print v
-            self.usage()
-            sys.exit(2)
+    def unescapeCheetahVars(self, theString):
+        """Unescape any escaped Cheetah \$vars in the string."""
+        
+        token = self.setting('cheetahVarStartToken')
+        return theString.replace('\\' + token, token)
 
-        setOpts = {}
-        for o, a in opts:
-            if o in ('-h',):
-                self.usage()
-                sys.exit()
-            if o in ('-R',):
-                setOpts['recursiveCompile'] = True
-            if o in ('-d',):
-                setOpts['compileDir'] = True
-            if o in ('-g',):
-                setOpts['appendGen'] = True
-        if setOpts.has_key('recursiveCompile') and \
-           setOpts.has_key('compileDir'):
-            self.usage()
-            sys.exit()
-        if setOpts.has_key('recursiveCompile'):
-            recursiveCompile(a, appendGen=setOpts.has_key('appendGen'))
-            sys.exit()
-        if setOpts.has_key('compileDir'):
-            compileDir(a, appendGen=setOpts.has_key('appendGen'))
-            sys.exit()
-        if not args:
-            self.usage()
-            sys.exit(2)
-        for fileName in args:
-            servletName = pathSplitext(pathSplit(fileName)[1])[0]
-            fp = open(fileName)
-            templateExt = fp.read()
-            fp.close()
-            print wrapTemplateCode(templateExt, servletName,
-                                   appendGen=setOpts.has_key('appendGen'))
+    def unescapeDirectives(self, theString):
+        """Unescape any escaped Cheetah \$vars in the string."""
+        
+        token = self.setting('directiveStartToken')
+        return theString.replace('\\' + token, token)
 
-
-    def usage(self):
-        print \
-"""Cheetah %(version)s Command-Line Compiler by %(author)s
-
-Compiles Cheetah files (.tmpl) into Webware servlet files (.py)
-
-Usage: 
-  %(scriptName)s [OPTIONS] filename ---> compile 'filename', output to stdout
-  %(scriptName)s -h                 ---> print this help and exit
-  %(scriptName)s -d [OPTIONS] dir   ---> compile all files in dir, output to
-                                          new files
-  %(scriptName)s -R [OPTIONS] dir   ---> same as -d, but operates
-                                          recursively on subdirs
-  -g                                      Compile to filenameGen.py
-  
-""" % {'scriptName':os.path.basename(sys.argv[0]),
-       'version':version,
-       'author':'Tavis Rudd',
-       }
-
-
-    
 ##################################################
-## if run from the command line ##
-if __name__ == '__main__':
+## METHOD COMPILERS
 
-    MainProgram().run()
+class MethodCompiler(SettingsManager, GenUtils):
+    def __init__(self, methodName, classCompiler, settings={}):
+        SettingsManager.__init__(self)
+        self._settings = settings
+        self._methodName = methodName
+
+    def setupState(self):
+        self._indent = self.setting('indentationStep')
+        self._indentLev = self.setting('initialMethIndentLevel')
+        self._pendingStrConstChunks = []
+        self._localVars = ['self']
+        if self.setting('recognize__builtins__'):
+            self._localVars.extend( dir(__builtins__) )
+        
+        
+        self._methodSignature = None
+        self._methodDef = None
+        self._docStringLines = []
+        self._methodBodyChunks = []
+
+        self._cacheRegionOpen = False
+        
+    def cleanupState(self):
+        pass
+
+    def methodName(self):
+        return self._methodName
+
+    def setMethodName(self, name):
+        self._methodName = name
+
+    def localVars(self):
+        return self._localVars
+        
+    ## methods for managing indentation
+    
+    def indentation(self):
+        return self._indent * self._indentLev
+    
+    def indent(self):
+        self._indentLev +=1
+        
+    def dedent(self):
+        if self._indentLev:
+            self._indentLev -=1
+        else:
+            raise Error('Attempt to dedent when the indentLev is 0')
+
+    ## methods for final code wrapping
+
+    def methodDef(self):
+        if self._methodDef:
+            return self._methodDef
+        else:
+            return self.wrapCode()
+
+    __str__ = methodDef
+    
+    def wrapCode(self):
+        self.commitStrConst()
+        methodDefChunks = (
+            self.methodSignature(),
+            '\n',
+            self.docString(),
+            self.methodBody(),
+            )
+        methodDef = ''.join(methodDefChunks)
+        self._methodDef = methodDef
+        return methodDef
+
+    def methodSignature(self):
+        return self._indent + self._methodSignature + ':'
+
+    def setMethodSignature(self, signature):
+        self._methodSignature = signature
+
+    def methodBody(self):
+        return ''.join( self._methodBodyChunks )
+
+    def docString(self):
+        ind = self._indent
+        docStr = ('%(ind)s"""\n%(ind)s' +
+                  '\n%(ind)s'.join(self._docStringLines) +
+                  '\n%(ind)s"""\n'
+                  ) % {'ind':ind*2}
+        return  docStr
+
+    ## methods for adding code
+
+    def addRawChunk(self, chunk):
+        self._methodBodyChunks.append(chunk)
+
+    def addMethDocString(self, line):
+        self._docStringLines.append(line)
+
+    def addLocalVars(self, varnameList):
+        self._localVars.extend(varnameList)
+        
+    def addChunk(self, chunk):
+        self.commitStrConst()
+        chunk = "\n" + self.indentation() + chunk
+        self.addRawChunk(chunk)
+
+    def appendToPrevChunk(self, appendage):
+        self._methodBodyChunks[-1] = self._methodBodyChunks[-1] + appendage
+
+    def addWriteChunk(self, chunk):
+        self.addChunk('write(' + chunk + ")")
+
+    def addFilteredChunk(self, chunk):
+        self.addWriteChunk('filter(' + chunk + ')')
+
+    def addStrConst(self, strConst):
+        self.appendToPrevStrConst(strConst)
+
+    def appendToPrevStrConst(self, strConst):
+        if self._pendingStrConstChunks:
+            self._pendingStrConstChunks.append(strConst)
+        else:
+            self._pendingStrConstChunks = [strConst]
+        
+    def commitStrConst(self):
+        if self._pendingStrConstChunks:
+            strConst = self.unescapeCheetahVars(''.join(self._pendingStrConstChunks))
+            strConst = self.unescapeDirectives(strConst)
+            self._pendingStrConstChunks = []
+            if self.setting('reprShortStrConstants') and \
+               strConst.count('\n') < self.setting('reprNewlineThreshold'):
+                self.addWriteChunk( repr(strConst).replace('\\012','\\n'))
+            else:
+                self.addWriteChunk(
+                    "'''" +
+                    repr(strConst).replace("\\n","\n").replace('\\012','\n')[1:-1] +
+                    "'''" )
+
+    def delLeadingWS(self):
+        if self._pendingStrConstChunks:
+            src = self._pendingStrConstChunks[-1]
+            BOL = max(src.rfind('\n')+1, src.rfind('\r')+1, 0)
+            if BOL < len(src):
+                self._pendingStrConstChunks[-1] = src[:BOL]
+        
+    def addMethComment(self, comm):
+        offSet = self.setting('commentOffset')
+        self.addChunk('#' + ' '*offSet + comm)
+
+
+    def addCall(self, expr):
+        self.addChunk( expr )
+        
+    def addSet(self, LVALUE, OP, RVALUE, isGlobal=True):
+
+
+        if self.setting('useNameMapper'):
+            splitPos1 = LVALUE.find('.')
+            splitPos2 = LVALUE.find('[')
+            if splitPos1 > 0 and splitPos2==-1:
+                splitPos = splitPos1
+            elif splitPos1 > 0 and splitPos1 < max(splitPos2,0):
+                splitPos = splitPos1
+            else:
+                splitPos = splitPos2
+                
+            if splitPos >0:
+                primary = LVALUE[:splitPos]
+                secondary = LVALUE[splitPos:]
+            else:
+                primary = LVALUE
+                secondary = ''
+
+        if isGlobal:
+            LVALUE = 'globalSetVars["' + primary + '"]' + secondary            
+        else:
+            self.addLocalVars( (primary,) )
+            
+        self.addChunk( LVALUE + ' ' + OP + ' ' + RVALUE.strip() )
+
+    def addWhile(self, expr):
+        self.addIndentingDirective(expr)
+        
+    def addFor(self, expr):
+        self.addIndentingDirective(expr)
+
+    def addIndentingDirective(self, expr):
+        if expr and not expr[-1] == ':':
+            expr = expr  + ':'
+        self.addChunk( expr )
+        self.indent()
+
+    def addReIndentingDirective(self, expr):
+        self.commitStrConst()
+        self.dedent()
+        if not expr[-1] == ':':
+            expr = expr  + ':'
+            
+        self.addChunk( expr )
+        self.indent()
+
+    def addIf(self, expr):
+        self.addIndentingDirective(expr)
+
+    def addElse(self, expr):
+        expr = re.sub(r'else[ \f\t]+if','elif', expr)
+        self.addReIndentingDirective(expr)
+
+    def addTry(self, expr):
+        self.addIndentingDirective(expr)
+        
+    def addExcept(self, expr):
+        self.addReIndentingDirective(expr)
+        
+    def addFinally(self, expr):
+        self.addReIndentingDirective(expr)
+        
+    def addPSP(self, PSP):
+        self.commitStrConst()
+        autoIndent = False
+        if PSP[0] == '=':
+            PSP = PSP[1:]
+            if PSP:
+                self.addWriteChunk('filter(' + PSP + ')')
+            return
+                    
+        elif PSP.lower() == 'end':
+            self.dedent()
+            return
+        elif PSP[-1] == '$':
+            autoIndent = True
+            PSP = PSP[:-1]
+        elif PSP[-1] == ':':
+            autoIndent = True
+            
+        for line in PSP.splitlines():
+            self.addChunk(line)
+            
+        if autoIndent:
+            self.indent()
+
+    
+    def cacheID(self):
+        return self._cacheID
+
+    def nextCacheID(self):
+        self._cacheID = str(random.randrange(100, 999)) \
+                        + str(random.randrange(10000, 99999))
+        return self._cacheID
+
+    def startCacheRegion(self, cacheInfo, lineCol):
+        ID = self.nextCacheID()
+        interval = cacheInfo.get('interval',None)
+        test = cacheInfo.get('test',None)
+        self._cacheRegionOpen = True    # attrib of current methodCompiler
+        
+        self.addChunk('## START CACHE REGION: at line, col ' + str(lineCol) + ' in the source.')
+        self.addChunk('RECACHE = True')
+        
+        self.addChunk('if not self._cacheData.has_key(' + repr(ID) + '):')
+        self.indent()
+        if cacheInfo.has_key('id'):
+            self.addChunk("self._cacheIndex['" +
+                          cacheInfo['id'] +
+                          "'] = '" + ID +"'")
+        if not (interval or test):
+            self.addChunk('pass')
+        if interval:
+            setRefreshTime = ('self.__cache' + ID +
+                              '__refreshTime = currentTime() + ' + str(interval))
+            self.addChunk(setRefreshTime)
+            self.dedent()
+            self.addChunk('elif currentTime() > self.__cache' + ID
+                               + '__refreshTime:')
+            self.indent()
+            self.addChunk(setRefreshTime)
+            self.addMethDocString('This cache will be refreshed every ' +
+                                       str(interval) + ' seconds.')
+        if test:
+            self.dedent()
+            self.addChunk('elif ' + test + ':')
+            self.indent()
+            self.addChunk('RECACHE = True')
+            
+        self.dedent()
+        self.addChunk('else:')
+        self.indent()
+        self.addChunk('RECACHE = False')
+        self.dedent()
+        self.addChunk('if RECACHE:')
+        self.indent()
+        self.addChunk('cacheCollector = DummyTransaction()')
+        self.addChunk('write = cacheCollector.response().write')
+        
+    def endCacheRegion(self):
+        self._cacheRegionOpen = False
+        self.addChunk('write = trans.response().write')
+        self.addChunk('self._cacheData[' + repr(self.cacheID())
+                      + '] = cacheCollector.response().getvalue()')
+        self.dedent()
+        self.addWriteChunk( 'self._cacheData[' + repr(self.cacheID()) + ']' )
+        self.addChunk('## END CACHE REGION')
+        self.addChunk('')
+
+class AutoMethodCompiler(MethodCompiler):
+
+    def setupState(self):
+        MethodCompiler.setupState(self)
+        self._localVars = ['self',
+                           'trans',
+                           'dummyTrans',
+                           'VFS',
+                           'VFN',
+                           'SL',
+                           'globalSetVars',
+                           'write',
+                           'format',
+                           'currentTime',
+                           ]
+        self._argStringList = [ ("self",None) ]
+        self._streamingEnabled = True
+        
+    def cleanupState(self):
+        MethodCompiler.cleanupState(self)
+        self.commitStrConst()
+        if self._cacheRegionOpen:
+            self.endCacheRegion()
+
+            
+        self._indentLev = self.setting('initialMethIndentLevel')
+        mainBodyChunks = self._methodBodyChunks
+        self._methodBodyChunks = []
+        self.addAutoSetupCode()
+        self._methodBodyChunks.extend(mainBodyChunks)
+        self.addAutoCleanupCode()
+        if self._streamingEnabled:
+            for argName, defVal in  [ ('trans', 'None'),
+                                      ("dummyTrans","False"),
+                                      ("VFS","valueFromSearchList"), 
+                                      ("VFN","valueForName"),
+                                      ("getmtime","getmtime"),
+                                      ("currentTime","time.time"),
+                                      ]:
+                self.addMethArg(argName, defVal)
+        
+    def addAutoSetupCode(self):
+        if self._streamingEnabled:
+            self.addChunk('if not trans:')
+            self.indent()
+            self.addChunk('trans = DummyTransaction()')
+            self.addChunk('dummyTrans = True')
+            self.dedent()
+        else:
+            self.addChunk('trans = DummyTransaction()')
+            self.addChunk('dummyTrans = True')
+        self.addChunk('write = trans.response().write')
+        self.addChunk('SL = self._searchList')
+        self.addChunk('filter = self._currentFilter')
+        self.addChunk('globalSetVars = self._globalSetVars')
+        self.addChunk('')
+
+        self.addChunk("#" *40)
+        self.addChunk('## START - generated method body')
+        self.addChunk('')
+
+    def addAutoCleanupCode(self):
+        self.addChunk('')
+        self.addChunk("#" *40)
+        self.addChunk('## END - generated method body')
+        self.addChunk('')
+        self.addStop()
+        self.addChunk('')
+        
+    def addStop(self, expr=None):
+        if 1:
+            self.addChunk('if dummyTrans:')
+            self.indent()
+            self.addChunk('return trans.response().getvalue()')
+            self.dedent()
+            self.addChunk('else:')
+            self.indent()
+            self.addChunk('return ""')
+            self.dedent()
+            
+    def addMethArg(self, name, defVal=None):
+        asteriskPos = max(name.rfind('*')+1, 0)
+        if asteriskPos:
+            self._streamingEnabled = False
+        self._argStringList.append( (name,defVal) )
+        self.addLocalVars((name[asteriskPos:],))
+        
+    def methodSignature(self):
+        argStringChunks = []
+        for arg in self._argStringList:
+            chunk = arg[0]
+            if not arg[1] == None:
+                chunk += '=' + arg[1]
+            argStringChunks.append(chunk)
+        return (self._indent + "def " + self.methodName() + "(" +
+                (',\n' + self._indent*3).join(argStringChunks) + "):\n\n")
+
+
+##################################################
+## CLASS COMPILERS
+
+class ClassCompiler(SettingsManager, GenUtils):
+    
+    _activeMethods = None      # converted to a list at runtime
+    
+    def __init__(self, className, mainMethodName='respond',
+                 templateObj=None,
+                 fileName=None,
+                 settings={}):
+
+        SettingsManager.__init__(self)
+        self._settings = settings
+        self._fileName = fileName
+        self._className = className
+        self._mainMethodName = mainMethodName
+        self._templateObj = templateObj
+        self.setupState()
+        methodCompiler = self.spawnMethodCompiler(mainMethodName)
+        methodCompiler.addMethDocString('This is the main method generated by Cheetah')
+        self.setActiveMethodCompiler(methodCompiler)
+
+        if fileName and self.setting('monitorSrcFile'):
+            self.addChunkToInit('self._filePath = ' + repr(fileName))
+            self.addChunkToInit('self._fileMtime = ' + str(getmtime(fileName)) )
+            
+            self.addChunk('if exists(' + repr(fileName) +
+                          ') and ' +
+                          'getmtime(' + repr(fileName) +
+                          ') > self._fileMtime:')
+            self.indent()
+            self.addChunk('self.compile(file=' + repr(fileName) + ')')
+            self.addChunk('write(self.' + mainMethodName + '(trans=trans))')            
+            self.addStop()
+            self.dedent()
+
+    def __getattr__(self, name):
+
+        """Provide access to the methods and attributes of the MethodCompiler
+        at the top of the activeMethods stack: one-way namespace sharing
+
+        
+        WARNING: Use .setMethods to assign the attributes of the MethodCompiler
+        from the methods of this class!!! or you will be assigning to attributes
+        of this object instead."""
+        
+
+        if self.__dict__.has_key(name):
+            return self.__dict__[name]
+        elif self.__class__.__dict__.has_key(name):
+            return self.__class__.__dict__[name]
+        elif self._activeMethods and hasattr(self._activeMethods[-1], name):
+            return getattr(self._activeMethods[-1], name)
+        else:
+            raise AttributeError, name
+
+    def setupState(self):
+        self._classDef = None
+        self._activeMethods = []        # stack while parsing/generating
+        self._finishedMethods = []      # store by order
+        self._methodsIndex = {}      # store by name
+        self._baseClasses = ['Template']
+        self._classDocStringLines = []
+        self._generatedAttribs = []      # printed after methods in the gen class def
+        self._initMethChunks = []
+        self._alias__str__ = True      # should we set the __str__ alias
+        
+        self._blockMetaData = {}
+        self._errorCatcherCount = 0
+        self._placeholderToErrorCatcherMap = {}
+
+    def setupInitMethod(self):
+        __init__ = self.spawnMethodCompiler('__init__', klass=MethodCompiler)
+        __init__.setupState()
+        __init__.setMethodSignature("def __init__(self, *args, **KWs)")
+        __init__.addChunk(
+            "%(mainBaseClass)s.__init__(self, *args, **KWs)" % {
+            'mainBaseClass':self._baseClasses[0],
+            }
+            )
+        for chunk in self._initMethChunks:
+            __init__.addChunk(chunk)
+        __init__.cleanupState()
+        self.swallowMethodCompiler(__init__, pos=0)
+
+    def cleanupState(self):
+        if self._mainMethodName == 'respond':
+            self._generatedAttribs.append('__str__ = respond')
+        while self._activeMethods:
+            methCompiler = self.getActiveMethodCompiler()
+            self.swallowMethodCompiler(methCompiler)
+        self.setupInitMethod()
+    
+    def setClassName(self, name):
+        self._className = name
+
+    def className(self):
+        return self._className
+       
+    def setBaseClasses(self, baseClasses):
+        self._baseClasses = baseClasses
+        
+    def setMainMethodName(self, methodName):
+        ## change the name in the methodCompiler and add new reference
+        mainMethod = self._methodsIndex[self._mainMethodName]
+        mainMethod.setMethodName(methodName)
+        self._methodsIndex[methodName] = mainMethod
+
+        ## make sure that fileUpdate code still works properly:
+        chunkToChange = ('write(self.' + self._mainMethodName + '(trans=trans))')
+        chunks = mainMethod._methodBodyChunks
+        if chunkToChange in chunks:
+            for i in range(len(chunks)):
+                if chunks[i] == chunkToChange:
+                    chunks[i] = ('write(self.' + methodName + '(trans=trans))')
+
+
+        ## get rid of the old reference and update self._mainMethodName
+        del self._methodsIndex[self._mainMethodName]
+        self._mainMethodName = methodName
+        
+    
+    def spawnMethodCompiler(self, methodName, klass=AutoMethodCompiler):
+        methodCompiler = klass(methodName,
+                               classCompiler=self,
+                               settings=self.settings(),
+                               )
+        self._methodsIndex[methodName] = methodCompiler
+        methodCompiler.setupState()
+        return methodCompiler
+
+    def setActiveMethodCompiler(self, methodCompiler):
+        self._activeMethods.append(methodCompiler)
+
+    def getActiveMethodCompiler(self):
+        return self._activeMethods.pop()
+        
+    def swallowMethodCompiler(self, methodCompiler, pos=None):
+        methodCompiler.cleanupState()
+        if pos==None:
+            self._finishedMethods.append( methodCompiler )
+        else:
+            self._finishedMethods.insert(pos, methodCompiler)
+
+        if self._templateObj and methodCompiler.methodName() != '__init__':
+            self._templateObj._bindCompiledMethod(methodCompiler)
+        return methodCompiler
+        
+    def finishedMethods(self):
+        return self._finishedMethods
+
+    def addBaseClass(self, baseClass):
+        self._baseClasses.append(baseClass)
+
+    def addClassDocString(self, line):
+        self._classDocStringLines.append(line)
+
+    def addChunkToInit(self,chunk):
+        self._initMethChunks.append(chunk)
+
+    def addAttribute(self, attribExpr):
+        self._generatedAttribs.append(attribExpr)
+
+    def addSettingsToInit(self, settingsStr, settingsType='ini'):
+        if settingsType=='python':
+            reader = 'updateSettingsFromPySrcStr'
+        else:            
+            reader = 'updateSettingsFromConfigStr'
+
+        settingsCode = ("self." + reader + "('''" +
+                        settingsStr.replace("'''","\'\'\'") +
+                        "''')")
+        self.addChunkToInit(settingsCode)
+
+    def addErrorCatcher(self, codeChunk, rawCode='', lineCol=''):
+        if self._placeholderToErrorCatcherMap.has_key(rawCode):
+            methodName = self._placeholderToErrorCatcherMap[rawCode]
+            if not self.setting('outputRowColComments'):
+                self._methodsIndex[methodName].addMethDocString(
+                    'plus at line, col ' +lineCol)
+            return methodName
+
+        self._errorCatcherCount += 1
+        methodName = '__errorCatcher' + str(self._errorCatcherCount)
+        self._placeholderToErrorCatcherMap[rawCode] = methodName
+        
+        checherMeth = self.spawnMethodCompiler(methodName, klass=MethodCompiler)
+        checherMeth.setupState()
+        checherMeth.setMethodSignature('def ' + methodName +
+                                     '(self, localsDict={})')
+        checherMeth.addMethDocString('Generated from ' + rawCode +
+                                   ' at line, col ' + lineCol + '.') 
+        checherMeth.addChunk('try:')
+        checherMeth.indent()
+        checherMeth.addChunk("return eval('''" + codeChunk + "''', globals(), localsDict)")
+        checherMeth.dedent()
+        checherMeth.addChunk('except self._errorCatcher.exceptions(), e:')
+        checherMeth.indent()        
+        checherMeth.addChunk("return self._errorCatcher.warn(exc_val=e, code= " +
+                             repr(codeChunk) + " , rawCode= " +
+                             repr(rawCode) + " , lineCol=" + str(lineCol) +")")
+        
+        checherMeth.cleanupState()
+        
+        self.swallowMethodCompiler(checherMeth)
+        return methodName
+
+    ## code wrapping methods
+    
+    def classDef(self):
+        if self._classDef:
+            return self._classDef
+        else:
+            return self.wrapClassDef()
+
+    __str__ = classDef
+    
+    def wrapClassDef(self):
+        self.addClassDocString('')
+        self.addClassDocString(self.setting('defDocStrMsg'))
+        ind = self.setting('indentationStep')
+        classDefChunks = (
+            self.classSignature(),
+            self.classDocstring(),
+            ind + '#'*50,
+            ind + '## GENERATED METHODS',
+            '\n',
+            self.methodDefs(),
+            ind + '#'*50,
+            ind + '## GENERATED ATTRIBUTES',
+            '\n',
+            self.attributes(),
+            )
+
+        classDef = '\n'.join(classDefChunks)
+        self._classDef = classDef
+        return classDef
+
+
+    def classSignature(self):
+        return "class " + self.className() + "(" + self.baseClasses() + "):"
+
+    def baseClasses(self):
+        return ','.join(self._baseClasses)
+        
+    def classDocstring(self):
+        ind = self.setting('indentationStep')
+        docStr = ('%(ind)s"""\n%(ind)s' +
+                  '\n%(ind)s'.join(self._classDocStringLines) +
+                  '\n%(ind)s"""\n'
+                  ) % {'ind':ind}
+        return  docStr
+
+    def methodDefs(self):
+        methodDefs = [str(methGen) for methGen in self.finishedMethods() ]
+        return '\n\n'.join(methodDefs)
+
+    def attributes(self):
+        attribs = [self.setting('indentationStep') + str(attrib)
+                      for attrib in self._generatedAttribs ]
+        return '\n\n'.join(attribs)
+
+
+    
+class AutoClassCompiler(ClassCompiler):
+    pass
+
+
+##################################################
+## MODULE COMPILERS
+        
+class ModuleCompiler(Parser, GenUtils):
+    
+    _activeClasses = None               # converted to a list at runtime
+    
+    def __init__(self, source=None, file=None, moduleName='GenTemplate',
+                 mainClassName=None,
+                 mainMethodName='respond',
+                 templateObj=None,
+                 settings={}):
+        
+        self._templateObj = templateObj
+        self._compiled = False
+        self._moduleName = moduleName
+        if not mainClassName:
+            self._mainClassName = moduleName
+        else:
+            self._mainClassName =mainClassName
+        self._mainMethodName = mainMethodName
+
+        
+        self._filePath = None
+        self._fileMtime = None
+        
+        if source and file:
+            raise TypeError("Cannot compile from a source string AND file.")
+        elif type(file) == types.StringType: # it's a filename.
+            f = open(file) # Raises IOError.
+            source = f.read()
+            f.close()
+            self._filePath = file
+            self._fileMtime = os.path.getmtime(file)
+        elif hasattr(file, 'read'):
+            source = file.read()  # Can't set filename or mtime--they're not accessible.
+        elif file:
+            raise TypeError("'file' argument must be a filename string or file-like object")
+
+
+        if self._filePath:
+            self._fileDirName, self._fileBaseName = os.path.split(self._filePath)
+            self._fileBaseNameRoot, self._fileBaseNameExt = os.path.splitext(self._fileBaseName)
+            
+        source = str( source )
+        # by converting to string here we allow objects such as other Templates
+        # to be passed in
+        
+        Parser.__init__(self, source, filename=self._filePath)
+        self._initializeSettings()
+        self.updateSettings(settings)
+        self.configureParser()
+        self.setupState()
+        self.initDirectives()
+
+    def __getattr__(self, name):
+
+        """Provide access to the methods and attributes of the ClassCompiler
+        at the top of the activeMethods stack: one-way namespace sharing
+
+
+        WARNING: Use .setMethods to assign the attributes of the ClassCompiler
+        from the methods of this class!!! or you will be assigning to attributes
+        of this object instead."""
+        
+        if self.__dict__.has_key(name):
+            return self.__dict__[name]
+        elif self.__class__.__dict__.has_key(name):
+            return self.__class__.__dict__[name]
+        elif self._activeClasses and hasattr(self._activeClasses[-1], name):
+            return getattr(self._activeClasses[-1], name)
+        else:
+            raise AttributeError, name
+
+
+    def _initializeSettings(self):
+        Parser._initializeSettings(self)
+        defaults = {
+            'indentationStep': ' '*4, 
+            'initialMethIndentLevel': 2,
+
+            'monitorSrcFile':True,
+            
+            ## controlling the handling of Cheetah $vars
+            'useNameMapper': True,      # Unified dotted notation and the searchList
+            'useAutocalling': True,
+            'recognize__builtins__':True,
+            'useErrorCatcher':False,
+
+            ## controlling the aesthetic appearance of the generated code
+            'commentOffset': 1,
+            # should shorter str constant chunks be printed using repr rather than ''' quotes
+            'reprShortStrConstants': True, 
+            'reprNewlineThreshold':3,
+            'outputRowColComments':True,
+
+            ## should #block's be wrapped in a comment in the template's output
+            'includeBlockMarkers': False,   
+            'blockMarkerStart':('\n<!-- START BLOCK: ',' -->\n'),
+            'blockMarkerEnd':('\n<!-- END BLOCK: ',' -->\n'),
+            
+            'defDocStrMsg':'Autogenerated by CHEETAH: The Python-Powered Template Engine'
+            }
+        self.updateSettings( defaults )
+
+    def setupState(self):
+        self._activeClasses = []
+        self._finishedClasses = []      # listed by ordered 
+        self._finishedClassIndex = {}  # listed by name
+        
+        self._moduleDef = None
+        self._moduleShBang = '#!/usr/bin/env python'
+        self._moduleHeaderLines = []
+        self._moduleDocStringLines = []
+        self._specialVars = {}
+
+        self._importStatements = [
+            "import sys",
+            "import os",
+            "import os.path",
+            "from os.path import getmtime, exists",
+            "import time",
+            "import types",
+            "from Cheetah.Template import Template",
+            "from Cheetah.DummyTransaction import DummyTransaction",
+            "from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList",
+            "import Cheetah.Filters as Filters",
+            "import Cheetah.ErrorCatchers as ErrorCatchers",
+            ]        
+
+        self._importedVars = ['sys',
+                              'os',
+                              'os.path',
+                              'time',
+                              'types',
+                              'Template',
+                              'DummyTransaction',
+                              'NotFound',
+                              'Filters',
+                              'ErrorCatchers',
+                              ]
+        
+        self._moduleConstants = [
+            "True = (1==1)",
+            "False = (1==0)",
+            ]
+
+        self._errorCatcherOn = False
+        
+    def compile(self):
+        classCompiler = self.spawnClassCompiler(self._mainClassName)            
+        self.addActiveClassCompiler(classCompiler)
+        self.parse()
+        self.swallowClassCompiler(self.getActiveClassCompiler())
+        self._compiled = True
+
+        
+    def spawnClassCompiler(self, className, klass=AutoClassCompiler,
+                           mainMethodName='respond'):
+        classCompiler = klass(className,
+                              mainMethodName=self._mainMethodName,
+                              templateObj=self._templateObj,
+                              fileName=self._filePath,
+                              settings=self.settings(),
+                              )
+        return classCompiler
+
+    def addActiveClassCompiler(self, classCompiler):
+        self._activeClasses.append(classCompiler)
+
+    def getActiveClassCompiler(self):
+        return self._activeClasses.pop()
+        
+    def swallowClassCompiler(self, classCompiler):
+        classCompiler.cleanupState()
+        self._finishedClasses.append( classCompiler )
+        self._finishedClassIndex[classCompiler.className()] = classCompiler
+        return classCompiler
+
+    def finishedClasses(self):
+        return self._finishedClasses
+
+    def importedVars(self):
+        return self._importedVars
+    
+    def addImportedVars(self, varNames):
+        self._importedVars.extend(varNames)
+        self._importedVars.sort()
+        self._importedVars.reverse()
+
+
+    def errorCatcherIsOn(self):
+        return self._errorCatcherOn
+    
+    def turnErrorCatcherOn(self):
+        self._errorCatcherOn = True
+
+    def turnErrorCatcherOff(self):
+        self._errorCatcherOn = False
+        
+    ## gen methods
+        
+    def closeDirective(self, lineClearToStartToken, endOfFirstLinePos):
+
+        if self.matchDirectiveEndToken():
+            self.getDirectiveEndToken()
+        elif lineClearToStartToken and (not self.atEnd()) and self.peek() in '\r\n':
+            self.readToEOL(gobble=True)
+            
+        if lineClearToStartToken and (self.atEnd() or self.pos() > endOfFirstLinePos):
+            self.delLeadingWS()
+    
+    ## methods for adding stuff to the module and class definitions
+    
+    def addShBang(self, shBang):
+        self._moduleShBang = shBang
+    
+    def addModuleHeader(self, line):
+        self._moduleHeaderLines.append(line)
+        
+    def addModuleDocString(self, line):        
+        self._moduleDocStringLines.append(line)
+
+    def addSpecialVar(self, basename, contents):
+        self._specialVars['__' + basename + '__'] = contents.strip()
+
+    def addImportStatement(self, importStatement):
+        self._importStatements.append(importStatement)
+
+    def addGlobalCodeChunk(self, codeChunk):
+        self._globalCodeChunks.append(codeChunk)
+
+    def addComment(self, comm):
+        specialVarMatch = specialVarRE.match(comm)
+        if specialVarMatch:
+            return self.addSpecialVar(specialVarMatch.group(1), comm[specialVarMatch.end():])
+        elif comm.startswith('doc:'):
+            addLine = self.addMethDocString
+            comm = comm[len('doc:'):].strip()
+        elif comm.startswith('doc-method:'):
+            addLine = self.addMethDocString
+            comm = comm[len('doc-method:'):].strip()
+        elif comm.startswith('doc-module:'):
+            addLine = self.addModuleDocString
+            comm = comm[len('doc-module:'):].strip()
+        elif comm.startswith('doc-class:'):
+            addLine = self.addClassDocString
+            comm = comm[len('doc-class:'):].strip()
+        elif comm.startswith('header:'):
+            addLine = self.addModuleHeader
+            comm = comm[len('header:'):].strip()
+        else:
+            addLine = self.addMethComment
+
+        for line in comm.splitlines():
+            addLine(line)
+
+    ## methods for module code wrapping
+    
+    def moduleDef(self):
+        if not self._compiled:
+            self.compile()
+        if self._moduleDef:
+            return self._moduleDef
+        else:
+            return self.wrapModuleDef()
+        
+    __str__ = moduleDef
+
+
+    def wrapModuleDef(self):
+        self.addModuleDocString('')
+        self.addModuleDocString(self.setting('defDocStrMsg'))
+        self.addModuleDocString(' CHEETAH VERSION: ' + version)
+        self.addSpecialVar('CHEETAH_version', version)
+        self.addModuleDocString(' Generation time: ' + self.timestamp())
+        self.addSpecialVar('CHEETAH_genTime', self.timestamp())
+        if self._filePath:
+            self.addSpecialVar('CHEETAH_src', self._filePath)
+            self.addModuleDocString('   Source file: ' + self._filePath)
+            self.addModuleDocString('   Source file last modified: ' +
+                                    self.timestamp(self._fileMtime))
+            
+        moduleDef = """%(header)s
+%(docstring)s
+%(specialVars)s
+
+##################################################
+## DEPENDENCIES
+
+%(imports)s
+
+##################################################
+## MODULE CONSTANTS
+
+%(constants)s
+
+##################################################
+## CLASSES
+
+%(classes)s
+
+%(footer)s
+""" %   {'header':self.moduleHeader(),
+         'docstring':self.moduleDocstring(),
+         'specialVars':self.specialVars(),
+         'imports':self.importStatements(),
+         'constants':self.moduleConstants(),
+         'classes':self.classDefs(),
+         'footer':self.moduleFooter(),
+         }
+       
+        self._moduleDef = moduleDef
+        return moduleDef
+
+    def timestamp(self, theTime=None):
+        if not theTime:
+            theTime = time.time()
+        return time.asctime(time.localtime(theTime))
+    
+    def moduleHeader(self):
+        header = self._moduleShBang + '\n'
+        if self._moduleHeaderLines:
+            offSet = self.setting('commentOffset')
+        
+            header += (
+                '#' + ' '*offSet + 
+                ('\n#'+ ' '*offSet).join(self._moduleHeaderLines) +
+                '\n'
+                )
+
+        return header
+
+    def moduleDocstring(self):
+        docStr = ('"""' +
+                  '\n'.join(self._moduleDocStringLines) +
+                  '\n"""\n'
+                  )
+        return  docStr
+
+
+    def specialVars(self):
+        chunks = []
+        theVars = self._specialVars
+        keys = theVars.keys()
+        keys.sort()
+        for key in keys:
+            chunks.append(key + ' = ' + repr(theVars[key])  )
+        return '\n'.join(chunks)
+        
+    def importStatements(self):
+        return '\n'.join(self._importStatements)
+        
+    def moduleConstants(self):
+        return '\n'.join(self._moduleConstants)
+
+
+
+    def classDefs(self):
+        classDefs = [str(klass) for klass in self.finishedClasses() ]
+        return '\n\n'.join(classDefs)
+
+    def moduleFooter(self):
+        return """
+# CHEETAH was developed by Tavis Rudd, Chuck Esterbrook, Ian Bicking and Mike Orr;
+# with code, advice and input from many other volunteers.
+# For more information visit http://www.CheetahTemplate.org
+
+##################################################
+## if run from command line:
+if __name__ == '__main__':
+    %(className)s().runAsMainProgram()
+""" % {'className':self._mainClassName}
+
+
+##################################################
+## Make Compiler an alias for ModuleCompiler
+    
+Compiler = ModuleCompiler
 
 
