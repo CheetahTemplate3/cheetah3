@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.51 2004/12/17 00:07:48 jjinux Exp $
+# $Id: SyntaxAndOutput.py,v 1.52 2004/12/30 14:56:37 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.51 $
+Version: $Revision: 1.52 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2004/12/17 00:07:48 $
+Last Revision Date: $Date: 2004/12/30 14:56:37 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.51 $"[11:-2]
+__revision__ = "$Revision: 1.52 $"[11:-2]
 
 
 ##################################################
@@ -538,7 +538,7 @@ class Placeholders_Vals(OutputTest):
     def test8(self):
         """True, False
         """
-        self.verify("$True $False", "1 0")
+        self.verify("$True $False", "%s %s"%(repr(True), repr(False)))
 
     def test9(self):
         """$_
@@ -1879,8 +1879,9 @@ class ImportDirective(OutputTest):
     def test9(self):
         """#import os.path -- use it
         """
+        
         self.verify("#import os.path\n$os.path.exists('.')",
-                    "1")
+                    repr(True))
 
     def test10(self):
         """#import os.path -- use it with NameMapper turned off
@@ -1891,7 +1892,7 @@ useNameMapper=False
 #end compiler-settings
 #import os.path
 $os.path.exists('.')""",
-                    "1")
+                    repr(True))
 
 
 class CompilerDirective(OutputTest):
@@ -2107,19 +2108,19 @@ class VarExists(OutputTest):               # Template.varExists()
         """$varExists('$anInt')
         """
         self.verify("$varExists('$anInt')",
-                    "1")
+                    repr(True))
 
     def test2(self):
         """$varExists('anInt')
         """
         self.verify("$varExists('anInt')",
-                    "1")
+                    repr(True))
 
     def test3(self):
         """$varExists('$anInt')
         """
         self.verify("$varExists('$bogus')",
-                    "0")
+                    repr(False))
 
     def test4(self):
         """$varExists('$anInt') combined with #if false
