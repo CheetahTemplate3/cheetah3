@@ -1,5 +1,10 @@
 Please initial your changes (there's a key at bottom) and add a date for each release
 ================================================================================
+0.9.11 (Mar 07, 2002)
+   - fixed a careless bug in cheetah-compile (TR)
+   - implemented the new 'cheetah' wrapper script (TR)
+   - refactored the local copy of unittest a bit (TR)
+
 0.9.10 (Mar 06, 2002): Primarily a bug fix release
    - fixed bug in srcfile-mtime monitoring / update code (TR)
    - fixed the parsing of single-line #defs and #blocks so they can have
