@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# $Id: CGITemplate.py,v 1.2 2002/06/10 02:57:02 hierro Exp $
+# $Id: CGITemplate.py,v 1.3 2003/06/14 16:14:43 hierro Exp $
 """A subclass of Cheetah.Template for use in CGI scripts.
 
 Usage in a template:
-    #extends Cheetah.Template.CGIMixin
+    #extends Cheetah.Tools.CGIMixin
     #implements respond
     $cgiHeaders#slurp
 
@@ -32,12 +32,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2002/06/10 02:57:02 $
+Last Revision Date: $Date: 2003/06/14 16:14:43 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.2 $"[11:-2]
+__revision__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
