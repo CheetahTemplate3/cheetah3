@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.6 2001/11/10 19:50:02 hierro Exp $
+# $Id: Filters.py,v 1.7 2001/11/10 20:40:56 hierro Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/11/10 19:50:02 $
+Last Revision Date: $Date: 2001/11/10 20:40:56 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -164,8 +164,14 @@ class WebSafe(Filter):
 
 class Strip(Filter):
     """Strip leading/trailing whitespace but preserve trailing newline.
+
+    If 'val' is a multi-line value, only the leading whitespace from the
+    first line and the trailing whitespace from the last line will be
+    removed.  This makes it suitable as a '#sed' filter ('#sed' has not been
+    implemented yet) but limis its usefulness as a '#filter' filter.
     """
     def filter(self, val, **kw):
+        val = Filter.filter(self, val, **kw)
         if val[-1:] == '\n':
             val = val[:-1]
             eol = '\n'
