@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.7 2002/10/01 17:44:06 tavis_rudd Exp $
+# $Id: CheetahWrapper.py,v 1.8 2002/10/01 17:45:06 tavis_rudd Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -7,13 +7,13 @@
 
 Meta-Data
 ================================================================================
-Author: Tavis Rudd <tavis@calrudd.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.7 $
+Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
+Version: $Revision: 1.8 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/10/01 17:44:06 $
+Last Revision Date: $Date: 2002/10/01 17:45:06 $
 """
-__author__ = "Tavis Rudd <tavis@calrudd.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.7 $"[11:-2]
+__author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
+__revision__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
