@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.6 2002/09/04 08:06:40 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.7 2002/10/01 17:44:06 tavis_rudd Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -8,12 +8,12 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/09/04 08:06:40 $
+Last Revision Date: $Date: 2002/10/01 17:44:06 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.6 $"[11:-2]
+__revision__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -74,7 +74,7 @@ WRAPPER_TOP = """\
          \ \/            \/ /
           \/    *   *     \/    CHEETAH %(Version)s Command-Line Tool
            \      |       / 
-            \  ==----==  /      by Tavis Rudd <tavis@calrudd.com>
+            \  ==----==  /      by Tavis Rudd <tavis@damnsimple.com>
              \__________/       and Mike Orr <iron@mso.oz.net>
               
 """ % globals()
