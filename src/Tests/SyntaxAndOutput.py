@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.6 2001/10/30 22:56:35 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.7 2001/11/02 16:43:36 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -15,12 +15,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/10/30 22:56:35 $
+Last Revision Date: $Date: 2001/11/02 16:43:36 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 
 ##################################################
@@ -244,6 +244,11 @@ class Backslashes(OutputTest):
         """ test backslash handling in an included file"""
         self.verify(r'#include "backslashes.txt"',
                     r'\ #LogFormat "%h %l %u %t \"%r\" %>s %b"' + '\n\n\n\n\n\n\n')
+
+    def test7(self):
+        """ a single \\ without using rawstrings plus many NEWLINES"""
+        self.verify("\ \ " + "\n\n\n\n\n\n\n\n\n",
+                    "\ \ " + "\n\n\n\n\n\n\n\n\n")
         
 class NonTokens(OutputTest):
     def test1(self):
