@@ -20,6 +20,9 @@ release
   - minor tweak to the class attribute lookup style in the Compiler.py
     __getattr__ methods [TR]
   - Fix printf format bug in "cheetah c --debug", found by Terry MacDonald. [MO]
+  - Disabled NameMapperDict test (in SyntaxAndOutput.py) because the
+    namemappers still have the dict-method bug.  (Reminder: don't use 
+    placehold names like $update that match dict method names.) [MO]
 
 0.9.15 (Mar 25, 2003)
   - a minor tweak to the cleanup actions of one of the test cases [TR]
