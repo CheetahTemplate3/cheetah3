@@ -1,25 +1,6 @@
-#extend SiteTemplate
-
-##============================================================================##
-#data
-
-#end data
-##============================================================================##
-
-
-##============================================================================##
-## from WebwareSiteTemplate
-#redefine locationBarContents
-            <A CLASS="locationBar" HREF="index">Home</A>&nbsp;&gt;&nbsp; 
-	    <A CLASS="locationBar" HREF="download">Download Cheetah</A>
-#end redefine locationBarContents
-## from WebwareSiteTemplate
-##============================================================================##
-
-
-##============================================================================##
-## from WebwareSiteTemplate
-#redefine mainContentsCell
+#from SiteTemplate import SiteTemplate
+#extends SiteTemplate
+#implements writeMainContentsCell
 
 <P>
 <A HREF="Downloads/Cheetah-LATEST.tar.gz">Here</A> is the current Cheetah
@@ -28,6 +9,10 @@ release (0.9.6).
 <P>
 And <A HREF="Downloads/">here</A> are all the recent Cheetah releases.
 
-#end redefine mainContentsCell
-## from WebwareSiteTemplate
-##============================================================================##
+################################################################################
+## reimplement a few other methods from SiteTemplate
+#def writeLocationBarContents
+<A CLASS="locationBar" HREF="index">Home</A>&nbsp;&gt;&nbsp; 
+<A CLASS="locationBar" HREF="download">Download Cheetah</A>
+#end def 
+################################################################################

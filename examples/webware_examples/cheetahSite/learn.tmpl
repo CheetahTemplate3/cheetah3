@@ -1,33 +1,6 @@
-#extend SiteTemplate
-
-##============================================================================##
-#data
-
-_stylesheetLibs = {'LaTeX-to-HTML':'learn.css'}
-
-def usersGuideTxt():
-    USERS_GUIDE_PATH = '/home/tavis/Cheetah/docs/users_guide_html/index.html'
-    txt = open(USERS_GUIDE_PATH).read()
-    start = txt.find('<div class="titlepage">')
-    end = txt.find('</DL>\\n<DIV CLASS="navigation">') - 3
-    return txt[start:end]
-
-#end data
-##============================================================================##
-
-
-##============================================================================##
-## from SiteTemplate
-#redefine locationBarContents
-            <A CLASS="locationBar" HREF="index">Home</A>&nbsp;&gt;&nbsp; 
-	    <A CLASS="locationBar" HREF="learn">Learn</A>
-#end redefine locationBarContents
-##============================================================================##
-
-
-##============================================================================##
-## from SiteTemplate
-#redefine mainContentsCell
+#from SiteTemplate import SiteTemplate
+#extends SiteTemplate
+#implements writeMainContentsCell
 
 	<P>The Cheetah Users' Guide is available in the following formats:<BR>
 	<A HREF="Downloads/users_guide_html/"><B>Single-page HTML</B></A><BR>
@@ -38,5 +11,13 @@ def usersGuideTxt():
 	</P>
 	<P>Note: it is currently incomplete and under-construction.</P>
 
-#end redefine mainContentsCell
-##=============================================================/home/tavis/Cheetah/docs/users_guide_html/===============##
+################################################################################
+## reimplement a few other methods from SiteTemplate
+
+#def writeLocationBarContents
+            <A CLASS="locationBar" HREF="index">Home</A>&nbsp;&gt;&nbsp; 
+	    <A CLASS="locationBar" HREF="learn">Learn</A>
+#end def 
+################################################################################
+
+

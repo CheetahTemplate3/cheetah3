@@ -1,24 +1,6 @@
-#extend SiteTemplate
-
-##============================================================================##
-#data
-
-#end data
-##============================================================================##
-
-
-##============================================================================##
-## from SiteTemplate
-#redefine locationBarContents
-            <A CLASS="locationBar" HREF="index">Home</A>&nbsp;&gt;&nbsp; 
-	    <A CLASS="locationBar" HREF="contribute">Contribute</A>
-#end redefine locationBarContents
-##============================================================================##
-
-
-##============================================================================##
-## from SiteTemplate
-#redefine mainContentsCell
+#from SiteTemplate import SiteTemplate
+#extends SiteTemplate
+#implements writeMainContentsCell
 
 <H2>How can I contribute?
 </H2>
@@ -89,5 +71,10 @@ Help spread the word ... recommend it to others, write articles about it, etc.
 
 <P>
 
-#end redefine mainContentsCell
-##============================================================================##
+################################################################################
+## reimplement a few other methods from SiteTemplate
+#def writeLocationBarContents
+<A CLASS="locationBar" HREF="index">Home</A>&nbsp;&gt;&nbsp; 
+<A CLASS="locationBar" HREF="contribute">Contribute</A>
+#end def 
+################################################################################

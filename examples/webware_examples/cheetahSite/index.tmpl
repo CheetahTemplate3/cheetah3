@@ -1,30 +1,9 @@
-#extend SiteTemplate
+#from SiteTemplate import SiteTemplate
+#extends SiteTemplate
+#implements writeMainContentsCell
 
-###################
-#redefine locationBar
-
-#end redefine locationBar
-###################
-
-
-##============================================================================##
-## from SiteTemplate
-#redefine leftSideBar
-<BR>
-<a href=http://lists.sourceforge.net/mailman/listinfo/cheetahtemplate-discuss><B>Mailing&nbsp;List</B></a>
-<BR>
-<BR>
-<A HREF="http://sourceforge.net/cvs/?group_id=28961"><B>CVS</B></A><BR>
-#end redefine leftSideBar
-##============================================================================##
-
-
-########################
-#redefine mainContentsCell
-
-##<H1 CLASS="mainText">What is Cheetah?</H1>
 <P>
-<B>Cheetah</B> is a #Python()-powered template engine and code-generator. It aims to:
+<B>Cheetah</B> is a $Python-powered template engine and code-generator. It aims to:
 <ul>
     <li> make it easy to separate content, graphic design, and program code.
     <li> make it easy to integrate content, graphic design, and program code.
@@ -35,7 +14,6 @@
     <li> achieve all these aims in a manner that is efficient, flexible, and extendable.
 </ul>
 </P>
-
 
 <P>
 <B>Cheetah</B> achieves these aims by:
@@ -60,7 +38,7 @@
 </LI>
 </UL>
 
-<P><B>Cheetah</B> requires #Python() 2.0 or greater. It can be used from ordinary Python
+<P><B>Cheetah</B> requires $Python 2.0 or greater. It can be used from ordinary Python
 programs, but also provides integration with <a
 href=http://webware.sourceforge.net/>Webware for Python</a>.</P>
 
@@ -78,6 +56,20 @@ and view the archives <a
 href=http://www.geocrawler.com/redir-sf.php3?list=cheetahtemplate-discuss>here</a>.
 </P>
 
+################################################################################
+## reimplement a few other methods from SiteTemplate
 
-#end redefine mainContentsCell
-########################
+#def writeLocationBar
+#end def 
+
+#def writeLeftSideBar
+<BR>
+<a href=http://lists.sourceforge.net/mailman/listinfo/cheetahtemplate-discuss><B>Mailing&nbsp;List</B></a>
+<BR>
+<BR>
+<A HREF="http://sourceforge.net/cvs/?group_id=28961"><B>CVS</B></A><BR>
+#end def 
+
+################################################################################
+
+
