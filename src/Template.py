@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.93 2002/05/08 22:42:03 tavis_rudd Exp $
+# $Id: Template.py,v 1.94 2002/05/13 18:09:33 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.93 $
+Version: $Revision: 1.94 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/05/08 22:42:03 $
+Last Revision Date: $Date: 2002/05/13 18:09:33 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.93 $"[11:-2]
+__revision__ = "$Revision: 1.94 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -57,9 +57,6 @@ except NameError:
 VFS = valueFromSearchList
 VFN = valueForName
 
-# All the keyword arguments allowed in the Template constructor.
-LegalKWs = ('_globalSetVars', '_preBuiltSearchList')
-
 ##################################################
 ## CLASSES
 
@@ -73,6 +70,9 @@ class Template(SettingsManager, Servlet):
     
     """The core template engine.  It serves as a base class for Template
     servlets and also knows how to compile a template."""
+
+    # All the keyword arguments allowed in the Template constructor.
+    _legalKWs = ['_globalSetVars', '_preBuiltSearchList']
 
     def __init__(self, source=None, searchList=[], file=None,
                  settings={},           # user settings that are visible in templates
@@ -96,7 +96,7 @@ class Template(SettingsManager, Servlet):
         ##################################################           
         ## Verify argument keywords and types
 
-	CheckKeywords(KWs, LegalKWs, 'Template constructor argument')
+	CheckKeywords(KWs, self._legalKWs, 'Template constructor argument')
 
         S = types.StringType
         L = types.ListType
