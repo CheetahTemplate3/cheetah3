@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.11 2001/12/19 02:10:25 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.12 2001/12/19 08:05:32 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2001/12/19 02:10:25 $
+Last Revision Date: $Date: 2001/12/19 08:05:32 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.11 $"[11:-2]
+__revision__ = "$Revision: 1.12 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -66,7 +66,7 @@ class Servlet(BaseServlet):
         self.request     = transaction.request()
         self._session     = None  # don't create unless needed
         self.write = response.write
-        self.writeln = response.writeln
+        #self.writeln = response.writeln
         
     def respond(self, trans=None):
         return ''
