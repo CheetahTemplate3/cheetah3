@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: IncludeDirective.py,v 1.10 2001/08/17 15:48:55 tavis_rudd Exp $
+# $Id: IncludeDirective.py,v 1.11 2001/08/25 17:39:50 tavis_rudd Exp $
 """IncludeDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/17 15:48:55 $
+Last Revision Date: $Date: 2001/08/25 17:39:50 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.10 $"[11:-2]
+__version__ = "$Revision: 1.11 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -59,11 +59,11 @@ class IncludeDirective(TagProcessor.TagProcessor):
     def handleInclude(self, match):
         """
 
-        #include <ARGS> <EXPR> 
+        #include <ARGS> <EXPR>
+        ... uses the value of EXPR as the path of the file to include.
+
+        #include <ARGS> source = <EXPR> 
         ... includes the value of the EXPR 
-        
-        #include <ARGS> file = <EXPR> 
-        ... uses the value of EXPR as the path of the file to  include.
 
         where <ARGS> is 'raw' or 'direct'
         """
@@ -89,17 +89,20 @@ class IncludeDirective(TagProcessor.TagProcessor):
             EXPR= ' '.join(EXPR.split()[1:])
             
         ## get the path of the Cheetah code to be included or the code itself
-        if EXPR.startswith('file'):
-            includeFromFile = True
+        if EXPR.startswith('source'): # include the value of the EXPR directly
             EXPR = '='.join(EXPR.split('=')[1:])
+            translatedPlaceholder = self.translateRawPlaceholderString(EXPR)
+            includeString = self.evalPlaceholderString(translatedPlaceholder)            
+        else:                           # use the value of EXPR as the filename
+            includeFromFile = True
             translatedPlaceholder = self.translateRawPlaceholderString(EXPR)
             fileName = self.evalPlaceholderString(translatedPlaceholder)
             fileName = self.normalizePath( fileName )
             if directInclude or raw:
                 includeString = self.getFileContents( fileName )
-        else:                           # include the value of the 
-            translatedPlaceholder = self.translateRawPlaceholderString(EXPR)
-            includeString = self.evalPlaceholderString(translatedPlaceholder)
+
+
+
             
 
         ## now process finish include

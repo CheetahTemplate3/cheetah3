@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: RawDirective.py,v 1.4 2001/08/16 22:15:18 tavis_rudd Exp $
+# $Id: RawDirective.py,v 1.5 2001/08/25 17:39:50 tavis_rudd Exp $
 """RawDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/16 22:15:18 $
+Last Revision Date: $Date: 2001/08/25 17:39:50 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -59,7 +59,7 @@ class RawDirective(TagProcessor.TagProcessor):
         blockID = '_' + str(id(unparsedBlock))
         self._rawTextBlocks[blockID] = unparsedBlock
         
-        replacementStr =  startToken + 'include raw ' + \
+        replacementStr =  startToken + 'include raw source=' + \
                          self.setting('placeholderStartToken') \
                          + 'rawTextBlocks.' + blockID + endToken
         

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.22 2001/08/16 22:15:18 tavis_rudd Exp $
+# $Id: Test.py,v 1.23 2001/08/25 17:39:50 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.22 $
+Version: $Revision: 1.23 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/16 22:15:18 $
+Last Revision Date: $Date: 2001/08/25 17:39:50 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.22 $"[11:-2]
+__version__ = "$Revision: 1.23 $"[11:-2]
 
 
 ##################################################
@@ -451,7 +451,7 @@ setTests = [
 
     ['#set + use of #include',
      """#set $aSetVar = 1234
-#include $includeBlock2
+#include source=$includeBlock2
 """,
      """1 2 1234""",],
 
@@ -495,31 +495,31 @@ posixCases += rawTests
 
 includeTests = [
     ['simple #include of $blockToBeParsed - with no whitespace',
-     "#include $blockToBeParsed",
+     "#include source=$blockToBeParsed",
      "1 2",],
 
     ['simple #include of $blockToBeParsed - with whitespace',
-     "\n#include $blockToBeParsed\n",
+     "\n#include source=$blockToBeParsed\n",
      "\n1 2",],
 
     ['simple #include of file - with no whitespace & single quotes',
-     "#include file='parseTest.txt'",
+     "#include 'parseTest.txt'",
      "1 2",],
 
     ['simple #include of file - with no whitespace & double quotes',
-     '#include file ="parseTest.txt"',
+     '#include "parseTest.txt"',
      "1 2",],
 
     ['simple #include of file - with extra whitespace',
-     "#include  file = 'parseTest.txt'",
+     "#include  'parseTest.txt'",
      "1 2",],
 
     ['simple #include of file using $includeFileName',
-     "#include  file = $includeFileName",
+     "#include  $includeFileName",
      "1 2",],
 
     ['complex #include of file - preceding and trailing html and \r',
-     """<HTML>\r#include file="parseTest.txt"\r</html>""",
+     """<HTML>\r#include "parseTest.txt"\r</html>""",
      """<HTML>\r1 2</html>""",
     ],
 
@@ -529,23 +529,23 @@ posixCases += includeTests
 
 includeRawTests = [
     ['simple #include raw of $emptyString - with no whitespace',
-     "#include raw $emptyString",
+     "#include raw source=$emptyString",
      "",],
 
     ['simple #include raw of $blockToBeParsed - with no whitespace',
-     "#include raw $blockToBeParsed",
+     "#include raw source=$blockToBeParsed",
      "$numOne $numTwo",],
 
     ['simple #include raw of file - with no whitespace',
-     "#include raw file = 'parseTest.txt'",
+     "#include raw 'parseTest.txt'",
      "$numOne $numTwo",],
 
     ['simple #include raw of file - with whitespace',
-     "#include raw  file ='parseTest.txt'",
+     "#include raw 'parseTest.txt'",
      "$numOne $numTwo",],
 
     ['simple #include raw of file - with whitespace',
-     "#include raw  file =$includeFileName",
+     "#include raw $includeFileName",
      "$numOne $numTwo",],
 
     ]
@@ -673,7 +673,7 @@ macroPlusIncludeTests = [
 This is the outer template
 #test2('outer')
 #test1('outer')
-#include $nestedTDwithMacros
+#include source=$nestedTDwithMacros
 """,
      """
 
