@@ -1,15 +1,12 @@
 #!/usr/bin/env python
-# $Id: WebInputMixin.py,v 1.1 2002/06/09 22:09:00 hierro Exp $
+# $Id: WebInputMixin.py,v 1.2 2002/06/10 02:56:22 hierro Exp $
 """Mixin for Cheetah.Servlet for importing web transaction variables in bulk.
 
 This works for GET/POST fields both in Webware servlets and in CGI scripts, 
 and for cookies and session variables in Webware servlets.  If you try to
 read a cookie or session variable in a CGI script, you'll get a RuntimeError.
-
-"In a CGI script" means (1) .isCgi() exists and returns true, or (2) we're
-not running as a Webware servlet.  This allows this module to work with or
-without the optional Cheetah.Tools.CGITemplate.  If you disagree with both
-these criteria, define your own boolean .isCgi() method.
+"In a CGI script" here means "not running as a Webware servlet".  If the CGI
+environment is not properly set up, Cheetah will act like there's no input.
 
 The public method provided is:
 
@@ -163,12 +160,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2002/03/17
-Last Revision Date: $Date: 2002/06/09 22:09:00 $
+Last Revision Date: $Date: 2002/06/10 02:56:22 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.1 $"[11:-2]
+__revision__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -285,8 +282,7 @@ class WebInputMixin:
         defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00, debug=False):
         """Import web transaction variables in bulk.  See module docstring.
         """
-        isCgi = hasattr(self, 'isCgi') and self.isCgi() or \
-            not self.isControlledByWebKit
+        isCgi = not self.isControlledByWebKit
         if   isCgi and src in ('f', 'v'):
             form = cgi.FieldStorage()
             source, func = 'field',   form.getvalue
