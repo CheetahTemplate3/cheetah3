@@ -27,6 +27,7 @@ release
         // a comment
         #compiler reset
 	// no longer a comment
+  - fixed the bug that Edmund Lian found in .addSet() when useNameMapper =0 (TR)
 
 0.9.12 (April 3, 2002)
    - no code changes from beta 2

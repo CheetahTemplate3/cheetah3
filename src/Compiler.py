@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.33 2002/04/20 21:22:56 hierro Exp $
+# $Id: Compiler.py,v 1.34 2002/04/24 21:32:19 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.33 $
+Version: $Revision: 1.34 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/04/20 21:22:56 $
+Last Revision Date: $Date: 2002/04/24 21:32:19 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.33 $"[11:-2]
+__revision__ = "$Revision: 1.34 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -367,29 +367,29 @@ class MethodCompiler(SettingsManager, GenUtils):
         self.addChunk( expr )
         
     def addSet(self, LVALUE, OP, RVALUE, isGlobal=True):
-
-
-        if self.setting('useNameMapper'):
-            splitPos1 = LVALUE.find('.')
-            splitPos2 = LVALUE.find('[')
-            if splitPos1 > 0 and splitPos2==-1:
-                splitPos = splitPos1
-            elif splitPos1 > 0 and splitPos1 < max(splitPos2,0):
-                splitPos = splitPos1
-            else:
-                splitPos = splitPos2
-                
-            if splitPos >0:
-                primary = LVALUE[:splitPos]
-                secondary = LVALUE[splitPos:]
-            else:
-                primary = LVALUE
-                secondary = ''
+        ## we need to split the LVALUE to deal with globalSetVars
+        #  and keeping track of localVars for this method
+        splitPos1 = LVALUE.find('.')
+        splitPos2 = LVALUE.find('[')
+        if splitPos1 > 0 and splitPos2==-1:
+            splitPos = splitPos1
+        elif splitPos1 > 0 and splitPos1 < max(splitPos2,0):
+            splitPos = splitPos1
+        else:
+            splitPos = splitPos2
+            
+        if splitPos >0:
+            primary = LVALUE[:splitPos]
+            secondary = LVALUE[splitPos:]
+        else:
+            primary = LVALUE
+            secondary = ''
 
         if isGlobal:
             LVALUE = 'globalSetVars["' + primary + '"]' + secondary            
         else:
-            self.addLocalVars( (primary,) )
+            if primary not in self._localVars:
+                self.addLocalVars( (primary,) )
             
         self.addChunk( LVALUE + ' ' + OP + ' ' + RVALUE.strip() )
 
