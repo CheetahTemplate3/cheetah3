@@ -68,8 +68,6 @@ Other TODO Items
 
 - 'errorCatcher None' to stop catching errors in the middle of a template.
 
-- Finish up changes to #indent so that it matches the Users' Guide. (MO)
-
 
 Dump Tools
 ==========
@@ -80,29 +78,29 @@ Template, which would print a stanza in the output showing all searchList
 variables and their values.  $dumpSearchList would group by searchList
 element; $dumpSearchListFlat would combine all into a single
 alphabetical listing.
-	I made an experimental version but it printed only instance variables,
+        I made an experimental version but it printed only instance variables,
 not methods and not inherited attributes.  Also, it wouldn't print right
 using the usual pattern of write-to-custom-StringIO-object-and-return-
 the-.getvalue() and I couldn't figure out why.
-	The stanza should be set apart by a row of stars with the words
+        The stanza should be set apart by a row of stars with the words
 "BEGIN/END SEARCH LIST DUMP".  Then for $dumpSearchList, precede each
 group with "*** searchList[i], type <element type>, 142 variables ***".
-	Because some elements like 'self' may have hundreds of inherited
+        Because some elements like 'self' may have hundreds of inherited
 methods that would create a forest-through-trees situation for the user,
 we may need an option to supress the variable listing for elements with
 > 20 variables (just print the summary line instead). ?
-	The final version should be in Template so it has implicit
+        The final version should be in Template so it has implicit
 access to the searchList and perhaps later to other variables (locals,
 globals, "#set global"s, builtins) too.  This is such a central
 debugging tool that you should not have to monopolize an #extends
 (the template's only #extends) to use it.  You could import it, however,
 if you pass in the searchList explicitly as an argument.  In that case,
 perhaps we can base it on a generic module for dumping variables/values.
-	Note that we cannot simply depend on str() and pprint, because
+        Note that we cannot simply depend on str() and pprint, because
 we need to show instances as dictionaries.  Likewise, dir() and vars()
 may get us part of the distance, but only if they show methods and
 inherited attributes too.  
-	These functions should print only top-level variables, not
+        These functions should print only top-level variables, not
 the subelements of collections.  I.e, if the first searchList element
 is a dictionary, show its keys/values, but do not expand any 
 subvalues if they are dictionaries too, unless the display tool happens
@@ -131,26 +129,61 @@ Rewrite the caching framework
 Make a wrapper function in the .py template module that builds a searchList
 from its positional arguments, then instantiates and fills a template and
 returns the result.  The preceding example would create a function thus:
-	def func(arg1, arg2="default", searchList=None, **kw):
-		"""Function docstring."""
-		sl = {'arg1': arg1, 'arg2': arg2}
-		if searchList is None:
-			searchList = [sl]
-		elif type(searchList) == types.ListType:
-			searchList.insert(0, sl)
-		else:
-			raise TypeError("arg 'searchList'")
-		t = TheTemplate(searchList=searchList, **kw)
-		return str(t)
+        def func(arg1, arg2="default", searchList=None, **kw):
+                """Function docstring."""
+                sl = {'arg1': arg1, 'arg2': arg2}
+                if searchList is None:
+                        searchList = [sl]
+                elif type(searchList) == types.ListType:
+                        searchList.insert(0, sl)
+                else:
+                        raise TypeError("arg 'searchList'")
+                t = TheTemplate(searchList=searchList, **kw)
+                return str(t)
 ##doc-entry: and #*doc-entry: comments are appended to the function docstring.
-	Finally, make this function accessible directly from the shell.
+        Finally, make this function accessible directly from the shell.
 If there are any non-option arguments on the command line, call the function
 instead of filling the template the normal way.  
-	This would perhaps make more sense as arguments to .respond().  But
+        This would perhaps make more sense as arguments to .respond().  But
 .respond() has that pesky 'trans' argument that mustn't be interfered with,
 and other programs may assume .respond() takes only one argument.  Also, 
 when called via str(), str() cannot take arguments.
-	
+        
+#indent
+========================================================================
+The current indenter is a kludge that has an indentation object, with
+implicit placeholder calls added at each line to generate the indentation,
+and #silent calls to adjust the object.  It should be reimplemented to
+generate code to call the indentation object directly.  Also, the user
+interface should be cleaned up, the implementation and Users' Guide
+synchronized, and test cases built.
+
+The desired implementation revolves around self._indenter, which knows the
+current indentation level (a non-negative integer), chars (the string output
+per level, default four spaces), and stack (the previous indentation levels).
+The .indent() method returns the indentation string currently appropriate.
+The desired interface so far:
+  #indent strip    ; strip leading whitespace from input lines
+  #indent add      ; add indentation to output lines as appropriate
+  #indent on       ; do both
+  #indent off      ; do neither
+  #indent reset    ; set level to 0 and clear stack
+  #indent ++       ; increment level
+  #indent --       ; decrement level
+  #indent pop [EXPR]   ; revert to Nth previous level (default 1)
+                   ; if pop past end of stack, set level to 0 and
+                   ; clear stack.  All +/-/= operations push the old level
+                   ; onto the stack.
+  #indent debug    ; dump level, chars and stack to template output
+
+Possible extensions:
+  #indent =EXPR    ; set level to N
+  #indent +EXPR    ; add N to level (not very necessary)
+  #indent -EXPR    ; subtract N from level (not very necessary)
+
+There should be one indentation object per Template instance, shared by
+methods and include files.
+
 
 Upload File
 ========================================================================
@@ -165,7 +198,7 @@ desirable situations where we just want to save the file, not read it into
 memory.  Reject files larger than a user-specified size or not in a list of
 user-approved MIME types.  Define appropriate exceptions for typical
 file-upload errors.  Method name .webUploadFileAsString?
-	One situation to support is when  form has a text(area) field
+        One situation to support is when  form has a text(area) field
 related to a file-upload control on the same form, and the user has the choice
 of typing into the field or uploading a text file.  We need a method that
 updates the text field's value if there is an uploaded file, but not if there
