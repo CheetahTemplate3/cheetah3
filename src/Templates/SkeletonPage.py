@@ -1,23 +1,23 @@
 #!/usr/bin/env python
-# $Id: SkeletonPage.py,v 1.3 2001/06/18 22:25:09 tavis_rudd Exp $
+# $Id: SkeletonPage.py,v 1.4 2001/08/08 07:13:49 tavis_rudd Exp $
 """A skeleton page template for use with the Cheetah package
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/06/18 22:25:09 $
+Last Revision Date: $Date: 2001/08/08 07:13:49 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
 
 import types, os, sys
 
-
+# intra-package imports ...
 from Cheetah.Servlet import TemplateServlet
 import Cheetah.Macros.HTML as HTMLMacros
 from Cheetah.Macros.HTML import spacer, currentYr, formHTMLTag, formatMetaTags
@@ -31,7 +31,7 @@ False = (0==1)
 ##################################################
 ## TEMPLATE ELEMENTS ##
 
-template = """$*docType
+templateDef = """$*docType
 <HTML>
 ####################
 #block headerComment
@@ -81,11 +81,14 @@ This skeleton page has no flesh. Its body needs to be implemented.
 class SkeletonPage(TemplateServlet):
     """A Skeleton HTML page template"""
     
-    def __init__(self, template=template, *searchList, **kw):
-        """ """
+    def __init__(self, templateDef=templateDef, *searchList, **kw):
+        
+        """Load the Cheetah.Macros.HTML macro library and register self.imgTag()
+        as the #imgTag() macro."""
+        
         self.loadMacrosFromModule(HTMLMacros)
         self.loadMacro('imgTag', self.imgTag )       
-        TemplateServlet.__init__(self, template, *searchList, **kw)
+        TemplateServlet.__init__(self, templateDef, *searchList, **kw)
        
     ## Default values for the names embedded in the template ##
     
@@ -105,13 +108,19 @@ class SkeletonPage(TemplateServlet):
    
 
     def metaTags(self):
-        """ """
+        """Return a formatted vesion of the self._metaTags dictionary."""
         if not hasattr(self,'_metaTags'):
             return ''
         else:
             formatMetaTags(self._metaTags)
     
     def stylesheetTags(self):
+        """Return a formatted version of the self._stylesheetLibs and
+        self._stylesheets dictionaries.  The keys in self._stylesheets must
+        be listed in the order that they should appear in the list
+        self._stylesheetsOrder, to ensure that the style rules are defined in
+        the correct order."""
+        
         stylesheetTagsTxt = ''
         if hasattr(self,'_stylesheetLibs'):
             for title, src in self._stylesheetLibs.items():
@@ -141,12 +150,25 @@ class SkeletonPage(TemplateServlet):
         return stylesheetTagsTxt.strip()
 
     def javascriptTags(self):
-        if not hasattr(self,'_javascriptTags'):
-            return ''
-        #else...
+        
+        """Return a formatted version of the self._javascriptTags and
+        self._javascriptLibs dictionaries.  Each value in self._javascriptTags
+        should be a either a code string to include, or a list containing the
+        JavaScript version number and the code string. The keys can be anything.
+        The same applies for self._javascriptLibs, but the string should be the
+        SRC filename rather than a code string."""
+        
         javascriptTagsTxt = []
-        if self._javascriptTags.has_key('libs'):
-            for title, details in self._javascriptTags['libs'].items():
+        if hasattr(self,'_javascriptTags'):
+            for key, details in self._javascriptTags.items():
+                if type(details) not in (types.ListType, types.TupleType):
+                    details = ['',details]
+
+                javascriptTagsTxt += ['<SCRIPT LANGUAGE="JavaScript', str(details[0]),
+                                      '" ><!--\n', str(details[0]), '\n//--></SCRIPT>\n']
+                
+        if hasattr(self,'_javascriptLibs'):
+            for key, details in self._javascriptlibs.items():
                 if type(details) not in (types.ListType, types.TupleType):
                     details = ['',details]
 
@@ -155,6 +177,7 @@ class SkeletonPage(TemplateServlet):
         return ''.join(javascriptTagsTxt)
     
     def bodyTag(self):
+        """Create a body tag from the entries in the dict self._bodyTagAttribs."""
         if not hasattr(self,'bodyTagAttribs'):
             self.bodyTagAttribs = {}
 
@@ -163,12 +186,14 @@ class SkeletonPage(TemplateServlet):
 
 
     def imgTag(self, src, alt='', width=None, height=None, border=0):
-        """dynamically generate an image tag
-
-        The dimensions are calculated using PIL or ImageMagick if they are available."""
+        
+        """Dynamically generate an image tag.  Cheetah will try to convert the
+        src argument to a WebKit serverSidePath relative to the servlet's
+        location. If width and height aren't specified they are calculated using
+        PIL or ImageMagick if available."""
+        
         try:
             src = self.serverSidePath(src)
-            print src
         except:
             pass
         
@@ -179,14 +204,19 @@ class SkeletonPage(TemplateServlet):
                     im = Image.open(src)
                     calcWidth, calcHeight = im.size
                     del im
+                    if not width: width = calcWidth
+                    if not height: height = calcHeight
+
                 except:
                     try:                # try imageMagick instead
-                        calcWidth, calcHeight = os.popen('identify -format "%w,%h" ' + src).read().split(',')
+                        calcWidth, calcHeight = os.popen(
+                            'identify -format "%w,%h" ' + src).read().split(',')
+                        if not width: width = calcWidth
+                        if not height: height = calcHeight
+            
                     except:
                         pass
                 
-            if not width: width = calcWidth
-            if not height: height = calcHeight
             
             return ''.join(['<IMG SRC="', src, '" WIDTH=', str(width), ' HEIGHT=', str(height),
                            ' ALT="', alt, '" BORDER=', str(border), '>'])
