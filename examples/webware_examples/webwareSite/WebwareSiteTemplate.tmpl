@@ -1,0 +1,459 @@
+#extend Cheetah.Templates.SkeletonPage
+
+##============================================================================##
+## macros for the Webware site
+
+#macro Python()
+<A HREF="http://www.python.org">Python</A>
+#end macro
+
+#macro PHP()
+<A HREF="http://www.php.net">PHP</A>
+#end macro
+
+#macro Zope()
+<A HREF="http://www.zope.org">Zope</A>
+#end macro
+
+#macro ASP()
+<A HREF="http://www.asp.net">ASP</A>
+#end macro
+
+#macro JSP()
+<A HREF="http://java.sun.com/products/jsp/">JSP</A>
+#end macro
+
+#macro ColdFusion()
+<A HREF="http://www.allaire.com">ColdFusion</A>
+#end macro
+
+#macro ASP()
+<A HREF="http://www.asp.net">ASP</A>
+#end macro
+
+#macro insetBox(width=170, boxTitle='', boxContents='')
+#cache
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$width>
+  <TR>
+    <TD COLSPAN=3 HEIGHT=1 BGCOLOR="$insetBoxes.titleFrameColor">#spacer()</TD>
+  </TR>
+  <TR>
+    <TD WIDTH=1 BGCOLOR="$insetBoxes.titleFrameColor">#spacer()</TD>
+    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD> ## force full width 
+    <TD WIDTH=1 BGCOLOR="$insetBoxes.titleFrameColor">#spacer()</TD>
+  </TR>
+  <TR>
+    <TD WIDTH=1 BGCOLOR="$insetBoxes.titleFrameColor">#spacer()</TD>
+    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$mainTbl.innerFrameColor">  ## force full width 
+       <DIV CLASS="insetBoxTitleContainer"><DIV CLASS="insetBoxTitle">$boxTitle</DIV></DIV>
+    </TD>
+    <TD WIDTH=1 BGCOLOR="$insetBoxes.titleFrameColor">#spacer()</TD>
+  </TR>
+  <TR>
+    <TD WIDTH=1 BGCOLOR="$insetBoxes.titleFrameColor">#spacer()</TD>
+    <TD WIDTH=900 HEIGHT=1 BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD> ## force full width 
+    <TD WIDTH=1 BGCOLOR="$insetBoxes.titleFrameColor">#spacer()</TD>
+  </TR>
+  <TR>
+    <TD COLSPAN=3 HEIGHT=1 BGCOLOR="$insetBoxes.titleFrameColor">#spacer()</TD>
+  </TR>
+</TABLE>
+	    
+<TABLE VALIGN="top" WIDTH=$width BORDER=0 CELLPADDING=0 CELLSPACING=0>
+  <TR>
+    <TD WIDTH=1 bgcolor="$insetBoxes.frameColor">#spacer()</TD>
+    <TD WIDTH=900 BGCOLOR="$insetBoxes.bgcolor">  ## force to full width 
+    ## now begin the contents cell of the insetBox
+#end cache    
+    $boxContents
+#cache    
+    ## end insetBox	
+    </TD>
+    <TD WIDTH=1 BGCOLOR="$insetBoxes.frameColor">#spacer()</TD>
+  </TR>
+</TABLE>
+
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$width>
+  <TR>
+    <TD HEIGHT=1 BGCOLOR="$insetBoxes.frameColor">#spacer()</TD>
+  </TR>
+</TABLE>
+#end cache
+#end macro
+##============================================================================##
+
+
+
+##============================================================================##
+#data
+
+title = "Webware - The Python-Powered Internet Platform"
+siteDomainName = "webware.sourceforge.net"
+siteCopyrightName= "The Webware Development Team"
+
+
+bodyTagAttribs = {"bgcolor": "black",
+                  "text":"#000033", #333333
+                  }
+
+navBar = {"bgcolor":"#3366CC", #EBEBEB #E0E0E0
+          }
+
+locationBar = {"bgcolor":"#3366CC", #EBEBEB #E0E0E0
+               "frameColor":"#CCCCCC",
+              }
+
+mainTbl = {"width":"90%",
+           "align":"center",
+           "contentsBgColor":"white",
+           "outerFrameColor":"#6699FF", #FFC850 #BDD4F1
+           "innerFrameColor":"#3366CC", #0059B2
+           "innerFrameWidth":8,
+           }
+
+insetBoxes = {"width":170,
+              "frameColor":"#DDDDDD", #000033
+              "titleFrameColor":"black", #000033
+              "bgcolor":"#FAFAFA",
+              }
+
+
+_sanSerifFonts = """helvetica, arial, "lucida sans", sans-serif"""
+
+_stylesheets = {
+  "H1.mainText": {"margin":"7px 2px",
+                  "font-size":"small",
+                  "font-weight":"bold",
+                  "font-family": _sanSerifFonts,
+                  },
+  ".mainText": {"margin-left":"10px"},
+  
+  ".navBarContainer": {"padding": "4px 0px", "color":"white"},
+  ".navBar, A.navBar:link, A.navBar:visited": {"font-size":"small",
+                                               "font-weight":"bold",
+                                               "color":"white",
+                                               "text-decoration":"none",
+                                               "font-family": _sanSerifFonts,
+                                               },
+  "A.navBar:hover, A.navBar:active": {"text-decoration":"underline"},
+  
+  ".locationBarContainer": {"padding": "2px 10px"},
+  ".locationBar, A.locationBar:link, A.locationBar:visited": {"font-size":"x-small",
+                                                              "color":"#666666",
+                                                              "text-decoration":"none",
+                                                              "font-family": _sanSerifFonts,
+                                                              },
+  "A.locationBar:hover, A.locationBar:active": {"text-decoration":"underline"},
+
+  ".copyrightFooter": {"color":"white", "font-size":"9pt"},
+
+  ".insetBoxTitleContainer":{"padding": "2px 5px",
+                             "color":"white",
+                             "font-weight":"bold",
+                             },
+  ".insetBoxTitle":{"color":"white",
+                    "font-size":"x-small",
+                    "font-weight":"bold",
+                    "text-decoration":"none",
+                    "font-family": _sanSerifFonts,
+                    },
+  ".insetBoxContainer":{"padding": "2px 2px 2px 5px"},
+  ".insetBox":{"font-size":"x-small",
+               "font-family": _sanSerifFonts,
+               },
+  "H1.insetBox":{"margin": "5px 5px",
+                 "padding": "0px",
+                 "font-size":"x-small",
+                 "font-weight":"bold",
+                 "font-family": _sanSerifFonts
+                 },
+               
+  "P.insetBox":{"margin": "2px 5px 7px 10px",
+                "padding": "0px",
+                "font-family": _sanSerifFonts
+                },
+  "A.insetBox:link, A.insetBox:visited":{"font-size":"x-small",
+                                         "text-decoration":"none",
+                                         },
+  "A.insetBox:hover, A.insetBox:active": {"text-decoration":"underline"},
+  
+  ".listItems": {"margin-bottom":"200px"},
+  }
+  
+_stylesheetsOrder = ["H1.mainText",
+                     ".mainText",
+                     ".navBarContainer",
+                     ".navBar, A.navBar:link, A.navBar:visited",
+                     "A.navBar:hover, A.navBar:active",
+                     ".locationBarContainer",
+                     ".locationBar, A.locationBar:link, A.locationBar:visited",
+                     "A.locationBar:hover, A.locationBar:active",
+                     ".copyrightFooter",
+                     ".insetBoxTitleContainer",
+                     ".insetBoxTitle",
+                     ".insetBoxContainer",
+                     ".insetBox",
+                     "H1.insetBox",
+                     "P.insetBox",
+                     "A.insetBox:link, A.insetBox:visited",
+                     "A.insetBox:hover, A.insetBox:active",
+                     ".listItems",
+                     ]
+
+#end data
+##============================================================================##
+
+
+##============================================================================##
+## from SkeletonPage
+#redefine bodyContents
+
+#####################
+#block header
+                    
+#end block header
+#####################
+
+<TABLE ALIGN=$mainTbl.align BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$mainTbl.width>
+  <TR>
+    <TD>
+    #####################
+    #block mainTblOuterHeader
+    <DIV ALIGN="center"><IMG SRC="webware_title_red-white_fat.gif" ALT="Webware"></DIV>
+    <DIV ALIGN="center"><IMG SRC="webware_subtitle_black.gif" ALT="The
+    Python-Powered Internet Platform"></DIV>
+    #spacer(1,5)
+    
+    #end block mainTblOuterHeader
+    #####################
+    </TD>
+  </TR>
+  <TR>
+    <TD WIDTH=1 HEIGHT=1 bgcolor="$mainTbl.outerFrameColor">#spacer()</TD>
+    ## top line of the mainTbl frame
+  </TR>
+</TABLE>
+
+
+<TABLE ALIGN=$mainTbl.align BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$mainTbl.width>
+  <TR>
+    <TD WIDTH=1 bgcolor="$mainTbl.outerFrameColor">#spacer()</TD>
+    <TD WIDTH=900> ## force to full width in Netscape
+    #####################
+    #block mainTblInnerHeader
+	
+    ##############
+    #block navBar
+    <TABLE WIDTH=100% BGCOLOR="$navBar.bgcolor" BORDER=0 CELLPADDING=0 CELLSPACING=0>
+      <TR>
+	<TD>
+	    <DIV ALIGN="center" CLASS="navBarContainer">
+            <A CLASS="navBar" HREF="index.py">Home</A>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+	    <A CLASS="navBar" HREF="learn.py">Learn</A>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;	    
+	    <A CLASS="navBar" HREF="download.py">Download</A>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+	    <A CLASS="navBar" HREF="contribute.py">Contribute</A>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+	    <A CLASS="navBar" HREF="communicate.py">Communicate</A>
+	    </DIV>
+	</TD>
+      </TR>
+    </TABLE>
+    #end block navBar
+    ##############
+
+    #end block mainTblInnerHeader
+    #####################
+    </TD>
+    <TD WIDTH="1" bgcolor="$mainTbl.outerFrameColor">#spacer()</TD>
+  </TR>
+</TABLE>
+
+<TABLE ALIGN=$mainTbl.align BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$mainTbl.width>
+  <TR>
+    <TD WIDTH=1 BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD>
+    <TD WIDTH=$mainTbl.innerFrameWidth bgcolor="$mainTbl.innerFrameColor">#spacer()</TD>
+    <TD WIDTH=900 HEIGHT=1 BGCOLOR="black">#spacer(100)</TD> ## force to full width in Netscape
+    <TD WIDTH=$mainTbl.innerFrameWidth bgcolor="$mainTbl.innerFrameColor">#spacer()</TD>
+    <TD WIDTH="1" BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD>
+  </TR>
+</TABLE>
+
+
+## MainTbl - contents ##
+
+<TABLE ALIGN=$mainTbl.align VALIGN="top" BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$mainTbl.width>
+  <TR>
+    <TD WIDTH=1 BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD>
+    <TD WIDTH=$mainTbl.innerFrameWidth bgcolor="$mainTbl.innerFrameColor">#spacer()</TD>
+    <TD WIDTH=1 BGCOLOR="black">#spacer()</TD>
+    
+    <TD BGCOLOR="$mainTbl.contentsBgColor">
+    
+    ###################
+    #block locationBar
+    <TABLE WIDTH=100% BGCOLOR="#EBEBEB" BORDER=0 CELLPADDING=0 CELLSPACING=0>
+      <TR>
+	<TD>
+	    <DIV CLASS="locationBarContainer">
+            ###################
+            #block locationBarContents
+            <A CLASS="locationBar" HREF="index.py">Home</A>&nbsp;&gt;&nbsp; 
+	    <A CLASS="locationBar" HREF="download.py">Download</A>
+            #end block locationBarContents
+            ###################
+	    </DIV>
+	</TD>
+      </TR>
+      <TR>
+	<TD HEIGHT=1 BGCOLOR="$locationBar.frameColor">#spacer()</TD>
+      </TR>
+    </TABLE>
+    
+    #end block locationBar
+    ###################
+
+    
+    
+    ######################
+    #block mainTblContents
+
+    #spacer(1,5)
+    
+    <TABLE VALIGN="top" WIDTH=100% BORDER=0 CELLPADDING=10 CELLSPACING=0>
+      <TR>
+        <TD VALIGN="top">
+	    ################
+	    #block leftSideBar
+	    <DIV ALIGN="center"><IMG SRC="onion_blue_on_white.gif" ALT=""></DIV>
+	    
+	    <BR>
+            
+	    ##======================================
+            #callMacro insetBox(boxTitle="Sections")
+            #arg boxContents
+	      <DIV CLASS="insetBox">
+	    
+	      <H1 CLASS="insetBox"><A CLASS="insetBox" HREF="learn.py">Learn</A></H1>
+	      <P CLASS="insetBox">
+              Manual<BR>
+	      Tutorials<BR>
+	      Tips and Tricks<BR>
+              Articles<BR>
+	      Language Comparisons<BR>
+	      Developer Information<BR>
+	      </P>
+	      
+	      <H1 CLASS="insetBox"><A CLASS="insetBox" HREF="download.py">Download</A></H1>
+	      <P CLASS="insetBox">
+	      Stable Releases<BR>
+	      CVS Snapshots<BR>
+	      Third-Party Packages<BR>
+	      Browse the CVS<BR>
+	      </P>
+	      
+	      <H1 CLASS="insetBox"><A CLASS="insetBox" HREF="contribute.py">Contribute</A></H1>
+	      <P CLASS="insetBox">
+	      Links to Webware Sites<BR>
+	      Bug Reports<BR>
+	      Patches and New Code<BR>
+	      Tutorials<BR>
+	      Tips and Tricks<BR>
+	      Articles<BR>
+	      Language Comparisons<BR>
+	      </P>
+	      
+	      <H1 CLASS="insetBox"><A CLASS="insetBox" HREF="communicate.py">Communicate</A></H1>
+	      <P CLASS="insetBox">
+	      News<BR>
+	      Mailing Lists<BR>
+	      The Developers<BR>
+	      Introduce Yourself<BR>
+	      </P>
+            
+	      </DIV> ## end insetBox           
+            #end arg
+            #end callMacro
+	    ##======================================
+            
+	    #end block leftSideBar
+	    ################
+	    
+        </TD>
+        <TD VALIGN="top" WIDTH=80%>
+	    ########################
+	    #block mainContentsCell
+	    #end block mainContentsCell
+	    ########################
+        </TD>	    
+      </TR>
+    </TABLE>
+
+    #spacer(1,200)
+    #end block mainTblContents
+    ######################    
+    </TD>
+    
+    <TD WIDTH=1 BGCOLOR="black">#spacer()</TD>
+    <TD WIDTH=$mainTbl.innerFrameWidth BGCOLOR="$mainTbl.innerFrameColor">#spacer()</TD>
+    <TD WIDTH="1" BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD>
+  </TR>
+</TABLE>
+
+
+## MainTbl - closure ##
+<TABLE ALIGN=$mainTbl.align BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$mainTbl.width>
+  <TR>
+    <TD WIDTH=1 BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD>
+    <TD WIDTH=$mainTbl.innerFrameWidth bgcolor="$mainTbl.innerFrameColor">#spacer()</TD>
+    <TD WIDTH=900 BGCOLOR="black">#spacer(100)</TD> ## force to full width in Netscape
+    <TD WIDTH=$mainTbl.innerFrameWidth bgcolor="$mainTbl.innerFrameColor">#spacer()</TD>
+    <TD WIDTH="1" BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD>
+  </TR>
+</TABLE>
+
+<TABLE ALIGN=$mainTbl.align BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$mainTbl.width>
+  <TR>
+    <TD WIDTH=1 BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD>
+    <TD WIDTH=900 BGCOLOR="$mainTbl.innerFrameColor">#spacer(1,25)</TD> ## force to full width in Netscape
+    <TD WIDTH="1" BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD>
+  </TR>
+</TABLE>
+
+<TABLE ALIGN=$mainTbl.align BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$mainTbl.width>
+  <TR>
+    <TD WIDTH=1 HEIGHT=1 BGCOLOR="$mainTbl.outerFrameColor">#spacer()</TD>
+  </TR>
+  <TR>
+    <TD>
+	#####################
+	#block mainTblOuterFooter
+	<DIV CLASS="copyrightFooter">
+        Copyright &copy; 1999 - #currentYr() The Webware Development Team. All rights reserved.
+        </DIV>
+        <BR>
+
+	<DIV CLASS="copyrightFooter" ALIGN="center">Hosted on<BR>
+	<A HREF="http://sourceforge.net"><IMG BORDER=0 SRC="sourceforge_logo.gif" ALT="sourceforge.net"></A>
+	</DIV>
+	
+        ##<DIV ALIGN="center"><IMG SRC="webware_logo.gif"></DIV>
+        ##<DIV ALIGN="center"><IMG SRC="webware_slogan_bw.gif"></DIV>
+	
+	#end block mainTblOuterFooter
+	#####################
+    </TD>
+  </TR>
+</TABLE>
+
+
+#####################
+#block footer
+<BR>
+<BR>
+<BR>
+#end block footer
+#####################
+
+
+#end redefine bodyContents
+## from SkeletonPage
+##============================================================================##

@@ -1,0 +1,54 @@
+Cheetah TODO list
+
+When a task is completed please change its - to an ! and move it to the bottom
+of the list.
+
+Specification
+================================================================================
+- firm up the list of features/syntax that are not subject to change
+- firm up the NamedValueAccess syntax (along with new test cases)
+
+Implementation
+================================================================================
+- design and implement the new parser we've been discussing
+- reimplement the #include directive so it monitors for changes to 
+  the included files
+- redesign and implement the Servlet Factory for Webware so the #extend directive
+  will work with .tmpl files as well as .py files
+- make sure that all the #directives that have start and end tags are
+  implemented in such a way that they won't cause 'maximum recursion' limit
+  errors if their content block is long.  Simple regexes won't cut it in these 
+  cases.
+
+Test Suite
+================================================================================
+- write script that will run the test cases with both Python 2.0 and 2.1
+- independent suite of test cases for NameMapper 
+- test cases for the PSP plugin
+- test cases for the SkeletonPage framework
+
+Documentation
+================================================================================
+- add the list of what's stable and what's not to the 'How Mature is Cheetah'
+  section
+- finish all the empty sections
+- flesh out the 'Quick Tutorial' in the 'Getting Started' section
+- add the glossary
+- add an 'Information for Developers' Section
+- add examples to the Examples section
+
+Website
+================================================================================
+- automate the documentation update (including regenerating the learn.html page)
+- add links to the CVS + some instructions
+- See if we can get WebKit working on Sourceforge...
+
+Examples
+================================================================================
+- create some non-html code generation examples
+
+Packaging
+================================================================================
+- Consider moving SettingsManager.py and NameMapper.py into the 
+  third_party_packages dir and making setup_all.py the main install script
+! make 'setup.py sdist_docs' generate the update docs by executing the Makefile

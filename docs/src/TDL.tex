@@ -1,0 +1,348 @@
+\section{The Template Definition Language}
+
+{\bf Template definitions} are text strings, or files, that have been marked up
+with Cheetah tags for special processing.  Cheetah has 2 types of tags:
+
+\begin{enumerate}
+\item {\bf placeholders}: for marking areas of the template that should be
+     replaced with something. 
+     
+     Placeholders begin with a dollar sign (\code{\$varName}).
+
+\item {\bf directives}: for everything else:
+     \begin{enumerate}   % level 2
+     \item {\bf raw text} for marking verbatim blocks should not be parsed for
+          Cheetah tags.
+     \item {\bf comments} that should not appear in the output
+     \item {\bf includes} to include external text.  The text can be included
+          verbatim or with parsing for Cheetah tags.
+     \item {\bf display logic} such as {\bf conditional blocks} (if-blocks) and
+          {\bf for loops}
+     \item {\bf blocks}, which are named sections of a template that can be
+          redefined (overridden) in a subclass or by template users
+     \item etc.
+     \end{enumerate}  % level 2
+
+     Directives begin with a hash character (\#).
+
+\end{enumerate}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Placeholder tags}
+Cheetah uses placeholder tags in the form \code{\$varName} to mark out
+areas of the template definition that should be replaced with something.  Placeholders are
+equivalent to {\bf fields} on a form.  Placeholders can be replaced with plain
+content or variables, objects and function output from Python.
+
+The example below demonstrates the use of placeholders in an HTML document.
+
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+$contents
+</BODY>
+</HTML>
+\end{verbatim}
+
+When this template is filled in, the placeholders \code{\$title} and
+\code{\$content} will be replaced with the values of the variables \code{title}
+and \code{content}.
+
+\subsubsection{Rules for placeholder names}
+\begin{itemize} 
+
+\item Cheetah ignores all dollar signs (\code{\$}) that are not followed
+     by a letter or an underscore.  As a corollary, dollar amounts
+     (\code{\$2.50})are not placeholders but are instead output literally as
+     they should be.  Cheetah also ignores any placeholder escaped by a
+     backslash (\code{$\backslash$\$placeholderName}).
+     
+\item The first character of a placeholder name must be either an underscore or
+     a letter. Valid characters for the rest of the name are underscores,
+     letters, numbers and periods.  These names are valid: \code{\$a},
+     \code{\$_}, \code{\$var}, \code{\$_var}, \code{\$var1}, \code{\$_1var},
+     \code{\$var2_}, \code{\$dict.key}, \code{\$list.item},
+     \code{\$object.method}.  These names are not: \code{\$1}, \code{\$var@2},
+     \code{\$\^var}.
+
+\item names are case-sensitive. \code{\$var} does not equal \code{\$Var}
+     or \code{\$vAr} or \code{\$VAR}.     
+     
+\item Trailing periods are ignored.  Cheetah will recognize that
+     placeholder name in \code{\$varName.} is \code{varName} and the period will
+     be left alone in the filled template output.
+     
+\item Placeholders can also be written in the form \code{\$\{placeholderName\}}.
+     This is useful for cases where there is no whitespace between the
+     placeholder and surrounding text (\code{surrounding\$\{embeddedVar\}text}).
+\end{itemize} 
+
+\subsubsection{The searchList}
+A {\bf namespace} is a Python dictionary that links names to values. Each
+template definition that has been loaded into a \code{Template} objet is
+associated with an ordered list of namespaces in which values for placeholder
+variable names can be stored.  This list is called the {\bf searchList}.
+
+The searchList can contain one or more namespaces.  In most cases only one
+namespace will be in the searchList unless you explicitly load extra ones.  When
+Cheetah fills in \code{\$content} in previous example it searchs
+sequentially through the searchList until it finds a value for \code{\$content}.
+Thus, if three namespaces are loaded and two of them contain a value for
+\code{\$content}, the value for \code{content} from the namespace that is
+closest to the start of the searchList will be returned.
+
+If you add a Python object to the searchList, its attributes and methods will be
+accessible as placeholder names.  For example, \code{myObject} contains
+\code{myAttrib} and \code{myMethod}.  If \code{myObject} is added to the
+searchList, \code{\$myAttrib} and \code{\$myMethod} can be used as placeholder
+names.  
+
+The default namespace in every searchList is the \code{Template} object itself.
+This means that any attributes or methods that are added to classes that inherit
+from \code{Template} can be accessed in templates via \code{\$placeholders}.  New
+namespaces can be added to the searchList at any time using the
+\code{Template.addToSearchList()} method.  See section \ref{webware} for more
+information on how to use namespaces and the searchList.
+
+\subsubsection{Placeholder values}
+
+Placeholder names can map to Python text strings, numbers, dictionaries, lists
+(arrays), functions, objects, or even nested Cheetah templates.  If the value is
+not a String, Cheetah will call \code{str()} on it to obtain a string
+representation that can be inserted into the template.  But if the value is a
+callable object (e.g., a function or a method), Cheetah will first call it and
+then call \code{str()} on the result.  You may include or omit the () after
+callable placeholders: Cheetah will call it (without arguments) in either case.
+
+
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+
+$aString                        ## these names are chosen to indicate what
+$aNumber                        ## type of value they map to.  They could be
+$aList                          ## any valid placeholder name.
+$aDictionary
+$aFunction
+$anObject
+
+</BODY>
+</HTML>
+\end{verbatim}
+
+Note that you don't need to include () after \code{\$aFunction}.  Cheetah
+will recognize callable variables like functions and methods, call them and
+interpolate their return value in the filled template output.
+
+You cannot pass arguments to a function or method called this way.  (Actually,
+you can, but this feature may be removed soon, because it introduces too much
+complexity that is better done in Python outside the template.)  The function or
+method must either accept no arguments, or all its arguments must have default
+values.  Macro calls (see the Macros section) can accept arguments, but we
+aren't talking about macros here.
+
+Templates can be nested. It is valid to embed a placeholder name that maps to
+another \code{Template} object.  The filled output of the nested template will be
+interpolated into the top-level template's output.  There is no limit on the
+depth of template nesting.
+
+\subsubsection{Placeholders with no value defined}
+If there is no value defined in the searchList for a placeholder name,
+Cheetah will search for an leading underscore version of the name.  For
+example, if it can't find \code{\$varName} it will attempt to find
+\code{\$_varName}.  If that fails, Cheetah will include the placeholder
+tag verbatim in the filled template output.
+
+This behaviour can be customized and a default value can be set for names
+that are not found. See section \ref{customizing} for more details.
+
+\subsubsection{Dotted notation}
+Placeholder names can also use {\bf dotted notation} to access entries in
+dictionaries, items in lists, and the attributes and methods of objects.
+Cheetah uses a consistent dotted notation syntax to access the contents
+of all types of containers.  This is unlike Python, C++, Java, and other
+languages where dotted notation can only be used to access the attributes and
+methods of objects. \footnote{Cheetah uses a Python module called
+  NameMapper to handle this style of dotted notation.  NameMapper is distributed
+  as part of the Cheetah package and can be used as a stand-alone tool.
+  NameMapper was inspired by Chuck Esterbrook's NamedValueAccess module.}
+
+\begin{verbatim}
+$aDictionary.keyName            ## must be a valid key of the dictionary 
+$aList.3                        ## must be a valid index (0-based like in Python)
+$anObject.attributeName         ## must be a valid attribute name
+$anObject.method                ## must be a valid method name, 
+                                ##   leave off the parentheses on method()
+\end{verbatim}
+
+
+Dotted notation can be used on nested containers of any depth.
+\begin{verbatim}
+$dict1.dict2.dict3.keyName      ## nested dictionaries
+$anObject.nestedDict.keyName    ## if the object contains a dictionary
+\end{verbatim}
+
+
+\subsubsection{Caching}
+
+By default the value of each \code{\$placeholder} is updated for each request.
+If you want to statically cache the value of the \code{\$placeholder} upon
+startup, add an asterisk after the \$ sign.  \code{\$var} becomes \code{\$*var}.
+See the section on the \code{\#cache} directive below for more information.
+
+If you only need to update the value of the \code{\$placeholders} at specific time intervals use
+this form: \code{\$variable} becomes \code{\$*15*variable} , where 15 is the time interval in
+minutes.  The time interval can also be specified in fractions of a minute such
+as \code{\$*0.5*variable}.
+
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+
+$var                ## dynamic - will be reinterpolated for each request
+$*var2              ## static - will be interpolated only once at start-up
+$*5*var3            ## timed refresh - will be updated every 5 minutes.
+
+</BODY>
+</HTML>
+\end{verbatim}
+
+%Note that Cheetah will automatically detect nested \code{Template} objects
+%and these 
+%% @@finish this off
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Directive tags}
+Directives tags are used for all functionality that cannot be handled with
+simple placeholders and are enclosed in \code{\#} and \code{/\#}.
+Cheetah does not use HTML/XML style tags because they would be hard to
+distinguish from real HTML tags and would not be visible in rendered HTML when
+something goes wrong.
+
+Some directives consist of a single tag while others have {\bf start} and
+{\bf end} tags that surround a chunk of text.  End tags are written in the form
+\code{\#end nameOfTheDirective/\#}.
+
+\subsubsection{Escaping directives}
+Directives can be escaped by placing a backslash ($\backslash$) before them.
+Escaped directives will be printed verbatim.
+
+\subsubsection{Tag closures: explicit and implicit}
+Directive tags can closed explicitly with \code{/\#} or implicitly with the end
+of the line if you're feeling lazy.
+\begin{verbatim}
+#block /#
+Text in the contents area of the
+block directive
+#end block /#
+\end{verbatim}
+or
+\begin{verbatim}
+#block
+Text in the contents area of the
+block directive
+#end block
+\end{verbatim}
+
+\subsubsection{Whitespace handling}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Comment directives}
+
+Comment directives are used to mark notes, explanations, and decorative text
+that should not appear in the output.  There are two forms of the comment
+directive: single-line and multi-line.
+
+All text in a template definition that lies between 2 hash characters
+(\code{\#\#}) and the end of the line is treated as a single-line comment and
+will not show up in the output, unless the 2 hash characters are escaped with a
+backslash.
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+##====================================  a decorative comment
+$contents                               ## an end-of-line comment
+##====================================
+</BODY>
+</HTML>
+\end{verbatim}
+
+Any text between \code{\#*} and \code{*\#} will be treated as a multi-line
+comment.
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+#*
+   Here is some multiline
+   comment text
+*#
+##====================================  a decorative comment
+$contents                               ## an end-of-line comment
+##====================================
+</BODY>
+</HTML>
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#raw directives}
+Any section of a template definition that is delimeted by \code{\#raw} and
+\code{\#end raw} will be printed verbatim without any parsing of
+\$placeholders or other directives.  This can be very useful for debugging or
+writing Cheetah examples and tutorials.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#include directives}
+
+\code{\#include} directives are used to include text from outside the template
+definition.  The text can come from \code{\$placeholder} variables or from
+external files.  The example below demonstrates use with \code{\$placeholder}
+variables.
+
+\begin{verbatim}
+#include $myParseText
+\end{verbatim}
+
+This example demonstrates its use with external files.
+\begin{verbatim}
+#include "includeFileName.txt"
+\end{verbatim}
+
+By default, included text will be parsed for Cheetah tags.  The keyword
+{\bf raw} can be used to mark the text for verbatim inclusion without any tag
+parsing.
+
+\begin{verbatim}
+#include raw $myParseText
+#include raw "includeFileName.txt"
+\end{verbatim}
+
+\code{Template} uses its .getFileContents(fileName) method to locate the file to
+be included.  This method can be overriden in subclasses if you want to modify
+or extend its behaviour.  It is possible to implement the logic for getting 
+remote files such as \code{http://myserver.com/file.txt}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#cache directives}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Display logic directives}
+
+\subsubsection{Conditional blocks}
+
+\subsubsection{For loops}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#block directives}
+
+\subsubsection{\#redefine directives}
+
+

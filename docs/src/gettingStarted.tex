@@ -1,0 +1,94 @@
+\section{Getting Started}
+\label{gettingStarted}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Requirements}
+Cheetah requires Python release 2.0 or greater and should run on any
+operating system that Python 2.0 runs on.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Installation}
+
+To install Cheetah for a single user:
+\begin{enumerate}
+\item copy the 'src' sub-directory to a directory called 'Cheetah' that is in the
+     user's PYTHON_PATH
+
+\end{enumerate}
+
+To install Cheetah for system-wide use:
+\begin{enumerate}
+\item on POSIX systems (AIX, Solaris, Linux, IRIX, etc.) become the 'root' user
+     and run: python ./setup.py install
+     
+\item On non-POSIX systems, such as Windows NT, login as an administrator and
+     type this at the command-line:  python setup.py install
+\end{enumerate}
+
+
+On POSIX systems, the system-wide installation will also install the Cheetah's
+command-line compiler program, TScompile, to a system-wide executable path such as
+/usr/local/bin.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Testing your installation}
+You can run the test suite to insure that your installation is correct by
+following these steps:
+\begin{enumerate}
+\item CD into the directory ./Cheetah   
+\item type: \code{python Tests.py} 
+\end{enumerate}
+
+If any of the tests fail please send a message to the email list with a copy of
+the test output and the following details about your installation:
+
+\begin{enumerate}
+\item your version of Cheetah
+\item your version of Python
+\item your operating system
+\item whether you have changed anything in the Cheetah installation
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quickstart tutorial}
+This tutorial briefly introduces the basic usage of Cheetah.  See the
+following chapters for more detailed explanations.  
+
+{\bf This tutorial will be fleshed out further at later date.} 
+
+The core of Cheetah is the \code{Template} class in the \code{Cheetah.Template}
+module. The following example shows how to use the \code{Template} class from an
+interactive Python session. Lines prefixed with \code{>>>} and \code{...} are
+user input.  The remaining lines are Python output.
+
+\begin{verbatim}
+>>> from Cheetah.Template import Template
+>>> templateDef = """
+... <HTML>
+... <HEAD><TITLE>$title</TITLE></HEAD>
+... <BODY>
+... $contents
+... </BODY>
+... </HTML>"""
+>>> nameSpace = {'title': 'Hello World Example', 'contents': 'Hello World!'}
+>>> templateObj = Template(templateDef, nameSpace)
+>>> print templateObj
+ 
+<HTML>
+<HEAD><TITLE>Hello World Example</TITLE></HEAD>
+<BODY>
+Hello World!
+</BODY>
+</HTML>
+>>> print templateObj  # templateObj can be printed as many times as you need
+ 
+<HTML>
+<HEAD><TITLE>Hello World Example</TITLE></HEAD>
+<BODY>
+Hello World!
+</BODY>
+</HTML>
+
+\end{verbatim}
+
+

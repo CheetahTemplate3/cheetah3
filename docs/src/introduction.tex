@@ -1,0 +1,213 @@
+\section{Introduction}
+\label{intro}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What is Cheetah?}
+\label{intro.whatIs}
+
+Cheetah is a Python-based template engine and code-generator.  It aims:
+
+\begin{itemize}
+\item {\bf to make it easy to separate content, graphic design, and program code.}
+     
+     Program code should not pollute HTML and HTML should not pollute program
+     code. Nor should content pollute the structure of complex HTML designs and
+     vice versa.
+
+     There should be no need for a designer to work through a programmer to
+     change a website's design or to use dynamic components that have already
+     been coded.  Likewise, content-providers should not have to work through a
+     'webmaster' to add new content to a site.  All members of the team should
+     be able to work independently and in parallel.
+     
+     A clean separation makes it easier for a team of content-providers,
+     designers, and programmers to work together without stepping on each
+     other's toes and polluting each other's work. Other advantages include
+     faster development time; HTML and program code that are easier to
+     understand and maintain; content that can be displayed in a variety of
+     non-HTML formats such as PDF; and highly modular, flexible, and reusable
+     site architectures.       
+     
+\item {\bf to make it easy to integrate content, graphic design, and program code.}
+     
+     While it should be easy to develop content, graphic design, and program
+     code separately, it should NOT be difficult to integrate them as part of a
+     website.  There should be no difficult hoops to jump through.
+     
+     It should be easy:
+     \begin{itemize}
+     \item for programmers to create reusable components and functions that are
+          accessible and understandable to designers.
+     \item for designers to mark out placeholders for content and dynamic components
+          in their templates.
+     \item for designers to soft-code aspects of their design that are either
+          repeated in several places or are subject to change.
+     \item for designers to extend and customize existing templates and thus minimize
+          duplication of effort and code.
+     \item and, of course, for content-providers to use the templates that
+          designers have created.
+     \end{itemize}
+
+     
+\item {\bf to provide template designers with a small set of 'Display Logic'
+       programming structures such as conditional blocks and 
+       for loops}
+     
+     Graphic designers often do tasks that would be easier, faster, and less
+     error prone if they had access to {\bf conditional blocks} and {\bf for
+       loops}.  However, a full programming language would be overkill for these
+     simple tasks and most designers don't have the time or desire to learn one.
+     
+\item {\bf to be equally well-suited for HTML, SGML, XML, SQL, Postscript, form
+       email, LaTeX, or any other text-based format.}
+     
+     Although it was designed with dynamic websites and web applications in mind,
+     Cheetah is not HTML-specific.
+     
+\item {\bf to achieve all these aims in a manner that is efficient, flexible, and
+       extendable.}
+     
+\end{itemize}
+
+Cheetah achieves these aims by:
+
+\begin{itemize}     
+     
+\item blending the power and flexibility of Python with the simplicity of a
+     small Template Definition language that non-programmers can understand.
+     
+\item giving template designers a simple way of accessing Python variables,
+     objects, and functions in their templates.
+     
+\item providing a modular, object-orientated framework that makes it easy to
+     create and maintain large websites.
+     
+\item compiling 'Template Definitions' into native Python code at startup.
+     Thereafter this code is executed for each request.  This approach is
+     dramatically faster than the string substitution approach used by many
+     templating engines.
+
+\item providing a very simple, yet powerful, caching mechanism that can
+     significantly increase the responsiveness of a dynamic website.
+
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Why is it called Cheetah?}
+\label{intro.name}
+
+Cheetah is fast, flexible, agile and graceful - like its namesake. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Who developed Cheetah?}
+\label{intro.developers}
+
+Cheetah is one of several templating frameworks that grew out of a 'templates'
+thread on the 'Webware For Python' email list.  Tavis Rudd, Mike Orr, Chuck
+Esterbrook, Ian Bicking and Tom Schwaller are the core developers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{How mature is Cheetah?}
+\label{intro.mature}
+
+Cheetah is alpha/beta software as this User's Guide is incomplete and several aspects
+of the design are still subject to change.  However, it has been tested
+extensively and has few known issues.  We are hoping to release production
+version 1.0 in the summer of 2001.
+
+Here's a summary of known issues and aspects of the design that are in flux.
+\begin{itemize}
+\item The \#include directive is not working with relative path file includes
+     when used with Webware. This should be resolved soon.
+\item The \#include directive might be reworked to monitor for changes in the
+     included file at run-time. It currently does the include once-off at
+     compile-time.
+\item The implementation of \$placeholders(WithArgstrings) needs to be fleshed
+     out to handle nesting.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Where can I get releases?}
+\label{intro.releases}
+
+Cheetah releases can be downloaded from
+\url{http://CheetahTemplate.sourceforge.net}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Where can I get news?}
+\label{intro.news}
+
+News and updates can be obtained from the the Cheetah website:
+\url{http://CheetahTemplate.sourceforge.net}
+
+Cheetah discussions take place on the list
+\email{cheetahtemplate-discuss@lists.sourceforge.net}.
+
+If you encounter difficulties, or are unsure about how to do something,
+please post a detailed message to the list.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{How can I contribute?}
+\label{intro.contribute}
+
+Cheetah is the work of many volunteers.  If you use Cheetah please share your
+experiences, tricks, customizations, and frustrations.
+
+\subsubsection{Bug reports and patches}
+
+If you think there is a bug in Cheetah, send a message to the email list
+with the following information:
+
+\begin{enumerate}
+\item a description of what you were trying to do and what happened
+\item all tracebacks and error output
+\item your version of Cheetah
+\item your version of Python
+\item your operating system
+\item whether you have changed anything in the Cheetah installation
+\end{enumerate}
+
+\subsubsection{Example sites and tutorials}
+If you're developing a website with Cheetah, please send a link to the
+email list so we can keep track of Cheetah sites.  Also, if you discover
+new and interesting ways to use Cheetah please share your experience and
+write a quick tutorial about your technique.
+
+\subsubsection{Macro libraries}
+We hope to build up a framework of macros libraries (see section
+\ref{macros.libraries}) to distribute with Cheetah and would appreciate
+any contributions.
+
+\subsubsection{Test cases}
+Cheetah is packaged with a regression testing suite that is run with each
+new release to ensure that everything is working as expected and that recent
+changes haven't broken anything.  The test cases are in the Cheetah.Tests
+module.  If you find a reproduceable bug please consider writing a test case
+that will pass only when the bug is fixed.  Send any new test cases to the email
+list with the subject-line ``new test case for Cheetah.''
+
+\subsubsection{Publicity}
+Help spread the word ... recommend it to others, write articles about it, etc.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Acknowledgements}
+\label{intro.acknowledgments}
+    
+We'd like to thank the following people for contributing valuable advice, code
+and encouragement: Geoff Talvola, Jay Love, Terrel Shumway, Sasa Zivkov, Arkaitz
+Bitorika, Jeremiah Bellomy, Baruch Even, Paul Boddie, Stephan Diehl, and Geir
+Magnusson.
+    
+The Velocity, WebMacro and Smarty projects provided inspiration and design
+ideas.  Cheetah has benefited from the creativity and energy of their
+developers. Thank you.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{License}
+\label{intro.license}
+
+Cheetah is released for unlimited distribution under the terms of the
+Python license.
+

@@ -1,0 +1,110 @@
++++ TEXINPUTS=/home/tavis/Cheetah/docs/src:/home/tavis/tmp/Python-2.1/Doc/paper-letter:/home/tavis/tmp/Python-2.1/Doc/texinputs::::~/.TeX:/usr/doc/.TeX:/usr/doc/.TeX::~/.TeX:/usr/doc/.TeX:/usr/doc/.TeX::~/.TeX:/usr/doc/.TeX:/usr/doc/.TeX:
++++ pdflatex users_guide
+This is pdfTeX, Version 3.14159-13d (Web2C 7.3.1)
+(/home/tavis/Cheetah/docs/src/users_guide.tex[/var/lib/texmf/pdftex/config/pdft
+ex.cfg]
+LaTeX2e <1999/12/01> patch level 1
+Babel <v3.6Z> and hyphenation patterns for american, french, german, ngerman, n
+ohyphenation, loaded.
+(/home/tavis/tmp/Python-2.1/Doc/texinputs/howto.cls
+Document Class: howto 1998/02/25 Document class (Python HOWTO)
+(/home/tavis/tmp/Python-2.1/Doc/texinputs/pypaper.sty
+(/usr/share/texmf/tex/latex/psnfss/times.sty)
+Using Times instead of Computer Modern.
+) (/usr/share/texmf/tex/latex/base/article.cls
+Document Class: article 1999/09/10 v1.4a Standard LaTeX document class
+(/usr/share/texmf/tex/latex/base/size10.clo))
+(/usr/share/texmf/tex/latex/fancyhdr/fancyhdr.sty)
+Using fancier footers than usual.
+(/home/tavis/tmp/Python-2.1/Doc/texinputs/python.sty
+(/usr/share/texmf/tex/latex/tools/longtable.sty)
+(/usr/share/texmf/pdftex/plain/misc/pdfcolor.tex)
+(/usr/share/texmf/tex/latex/tools/verbatim.sty)
+(/usr/share/texmf/tex/latex/base/alltt.sty)))
+(/home/tavis/Cheetah/docs/src/moreverb.sty
+Package: `moreverb' v2.0 <1994/12/13> (RF, after AJCD and RmS)
+)
+No file users_guide.aux.
+(/usr/share/texmf/tex/latex/psnfss/ot1ptm.fd)
+Underfull \hbox (badness 10000) in paragraph at lines 11--11
+
+(/usr/share/texmf/tex/latex/psnfss/ot1phv.fd)
+No file users_guide.toc.
+(/usr/share/texmf/tex/latex/psnfss/omsptm.fd)
+Underfull \hbox (badness 10000) has occurred while \output is active
+[]
+[1[/var/lib/texmf/dvips/config/pdftex.map]]
+(/home/tavis/Cheetah/docs/src/introduction.tex [2] [3]
+
+LaTeX Warning: Reference `macros.libraries' on page 4 undefined on input line 1
+80.
+
+) [4] (/home/tavis/Cheetah/docs/src/gettingStarted.tex
+(/usr/share/texmf/tex/latex/psnfss/ot1pcr.fd)) [5] [6]
+(/home/tavis/Cheetah/docs/src/TemplateObjects.tex) [7]
+(/home/tavis/Cheetah/docs/src/TDL.tex [8]
+
+LaTeX Warning: Reference `webware' on page 9 undefined on input line 106.
+
+[9]
+
+LaTeX Warning: Reference `customizing' on page 10 undefined on input line 160.
+
+[10] [11] [12]) [13] (/home/tavis/Cheetah/docs/src/macros.tex) [14]
+(/home/tavis/Cheetah/docs/src/webware.tex [15] [16]) [17]
+(/home/tavis/Cheetah/docs/src/customizing.tex) [18]
+(/home/tavis/Cheetah/docs/src/examples.tex) [19]
+(/home/tavis/Cheetah/docs/src/users_guide.aux
+(/home/tavis/Cheetah/docs/src/introduction.aux)
+(/home/tavis/Cheetah/docs/src/gettingStarted.aux)
+(/home/tavis/Cheetah/docs/src/TemplateObjects.aux)
+(/home/tavis/Cheetah/docs/src/TDL.aux) (/home/tavis/Cheetah/docs/src/macros.aux
+) (/home/tavis/Cheetah/docs/src/webware.aux)
+(/home/tavis/Cheetah/docs/src/customizing.aux)
+(/home/tavis/Cheetah/docs/src/examples.aux))
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ )
+(see the transcript file for additional information)<8r.enc><cmsy10.pfb>
+Output written on users_guide.pdf (19 pages, 44632 bytes).
+Transcript written on users_guide.log.
++++ pdflatex users_guide
+This is pdfTeX, Version 3.14159-13d (Web2C 7.3.1)
+(/home/tavis/Cheetah/docs/src/users_guide.tex[/var/lib/texmf/pdftex/config/pdft
+ex.cfg]
+LaTeX2e <1999/12/01> patch level 1
+Babel <v3.6Z> and hyphenation patterns for american, french, german, ngerman, n
+ohyphenation, loaded.
+(/home/tavis/tmp/Python-2.1/Doc/texinputs/howto.cls
+Document Class: howto 1998/02/25 Document class (Python HOWTO)
+(/home/tavis/tmp/Python-2.1/Doc/texinputs/pypaper.sty
+(/usr/share/texmf/tex/latex/psnfss/times.sty)
+Using Times instead of Computer Modern.
+) (/usr/share/texmf/tex/latex/base/article.cls
+Document Class: article 1999/09/10 v1.4a Standard LaTeX document class
+(/usr/share/texmf/tex/latex/base/size10.clo))
+(/usr/share/texmf/tex/latex/fancyhdr/fancyhdr.sty)
+Using fancier footers than usual.
+(/home/tavis/tmp/Python-2.1/Doc/texinputs/python.sty
+(/usr/share/texmf/tex/latex/tools/longtable.sty)
+(/usr/share/texmf/pdftex/plain/misc/pdfcolor.tex)
+(/usr/share/texmf/tex/latex/tools/verbatim.sty)
+(/usr/share/texmf/tex/latex/base/alltt.sty)
+! Interruption.
+\@argdef ...fdefinable #1{\@yargdef #1\@ne {#2}{#3
+                                                  }}
+l.634 }{\end{fulllineitems}}
+                            
+? 
+! Emergency stop.
+\@argdef ...fdefinable #1{\@yargdef #1\@ne {#2}{#3
+                                                  }}
+l.634 }{\end{fulllineitems}}
+                            
+!  ==> Fatal error occurred, the output PDF file not finished!
+Transcript written on users_guide.log.
+*** Session transcript and error messages are in users_guide.how.

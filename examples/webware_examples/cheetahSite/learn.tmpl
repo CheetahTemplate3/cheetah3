@@ -1,0 +1,43 @@
+#extend SiteTemplate
+
+##============================================================================##
+#data
+
+def usersGuideTxt():
+    USERS_GUIDE_PATH = '/home/tavis/Cheetah/docs/users_guide_html/index.html'
+    txt = open(USERS_GUIDE_PATH).read()
+    start = txt.find('<div class="titlepage">')
+    end = txt.find('</DL>\\n<DIV CLASS="navigation">') - 3
+    return txt[start:end]
+
+#end data
+##============================================================================##
+
+
+##============================================================================##
+## from SiteTemplate
+#redefine locationBarContents
+            <A CLASS="locationBar" HREF="index.html">Home</A>&nbsp;&gt;&nbsp; 
+	    <A CLASS="locationBar" HREF="learn.html">Learn</A>
+#end redefine locationBarContents
+##============================================================================##
+
+
+##============================================================================##
+## from SiteTemplate
+#redefine leftSideBar
+	<BR>
+	<A HREF="Downloads/users_guide.pdf"><B>PDF</B></A><BR>
+	<A HREF="Downloads/users_guide.ps"><B>PostScript</B></A><BR>
+	<A HREF="Downloads/users_guide.txt"><B>Plain Text</B></A><BR>
+#end redefine leftSideBar
+##============================================================================##
+
+##============================================================================##
+## from SiteTemplate
+#redefine mainContentsCell
+
+$*usersGuideTxt
+
+#end redefine mainContentsCell
+##============================================================================##

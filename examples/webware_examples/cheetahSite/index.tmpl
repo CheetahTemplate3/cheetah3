@@ -1,0 +1,82 @@
+#extend SiteTemplate
+
+###################
+#redefine locationBar
+
+#end redefine locationBar
+###################
+
+
+##============================================================================##
+## from SiteTemplate
+#redefine leftSideBar
+	<BR>
+	<a href=http://lists.sourceforge.net/mailman/listinfo/cheetahtemplate-discuss><B>Mailing
+	List</B></a><BR>
+	<A HREF="http://sourceforge.net/cvs/?group_id=28961"><B>CVS</B></A><BR>
+#end redefine leftSideBar
+##============================================================================##
+
+
+########################
+#redefine mainContentsCell
+
+##<H1 CLASS="mainText">What is Cheetah?</H1>
+<P>
+<B>Cheetah</B> is a #Python()-powered template engine and code-generator. It aims to:
+<ul>
+    <li> make it easy to separate content, graphic design, and program code.
+    <li> make it easy to integrate content, graphic design, and program code.
+    <li> provide template designers with a small set of <i>display
+    logic</i> programming structures such as conditional blocks and for loops
+    <li> be equally well-suited for any text format including HTML,
+	SGML, XML, SQL, Postscript, e-mail and LaTeX
+    <li> achieve all these aims in a manner that is efficient, flexible, and extendable.
+</ul>
+</P>
+
+
+<P>
+<B>Cheetah</B> achieves these aims by:
+
+<UL>
+<LI>blending the power and flexibility of Python with the simplicity of a
+     small Template Definition language that non-programmers can understand.
+<LI>giving template designers a simple way of accessing Python variables,
+     objects, and functions in their templates.
+
+<LI>providing a modular, object-orientated framework that makes it easy to
+     create and maintain large websites.
+
+<LI>compiling 'Template Definitions' into native Python code at startup.
+     Thereafter this code is executed for each request.  This approach is
+     dramatically faster than the string substitution approach used by many
+     templating engines.
+
+</LI>
+<LI>providing a very simple, yet powerful, caching mechanism that can
+     significantly increase the responsiveness of a dynamic website.
+</LI>
+</UL>
+
+<P><B>Cheetah</B> requires #Python() 2.0 or greater. It can be used from ordinary Python
+programs, but also provides integration with <a
+href=http://webware.sourceforge.net/>Webware for Python</a>.</P>
+
+<P><B>Cheetah</B> is Open Source Software, released under the terms of the Python
+License.
+
+<P><B>Cheetah</B> is alpha software as some aspects of its design are still subject to
+change.  We plan to release a stable version later this summer.
+
+<P> The discussion list is 
+<a href=mailto:cheetahtemplate-discuss@lists.sourceforge.net
+>cheetahtemplate-discuss@lists.sourceforge.net</a>. 
+You can join <a href=http://lists.sourceforge.net/mailman/listinfo/cheetahtemplate-discuss>here</a>
+and view the archives <a
+href=http://www.geocrawler.com/redir-sf.php3?list=cheetahtemplate-discuss>here</a>.
+</P>
+
+
+#end redefine mainContentsCell
+########################

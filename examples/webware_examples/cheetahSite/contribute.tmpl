@@ -1,0 +1,93 @@
+#extend SiteTemplate
+
+##============================================================================##
+#data
+
+#end data
+##============================================================================##
+
+
+##============================================================================##
+## from SiteTemplate
+#redefine locationBarContents
+            <A CLASS="locationBar" HREF="index.html">Home</A>&nbsp;&gt;&nbsp; 
+	    <A CLASS="locationBar" HREF="contribute.html">Contribute</A>
+#end redefine locationBarContents
+##============================================================================##
+
+
+##============================================================================##
+## from SiteTemplate
+#redefine mainContentsCell
+
+<H2>How can I contribute?
+</H2>
+
+<P> Cheetah is the work of many volunteers.  If you use Cheetah, share
+your experiences, tricks, customizations, and frustrations.  Please join the <a
+href=http://lists.sourceforge.net/mailman/listinfo/cheetahtemplate-discuss>mailing
+list</a>.
+
+<P>
+
+<H3>Bug reports and patches</A>
+</H3>
+
+<P>
+If you think there is a bug in Cheetah, send a message to the email list
+with the following information:
+
+<P>
+
+<OL>
+<LI>a description of what you were trying to do and what happened
+</LI>
+<LI>all tracebacks and error output
+</LI>
+<LI>your version of Cheetah
+</LI>
+<LI>your version of Python
+</LI>
+<LI>your operating system
+</LI>
+<LI>whether you have changed anything in the Cheetah installation
+</LI>
+</OL>
+
+<P>
+
+<H3>Example sites and tutorials</A>
+</H3>
+If you're developing a website with Cheetah, please send a link to the
+email list so we can keep track of Cheetah sites.  Also, if you discover
+new and interesting ways to use Cheetah please share your experience and
+write a quick tutorial about your technique.
+
+<P>
+
+<H3>Macro libraries</A></H3> 
+We hope to build up a framework of macros
+libraries (see the Users Guide) to distribute with Cheetah and would
+appreciate any contributions.
+
+<P>
+
+<H3>Test cases</A>
+</H3>
+Cheetah is packaged with a regression testing suite that is run with each
+new release to ensure that everything is working as expected and that recent
+changes haven't broken anything.  The test cases are in the Cheetah.Tests
+module.  If you find a reproduceable bug please consider writing a test case
+that will pass only when the bug is fixed.  Send any new test cases to the email
+list with the subject-line ``new test case for Cheetah.''
+
+<P>
+
+<H3>Publicity</A>
+</H3>
+Help spread the word ... recommend it to others, write articles about it, etc.
+
+<P>
+
+#end redefine mainContentsCell
+##============================================================================##

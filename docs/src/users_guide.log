@@ -1,0 +1,93 @@
+This is pdfTeX, Version 3.14159-13d (Web2C 7.3.1) (format=pdflatex 2000.3.11)  12 JUN 2001 20:48
+**users_guide
+(/home/tavis/Cheetah/docs/src/users_guide.tex[/var/lib/texmf/pdftex/config/pdft
+ex.cfg]
+LaTeX2e <1999/12/01> patch level 1
+Babel <v3.6Z> and hyphenation patterns for american, french, german, ngerman, n
+ohyphenation, loaded.
+(/home/tavis/tmp/Python-2.1/Doc/texinputs/howto.cls
+Document Class: howto 1998/02/25 Document class (Python HOWTO)
+(/home/tavis/tmp/Python-2.1/Doc/texinputs/pypaper.sty
+(/usr/share/texmf/tex/latex/psnfss/times.sty
+Package: times 1999/03/29 PSNFSS v.7.2 Times font as default roman : S Rahtz
+)
+Using Times instead of Computer Modern.
+) (/usr/share/texmf/tex/latex/base/article.cls
+Document Class: article 1999/09/10 v1.4a Standard LaTeX document class
+(/usr/share/texmf/tex/latex/base/size10.clo
+File: size10.clo 1999/09/10 v1.4a Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/share/texmf/tex/latex/fancyhdr/fancyhdr.sty
+\headwidth=\dimen103
+)
+Using fancier footers than usual.
+(/home/tavis/tmp/Python-2.1/Doc/texinputs/python.sty
+Package: python 1998/01/11 LaTeX package (Python markup)
+
+(/usr/share/texmf/tex/latex/tools/longtable.sty
+Package: longtable 1998/05/13 v4.09 Multi-page Table package (DPC)
+\LTleft=\skip43
+\LTright=\skip44
+\LTpre=\skip45
+\LTpost=\skip46
+\LTchunksize=\count87
+\LTcapwidth=\dimen104
+\LT@head=\box26
+\LT@firsthead=\box27
+\LT@foot=\box28
+\LT@lastfoot=\box29
+\LT@cols=\count88
+\LT@rows=\count89
+\c@LT@tables=\count90
+\c@LT@chunks=\count91
+\LT@p@ftn=\toks14
+)
+(/usr/share/texmf/pdftex/plain/misc/pdfcolor.tex)
+(/usr/share/texmf/tex/latex/tools/verbatim.sty
+Package: verbatim 2000/01/07 v1.5m LaTeX2e package for verbatim enhancements
+\every@verbatim=\toks15
+\verbatim@line=\toks16
+\verbatim@in@stream=\read1
+)
+\py@codewidth=\skip47
+
+(/usr/share/texmf/tex/latex/base/alltt.sty
+Package: alltt 1997/06/16 v2.0g defines alltt environment
+)
+\py@ModSynopsisFile=\write3
+
+! Interruption.
+\@argdef ...fdefinable #1{\@yargdef #1\@ne {#2}{#3
+                                                  }}
+l.634 }{\end{fulllineitems}}
+                            
+? 
+! Emergency stop.
+\@argdef ...fdefinable #1{\@yargdef #1\@ne {#2}{#3
+                                                  }}
+l.634 }{\end{fulllineitems}}
+                            
+End of file on the terminal!
+
+ 
+Here is how much of TeX's memory you used:
+ 732 strings out of 25631
+ 8397 string characters out of 193579
+ 54392 words of memory out of 384000
+ 3753 multiletter control sequences out of 10000+15000
+ 3640 words of font info for 14 fonts, out of 400000 for 1000
+ 14 hyphenation exceptions out of 1000
+ 30i,0n,42p,231b,40s stack positions out of 300i,100n,500p,50000b,4000s
+!  ==> Fatal error occurred, the output PDF file not finished!

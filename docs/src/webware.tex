@@ -1,0 +1,144 @@
+\section{Using Cheetah with Webware}
+\label{webware}
+
+\subsection{Background}
+Webware is a 'Python-Powered Internet Platform' that uses servlets in a manner
+similar to Java servlets.  'WebKit' is the name of Webware's application server.
+For more details please visit http://webware.sourceforge.net.
+
+As Cheetah's core is flexible there are many ways to use it with Webware
+servlets.  There are two broad categories: the Inheritance approach and
+the Containment approach.  In the Inheritance approach a servlet is created that
+subclasses both the Template class and Webware's HTTPServlet class.  The
+Template instance IS the servlet and its .respond() method is
+automatically called by WebKit for each request.  All pre-request processing is
+handled via Cheetah.
+
+In the Containment approach an instance of the Template class is wrapped
+up inside of a Webware servlet class.  Instances of the servlet class must
+explicitly call the Template instance's .respond(), or .__str__(), method
+for each request.  In this case the servlet class can handle whatever
+per-request processing needs to be done before it calls Cheetah.respond().
+
+The Inheritance approach is the simplest and is best suited for building sites
+from scratch.
+
+The Containment approach is slightly more complex and is best suited for use
+with existing Webware servlets.  It is also ideal for cases where you wish to
+use Cheetah for only a portion of the servlet's output, such as a
+discussion-forum table at the bottom of a webpage. 
+
+\subsection{Using the Inheritance approach}
+Cheetah.Servlet provides a servlet class that can be subclassed to create 
+Webware servlets, as in the trivial example below.
+
+\begin{verbatim}
+## FILE: hello_world.py ##
+template = """
+<HTML>
+<HEAD><TITLE>'Hello World - Test Servlet</TITLE></HEAD>
+<BODY>
+Hello World!
+</BODY>
+</HTML>
+"""
+from Cheetah.Servlet import TemplateServlet
+class hello_world(TemplateServlet):
+    def __init__(self):
+        TemplateServlet.__init__(self, template) 
+\end{verbatim}
+
+TemplateServlet's constructor method (\code{TemplateServlet.__init__()}) adds
+the attribute dictionary of the servlet to the searchList that
+\code{\$placeholder} variables can extracted from.  Thus, attributes and methods
+of the servlet object can be interpolated into the template like this:
+
+\begin{verbatim}
+## FILE: hello_world.py ##
+template = """
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+$contents
+</BODY>
+</HTML>
+"""
+from Cheetah.Servlet import TemplateServlet
+class hello_world(TemplateServlet):
+    title = 'Hello World - Test Servlet'
+    def __init__(self):
+        TemplateServlet.__init__(self, template) 
+
+    def contents(self):
+        return 'Hello World!'
+\end{verbatim}
+
+This process can be simplified for non-programmers. All the Python wrapper code
+in these examples can be generated automatically by \code{cheetah-compile}, a small program
+that is installed with Cheetah. \code{cheetah-compile} parses Template Definitions
+written in files with the .tmpl extension and generates a Webware servlet file
+with the .py extension for each .tmpl file.  Type \code{cheetah-compile} after
+installing Cheetah to get information on how to use it.
+
+Here's the first example as a .tmpl file:
+
+\begin{verbatim}
+## FILE: hello_world.tmpl ##
+<HTML>
+<HEAD><TITLE>Hello World - Test Servlet</TITLE></HEAD>
+<BODY>
+Hello World!
+</BODY>
+</HTML>
+\end{verbatim}
+
+Here's the second example as a .tmpl file.  Note that all lines that begin with
+\code{\#\#} are comment lines.
+
+\begin{verbatim}
+## FILE: hello_world.tmpl ##
+##===================================
+#data
+title = 'Hello World - Test Servlet'
+def contents():
+    return 'Hello World!'
+#/data
+##===================================
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+$contents
+</BODY>
+</HTML>
+\end{verbatim}
+
+\subsubsection{The \#data directive}
+The previous example introduced the \code{\#data} directive, a shortcut means
+of adding data into the servlet's attribute dictionary and thus into
+the Template's {\bf searchList}. The \code{\#data} directive can be used in
+any Template Definition, regardless of whether the definition is in a .py or
+.tmpl file.  
+
+\code{\#data} directives can contain any valid Python code
+
+\subsubsection{The SkeletonPage framework}
+
+\subsubsection{PlateKit}
+Forget what you knew about PlateKit. It's undergoing some changes and is out of
+action for the time-being.
+
+\subsection{Using the Containment approach}
+
+
+\subsection{User interaction in either approach}
+
+
+\subsection{Components}
+
+\subsubsection{What are components?}
+
+\subsubsection{Using components}
+
+\subsubsection{Building components}
+
+

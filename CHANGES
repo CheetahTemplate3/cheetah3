@@ -1,0 +1,82 @@
+Please initial your changes
+================================================================================
+0.9.7 (not released yet)
+  - moved some stuff from __init__.py into CHANGES and TODO 
+  - added a new command 'sdist_docs' to setup.py which rebuilds the docs
+    when making a source distribution
+  - changed the name of the ./Cheetah dir to ./src
+
+0.9.6 (June 12, 2001)
+  - fixed a bug in NameMapper that was preventing 'obj.__class__.__name__' from mapping (TR)
+
+0.9.5 (June 10, 2001)
+  - implemented the #cache directive - see the mailing list (TR)
+  - reworked the handling of cached $placeholders and set $var to mean NO_CACHE,
+    $*var to mean STATIC_CACHE, and $*15*var to mean TIMED_REFRESH_CACHE (TR)
+  - renamed Template._getValueForName as Template.mapName (TR)
+
+0.9.4 (June 9, 2001)
+  - created a SettingsManager base class to handle settings for the Template class (TR)
+  - moved the HTML docs icons into the same dir as the HTML (TR)
+
+0.9.3
+  - updated the User's Guide Makefile. Builds HTML, PDF, and PS in the ./docs dir now. (TR)
+  - changed the refs to 'Tavis Rudd' in the docs to 'The Cheetah Development Team' (TR)
+  - added a few bits to the docs (TR)
+  - did some internal renaming so 'nameMapperTags' are referred as 'placeholderTags' (TR)
+  - added the #slurp directive (TR)
+  
+0.9.2
+  - got the PSP plugin working again.  It still need test cases. (TR)
+
+0.9.1
+  - Changed the name of the package to 'Cheetah' from TemplateServer (TR)
+  - Changed the name of the Server module and its TemplateServer class to 'Template' (TR)
+  - Changed the name of the 'TScompile' script to 'cheetah-compile' (TR)
+  - updated the docs (TR)
+
+0.9.0
+  - changed the names and behaviour of the #parse and #include directives (TR)
+    see the docs for more. (TR)
+  - changed #verbatim to #raw (TR)
+  - fixed a bug in Tests.py that caused an error on the first run. (TR)
+  - more docs (TR + MO)
+  ! all tests pass with Python 2.1 and 2.0 (TR)
+  
+0.8.4
+  - changed the #directive end tags to #end if instead of #/if and #end (TR)
+    macro instead of #/macro (TR)
+  - more work on the User's Guide (TR)
+  - fixed a bug in TScompile (TR)
+  
+0.8.3
+  - fixed a problem with the regexs that caused $vars and #directives at the (TR)
+    very beginning of the template string not to match in Python 2.0 (TR)
+  - removed some Test cases that made invalid assumptions about the order (TR)
+    of items in dictionaries. (TR)
+
+0.8.2
+  - finished half of the User's Guide (TR)
+  - fixed several small bugs (TR)
+  - added the #comment directive and removed the old <# multiline comment tag #> (TR)
+  - changed the explicit directive closure to /# from ;# (TR)
+
+  
+0.7.6
+  - several small bug fixes (TR)
+  - reimplemented the #block directive to avoid maximum recursion depth errors (TR)
+    with large blocks. (TR)
+  - created many new test cases in the regression testing suite (TR)
+  - added an example site to the examples/ directory (TR)
+  - started the User's Guide (TR)
+
+0.7.5
+  - implemented the command-line compiler (TR)
+
+0.7.3-4
+  - implemented the regression testing suite (TR)
+  - fixed a number of small bugs (TR)
+
+0.7.2
+  - implemented the #longMacro directive (TR)
+  
