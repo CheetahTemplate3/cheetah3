@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.92 2002/05/08 17:51:56 tavis_rudd Exp $
+# $Id: Template.py,v 1.93 2002/05/08 22:42:03 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.92 $
+Version: $Revision: 1.93 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/05/08 17:51:56 $
+Last Revision Date: $Date: 2002/05/08 22:42:03 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.92 $"[11:-2]
+__revision__ = "$Revision: 1.93 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -367,7 +367,7 @@ class Template(SettingsManager, Servlet):
 
 
     def _includeCheetahSource(self, srcArg, trans=None, includeFrom='file',
-                              raw=False, includeID=None
+                              raw=False, _includeID=None
                               ):
         
         """This is the method that #include directives translate into."""
@@ -375,9 +375,9 @@ class Template(SettingsManager, Servlet):
         if not hasattr(self, '_cheetahIncludes'):
             self._cheetahIncludes = {}
 
-        if not includeID:
-            includeID = srcArg
-        if not self._cheetahIncludes.has_key(includeID):
+        if not _includeID:
+            _includeID = srcArg
+        if not self._cheetahIncludes.has_key(_includeID):
             if includeFrom == 'file':
                 path = self.serverSidePath(srcArg)
                 if not raw:
@@ -388,9 +388,9 @@ class Template(SettingsManager, Servlet):
                                               )
                     if not hasattr(nestedTemplate, 'respond'):
                         nestedTemplate.compileTemplate()
-                    self._cheetahIncludes[includeID] = nestedTemplate
+                    self._cheetahIncludes[_includeID] = nestedTemplate
                 else:
-                    self._cheetahIncludes[includeID] = self.getFileContents(path)
+                    self._cheetahIncludes[_includeID] = self.getFileContents(path)
             else:                       # from == 'str'
                 if not raw:
                     nestedTemplate = Template(
@@ -400,15 +400,15 @@ class Template(SettingsManager, Servlet):
                         )
                     if not hasattr(nestedTemplate, 'respond'):
                         nestedTemplate.compileTemplate()
-                    self._cheetahIncludes[includeID] = nestedTemplate
+                    self._cheetahIncludes[_includeID] = nestedTemplate
                 else:
-                    self._cheetahIncludes[includeID] = srcArg
+                    self._cheetahIncludes[_includeID] = srcArg
         ##
 
         if not raw:
-            self._cheetahIncludes[includeID].respond(trans)
+            self._cheetahIncludes[_includeID].respond(trans)
         else:
-            trans.response().write(self._cheetahIncludes[includeID])
+            trans.response().write(self._cheetahIncludes[_includeID])
 
 
     def _genTmpFilename(self):
