@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.54 2001/09/15 19:32:31 tavis_rudd Exp $
+# $Id: Template.py,v 1.55 2001/09/15 19:35:10 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.54 $
+Version: $Revision: 1.55 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/09/15 19:32:31 $
+Last Revision Date: $Date: 2001/09/15 19:35:10 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.54 $"[11:-2]
+__version__ = "$Revision: 1.55 $"[11:-2]
 
 
 ##################################################
@@ -519,7 +519,7 @@ class Template(SettingsManager, Parser):
                 textVsTagsList.extend(chunk.split(settings['internalDelims'][1]))
 
             for i in range(0,len(textVsTagsList),2):
-                ## ''' must be escaped in the text chunks
+                ## ''' must be escaped in the text chunks (odd indices)
                 textVsTagsList[i] = textVsTagsList[i].replace("'''",r"\'\'\'")
             if debug:
                 results['stage2'].append(('textVsTagsList', textVsTagsList))
