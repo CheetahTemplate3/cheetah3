@@ -98,7 +98,7 @@ it.  Complex cases may confuse Cheetah (or the human maintainer!), so when in
 doubt, use the``{}''.
 
 Cheetah knows that a dollar amount is not a Placeholder Tag, because
-Placeholder Names may not begin with a digit or a hyphen.  Thus, Cheetah will
+Placeholder Names may not begin with a digit or a hyphen.  So Cheetah will
 output dollar amounts literally, as it should.  Examples:
 \code{\$2.50} and \code{\$-1,234.56} (or \code{\$2,50} and \code{\$-1.234,56}
 for Europeans).
@@ -122,10 +122,10 @@ quotes.
 
 Cheetah uses what we call Uniform Dotted Notation.  This means that in
 \code{\$a.b}, 'b' is not necessarily an attribute of 'a'.  'a' may be a
-dictionary and 'b' one of its keys.  Thus, the template maintainer does not have
-to worry about whether a value is an instance or a dictionary: they can use the
-same notation in either case.  The programmer can change the implementation
-from one to the other without having to get the Template Definitions changed.
+dictionary and 'b' one of its keys.  This allows the template maintainer to
+pretend everything is an attribute, and gives the programmer some freedom to
+change the implementation without having to ask the template maintainer to
+change the Template Definition each time.
 
 To use Uniform Dotted Notation with dictionaries, the key must be a legal
 Identifier.  That is, it must start with a letter or an underscore, and contain
@@ -162,96 +162,97 @@ If you don't like autocalling, there's a Setting to disable it.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Calculating Placeholder Values}
 
-A detailed explanation of how Cheetah looks up and converts Placeholder Values
-would be complicated and tedious, but a few points are worth mentioning.
-
 To resolve a Placeholder Name, Cheetah looks up the first Identifier in the
-first Namespace in the Search List.  If the Placeholder Key (which may be an
-attribute or a key--Cheetah checks both) is not found, Cheetah tries the 
+first Namespace in the Search List.  If an identical Placeholder Key (which may
+be an attribute or a key--Cheetah checks both) is not found, Cheetah tries the
 second Namespace, and so on.
 
-Assuming a Namespace Key is found that's identical to the Identifier, the
-Namespace Value is taken.  Function calling, autocalling, key/subscript
-lookup and Uniform Dotted Notation lookup are performed as appropriate.  (Note
+If a Namespace Key is found Cheetah takes its value (the Namespace Value) and
+performs any further lookups and calls that are required: function calls,
+autocalling, key/subscript lookup, and Uniform Dotted Notation lookup.  (Note
 that for all Identifiers except the first, any lookups are performed only in
-the preceding value, not in the Search List.)  Finally, Python's \code{str()}
-function is called to convert the result to a string, and it's inserted into
-the Filled Template.
+the preceding value, not in the Search List.) Finally, Python's \code{str()}
+function is called to convert the final value to a string (the Placeholder
+Value), and it's inserted into the Filled Template.
 
 This process actually happens in two phases.  When the TO is created, and again
 whenever its \code{.recompile()} method is called, Cheetah creates a little
-Python program and stores it in the TO.  (This is called ``compiling the 
-template''.)  The program calculates the Filled Template according to the
+Python function and stores it in the TO; this is called ``compiling the 
+template''.  The little function calculates the Filled Template according to the
 specification in the Template Definition.  Each Placeholder Tag is converted
 into a Python expression that looks up the value in it's current (at compile
 time) position in the Search List.
 
-This has some consequences for how much freedom you have to change a 
-Namespace Value's type, whether you can move it from one Namespace to 
-another, and whether you can add/delete/move Namespaces in the Search List.
 For best results, process your TO in this order:
 
 \begin{enumerate}
 
 \item   Create your Namespaces and assign values for each of your placeholders.
+     For \code{#for} loops, build a list of objects to be looped over and
+     assign this list as a Namespace Value.
 
 \item   Create the TO, passing it the Template Definition and the Namespaces in
      order.
 
-\item   Fill the template.
+\item   Fill the template.  If you need only one Filled Template, you're done.
 
 \item  If you want to produce another Filled Template, assign new values for
-     your placeholders in place.  That is, use ordinary attribute assignment and
-     key assignment.  Do not move the attribute/key from one Namespace to 
-     another.  Do not change the type of the value.  Do not add a Namespace--
-     you should have already passed all the Namespaces you need to the
-     constructor.  When you've finished setting your new values, fill the
-     template again.  Repeat for as many Filled Templates as you need.
+     your placeholders in place, using ordinary attribute assignment and key
+     assignment.  (It's more convenient to make the changes using individual
+     references to each Namespace object that you've kept somewhere else, 
+     rather than trying to subscript the Search List.)  Avoid doing the
+     ``unsafe'' operations below.  Then fill the template again.  Repeat for as
+     many Filled Templates as you need.
 
 \end{enumerate}
 
-In practice, the rules aren't quite that restrictive.  However, following these
-steps is a good habit to get into.  The reason is that when Cheetah compiles
-the template, it hardcodes certain assumptions about the Placeholder Values into
-the Python code, namely, where each key is in the Search List, and which 
-Identifiers are to be autocalled.  Take \code{\$a.b} for example.  Say 'a'
-is found in the second Namespace, that Namespace is an instance, and 'a' is a
-dictionary.  Cheetah might compile this Placeholder Name to:
+Templates can be nested.  A Namespace Value may be another TO.  When your TO
+is filled, the inner TO will automatically be filled, and any TO's \em{it}
+contains will also be filled, ad infinitum.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{``Unsafe'' operations}
+
+Certain operations are ``unsafe'' after the TO has been instantiated.  These
+are: moving a Namespace Key from one Namespace to another, changing the type of
+a value (beyond certain limits), and adding/deleting/moving Namespaces in the
+Search List. If you do any of these operations, you must recompile the template
+by calling the TO's \code{.recompile()} method before filling it.  If you try
+to fill the template without recompiling, you may get an error or incorrect
+output.
+
+To understand why, remember that when the TO is
+compiled, Cheetah generates a Python expression that looks up the value at its
+current (at compile time) location in the Search List.  Any operation that 
+would require a change of syntax for this expression is ``unsafe''.  For
+instance, consider \code{\$a.b}.  Assume that 'a' is found in the second 
+Namespace in the Search List, that that Namespace is an instance, and 'a' is
+a dictionary.  The equivalent Python expression would be \footnote{This is a
+conceptual example, not the exact code Cheetah would generate.}:
 
 \begin{verbatim}
 searchList[1].a['b']
 \end{verbatim}
 
-Now take \code{\$c.d}.  In this case, 'c' is found in the first Namespace, that
-Namespace is a dictionary, and 'c' is a function returning an instance.
-Cheetah might compile this Placeholder Name to:
+Now move 'a' to the first Namespace (which is a dictionary), and make it a 
+function returning a dictionary.  The Placeholder Tag remains the same --
+\code{\$a.b} -- but the Python expression changes to something very different:
 
 \begin{verbatim}
-searchList[0]['c']().d
+\code{searchList[0]['c']().d}
 \end{verbatim}
 
-Now say you add a key 'a' in the first Namespace.  The expression is still
-going to the second Namespace, so the new 'a' is ignored.  Now say you change
-the type of 'c' from a function returning an instance to an instance itself.
-Cheetah will still try to autocall 'c', which will raise a ``not callable''
-error.  Now say you change the type of 'a' from dictionary to instance
-(or integer!).  You fill the template--and get an AttributeError!
+Re changing the type of a value, simple changes like changing a string to an
+integer is safe because it doesn't affect the lookup expression.  But 
+changing a value from an autocallable type to a non-autocallable type or 
+vice-versa, or changing it to or from an instance, dictionary or list, requires
+recompiling the template to adjust the Python expression.
 
-Simple things like changing a string to a number are safe.  But beware of
-changing an autocallable value to a non-autocallable one or vice-versa, or
-changing an instance to a dictionary.  
-
-However, there is a way to do ``unsafe'' changes without getting bitten.  After
-making your changes, recompile the template by calling the TO's
-\code{.recompile()} method after making your changes and before filling the
-template.  The TO will adjust itself to the new values.
-
-But usually, when you think you want to add a Namespace or change the type
-of a value, it's time to create another TO.
-
-Templates can be nested.  A Namespace Value may be another TO.  When your TO
-is filled, the inner TO will automatically be filled, and any TO's \em{it}
-contains will also be filled, ad infinitum.
+But usually, whenever you think you want to add a Namespace, move a key or
+change the type of a value, you should be creating another TO instead, or
+adjusting your code so that the correct Namespaces and value types are already
+in place when you create the TO.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
