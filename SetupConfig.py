@@ -9,6 +9,7 @@ packages = ['Cheetah',
             'Cheetah.Templates',
             'Cheetah.Tests',
             'Cheetah.Tools',
+            'Cheetah.Utils',
             ]
 
 package_dir = {'Cheetah':'src'}
