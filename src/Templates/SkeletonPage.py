@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SkeletonPage.py,v 1.4 2001/08/08 07:13:49 tavis_rudd Exp $
+# $Id: SkeletonPage.py,v 1.5 2001/08/10 04:52:06 tavis_rudd Exp $
 """A skeleton page template for use with the Cheetah package
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/08/08 07:13:49 $
+Last Revision Date: $Date: 2001/08/10 04:52:06 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -98,9 +98,10 @@ class SkeletonPage(TemplateServlet):
     title = ''
     #_metaTags = {'HTTP_EQUIV':{'test':1234}, 'NAME':{'test':1234,'test2':1234} }
     #_stylesheets = {'.cssClassName':'stylesheetCode'}
+    #_stylesheetsOrder = ['.cssClassName',]
     #_stylesheetLibs = {'libName':'libSrcPath'}
     #_javascriptLibs = {'libName':'libSrcPath'}
-    bodyTagAttribs = {}
+    _bodyTagAttribs = {}
    
     siteDomainName = 'www.example.com'
     siteCredits = 'Designed & Implemented by Tavis Rudd'
@@ -108,7 +109,9 @@ class SkeletonPage(TemplateServlet):
    
 
     def metaTags(self):
-        """Return a formatted vesion of the self._metaTags dictionary."""
+        """Return a formatted vesion of the self._metaTags dictionary, using the
+        formatMetaTags function from Cheetah.Macros.HTML"""
+        
         if not hasattr(self,'_metaTags'):
             return ''
         else:
@@ -150,7 +153,6 @@ class SkeletonPage(TemplateServlet):
         return stylesheetTagsTxt.strip()
 
     def javascriptTags(self):
-        
         """Return a formatted version of the self._javascriptTags and
         self._javascriptLibs dictionaries.  Each value in self._javascriptTags
         should be a either a code string to include, or a list containing the
@@ -178,8 +180,8 @@ class SkeletonPage(TemplateServlet):
     
     def bodyTag(self):
         """Create a body tag from the entries in the dict self._bodyTagAttribs."""
-        if not hasattr(self,'bodyTagAttribs'):
-            self.bodyTagAttribs = {}
+        if not hasattr(self,'_bodyTagAttribs'):
+            self._bodyTagAttribs = {}
 
         bodyTagTxt = formHTMLTag('BODY', self.bodyTagAttribs)
         return bodyTagTxt
@@ -192,35 +194,38 @@ class SkeletonPage(TemplateServlet):
         location. If width and height aren't specified they are calculated using
         PIL or ImageMagick if available."""
         
-        try:
-            src = self.serverSidePath(src)
-        except:
-            pass
+        src = self.normalizePath(src)
         
-        try:
-            if not width or not height:
-                try:                    # see if the dimensions can be calc'd with PIL
-                    import Image
-                    im = Image.open(src)
-                    calcWidth, calcHeight = im.size
-                    del im
+
+        if not width or not height:
+            try:                    # see if the dimensions can be calc'd with PIL
+                import Image
+                im = Image.open(src)
+                calcWidth, calcHeight = im.size
+                del im
+                if not width: width = calcWidth
+                if not height: height = calcHeight
+
+            except:
+                try:                # try imageMagick instead
+                    calcWidth, calcHeight = os.popen(
+                        'identify -format "%w,%h" ' + src).read().split(',')
                     if not width: width = calcWidth
                     if not height: height = calcHeight
-
+        
                 except:
-                    try:                # try imageMagick instead
-                        calcWidth, calcHeight = os.popen(
-                            'identify -format "%w,%h" ' + src).read().split(',')
-                        if not width: width = calcWidth
-                        if not height: height = calcHeight
-            
-                    except:
-                        pass
+                    pass
                 
-            
+        if width and height:
             return ''.join(['<IMG SRC="', src, '" WIDTH=', str(width), ' HEIGHT=', str(height),
                            ' ALT="', alt, '" BORDER=', str(border), '>'])
-        except:
+        elif width:
+            return ''.join(['<IMG SRC="', src, '" WIDTH=', str(width),
+                           ' ALT="', alt, '" BORDER=', str(border), '>'])
+        elif height:
+            return ''.join(['<IMG SRC="', src, '" HEIGHT=', str(height),
+                           ' ALT="', alt, '" BORDER=', str(border), '>'])
+        else:
             return ''.join(['<IMG SRC="', src, '" ALT="', alt, '" BORDER=', str(border),'>'])
 
 
