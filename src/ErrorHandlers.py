@@ -5,12 +5,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/18 17:26:01 $
+Last Revision Date: $Date: 2001/07/13 18:09:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -100,8 +100,8 @@ class ResponseErrorHandler(ErrorHandler):
         ErrorHandler.__init__(self)
 
     def introText(self):
-        return """Cheetah compiled this template successfully, but an error
-(aka Exception) occurred when Cheetah was executing the generated code."""
+        return """Cheetah compiled this template successfully, but an error (aka Exception)
+occurred at run-time when Cheetah was executing the generated code."""
         
     def errorDetails(self):
         msg = self.format_exc()

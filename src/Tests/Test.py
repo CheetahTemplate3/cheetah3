@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.6 2001/07/12 19:07:05 tavis_rudd Exp $
+# $Id: Test.py,v 1.7 2001/07/13 18:09:40 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/12 19:07:05 $
+Last Revision Date: $Date: 2001/07/13 18:09:40 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 
 ##################################################
@@ -174,7 +174,6 @@ $obj $obj.
 $obj.meth $obj.meth. $obj.meth(). $obj.meth(6).
 $obj.meth('z'). $obj.meth("z"). $obj.meth("z"*2). $obj.meth(arg="z"). $obj.meth(arg='z').
 $func, $numTwo, ${func}, $numOne
-$func($numTwo)
 """,
 
      """
@@ -189,7 +188,6 @@ object object.
 arff arff. arff. 6.
 z. z. zz. z. z.
 Scooby, 2, Scooby, 1
-2
 """
               ],
     ]

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SearchList.py,v 1.2 2001/07/12 19:07:42 tavis_rudd Exp $
+# $Id: SearchList.py,v 1.3 2001/07/13 18:09:39 tavis_rudd Exp $
 
 """Provides a SearchList class for Cheetah Template Objects.  The searchList is
 used to store the list of namespaces to map $placeholder values from.
@@ -9,12 +9,12 @@ Meta-Data
 Authors: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution
          under the terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/07/12 19:07:42 $
+Last Revision Date: $Date: 2001/07/13 18:09:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -54,7 +54,7 @@ class SearchList(UserList):
                 pass           
         raise NotFound
     
-    def translateName(self, name):
+    def translateName(self, name, executeCallables=False):
         """Translate a $placeholder name into valid Python code."""
         
         if type(name)==StringType:
@@ -73,6 +73,6 @@ class SearchList(UserList):
             raise NotFound
 
         return '[' + str(namespaceNum) + ']' + translateNameToCode(
-            self[namespaceNum], nameChunks)
+            self[namespaceNum], nameChunks, executeCallables=executeCallables)
         
             

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.3 2001/06/28 19:25:24 echuck Exp $
+# $Id: NameMapper.py,v 1.4 2001/07/13 18:09:39 tavis_rudd Exp $
 
 """Utilities for accessing the members of an object via string representations
 of those members.  Template processing is its primary intended use.
@@ -58,19 +58,19 @@ Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
 License: This software is released for unlimited distribution
          under the terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/06/28 19:25:24 $
+Last Revision Date: $Date: 2001/07/13 18:09:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
 
 import types
-from types import StringType
+from types import StringType, InstanceType, ClassType 
 import re
 # it uses the string methods and list comprehensions added in recent versions of python
 
@@ -93,7 +93,7 @@ class NoDefault:
 ##################################################
 ## FUNCTIONS ##
 
-def valueForName(obj, name, default=NoDefault, exectuteCallables=False):
+def valueForName(obj, name, default=NoDefault, executeCallables=False):
     """Get the value for the specified name.  This function can be called
     recursively.  """
 
@@ -109,12 +109,19 @@ def valueForName(obj, name, default=NoDefault, exectuteCallables=False):
     if len(nameChunks) > 1:
         # its a composite name like: nestedObject.item
         binding = valueForKey(obj, firstKey, default)
+        if executeCallables and callable(binding) and \
+           type(binding) not in (InstanceType, ClassType):
+            # the type check allows access to the methods of instances
+            # of classes with __call__() defined
+            # and also allows obj.__class__.__name__
+            binding = binding()
+        
         return valueForName(binding, nameChunks[1:], default,
-                            exectuteCallables=exectuteCallables)
+                            executeCallables=executeCallables)
     else:
         # its a single key like: nestedObject
         binding =  valueForKey(obj, firstKey, default)
-        if exectuteCallables and callable(binding):
+        if executeCallables and callable(binding):
             binding = binding()
         return binding
 
@@ -179,7 +186,7 @@ def hasName(obj, name):
         return False
 
 
-def translateNameToCode(obj, name):
+def translateNameToCode(obj, name, executeCallables=True):
     """Translate a namemapper name to Python code."""
     if type(name)==StringType:
         nameChunks=name.split('.')
@@ -188,14 +195,20 @@ def translateNameToCode(obj, name):
 
     codeChunks = []
     for name in nameChunks:
-        item = eval('obj' + ''.join(codeChunks))
-        keyType = determineKeyType(item, name)
+        lastItem = eval('obj' + ''.join(codeChunks))
+        keyType = determineKeyType(lastItem, name)
         if keyType == PLAIN_ATTRIBUTE:
             code = '.' + name
         if keyType == UNDERSCORED_ATTRIBUTE:
             code = '._' + name
         if keyType == MAPPING_KEY:
             code = '["' + name + '"]'
+
+        currentItem = eval('obj' + ''.join(codeChunks) + code)
+        if executeCallables and callable(currentItem) and \
+           type(currentItem) not in (InstanceType, ClassType):
+            code = code + '()'
+            
         codeChunks.append(code)
 
     return ''.join(codeChunks)

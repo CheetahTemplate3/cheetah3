@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.7 2001/07/12 19:07:42 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.8 2001/07/13 18:09:39 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/12 19:07:42 $
+Last Revision Date: $Date: 2001/07/13 18:09:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 
 ##################################################
@@ -195,33 +195,97 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
 
 
     def translatePlaceholderString(self, txt, searchList, templateObj,
-                                   prefix='searchList', executeCallables=False):
-        """Translate an unmarked placeholder string into valid Python code."""
+                                   prefix='searchList', executeCallables=True):
+        """Translate a marked placeholder string into valid Python code."""
         
-        def translateSubber(match, prefix=prefix, searchList=searchList,
+        def translateName(name, prefix=prefix, searchList=searchList,
                             templateObj=templateObj,
                             executeCallables=executeCallables):
-            name =  match.group(1)
-            nameChunks = name.split('.')
-            try:
-                translated = prefix + searchList.translateName(name)
-                if executeCallables and translated.find('(') == -1 \
-                                    and callable(eval(translated)):
-                    translated += '()'
-                return translated
-            except NameMapper.NotFound:
-                if name in templateObj._localVarsList:
-                    return name
-                if templateObj and nameChunks[0] in templateObj._localVarsList:
-                    name = 'valueForName(' + nameChunks[0] + ',"""' + \
-                       '.'.join(nameChunks[1:]) + '""", exectuteCallables=True)'
-                    return name
-                raise NameMapper.NotFound, name
 
-        return self._nameRE.sub(translateSubber, txt)
+            ## get rid of the 'cache-type' tokens
+            # - these are handled by the tag-processor instead
+            nameChunks = name.split('.')
+            if nameChunks[0] == 'CACHED':
+                    del nameChunks[0]
+            if nameChunks[0].startswith('REFRESH'):
+                del nameChunks[0]
+            name = '.'.join(nameChunks)
+
+            ## split the name into a part that NameMapper can handle and the rest
+            firstSpecialChar = re.search(r'\(|\[', name)
+            if firstSpecialChar:         # NameMapper can't handle [] or ()
+                firstSpecialChar = firstSpecialChar.start()
+                nameMapperPartOfName, remainderOfName = \
+                                      name[0:firstSpecialChar], name[firstSpecialChar:]
+                remainderOfName = remainderOfName
+            else:
+                nameMapperPartOfName = name
+                remainderOfName = ''
+
+            ## only do autocalling on names that have no () in them
+            if name.find('(') == -1 and templateObj.setting('useAutocalling'):
+                safeToAutoCall = True
+            else:
+                safeToAutoCall = False
+            
+            ## deal with local vars from #set and #for directives
+            if name in templateObj._localVarsList:
+                return name
+            elif nameChunks[0] in templateObj._localVarsList:
+                translatedName = 'valueForName(' + nameChunks[0] + ',"""' + \
+                           '.'.join(nameChunks[1:]) + '""", executeCallables=True)' + \
+                           remainderOfName
+                return translatedName
+
+
+            ## Translate the NameMapper part of the Name
+            try:
+                translatedName = prefix + searchList.translateName(
+                    nameMapperPartOfName, executeCallables=safeToAutoCall) + \
+                    remainderOfName
+            except NameMapper.NotFound:
+                if nameMapperPartOfName in templateObj._localVarsList:
+                    return name
+                elif templateObj and nameChunks[0] in templateObj._localVarsList:
+                    name = 'valueForName(' + nameChunks[0] + ',"""' + \
+                       '.'.join(nameChunks[1:]) + '""", executeCallables=True)'
+                    return name
+                else:
+                    raise NameMapper.NotFound, name
+
+
+            ## Deal with Cheetah 'Template' and 'Component' objects
+            # but only if the tag has no ()'s in it 
+            if safeToAutoCall:
+                value = eval(translatedName)
+                if isinstance(value, Component):
+                    templateObj._componentsDict[name] = value
+                    return 'components["""' + \
+                           name + '"""](trans, templateObj=self)'
+                elif isinstance(value, Template.Template):
+                    templateObj._nestedTemplatesCache[name] = value.respond
+                    return 'nestedTemplates["""' + \
+                           name + '"""](trans, iAmNested=True)'
+
+            return translatedName
+
+
+        ##########################
+        resultList = []
+        for live, chunk in self.splitTxt(txt):
+            if live:
+                if self._nameRE.search(chunk):
+                    chunk = self.translatePlaceholderString(chunk,
+                                                            searchList, templateObj)
+                resultList.append( translateName(chunk) ) # using the function from above
+            else:
+                resultList.append(chunk)
+
+        return string.join(resultList, "")
+    
 
     def translateRawPlaceholderString(self, txt, searchList, templateObj=None,
-                                      prefix='searchList', executeCallables=False):
+                                      prefix='searchList', executeCallables=True):
         """Translate raw $placeholders in a string directly into valid Python code.
 
         This method is used for handling $placeholders in #directives
@@ -287,7 +351,9 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
     def processTag(self, templateObj, tag):
 
         """This method is called by the Template class for every $placeholder
-        tag in the template definition"""
+        tag in the template definition
+
+        It is a wrapper around self.translatePlaceholderString that deals with caching"""
 
         ## find out what cacheType the tag has
         if not templateObj._codeGeneratorState['defaultCacheType'] == None:
@@ -297,15 +363,9 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
                         templateObj._codeGeneratorState['cacheRefreshInterval']
         else:
             cacheType = NO_CACHE
-        
-        if tag.find('[') != -1:         # NameMapper can't handle brackets
-            nameMapperPartOfName, remainderOfName = tag.split('[')
-            remainderOfName = '[' + remainderOfName
-        else:
-            nameMapperPartOfName = tag
-            remainderOfName = ''
 
-        nameChunks = nameMapperPartOfName.split('.')
+        ## examine the namechunks for the caching keywords
+        nameChunks = tag.split('.')
         if nameChunks[0] == 'CACHED':
             del nameChunks[0]
             cacheType = STATIC_CACHE
@@ -313,62 +373,28 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
             cacheType = TIMED_REFRESH_CACHE
             cacheRefreshInterval = float('.'.join(nameChunks[0].split('_')[1:]))
             del nameChunks[0]
-        tag = '.'.join(nameChunks) + remainderOfName
-        
-        ## deal with local vars from #set and #for directives
-        if nameMapperPartOfName in templateObj._localVarsList:
-            return self.wrapEvalTag(templateObj, 'str(' + tag + ')')
+        tag = '.'.join(nameChunks)
 
-        elif nameChunks[0] in templateObj._localVarsList:
-            translatedTag = 'valueForName(' + nameChunks[0] + ',"""' + \
-                       '.'.join(nameChunks[1:]) + '""", exectuteCallables=True)' + \
-                       remainderOfName
-            return self.wrapEvalTag(templateObj, "str(" + translatedTag + ")")
 
+        ## translate the tag into Python code using self.translatePlaceholderString
         searchList = templateObj.searchList()
         try:
-            translatedTag = self.translatePlaceholderString(self._marker + tag, searchList, templateObj)
+            translatedTag = self.translatePlaceholderString(
+                self._marker + tag, searchList, templateObj)
         except NameMapper.NotFound:
-            self.wrapEvalTag(templateObj,
-                             'self.placeholderProcessor.getValueAtRuntime(' +
-                             tag + ')')
-            return templateObj._settings['varNotFound_handler'](templateObj, tag)
+            return self.wrapEvalTag(
+                templateObj,
+                'self.placeholderProcessor.getValueAtRuntime(self, """' + \
+                tag + '""")')
 
-        if tag.find('(') == -1:
-            safeToAutoCall = True
-        else:
-            safeToAutoCall = False
 
-        isCallable = False
-        if safeToAutoCall:
-            tagValue = eval(translatedTag)
-            if isinstance(tagValue, Component):
-                templateObj._componentsDict[tag] = tagValue
-                return self.wrapEvalTag(templateObj, 'components["""' +
-                                        tag + '"""](trans, templateObj=self)')
-            elif isinstance(tagValue, Template.Template):
-                templateObj._nestedTemplatesCache[tag] = tagValue.respond
-                return self.wrapEvalTag(templateObj, 'nestedTemplates["""' +
-                                        tag + '"""](trans, iAmNested=True)')
-            elif callable(tagValue):
-                isCallable = True
-
+        ## deal with the caching and return the proper code to the code-generator
         if cacheType == STATIC_CACHE:
-            if not safeToAutoCall:
-                tagValue = eval(translatedTag)
-            elif isCallable:
-                tagValue = tagValue()
-            return str(tagValue)
+            return str(eval(translatedTag))
         elif cacheType == TIMED_REFRESH_CACHE:
-            if isCallable:
-                translatedTag = translatedTag + '()'
             templateObj._setTimedRefresh(translatedTag, cacheRefreshInterval)
             return self.wrapEvalTag(
                 templateObj,
                 'timedRefreshCache["""' + translatedTag + '"""]')
         else:
-            # NO_CACHE or is not safe to cache
-            if isCallable:
-                return self.wrapEvalTag(templateObj, "str(" + translatedTag + "())")
-            else:
-                return self.wrapEvalTag(templateObj, "str(" + translatedTag + ")")
+            return self.wrapEvalTag(templateObj, "str(" + translatedTag + ")")
