@@ -42,9 +42,6 @@ PyNamemapper_valueForKey(PyObject *obj, char *key)
     }
   }
   return theValue;
-  notFound(key);		/* we shouldn't have gotten here - so raise error */
-
-
 }
 
 static PyObject *
@@ -128,8 +125,6 @@ PyNamemapper_valueFromSearchList(PyObject *searchList,
   }
   return NULL;	/* the first key wasn't found in any namespace -- NotFound is raised */
 }
-
-
 
 
 static int getNameChunks(char *nameChunks[], char *name) 
