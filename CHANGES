@@ -6,13 +6,14 @@ release
   - set 'monitorSrcFile' to false as it was causing problems with the
     ImportHooks ... This might be temporary as the problem needs more thought
     (TR)
-  - made 'self' visible in '#settings python' directives (TR)
   - fixed meta tag http_equiv to be http-equiv in SkeletonPage (TR)
   - $webInput (Utils.WebInputMixin) 'source' arg can be either case. (MO)
   - fixed code-gen bug in MethodCompiler.commitStrConst that was leading to
     triple single quotes followed immediately by another single quote if the
     template def contained a '$placeholder' surrounded in single quotes and
     multiple \n newlines ... plus added new test case.(TR)
+  - undocumented the '#settings' directive.  The directive itself will be
+    removed soon.  (MO)
   - Utils.optik: Optik 1.3 package by Gregory P Ward, for parsing
     command-line options in 'cheetah' comamnd.  Copied unchanged into
     Cheetah except added "Cheetah.Utils.optik." prefix to intra-package
