@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.61 2002/11/28 22:06:54 tavis_rudd Exp $
+# $Id: Parser.py,v 1.62 2002/11/28 22:09:51 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.61 $
+Version: $Revision: 1.62 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/11/28 22:06:54 $
+Last Revision Date: $Date: 2002/11/28 22:09:51 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.61 $"[11:-2]
+__revision__ = "$Revision: 1.62 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1116,7 +1116,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             cacheInfo['ID'] = repr(rawPlaceholder)[1:-1]
             self.startCacheRegion(cacheInfo, lineCol)
             
-        if self.errorCatcherIsOn():            
+        if self.isErrorCatcherOn():            
             methodName = self.addErrorCatcher(codeChunk,
                                               rawCode=rawPlaceholder,
                                               lineCol=lineCol,
