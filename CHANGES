@@ -31,7 +31,7 @@ release
     that affected the Template and ModuleCompiler classes. (TR)
   - Template: compiling a template from a string now works if the current
     directory doesn't have write permission.  (MO)
-
+  - remove temporary .pyo files in addition to .py and .pyc files (TR)
 
 0.9.15a3 (Nov 10, 2002)
   - corrected a dictionary bug in the Python version of NameMapper (TR)
