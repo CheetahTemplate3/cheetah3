@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.17 2001/11/06 22:38:49 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.18 2001/11/06 22:50:31 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.17 $
+Version: $Revision: 1.18 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2001/11/06 22:38:49 $
+Last Revision Date: $Date: 2001/11/06 22:50:31 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.17 $"[11:-2]
+__version__ = "$Revision: 1.18 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -653,23 +653,18 @@ class ClassCompiler(SettingsManager, GenUtils):
         
         if fileName and self.setting('monitorSrcFile'):
 
-            self.addChunkToInit('self._filePath_for_' + self._className
-                                + ' = ' + repr(fileName))
-            self.addChunkToInit('self._fileMtime_for_' + self._className +
-                                ' = ' + str(getmtime(fileName)) )
+            self.addChunkToInit('self._filePath = ' + repr(fileName))
+            self.addChunkToInit('self._fileMtime = ' + str(getmtime(fileName)) )
             if self._templateObj:
-                setattr(self._templateObj, '_filePath_for_' + self._className, fileName)
-                setattr(self._templateObj, '_fileMtime_for_' + self._className, getmtime(fileName))
+                setattr(self._templateObj, '_filePath', fileName)
+                setattr(self._templateObj, '_fileMtime', getmtime(fileName))
                 
-            self.addChunk('if exists(self._filePath_for_' + self._className +
-                          ') and ' +
-                          'getmtime(self._filePath_for_' + self._className+
-                          ') > self._fileMtime_for_' + self._className + ':')
+            self.addChunk('if exists(self._filePath) and ' +
+                          'getmtime(self._filePath) > self._fileMtime:')
             self.indent()
-            self.addChunk('self.compile(file=self._filePath_for_' + self._className +')')
+            self.addChunk('self.compile(file=self._filePath)')
             self.addChunk(
-                'write(getattr(self, self._mainCheetahMethod_for_' + self._className 
-                + ')(trans=trans))')            
+                'write(getattr(self, self._mainCheetahMethod)(trans=trans))')            
             self.addStop()
             self.dedent()
 
