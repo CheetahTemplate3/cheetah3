@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.20 2001/08/06 03:50:16 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.21 2001/08/08 00:41:02 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.20 $
+Version: $Revision: 1.21 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/06 03:50:16 $
+Last Revision Date: $Date: 2001/08/08 00:41:02 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.20 $"[11:-2]
+__version__ = "$Revision: 1.21 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -287,6 +287,21 @@ def preProcessMacroDirectives(templateObj, templateDef):
             argName = match.group(1).replace('placeholderTag.','')
             if argName in argNamesList:
                 return "''' + str(" + argName + ") + '''"
+
+            firstSpecialChar = re.search(r'\(|\[', argName)
+            if firstSpecialChar:         # NameMapper can't handle [] or ()
+                firstSpecialChar = firstSpecialChar.start()
+                nameMapperPartOfName, remainderOfName = \
+                                      argName[0:firstSpecialChar], argName[firstSpecialChar:]
+                remainderOfName = remainderOfName
+            else:
+                nameMapperPartOfName = argName
+                remainderOfName = ''
+
+            nameMapperChunks = nameMapperPartOfName.split('.')
+            if nameMapperChunks[0] in argNamesList:
+                return "''' + str(NameMapper.valueForName(" + nameMapperChunks[0] + ", '" +\
+                       '.'.join(nameMapperChunks[1:]) + "')" + remainderOfName + ") + '''"
             else:
                 return templateObj.setting('placeholderStartToken') + \
                        '{' + match.group(1) + '}'
