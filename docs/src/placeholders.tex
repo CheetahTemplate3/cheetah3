@@ -1,11 +1,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Placeholder Tags (and Values)}
 
-Cheetah's Placeholder Tags are equivalent to data fields in a form letter, or to
-\code{\%(key)s} fields in the \code{\%} operator's format string.
+Cheetah's Placeholder Tags (\$P) are equivalent to data fields in a form
+letter, or to \code{\%(key)s} fields in the \code{\%} operator's format string.
 In other words, Placeholder Tags are used as lookup keys, and are replaced by
-their corresponding values when the template is filled in.
-Let's look again at the example from the introduction:
+their corresponding values when the template is filled in.  Let's look again at
+the example from the introduction:
 
 \begin{verbatim}
 <HTML>
@@ -274,7 +274,6 @@ that are not found. See section \ref{customizing} for more details.
 By default the value of each \code{\$placeholder} is updated for each request.
 If you want to statically cache the value of the \code{\$placeholder} upon
 startup, add an asterisk after the \$ sign.  \code{\$var} becomes \code{\$*var}.
-See the section on the \code{\#cache} directive below for more information.
 
 If you only need to update the value of the \code{\$placeholders} at specific time intervals use
 this form: \code{\$variable} becomes \code{\$*15*variable} , where 15 is the time interval in
@@ -294,4 +293,5 @@ $*5*var3            ## timed refresh - will be updated every 5 minutes.
 </HTML>
 \end{verbatim}
 
-
+You can also use the \code{\#cache ... \#end cache} directive to change the
+caching policy for \$P's with no ``*''.
