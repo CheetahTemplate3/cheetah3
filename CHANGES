@@ -1,6 +1,9 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
+0.9.16 (Mar 27, 2005)
+  - this is just 0.9.16b1 repackaged [TR]
+
 0.9.16b1 (Feb 28, 2005)
   - fixed attr error in Parser.eatEncoding [TR]
   - some tweaks to Compiler.py to prevent errors with dynamically compiled
