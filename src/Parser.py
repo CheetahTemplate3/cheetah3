@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.45 2002/03/26 02:05:09 tavis_rudd Exp $
+# $Id: Parser.py,v 1.46 2002/04/09 18:57:12 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.45 $
+Version: $Revision: 1.46 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/03/26 02:05:09 $
+Last Revision Date: $Date: 2002/04/09 18:57:12 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.45 $"[11:-2]
+__revision__ = "$Revision: 1.46 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1422,11 +1422,14 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.getDirectiveStartToken()
         self.advance(len('extends'))
         self.getWhiteSpace()
-        self.setMainMethodName('writeBody') # change from the default 'respond'
-        baseClassList = self.getTargetVarsList()
-        self.setBaseClasses( baseClassList )
-        mainBaseClass =  self._baseClasses[0]
+        # change the default mainMethodName from the default 'respond' 
+        self.setMainMethodName('writeBody') 
+        baseClass = self.getDottedName()
         self.closeDirective(lineClearToStartToken, endOfFirstLine)
+        
+        self.setBaseClass(baseClass)
+        mainBaseClass =  self._baseClass
+
         
         ##################################################
         ## dynamically bind to and __init__ with this new baseclass
@@ -1435,14 +1438,10 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         
         if self._templateObj:
             mod = self._templateObj._importAsDummyModule('\n'.join(self._importStatements))
-            newBaseClasses = []
-            for baseClass in self._baseClasses:
-                newBaseClasses.append( getattr(mod, baseClass))
-
             class newClass:
                 pass
             newClass.__name__ = self._mainClassName
-            newClass.__bases__ = tuple(newBaseClasses)
+            newClass.__bases__ = (getattr(mod,self._baseClass), )
             self._templateObj.__class__ = newClass
             # must initialize it so instance attributes are accessible
             newClass.__init__(self._templateObj)

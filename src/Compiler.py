@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.29 2002/04/08 00:19:16 hierro Exp $
+# $Id: Compiler.py,v 1.30 2002/04/09 18:56:25 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.29 $
+Version: $Revision: 1.30 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/04/08 00:19:16 $
+Last Revision Date: $Date: 2002/04/09 18:56:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.29 $"[11:-2]
+__revision__ = "$Revision: 1.30 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -681,7 +681,7 @@ class ClassCompiler(SettingsManager, GenUtils):
         self._activeMethods = []        # stack while parsing/generating
         self._finishedMethods = []      # store by order
         self._methodsIndex = {}      # store by name
-        self._baseClasses = ['Template']
+        self._baseClass = 'Template'
         self._classDocStringLines = []
         self._generatedAttribs = []      # printed after methods in the gen class def
         self._initMethChunks = []
@@ -695,11 +695,7 @@ class ClassCompiler(SettingsManager, GenUtils):
         __init__ = self.spawnMethodCompiler('__init__', klass=MethodCompiler)
         __init__.setupState()
         __init__.setMethodSignature("def __init__(self, *args, **KWs)")
-        __init__.addChunk(
-            "%(mainBaseClass)s.__init__(self, *args, **KWs)" % {
-            'mainBaseClass':self._baseClasses[-1],
-            }
-            )
+        __init__.addChunk("%s.__init__(self, *args, **KWs)" % self._baseClass)
         for chunk in self._initMethChunks:
             __init__.addChunk(chunk)
         __init__.cleanupState()
@@ -725,8 +721,8 @@ class ClassCompiler(SettingsManager, GenUtils):
     def className(self):
         return self._className
        
-    def setBaseClasses(self, baseClasses):
-        self._baseClasses = baseClasses
+    def setBaseClass(self, baseClass):
+        self._baseClass = baseClass
         
     def setMainMethodName(self, methodName):
         ## change the name in the methodCompiler and add new reference
@@ -776,9 +772,6 @@ class ClassCompiler(SettingsManager, GenUtils):
         
     def finishedMethods(self):
         return self._finishedMethods
-
-    def addBaseClass(self, baseClass):
-        self._baseClasses.append(baseClass)
 
     def addClassDocString(self, line):
         self._classDocStringLines.append(line)
@@ -875,10 +868,7 @@ class ClassCompiler(SettingsManager, GenUtils):
 
 
     def classSignature(self):
-        return "class " + self.className() + "(" + self.baseClasses() + "):"
-
-    def baseClasses(self):
-        return ','.join(self._baseClasses)
+        return "class %s(%s):" % (self.className(), self._baseClass)
         
     def classDocstring(self):
         ind = self.setting('indentationStep')
