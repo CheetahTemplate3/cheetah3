@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.26 2003/03/18 04:41:48 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.27 2003/12/03 04:52:53 tavis_rudd Exp $
 
 """This module implements Cheetah's optional NameMapper syntax.
 
@@ -134,13 +134,13 @@ Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@damnsimple.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.26 $
+Version: $Revision: 1.27 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2003/03/18 04:41:48 $
+Last Revision Date: $Date: 2003/12/03 04:52:53 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__revision__ = "$Revision: 1.26 $"[11:-2]
+__revision__ = "$Revision: 1.27 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -249,7 +249,7 @@ except:
                 val = _valueForName(namespace, nameChunks,
                                     executeCallables=executeCallables, passNamespace=True)
                 return val
-            except NotFoundInNamespace:
+            except (NotFoundInNamespace, NotFound):
                 pass           
         raise NotFound(name)
 
