@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.39 2002/01/23 20:20:20 tavis_rudd Exp $
+# $Id: Parser.py,v 1.40 2002/02/25 03:57:20 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.39 $
+Version: $Revision: 1.40 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/01/23 20:20:20 $
+Last Revision Date: $Date: 2002/02/25 03:57:20 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.39 $"[11:-2]
+__revision__ = "$Revision: 1.40 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -315,7 +315,7 @@ class _LowLevelSemanticsParser(Lexer):
             r'(?P<cacheToken>' +
             cacheToken +
             ')' +
-            r'(?P<enclosure>(?:|\{|\(|\[|)[ \t\f]*)' + # allow WS after enclosure
+            r'(?P<enclosure>(?:(?:\{|\(|\[)[ \t\f]*))' + # allow WS after enclosure
             r'(?=[A-Za-z_])')
         validCharsLookAhead = r'(?=[A-Za-z_\*!\{\(\[])'
         self.cheetahVarStartToken = self.setting('cheetahVarStartToken')
