@@ -173,11 +173,22 @@ The constructor accepts the following keyword arguments:
 You must specify either {\bf source} or {\bf file}, but not both.  All other
 arguments are optional.  If you are using {\bf source}, you may omit the
 \code{source=} prefix {\em if it is the first argument}, as in all the examples
-above.
+above.  
 
 If you spell a keyword wrong, it will be ignored rather than causing an error.
 So check your spelling!
 
+When using a precompiled template class created by \code{cheetah-compile}, you do
+{\em not} need to specify a {\bf source} or {\bf file} argument since that has
+already been provided.  This allows you to instantiate a precompiled template
+object without any constructor arguments if you wish:
+\begin{verbatim}
+from MyPrecompiledTemplate import MyPrecompiledTemplate
+t = MyPrecompiledTemplate()
+t.name = "Fred Flintstone"
+t.city = "Bedrock City"
+print t
+\end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{cheetah-compile: converting .tmpl files into .py files}
