@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.4 2001/06/18 19:26:30 tavis_rudd Exp $
+# $Id: Template.py,v 1.5 2001/06/18 22:12:09 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/18 19:26:30 $
+Last Revision Date: $Date: 2001/06/18 22:12:09 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 
 ##################################################
@@ -47,6 +47,7 @@ from Utilities import \
 True = (1==1)
 False = (0==1)
 
+RESTART = 0
 ##################################################
 ## CLASSES ##
 
@@ -120,7 +121,6 @@ class Template(SettingsManager):
                            CodeGen.preProcessLazyMacroCalls),
                           ('lazyMacroCalls',
                            CodeGen.preProcessLazyMacroCalls),
-
                           ('explicitMacroCalls',
                            CodeGen.preProcessExplicitMacroCalls),
                           ('comments',
@@ -299,6 +299,9 @@ class Template(SettingsManager):
             if debug: results['stage1'] = []
             for preProcessor in settings['preProcessors']:
                 templateDef = preProcessor[1](self, templateDef)
+                if type(templateDef)==types.TupleType and templateDef[0] == RESTART:
+                    # a parser restart might have been requested for #include's 
+                    return self._codeGenerator(templateDef[1])
                 if debug: results['stage1'].append((preProcessor[0], templateDef))
 
                             
