@@ -31,6 +31,6 @@ text:
 
 clean:
 	-rm -rf $(DOCNAME)
-	-rm *.aux *.l2h *~ *.log *.ind *.bkm *.how *.toc
+	-rm -f *.aux *.l2h *~ *.log *.ind *.bkm *.how *.toc
 	-rm -rf ../html
 
