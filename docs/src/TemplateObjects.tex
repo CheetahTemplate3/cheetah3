@@ -320,6 +320,26 @@ are available to change configuration settings after instantiation.
 
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Instance variables}
+
+You shouldn't use or modify these directly, but they are documented here for
+completeness.
+
+\begin{description}
+
+\item{._fileName}  The filename that was passed to the constructor's `file'
+     keyword argument, or None if a filename was not passed.
+     
+\item{._fileMtime}  The modify time of the file whose filename was passed to
+     the constructor's `file' keyword argument, or None if no filename was
+     passed.  (This is for future implementation of automatically recompiling
+     the TO if the source file changes.)
+
+\end{description}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Debugging}
 
