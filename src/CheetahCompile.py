@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.14 2001/12/05 18:47:54 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.15 2001/12/05 20:30:33 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.14 $
+Version: $Revision: 1.15 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/12/05 18:47:54 $
+Last Revision Date: $Date: 2001/12/05 20:30:33 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.14 $"[11:-2]
+__version__ = "$Revision: 1.15 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -27,7 +27,6 @@ import shutil
 
 #intra-package imports ...
 from Version import version
-from Template import Template
 from Compiler import Compiler
 
 ##################################################
@@ -38,7 +37,8 @@ False = (1==0)
 
 class Error(Exception):
     pass
-    
+
+
 class CheetahCompile:
     """A command-line compiler for Cheetah .tmpl files."""
 
@@ -46,92 +46,96 @@ class CheetahCompile:
     SERVLET_EXTENSION = '.py'
     SERVLET_BACKUP_EXT = '.py_bak'
     GENERATED_EXT = '.html'
+    
+    RECURSIVE = False
     MAKE_BACKUPS = True
     VERBOSE = False
+    
+    WRITE_GENERATED = False
+    PRINT_GENERATED = False
     
     def __init__(self, scriptName=os.path.basename(sys.argv[0]),
                  cmdLineArgs=sys.argv[1:]):
 
-        self.compileDirectories = False
-        self.recurseDirectories = False
-        self.writeGenerated = False
-        self.printGenerated = False
-        self.compiledFiles = []
         self._scriptName = scriptName
         self._cmdLineArgs = cmdLineArgs
 
     def run(self):
         """The main program controller."""
+        
+        self._processCmdLineArgs()
+        self._buildFileList()
+        self._processFileList()
+        
+    def _processCmdLineArgs(self):
         try:
-            opts, args = getopt.getopt( self._cmdLineArgs, 'hpdRwv', [])
+            self._opts, self._args = getopt.getopt(
+                self._cmdLineArgs, 'hpdRwv', [])
 
         except getopt.GetoptError, v:
             # print help information and exit:
             print v
             self.usage()
             sys.exit(2)
-        if not (opts or args):
-            self.usage()
-            sys.exit()
         
-        for o, a in opts:
+        for o, a in self._opts:
             if o in ('-h',):
                 self.usage()
                 sys.exit()
             if o in ('-R',):
-                self.compileDirectories = True
-                self.recurseDirectories = True
-            if o in ('-d',):
-                self.compileDirectories = True
+                self.RECURSIVE = True
             if o in ('-p',):
-                self.printGenerated = True
+                self.PRINT_GENERATED = True
             if o in ('-w',):
-                self.writeGenerated = True
+                self.WRITE_GENERATED = True
             if o in ('-v',):
                 self.VERBOSE = True
-                    
-        if not args and self.compileDirectories:
-            args = ["."]
-        for fileName in args:
-            self.processFile(fileName)
-        if self.writeGenerated:
-            for fileName in self.compiledFiles:
-                self.generate(fileName)
 
-    def processFile(self, fileName):
-        if os.path.isdir(fileName):
-            if not self.compileDirectories:
-                return
-            for file in os.listdir(fileName):
-                file = os.path.join(fileName, file)
-                if os.path.isdir(file):
-                    if self.recurseDirectories:
-                        self.processFile(file)
-                    continue
-                extension = os.path.splitext(file)[1]
-                if extension == self.CHEETAH_EXTENSION:
-                    self.processFile(file)
-        else:
-            self.compileFile(fileName)
+
+    def _buildFileList(self):
+        if not self._args:
+            self._args = ["."]
             
-         
-    def compileFile(self, fileName):
-        """Compile an single Cheetah file.  """
+        pending = self._args[:]
+        self._fileList = []
+        addFile = self._fileList.append
 
+        while pending:
+            entry = pending.pop()
+            if os.path.isdir(entry):
+                for fileOrDir in os.listdir(entry):
+                    fileOrDir = os.path.join(entry, fileOrDir)
+                    if os.path.isdir(fileOrDir):
+                        if self.RECURSIVE:
+                            pending.append(fileOrDir)
+                        continue
+                    if self._isTemplateFile(fileOrDir):
+                        addFile(fileOrDir)
+            else:
+                addFile(fileName)
+            
+    def _isTemplateFile(self, filename):
+        return os.path.splitext(filename)[1] == self.CHEETAH_EXTENSION
+
+    def _processFileList(self):
+        self._compiledFiles = []
+        for file in self._fileList:
+            self._processFile(file)
+            
+        if self.WRITE_GENERATED:
+            for fileName in self._compiledFiles:
+                self._generate(fileName)
+
+    def _processFile(self, fileName):
         srcFile = fileName
         fileNameMinusExt = os.path.splitext(fileName)[0]
-        className = os.path.split(fileNameMinusExt)[1]
-        if not re.match(r'[a-zA-Z_][a-zA-Z_0-9]*$', className):
-            raise Error(
-                "The filename %s contains invalid characters.  It must" \
-                " be named according to the same rules as Python modules."
-                % fileName)
+        className = os.path.split(fileNameMinusExt)[1]        
+        pyCode = self._compileFile(srcFile, className)
+        
+        self._compiledFiles.append(fileNameMinusExt)
 
-        self.compiledFiles.append(fileNameMinusExt)
-        genCode = str(Compiler(file=srcFile, moduleName=className,
-                               mainClassName=className))
 
-        if not self.printGenerated or self.writeGenerated:
+        if not self.PRINT_GENERATED or self.WRITE_GENERATED:
             outputModuleFilename = fileNameMinusExt + self.SERVLET_EXTENSION
 
             if self.MAKE_BACKUPS and os.path.exists(outputModuleFilename):
@@ -146,13 +150,26 @@ class CheetahCompile:
                                               className + self.SERVLET_EXTENSION)
                 
             fp = open(outputModuleFilename,'w')
-            fp.write(genCode)
+            fp.write(pyCode)
             fp.close()
             
-        if self.printGenerated:
+        if self.PRINT_GENERATED:
             print genCode
+
+    def _compileFile(self, srcFile, className):
+        """Compile an single Cheetah file.  """
+
+        if not re.match(r'[a-zA-Z_][a-zA-Z_0-9]*$', className):
+            raise Error(
+                "The filename %s contains invalid characters.  It must" \
+                " be named according to the same rules as Python modules."
+                % srcFile)
+        pyCode = str(Compiler(file=srcFile, moduleName=className,
+                               mainClassName=className))
+        return pyCode
+
             
-    def generate(self, fileNameMinusExt):
+    def _generate(self, fileNameMinusExt):
         ## @@IB: this sys.path is a hack
         sys.path = [os.path.dirname(fileNameMinusExt)] + sys.path
         try:
@@ -179,7 +196,6 @@ Usage:
   %(scriptName)s [OPTION] {-R|-d} FILES/DIRECTORIES
 
   -R                          Recurse subdirectories
-  -d                          Compile all *.tmpl files in directory
   -p                          Print generated Python code to stdout
   -w                          Write output of template to *.html
   -v                          Be verbose
@@ -195,5 +211,4 @@ Usage:
 if __name__ == '__main__':
 
     CheetahCompile().run()
-
 
