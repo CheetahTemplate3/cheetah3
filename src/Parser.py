@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.42 2002/02/26 07:12:56 tavis_rudd Exp $
+# $Id: Parser.py,v 1.43 2002/03/06 16:42:21 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.42 $
+Version: $Revision: 1.43 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/02/26 07:12:56 $
+Last Revision Date: $Date: 2002/03/06 16:42:21 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.42 $"[11:-2]
+__revision__ = "$Revision: 1.43 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -662,7 +662,7 @@ class _LowLevelSemanticsParser(Lexer):
           ]
 
         """
-        
+
         chunks = []
         while self.pos() < len(self):
             rest = ''
