@@ -2,7 +2,7 @@ PackageName = "Cheetah"
 Title = "Cheetah: The Python-Powered Template Engine"
 Description = "Provides Cheetah, a Python-powered template engine and code generator"
 Status = 'Beta'
-Version = '0.9.12'
+Version = '0.9.13a1'
 Maintainer = "Tavis Rudd"
 Author = "The Cheetah Development Team"
 AuthorEmail = "cheetahtemplate-discuss@lists.sf.net"
@@ -52,7 +52,7 @@ try:
                                       [os.path.join("%(PackageDir)s" ,"_namemapper.c")
                                        % self.settings()
                                        ]
-                                      )
+                                      ),                           
                             ]
             else:
                 extModules=[]
