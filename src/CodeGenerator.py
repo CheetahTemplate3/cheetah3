@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.17 2001/08/03 21:48:34 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.18 2001/08/04 00:02:44 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.17 $
+Version: $Revision: 1.18 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/03 21:48:34 $
+Last Revision Date: $Date: 2001/08/04 00:02:44 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.17 $"[11:-2]
+__version__ = "$Revision: 1.18 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -77,10 +77,9 @@ class DisplayLogicProcessor(TagProcessor.TagProcessor):
             outputCode = indent*templateObj._codeGeneratorState['indentLevel']
 
         elif tag in ('continue','break'):
-            outputCode = indent*templateObj._codeGeneratorState['indentLevel'] + tag + "\n"
-            templateObj._codeGeneratorState['indentLevel'] -= 1
-            outputCode += indent*templateObj._codeGeneratorState['indentLevel']
-
+            outputCode = indent*templateObj._codeGeneratorState['indentLevel'] + tag \
+                         + "\n" + \
+                         indent*templateObj._codeGeneratorState['indentLevel']
         elif tag[0:4] in ('else','elif'):
             tag = tag.replace('else if','elif')
             
