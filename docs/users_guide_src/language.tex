@@ -137,6 +137,8 @@ These tags may not be used inside other Cheetah tags.
 \item execute code and discard output: \code{<\%} \ldots \code{\%>}
 \end{enumerate}
 
+%% @@MO: TODO: reconcile the order of this summary with the order in the
+%% detail sections.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Placeholder Syntax Rules}
@@ -176,10 +178,19 @@ These tags may not be used inside other Cheetah tags.
      the {\em long placeholder syntax}; the form without braces is called, you
      guessed it, the {\em short placeholder syntax}.
 
-\item The syntax \code{\$\{placeholderName, \$arg1="val1"\}} passes arguments to
+\item The syntax \code{\$\{placeholderName, arg1="val1"\}} passes arguments to
      the output filter (see \code{\#filter}, section \ref{output.filter}.
-     The braces and comma are required in this case.
-   
+     The braces and comma are required in this case.  Note that filter arguments
+     don't have a \code{\$} on the left side of the equal sign.
+
+\item There is one other place you omit the \code{\$} prefix: intermediate
+     variables in Python list comprehensions.  This is a limitation of
+     Cheetah's parser, but it also makes sense.  These are temporary variables
+     local to the list comprehension,  and not any of Cheetah's business.  For
+     example:
+\begin{verbatim}
+#set $theRange = [x ** 2 for x in $range(10)]
+\end{verbatim}
 \item Cheetah ignores all dollar signs (\code{\$}) that are not followed by a
      letter or an underscore.  Cheetah also ignores any placeholder escaped by a
      backslash (\code{$\backslash$\$placeholderName}).

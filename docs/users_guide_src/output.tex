@@ -211,12 +211,14 @@ the filter just returns a string representation of the placeholder's value,
 unless it is \code{'None'}, in which case it returns an empty string. 
 
 Certain filters take optional arguments to modify their behaviour.  To pass
-arguments, use the long placeholder syntax and precede each argument by a comma.
-For instance, the MaxLen filter takes an argument 'maxlen':
+arguments, use the long placeholder syntax and precede each filter argument by
+a comma.  Filter arguments don't take a \code{\$} prefix, to avoid clutter in
+the placeholder tag which already has plenty of dollar signs.  For instance,
+the MaxLen filter takes an argument 'maxlen':
 
 \begin{verbatim}
-$\{placeholderName, $maxlen=20\}
-${functionCall($functionArg), $maxlen=$myMaxLen}
+${placeholderName, maxlen=20}
+${functionCall($functionArg), maxlen=$myMaxLen}
 \end{verbatim}
 
 To change the output filter, use the \code{'filter'} keyword to the
@@ -290,6 +292,11 @@ http://cheetah.colorstudy.net/twiki/bin/edit/Cheetah/OutputFilters
 for the latest ideas.
 
 %% @@MO: Tavis TODO: fix the description of the Pager filter.  It needs a howto.
+
+%% @@MO: How about using settings to provide default arguments for filters?
+%% Each filter could look up FilterName (or FilterNameDefaults) setting,
+%% whose value would be a dictionary containing keyword/value pairs.  These
+%% would be overridden by same-name keys passed by the placeholder.
 
 
 % Local Variables:
