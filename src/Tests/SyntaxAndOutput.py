@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.22 2002/01/23 20:21:26 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.23 2002/02/25 04:04:11 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.22 $
+Version: $Revision: 1.23 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/01/23 20:21:26 $
+Last Revision Date: $Date: 2002/02/25 04:04:11 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.22 $"[11:-2]
+__revision__ = "$Revision: 1.23 $"[11:-2]
 
 
 ##################################################
@@ -260,8 +260,8 @@ class Backslashes(OutputTest):
 class NonTokens(OutputTest):
     def test1(self):
         """dollar signs not in Cheetah $vars"""
-        self.verify("$ $$ $5 $. ",
-                    "$ $$ $5 $. ")
+        self.verify("$ $$ $5 $. $ test",
+                    "$ $$ $5 $. $ test")
 
     def test2(self):
         """hash not in #directives"""
