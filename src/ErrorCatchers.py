@@ -1,34 +1,19 @@
 #!/usr/bin/env python
-# $Id: ErrorCatchers.py,v 1.6 2002/10/01 17:52:02 tavis_rudd Exp $
+# $Id: ErrorCatchers.py,v 1.7 2005/01/03 19:59:07 tavis_rudd Exp $
 """ErrorCatcher class for Cheetah Templates
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/10/01 17:52:02 $
+Last Revision Date: $Date: 2005/01/03 19:59:07 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.6 $"[11:-2]
-
-##################################################
-## DEPENDENCIES
+__revision__ = "$Revision: 1.7 $"[11:-2]
 
 import time
-
-from NameMapper import NotFound
-
-##################################################
-## CONSTANTS & GLOBALS
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
-
-##################################################
-## CLASSES
+from Cheetah.NameMapper import NotFound
 
 class Error(Exception):
     pass
@@ -44,8 +29,6 @@ class ErrorCatcher:
     
     def warn(self, exc_val, code, rawCode, lineCol):
         return rawCode
-    
-
 ## make an alias
 Echo = ErrorCatcher
 
