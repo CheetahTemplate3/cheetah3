@@ -1,13 +1,14 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.27 2003/12/03 04:52:53 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.28 2005/01/03 19:05:49 tavis_rudd Exp $
 
-"""This module implements Cheetah's optional NameMapper syntax.
+"""This module supports Cheetah's optional NameMapper syntax.
 
 Overview
 ================================================================================
-NameMapper is a simple syntax for accessing Python data structures, functions,
-and methods from Cheetah. It's called NameMapper because it 'maps' simple
-'names' in Cheetah templates to complex objects in Python.
+
+NameMapper provides a simple syntax for accessing Python data structures,
+functions, and methods from Cheetah. It's called NameMapper because it 'maps'
+simple 'names' in Cheetah templates to possibly more complex syntax in Python.
 
 Its purpose is to make working with Cheetah easy for non-programmers.
 Specifically, non-programmers using Cheetah should NOT need to be taught (a)
@@ -16,18 +17,16 @@ and methods are, and (c) what 'self' is.  A further aim (d) is to buffer the
 code in Cheetah templates from changes in the implementation of the Python data
 structures behind them.
 
-Consider this scenario.
+Consider this scenario:
 
-You've been hired as a consultant to design and implement a customer information
-system for your client. The class you create has a 'customers' method that
-returns a dictionary of all the customer objects.  Each customer object has an
-'address' method that returns the a dictionary with information about the
-customer's address.
+You are building a customer information system. The designers with you want to
+use information from your system on the client's website --AND-- they want to
+understand the display code and so they can maintian it themselves.
 
-The designers working for your client want to use information from your system
-on the client's website --AND-- they want to understand the display code and so
-they can maintian it themselves.
-
+You write a UI class with a 'customers' method that returns a dictionary of all
+the customer objects.  Each customer object has an 'address' method that returns
+the a dictionary with information about the customer's address.  The designers
+want to be able to access that information.
 
 Using PSP, the display code for the website would look something like the
 following, assuming your servlet subclasses the class you created for managing
@@ -56,7 +55,7 @@ and, conceptually, is far more accessible. With PHP or ASP, the code would be
 even messier than the PSP
 
 This is a rather extreme example and, of course, you could also just implement
-'$customer($ID).city' and obey the Law of Demeter (search Google for more on that).
+'$getCustomer($ID).city' and obey the Law of Demeter (search Google for more on that).
 But good object orientated design isn't the point here.
 
 Details
@@ -98,7 +97,7 @@ Further notes:
 autocalling can only be used with functions or methods that either have no
 arguments or have default values for all arguments.
 
-* NameMapper only autocalls functions and methods.  Classes and callable objects
+* NameMapper only autocalls functions and methods.  Classes and callable object instances
 will not be autocalled.  
 
 * Autocalling can be disabled using Cheetah's 'useAutocalling' setting.
@@ -112,167 +111,188 @@ CASCADING section below for details.
 
 NAMESPACE CASCADING (d)
 --------------------
+...
 
 Implementation details
 ================================================================================
 
-* NameMapper's search order is object attributes, then underscored attributes,
-  and finally dictionary items.
+* NameMapper's search order is dictionary keys then object attributes
 
 * NameMapper.NotFound is raised if a value can't be found for a name.
 
 Performance and the C version
 ================================================================================
-Cheetah comes with both a C version and a Python Version of NameMapper.  The C
-Version is up to 6 times faster.  It's slightly slower than standard Python
-syntax, but you won't notice the speed difference in normal usage scenarios.
+
+Cheetah comes with both a C version and a Python version of NameMapper.  The C
+version is significantly faster and the exception tracebacks are much easier to
+read.  It's still slower than standard Python syntax, but you won't notice the
+difference in realistic usage scenarios.
 
 Cheetah uses the optimized C version (_namemapper.c) if it has
-been compiled, or falls back automatically to the Python version if not.
+been compiled or falls back to the Python version if not.
 
 Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@damnsimple.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.27 $
+Version: $Revision: 1.28 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2003/12/03 04:52:53 $
+Last Revision Date: $Date: 2005/01/03 19:05:49 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__revision__ = "$Revision: 1.27 $"[11:-2]
+__revision__ = "$Revision: 1.28 $"[11:-2]
 
-##################################################
-## DEPENDENCIES
-
+from __future__ import generators
 import types
 from types import StringType, InstanceType, ClassType, TypeType
-import re
-# it uses the string methods and list comprehensions added in recent versions of python
+from pprint import pformat
+import inspect
 
-##################################################
-## GLOBALS AND CONSTANTS
+_INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS = False
+_ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS = True
+__all__ = ['NotFound',
+           'hasKey',
+           'valueForKey',
+           'valueForName',
+           'valueFromSearchList',
+           'valueFromFrameOrSearchList',
+           'valueFromFrame',
+           ]
 
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
-
-class NoDefault:
-    pass
-
-##################################################
-## FUNCTIONS
 
 ## N.B. An attempt is made at the end of this module to import C versions of
 ## these functions.  If _namemapper.c has been compiled succesfully and the
 ## import goes smoothly, the Python versions defined here will be replaced with
 ## the C versions.
-try:
-    from _namemapper import NotFound, valueForKey, valueForName, valueFromSearchList
-    # it is possible, with Jython for example, that _namemapper.c hasn't been compiled
-    C_VERSION = True
-except:
-    C_VERSION = False
 
-    class NotFound(LookupError):
-        pass
-    class NotFoundInNamespace(NotFound):
-        pass
+class NotFound(LookupError):
+    pass
+
+def _raiseNotFoundException(key, namespace):
+    excString = "cannot find '%s'"%key
+    if _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS:
+        excString += ' in the namespace %s'%pformat(namespace)
+    raise NotFound(excString)
+
+def _wrapNotFoundException(exc, fullName, namespace):
+    if not _ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS:
+        raise 
+    else:
+        excStr = exc.args[0]
+        if excStr.find('while searching')==-1: # only wrap once!
+            excStr +=" while searching for '%s'"%fullName
+            if _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS:
+                excString += ' in the namespace %s'%pformat(namespace)
+            exc.args = (excStr,)
+        raise
     
-    def valueForKey(obj, key):
-    
-        """Get the value of the specified key.  The 'obj' can be a a mapping or any
-        Python object that supports the __getattr__ method. The key can be a mapping
-        item, or an attribute."""
-    
-        if hasattr(obj, key):
-            return getattr(obj, key)
-        elif hasattr(obj, '__getitem__'):
-            try:
-                return obj[key]
-            except KeyError:
-                raise NotFound, key
-        else:
-            raise NotFound, key
-                
-
-
-    def valueForName(obj, name, executeCallables=False):
-        """Get the value for the specified name.  This function can be called
-        recursively.  """
-    
-        if type(name)==StringType:
-            # then this is the first call to this function.
-            nameChunks=name.split('.')
-        else:
-            #if this function calls itself then name already is a list of nameChunks
-            nameChunks = name
-            
-        return _valueForName(obj, nameChunks, executeCallables=executeCallables)
-    
-    def _valueForName(obj, nameChunks, executeCallables=False, passNamespace=False):
-        ## go get a binding for the key ##
-        firstKey = nameChunks[0]
-        if passNamespace:
-            try:
-                binding = valueForKey(obj, firstKey)
-            except NotFound:
-                raise NotFoundInNamespace
-        else:
-            binding = valueForKey(obj, firstKey)
-        if executeCallables and callable(binding) and \
-           type(binding) not in (InstanceType, ClassType, TypeType):
-            # the type check allows access to the methods of instances
-            # of classes with __call__() defined
-            # and also allows obj.__class__.__name__
-            binding = binding()
-    
-        if len(nameChunks) > 1:
-            # its a composite name like: nestedObject.item
-            return _valueForName(binding, nameChunks[1:],
-                                executeCallables=executeCallables)
-        else:
-            # its a single key like: nestedObject
-            return binding
-
-    def valueFromSearchList(searchList, name, executeCallables=False):
-        if type(name)==StringType:
-            # then this is the first call to this function.
-            nameChunks=name.split('.')
-        else:
-            #if this function calls itself then name already is a list of nameChunks
-            nameChunks = name
-
-        for namespace in searchList:
-            try:
-                val = _valueForName(namespace, nameChunks,
-                                    executeCallables=executeCallables, passNamespace=True)
-                return val
-            except (NotFoundInNamespace, NotFound):
-                pass           
-        raise NotFound(name)
-
-
-##################################################
-# these functions are not in the C version
-
 def hasKey(obj, key):
     """Determine if 'obj' has 'key' """
-    if hasattr(obj, key):
+    if hasattr(obj,'has_key') and obj.has_key(key):
         return True
-    elif hasattr(obj,'has_key') and obj.has_key(key):
+    elif hasattr(obj, key):
         return True
     else:
         return False
 
+def valueForKey(obj, key):
+    if hasattr(obj, 'has_key') and obj.has_key(key):
+        return obj[key]
+    elif hasattr(obj, key):
+        return getattr(obj, key)
+    else:
+        _raiseNotFoundException(key, obj)
+
+def _valueForName(obj, name, executeCallables=False):
+    nameChunks=name.split('.')
+    for i in range(len(nameChunks)):
+        key = nameChunks[i]
+        if hasattr(obj, 'has_key') and obj.has_key(key):
+            nextObj = obj[key]
+        elif hasattr(obj, key):
+            nextObj = getattr(obj, key)
+        else:
+            _raiseNotFoundException(key, obj)
+        
+        if (executeCallables and callable(nextObj)
+            and (type(nextObj) not in (InstanceType, ClassType))):
+            obj = nextObj()
+        else:
+            obj = nextObj
+    return obj
+
+def valueForName(obj, name, executeCallables=False):
+    try:
+        return _valueForName(obj, name, executeCallables)
+    except NotFound, e:
+        _wrapNotFoundException(e, fullName=name, namespace=obj)
+
+def valueFromSearchList(searchList, name, executeCallables=False):
+    key = name.split('.')[0]
+    for namespace in searchList:
+        if hasKey(namespace, key):
+            return _valueForName(namespace, name,
+                                executeCallables=executeCallables)
+    _raiseNotFoundException(key, searchList)
+
+def _namespaces(callerFrame, searchList=None):
+    yield callerFrame.f_locals
+    if searchList:
+        for namespace in searchList:
+            yield namespace
+    yield callerFrame.f_globals
+    yield __builtins__
+
+def valueFromFrameOrSearchList(searchList, name, executeCallables=False,
+                               frame=None):
+    def __valueForName():
+        try:
+            return _valueForName(namespace, name, executeCallables=executeCallables)
+        except NotFound, e:
+            _wrapNotFoundException(e, fullName=name, namespace=searchList)
+    try:
+        if not frame:
+            frame = inspect.stack()[1][0]
+        key = name.split('.')[0]
+        for namespace in _namespaces(frame, searchList):
+            if hasKey(namespace, key): return __valueForName()
+        _raiseNotFoundException(key, searchList)
+    finally:
+        del frame
+
+def valueFromFrame(name, executeCallables=False, frame=None):
+    # @@TR consider implementing the C version the same way
+    # at the moment it provides a seperate but mirror implementation
+    # to valueFromFrameOrSearchList
+    try: 
+        if not frame:
+            frame = inspect.stack()[1][0]
+        return valueFromFrameOrSearchList(searchList=None,
+                                          name=name,
+                                          executeCallables=executeCallables,
+                                          frame=frame)
+    finally:
+        del frame
+
 def hasName(obj, name):
+    #Not in the C version
     """Determine if 'obj' has the 'name' """
+    key = name.split('.')[0]
+    if not hasKey(obj, key):
+        return False
     try:
         valueForName(obj, name)
         return True
     except NotFound:
         return False
+try:
+    from _namemapper import NotFound, valueForKey, valueForName, \
+         valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
+    # it is possible with Jython or Windows, for example, that _namemapper.c hasn't been compiled
+    C_VERSION = True
+except:
+    C_VERSION = False
 
 ##################################################
 ## CLASSES
