@@ -5,12 +5,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/13 18:09:39 $
+Last Revision Date: $Date: 2001/07/13 22:59:15 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -185,7 +185,7 @@ class Stage2ErrorHandler(StageErrorHandler):
             msg += "\nThis was the state of the template when the error occurred:\n\n"
             msg += insertLineNums( self._localvars['templateDef'] )
             
-        else:
+        elif self._localvars['subStage'] == 'd':
             msg += "Cheetah was joining the code from each of the tags into " + \
                    "a string when the error occurred.\n"
             msg += "This was the list of code chunks (even) and normal text (odd) " + \
