@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.68 2005/01/06 12:59:19 tavis_rudd Exp $
+# $Id: Parser.py,v 1.69 2005/01/11 15:46:51 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.68 $
+Version: $Revision: 1.69 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/01/06 12:59:19 $
+Last Revision Date: $Date: 2005/01/11 15:46:51 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.68 $"[11:-2]
+__revision__ = "$Revision: 1.69 $"[11:-2]
 
 import os
 import sys
@@ -1259,7 +1259,7 @@ class _HighLevelParser(_LowLevelParser):
         self.advance(len('encoding'))
         self.getWhiteSpace()
         encoding = self.readToEOL()
-        self.setModuleEncoding(encoding.strip())
+        self._compiler.setModuleEncoding(encoding.strip())
         
     def eatCompiler(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
