@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.29 2001/11/07 18:18:05 tavis_rudd Exp $
+# $Id: Parser.py,v 1.30 2001/11/08 06:20:25 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.29 $
+Version: $Revision: 1.30 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/11/07 18:18:05 $
+Last Revision Date: $Date: 2001/11/08 06:20:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.29 $"[11:-2]
+__version__ = "$Revision: 1.30 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1498,7 +1498,8 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         else:
             isKlass = False
             theFilter = self.getIdentifier()
-            
+            self.getWhiteSpace()
+        
         self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
 
         if isKlass:
