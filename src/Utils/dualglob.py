@@ -128,7 +128,6 @@ source file '%s' is directory but recursion flag is False""" % src)
                 path = fil
             else:
                 path = os.path.join(orig, fil)
-            print "Path is", path
             if os.path.isdir(path):
                 self._evaluateDir(path)
             elif not fil.endswith(iext):
