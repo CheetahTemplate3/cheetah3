@@ -81,16 +81,6 @@ Test Suite
   from a running WebKit server, make a servlet that runs the tests and outputs
   diagnostics to the browser.
 
-Documentation
-================================================================================
-- more examples in the Webware section (MO)
-- more examples/advice all over the Users' Guide about recommended/
-  non-recommended strategies (MO)
-- developers' guide (MO)
-- beginners guide
-- quick reference for template maintainers (MO - someday)
-- HOWTOs (somebody offered to make some)
-
 Website
 ================================================================================
 - automate the documentation update 
