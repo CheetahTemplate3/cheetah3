@@ -1,11 +1,12 @@
 Please initial your changes and a date for each release
 ================================================================================
-0.9.7 (July 12, 2001)
+0.9.7 (July 13, 2001)
   - reimplemented the parsing of $placeholders using the Python tokenizer module (TR)
     - now translates into Python code instead of going through NameMapper for
       each request
     - supports arg lists and nested placeholders
-    - maintained support for autocalling of functions, but this may be removed
+    - maintained support for autocalling of functions and methods,
+      will do this serially for $func.otherFunc, etc.
   - reimplemented the #include and #raw directives using nested templates for
     parsed includes and  string attributes of 'Template' to store raw text
     The support for file update monitoring of includes is still not implemented (TR)
