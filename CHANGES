@@ -1,20 +1,18 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
-0.9.15a4 (Nov ??, 2002)
-  - .addToSearchList() and .prependToSearchList() are gone.  Instead of 
-    adding containers to the searchList after instantiation, pass all the
-    containers you need to the constuctor, keep another reference somewhere
-    to the containers, and modify the containers directly.  Generic libraries
-    that want to add a new kind of information to the searchList (e.g.,
-    web variables) should do "self.searchList().insert(0, myContainer)". (MO)
-
 0.9.15a3 (Nov 10, 2002)
   - corrected a dictionary bug in the Python version of NameMapper (TR)
   - Rewrote the "cheetah" command (CheetahWrapper.py) again and added test
     cases.  New options --flat and --nobackup; --stdout is now a synonym for
     -p.  See the "cheetah compile" section in the Users' Guide for details.
     Deleted Utils.dualglob: merged into CheetahWrapper.  (MO)
+  - .addToSearchList() and .prependToSearchList() are gone.  Instead of 
+    adding containers to the searchList after instantiation, pass all the
+    containers you need to the constuctor, keep another reference somewhere
+    to the containers, and modify the containers directly.  Generic libraries
+    that want to add a new kind of information to the searchList (e.g.,
+    web variables) should do "self.searchList().insert(0, myContainer)". (MO)
 
 0.9.15a2 (Nov 4th, 2002)
   - Filters now have access to the name of the placeholder they're filtering.
