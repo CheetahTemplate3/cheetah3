@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SettingsManager.py,v 1.4 2001/08/04 05:33:06 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.5 2001/08/14 23:15:37 tavis_rudd Exp $
 """Provides a mixin class for managing application settings 
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2001/08/04 05:33:06 $
+Last Revision Date: $Date: 2001/08/14 23:15:37 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 
 ##################################################
@@ -34,8 +34,17 @@ from types import StringType, \
      DictType
 import types
 from cStringIO import StringIO
-from threading import Lock  # used for thread lock on sys.path manipulations
 import imp                  # used by SettingsManager.updateFromPySrcFile()
+
+try:
+    import threading
+    from threading import Lock  # used for thread lock on sys.path manipulations
+except:
+    class Lock:
+        def acquire(self):
+            pass
+        def release(self):
+            pass
 
 #intra-package imports ...
 from Utilities import mergeNestedDictionaries  #@@ consider moving this to here
