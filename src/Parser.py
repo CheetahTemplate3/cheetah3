@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.16 2001/09/14 17:22:26 tavis_rudd Exp $
+# $Id: Parser.py,v 1.17 2001/09/14 17:25:45 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.16 $
+Version: $Revision: 1.17 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/09/14 17:22:26 $
+Last Revision Date: $Date: 2001/09/14 17:25:45 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.16 $"[11:-2]
+__version__ = "$Revision: 1.17 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -338,7 +338,9 @@ class Parser:
         searchList = self.searchList()
         
         def translateName(name, self=self,
-                          autoCall=autoCall):
+                          autoCall=autoCall,
+                          firstSpecialCharRE=re.compile(r'\(|\['),
+                          ):
             
             ## get rid of the 'cache-type' tokens
             # - these are handled by the tag-processor instead
@@ -350,7 +352,7 @@ class Parser:
             name = '.'.join(nameChunks)
 
             ## split the name into a part that NameMapper can handle and the rest
-            firstSpecialChar = re.search(r'\(|\[', name)
+            firstSpecialChar = firstSpecialCharRE.search(name)
             if firstSpecialChar:         # NameMapper can't handle [] or ()
                 firstSpecialChar = firstSpecialChar.start()
                 nameMapperPartOfName, remainderOfName = \
