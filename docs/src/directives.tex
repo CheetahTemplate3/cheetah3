@@ -1,0 +1,134 @@
+\section{Directive Tags}
+
+% Will promote subsubsections to subsections.
+
+
+Directives tags are used for all functionality that cannot be handled with
+simple placeholders and are enclosed in \code{\#} and \code{/\#}.
+Cheetah does not use HTML/XML style tags because they would be hard to
+distinguish from real HTML tags and would not be visible in rendered HTML when
+something goes wrong.
+
+Some directives consist of a single tag while others have {\bf start} and
+{\bf end} tags that surround a chunk of text.  End tags are written in the form
+\code{\#end nameOfTheDirective/\#}.
+
+\subsubsection{Escaping directives}
+Directives can be escaped by placing a backslash ($\backslash$) before them.
+Escaped directives will be printed verbatim.
+
+\subsubsection{Tag closures: explicit and implicit}
+Directive tags can closed explicitly with \code{/\#} or implicitly with the end
+of the line if you're feeling lazy.
+\begin{verbatim}
+#block /#
+Text in the contents area of the
+block directive
+#end block /#
+\end{verbatim}
+or
+\begin{verbatim}
+#block
+Text in the contents area of the
+block directive
+#end block
+\end{verbatim}
+
+\subsubsection{Whitespace handling}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Comment directives}
+
+Comment directives are used to mark notes, explanations, and decorative text
+that should not appear in the output.  There are two forms of the comment
+directive: single-line and multi-line.
+
+All text in a template definition that lies between 2 hash characters
+(\code{\#\#}) and the end of the line is treated as a single-line comment and
+will not show up in the output, unless the 2 hash characters are escaped with a
+backslash.
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+##====================================  a decorative comment
+$contents                               ## an end-of-line comment
+##====================================
+</BODY>
+</HTML>
+\end{verbatim}
+
+Any text between \code{\#*} and \code{*\#} will be treated as a multi-line
+comment.
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+#*
+   Here is some multiline
+   comment text
+*#
+##====================================  a decorative comment
+$contents                               ## an end-of-line comment
+##====================================
+</BODY>
+</HTML>
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#raw directives}
+Any section of a template definition that is delimeted by \code{\#raw} and
+\code{\#end raw} will be printed verbatim without any parsing of
+\$placeholders or other directives.  This can be very useful for debugging or
+writing Cheetah examples and tutorials.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#include directives}
+
+\code{\#include} directives are used to include text from outside the template
+definition.  The text can come from \code{\$placeholder} variables or from
+external files.  The example below demonstrates use with \code{\$placeholder}
+variables.
+
+\begin{verbatim}
+#include $myParseText
+\end{verbatim}
+
+This example demonstrates its use with external files.
+\begin{verbatim}
+#include "includeFileName.txt"
+\end{verbatim}
+
+By default, included text will be parsed for Cheetah tags.  The keyword
+{\bf raw} can be used to mark the text for verbatim inclusion without any tag
+parsing.
+
+\begin{verbatim}
+#include raw $myParseText
+#include raw "includeFileName.txt"
+\end{verbatim}
+
+\code{Template} uses its .getFileContents(fileName) method to locate the file to
+be included.  This method can be overriden in subclasses if you want to modify
+or extend its behaviour.  It is possible to implement the logic for getting 
+remote files such as \code{http://myserver.com/file.txt}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#cache directives}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Display logic directives}
+
+\subsubsection{Conditional blocks}
+
+\subsubsection{For loops}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#block directives}
+
+\subsubsection{\#redefine directives}
+
+
