@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.33 2002/04/24 21:36:02 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.34 2002/05/14 23:18:25 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.33 $
+Version: $Revision: 1.34 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/04/24 21:36:02 $
+Last Revision Date: $Date: 2002/05/14 23:18:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.33 $"[11:-2]
+__revision__ = "$Revision: 1.34 $"[11:-2]
 
 
 ##################################################
@@ -1400,6 +1400,16 @@ $testDict.two""",
     def test14(self):
         """simple #set without NameMapper on"""
         self.verify("""#compiler useNameMapper = 0\n#set $testVar = 1 \n$testVar""",
+                    "1")
+
+    def test15(self):
+        """simple #set without $"""
+        self.verify("""#set testVar = 1 \n$testVar""",
+                    "1")
+
+    def test16(self):
+        """simple #set global without $"""
+        self.verify("""#set global testVar = 1 \n$testVar""",
                     "1")
 
 class IfDirective(OutputTest):
