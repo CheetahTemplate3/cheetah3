@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.9 2002/10/10 06:17:27 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.10 2002/10/20 03:29:01 hierro Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -8,12 +8,12 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/10/10 06:17:27 $
+Last Revision Date: $Date: 2002/10/20 03:29:01 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.9 $"[11:-2]
+__revision__ = "$Revision: 1.10 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -214,8 +214,8 @@ class CheetahWrapper:
             print "(backup %s)" % bak # On same line as previous message.
         else:
             print # Print pending newline.
-        if not os.path.exists(dstDir):
-            os.makedirs(dstDir)
+        #if not os.path.exists(dstDir):
+        #    os.makedirs(dstDir) # XXX Commented, buggy.
         f = open(dst, 'w')
         f.write(output)
         f.close()
