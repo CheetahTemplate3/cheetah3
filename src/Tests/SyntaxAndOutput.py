@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.23 2002/02/25 04:04:11 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.24 2002/03/06 16:54:40 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.23 $
+Version: $Revision: 1.24 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/02/25 04:04:11 $
+Last Revision Date: $Date: 2002/03/06 16:54:40 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.23 $"[11:-2]
+__revision__ = "$Revision: 1.24 $"[11:-2]
 
 
 ##################################################
@@ -1831,7 +1831,7 @@ class ExtendsDirective(OutputTest):
 #implements respond
 $spacer()
 """,
-                    '<IMG SRC="spacer.gif" WIDTH=1 HEIGHT=1 ALT="">\n')
+                    '<img src="spacer.gif" width="1" height="1" alt="" />\n')
 
     def test2(self):
         """multiple inheritance test"""
@@ -1842,7 +1842,7 @@ $spacer()
 #implements respond
 $spacer()
 """,
-                    '<IMG SRC="spacer.gif" WIDTH=1 HEIGHT=1 ALT="">\n')
+                    '<img src="spacer.gif" width="1" height="1" alt="" />\n')
 
 class ImportantExampleCases(OutputTest):
     def test1(self):
