@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.70 2001/11/10 22:54:58 tavis_rudd Exp $
+# $Id: Template.py,v 1.71 2001/11/24 04:32:47 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.70 $
+Version: $Revision: 1.71 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/10 22:54:58 $
+Last Revision Date: $Date: 2001/11/24 04:32:47 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.70 $"[11:-2]
+__version__ = "$Revision: 1.71 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -256,7 +256,7 @@ class Template(SettingsManager, Servlet):
             
     ## utility functions ##   
 
-    def getVar(varName, default=NoDefault):
+    def getVar(self, varName, default=NoDefault):
         
         """Get a variable from the searchList.  If the variable can't be found
         in the searchList, it returns the default value if one was given, or
