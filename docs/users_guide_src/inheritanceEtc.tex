@@ -168,6 +168,14 @@ with the new definition.  If the new \code{\#def} occurs in a subclass, it overr
 parent's definition.  See the \code{\#extends} directive above for information about
 subclasses.  Overriding is frequently used for blocks, which will be described next.
 
+There is also a single line version of the \code{\#def} directive:
+
+\begin{verbatim}
+#attr adj = 'trivial'
+#def myMeth: This is the $adj method 
+$myMeth
+\end{verbatim}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#block ... \#end block}
@@ -236,41 +244,48 @@ seventy-three.  That's not counting phrases like "take off" and "run-in".)
 \subsection{\#settings ... \#endSettings}
 \label{inheritanceEtc.settings}
 
-[This explanation is wrong.  Settings are not in the searchList unless you
-put them there (via self.addToSearchList()).  The purpose of
-\code{\#settings} is to provide the ability for Filters and logic code to be
-customizable by the user without having to be rewritten or subclassed.]
-
-% @@ MSO: Tavis, rewrite.
-
-\code{\#settings} provides yet another way to set values for
-\code{\#placeholders} to find, using Cheetah's SettingsManager infrastructure.
-It is best understood by reading the comments in
+The \code{\#settings} directive works in tandem with Cheetah's
+\code{SettingsManager} system to provide yet another way to set values for
+\code{\#placeholders} to find.  It is best understood by reading the comments in
 \code{\#SettingsManager.py} in conjunction with this documentation.
 
-SettingsManager provides a sophisticated strategy for getting and setting
-key/value pairs (called "settings") individually, or in bulk from a dictionary
-or a hierarchy of dictionaries.  A "hierarchy of dictionaries" means you can
-pass in a dictionary of dictionaries (of dictionaries, etc...) containing only
-the keys and subkeys (and subkeys, etc...) that have changed, and
-SettingsManager will merge all the changes in.  SettingsManager can also read
-settings from an exec'able Python string or file, or from a text string or file in ConfigParser format (aka Windows .ini format).  Cheetah does one up on 
-ConfigParser, however, because it parses case-sensitively, and automatically
-converts numeric values to numbers, 'None' to None, and 'true' and 'false' to
-Boolean true and false.  
+\code{SettingsManager} is a system for managing application settings.  An
+Application may subclass \code{SettingsManager.SettingsManager} and gain access
+to some sophisticated methods for getting and setting key/value pairs
+("settings") individually, or in bulk from a dictionary or a hierarchy of
+dictionaries.  You can pass in a dictionary of dictionaries (of dictionaries,
+etc...) containing only the keys and subkeys (and subkeys, etc...) that have
+changed, and SettingsManager will merge all the changes in.  SettingsManager can
+also read settings in from modules, exec'able Python strings/files, and
+strings/files in Python's standard \code{ConfigParser} format (aka Windows .ini
+format).  Unlike ConfigParser, however, because it parses case-sensitively, and
+automatically converts numeric values to numbers, 'None' to None, and 'true' and
+'false' to Boolean true and false.
 
-What does this have to do with Cheetah?  It means that you can put:
+What does this have to do with Cheetah templates? When you have large sets of
+hierarchically structured data that you want to make available to
+\code{\$placeholders}, the (\code{\#settings} directive can be convenient
+alternative to \code{\#attr} and \code{\#def}:
 
 \begin{verbatim}
 #settings
-test: blarg
+[SubSection1]
+test = blarg
+
+[SubSection2]
+test = foo
 #end settings
-$test
+$settings.SubSection1.test
 
 #settings python
-test = 'blarg'
+SubSection1 = {
+  'test':'blarg',
+  }
+SubSection2 = {
+  'test':'foo',
+  }
 #end settings
-$test
+$settings.SubSection1.test
 \end{verbatim}
 
 in your template and get the following output:
@@ -281,41 +296,28 @@ blarg
 blarg
 \end{verbatim}
 
-Pretty snazzy, eh?  What's going on here?  Both the first and the second
-stanzas above put a key 'test' with the value 'blarg' at the end of the 
-searchList.  "At the end" means it is at the bottom of the totem pole,
-the last in the pecking order, and will be overridden by any other key
-'test' in the searchList, by a \code{\#set} variable 'test', or by an attribute
-'test' in the template object.  The first stanza is in ConfigParser format
-(aka Windows .ini format)--note the lack of \code{\$} before the key, and the
-lack of quotes around the value.  The
-second stanza is in Python format, as if it were a Python module, with
-quotes, but no \code{\$}.
+The first stanza is in ConfigParser format (aka Windows .ini format)--note the
+lack of \code{\$} before the key, and the lack of quotes around the value.  The
+second stanza is in Python format, as if it were a Python module, with quotes,
+but no \code{\$}.
 
-%% @@MO: Is the first stanza 'test: blarg' or 'test = blarg'.  The former is
-%% what ConfigParser accepts (with a [section] header), and the latter is
-%% what Tavis' e-mail says.
-%% However, when I tried it either way, I got a "NameMapper.NotFound: test"
-%% error.
+You can also place your template object's settings dictionary in \code{the
+searchList} so you can type \code{\$mySetting} instead of
+\code{\$settings.mySetting}.
 
-You may also use \code{SettingsManager} in your own applications, by using it
-as a base class for your application class.  Then your users can keep their
-preferences in configuration files, and you can use the 
-\code{SettingsManager} methods to parse the files and extract the settings.
+Dictionary merging can be turned off with the 'nomerge' keyword:
 
-(\code{\#settings} is also meant as a substitute for those who miss the
-\code{\#data} directive that existed in Cheetah 0.9.8a3 - 0.9.8 and are not
-satisfied with \code{\#attr} and \code{\#def}.)
-
-The following compiler settings affect \code{\#settings}:
-'putSettingsInSearchList' (default true).
-
-Dictionary merging can be turned off with the 'nomerge' keyword.
-
-%% @@MSO: Need example of the 'nomerge' keyword.  Where do you specify it?
-
-%% @@MSO: Tavis needs to refine this section, since only he understands how
-%% #settings is supposed to work.
+\begin{verbatim}
+#settings python nomerge
+SubSection1 = {
+  'test':'blarg',
+  }
+SubSection2 = {
+  'test':'foo',
+  }
+#end settings
+$settings.SubSection1.test
+\end{verbatim}
 
 % Local Variables:
 % TeX-master: "users_guide"
