@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.9 2001/11/25 03:04:32 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.10 2001/11/25 03:05:47 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/25 03:04:32 $
+Last Revision Date: $Date: 2001/11/25 03:05:47 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.9 $"[11:-2]
+__version__ = "$Revision: 1.10 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -127,7 +127,7 @@ class CheetahCompile:
 
         if not self.printGenerated or self.writeGenerated:
             outputModuleFilename = fileNameMinusExt + self.SERVLET_EXTENSION
-            if os.path.exists(outputFilename):
+            if os.path.exists(outputModuleFilename):
                 shutil.copyfile(outputModuleFilename,
                                 fileNameMinusExt + self.SERVLET_BACKUP_EXT)
             fp = open(outputModuleFilename,'w')
