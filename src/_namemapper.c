@@ -203,6 +203,7 @@ namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)
 
   numChunks = getNameChunks(nameChunks, name, nameCopy);
   if (PyErr_Occurred()) { 	/* there might have been TooManyPeriods */
+    free(nameCopy);
     return NULL;
   }
 
@@ -243,6 +244,7 @@ namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
 
   numChunks = getNameChunks(nameChunks, name, nameCopy);
   if (PyErr_Occurred()) { 	/* there might have been TooManyPeriods */
+    free(nameCopy);
     return NULL;
   }
 
