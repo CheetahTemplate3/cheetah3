@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: MacroDirective.py,v 1.9 2001/08/31 23:12:58 tavis_rudd Exp $
+# $Id: MacroDirective.py,v 1.10 2001/09/16 00:05:57 tavis_rudd Exp $
 """MacroDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/31 23:12:58 $
+Last Revision Date: $Date: 2001/09/16 00:05:57 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.9 $"[11:-2]
+__version__ = "$Revision: 1.10 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -73,7 +73,7 @@ class MacroDirective(TagProcessor.TagProcessor):
         globalsDict, localsDict = self.execPlaceholderString(dummyCode)
         argNamesList = localsDict['dummy'].func_code.co_varnames
 
-        macroBody = self.wrapExressionsInStr(self.markPlaceholders(macroBody),
+        macroBody = self.wrapExpressionsInStr(self.markPlaceholders(macroBody),
                                              marker=self.setting('placeholderMarker'),
                                              before='<argInBody>',
                                              after='</argInBody>')        

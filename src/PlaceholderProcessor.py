@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.32 2001/09/07 18:10:14 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.33 2001/09/16 00:05:57 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.32 $
+Version: $Revision: 1.33 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/09/07 18:10:14 $
+Last Revision Date: $Date: 2001/09/16 00:05:57 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.32 $"[11:-2]
+__version__ = "$Revision: 1.33 $"[11:-2]
 
 
 ##################################################
@@ -49,7 +49,7 @@ class PlaceholderProcessor(TagProcessor):
     
     def preProcess(self, templateDef):
         """Wrap all marked placeholders in a string with Cheetah's internal delims."""
-        templateDef = self.wrapExressionsInStr(self.markPlaceholders(templateDef),
+        templateDef = self.wrapExpressionsInStr(self.markPlaceholders(templateDef),
                                                marker=self.setting('placeholderMarker'),
                                                before=self.setting('internalDelims')[0] + \
                                                self._token + self.setting('tagTokenSeparator'),
