@@ -1,5 +1,9 @@
 Please initial your changes (there's a key at bottom) and add a date for each release
 ================================================================================
+
+0.9.12b2 (not released yet)
+  - fixed Win32 path bug in Template._makeDummyPackageForDir() (TR)
+
 0.9.12b1 (Mar 24, 2002)
    - $request().field(args) now works, identical to $request.field(args)
      to implement this, the request object is now self.request() instead of
