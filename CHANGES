@@ -76,6 +76,8 @@ Please initial your changes and add a date for each release
     avialable. This behaviour is roughly the same as in Webware's PSP.  Will
     implement output buffering PHP-style later if there is any demand. (TR)
 
+  - made #include a run-time tag rather than compile-time.  This is slower, but
+    the semantics are better. (TR)
  
 0.9.7 (July 13, 2001)
   - reimplemented the parsing of $placeholders using the Python tokenize module (TR)
