@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.52 2002/11/28 22:10:02 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.53 2002/11/29 06:07:38 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.52 $
+Version: $Revision: 1.53 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/11/28 22:10:02 $
+Last Revision Date: $Date: 2002/11/29 06:07:38 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.52 $"[11:-2]
+__revision__ = "$Revision: 1.53 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -32,7 +32,7 @@ import types
 try:
     _StringTypes = types.StringTypes
 except AttributeError:
-    _StringTypes = [types.StringType, types.UnicodeType]
+    _StringTypes = (types.StringType, types.UnicodeType)
 import time
 import random
 
