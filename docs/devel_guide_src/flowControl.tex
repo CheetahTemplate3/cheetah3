@@ -1,6 +1,102 @@
 \section{Directives: Flow Control}
 \label{flowControl}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#for}
+\label{flowControl.for}
+
+The template:
+\begin{verbatim}
+#for $i in $range(10)
+$i #slurp
+#end for
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+0 1 2 3 4 5 6 7 8 9 
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+for i in range(10):
+    write(filter(i)) # generated from '$i' at line 2, col 1.
+    write(' ')
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#repeat}
+\label{flowControl.repeat}
+
+The template:
+\begin{verbatim}
+#repeat 3
+My bonnie lies over the ocean
+#end repeat
+O, bring back my bonnie to me!
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+My bonnie lies over the ocean
+My bonnie lies over the ocean
+My bonnie lies over the ocean
+O, bring back my bonnie to me!
+\end{verbatim}
+(OK, so the second line should be ``sea'' instead of ``ocean''.)
+
+The generated code:
+\begin{verbatim}
+for i in range( 3):
+    write('My bonnie lies over the ocean\n')
+write('O, bring back my bonnie to me!\n')
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#while}
+\label{flowControl.while}
+
+The template:
+\begin{verbatim}
+#set $alive = True
+#while $alive
+I am alive!
+#set $alive = False
+#end while
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+I am alive!
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+alive = True
+while alive:
+    write('I am alive!\n')
+    alive = False
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#if}
+\label{}
+
+The template:
+\begin{verbatim}
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+\end{verbatim}
+
+
+
 
 % Local Variables:
 % TeX-master: "devel_guide"

@@ -26,6 +26,27 @@ comment.
 *#
 \end{verbatim}
 
+If you put blank lines around method definitions or loops to separate them,
+be aware that the blank lines will be output as is.  To avoid this, make sure
+the blank lines are enclosed in a comment.  Since you normally has a
+comment before the next method definition (right?), you can just extend that
+comment to include the blank lines after the previous method definition, like
+so:
+\begin{verbatim}
+#def method1
+... lines ...
+#end def
+#*
+
+
+   Description of method2.
+   $arg1, string, a phrase.
+*#
+#def method2($arg1)
+... lines ...
+#end def
+\end{verbatim}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Whitespace around comments}
 \label{comments.whitespace}

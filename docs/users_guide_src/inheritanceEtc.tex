@@ -219,7 +219,7 @@ included files.  Use this feature with care to prevent surprises.
 The \code{\#attr} directive creates class attributes in the generated Python
 class.  It should be used to assign simple Python literals such as numbers or
 strings.  In particular, the expression must {\em not} depend on searchList
-values or \code{\#set} variables, since those are not known at compile time.
+values or \code{\#set} variables since those are not known at compile time.
 
 \begin{verbatim}
 #attr $title = "Rob Roy"
@@ -378,6 +378,8 @@ followed immediately by a \code{\#placeholder} for the same name.  In fact,
 that's what Cheetah does.  Which means you can use \code{\$theBlockName}
 later in the template to output the block content again.
 
+The block must not require arguments because the implicit placeholder that's
+generated will call the block without arguments.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
