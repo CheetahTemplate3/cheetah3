@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.12 2001/11/09 19:27:18 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.13 2001/11/09 21:37:06 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/09 19:27:18 $
+Last Revision Date: $Date: 2001/11/09 21:37:06 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.12 $"[11:-2]
+__version__ = "$Revision: 1.13 $"[11:-2]
 
 
 ##################################################
@@ -1777,7 +1777,7 @@ class FilterDirective(OutputTest):
     def test3(self):
         """#filter MaxLen -- maxlen of 5"""
 
-        self.verify("#filter MaxLen  \n${tenDigits, maxlen=5}",
+        self.verify("#filter MaxLen  \n${tenDigits, $maxlen=5}",
                     "12345")
 
     def test4(self):
@@ -1795,9 +1795,15 @@ class FilterDirective(OutputTest):
     def test6(self):
         """#filter WebSafe -- also space
         """
-        self.verify("#filter WebSafe  \n${webSafeTest, also=' '}",
+        self.verify("#filter WebSafe  \n${webSafeTest, $also=' '}",
                     "abc&nbsp;&lt;=&gt;&nbsp;&amp;")
         
+    def test7(self):
+        """#filter WebSafe -- also space, without $ on the args
+        """
+        self.verify("#filter WebSafe  \n${webSafeTest, also=' '}",
+                    "abc&nbsp;&lt;=&gt;&nbsp;&amp;")
+
 class EchoDirective(OutputTest):
     def test1(self):
         """#echo 1234
