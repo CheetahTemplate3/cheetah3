@@ -1,9 +1,13 @@
 Cheetah TODO list
+-----------------
 
-When a task is completed please change its - to an ! and move it to the bottom
-of the list.
+* If you are working on a task please put your initials at the end of the
+  description
 
-Specification
+* When a task is completed please change its - to an ! and move it to the bottom
+  of the list.
+
+Languague Specification
 ================================================================================
 - firm up the list of features/syntax that are not subject to change
 - firm up the NamedValueAccess syntax (along with new test cases)
