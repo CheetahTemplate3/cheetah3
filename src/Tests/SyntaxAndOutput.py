@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.54 2005/01/06 13:06:03 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.55 2005/02/28 23:50:38 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.54 $
+Version: $Revision: 1.55 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/01/06 13:06:03 $
+Last Revision Date: $Date: 2005/02/28 23:50:38 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.54 $"[11:-2]
+__revision__ = "$Revision: 1.55 $"[11:-2]
 
 
 ##################################################
@@ -1151,6 +1151,14 @@ class AttrDirective(OutputTest):
                     "  --   \nblarg")
 
 
+class EncodingDirective(OutputTest):
+
+    def test1(self):
+        """basic #encoding """
+        self.verify("#encoding utf-8\n1234",
+                    "1234")
+
+
 class DefDirective(OutputTest):
 
     def test1(self):
@@ -1913,6 +1921,12 @@ useNameMapper=False
 $os.path.exists('.')""",
                     repr(True))
 
+    def test11(self):
+        """#from math import *
+        """
+        
+        self.verify("#from math import *\n$pow(1,2) $log10(10)",
+                    "1.0 1.0")
 
 class CompilerDirective(OutputTest):
     def test1(self):
