@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.2 2001/08/03 19:20:50 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.3 2001/08/04 01:01:46 tavis_rudd Exp $
 """An abstract base class for Cheetah Servlets that can be used with Webware
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/08/03 19:20:50 $
+Last Revision Date: $Date: 2001/08/04 01:01:46 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -22,20 +22,6 @@ from Template import Template
 from Utilities import mergeNestedDictionaries
 import CodeGenerator as CodeGen
 
-try: 
-    from WebKit.HTTPServlet import HTTPServlet
-except:
-    ## for testing from the commandline or with TR's experimental rewrite of WebKit
-    class HTTPServlet: 
-        _reusable = 1
-        _threadSafe = 0
-        
-        def awake(self, transaction):
-            pass
-        
-        def sleep(self, transaction):
-            pass
-
 ##################################################
 ## GLOBALS AND CONSTANTS ##
 
@@ -44,6 +30,27 @@ False = (0==1)
 
 ##################################################
 ## CLASSES ##
+
+
+isRunningFromWebKit = False
+try: 
+    from WebKit.HTTPServlet import HTTPServlet
+    isRunningFromWebKit = True
+except:
+    ## for testing from the commandline or with TR's experimental rewrite of WebKit
+    
+    class HTTPServlet: 
+        _reusable = 1
+        _threadSafe = 0
+
+        def __init__(self):
+            pass
+        
+        def awake(self, transaction):
+            pass
+        
+        def sleep(self, transaction):
+            pass
 
 class TemplateServlet(Template, HTTPServlet):
     """An abstract base class for Cheetah servlets that can be used with
@@ -55,8 +62,14 @@ class TemplateServlet(Template, HTTPServlet):
             kw['settings']={}
         kw['settings']['delayedStart'] = True
         Template.__init__(self, template, *searchList, **kw)
+        HTTPServlet.__init__(self)
         self.initializeTemplate()
-        self.startServer()
+        self._started = False
+        
+        if not isRunningFromWebKit:
+            self._started = True
+            self.startServer()
+
 
     def initializeTemplate(self):
         """a hook that can be used by subclasses to do things after the
@@ -64,7 +77,51 @@ class TemplateServlet(Template, HTTPServlet):
         (i.e. before the codeGeneration process starts) """
         pass
 
+    def awake(self, transaction):
+        self._transaction = transaction
+        self._response    = transaction.response()
+        self._request     = transaction.request()
+        self._session     = None  # don't create unless needed
+        if not self._started:
+            self._started = True
+            self.startServer()
 
+    def sleep(self, transaction):
+        self._session = None
+        self._request  = None
+        self._response = None
+        self._transaction = None
 
+    def application(self):
+        return self._transaction.application()
+
+    def transaction(self):
+        return self._transaction
+
+    def request(self):
+        return self._request
+
+    def response(self):
+        return self._response
+
+    def session(self):
+        if not self._session:
+            self._session = self._transaction.session()
+        return self._session
+            
+    def normalizePath(self, path):
+        """A hook for any neccessary path manipulations.
+
+        For example, when this is used with Webware servlets all relative paths
+        must be converted so they are relative to the servlet's directory rather
+        than relative to the program's current working dir.
+
+        The default implementation just normalizes the path for the current
+        operating system."""
+
+        if hasattr(self,'serverSidePath'):
+            return self.serverSidePath(path)
+        else:
+            return os.path.normpath(path.replace("\\",'/'))
 
 
