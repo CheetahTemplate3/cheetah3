@@ -56,14 +56,6 @@ Implementation
 - finish the #cache directive's varyBy keyword (tied to Tavis' proposed caching
   framework for Webware)
 
-- Remove the -w option from 'cheetah compile'.  New command 'cheetah fill'
-  replaces the -w switch and more: it fills the template into *.html, another
-  extension or stdout.  It accepts the -R (recurse), -p (to stdout) and 
-  -v (verbose) options of 'cheetah compile', and the '-e/--env' and 
-  '-p/--pickle' options of .py template modules.  Note the conflict between
-  -p (stdout) and -p (pickle); we'll have to rename -p (stdout) to something
-  else, both in 'cheetah fill' and 'cheetah compile'.
-
 - Delete whitespace before comments.  If the rest of the line consists
   of only non-outputting directives and whitespace, delete the line from the
   output.  The only outputting directives I see are #echo, #block and
@@ -71,6 +63,52 @@ Implementation
 
 - 'python setup.py uninstall'.  This may require hacking an uninstall feature
   into distutils.
+
+
+Cheetah command revamp
+===============================================================================
+- Usage: cheetah COMMAND ARGUMENTS
+- Commands:
+     cheetah --help | -h
+     cheetah --version
+     cheetah compile | c           # .tmpl -> .py
+     cheetah fill | f              # .tmpl -> .html       (Not implemented yet)
+     cheetah cgi                   # .tmpl -> CGI script  (Not implemented yet)
+
+- Delay implementation of 'cheetah cgi' until spec is more precise.  (In
+  the meantime, you can use 'cheetah compile' and put 
+  	Content-type: text/html
+  and a blank line at the top of the template definition.)
+
+- Options common to 'compile', 'fill' and 'cgi':
+    -i EXT                         # input file extension  (-i '' for no ext)
+    -o EXT                         # output file extension (-o '' for no ext)
+    -R                             # recurse subdirectories
+    -                              # (as input filename) input from stdin
+    -p                             # output to stdout
+
+- Options for 'fill' (and .py template modules):
+    --env                          # Push environment onto searchList.
+    --pickle=FILE                  # Unpickle FILE and push onto searchList.
+                                   # (--pickle=-  => unpickle from stdin)
+
+- Remove options:
+    cheetah-compile -w             # Same as 'cheetah fill' but less powerful.
+    cheetah -c                     # 'cheetah c' is easier to type.
+    -p (pickle)                    # Conflicts with -p (to stdout)
+
+- Input extension, unless overridden by -i, is ".tmpl".  If an input file is 
+  specified but does not exist, try adding this extension.  When recursing,
+  consider only files with this extension.
+
+- Output extension, unless overridden by -o, is ".py" for 'cheetah compile'
+  and 'cheetah cgi', and ".html" for 'cheetah fill'.
+
+- Program will examine its own name ( os.path.basename(sys.argv[0]) ), and if
+  it looks like "cheetah-WORD", use WORD as the command instead of sys.argv[1] .
+  Then cheetah-compile can be a symlink or copy of this, and people can create
+  cheetah-fill etc if desired.
+
 
 
 Test Suite
