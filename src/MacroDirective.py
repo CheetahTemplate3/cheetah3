@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: MacroDirective.py,v 1.1 2001/08/11 03:21:35 tavis_rudd Exp $
+# $Id: MacroDirective.py,v 1.2 2001/08/11 03:45:03 tavis_rudd Exp $
 """MacroDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/11 03:21:35 $
+Last Revision Date: $Date: 2001/08/11 03:45:03 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -45,13 +45,16 @@ class MacroDirective(TagProcessor.TagProcessor):
 
         gobbleWS = re.compile(bits['start_gobbleWS'] + r'macro[\t ]+' +
                               r'(.+?)' + bits['lazyEndGrp'] + '(.*?)' +
-                              bits['lazyEndGrp'] + r'[\f\t ]*#end macro[f\t ]*' +
+                              bits['lazyEndGrp'] + r'[\f\t ]*' +
+                              bits['startTokenEsc'] + 'end macro[f\t ]*' +
                               bits['lazyEndGrp'],
                               re.DOTALL | re.MULTILINE)
         
-        plain = re.compile(r'#macro[\t ]+' +
-                           r'(.+?)(?:/#|\r\n|\n|\r)(.*?)' +
-                           r'(?:\r\n|\n|\r)[\t ]*#end macro[\t ]*(?:\r\n|\n|\r|\Z)',
+        plain = re.compile(bits['start'] + r'macro[\t ]+' +
+                           r'(.+?)' + bits['endGrp'] + '(.*?)' +
+                           bits['lazyEndGrp'] + r'[\f\t ]*' +
+                           bits['startTokenEsc'] + 'end macro[\t ]*' +
+                           bits['endGrp'],
                            re.DOTALL | re.MULTILINE)
 
         self._delimRegexs = [gobbleWS, plain]
@@ -144,4 +147,135 @@ class MacroDirective(TagProcessor.TagProcessor):
         ##
         for RE in self._delimRegexs:
             templateDef = RE.sub(handleMacroDefs, templateDef)
+        return templateDef
+
+
+
+
+class CallMacroDirective(TagProcessor.TagProcessor):
+    """handle any  #callMacro definitions """
+    
+    def __init__(self, templateObj):
+        TagProcessor.TagProcessor.__init__(self,templateObj)
+
+        bits = self._directiveREbits
+        plain =  re.compile(bits['start'] + r'callMacro[\t ]+' +
+                            r'(?P<macroName>[A-Za-z_][A-Za-z_0-9]*?)' +
+                            r'\((?P<argString>.*?)\)[\t ]*' + bits['endGrp'] +
+                            r'(?P<extendedArgString>.*?)' +
+                            bits['startTokenEsc'] + r'end callMacro[\t ]*' + bits['endGrp'],
+                            re.DOTALL | re.MULTILINE)
+
+        self._argsRE = re.compile(bits['start'] + r'arg[\t ]+' +
+                                  r'(?P<argName>[A-Za-z_][A-Za-z_0-9]*?)' +
+                                  r'[\t ]*' + bits['endGrp'] +
+                                  r'(?P<argValue>.*?)' +
+                                  r'(?:\r\n|\n|\r)[\t ]*' + 
+                                  bits['startTokenEsc'] + 'end arg[\t ]*'
+                                  + bits['endGrp'],
+                            re.DOTALL | re.MULTILINE)
+
+        self._delimRegexs = [plain, ]
+        
+    def preProcess(self, templateObj, templateDef):
+        templateObj = self.templateObj()
+
+        def subber(match, templateObj=templateObj,
+                   argsRE=self._argsRE):
+            
+            macroName = match.group('macroName').strip()
+            argString = match.group('argString')
+            extendedArgString = match.group('extendedArgString')
+    
+            try:
+                searchList = templateObj.searchList()
+                argString = templateObj.translatePlaceholderVars(argString)
+                
+            except NameMapper.NotFound, name:
+                line = lineNumFromPos(match.string, match.start())
+                raise Error('Undeclared variable ' + str(name) + 
+                            ' used in macro call #'+ macroSignature + 
+                            ' on line ' + str(line))
+    
+            extendedArgsDict = {}
+            
+            def processExtendedArgs(match, extendedArgsDict=extendedArgsDict):
+                """check each $var in the macroBody to see if it is in this macro's
+                argNamesList and needs substituting"""
+                extendedArgsDict[ match.group('argName') ] = match.group('argValue')
+                return ''
+    
+
+            argsRE.sub(processExtendedArgs, extendedArgString)
+    
+            
+            fullArgString = argString
+            if fullArgString:
+                fullArgString += ', '
+            for argName in extendedArgsDict.keys():
+                fullArgString += argName + '=extendedArgsDict["' + argName + \
+                                 '"]' + ', '
+            
+            ## validateMacroDirective(templateObj, fullArgString)
+                
+            if macroName in templateObj._macros.keys():
+                return eval('templateObj._macros[macroName](' + fullArgString + ')', vars())
+            else:
+                raise Error('The macro ' + macroName + \
+                            ' was called, but it does not exist')
+            
+        for RE in self._delimRegexs:
+            templateDef = RE.sub(subber, templateDef)
+    
+        return templateDef
+
+
+
+class LazyMacroCall(TagProcessor.TagProcessor):
+    """Handle any calls to macros that are already defined."""
+    
+    def __init__(self, templateObj):
+        TagProcessor.TagProcessor.__init__(self,templateObj)
+        from Parser import escCharLookBehind
+        bits = self._directiveREbits
+        plain = re.compile(escCharLookBehind + r'(#[a-zA-Z_][a-zA-Z_0-9\.]*\(.*?\))')
+        self._delimRegexs = [plain]
+        
+    def preProcess(self, templateObj, templateDef):
+        
+        templateObj = self.templateObj()
+        
+        def handleMacroCalls(match, templateObj=templateObj):
+            """for each macro call that is found in the template, substitute it with
+            the macro's output"""
+            
+            macroSignature = match.group(1)[1:]
+            firstParenthesis = macroSignature.find('(')
+            macroArgstring = macroSignature[firstParenthesis+1:-1]
+            macroName = macroSignature[0:firstParenthesis]
+    
+            searchList = templateObj.searchList()
+            searchList_getMeth = searchList.get # shortcut name-binding in the eval
+            
+            try:
+                macroArgstring = templateObj.translatePlaceholderVars(macroArgstring)
+                
+            except NameMapper.NotFound, name:
+                line = lineNumFromPos(match.string, match.start())
+                raise Error('Undeclared variable ' + str(name) + \
+                            ' used in macro call #'+ macroSignature + ' on line ' +
+                            str(line))       
+                
+            ## validateMacroDirective(templateObj, macroArgstring)
+            
+            if macroName in templateObj._macros.keys():
+    
+                return eval('templateObj._macros[macroName](' + macroArgstring + ')',
+                            vars())
+            else:
+                raise Error('The macro ' + macroName + \
+                            ' was called, but it does not exist')
+    
+        for RE in self._delimRegexs:
+            templateDef = RE.sub(handleMacroCalls, templateDef)
         return templateDef
