@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.13 2001/11/09 21:37:06 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.14 2001/11/10 19:52:35 hierro Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.13 $
+Version: $Revision: 1.14 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/09 21:37:06 $
+Last Revision Date: $Date: 2001/11/10 19:52:35 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.13 $"[11:-2]
+__version__ = "$Revision: 1.14 $"[11:-2]
 
 
 ##################################################
@@ -108,6 +108,8 @@ defaultTestNameSpace = {
     'zero':0,
     'tenDigits': 1234567890,
     'webSafeTest': 'abc <=> &',
+    'strip1': '  \t\n   strippable whitespace   \t\t  \n',
+    'strip2': '  \t\n   strippable whitespace   \t\t  ',
     
     'blockToBeParsed':"""$numOne $numTwo""",
     'includeBlock2':"""$numOne $numTwo $aSetVar""",
@@ -1804,6 +1806,19 @@ class FilterDirective(OutputTest):
         self.verify("#filter WebSafe  \n${webSafeTest, also=' '}",
                     "abc&nbsp;&lt;=&gt;&nbsp;&amp;")
 
+    def test8(self):
+        """#filter Strip -- trailing newline
+        """
+        self.verify("#filter Strip\n$strip1",
+                    "strippable whitespace\n")
+
+    def test9(self):
+        """#filter Strip -- no trailing newine
+        """
+        self.verify("#filter Strip\n$strip2",
+                    "strippable whitespace")
+
+
 class EchoDirective(OutputTest):
     def test1(self):
         """#echo 1234
@@ -1850,3 +1865,5 @@ for klass in [var for var in globals().values()
         
 if __name__ == '__main__':
     unittest.main()
+
+# vim: shiftwidth=4 tabstop=4 expandtab
