@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.5 2001/08/10 04:51:31 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.6 2001/08/15 02:14:25 tavis_rudd Exp $
 """An abstract base class for Cheetah Servlets that can be used with Webware
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/08/10 04:51:31 $
+Last Revision Date: $Date: 2001/08/15 02:14:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -20,7 +20,6 @@ import types
 # intra-package imports ...
 from Template import Template
 from Utilities import mergeNestedDictionaries
-import CodeGenerator as CodeGen
 
 ##################################################
 ## GLOBALS AND CONSTANTS ##
