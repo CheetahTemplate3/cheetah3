@@ -85,11 +85,65 @@ included templates.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#attr}
+\label{inheritanceEtc.attr}
+
+The \code{\#attr} directive is used to declare new attributes of the generated Python
+class.  It should be used to assign simple Python literals such as numbers or
+strings.  
+
+\begin{verbatim}
+#attr myAttr = 1234
+#attr myAttr2 = 'a string'
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#def}
 \label{inheritanceEtc.def}
 
-The \code{\#def} directive is used to define new methods of the generated Python
-class.  It is roughly analogous to Python's \code{def} statement.  
+The \code{\#def} directive is used to declare new methods of the generated Python
+class.  It is roughly analogous to Python's \code{def} statement.  Any Cheetah
+code in the contents of the \code{\#def} directive will be processed.  
+
+\begin{verbatim}
+#def myMeth()
+This is the text in my method 
+$a $b $c(123)  ## these placeholder names have been defined elsewhere
+#end def
+
+## and now use it...
+$myMeth()
+\end{verbatim}
+
+The arglist and parentheses can be omitted:
+\begin{verbatim}
+#def myMeth
+This is the text in my method 
+$a $b $c(123)
+#end def
+
+## and now use it...
+$myMeth
+\end{verbatim}
+
+Methods can accept arguments, and have defaults for those arguments:
+\begin{verbatim}
+#def myMeth($a, $b=1234)
+This is the text in my method 
+$a - $b
+#end def
+
+## and now use it...
+$myMeth(1)
+\end{verbatim}
+
+The output from this last example will be:
+
+\begin{verbatim}
+This is the text in my method 
+1 - 1234
+\end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#block ... \#end block}
@@ -132,6 +186,8 @@ inner block2 contents
 
 #end block outerBlock
 \end{verbatim}
+
+Note that the name of the block is optional for the \code{\#end block} tag.
 
 Like methods defined with \code{\#def}, blocks are compiled into methods of the
 generated Python class and can be reimplemented in subclasses using the

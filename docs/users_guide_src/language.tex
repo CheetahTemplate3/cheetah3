@@ -61,7 +61,9 @@ information inside the HTML tags:
 \item Generation, caching and filtering of output
      \begin{enumerate}
      \item plain text
-     \item placeholders: \code{\$var}, \code{\$method()}
+     \item output from simple expressions: \code{\$placeholders}
+     \item output from more complex expressions: \code{\#echo} \ldots
+     \item silencing output from expressions: \code{\#silent} \ldots
      \item gobble the EOL: \code{\#slurp}
      \item parsed file includes: \code{\#include} \ldots
      \item raw file includes: \code{\#include raw} \ldots
@@ -70,10 +72,7 @@ information inside the HTML tags:
      \item cached regions: \code{\#cache} \ldots \code{\#cache}
      \item set the output filter: \code{\#filter} \ldots
      \end{enumerate}
-     
-\item Function/method calling without outputting the return value: \code{\#call}
-     \ldots
-     
+          
 \item Importing other modules and from other modules: \code{\#import} \ldots,
      \code{\#from} \ldots
 
@@ -85,7 +84,7 @@ information inside the HTML tags:
 
 \item Compile-time declaration
      \begin{enumerate}
-     \item define class attributes: \code{\#attribute} \ldots
+     \item define class attributes: \code{\#attr} \ldots
      \item define class methods: \code{\#def} \ldots \code{\#end def}
      \item \code{\#block} \ldots \code{\#end block} provides a simplified
           interface to \code{\#def} \ldots \code{\#end def}

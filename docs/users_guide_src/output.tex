@@ -1,9 +1,8 @@
 \section{Generating, Caching and Filtering Output}
 \label{output}
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Placeholders}
+\subsection{Output From Simple Expressions: Placeholders}
 \label{TDL.placeholders}
 
 Placeholders are like 'primaries' in Python (see section 5.3 of Python's
@@ -15,6 +14,43 @@ When a template is processed each placeholder will be replaced with the string
 representation of its value.  These string representations are identical to
 those returned by Python's str() function, with the exception of \code{None}.
 \code{None} is replaced with an empty string, or in other words nothing.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Output From Complex Expressions: \#echo}
+\label{TDL.echo}
+
+The \code{\#echo} directive is used to echo the output from expressions that
+can't be written as simple \$placeholders.  It serves the same purpose as ASP's
+<\%=EXPR\%> tag.
+
+\begin{verbatim}
+Here is my #echo ','.join(['silly']*5) # example 
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Output From Complex Expressions: \#echo}
+\label{TDL.echo}
+
+The \code{\#echo} directive is used to echo the output from expressions that
+can't be written as simple \$placeholders.  It serves the same purpose as ASP's
+<\%=EXPR\%> tag.
+
+\begin{verbatim}
+Here is my #echo ','.join(['silly']*5) # example 
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Silencing The Output From Expressions: \#silent}
+\label{output.silent}
+
+The \code{\#silent} directive is used to silence the output from any expressions that
+must excuted.  It is similar to ASP's <\% EXPR \%> tag.
+
+\begin{verbatim}
+Here is #silent $doSomething() # nothing
+\end{verbatim}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Caching Output}
