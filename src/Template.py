@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.49 2001/08/31 23:12:58 tavis_rudd Exp $
+# $Id: Template.py,v 1.50 2001/09/07 18:10:14 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.49 $
+Version: $Revision: 1.50 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/31 23:12:58 $
+Last Revision Date: $Date: 2001/09/07 18:10:14 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.49 $"[11:-2]
+__version__ = "$Revision: 1.50 $"[11:-2]
 
 
 ##################################################
@@ -565,7 +565,7 @@ class Template(SettingsManager, Parser):
                           + indent * 2 + "#setupCodeInsertMarker\n" \
                           + indent * 2 + "if filePath and getmtime(filePath) > fileMtime:\n"\
                           + indent * 3 + "self.recompileFromFile(filePath)\n"\
-                          + indent * 3 + "return self.respond(trans=trans, iAmNested=iAmNested)\n"\
+                          + indent * 3 + "return self.respond(trans=trans)\n"\
                           + indent * 2 + "if checkForCacheRefreshes:\n"\
                           + indent * 3 + "currTime = currentTime()\n"\
                           + indent * 3 + "timedRefreshList.sort()\n"\
@@ -585,7 +585,6 @@ class Template(SettingsManager, Parser):
                           + indent * 2 + "print self._settings['responseErrorHandler'](self)\n" \
                           + indent * 2 + "raise\n" \
 
-            
             perResponseSetupCode = ''
             for tagProcessor, codeChunk in self._perResponseSetupCodeChunks.items():
                 perResponseSetupCode += codeChunk
