@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Utilities.py,v 1.2 2001/07/09 02:36:24 echuck Exp $
+# $Id: Utilities.py,v 1.3 2001/08/08 06:31:07 tavis_rudd Exp $
 """Utility classes and functions used in the Cheetah package
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/09 02:36:24 $
+Last Revision Date: $Date: 2001/08/08 06:31:07 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 
 ##################################################
@@ -32,6 +32,9 @@ False = (0==1)
 ## FUNCTIONS ##
 
 def insertLineNums(string):
+    """Return a version of the string with each line prefaced with its line
+     number."""
+     
     string = str(string)
     lineNum = [0,]
     def lineNums(match, lineNum=lineNum):
@@ -43,16 +46,20 @@ def insertLineNums(string):
     else:
         return "1 |" + string
 
-def getLines(string, lineNums):
+def getLines(string, sliceObj):
+    """Slice a string up into a list of lines and return a slice."""
     lines = string.split('\n')
     return lines[lineNums]
 
 def lineNumFromPos(string, pos):
+    """Calculate what line a position in a string lies on. This doesn't work on
+     Mac-OS."""
+    
     return len(string[0:pos].split('\n'))
 
 
 def removeDuplicateValues(list):
-    """remove all duplicate values in a list"""
+    """Remove all duplicate values in a list."""
     listCopy = []
     while len(list) > 0:
         if not list[0] in listCopy:
