@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.8 2001/07/11 21:42:11 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.9 2001/07/12 15:12:18 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/11 21:42:11 $
+Last Revision Date: $Date: 2001/07/12 15:12:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -581,9 +581,9 @@ def preProcessBlockDirectives(templateObj, templateDef):
             startTagMatch = startTagRE.search(templateDef)
             blockName = startTagMatch.group('blockName')
             endTagRE = re.compile(r'^[\t ]*#end block[\t ]+' + blockName +
-                                  r'[\t ]*(?:\r\n|\n|\Z)|'+
+                                  r'[\t ]*(?:\r\n|\n|\r|\Z)|'+
                                   r'#end block[\t ]+' + blockName +
-                                  r'[\t ]*(?:/#|\r\n|\n|\Z)',
+                                  r'[\t ]*(?:/#|\r\n|\n|\r|\Z)',
                                   re.DOTALL | re.MULTILINE)
             templateDef = handleBlock(blockName, startTagMatch, endTagRE,
                                    templateDef=templateDef)
