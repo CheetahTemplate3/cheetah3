@@ -1,5 +1,11 @@
 Please initial your changes and add a date for each release
 ================================================================================
+0.9.9a2 (October 10, 2001) 
+   - updated the example site and the SkeletonPage framework (TR)
+   - fixed some small bugs (TR)
+   - corrected some typos in the docs (TR + MO)
+   - added Ian's sitehiearchy class to Cheetah.Tools (TR + IB)
+
 0.9.9a1 (October 9, 2001)  [many changes and bug-fixes]
    - a complete reimplementation of Cheetah's core (the parser and compiler
      classes) (TR + IB)
