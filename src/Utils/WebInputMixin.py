@@ -1,14 +1,19 @@
 #!/usr/bin/env python
-# $Id: CGIImportMixin.py,v 1.3 2002/06/08 05:58:58 hierro Exp $
+# $Id: WebInputMixin.py,v 1.1 2002/06/09 22:09:00 hierro Exp $
 """Mixin for Cheetah.Servlet for importing web transaction variables in bulk.
 
 This works for GET/POST fields both in Webware servlets and in CGI scripts, 
 and for cookies and session variables in Webware servlets.  If you try to
 read a cookie or session variable in a CGI script, you'll get a RuntimeError.
 
+"In a CGI script" means (1) .isCgi() exists and returns true, or (2) we're
+not running as a Webware servlet.  This allows this module to work with or
+without the optional Cheetah.Tools.CGITemplate.  If you disagree with both
+these criteria, define your own boolean .isCgi() method.
+
 The public method provided is:
 
-    def cgiImport(self, names, namesMulti=(), default='', src='f',
+    def webInput(self, names, namesMulti=(), default='', src='f',
         defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00, debug=False):
 
 This method places the specified GET/POST fields, cookies or session variables
@@ -25,17 +30,17 @@ else, that value is substituted for the missing/bad value.
 
 The simplest usage is:
 
-    #silent $cgiImport(['choice'])
+    #silent $webInput(['choice'])
     $choice
 
-    dic = self.cgiImport(['choice'])
+    dic = self.webInput(['choice'])
     write(dic['choice'])
 
 Both these examples retrieves the GET/POST field 'choice' and print it.  If you
 leave off the "#silent", all the values would be printed too.  But a better way
 to preview the values is
 
-    #silent $cgiImport(['name'], $debug=1)
+    #silent $webInput(['name'], $debug=1)
 
 because this pretty-prints all the values inside HTML <PRE> tags.
 
@@ -55,13 +60,13 @@ Multi values work like this:
 Example: assume 'days' came from a set of checkboxes or a multiple combo box
 on a form, and the user chose "Monday", "Tuesday" and "Thursday".
 
-    #silent $cgiImport([], ['days'])
+    #silent $webInput([], ['days'])
     The days you chose are: #slurp
     #for $day in $days
     $day #slurp
     #end for
 
-    dic = self.cgiImport([], ['days'])
+    dic = self.webInput([], ['days'])
     write("The days you chose are: ")
     for day in dic['days']:
         write(day + " ")
@@ -91,7 +96,7 @@ checkboxes that were checked when Submit was pressed.  Our task now is to
 turn on the days the user checked, turn off the days he unchecked, and leave
 on or off the days he didn't change.
 
-    dic = self.cgiImport([], ['dayCheckboxes'])
+    dic = self.webInput([], ['dayCheckboxes'])
     wantedDays = dic['dayCheckboxes'] # The days the user checked.
     for day, on in self.getAllValues():
         if   not on and wantedDays.has_key(day):
@@ -114,7 +119,7 @@ the end.  But sometimes you want automatic number conversion, so that
 you can do numeric comparisions in your templates without having to
 write a bunch of conversion/exception handling code.  Example:
 
-    #silent $cgiImport(['name', 'height:int'])
+    #silent $webInput(['name', 'height:int'])
     $name is $height cm tall.
     #if $height >= 300
     Wow, you're tall!
@@ -122,7 +127,7 @@ write a bunch of conversion/exception handling code.  Example:
     Pshaw, you're short.
     #end if
 
-    dic = self.cgiImport(['name', 'height:int'])
+    dic = self.webInput(['name', 'height:int'])
     name = dic[name]
     height = dic[height]
     write("%s is %s cm tall." % (name, height))
@@ -158,12 +163,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.1 $
 Start Date: 2002/03/17
-Last Revision Date: $Date: 2002/06/08 05:58:58 $
+Last Revision Date: $Date: 2002/06/09 22:09:00 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.3 $"[11:-2]
+__revision__ = "$Revision: 1.1 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -173,7 +178,7 @@ True, False = (1==1), (1==0)
 ##################################################
 ## DEPENDENCIES
 
-import cgi     # Used by CGIImportMixin.cgiImport() if this is a CGI script.
+import cgi     # Used by WebInputMixin.cgiImport() if this is a CGI script.
 import pprint
 from Cheetah.Utils.Misc import UseOrRaise
 
@@ -268,19 +273,20 @@ def _lookup(name, func, multi, converters):
 ##################################################
 ## PUBLIC CLASS
 
-class CGIImportMixin:
-    """A mixin class for Cheetah.Servlet with a method for importing 
+class WebInputMixin:
+    """A mixin class for Cheetah.Template with a method for importing 
     web transaction variables in bulk.  Depends on a base class of
     Webware [HTTP]Servlet.
     """
     
     NonNumericInputError = NonNumericInputError
 
-    def cgiImport(self, names, namesMulti=(), default='', src='f',
+    def webInput(self, names, namesMulti=(), default='', src='f',
         defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00, debug=False):
         """Import web transaction variables in bulk.  See module docstring.
         """
-        isCgi = self.isCgi()
+        isCgi = hasattr(self, 'isCgi') and self.isCgi() or \
+            not self.isControlledByWebKit
         if   isCgi and src in ('f', 'v'):
             form = cgi.FieldStorage()
             source, func = 'field',   form.getvalue
@@ -319,7 +325,7 @@ class CGIImportMixin:
         # We could split the method into a superclass
         # method for Webware/WebwareExperimental and a subclass for Cheetah.
         # The superclass would merely 'return dic'.  The subclass would
-        # 'dic = super(ThisClass, self).cgiImport(names, namesMulti, ...)'
+        # 'dic = super(ThisClass, self).webInput(names, namesMulti, ...)'
         # and then the code below.
         if debug:
            self.write("<PRE>\n" + pprint.pformat(dic) + "\n</PRE>\n\n")
