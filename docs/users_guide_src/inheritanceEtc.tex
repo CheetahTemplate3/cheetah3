@@ -222,9 +222,9 @@ strings.  In particular, the expression must {\em not} depend on searchList
 values or \code{\#set} variables, since those are not known at compile time.
 
 \begin{verbatim}
-#attr title = "Rob Roy"
-#attr author = "Sir Walter Scott"
-#attr version = 123.4
+#attr $title = "Rob Roy"
+#attr $author = "Sir Walter Scott"
+#attr $version = 123.4
 \end{verbatim}
 
 This template or any child template can output the value thus:
@@ -237,11 +237,12 @@ If you have a library of templates derived from etexts
 and put them in a database (assuming the templates have been compiled into
 .py template modules):
 
-\begin{verbatim}
-import glob
-
-\end{verbatim}
-
+(Example to be written later.)
+%\begin{verbatim}
+%import glob
+%
+%\end{verbatim}
+%
 % @@MO: Finish this example.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
