@@ -1,6 +1,14 @@
 Please initial your changes and a date for each release
 ================================================================================
 0.9.7 (not released yet)
+  - reimplemented the parsing of $placeholders using the Python tokenizer module
+    - now translates into Python code instead of going through NameMapper for
+      each request
+    - supports arg lists and nested placeholders
+    - maintained support for autocalling of functions, but this may be removed
+  - reimplemented the #include and #raw directives using nested templates for
+    parsed includes and  string attributes of 'Template' to store raw text
+    The support for file update monitoring of includes is still not implemented
   - moved some stuff from __init__.py into CHANGES and TODO 
   - added a new command 'sdist_docs' to setup.py which rebuilds the docs
     when making a source distribution
