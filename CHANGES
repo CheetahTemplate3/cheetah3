@@ -23,6 +23,8 @@ release
   - Disabled NameMapperDict test (in SyntaxAndOutput.py) because the
     namemappers still have the dict-method bug.  (Reminder: don't use 
     placehold names like $update that match dict method names.) [MO]
+  - #repeat now uses a local variable of the form __i$num which permits 
+    nesting [JJ]
 
 0.9.15 (Mar 25, 2003)
   - a minor tweak to the cleanup actions of one of the test cases [TR]
