@@ -1,10 +1,14 @@
 Please initial your changes and add a date for each release
 ================================================================================
+0.9.9a4 (not released) 
+   - added #repeat (TR implementing Chuck's suggestion)
+   - added #unless (TR implementing Mike's suggestion)
+
 0.9.9a3 (October 12, 2001) 
-   - more in the Users Guide
-   - renamed #attribute as #attr
-   - renamed #call as #silent
-   - added #echo directive
+   - more in the Users Guide (TR)
+   - renamed #attribute as #attr  (TR)
+   - renamed #call as #silent (TR)
+   - added #echo directive (TR)
  
 0.9.9a2 (October 11, 2001) 
    - updated the example site and the SkeletonPage framework (TR)
