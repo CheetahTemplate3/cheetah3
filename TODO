@@ -72,36 +72,6 @@ Rewrite the caching framework
   file is updated.  This would allow a data structure to be kept in
   sync whenever its text configuration file is changed.
 
-
-
-local/global/builtin variable lookup
-==============================================================================
-Cheetah currently does not allow users to override Python's builtin functions.
-This provides safety because it prevents users from overriding e.g. $str and
-breaking Cheetah horribly.  However, it also prevents users from using common
-placeholder names such as $file, $max, $property, etc.; often requiring
-convoluted circumlocutions to shadow a database field that's named one of
-those.  Worse, the application developer (template maintainer) can't be sure
-the user's version of Python won't have a new builtin defined that will make
-the template fail.  
-
-Related to this is the question of whether to use bare variable names for
-lookup of local/global/builtin variables.  Currently at compile time, Cheetah
-looks for a local/global/builtin variable and, if found, generates a bare
-variable name.  If it's not found, it generates a a NameMapper lookup instead.  
-Lookup of bare variable names is much faster, but it complicates the
-implementation and may contribute to the can't-override-builtins problem.
-
-To get rid of bare variable names in compiled templates, we'd need to add
-the equivalent objects to the searchList:
-    1) locals()
-    2) "#set global" variables
-    3) ... [user-defined searchList] ...
-    4) self  -- the compiled template object
-    4) globals()   -- for imported objects
-    5) __builtins__
-The order these objects appear in the searchList may be subject to debate.
-
 #entry $func($arg1, $arg2="default", $**kw)
 ===============================================================================
 Make a wrapper function in the .py template module that builds a searchList
