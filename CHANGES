@@ -13,6 +13,8 @@ release
     to the containers, and modify the containers directly.  Generic libraries
     that want to add a new kind of information to the searchList (e.g.,
     web variables) should do "self.searchList().insert(0, myContainer)". (MO)
+  - The Cheetah version of unittest now prints a blank line after each 
+    traceback to separate them.  (MO)
 
 0.9.15a2 (Nov 4th, 2002)
   - Filters now have access to the name of the placeholder they're filtering.
