@@ -19,6 +19,10 @@ release
     option "--list PATH/CheetahWrapper.py", lists all scenarios that would be
     tested; the argument is the path to the test module itself. (MO)
   - made Cheetah.NameMapper.NotFound subclass the builtin LookupError (TR)
+  - added an initial implementation of single line #if directives
+    #if <condition> then <true> else <false>
+    The parsing is fairly rudimentary for now and assumes that the keywords
+    'then' and 'else' won't appear any inside a string in this directive (TR)
 
 0.9.15a1 (Oct 6th, 2002)
   - fixed a package-relative import bug in ImportHooks.py (TR)
