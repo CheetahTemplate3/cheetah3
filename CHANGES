@@ -2,16 +2,20 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 0.9.14b1 (not released yet)
+  - moved the Users' Guide and the Developers' Guide into a separate CVS module,
+    'CheetahDocs', so they can be distributed separately from the source distro
+    (TR,MO)
   - added TypeType to the types that NameMapper won't do autocalling on (TR)
   - in Template.py moved the global LegalKWs to Template._legalKWs (TR)
-  - moved documentation to separate CVS module CheetahDocs (TR,MO)
-
+  - made #set work with RVALUES that are missing the recommended $ (TR)
+  - added some new test cases for the #set directive (TR)
+  - fixed bug in the output of the #unless directive that Mike found (TR)
 
 0.9.13 (May 8, 2002)
   - changed Cheetah.Servlet.isRunningFromWebKit to isWebwareInstalled (TR)
 
-  - fixed parsing bug that would exit an expression if the directiveEndToken
-    was a valid Python token and was found inside the directive.  (TR)
+  - fixed parsing bug that would exit an expression if the directiveEndToken was a
+    valid Python token and was found inside the directive.  (TR)
 
     E.g.:
     #compiler-settings
