@@ -3,12 +3,13 @@ release
 ================================================================================
 0.9.16a1 (??? 2003)
   - fixed a caching bug related to the #include directive. Thanks to Michael
-  Engelhart for reporting it.[TR]
+    Engelhart for reporting it.[TR]
+  - added the new #encoding directive to handle PEP 263
+    http://www.python.org/doc/2.3/whatsnew/section-encodings.html [TR]
   - Tools.CGITemplate: fix bug in comment.[MO]
   - Abort with a helpful error message if user runs 'cheetah test' in a
     directory without write permission.  (Kludge in CheetahWrapper.py; we
     should probably move the temp files under the system tmp directory.) [MO]
-    
 
 0.9.15 (Mar 25, 2003)
   - a minor tweak to the cleanup actions of one of the test cases [TR]
