@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.57 2004/01/20 20:14:32 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.58 2004/12/15 22:32:27 jjinux Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.57 $
+Version: $Revision: 1.58 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2004/01/20 20:14:32 $
+Last Revision Date: $Date: 2004/12/15 22:32:27 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.57 $"[11:-2]
+__revision__ = "$Revision: 1.58 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -108,6 +108,9 @@ class GenUtils:
         
         
     def genCheetahVar(self, nameChunks, plain=False):
+        # This is a special case for gettext's special method, _.
+        if nameChunks[0][0] == "_":
+            plain = True
         if self.setting('useNameMapper') and not plain:
             return self.genNameMapperVar(nameChunks)
         else:
