@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.55 2001/09/15 19:35:10 tavis_rudd Exp $
+# $Id: Template.py,v 1.56 2001/09/15 19:37:14 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.55 $
+Version: $Revision: 1.56 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/09/15 19:35:10 $
+Last Revision Date: $Date: 2001/09/15 19:37:14 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.55 $"[11:-2]
+__version__ = "$Revision: 1.56 $"[11:-2]
 
 
 ##################################################
@@ -461,10 +461,10 @@ class Template(SettingsManager, Parser):
         the 2nd stage are wrapped up in a code string of a function definition
 
         stage 4 - the generated code string is filtered using the filters
-        defined in the TemplateServer settings
+        defined in the TemplateServer settings. -- a currently unused hook --
 
         stage 5 - the generated code string is executed to produce a python
-        function, that will become a method of the TemplateServer
+        function, that will become a method of the Template object. 
 
         These stages are contained in a try: ... except: ... block that will
         provide helpful information for debugging if an error is caught."""
