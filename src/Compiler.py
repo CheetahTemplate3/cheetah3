@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.9 2001/10/11 03:36:36 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.10 2001/10/12 02:57:21 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2001/10/11 03:36:36 $
+Last Revision Date: $Date: 2001/10/12 02:57:21 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.9 $"[11:-2]
+__version__ = "$Revision: 1.10 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -375,7 +375,7 @@ class MethodCompiler(SettingsManager, GenUtils):
         self.addChunk('#' + ' '*offSet + comm)
 
 
-    def addCall(self, expr):
+    def addSilent(self, expr):
         self.addChunk( expr )
         
     def addSet(self, LVALUE, OP, RVALUE, isGlobal=True):
