@@ -592,10 +592,10 @@ placeholder variable for it.
 
 To look up a CGI GET or POST parameter (with POST overriding):
 \begin{verbatim}
-$request.field.myParameter           ## Uniform Dotted Notation and autocalling.
-$request.field('myParameter')        ## Using autocalling only.
-$request().field('myParameter')      ## Using neither, boring.
-self.request().field('myParameter')
+$request.field.myField           ## Uniform Dotted Notation and autocalling.
+$request.field('myField')        ## Using autocalling only.
+$request().field('myField')      ## Using neither, boring.
+self.request().field('myField')
 \end{verbatim}
 These will fail if Webware is not available, because \code{\$request}
 (aka \code{self.request()} will be \code{None} rather than a Webware
@@ -604,8 +604,8 @@ you may want to put the \code{.field} method in a local variable for
 convenience:
 \begin{verbatim}
 #set $field = $request.field
-$field.myParameter
-$field('myParameter')
+$field.myField
+$field('myField')
 \end{verbatim}
 But remember to do complicated calculations in Python, and assign the results
 to simple variables in the searchList for display.  These \code{\$request}
@@ -623,11 +623,11 @@ Other useful request goodies:
 $request.time              ## Time this request began in Unix ticks.
 $request.timeStamp         ## Time in human-readable format ('asctime' format).
 ## Defined in WebKit.HTTPRequest
-$request.hasField.myParameter  ## Is a CGI parameter defined?
+$request.hasField.myField  ## Is a CGI parameter defined?
 $request.fields            ## Dictionary of all CGI parameters.
 $request.cookie.myCookie   ## A cookie parameter (also .hasCookie, .cookies).
-$request.value.myValue     ## A field or cookie variable (field overrides,
-                           ## also .hasValue).
+$request.value.myValue     ## A field or cookie variable (field overrides)
+                           ## (also .hasValue).
 $request.session.mySessionVar  # A session variable.
 $request.extraURLPath      ## URL path components to right of servlet, if any.
 $request.serverDictionary  ## Dict of environmental vars from web server.
