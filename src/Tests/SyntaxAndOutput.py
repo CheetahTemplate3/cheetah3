@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.15 2001/11/10 22:28:36 hierro Exp $
+# $Id: SyntaxAndOutput.py,v 1.16 2001/11/24 04:47:30 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.15 $
+Version: $Revision: 1.16 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/10 22:28:36 $
+Last Revision Date: $Date: 2001/11/24 04:47:30 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.15 $"[11:-2]
+__version__ = "$Revision: 1.16 $"[11:-2]
 
 
 ##################################################
@@ -1848,6 +1848,73 @@ class SilentDirective(OutputTest):
 
 class ErrorCatcherDirective(OutputTest):
     pass
+
+
+
+class VarExists(OutputTest):               # Template.varExists()
+    
+    def test1(self):
+        """$varExists('$anInt')
+        """
+        self.verify("$varExists('$anInt')",
+                    "1")
+
+    def test2(self):
+        """$varExists('anInt')
+        """
+        self.verify("$varExists('anInt')",
+                    "1")
+
+    def test3(self):
+        """$varExists('$anInt')
+        """
+        self.verify("$varExists('$bogus')",
+                    "0")
+
+    def test4(self):
+        """$varExists('$anInt') combined with #if false
+        """
+        self.verify("#if $varExists('$bogus')\n1234\n#else\n999\n#end if",
+                    "999\n")
+
+    def test5(self):
+        """$varExists('$anInt') combined with #if true
+        """
+        self.verify("#if $varExists('$anInt')\n1234\n#else\n999#end if",
+                    "1234\n")
+
+class GetVar(OutputTest):               # Template.getVar()
+    def test1(self):
+        """$getVar('$anInt')
+        """
+        self.verify("$getVar('$anInt')",
+                    "1")
+
+    def test2(self):
+        """$getVar('anInt')
+        """
+        self.verify("$getVar('anInt')",
+                    "1")
+
+    def test3(self):
+        """$self.getVar('anInt')
+        """
+        self.verify("$self.getVar('anInt')",
+                    "1")
+        
+    def test4(self):
+        """$getVar('bogus', 1234)
+        """
+        self.verify("$getVar('bogus',  1234)",
+                    "1234")
+        
+    def test5(self):
+        """$getVar('$bogus', 1234)
+        """
+        self.verify("$getVar('$bogus',  1234)",
+                    "1234")
+
+
 
 ##################################################
 ## CREATE CONVERTED EOL VERSIONS OF THE TEST CASES 
