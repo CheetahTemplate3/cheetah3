@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.77 2001/12/07 04:38:33 tavis_rudd Exp $
+# $Id: Template.py,v 1.78 2001/12/07 04:51:02 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.77 $
+Version: $Revision: 1.78 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/12/07 04:38:33 $
+Last Revision Date: $Date: 2001/12/07 04:51:02 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.77 $"[11:-2]
+__version__ = "$Revision: 1.78 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -240,6 +240,10 @@ class Template(SettingsManager, Servlet):
     def addToSearchList(self, object):
         """Append an object to the end of the searchlist.""" 
         self._searchList.append(object)
+
+    def prependToSearchList(self, object):
+        """Prepend an object to the end of the searchlist.""" 
+        self._searchList.insert(0, object)
 
     def errorCatcher(self):
         """Return a reference to the current errorCatcher"""
