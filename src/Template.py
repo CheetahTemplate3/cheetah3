@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.19 2001/08/07 05:28:07 tavis_rudd Exp $
+# $Id: Template.py,v 1.20 2001/08/07 19:42:12 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.19 $
+Version: $Revision: 1.20 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/07 05:28:07 $
+Last Revision Date: $Date: 2001/08/07 19:42:12 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.19 $"[11:-2]
+__version__ = "$Revision: 1.20 $"[11:-2]
 
 
 ##################################################
@@ -37,6 +37,7 @@ from SearchList import SearchList
 import CodeGenerator as CodeGen
 from PlaceholderProcessor import PlaceholderProcessor
 from CacheDirectiveProcessor import CacheDirectiveProcessor, EndCacheDirectiveProcessor
+from StopDirectiveProcessor import StopDirectiveProcessor
 import ErrorHandlers
 from Delimiters import delimiters as delims
 from Utilities import \
@@ -69,6 +70,7 @@ class Template(SettingsManager):
     placeholderProcessor =  PlaceholderProcessor()
     displayLogicProcessor = CodeGen.DisplayLogicProcessor()
     setDirectiveProcessor = CodeGen.SetDirectiveProcessor()        
+    stopDirectiveProcessor = StopDirectiveProcessor()
     cacheDirectiveProcessor = CacheDirectiveProcessor()
     endCacheDirectiveProcessor = EndCacheDirectiveProcessor()
 
@@ -157,6 +159,8 @@ class Template(SettingsManager):
                            CodeGen.preProcessSlurpDirective),
                           ('display logic directives',
                            displayLogicProcessor.preProcess),
+                          ('stop directives',
+                           stopDirectiveProcessor.preProcess),
                           ('placeholders',
                            placeholderProcessor.preProcess),
                           ('unescapePlaceholders',
@@ -168,6 +172,7 @@ class Template(SettingsManager):
                          'setDirective':setDirectiveProcessor,
                          'cacheDirective':cacheDirectiveProcessor,
                          'endCacheDirective':endCacheDirectiveProcessor,
+                         'stopDirective':stopDirectiveProcessor,
                          },
             
                     
@@ -215,8 +220,6 @@ class Template(SettingsManager):
         process settings, then call self._compileTemplate() to parse/compile the
         template and prepare the self.__str__() and self.respond() methods for
         serving the template.
-
-        The
 
         Configuration settings should be passed in as a dictionary via the
         'settings' keyword.

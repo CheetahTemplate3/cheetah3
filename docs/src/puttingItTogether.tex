@@ -1,48 +1,60 @@
 \section{Putting it all together}
 \label{puttingItTogether}
 
+This section explains how to use Cheetah as a stand-alone tool and gives an
+under-the-hood view of how Cheetah works.  If you are using Cheetah with Webware
+and want to get straight into it, skip ahead to section
+\ref{webware.inheritance.tmpl}.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The Template class}
 \label{puttingItTogether.TO}
-The Template class (\code{Cheetah.Template.Template}) is the heart of Cheetah.
-It parses and compiles Template Definitions into Python code and serves the
-filled template output to any client that requests it.  When people say ``the
-template'', they mean an instance of the Template class or one of its
-subclasses.
+The \code{Template} class (\code{Cheetah.Template.Template}) is the heart of
+Cheetah.  Objects of this class parse and compile template definitions into a
+chunk of Python code.  This chunk of Python code is then bound to the template
+object's \code{.__str__()} and \code{.respond()} methods, and is executed each
+time you request the filled output from the template by calling either of these
+methods.  
+
+The \code{.__str__()} method is called automatically by Python's print keyword:
+\code{print templateObj}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Constructing Template Objects}
+\subsubsection{Constructing template objects}
 
-\begin{description}
+Template objects may be created manually in Python code or automatically using
+\code{.tmpl} files when Cheetah is used with Webware. See section
+\ref{webware.inheritance.tmpl} for more information on \code{.tmpl} files.  The
+section only deals with manual creation.
 
-\item{\code{templateObj = Template("The king is a \$placeholder1.")}}
-     Pass the Template Definition as a string.
-
-\item{\code{templateObj = Template(file="fink.tmpl")}}
-     Read the Template Definition from a file named "fink.tmpl".
-     
-\item{\code{templateObj = Template(file=f)}}
-     Read the Template Definition from file-like object 'f'.
-     
-\item{\code{templateObj = Template("The king is a \$placeholder1.", dic, obj)}}
-     Pass the Template Definition as a string.  Also pass two Namespaces for the
-     Search List: a dictionary 'dic' and an instance 'obj'.
-     
-\item{\code{templateObj = Template(None, dic, obj, file="fink.txt")}}
-     Same, but pass a filename instead of a string.  The \code{None} is required
-     here to represent the missing Template Definition string--this due to
-     Python's rules for positional parameters.
-     
-\item{\code{templateObj = Template(None, dic, obj, file="fink.txt")}}
-     Same with a file object.
-
-\end{description}
-
+The constructor method of the \code{Template()} class 
 
 You must pass either a Template Definition string or a 'file' keyword argument,
-but not both.  These invocations all raise a TypeError:
+but not both.  
 
+Here are some examples of the various ways to create a template object:
+\begin{description}
+\item{\code{templateObj = Template("The king is a \$placeholder1.")}}
+     Pass the Template Definition as a string.
+\item{\code{templateObj = Template(file="fink.ctd")}}
+     Read the Template Definition from a file named "fink.ctd".  Note, do not
+     confuse \code{.ctd} files with the \code{.tmpl} files that may be used
+     directly with Webware (see section \ref{webware.inheritance.tmpl})
+\item{\code{templateObj = Template(file=f)}}
+     Read the Template Definition from file-like object 'f'.
+\item{\code{templateObj = Template("The king is a \$placeholder1.", dict, obj)}}
+     Pass the Template Definition as a string.  Also pass two Namespaces for the
+     searchList: a dictionary 'dict' and an instance 'obj'.
+\item{\code{templateObj = Template(None, dict, obj, file="fink.txt")}}
+     Same, but pass a filename instead of a string.  The \code{None} is required
+     here to represent the missing Template Definition string -- this due to
+     Python's rules for positional parameters.
+\item{\code{templateObj = Template(None, dict, obj, file="fink.txt")}}
+     Same with a file object.
+\end{description}
+
+The following usage examples are not allowed:
 \begin{verbatim}
 templateObj = Template() 
 templateObj = Template("The king is a $placeholder1", file="fink.txt")
@@ -51,6 +63,43 @@ templateObj = Template("The king is a $placeholder1", file=f)
 
 Certain other keyword arguments are also accepted, see 
 ``Keyword arguments accepted by the constructor'' below.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Keyword arguments accepted by the constructor}
+
+None of these keyword arguments are necessary for normal usage of a TO.
+
+\begin{description}
+
+\item(file) Discussed above in ``Constructing Template Objects''.
+
+\item{macros} Dictionary of macro name (string) -> macro definition (function).
+     These macros are defined before the TO is compiled.
+
+\item{cheetahBlocks} Dictionary of block name (string) -> block definition
+     (string).
+
+% Why would a programmer want to call this?
+
+\item{settings}  Dictionary of configuration settings to merge in.  This is
+     often useful to specify an alternate behavior for missing Namespace Keys:
+\begin{verbatim}
+from Cheetah import CodeGenerator
+settings = {'varNotFound_handler': CodeGenerator.varNotFound_bigWarning}
+templateObj = Template(file="fink.txt", settings=settings)       # Or:
+templateObj = Template("The king is a $placeholder1.", settings=settings)
+\end{verbatim}
+    
+
+\item{overwriteSettings}  Dictionary of configuration settings.  Any existing
+     configuration settings are erased.
+
+\item{plugins}  List of Cheetah plugins to register, in addition to those
+     specified by the configuration setting `plugins'.  Cheetah ships with two
+     plugins so far: a debugger and a PSP interface.
+
+\end{description}
+
      
 Any positional arguments besides the first are Namespaces for the Search List.
 The constructor builds a Search List as a flat list of Namespaces,
@@ -67,7 +116,6 @@ concatenated in the following order:
 
 \end{enumerate}
 
-
 Every Namespace must have Namespace Keys and Namespace Values.  This means it
 must be an object that supports attribute/value pairs or key/value pairs.  
 Instances, dictionaries, modules and classes all make suitable Namespaces.
@@ -81,70 +129,6 @@ right.  Each recursive ``Namespace'' must be a valid Namespace type
 Namespace Value may {\em not} be a list, because the first Identifier in a
 Placeholder Name may not be numeric.  (If this paragraph is unclear, read it
 again after you're read the ``Placeholder Tags'' chapter.)
-
-Let's look again at that example in the introduction.  (Get used to it; you'll
-be seeing it again later too.)
-
-\begin{verbatim}
->>> from Cheetah.Template import Template
->>> templateDef = """\
-... <HTML>
-... <HEAD><TITLE>$title</TITLE></HEAD>
-... <BODY>
-... $contents
-... </BODY>
-... </HTML>"""
->>> nameSpace = {'title': 'Hello World Example', 'contents': 'Hello World!'}
->>> templateObj = Template(templateDef, nameSpace)
-\end{verbatim}
-
-Now let's sneak a peek at this TO's Search List:
-
-\begin{verbatim}
->>> templateObj.searchList()
-[{'title': 'Hello World Example', 'contents': 'Hello World!'}, 
-<Cheetah.Template.Template instance at 0x80e8464>]
-\end{verbatim}
-
-Just as we expected, the Search List contains two elements: our 
-\code{nameSpace} dictionary, and the TO's \code{self}.
-
-(Note: the Search List looks like a Python list but it's not.  With few
-exceptions, you should not attempt to modify the Search List after the Template
-Object has been created.)
-
-Here's another TO which will produce the identical result.  This time, we'll be
-lazy and use the default Namespace rather than adding our own.
-
-\begin{verbatim}
->>> nameSpace = {'title': 'Hello World Example', 'contents': 'Hello World!'}
->>> templateObj2 = Template(templateDef)
->>> templateObj2.title = 'Hello World Example'
->>> templateObj2.contents = 'Hello World!'
->>> templateObj2.searchList()
-[<Cheetah.Template.Template instance at 0x81a153c>]
-\end{verbatim}
-
-Here's a third TO that passes our \code{nameSpace} dictionary
-another way.  It also passes Python's \code{\_\_builtin\_\_} module just for
-fun.  The \code{\_\_builtin\_\_} module contains all of Python's built-in
-functions.  We won't actually use it until we learn how to call functions in
-the ``Functions and Macros'' chapter, but it's good to know it's available.
-
-\begin{verbatim}
->>> import __builtin__
->>> mySearchList = (nameSpace, __builtin__)
->>> templateObj3 = Template(templateDef, searchList=mySearchList)
->>> templateObj3.searchList()
-[<Cheetah.Template.Template instance at 0x81a5824>, {'title': 'Hello World Example', 'contents': 'Hello World!'}, <module '__builtin__' (built-in)>]
-\end{verbatim}
-
-Because the current implementation compiles the TO immediately, your Search 
-List must already contain Namespace Values of the appropriate types for all
-Placeholder Names, at least those which are not simple strings or are used
-in Display Logic (that is, in the attribute of an \code{\#if} or \code{\#for}
-directive).  Otherwise you will likely get an exception.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using Template objects}
@@ -218,42 +202,6 @@ won't autocall when it should.  For the reason why, see the section
 % autocalling.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Keyword arguments accepted by the constructor}
-
-None of these keyword arguments are necessary for normal usage of a TO.
-
-\begin{description}
-
-\item(file) Discussed above in ``Constructing Template Objects''.
-
-\item{macros} Dictionary of macro name (string) -> macro definition (function).
-     These macros are defined before the TO is compiled.
-
-\item{cheetahBlocks} Dictionary of block name (string) -> block definition
-     (string).
-
-% Why would a programmer want to call this?
-
-\item{settings}  Dictionary of configuration settings to merge in.  This is
-     often useful to specify an alternate behavior for missing Namespace Keys:
-\begin{verbatim}
-from Cheetah import CodeGenerator
-settings = {'varNotFound_handler': CodeGenerator.varNotFound_bigWarning}
-templateObj = Template(file="fink.txt", settings=settings)       # Or:
-templateObj = Template("The king is a $placeholder1.", settings=settings)
-\end{verbatim}
-    
-
-\item{overwriteSettings}  Dictionary of configuration settings.  Any existing
-     configuration settings are erased.
-
-\item{plugins}  List of Cheetah plugins to register, in addition to those
-     specified by the configuration setting `plugins'.  Cheetah ships with two
-     plugins so far: a debugger and a PSP interface.
-
-\end{description}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Methods}
@@ -318,54 +266,3 @@ Template Definition.  They will no longer show up in Filled Templates.
 Since the Template class inherits from the SettingsManager mixin, those methods
 are available to change configuration settings after instantiation.
 
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Instance variables}
-
-You shouldn't use or modify these directly, but they are documented here for
-completeness.
-
-\begin{description}
-
-\item{._fileName}  The filename that was passed to the constructor's `file'
-     keyword argument, or None if a filename was not passed.
-     
-\item{._fileMtime}  The modify time of the file whose filename was passed to
-     the constructor's `file' keyword argument, or None if no filename was
-     passed.  (This is for future implementation of automatically recompiling
-     the TO if the source file changes.)
-
-\end{description}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Debugging}
-
-If the environmental variable \code{CHEETAH\_DEBUG} is True, the TO will
-run in debug mode.  This provides a more verbose error message if an 
-exception occurs.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Subclasses}
-
-\begin{description}
-
-\item{Cheetah.Servlet.TemplateServlet}  ``An asbstract base class for Cheetah
-     servlets that can be used with Webware.''  The constructor is the same
-     as the Template class'.  There is an \code{.initializeTemplate()} method
-     you can override to do setup before the template is compiled.  This class
-     also inherits from \code{WebKit.HTTPServlet.HTTPServlet} if Webware is
-     available.  (If not, it fakes it with an empty superclass called
-     HTTPServlet to satisfy the inheritance.)
-
-\item{Cheetah.Templates.SkeletonPage}  A TemplateServlet subclass suitable as
-     a \code{WebKit.Page}-like superclass for your site.  The Template 
-     Definition encompasses an entire HTML page, with blocks for the content,
-     page header/footer, sidebars, etc, features for stylesheet dictionaries,
-     HEAD tags, BODY attributes, etc.  An example of a site using this is in
-     the {\bf examples/webware\_examples/} directory.
-
-\end{description}

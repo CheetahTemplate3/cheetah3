@@ -1,7 +1,11 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Using Cheetah with Webware}
 \label{webware}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Background}
+\label{webware.background}
+
 Webware is a 'Python-Powered Internet Platform' that uses servlets in a manner
 similar to Java servlets.  'WebKit' is the name of Webware's application server.
 For more details please visit http://webware.sourceforge.net.
@@ -28,7 +32,10 @@ with existing Webware servlets.  It is also ideal for cases where you wish to
 use Cheetah for only a portion of the servlet's output, such as a
 discussion-forum table at the bottom of a webpage. 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using the Inheritance approach}
+\label{webware.inheritance}
+
 Cheetah.Servlet provides a servlet class that can be subclassed to create 
 Webware servlets, as in the trivial example below.
 
@@ -73,6 +80,10 @@ class hello_world(TemplateServlet):
         return 'Hello World!'
 \end{verbatim}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using .tmpl files}
+\label{webware.inheritance.tmpl}
+
 This process can be simplified for non-programmers. All the Python wrapper code
 in these examples can be generated automatically by \code{cheetah-compile}, a small program
 that is installed with Cheetah. \code{cheetah-compile} parses Template Definitions
@@ -80,7 +91,7 @@ written in files with the .tmpl extension and generates a Webware servlet file
 with the .py extension for each .tmpl file.  Type \code{cheetah-compile} after
 installing Cheetah to get information on how to use it.
 
-Here's the first example as a .tmpl file:
+Here's the first example as a \code{.tmpl} file:
 
 \begin{verbatim}
 ## FILE: hello_world.tmpl ##
@@ -92,7 +103,7 @@ Hello World!
 </HTML>
 \end{verbatim}
 
-Here's the second example as a .tmpl file.  Note that all lines that begin with
+Here's the second example as a \code{.tmpl} file.  Note that all lines that begin with
 \code{\#\#} are comment lines.
 
 \begin{verbatim}
@@ -112,33 +123,34 @@ $contents
 </HTML>
 \end{verbatim}
 
-\subsubsection{The \#data directive}
-The previous example introduced the \code{\#data} directive, a shortcut means
-of adding data into the servlet's attribute dictionary and thus into
-the Template's {\bf searchList}. The \code{\#data} directive can be used in
-any Template Definition, regardless of whether the definition is in a .py or
-.tmpl file.  
 
-\code{\#data} directives can contain any valid Python code
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{The SkeletonPage framework}
+\label{webware.inheritance.skeletonPage}
 
-\subsubsection{PlateKit}
-Forget what you knew about PlateKit. It's undergoing some changes and is out of
-action for the time-being.
+%\subsubsection{PlateKit}
+%Forget what you knew about PlateKit. It's undergoing some changes and is out of
+%action for the time-being.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using the Containment approach}
+\label{webware.containment}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{User interaction in either approach}
+\label{webware.userInteraction}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Components}
+\label{webware.components}
 
-\subsubsection{What are components?}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Using components}
+\label{webware.components.using}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Building components}
-
+\label{webware.components.building}
 

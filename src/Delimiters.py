@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Delimiters.py,v 1.6 2001/08/07 05:47:04 tavis_rudd Exp $
+# $Id: Delimiters.py,v 1.7 2001/08/07 19:42:12 tavis_rudd Exp $
 """A dictionary of delimeter regular expressions that are used in Cheetah
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/07 05:47:04 $
+Last Revision Date: $Date: 2001/08/07 19:42:12 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 
 ##################################################
@@ -78,6 +78,8 @@ delimiters = {
     'setDirective': re.compile(escCharLookBehind +
                                r'#set[\t ]+(.+?)(?:/#|\r\n|\n|\r|\Z)'),
 
+    'stopDirective': re.compile(escCharLookBehind +
+                                r'#stop(.*?)(?:/#|\r\n|\n|\r|\Z)'),
 
     'cacheDirectiveStartTag': re.compile(escCharLookBehind +
                                          r'#cache(.*?)(?:/#|\r\n|\n|\r|\Z)'),
