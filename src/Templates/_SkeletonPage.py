@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: _SkeletonPage.py,v 1.2 2001/10/10 06:47:41 tavis_rudd Exp $
-"""A skeleton page template for use with the Cheetah package
+# $Id: _SkeletonPage.py,v 1.3 2001/10/11 03:30:35 tavis_rudd Exp $
+"""A baseclass for the SkeletonPage template
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/10/10 06:47:41 $
+Last Revision Date: $Date: 2001/10/11 03:30:35 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -31,23 +31,23 @@ False = (0==1)
 ## CLASSES ##
         
 class _SkeletonPage(Template):
-    """A Skeleton HTML page template"""
-
-
-    def _initializeSettings(self):
-        Template._initializeSettings(self)
-        
-        ## Default values for the names embedded in the template ##
+    """A baseclass for the SkeletonPage template"""
     
+    def __init__(self, *args, **KWs):
+        Template.__init__(self, *args, **KWs)
+        self._initializeSettings()
+        self.addToSearchList(self.settings())
+        
+    def _initializeSettings(self):
+        ## Default values for the names embedded in the template ##
         docType = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" ' + \
                   '"http://www.w3.org/TR/html4/loose.dtd">'
-
+        
+        title = ''
         siteDomainName = 'www.example.com'
         siteCredits = 'Designed & Implemented by Tavis Rudd'
         siteCopyrightName = "Tavis Rudd"
-
-        title = ''
-        
+    
         metaTags = {}
         # metaTags = {'HTTP_EQUIV':{'test':1234}, 'NAME':{'test':1234,'test2':1234} }
         stylesheets = {}

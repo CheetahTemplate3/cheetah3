@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.22 2001/10/10 06:55:44 tavis_rudd Exp $
+# $Id: Parser.py,v 1.23 2001/10/11 03:30:34 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.22 $
+Version: $Revision: 1.23 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/10/10 06:55:44 $
+Last Revision Date: $Date: 2001/10/11 03:30:34 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.22 $"[11:-2]
+__version__ = "$Revision: 1.23 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -229,7 +229,7 @@ class ArgList:
         self.defVals[i] += token
     
     def merge(self):
-        return map(None, self.argNames, self.defVals)
+        return map(None, [i.strip() for i in self.argNames], [i.strip() for i in self.defVals])
     
     def __str__(self):
         return str(self.merge())
@@ -1224,9 +1224,8 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.advance(len('attribute'))
         self.getWhiteSpace()
         
-        if not self.matchCheetahVarStart():
-            raise ParseError(self, msg='CheetahVar expected')
-        self.getCheetahVarStartToken()
+        if self.matchCheetahVarStart():
+            self.getCheetahVarStartToken()
         attribName = self.getIdentifier()
         self.getWhiteSpace()
         self.getAssignmentOperator()

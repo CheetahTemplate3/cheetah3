@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.7 2001/10/10 06:47:41 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.8 2001/10/11 03:30:34 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2001/10/10 06:47:41 $
+Last Revision Date: $Date: 2001/10/11 03:30:34 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -516,14 +516,17 @@ class MethodCompiler(SettingsManager, GenUtils):
         self.dedent()
         self.addChunk('if RECACHE:')
         self.indent()
-        self.addChunk('cacheCollector = DummyTransaction()')
+        self.addChunk('orig_trans = trans')
+        self.addChunk('trans = cacheCollector = DummyTransaction()')
         self.addChunk('write = cacheCollector.response().write')
         
     def endCacheRegion(self):
         self._cacheRegionOpen = False
+        self.addChunk('trans = orig_trans')
         self.addChunk('write = trans.response().write')
         self.addChunk('self._cacheData[' + repr(self.cacheID())
                       + '] = cacheCollector.response().getvalue()')
+        self.addChunk('del cacheCollector')
         self.dedent()
         self.addWriteChunk( 'self._cacheData[' + repr(self.cacheID()) + ']' )
         self.addChunk('## END CACHE REGION')
@@ -993,7 +996,7 @@ class ModuleCompiler(Parser, GenUtils):
             'outputRowColComments':True,
 
             ## should #block's be wrapped in a comment in the template's output
-            'includeBlockMarkers': False,   
+            'includeBlockMarkers': True,   
             'blockMarkerStart':('\n<!-- START BLOCK: ',' -->\n'),
             'blockMarkerEnd':('\n<!-- END BLOCK: ',' -->\n'),
             
@@ -1129,6 +1132,9 @@ class ModuleCompiler(Parser, GenUtils):
         self._globalCodeChunks.append(codeChunk)
 
     def addComment(self, comm):
+        if re.match(r'#+$',comm):      # skip bar comments
+            return
+        
         specialVarMatch = specialVarRE.match(comm)
         if specialVarMatch:
             return self.addSpecialVar(specialVarMatch.group(1), comm[specialVarMatch.end():])
