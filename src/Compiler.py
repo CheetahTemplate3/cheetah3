@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.22 2002/01/06 07:36:27 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.23 2002/02/26 22:02:04 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.22 $
+Version: $Revision: 1.23 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/01/06 07:36:27 $
+Last Revision Date: $Date: 2002/02/26 22:02:04 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.22 $"[11:-2]
+__revision__ = "$Revision: 1.23 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -308,11 +308,11 @@ class MethodCompiler(SettingsManager, GenUtils):
         return ''.join( self._methodBodyChunks )
 
     def docString(self):
-        ind = self._indent
-        docStr = ('%(ind)s"""\n%(ind)s' +
-                  '\n%(ind)s'.join(self._docStringLines) +
-                  '\n%(ind)s"""\n'
-                  ) % {'ind':ind*2}
+        ind = self._indent*2
+        
+        docStr = (ind + '"""\n' + ind +
+                  ('\n' + ind).join(self._docStringLines) +
+                  '\n' + ind + '"""\n')
         return  docStr
 
     ## methods for adding code
@@ -966,9 +966,8 @@ class ModuleCompiler(Parser, GenUtils):
 
     def __getattr__(self, name):
 
-        """Provide access to the methods and attributes of the ClassCompiler
-        at the top of the activeMethods stack: one-way namespace sharing
-
+        """Provide access to the methods and attributes of the ClassCompiler:
+        one-way namespace sharing
 
         WARNING: Use .setMethods to assign the attributes of the ClassCompiler
         from the methods of this class!!! or you will be assigning to attributes
