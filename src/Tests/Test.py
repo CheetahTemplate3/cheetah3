@@ -1,11 +1,9 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.33 2002/03/07 04:02:06 tavis_rudd Exp $
+# $Id: Test.py,v 1.34 2002/03/07 04:02:42 tavis_rudd Exp $
 """Core module of Cheetah's Unit-testing framework
 
 TODO
 ================================================================================
-- Check NameMapper independently
-
 # combo tests
 # negative test cases for expected exceptions
 # black-box vs clear-box testing
@@ -16,12 +14,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.33 $
+Version: $Revision: 1.34 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/03/07 04:02:06 $
+Last Revision Date: $Date: 2002/03/07 04:02:42 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.33 $"[11:-2]
+__revision__ = "$Revision: 1.34 $"[11:-2]
 
 
 ##################################################
