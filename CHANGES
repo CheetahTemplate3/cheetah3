@@ -5,7 +5,18 @@ Please initial your changes and a date for each release
   - Added package ./src/Tools/ for contributed classes/functions/packages not
     necessary to run Cheetah.  The first such class is RecursiveNull.py by Ian
     Bicking.  Added package Cheetah.Tools to list in ./setup.py . (MO)
-
+  - Template.__init__ keyword arg 'searchList': no longer has to be a tuple.  It
+    may be a list or any type that that Python's 'tuple' function accepts. (MO)
+  - Template.__init__ new keyword arg 'file': this may be a filename or file
+    object to read the Template Definition from.  If you use this, you must not
+    pass a Template Definition string also.  New instance variables 
+    ._fileName and ._fileMtime are set if a filename was passed; otherwise they
+    are None. (MO)
+  - CodeGenerator new function 'varNotFound_KeyError': raises KeyError if a
+    placeholder name is missing when filling the template.  Disabled by default.
+    (MO)
+  - Template.getUnknowns (new method): returns a list of Placeholder Names
+    missing in the Search List. (MO)
 
 0.9.7 (July 13, 2001)
   - reimplemented the parsing of $placeholders using the Python tokenizer module (TR)
