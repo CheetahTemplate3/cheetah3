@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.27 2001/08/10 18:46:22 tavis_rudd Exp $
+# $Id: Template.py,v 1.28 2001/08/10 19:26:02 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.27 $
+Version: $Revision: 1.28 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/10 18:46:22 $
+Last Revision Date: $Date: 2001/08/10 19:26:02 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.27 $"[11:-2]
+__version__ = "$Revision: 1.28 $"[11:-2]
 
 
 ##################################################
@@ -34,9 +34,13 @@ from SettingsManager import SettingsManager
 from NameMapper import valueForName     # this is used in the generated code
 from SearchList import SearchList
 import CodeGenerator as CodeGen
+
 from PlaceholderProcessor import PlaceholderProcessor
+from DisplayLogicProcessor import DisplayLogicProcessor
+from SetDirectiveProcessor import SetDirectiveProcessor
 from CacheDirectiveProcessor import CacheDirectiveProcessor, EndCacheDirectiveProcessor
 from StopDirectiveProcessor import StopDirectiveProcessor
+
 import ErrorHandlers
 from Delimiters import delimiters as delims
 from Utilities import processTextVsTagsList, mergeNestedDictionaries 
@@ -176,11 +180,9 @@ class Template(SettingsManager):
         else:
             raise TypeError("'file' argument must be a filename or file-like object")
 
-        self._templateDef = str( templateDef ) 
+        self._templateDef = str( templateDef )
         # by converting to string here we allow other objects such as other Templates
         # to be passed in
-
-
 
         ## process the settings
         self.initializeSettings()
@@ -238,8 +240,8 @@ class Template(SettingsManager):
         placeholderProcessor =  PlaceholderProcessor(self)
         self.placeholderProcessor = placeholderProcessor
         
-        displayLogicProcessor = CodeGen.DisplayLogicProcessor(self)
-        setDirectiveProcessor = CodeGen.SetDirectiveProcessor(self)        
+        displayLogicProcessor = DisplayLogicProcessor(self)
+        setDirectiveProcessor = SetDirectiveProcessor(self)        
         stopDirectiveProcessor = StopDirectiveProcessor(self)
         cacheDirectiveProcessor = CacheDirectiveProcessor(self)
         endCacheDirectiveProcessor = EndCacheDirectiveProcessor(self)
@@ -348,6 +350,11 @@ class Template(SettingsManager):
 
     ## make an alias
     recompile = compileTemplate
+
+    def _getCodeGeneratorState(self):
+        """Return a reference to self._codeGeneratorState. This is used by the
+        tag processors."""
+        return self._codeGeneratorState
     
     def _codeGenerator(self, templateDef):
         

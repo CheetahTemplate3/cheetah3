@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: TagProcessor.py,v 1.3 2001/08/10 18:46:22 tavis_rudd Exp $
+# $Id: TagProcessor.py,v 1.4 2001/08/10 19:26:02 tavis_rudd Exp $
 """Tag Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/10 18:46:22 $
+Last Revision Date: $Date: 2001/08/10 19:26:02 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -42,15 +42,23 @@ class TagProcessor:
     _tagType = EVAL_TAG_TYPE
 
     def __init__(self, templateObj):
-        self._templateObj = templateObj
+        """Setup some internal references to the templateObj. This method must
+        be called by subclasses."""
 
+        self._templateObj = templateObj
+        ## setup some method mappings for convenience
+        self.state = templateObj._getCodeGeneratorState
+        self.settings = templateObj.settings
+        self.setting = templateObj.setting
+        self.searchList = templateObj.searchList
+        
     def templateObj(self):
         """Return a reference to the templateObj that controls this processor"""
         return self._templateObj
-    
+
     def preProcess(self, templateObj, templateDef):
-        delims = templateObj.setting('internalDelims')
-        tagTokenSeparator = templateObj.setting('tagTokenSeparator')
+        delims = self.setting('internalDelims')
+        tagTokenSeparator = self.setting('tagTokenSeparator')
         def subber(match, delims=delims, token=self._token,
                    tagTokenSeparator=tagTokenSeparator,
                    templateObj=templateObj):
@@ -74,9 +82,9 @@ class TagProcessor:
         This must be called by subclasses"""
         templateObj = self.templateObj()
         
-        if not templateObj._codeGeneratorState.has_key('indentLevel'):
-            templateObj._codeGeneratorState['indentLevel'] = \
-                          templateObj._settings['initialIndentLevel']
+        if not self.state().has_key('indentLevel'):
+            self.state()['indentLevel'] = \
+                          self.settings()['initialIndentLevel']
         if not hasattr(templateObj, '_localVarsList'):
             # may have already been set by #set or #for
             templateObj._localVarsList = []
@@ -84,12 +92,16 @@ class TagProcessor:
         if not hasattr(templateObj,'_perResponseSetupCodeChunks'):
             templateObj._perResponseSetupCodeChunks = {}
 
-        if not templateObj._codeGeneratorState.has_key('defaultCacheType'):
-            templateObj._codeGeneratorState['defaultCacheType'] = None
+        if not self.state().has_key('defaultCacheType'):
+            self.state()['defaultCacheType'] = None
 
     
     def processTag(self, tag):
         return self.wrapTagCode( self.translateTag(tag) )
+
+    def validateTag(self, tag):
+        """A hook for doing security and syntax checks on a tag"""
+        pass
 
     def translateTag(self, tag):
         pass
@@ -99,8 +111,8 @@ class TagProcessor:
 
     def wrapEvalTag(self, translatedTag):
         templateObj = self.templateObj()
-        indent = templateObj._settings['indentationStep'] * \
-                 templateObj._codeGeneratorState['indentLevel']
+        indent = self.setting('indentationStep') * \
+                 self.state()['indentLevel']
         return "''',\n" + indent + translatedTag + ", '''"
 
     def wrapTagCode(self, translatedTag):

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.26 2001/08/10 18:46:22 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.27 2001/08/10 19:26:02 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.26 $
+Version: $Revision: 1.27 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/10 18:46:22 $
+Last Revision Date: $Date: 2001/08/10 19:26:02 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.26 $"[11:-2]
+__version__ = "$Revision: 1.27 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -27,15 +27,7 @@ from time import time as currentTime # used in the cache refresh code
 # intra-package imports ...
 import TagProcessor
 import NameMapper
-from Validators import \
-     validateDisplayLogicCode, \
-     validateArgStringInPlaceholderTag, \
-     validateIncludeDirective, \
-     validateMacroDirective, \
-     validateSetDirective
-
 from Delimiters import delimiters
-from Components import Component
 #import Template #NOTE THIS IS IMPORTED BELOW TO AVOID CIRCULAR IMPORTS
 from Utilities import lineNumFromPos
 
@@ -53,134 +45,6 @@ class Error(Exception):
 
 class NoDefault:
     pass
-
-class DisplayLogicProcessor(TagProcessor.TagProcessor):
-    """A class for processing display logic tags in Cheetah Templates."""
-    
-    def __init__(self, templateObj):
-        TagProcessor.TagProcessor.__init__(self, templateObj)
-        self._tagType = TagProcessor.EXEC_TAG_TYPE
-        self._delimRegexs = [delimiters['displayLogic_gobbleWS'],
-                             delimiters['displayLogic']]
-        self._token = 'displayLogic'
-                    
-    def translateTag(self, tag):
-        """process display logic embedded in the template"""
-
-        templateObj = self.templateObj()
-        settings = templateObj._settings
-        indent = settings['indentationStep']
-        
-        tag = tag.strip()
-        validateDisplayLogicCode(templateObj, tag) 
-        
-        if tag in ('end if','end for'):
-            templateObj._codeGeneratorState['indentLevel'] -= 1
-            outputCode = indent*templateObj._codeGeneratorState['indentLevel']
-
-        elif tag in ('continue','break'):
-            outputCode = indent*templateObj._codeGeneratorState['indentLevel'] + tag \
-                         + "\n" + \
-                         indent*templateObj._codeGeneratorState['indentLevel']
-        elif tag[0:4] in ('else','elif'):
-            tag = tag.replace('else if','elif')
-            
-            if tag[0:4] == 'elif':
-                tag = templateObj.translatePlaceholderVars(tag)
-                tag = tag.replace('()() ','() ') # get rid of accidental double calls
-            
-            outputCode = indent*(templateObj._codeGeneratorState['indentLevel']-1) + \
-                         tag +":\n" + \
-                         indent*templateObj._codeGeneratorState['indentLevel']
-    
-        elif re.match(r'if +|for +', tag): # it's the start of a new block
-            templateObj._codeGeneratorState['indentLevel'] += 1
-            
-            if tag[0:3] == 'for':
-                ##translate this #for $i in $list/# to this #for i in $list/#
-                INkeywordPos = tag.find(' in ')
-                tag = tag[0:INkeywordPos].replace(
-                    templateObj.setting('placeholderStartToken'),'') + \
-                               tag[INkeywordPos:]
-    
-                ## register the local vars in the loop with the templateObj  ##
-                #  so placeholderTagProcessor will recognize them
-                #  and handle their use appropriately
-                localVars, restOfForStatement = tag[3:].split(' in ')
-                localVarsList =  [localVar.strip() for localVar in
-                                  localVars.split(',')]
-                templateObj._localVarsList += localVarsList 
-    
-            tag = templateObj.translatePlaceholderVars(tag)
-            tag = tag.replace('()() ','() ') # get rid of accidental double calls
-            outputCode = indent*(templateObj._codeGeneratorState['indentLevel']-1) + \
-                         tag + ":\n" + \
-                         indent*templateObj._codeGeneratorState['indentLevel']
-        
-        else:                           # it's a chunk of plain python code              
-            outputCode = indent*(templateObj._codeGeneratorState['indentLevel']) + \
-                         tag + \
-                         "\n" + indent*templateObj._codeGeneratorState['indentLevel']            
-            
-        return outputCode
-
-class SetDirectiveProcessor(TagProcessor.TagProcessor):
-    """A class for processing display logic tags in Cheetah Templates."""
-    
-    _token = 'setDirective'
-    _tagType = TagProcessor.EXEC_TAG_TYPE
-    _delimRegexs = [delimiters['setDirective'],]
-                    
-    def translateTag(self, tag):
-        """generate python code from setDirective tags, and register the vars with
-        placeholderTagProcessor as local vars."""
-        templateObj = self.templateObj()
-        validateSetDirective(templateObj, tag)
-        
-        firstEqualSign = tag.find('=')
-        varName = tag[0: firstEqualSign].replace(
-            templateObj.setting('placeholderStartToken'),'').strip()
-        valueString = tag[firstEqualSign+1:]
-        valueString = templateObj.translatePlaceholderVars(valueString)
-        # get rid of accidental double calls
-        valueString = valueString.replace('()()','()')
-        
-        #templateObj._localVarsList.append(varName)
-                
-        indent = templateObj.setting('indentationStep')
-        if not templateObj._codeGeneratorState.has_key('indentLevel'):
-            templateObj._codeGeneratorState['indentLevel'] = \
-                        templateObj.setting('initialIndentLevel')
-    
-        return indent*(templateObj._codeGeneratorState['indentLevel']) + \
-               'setVars["""' + varName + '"""]' +\
-               "=" + valueString + "\n" + \
-               indent * templateObj._codeGeneratorState['indentLevel']
-        
-
-class CacheDirectiveProcessor(TagProcessor.TagProcessor):
-    _tagType = TagProcessor.EMPTY_TAG_TYPE
-    _token = 'cacheDirective'
-    _delimRegexs = [delimiters['cacheDirectiveStartTag'],]    
-
-    def translateTag(self, tag):
-        templateObj = self.templateObj()
-        tag = tag.strip()
-        if not tag:
-            templateObj._codeGeneratorState['defaultCacheType'] = \
-                                       STATIC_CACHE
-        else:
-            templateObj._codeGeneratorState['defaultCacheType'] = \
-                                       TIMED_REFRESH_CACHE
-            templateObj._codeGeneratorState['cacheRefreshInterval'] = float(tag)
-
-        
-class EndCacheDirectiveProcessor(CacheDirectiveProcessor):
-    _token = 'endCacheDirective'
-    _delimRegexs = [delimiters['cacheDirectiveEndTag'],]    
-    
-    def translateTag(self, tag):
-        self.templateObj()._codeGeneratorState['defaultCacheType'] = NoDefault
 
 
 ##################################################
@@ -242,7 +106,8 @@ def preProcessMacroDirectives(templateObj, templateDef):
     def handleMacroDefs(match, templateObj=templateObj):
         """process each match of the macro definition regex"""
         macroSignature = match.group(1)
-        validateMacroDirective(templateObj, macroSignature)
+
+        ##validateMacroDirective(templateObj, macroSignature)
         
         firstParenthesis = macroSignature.find('(')
         macroArgstring = macroSignature[firstParenthesis+1:-1]
@@ -336,7 +201,8 @@ def preProcessLazyMacroCalls(templateObj, templateDef):
                         ' used in macro call #'+ macroSignature + ' on line ' +
                         str(line))       
             
-        validateMacroDirective(templateObj, macroArgstring)
+        ## validateMacroDirective(templateObj, macroArgstring)
+        
         if macroName in templateObj._macros.keys():
             return eval('templateObj._macros[macroName](' + macroArgstring + ')',
                         vars())
@@ -386,7 +252,8 @@ def preProcessExplicitMacroCalls(templateObj, templateDef):
             fullArgString += argName + '=extendedArgsDict["' + argName + \
                              '"]' + ', '
         
-        validateMacroDirective(templateObj, fullArgString)
+        ## validateMacroDirective(templateObj, fullArgString)
+            
         if macroName in templateObj._macros.keys():
             return eval('templateObj._macros[macroName](' + fullArgString + ')', vars())
         else:
@@ -433,8 +300,10 @@ def preProcessIncludeDirectives(templateObj, templateDef):
     RESTART = [False,]
     def subber(match, templateObj=templateObj, RESTART=RESTART, Template=Template):
         args = match.group(1).strip()
+
         # do a safety/security check on this tag
-        validateIncludeDirective(templateObj, args)
+        ##validateIncludeDirective(templateObj, args)
+        
         includeString = match.group(1).strip()
         
         raw = False
