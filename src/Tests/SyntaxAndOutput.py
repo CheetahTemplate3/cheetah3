@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.36 2002/06/08 05:58:58 hierro Exp $
+# $Id: SyntaxAndOutput.py,v 1.37 2002/06/09 22:11:12 hierro Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.36 $
+Version: $Revision: 1.37 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/06/08 05:58:58 $
+Last Revision Date: $Date: 2002/06/09 22:11:12 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.36 $"[11:-2]
+__revision__ = "$Revision: 1.37 $"[11:-2]
 
 
 ##################################################
@@ -2088,15 +2088,21 @@ class CGI(OutputTest):
     def test1(self):
         """A regular template."""
         self._guaranteeNoCGI()
-        self.verify("$cgiHeaders#slurp\nHello, world!", 
-                    "Hello, world!")
+        source = "#extends Cheetah.Tools.CGITemplate\n" + \
+                 "#implements respond\n" + \
+                 "$cgiHeaders#slurp\n" + \
+                 "Hello, world!" 
+        self.verify(source, "Hello, world!")
 
 
     def test2(self):
         """A CGI script."""
         self._beginCGI()
-        self.verify("$cgiHeaders#slurp\nHello, world!", 
-                    "Content-type: text/html\n\nHello, world!")
+        source = "#extends Cheetah.Tools.CGITemplate\n" + \
+                 "#implements respond\n" + \
+                 "$cgiHeaders#slurp\n" + \
+                 "Hello, world!" 
+        self.verify(source, "Content-type: text/html\n\nHello, world!")
         self._endCGI()
 
 
@@ -2113,7 +2119,9 @@ class CGI(OutputTest):
            better not call $cgiImport() because it would be misled.
         """
         self._beginCGI()
-        source = "<% self.isControlledByWebKit = True %>#slurp\n" + \
+        source = "#extends Cheetah.Tools.CGITemplate\n" + \
+                 "#implements respond\n" + \
+                 "<% self.isControlledByWebKit = True %>#slurp\n" + \
                  "$cgiHeaders#slurp\n" + \
                  "Hello, world!"
         self.verify(source, "Hello, world!")
@@ -2124,8 +2132,10 @@ class CGI(OutputTest):
         """A CGI script with a GET variable."""
         self._beginCGI()
         os.environ['QUERY_STRING'] = "cgiWhat=world"
-        source = "$cgiHeaders#slurp\n" + \
-                 "#silent $cgiImport(['cgiWhat'])##slurp\n" + \
+        source = "#extends Cheetah.Tools.CGITemplate\n" + \
+                 "#implements respond\n" + \
+                 "$cgiHeaders#slurp\n" + \
+                 "#silent $webInput(['cgiWhat'])##slurp\n" + \
                  "Hello, $cgiWhat!"
         self.verify(source, 
                     "Content-type: text/html\n\nHello, world!")
