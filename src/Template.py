@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.23 2001/08/08 23:38:41 tavis_rudd Exp $
+# $Id: Template.py,v 1.24 2001/08/10 03:27:41 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.23 $
+Version: $Revision: 1.24 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/08 23:38:41 $
+Last Revision Date: $Date: 2001/08/10 03:27:41 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.23 $"[11:-2]
+__version__ = "$Revision: 1.24 $"[11:-2]
 
 
 ##################################################
@@ -40,10 +40,8 @@ from CacheDirectiveProcessor import CacheDirectiveProcessor, EndCacheDirectivePr
 from StopDirectiveProcessor import StopDirectiveProcessor
 import ErrorHandlers
 from Delimiters import delimiters as delims
-from Utilities import \
-     removeDuplicateValues, \
-     mergeNestedDictionaries, \
-     insertLineNums
+from Utilities import mergeNestedDictionaries
+
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
@@ -78,7 +76,7 @@ class Template(SettingsManager):
         'placeholderStartToken':'$',
         'useAutocalling': True,
         'useLateBinding': True,
-        'delayedStart': False,            
+        'delayedCompile': False,            
         'plugins':[],
         'varNotFound_handler': CodeGen.varNotFound_echo,
         'debug': False,
@@ -305,7 +303,7 @@ class Template(SettingsManager):
             self._registerCheetahPlugin(plugin)
 
         
-        if not self.setting('delayedStart'):
+        if not self.setting('delayedCompile'):
             self.compileTemplate()
                    
     def searchList(self):
