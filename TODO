@@ -14,8 +14,8 @@ Languague Specification
 Implementation
 ================================================================================
 
-- redesign and implement the Servlet Factory for Webware so the #extend directive
-  will work with .tmpl files as well as .py files
+- redesign and implement the Servlet Factory for Webware so the #extend
+  directive will work with .tmpl files as well as .py files
 
 Test Suite
 ================================================================================
@@ -25,6 +25,7 @@ Test Suite
 Documentation
 ================================================================================
 - finish up the Webware section
+- quick-reference guide (MO)
 
 Website
 ================================================================================
