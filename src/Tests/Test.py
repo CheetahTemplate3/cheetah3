@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.7 2001/07/13 18:09:40 tavis_rudd Exp $
+# $Id: Test.py,v 1.8 2001/07/13 20:31:40 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/13 18:09:40 $
+Last Revision Date: $Date: 2001/07/13 20:31:40 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 
 ##################################################
@@ -166,7 +166,7 @@ posixCases = [
 $ $500 $. \$var
 '''
 $emptyString $numZero
-${numOne}$numTwo
+${numOne}$numTwo $numOne$numTwo
 $numOne and $numTwo $c. $dict.one $dict.nestedFunc
 $func $func. $func(). $func(4). $func('x'). $func("x"). $func("x"*2). $func(arg="x"). $func(arg='x').
 $meth $meth. $meth(). $meth(5). $meth('y'). $meth("y"). $meth("y"*2). $meth(arg="y"). $meth(arg='y').
@@ -180,7 +180,7 @@ $func, $numTwo, ${func}, $numOne
 $ $500 $. $var
 '''
  0
-12
+12 12
 1 and 2 blarg. item1 Scooby
 Scooby Scooby. Scooby. 4. x. x. xx. x. x.
 doo doo. doo. 5. y. y. yy. y. y.
