@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.17 2001/08/03 19:20:50 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.18 2001/08/07 05:34:00 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.17 $
+Version: $Revision: 1.18 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/03 19:20:50 $
+Last Revision Date: $Date: 2001/08/07 05:34:00 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.17 $"[11:-2]
+__version__ = "$Revision: 1.18 $"[11:-2]
 
 
 ##################################################
@@ -308,8 +308,8 @@ class PlaceholderProcessor(TagProcessor):
                 return name
             elif nameChunks[0] in templateObj._localVarsList:
                 translatedName = 'valueForName(' + nameChunks[0] + ',"""' + \
-                           '.'.join(nameChunks[1:]) + '""", executeCallables=True)' + \
-                           remainderOfName
+                           '.'.join(nameChunks[1:]) + '""", executeCallables=' + \
+                           str(safeToAutoCall) + ')' + remainderOfName
                 return translatedName
 
 
@@ -323,7 +323,8 @@ class PlaceholderProcessor(TagProcessor):
                     return name
                 elif templateObj and nameChunks[0] in templateObj._localVarsList:
                     name = 'valueForName(' + nameChunks[0] + ',"""' + \
-                       '.'.join(nameChunks[1:]) + '""", executeCallables=True)'
+                       '.'.join(nameChunks[1:]) + '""", executeCallables=' + \
+                       str(safeToAutoCall) + ')'
                     return name
                 else:
                     raise NameMapper.NotFound, name
