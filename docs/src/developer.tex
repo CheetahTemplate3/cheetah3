@@ -1,0 +1,76 @@
+\section{For Cheetah Developers}
+\label{developer}
+
+This chapter is for people on the Cheetah development team, and for those who
+want the ``inside scoop'' on how Cheetah works.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adding features to Cheetah}
+
+Whenever you add a feature to Cheetah, follow these steps:
+
+\begin{enumerate}
+
+\item  Add the feature.
+
+\item  Write a regression test for it.  Verify the test suite does not break.
+
+\item  Add an entry to the CHANGES file explaining what you did.
+
+\item  Update the documentation.
+
+\item  Commit it all.
+
+\end{enumerate}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Running regression tests}
+
+Cheetah comes with a set of regression tests to verify it's working properly.
+To run the tests:
+
+\begin{enumerate}
+
+\item  \code{cd} into \bf{src/Cheetah/Tests} in the Cheetah source distribution 
+     or \bf{site-packages/Cheetah/Tests} in your Python library directory.
+     
+\item  Run the command:  \code{python Test.py}
+
+\item  It will run 15-30 seconds and then print either "OK" or an error message.
+
+\end{enumerate}
+
+The test suite tries to write the file \bf{parseTest.txt} in the current 
+directory if it doesn't exist.  You will get an IOError if you don't have write
+permission.  You must run the test suite once as a user with write permission
+permission (e.g., root), then you'll be able to run it as any user.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adding regression tests}
+
+In Tests.py, search for: "### *** ADD NEW TYPES OF POSIX CASES
+ABOVE HERE. ***  ###" and add your test.  \code{posixCases} is a list.  Each
+element is a list of three strings.  The subscripts are:
+
+\begin{description}
+
+\item{[0]}  A description of the test.
+
+\item{[1]}  A small Template Definition.
+
+\item{[2]}  The expected output.
+
+\end{description}
+
+
+``Posix cases} means tests which should work on all platforms.  For
+platform-specific tests, there are two other lists \code{windowsCases} and
+\code{macintoshCases}. 
+separate lists 
+
+Look near the top of the file for many Placeholder Names you can refer to.  If
+none of these are suitable, you may add additional ones.
+
+
