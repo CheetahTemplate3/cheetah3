@@ -1,7 +1,7 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
-0.9.15a3 (Nov ??, 2002)
+0.9.15a3 (Nov 11, 2002)
   - corrected a dictionary bug in the Python version of NameMapper (TR)
   - Rewrote the "cheetah" command (CheetahWrapper.py) again and added test
     cases.  New options --flat and --nobackup; --stdout is now a synonym for
