@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.9 2001/07/13 19:55:18 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.10 2001/07/13 19:58:12 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/13 19:55:18 $
+Last Revision Date: $Date: 2001/07/13 19:58:12 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.9 $"[11:-2]
+__version__ = "$Revision: 1.10 $"[11:-2]
 
 
 ##################################################
@@ -77,7 +77,7 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
         All $placeholders are translated into valid Python code by swapping $
         for the self._marker.  This marker is then used to find the start of
         each placeholder and allows $vars in function arg lists to be parsed
-        correctly.
+        correctly.  '$x()' becomes  ' placeholderTag.x()' when it's marked.
 
         The marker starts with a space to allow $var$var to be parsed correctly.
         $a$b is translated to --placeholderTag.a placeholderTag.b-- instead of
