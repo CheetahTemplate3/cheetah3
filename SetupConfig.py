@@ -1,6 +1,6 @@
 #-------Main Package Settings-----------#
 name = "Cheetah"
-from src.Version import version
+from src._properties import Version as version
 maintainer = "Tavis Rudd"
 author = "The Cheetah Development Team"
 author_email = "cheetahtemplate-discuss@lists.sf.net"
