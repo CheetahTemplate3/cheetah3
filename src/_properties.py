@@ -24,9 +24,13 @@ PackageToDirMap = {'%(PackageName)s':'%(PackageDir)s',
                    }
 ManifestTemplates = ['recursive-include %(PackageDir)s *',
                      'recursive-exclude %(PackageDir)s *.pyc *~ *.aux',
-                     'include *.py *.cfg TODO CHANGES LICENSE README examples docs',
+                     'include *.py *.cfg TODO CHANGES LICENSE README bin examples docs',
                      'recursive-include docs * ',
-                     'recursive-exclude docs *~ *.aux',
+                     'recursive-exclude docs *~ *.aux',                     
+                     'recursive-include bin * ',
+                     'recursive-exclude bin *~',                     
+                     'recursive-include examples * ',
+                     'recursive-exclude examples *~',                                          
                      ]
 
 Scripts = ['bin/cheetah-compile',

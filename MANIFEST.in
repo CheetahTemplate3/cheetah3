@@ -1,5 +1,6 @@
-include *.py *.cfg TODO CHANGES LICENSE README examples docs
+include *.py *.cfg TODO CHANGES LICENSE README examples docs bin
 recursive-include src *
+recursive-include bin *
 recursive-include docs * 
 recursive-include examples *
 recursive-exclude src *.pyc *~ *.aux
