@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.23 2001/10/11 03:30:34 tavis_rudd Exp $
+# $Id: Parser.py,v 1.24 2001/10/11 03:39:39 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.23 $
+Version: $Revision: 1.24 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/10/11 03:30:34 $
+Last Revision Date: $Date: 2001/10/11 03:39:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.23 $"[11:-2]
+__version__ = "$Revision: 1.24 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -229,7 +229,12 @@ class ArgList:
         self.defVals[i] += token
     
     def merge(self):
-        return map(None, [i.strip() for i in self.argNames], [i.strip() for i in self.defVals])
+        defVals = self.defVals
+        for i in range(len(defVals)):
+            if type(defVals[i]) == StringType:
+                defVals[i] = defVals[i].strip()
+                
+        return map(None, [i.strip() for i in self.argNames], defVals)
     
     def __str__(self):
         return str(self.merge())

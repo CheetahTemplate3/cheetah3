@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.8 2001/10/11 03:30:34 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.9 2001/10/11 03:36:36 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2001/10/11 03:30:34 $
+Last Revision Date: $Date: 2001/10/11 03:36:36 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -996,7 +996,7 @@ class ModuleCompiler(Parser, GenUtils):
             'outputRowColComments':True,
 
             ## should #block's be wrapped in a comment in the template's output
-            'includeBlockMarkers': True,   
+            'includeBlockMarkers': False,   
             'blockMarkerStart':('\n<!-- START BLOCK: ',' -->\n'),
             'blockMarkerEnd':('\n<!-- END BLOCK: ',' -->\n'),
             

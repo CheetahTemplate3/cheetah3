@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.60 2001/10/11 03:35:05 tavis_rudd Exp $
+# $Id: Template.py,v 1.61 2001/10/11 03:40:44 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.60 $
+Version: $Revision: 1.61 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/10/11 03:35:05 $
+Last Revision Date: $Date: 2001/10/11 03:40:44 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.60 $"[11:-2]
+__version__ = "$Revision: 1.61 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -159,7 +159,7 @@ class Template(SettingsManager, Servlet):
         if file and type(file) == StringType:
             file = self.serverSidePath(file)
             self._fileMtime = os.path.getmtime(file)
-            self._fileDirName, self._fileBaseName = os.path.split(self._filePath)
+            self._fileDirName, self._fileBaseName = os.path.split(file)
         self._filePath = file
                     
         compiler = Compiler(source, file,
