@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.9 2001/08/13 22:01:28 tavis_rudd Exp $
+# $Id: Parser.py,v 1.10 2001/08/14 06:07:19 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/13 22:01:28 $
+Last Revision Date: $Date: 2001/08/14 06:07:19 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.9 $"[11:-2]
+__version__ = "$Revision: 1.10 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -373,13 +373,13 @@ class Parser:
                 return name
             elif nameChunks[0] in templateObj._localVarsList:
                 translatedName = 'valueForName(' + nameChunks[0] + ',"""' + \
-                           '.'.join(nameChunks[1:]) + '""", executeCallables=' + \
+                           '.'.join(nameChunks[1:]) + '""", ' + \
                            str(safeToAutoCall) + ')' + remainderOfName
                 return translatedName
 
             ## Translate the NameMapper part of the Name
             translatedName = 'valueFromSearchList(searchList, "' + \
-                           nameMapperPartOfName + '", executeCallables=' + \
+                           nameMapperPartOfName + '", ' + \
                            str(safeToAutoCall) + ')' + remainderOfName
             return translatedName
 
