@@ -4,16 +4,22 @@ release
 0.9.15a4 (unreleased)
   - The Cheetah version of unittest now prints a blank line after each 
     traceback to separate them.  (MO)
-  - The NameMapper (Python version) looks for a key first, then an 
+  - The NameMapper (Python version, version 2) looks for a key first, then an 
     attribute/method.  But it ignores the attributes/methods if (1)
     the object has keys (i.e., .__getitem__() is defined) and (2) this
     is the first "chunk" (component, identifier) in a searchList lookup.
-    This is to prevent $update from matching a dictionary method if there
-    happens to be a dictionary container in the searchList.  
+    this is to prevent $update from matching a dictionary method if there
+    happens to be a dictionary container in the searchlist.  
         COMPATIBILITY NOTE: NameMapper used to look for an attribute first.
     So if $a has both an attribute 'foo' and a key 'foo', $a.foo now finds
     a['foo'] instead of a.foo.  To get the attribute, you must do 
     $getattr($a, 'foo') or turn NameMapper off. (MO)
+  - The NameMapper (Python version, version 3) again looks for an attribute
+    first, then a key.  But now it ignores the attributes/methods if the
+    object is a dictionary (a built-in Python dictionary, not a subclass)
+    and this is the first "chunk" (component, identifier) in a searchList
+    lookup.  this is to prevent $update from matching a dictionary method if
+    there happens to be a dictionary container in the searchlist.  (MO)
 
 0.9.15a3 (Nov 10, 2002)
   - corrected a dictionary bug in the Python version of NameMapper (TR)
