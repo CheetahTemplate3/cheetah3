@@ -1,5 +1,5 @@
 # You must change PYTHONSRC to the path of your Python source distributon.
-PYTHONSRC=/home/tavis/tmp/Python-2.1
+PYTHONSRC=/home/iron/nobackup/PYTHON/Python-2.2b1
 DOCNAME=devel_guide
 MKHOWTO=$(PYTHONSRC)/Doc/tools/mkhowto
 MAIN_TEX_FILE= devel_guide.tex
@@ -31,6 +31,6 @@ text:
 
 clean:
 	-rm -rf $(DOCNAME)
-	-rm *.aux *.l2h *~ *.log *.ind *.bkm *.how *.toc
+	-rm -f *.aux *.l2h *~ *.log *.ind *.bkm *.how *.toc
 	-rm -rf ../html
 
