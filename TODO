@@ -8,12 +8,17 @@ Cheetah TODO list
   affected a released version of Cheetah.
 
 
-Goals for 1.0
+Requirements for 1.0
 =========================================================================
-- Change #compiler-settings to #compiler
 - write a formalized grammar for Cheetah in BNF 
 - update User's Guide about changes to SkeletonPage (no more #settings,
   etc) (TR)
+- document all methods/attributes inherited from Template and
+  WebKit.Servlet/Cheetah.DummyServlet, for section 11.5 of the Users' Guide.
+  Distinguish those that are frequently used by the template maintainer,
+  those occasionally used, and those never used.  These must be documented
+  to avoid unknowingly overriding a Template/Servlet variable and causing
+  side effects.
 - decide whether/when to change the way local/global/builtin variables
   are looked up (see below).
 
