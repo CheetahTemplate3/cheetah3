@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: TagProcessor.py,v 1.9 2001/08/13 22:14:31 tavis_rudd Exp $
+# $Id: TagProcessor.py,v 1.10 2001/08/14 19:29:50 tavis_rudd Exp $
 """Tag Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/13 22:14:31 $
+Last Revision Date: $Date: 2001/08/14 19:29:50 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.9 $"[11:-2]
+__version__ = "$Revision: 1.10 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -100,7 +100,7 @@ class TagProcessor(Parser):
     def wrapEvalTag(self, translatedTag):
         indent = self.setting('indentationStep') * \
                  self.state()['indentLevel']
-        return "''',\n" + indent + translatedTag + ", '''"
+        return "''',\n" + indent + translatedTag + ",\n" + indent + "'''"
 
     def wrapTagCode(self, translatedTag):
         if self._tagType == EVAL_TAG_TYPE:

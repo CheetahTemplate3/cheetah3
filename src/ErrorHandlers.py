@@ -5,12 +5,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/11 04:57:39 $
+Last Revision Date: $Date: 2001/08/14 19:29:50 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -37,11 +37,11 @@ False = (0==1)
 class ErrorHandler:
     """An abstract base class for Cheetah ErrorHandlers"""
     
-    def __init__(self):
+    def __init__(self, templateObj):
         """collect some information about the exception and the server"""
         self._localvars = localvars = sys.exc_traceback.tb_frame.f_locals
-        self._server = server = localvars['self']
-        self._debug = server._settings['debug']
+        self._templateObj = templateObj
+        self._debug = templateObj._settings['debug']
 
     def format_exc(self):
         return ''.join( format_exception(sys.exc_type, sys.exc_value,
@@ -96,8 +96,8 @@ class ResponseErrorHandler(ErrorHandler):
     """An error handler for exceptions raised during the Template serving
     cycle"""
     
-    def __init__(self):
-        ErrorHandler.__init__(self)
+    def __init__(self, templateObj):
+        ErrorHandler.__init__(self, templateObj)
 
     def introText(self):
         return """Cheetah compiled this template successfully, but an error (aka Exception)
@@ -106,22 +106,21 @@ occurred at run-time when Cheetah was executing the generated code."""
     def errorDetails(self):
         msg = self.format_exc()
         msg += "\nHere's a copy of the code that Cheetah generated:\n\n"
-        msg += insertLineNums( self._server._generatedCode )
+        msg += insertLineNums( self._templateObj._generatedCode )
         
-        self._server._errorMsgStack.append(msg)
-        self._server._errorMsgStack.reverse()
-        return '\n'.join( self._server._errorMsgStack )
+        self._templateObj._errorMsgStack.append(msg)
+        self._templateObj._errorMsgStack.reverse()
+        return '\n'.join( self._templateObj._errorMsgStack )
 
 
 
 
 class CodeGeneratorErrorHandler(ErrorHandler):
     """The master ErrorHandler for Cheetah's codeGenerator."""
-    def __init__(self):
-        ErrorHandler.__init__(self)
-        server = self._server
+    def __init__(self, templateObj):
+        ErrorHandler.__init__(self, templateObj)
         self._stage = stage = self._localvars['stage']
-        self._stageSettings = server._settings['stages'][stage]
+        self._stageSettings = templateObj._settings['stages'][stage]
 
     def introText(self):
         fillValues = {'stage': self._stage,
@@ -133,16 +132,16 @@ class CodeGeneratorErrorHandler(ErrorHandler):
 Stage %(stage)s, '%(stageTitle)s', is when %(stageDescription)s""" % fillValues
 
     def errorDetails(self):
-        self._stageSettings['errorHandler']()
-        self._server._errorMsgStack.reverse()
-        return '\n'.join( self._server._errorMsgStack )
+        self._stageSettings['errorHandler'](self._templateObj)
+        self._templateObj._errorMsgStack.reverse()
+        return '\n'.join( self._templateObj._errorMsgStack )
 
 
 class StageErrorHandler(ErrorHandler):
     """ErrorHandler base class for stages of Cheetah's codeGenerator."""
-    def __init__(self):
-        ErrorHandler.__init__(self)
-        self._server._errorMsgStack.append( self.generateErrMsg() )
+    def __init__(self, templateObj):
+        ErrorHandler.__init__(self, templateObj)
+        self._templateObj._errorMsgStack.append( self.generateErrMsg() )
 
     def generateErrMsg(self):
         pass
