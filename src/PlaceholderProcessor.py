@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.19 2001/08/08 23:38:41 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.20 2001/08/10 18:46:22 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.19 $
+Version: $Revision: 1.20 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/08 23:38:41 $
+Last Revision Date: $Date: 2001/08/10 18:46:22 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.19 $"[11:-2]
+__version__ = "$Revision: 1.20 $"[11:-2]
 
 
 ##################################################
@@ -69,7 +69,7 @@ class SyntaxError(ValueError):
 class PlaceholderProcessor(TagProcessor):
     """A class for processing $placeholders in strings."""
 
-    def __init__(self, tagStartToken = '$', marker=' placeholderTag.',
+    def __init__(self, templateObj, tagStartToken = '$', marker=' placeholderTag.',
            markerEscaped = ' placeholderTag\.',
            markerLookBehind=r'(?:(?<= placeholderTag\.)|(?<= placeholderTag\.\{))'):
         """Setup the regexs used by this class
@@ -85,6 +85,7 @@ class PlaceholderProcessor(TagProcessor):
         --placeholderTag.aplaceholderTag.b--, which the parser would mistake for
         a single $placeholder The extra space is removed by the parser."""
 
+        TagProcessor.__init__(self, templateObj)
         nameCharLookForward = r'(?=[A-Za-z_])'
         cachedTags = re.compile(markerLookBehind + r'\*' + nameCharLookForward)
         refreshTags = re.compile(markerLookBehind +
@@ -146,11 +147,12 @@ class PlaceholderProcessor(TagProcessor):
         txt = self._refreshTags.sub(refreshSubber, txt)
         return txt
     
-    def initializeTemplateObj(self, templateObj):
+    def initializeTemplateObj(self):
         """Initialize the templateObj so that all the necessary attributes are
         in place for the tag-processing stage"""
 
-        TagProcessor.initializeTemplateObj(self, templateObj)
+        templateObj = self.templateObj()
+        TagProcessor.initializeTemplateObj(self)
         
         if not templateObj._perResponseSetupCodeChunks.has_key('placeholders'):
             ## setup the code to be included at the beginning of each response ##
@@ -267,9 +269,10 @@ class PlaceholderProcessor(TagProcessor):
         return self.wrapPlaceholders(self.mark(templateDef))
 
 
-    def translatePlaceholderString(self, txt, templateObj):
+    def translatePlaceholderString(self, txt):
         """Translate a marked placeholder string into valid Python code."""
 
+        templateObj = self.templateObj()
         searchList = templateObj.searchList()
         def translateName(name, searchList=searchList, templateObj=templateObj):
             
@@ -322,7 +325,7 @@ class PlaceholderProcessor(TagProcessor):
         for live, chunk in self.splitTxt(txt):
             if live:
                 if self._nameRE.search(chunk):
-                    chunk = self.translatePlaceholderString(chunk, templateObj)
+                    chunk = self.translatePlaceholderString(chunk)
                 resultList.append( translateName(chunk) ) # using the function from above
             else:
                 resultList.append(chunk)
@@ -330,24 +333,23 @@ class PlaceholderProcessor(TagProcessor):
         return string.join(resultList, "")
     
 
-    def translateRawPlaceholderString(self, txt, searchList, templateObj=None,
-                                      prefix='searchList'):
+    def translateRawPlaceholderString(self, txt):
         """Translate raw $placeholders in a string directly into valid Python code.
 
         This method is used for handling $placeholders in #directives
         """
 
-        return self.translatePlaceholderString(
-            self.mark(txt), templateObj=templateObj)
+        return self.translatePlaceholderString(self.mark(txt))
 
         
-    def processTag(self, templateObj, tag):
+    def processTag(self, tag):
 
         """This method is called by the Template class for every $placeholder
         tag in the template definition
 
         It is a wrapper around self.translatePlaceholderString that deals with caching"""
 
+        templateObj = self.templateObj()
         ## find out what cacheType the tag has
         if not templateObj._codeGeneratorState['defaultCacheType'] == None:
             cacheType = templateObj._codeGeneratorState['defaultCacheType']
@@ -370,8 +372,7 @@ class PlaceholderProcessor(TagProcessor):
 
 
         ## translate the tag into Python code using self.translatePlaceholderString
-        translatedTag = self.translatePlaceholderString(
-            self._marker + tag, templateObj)
+        translatedTag = self.translatePlaceholderString(self._marker + tag)
 
         
         ## deal with the caching and return the proper code to the code-generator
@@ -381,7 +382,11 @@ class PlaceholderProcessor(TagProcessor):
         elif cacheType == TIMED_REFRESH_CACHE:
             templateObj._setTimedRefresh(translatedTag, cacheRefreshInterval)
             return self.wrapEvalTag(
-                templateObj,
                 'timedRefreshCache["""' + translatedTag + '"""]')
         else:
-            return self.wrapEvalTag(templateObj, "str(" + translatedTag + ")")
+            return self.wrapEvalTag("str(" + translatedTag + ")")
+
+
+
+
+

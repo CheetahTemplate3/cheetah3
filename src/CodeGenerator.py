@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.25 2001/08/08 23:38:41 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.26 2001/08/10 18:46:22 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.25 $
+Version: $Revision: 1.26 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/08 23:38:41 $
+Last Revision Date: $Date: 2001/08/10 18:46:22 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.25 $"[11:-2]
+__version__ = "$Revision: 1.26 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -57,15 +57,17 @@ class NoDefault:
 class DisplayLogicProcessor(TagProcessor.TagProcessor):
     """A class for processing display logic tags in Cheetah Templates."""
     
-    def __init__(self):
+    def __init__(self, templateObj):
+        TagProcessor.TagProcessor.__init__(self, templateObj)
         self._tagType = TagProcessor.EXEC_TAG_TYPE
         self._delimRegexs = [delimiters['displayLogic_gobbleWS'],
                              delimiters['displayLogic']]
         self._token = 'displayLogic'
                     
-    def translateTag(self, templateObj, tag):
+    def translateTag(self, tag):
         """process display logic embedded in the template"""
-    
+
+        templateObj = self.templateObj()
         settings = templateObj._settings
         indent = settings['indentationStep']
         
@@ -129,9 +131,10 @@ class SetDirectiveProcessor(TagProcessor.TagProcessor):
     _tagType = TagProcessor.EXEC_TAG_TYPE
     _delimRegexs = [delimiters['setDirective'],]
                     
-    def translateTag(self, templateObj, tag):
+    def translateTag(self, tag):
         """generate python code from setDirective tags, and register the vars with
         placeholderTagProcessor as local vars."""
+        templateObj = self.templateObj()
         validateSetDirective(templateObj, tag)
         
         firstEqualSign = tag.find('=')
@@ -160,7 +163,8 @@ class CacheDirectiveProcessor(TagProcessor.TagProcessor):
     _token = 'cacheDirective'
     _delimRegexs = [delimiters['cacheDirectiveStartTag'],]    
 
-    def translateTag(self, templateObj, tag):
+    def translateTag(self, tag):
+        templateObj = self.templateObj()
         tag = tag.strip()
         if not tag:
             templateObj._codeGeneratorState['defaultCacheType'] = \
@@ -175,41 +179,12 @@ class EndCacheDirectiveProcessor(CacheDirectiveProcessor):
     _token = 'endCacheDirective'
     _delimRegexs = [delimiters['cacheDirectiveEndTag'],]    
     
-    def translateTag(self, templateObj, tag):
-        templateObj._codeGeneratorState['defaultCacheType'] = NoDefault
+    def translateTag(self, tag):
+        self.templateObj()._codeGeneratorState['defaultCacheType'] = NoDefault
 
 
 ##################################################
 ## FUNCTIONS ##
-def separateTagsFromText(initialText, placeholderRE):
-    """breaks a string up into a textVsTagsList where the odd items are plain
-    text and the even items are the contents of the tags matched by
-    placeholderRE"""
-    
-    textVsTagsList = []
-    position = [0,]
-    
-    def subber(match, textVsTagsList=textVsTagsList,
-               position=position, initialText=initialText):
-
-        textVsTagsList.append( initialText[position[0]:match.start()] )
-        position[0] = match.end()
-        textVsTagsList.append(match.group(1))
-        return ''                       # dummy output that is ignored
-        
-    placeholderRE.sub(subber, initialText)  # ignoring the return value
-    textVsTagsList.append(initialText[position[0]:])
-    return textVsTagsList
-
-def processTextVsTagsList(textVsTagsList, tagProcessorFunction):
-    """loops through textVsTagsList - the output from separateTagsFromText() -
-    and filters all the tag items with the tagProcessorFunction"""
-    
-    ## odd items are plain text, even ones are tags
-    processedList = textVsTagsList[:]
-    for i in range(1, len(processedList), 2):
-        processedList[i] = tagProcessorFunction(processedList[i])
-    return processedList
 
 ## codeGenerator plugins ##
 

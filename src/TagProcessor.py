@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: TagProcessor.py,v 1.2 2001/08/03 19:20:50 tavis_rudd Exp $
+# $Id: TagProcessor.py,v 1.3 2001/08/10 18:46:22 tavis_rudd Exp $
 """Tag Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/03 19:20:50 $
+Last Revision Date: $Date: 2001/08/10 18:46:22 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -41,9 +41,13 @@ class Error(Exception):
 class TagProcessor:
     _tagType = EVAL_TAG_TYPE
 
-    def __init__(self):
-        pass
+    def __init__(self, templateObj):
+        self._templateObj = templateObj
 
+    def templateObj(self):
+        """Return a reference to the templateObj that controls this processor"""
+        return self._templateObj
+    
     def preProcess(self, templateObj, templateDef):
         delims = templateObj.setting('internalDelims')
         tagTokenSeparator = templateObj.setting('tagTokenSeparator')
@@ -63,11 +67,12 @@ class TagProcessor:
 
         return templateDef
    
-    def initializeTemplateObj(self, templateObj):
+    def initializeTemplateObj(self):
         """Initialize the templateObj so that all the necessary attributes are
         in place for the tag-processing stage
 
         This must be called by subclasses"""
+        templateObj = self.templateObj()
         
         if not templateObj._codeGeneratorState.has_key('indentLevel'):
             templateObj._codeGeneratorState['indentLevel'] = \
@@ -83,24 +88,25 @@ class TagProcessor:
             templateObj._codeGeneratorState['defaultCacheType'] = None
 
     
-    def processTag(self, templateObj, tag):
-        return self.wrapTagCode( templateObj, self.translateTag(templateObj, tag) )
+    def processTag(self, tag):
+        return self.wrapTagCode( self.translateTag(tag) )
 
-    def translateTag(self, templateObj, tag):
+    def translateTag(self, tag):
         pass
 
-    def wrapExecTag(self, templateObj, translatedTag):
+    def wrapExecTag(self, translatedTag):
         return "''',])\n" + translatedTag + "outputList.extend(['''"
 
-    def wrapEvalTag(self, templateObj, translatedTag):
+    def wrapEvalTag(self, translatedTag):
+        templateObj = self.templateObj()
         indent = templateObj._settings['indentationStep'] * \
                  templateObj._codeGeneratorState['indentLevel']
         return "''',\n" + indent + translatedTag + ", '''"
 
-    def wrapTagCode(self, templateObj, translatedTag):
+    def wrapTagCode(self, translatedTag):
         if self._tagType == EVAL_TAG_TYPE:
-            return self.wrapEvalTag(templateObj, translatedTag)
+            return self.wrapEvalTag(translatedTag)
         elif self._tagType == EXEC_TAG_TYPE:
-            return self.wrapExecTag(templateObj, translatedTag)
+            return self.wrapExecTag(translatedTag)
         elif self._tagType == EMPTY_TAG_TYPE:
             return ''

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Utilities.py,v 1.4 2001/08/10 03:36:38 tavis_rudd Exp $
+# $Id: Utilities.py,v 1.5 2001/08/10 18:46:22 tavis_rudd Exp $
 """Utility classes and functions used in the Cheetah package
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/10 03:36:38 $
+Last Revision Date: $Date: 2001/08/10 18:46:22 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 
 ##################################################
@@ -28,8 +28,30 @@ import types
 True = (1==1)
 False = (0==1)
 
+class Error(Exception): pass
+
 ##################################################
 ## FUNCTIONS ##
+
+def separateTagsFromText(initialText, startTagRE, endTagRE):
+    """breaks a string up into a textVsTagsList where the odd items are plain
+    text and the even items are the contents of the tags."""
+
+    chunks = startTagRE.split(initialText)
+    textVsTagsList = []
+    for chunk in chunks:
+        textVsTagsList.extend(endTagRE.split(chunk))
+    return textVsTagsList
+
+def processTextVsTagsList(textVsTagsList, tagProcessorFunction):
+    """loops through textVsTagsList - the output from separateTagsFromText() -
+    and filters all the tag items with the tagProcessorFunction"""
+    
+    ## odd items are plain text, even ones are tags
+    processedList = textVsTagsList[:]
+    for i in range(1, len(processedList), 2):
+        processedList[i] = tagProcessorFunction(processedList[i])
+    return processedList
 
 def insertLineNums(string):
     """Return a version of the string with each line prefaced with its line

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.26 2001/08/10 04:53:47 tavis_rudd Exp $
+# $Id: Template.py,v 1.27 2001/08/10 18:46:22 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.26 $
+Version: $Revision: 1.27 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/10 04:53:47 $
+Last Revision Date: $Date: 2001/08/10 18:46:22 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.26 $"[11:-2]
+__version__ = "$Revision: 1.27 $"[11:-2]
 
 
 ##################################################
@@ -31,8 +31,7 @@ import os.path                    # used in Template.normalizePath()
 
 # intra-package imports ...
 from SettingsManager import SettingsManager
-from NameMapper import valueForName
-import NameMapper
+from NameMapper import valueForName     # this is used in the generated code
 from SearchList import SearchList
 import CodeGenerator as CodeGen
 from PlaceholderProcessor import PlaceholderProcessor
@@ -40,8 +39,7 @@ from CacheDirectiveProcessor import CacheDirectiveProcessor, EndCacheDirectivePr
 from StopDirectiveProcessor import StopDirectiveProcessor
 import ErrorHandlers
 from Delimiters import delimiters as delims
-from Utilities import mergeNestedDictionaries
-
+from Utilities import processTextVsTagsList, mergeNestedDictionaries 
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
@@ -65,17 +63,9 @@ class RESTART:
 class Template(SettingsManager):
     """The core template engine: parses, compiles, and serves templates."""
 
-    placeholderProcessor =  PlaceholderProcessor()
-    displayLogicProcessor = CodeGen.DisplayLogicProcessor()
-    setDirectiveProcessor = CodeGen.SetDirectiveProcessor()        
-    stopDirectiveProcessor = StopDirectiveProcessor()
-    cacheDirectiveProcessor = CacheDirectiveProcessor()
-    endCacheDirectiveProcessor = EndCacheDirectiveProcessor()
-
     _settings = {
         'placeholderStartToken':'$',
         'useAutocalling': True,
-        'useLateBinding': True,
         'delayedCompile': False,            
         'plugins':[],
         'varNotFound_handler': CodeGen.varNotFound_echo,
@@ -84,7 +74,8 @@ class Template(SettingsManager):
         'blockMarkerStart':['<!-- START BLOCK: ',' -->'],
         'blockMarkerEnd':['<!-- END BLOCK: ',' -->'],
         'includeBlockMarkers': False,
-
+        
+        ## The rest of this stuff is mainly for internal use
 
         'delimiters':{'includeDirective': [delims['includeDirective_gobbleWS'],
                                            delims['includeDirective'],
@@ -110,77 +101,10 @@ class Template(SettingsManager):
                       },
        
         'internalDelims':["<Cheetah>","</Cheetah>"],
-        'internalDelimsRE': re.compile(r"<Cheetah>(.+?)</Cheetah>",
-                                     re.DOTALL),
         'tagTokenSeparator': '__@__',
         'indentationStep': ' '*4, # 4 spaces - used in the generated code
         'initialIndentLevel': 2, 
-            
-        'preProcessors': [('rawDirectives',
-                           CodeGen.preProcessRawDirectives),
-                          ('comments',
-                           CodeGen.preProcessComments),
-                          ('setDirectives',
-                           setDirectiveProcessor.preProcess),
-                          ('dataDirectives',
-                           CodeGen.preProcessDataDirectives),
-                          ('blockDirectives',
-                           CodeGen.preProcessBlockDirectives),
-                          ('macroDirectives',
-                           CodeGen.preProcessMacroDirectives),
-
-                          # do includes before macro calls
-                          ('includeDirectives',
-                           CodeGen.preProcessIncludeDirectives),
-
-                          ('lazyMacroCalls',
-                           CodeGen.preProcessLazyMacroCalls),
-                          ('lazyMacroCalls',
-                           CodeGen.preProcessLazyMacroCalls),
-                          ('explicitMacroCalls',
-                           CodeGen.preProcessExplicitMacroCalls),
-
-                          ('rawDirectives',
-                           CodeGen.preProcessRawDirectives),
-                          ('comments',
-                           CodeGen.preProcessComments),
-                          ('setDirectives',
-                           setDirectiveProcessor.preProcess),
-                          # + do includes after macro calls
-                          ('includeDirectives',
-                           CodeGen.preProcessIncludeDirectives),
-
-                          ('cacheDirective',
-                           cacheDirectiveProcessor.preProcess),
-                          ('endCacheDirective',
-                           endCacheDirectiveProcessor.preProcess),
-                          ('slurpDirectives',
-                           CodeGen.preProcessSlurpDirective),
-                          ('display logic directives',
-                           displayLogicProcessor.preProcess),
-                          ('stop directives',
-                           stopDirectiveProcessor.preProcess),
-                          ('placeholders',
-                           placeholderProcessor.preProcess),
-                          ('unescapePlaceholders',
-                           placeholderProcessor.unescapePlaceholders),
-                          ],
-                 
-        'tagProcessors':{'placeholders':placeholderProcessor,
-                         'displayLogic':displayLogicProcessor,
-                         'setDirective':setDirectiveProcessor,
-                         'cacheDirective':cacheDirectiveProcessor,
-                         'endCacheDirective':endCacheDirectiveProcessor,
-                         'stopDirective':stopDirectiveProcessor,
-                         },
-            
-                    
-        'generatedCodeFilters':[('removeEmptyStrings',
-                                 CodeGen.removeEmptyStrings),
-                                ('addPerResponseCode',
-                                 CodeGen.addPerResponseCode),
-                                ],
-                    
+                                
         'masterErrorHandler':ErrorHandlers.CodeGeneratorErrorHandler,
         'responseErrorHandler': ErrorHandlers.ResponseErrorHandler,
 
@@ -307,7 +231,89 @@ class Template(SettingsManager):
         ## Now, start compile if we're meant to
         if not self.setting('delayedCompile'):
             self.compileTemplate()
-                   
+
+    def initializeSettings(self):
+        """Setup the tag processors."""
+        
+        placeholderProcessor =  PlaceholderProcessor(self)
+        self.placeholderProcessor = placeholderProcessor
+        
+        displayLogicProcessor = CodeGen.DisplayLogicProcessor(self)
+        setDirectiveProcessor = CodeGen.SetDirectiveProcessor(self)        
+        stopDirectiveProcessor = StopDirectiveProcessor(self)
+        cacheDirectiveProcessor = CacheDirectiveProcessor(self)
+        endCacheDirectiveProcessor = EndCacheDirectiveProcessor(self)
+
+        self.updateSettings({
+            'preProcessors': [('rawDirectives',
+                               CodeGen.preProcessRawDirectives),
+                              ('comments',
+                               CodeGen.preProcessComments),
+                              ('setDirectives',
+                               setDirectiveProcessor.preProcess),
+                              ('dataDirectives',
+                               CodeGen.preProcessDataDirectives),
+                              ('blockDirectives',
+                               CodeGen.preProcessBlockDirectives),
+                              ('macroDirectives',
+                               CodeGen.preProcessMacroDirectives),
+
+                              # do includes before macro calls
+                              ('includeDirectives',
+                               CodeGen.preProcessIncludeDirectives),
+
+                              ('lazyMacroCalls',
+                               CodeGen.preProcessLazyMacroCalls),
+                              ('lazyMacroCalls',
+                               CodeGen.preProcessLazyMacroCalls),
+                              ('explicitMacroCalls',
+                               CodeGen.preProcessExplicitMacroCalls),
+                              
+                              ('rawDirectives',
+                               CodeGen.preProcessRawDirectives),
+                              ('comments',
+                               CodeGen.preProcessComments),
+                              ('setDirectives',
+                               setDirectiveProcessor.preProcess),
+                              # + do includes after macro calls
+                              ('includeDirectives',
+                               CodeGen.preProcessIncludeDirectives),
+                              
+                              ('cacheDirective',
+                               cacheDirectiveProcessor.preProcess),
+                              ('endCacheDirective',
+                               endCacheDirectiveProcessor.preProcess),
+                              ('slurpDirectives',
+                               CodeGen.preProcessSlurpDirective),
+                              ('display logic directives',
+                               displayLogicProcessor.preProcess),
+                              ('stop directives',
+                               stopDirectiveProcessor.preProcess),
+                              ('placeholders',
+                               placeholderProcessor.preProcess),
+                              ('unescapePlaceholders',
+                               placeholderProcessor.unescapePlaceholders),
+                              ],
+            
+            'coreTagProcessors':{'placeholders':placeholderProcessor,
+                                 'displayLogic':displayLogicProcessor,
+                                 'setDirective':setDirectiveProcessor,
+                                 'cacheDirective':cacheDirectiveProcessor,
+                                 'endCacheDirective':endCacheDirectiveProcessor,
+                                 'stopDirective':stopDirectiveProcessor,
+                                 },
+            
+            
+            'generatedCodeFilters':[('removeEmptyStrings',
+                                     CodeGen.removeEmptyStrings),
+                                    ('addPerResponseCode',
+                                     CodeGen.addPerResponseCode),
+                                    ],
+            }
+                            ) # self.updateSettings(...
+        
+        #end of self.initializeSettings()
+        
     def searchList(self):
         """Return a reference to the searchlist"""
         return self._searchList
@@ -326,9 +332,7 @@ class Template(SettingsManager):
         code.  This method is used to translate $placeholders inside directives,
         not for the Template Definition itself."""
         
-        translated = self.placeholderProcessor.translateRawPlaceholderString(
-            string, searchList=self.searchList(), templateObj=self)
-        return translated
+        return self.placeholderProcessor.translateRawPlaceholderString(string)
 
     def compileTemplate(self):
         """Process and parse the template, then compile it into a function definition
@@ -355,7 +359,8 @@ class Template(SettingsManager):
         specified in the TemplateServer settings
 
         stage 2 - convert the $placeholder tags, display logic directives, #set
-        directives, #cache diretives, etc. into chunks of python code
+        directives, #cache diretives, etc. (all the internal-state dependent
+        tags) into chunks of python code
 
         stage 3 - the chunks of python code and the chunks of plain text from
         the 2nd stage are wrapped up in a code string of a function definition
@@ -401,21 +406,24 @@ class Template(SettingsManager):
             
             # a)
             subStage = 'a'
-            for processor in settings['tagProcessors'].values():
-                processor.initializeTemplateObj(self)
+            for processor in settings['coreTagProcessors'].values():
+                processor.initializeTemplateObj()
                 
             # b)
             subStage = 'b'
-            textVsTagsList = CodeGen.separateTagsFromText(
-                templateDef, settings['internalDelimsRE'])
+            chunks = templateDef.split(settings['internalDelims'][0])
+            textVsTagsList = []
+            for chunk in chunks:
+                textVsTagsList.extend(chunk.split(settings['internalDelims'][1]))
+
             if debug:
                 results['stage2'].append(('textVsTagsList', textVsTagsList))
             
             # c)
             subStage = 'c'
-            codePiecesFromTextVsTagsList = CodeGen.processTextVsTagsList(
+            codePiecesFromTextVsTagsList = processTextVsTagsList(
                 textVsTagsList,
-                self._tagProcessor)
+                self._coreTagProcessor)
             
             # d)
             subStage = 'd'
@@ -501,13 +509,15 @@ class Template(SettingsManager):
         Template instance"""
         return new.instancemethod(function, self, self.__class__)
 
-    def _tagProcessor(self, tag):
+    def _coreTagProcessor(self, tag):
         """An abstract tag processor that will identify the tag type from its
-        tagToken prefix and call the appropriate processor for that type of
-        tag"""
+        tagToken prefix and call the appropriate processor for that type of tag.
+        This used for the core tags that are sensitive to state values such as
+        the indentation level."""
+        
         settings = self._settings
         tagToken, tag = tag.split(settings['tagTokenSeparator'])
-        processedTag = settings['tagProcessors'][tagToken].processTag(self, tag)
+        processedTag = settings['coreTagProcessors'][tagToken].processTag(tag)
         return processedTag
 
     
