@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.47 2001/08/19 22:04:13 tavis_rudd Exp $
+# $Id: Template.py,v 1.48 2001/08/30 20:37:57 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.47 $
+Version: $Revision: 1.48 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/19 22:04:13 $
+Last Revision Date: $Date: 2001/08/30 20:37:57 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.47 $"[11:-2]
+__version__ = "$Revision: 1.48 $"[11:-2]
 
 
 ##################################################
@@ -37,6 +37,7 @@ from NameMapper import valueFromSearchList, valueForName # this is used in the g
 import ErrorHandlers              # for the code-generator
 import ErrorCheckers              # for placeholder tags
 import Formatters
+from DummyTransaction import DummyTransaction
 
 #coreTagProcessors
 from PlaceholderProcessor import PlaceholderProcessor
@@ -536,7 +537,7 @@ class Template(SettingsManager, Parser):
             if debug: results['stage3'] = []
             indent = settings['indentationStep']
             generatedCode = \
-                          "def generatedFunction(self, trans=None, iAmNested=False,\n " + \
+                          "def generatedFunction(self, trans=None, dummyTrans=False,\n " + \
                           "joinListAsStr=''.join,\n " + \
                           "filePath=self._filePath,\n " + \
                           "fileMtime=self._fileMtime,\n " + \
@@ -564,16 +565,16 @@ class Template(SettingsManager, Parser):
                           + indent * 3 + "timedRefreshList.sort()\n"\
                           + indent * 3 + "if currTime >= timedRefreshList[0][0]:\n"\
                           + indent * 4 + "timedRefresh(currTime)\n"\
-                          + indent * 3 + "                                   \n" \
-                          + indent * 2 + "outputList = []\n" \
-                          + indent * 2 + "extendOutputList = outputList.extend\n" \
-                          + indent * 2 + "extendOutputList( ['''" + \
+                          + indent * 2 + "if not trans:\n"\
+                          + indent * 3 + "trans = DummyTransaction()\n"\
+                          + indent * 3 + "dummyTrans = True\n"\
+                          + indent * 2 + "write = trans.response().write\n" \
+                          + indent * 2 + "write('''" + \
                                          codeFromTextVsTagsList + \
-                                         "''',] )\n" \
-                          + indent * 2 + "output = joinListAsStr(outputList)\n" \
-                          + indent * 2 + "if trans and not iAmNested:\n" \
-                          + indent * 3 + "trans.response().write(output)\n" \
-                          + indent * 2 + "return output\n" \
+                                         "''')\n" \
+                          + indent * 2 + "if dummyTrans:\n" \
+                          + indent * 3 + "return trans.response().getvalue()\n" \
+                          + indent * 2 + "else: return ''\n" \
                           + indent * 1 + "except:\n" \
                           + indent * 2 + "print self._settings['responseErrorHandler'](self)\n" \
                           + indent * 2 + "raise\n" \
