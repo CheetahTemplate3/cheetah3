@@ -236,7 +236,10 @@ seventy-three.  That's not counting phrases like "take off" and "run-in".)
 \subsection{\#settings ... \#endSettings}
 \label{inheritanceEtc.settings}
 
-[This explanation is preliminary and untested.]
+[This explanation is wrong.  Settings are not in the searchList unless you
+put them there (via self.addToSearchList()).  The purpose of
+\code{\#settings} is to provide the ability for Filters and logic code to be
+customizable by the user without having to be rewritten or subclassed.]
 
 \code{\#settings} provides yet another way to set values for
 \code{\#placeholders} to find, using Cheetah's SettingsManager infrastructure.
