@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.27 2002/03/13 18:54:05 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.28 2002/03/28 19:36:35 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.27 $
+Version: $Revision: 1.28 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/03/13 18:54:05 $
+Last Revision Date: $Date: 2002/03/28 19:36:35 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.27 $"[11:-2]
+__revision__ = "$Revision: 1.28 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -21,6 +21,8 @@ import re
 import os
 import getopt
 import os.path
+import traceback
+import imp
 
 from glob import glob
 import shutil
@@ -45,7 +47,7 @@ class CheetahCompile:
 
     CHEETAH_EXTENSION = '.tmpl'
     SERVLET_EXTENSION = '.py'
-    SERVLET_BACKUP_EXT = '.py_bak'
+    BACKUP_SUFFIX = '_bak'
     GENERATED_EXT = '.html'
     
     RECURSIVE = False
@@ -145,14 +147,14 @@ class CheetahCompile:
             outputModuleFilename = fileNameMinusExt + self.SERVLET_EXTENSION
 
             if self.MAKE_BACKUPS and os.path.exists(outputModuleFilename):
-                print 'Backing up %s before saving new version of %s' % (
+                print '  Backing up %s before saving new version of %s' % (
                     outputModuleFilename, srcFile )
                 
                 shutil.copyfile(outputModuleFilename,
-                                fileNameMinusExt + self.SERVLET_BACKUP_EXT)
+                                outputModuleFilename + self.BACKUP_SUFFIX)
 
-            print 'Saving compiled version of %s -> %s' % (
-                srcFile, className + self.SERVLET_EXTENSION)
+            print '  Saving compiled version of %s -> %s' % (
+                srcFile, outputModuleFilename)
                 
             fp = open(outputModuleFilename,'w')
             fp.write(pyCode)
@@ -175,20 +177,46 @@ class CheetahCompile:
 
             
     def _generate(self, fileNameMinusExt):
-        ## @@IB: this sys.path is a hack
-        sys.path = [os.path.dirname(fileNameMinusExt)] + sys.path
+        
+        """Writes the output of a cheetah template file to an .html file with
+        the same basename."""
+
+        oldSysPath = sys.path[:]       
         try:
-            mod = __import__(os.path.basename(fileNameMinusExt))
-            klass = getattr(mod, os.path.basename(fileNameMinusExt))
+            outputFilename = fileNameMinusExt + self.GENERATED_EXT
+            dirname, basename = os.path.split(fileNameMinusExt)        
+            ## @@IB: this sys.path is a hack
+            sys.path = [dirname] + sys.path
+            
+            print 'Writing the output of the template %s -> %s' % (
+                fileNameMinusExt, outputFilename)
+
+            fp, pathname, stuff = imp.find_module(basename, [dirname])
+            mod = imp.load_module(basename, fp, pathname, stuff)
+            klass = getattr(mod, basename)
             value = str(klass())
         except:
-            sys.stderr.write('Exception raised while trying to write file %s\n'
-                             % repr(fileNameMinusExt))
+            sys.stderr.write(
+                'An error occurred while trying to import the compiled template %s\n'
+                % repr(fileNameMinusExt))
+            traceback.print_exc(file=sys.stderr)
         else:
-            fp = open(fileNameMinusExt + self.GENERATED_EXT, "w")
-            fp.write(value)
-            fp.close()
+            if self.MAKE_BACKUPS and os.path.exists(outputFilename):
+                print '  Backing up %s before saving new version.' % (outputFilename,)
+                
+                shutil.copyfile(outputFilename,
+                                outputFilename + self.BACKUP_SUFFIX)
 
+            try:
+                fp = open(outputFilename, "w")
+                fp.write(value)
+                fp.close()
+            except:
+                sys.stderr.write('Exception raised while trying to write file %s\n'
+                                 % repr(fileNameMinusExt))
+                traceback.print_exc(file=sys.stderr)
+            
+        sys.path = oldSysPath
         
     def usage(self):
         print \
@@ -201,7 +229,7 @@ Usage:
   %(scriptName)s [OPTIONS] -  (accept a file on stdin)
   -R                          Recurse subdirectories
   -p                          Print generated Python code to stdout
-  -w                          Write output of template to *.html
+  -w                          Write output of template files to *.html
   -v                          Be verbose
   -h | --help                 Print this help message
 """ % {'scriptName':self._scriptName,
