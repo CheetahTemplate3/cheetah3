@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.46 2002/10/05 22:12:00 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.47 2002/10/05 23:57:18 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.46 $
+Version: $Revision: 1.47 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/10/05 22:12:00 $
+Last Revision Date: $Date: 2002/10/05 23:57:18 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.46 $"[11:-2]
+__revision__ = "$Revision: 1.47 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -144,7 +144,7 @@ class GenUtils:
         When this method is fed the list above it returns
           VFN(VFN(VFS(SL, 'a.b.c',1)[1], 'd',0)(), 'x.y.z',1)
         which can be represented as
-          VFN(B`, C[0], str(ACS and C[1]))C[2]
+          VFN(B` + [globals(), __builtin__], C[0], str(ACS and C[1]))C[2]
         where:
           ACS = self.setting('useAutocalling') = 1 in this example
           VFN = NameMapper.valueForName
@@ -156,7 +156,7 @@ class GenUtils:
           C = ('x.y.z',1,'')
 
           B` = VFN(A`, B[0], str(ACS and B[1]))B[2]
-          A` = VFS(SL, A[0], str(ACS and A[1]))A[2]
+          A` = VFS(SL + [globals(), __builtin__], A[0], str(ACS and A[1]))A[2]
           
         """
 
@@ -165,20 +165,18 @@ class GenUtils:
         
         chunk = nameChunks.pop()
         
-        #firstBit = chunk[0].split('.')[0]
-        #if chunk[0] in self.localVars():
-        #    # @@TR: note this method won't use autocalling on these vars!!            
-        #    translatedName = chunk[0] + chunk[2]
-        #elif firstBit in self.localVars():
-        #    translatedName = ('VFN(' + firstBit +
-        #                      ',"' + '.'.join(chunk[0].split('.')[1:]) +
-        #                      '",' + str(autoCall and chunk[1]) + ')'
-        #                      + chunk[2])            
-        #else:
-        
-        translatedName = ('VFS([locals()] + SL + [globals(), __builtin__],"' + chunk[0] +
-                          '",' + str(autoCall and chunk[1]) + ')'
-                          + chunk[2])
+        firstBit = chunk[0].split('.')[0]
+        if chunk[0] in self.localVars():
+            translatedName = chunk[0] + chunk[2]
+        elif firstBit in self.localVars():
+            translatedName = ('VFN(' + firstBit +
+                              ',"' + '.'.join(chunk[0].split('.')[1:]) +
+                              '",' + str(autoCall and chunk[1]) + ')'
+                              + chunk[2])            
+        else:
+            translatedName = ('VFS(SL + [globals(), __builtin__],"' + chunk[0] +
+                              '",' + str(autoCall and chunk[1]) + ')'
+                              + chunk[2])
         
         while nameChunks:
             chunk = nameChunks.pop()
