@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.5 2001/07/11 22:28:12 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.6 2001/07/12 17:41:54 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/11 22:28:12 $
+Last Revision Date: $Date: 2001/07/12 17:41:54 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 
 ##################################################
@@ -72,6 +72,7 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
     def __init__(self, tagRE = placeholderTagsRE, marker='placeholderTag.',
            markerEscaped = 'placeholderTag\.',
            markerLookBehind=r'(?:(?<=placeholderTag\.)|(?<=placeholderTag\.\{))'):
+        """Setup the regexs used by this class"""
 
         nameCharLookForward = r'(?=[A-Za-z_])'
         cachedTags = re.compile(markerLookBehind + r'\*' + nameCharLookForward)
@@ -89,6 +90,12 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
             marker + r'(?:CACHED\.|REFRESH_[0-9]+(?:_[0-9]+){0,1}\.){0,1}([A-Za-z_0-9\.]+)')
 
     def mark(self, txt):
+        """Swap the $'s for a marker that can be parsed as valid python code.
+        Default is 'placeholder.'
+
+        Also mark whether the placeholder is to be statically cached or
+        timed-refresh cached"""
+        
         txt = self._tagRE.sub(self._marker, txt)
         txt = self._cachedTags.sub('CACHED.', txt)
         def refreshSubber(match):
@@ -97,7 +104,13 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
         return txt
 
     def splitTxt(self, txt):
-        """  """
+        
+        """Split a text string containing marked placeholders
+        (e.g. self.mark(txt)) into a list of plain text VS placeholders.
+
+        This is the core of the placeholder parsing!
+        """
+        
         namechars = "abcdefghijklmnopqrstuvwxyz" \
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
         chunks = []
@@ -161,7 +174,10 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
 
     def wrapPlaceholders(self, txt, before='<Cheetah>placeholders__@__',
                          after='</Cheetah>'):
-        """Evaluate and substitute the appropriate parts of the string."""
+        
+        """Wrap all marked placeholders in a template definition in the internal
+        Cheetah tags so that they will be picked up by the tag processor."""
+        
         result = []
         resAppend = result.append
         for live, chunk in self.splitTxt(txt):
@@ -173,10 +189,15 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
         return string.join(result, "")
 
     def preProcess(self, templateObj, templateDef):
+        """Do the preProcessing stuff for stage 1 of the Template class'
+        code-generator"""
         return self.wrapPlaceholders(self.mark(templateDef))
+
 
     def translatePlaceholderString(self, txt, searchList, templateObj,
                                    prefix='searchList', executeCallables=False):
+        """Translate an unmarked placeholder string into valid Python code."""
+        
         def translateSubber(match, prefix=prefix, searchList=searchList,
                             templateObj=templateObj,
                             executeCallables=executeCallables):
@@ -194,17 +215,26 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
                 if templateObj and nameChunks[0] in templateObj._localVarsList:
                     name = 'valueForName(' + nameChunks[0] + ',"""' + \
                        '.'.join(nameChunks[1:]) + '""", exectuteCallables=True)'
-                return name
+                    return name
+                raise NameMapper.NotFound, name
 
         return self._nameRE.sub(translateSubber, txt)
 
     def translateRawPlaceholderString(self, txt, searchList, templateObj=None,
                                       prefix='searchList', executeCallables=False):
+        """Translate raw $placeholders in a string directly into valid Python code.
+
+        This method is used for handling $placeholders in #directives
+        """
+        
         return self.translatePlaceholderString(
             self.mark(txt), searchList, prefix=prefix, templateObj=templateObj,
             executeCallables=executeCallables)
 
     def initializeTemplateObj(self, templateObj):
+        """Initialize the templateObj so that all the necessary attributes are
+        in place for the tag-processing stage"""
+        
         if not templateObj._codeGeneratorState.has_key('indentLevel'):
             templateObj._codeGeneratorState['indentLevel'] = \
                           templateObj._settings['initialIndentLevel']
@@ -244,6 +274,9 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
 
 
     def processTag(self, templateObj, tag):
+
+        """This method is called by the Template class for every $placeholder
+        tag in the template definition"""
 
         ## find out what cacheType the tag has
         if not templateObj._codeGeneratorState['defaultCacheType'] == None:
