@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.10 2001/07/16 16:30:30 tavis_rudd Exp $
+# $Id: Template.py,v 1.11 2001/07/31 04:20:02 hierro Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/16 16:30:30 $
+Last Revision Date: $Date: 2001/07/31 04:20:02 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.10 $"[11:-2]
+__version__ = "$Revision: 1.11 $"[11:-2]
 
 
 ##################################################
@@ -26,6 +26,7 @@ import new                        # used to bind the compiled template code
 import types                      # used in the mergeNewTemplateData method
 import time                       # used in the cache refresh code
 from time import time as currentTime # used in the cache refresh code
+import types                      # used in the constructor
 
 # intra-package imports ...
 from SettingsManager import SettingsManager
@@ -196,7 +197,7 @@ class Template(SettingsManager):
                   },
         }
 
-    def __init__(self, templateDef, *searchList, **kw):
+    def __init__(self, templateDef=None, *searchList, **kw):
         """setup the namespace search list, process settings, then call
         self._startServer() to parse/compile the template and prepare the
         self.__str__() and self.respond() methods for serving the template.
@@ -207,7 +208,31 @@ class Template(SettingsManager):
         self._searchList = SearchList( searchList )
         self._searchList.append(self)
         if kw.has_key('searchList'):
-            self._searchList.extend( kw['searchList'] )
+            tup = tuple(kw['searchList'])
+            self._searchList.extend(tup) # .extend requires a tuple.
+
+        # Unravel whether the user passed in a string, filename or file object.
+        self._fileName = None
+        self._fileMtime = None
+        file = kw.get('file', None)
+        if   templateDef and file:
+            raise TypeError("cannot specify both Template Definition and file")
+        elif (not templateDef) and (not file):
+            raise("must pass Template Definition string, or 'file' keyword arg")
+        elif templateDef:
+            pass
+        elif type(file) == types.StringType: # If it's a filename.
+            f = open(file) # Raises IOError.
+            templateDef = f.read()
+            f.close()
+            self._fileName = file
+            self._fileMtime = os.path.getmtime(file)
+        elif type(file) == types.FileType:
+            templateDef = file.read()
+            # Can't set filename or mtime; they're not accessible.
+        else:
+            raise TypeError("'file' argument must be file name or file object")
+            # Not allowing UserFile out of laziness.
 
         if kw.has_key('macros'):
             self._macros = kw['macros']
@@ -529,7 +554,7 @@ class Template(SettingsManager):
         extension = CodeGen.preProcessComments(self, extension)
         CodeGen.preProcessDataDirectives(self, extension)
         CodeGen.preProcessMacroDirectives(self, extension) 
-   
+
 
     ## utility functions ##
     def translatePath(self, path):
@@ -542,6 +567,39 @@ class Template(SettingsManager):
         fp.close()
         return output
         
+    def getUnknowns(self):
+        """
+        Returns a sorted list of Placeholder Names which are missing in the
+        Search List.
+        """
+        class Accumulator:
+            """
+            Accumulate unique values.  This is a set, but the 'include' method
+            calls the original handler as a side effect.
+            """
+            def __init__(self, originalHandler):
+                self.data = {}
+                self.originalHandler = originalHandler
+            def include(self, templateObj, tag):
+                """Add a tag to the set."""
+                self.data[tag] = 1
+                return self.originalHandler(templateObj, tag)
+            def result(self):
+                """Return the list of tags in the set, sorted."""
+                ret = self.data.keys()
+                ret.sort()
+                return ret
+        originalHandler = self._settings['varNotFound_handler']
+        accum = Accumulator(originalHandler)
+        self._settings['varNotFound_handler'] = accum.include
+        try:
+            str(self) # Fill the Template Object and throw away the result.
+            unknowns = accum.result()
+        finally:
+            self._settings['varNotFound_handler'] = originalHandler
+        return unknowns
+            
+    
     def runAsMainProgram(self):
         """An abstract method that can be reimplemented to enable the Template
         to function as a standalone command-line program for static page
