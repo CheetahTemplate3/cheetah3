@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: _SkeletonPage.py,v 1.8 2002/08/01 20:09:39 tavis_rudd Exp $
+# $Id: _SkeletonPage.py,v 1.9 2002/08/05 00:02:33 tavis_rudd Exp $
 """A baseclass for the SkeletonPage template
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2002/08/01 20:09:39 $
+Last Revision Date: $Date: 2002/08/05 00:02:33 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.8 $"[11:-2]
+__revision__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -47,7 +47,7 @@ class _SkeletonPage(Template):
     
     def __init__(self, *args, **KWs):
         Template.__init__(self, *args, **KWs)
-        self._metaTags = {'HTTP_EQUIV':{'keywords':'Cheetah,'}, 
+        self._metaTags = {'HTTP-EQUIV':{'keywords':'Cheetah,'}, 
                     'NAME':{'generator':'Cheetah: The Python-Powered Template Engine'}
                     }
         # metaTags = {'HTTP_EQUIV':{'test':1234}, 'NAME':{'test':1234,'test2':1234} }
@@ -199,9 +199,9 @@ class _SkeletonPage(Template):
     def formatMetaTags(self, metaTags):
         """format a dict of metaTag definitions into an HTML version"""
         metaTagsTxt = []
-        if metaTags.has_key('HTTP_EQUIV'):
-            for http_equiv, contents in metaTags['HTTP_EQUIV'].items():
-                metaTagsTxt += ['<meta http_equiv="', str(http_equiv), '" contents="',
+        if metaTags.has_key('HTTP-EQUIV'):
+            for http_equiv, contents in metaTags['HTTP-EQUIV'].items():
+                metaTagsTxt += ['<meta http-equiv="', str(http_equiv), '" contents="',
                                 str(contents), '" />\n']
                 
         if metaTags.has_key('NAME'):
