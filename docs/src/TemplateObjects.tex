@@ -24,13 +24,37 @@ The constructor has one required argument: the Template Definition as
 a string.  Any additional arguments are Namespaces for the Search List.  The
 constructor also accepts keyword arguments.
 
-The complete Search List consists of:  all the Namespaces passed to the
-constructor, then the template itself (the Template Object's \code{self}
-attribute), then the \em{tuple} of Namespaces in the keyword argument
-\code{searchList} if present.  All these Namespaces are concatinated in order
-into a flat list.  Each Namespace may be any Python object that has attributes,
-keys and/or subscripts: this includes instances, dictionaries, modules,
-lists, classes, etc.
+The constructor builds a Search List as a flat list of Namespaces,
+concatenated in the following order:
+
+\begin{enumerate}
+
+\item  All the Namespaces passed to the constructor, from left to right.
+
+\item  The TO itself (its \code{self} attribute), 
+
+\item  The Namespaces in the keyword argument \code{searchList} if present.  
+     This argument must be a \em{tuple}!  
+
+\end{enumerate}
+
+% I propose we allow the 'searchList' argument to be a list, and the
+% constructor call tuple() on it to convert it to a tuple.  People will want to
+% pass in a list because it's, uh, called a "List".
+
+Every Namespace must have Namespace Keys and Namespace Values.  This means it
+must be an object that supports attribute/value pairs or key/value pairs.  
+Instances, dictionaries, modules and classes all make suitable Namespaces.
+The Namespace Keys must be strings; the Namespace Values may be any Python
+object.
+
+If the Placeholder Name uses Dotted Notation, the Namespace Value will itself
+be used as a Namespace recursively to resolve each Identifier from left to 
+right.  Each recursive ``Namespace'' must be a valid Namespace type 
+\em{or} a Python list or list-compatible instance.  However, the top-level
+Namespace Value may \em{not} be a list, because the first Identifier in a
+Placeholder Name may not be numeric.  (If this paragraph is unclear, read it
+again after you're read the ``Placeholder Tags'' chapter.)
 
 Let's look again at that example in the introduction.  (Get used to it; you'll
 be seeing it again later too.)
@@ -48,7 +72,7 @@ be seeing it again later too.)
 >>> templateObj = Template(templateDef, nameSpace)
 \end{verbatim}
 
-Now let's sneak a peek at this template's Search List:
+Now let's sneak a peek at this TO's Search List:
 
 \begin{verbatim}
 >>> templateObj.searchList()
@@ -57,11 +81,10 @@ Now let's sneak a peek at this template's Search List:
 \end{verbatim}
 
 Just as we expected, the Search List contains two elements: our 
-\code{nameSpace} dictionary, and the template's \code{self}.
+\code{nameSpace} dictionary, and the TO's \code{self}.
 
-Here's another Template Object which will produce the identical result.
-This time, we'll be lazy and use the default Namespace rather than adding our
-own.
+Here's another TO which will produce the identical result.  This time, we'll be
+lazy and use the default Namespace rather than adding our own.
 
 \begin{verbatim}
 >>> nameSpace = {'title': 'Hello World Example', 'contents': 'Hello World!'}
@@ -72,11 +95,11 @@ own.
 [<Cheetah.Template.Template instance at 0x81a153c>]
 \end{verbatim}
 
-Here's a third Template Object that passes our \code{nameSpace} dictionary
+Here's a third TO that passes our \code{nameSpace} dictionary
 another way.  It also passes Python's \code{\_\_builtin\_\_} module just for
 fun.  The \code{\_\_builtin\_\_} module contains all of Python's built-in
 functions.  We won't actually use it until we learn how to call functions in
-the ``Functions and Macros'' chapter, but it's good to know it's there.
+the ``Functions and Macros'' chapter, but it's good to know it's available.
 
 \begin{verbatim}
 >>> import __builtin__
@@ -86,20 +109,17 @@ the ``Functions and Macros'' chapter, but it's good to know it's there.
 [<Cheetah.Template.Template instance at 0x81a5824>, {'title': 'Hello World Example', 'contents': 'Hello World!'}, <module '__builtin__' (built-in)>]
 \end{verbatim}
 
-(By the way, the reason the 'searchList' keyword argument must be a tuple is
-that it's added using Python's \code{.extend} method for list objects, and
-the \code{.extend} method requires a tuple.)
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using Template objects}
 
-To use a template, simply print it, apply Python's
+To use a TO, simply print it, apply Python's
 \code{str()} function to it, or call its \code{.respond} method.  This is
-called ``filling in'' or ``invoking'' the template.  The result is a string
-with all the placeholders filled in with their current values, and all the
-directives executed; the resulting string is called the Filled Template.
+called ``filling'' the TO or informally,  ``filling in the template''.  The
+result is a string with all the Placeholders filled in with their current
+Placeholder Values, and all the directives executed.  The resulting string is
+called the Filled Template.
 
 \begin{verbatim}
 >>> print templateObj
@@ -124,9 +144,9 @@ Filled Templates are identical, or ``0'' if they are not.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Modifying Template objects}
 
-From the same template instance you can produce as many Filled Templates as you
+From the same TO you can produce as many Filled Templates as you
 want, each with its own set of changeable data.  To set the changeable data for
-the next template, simply modify the Namespaces in the Search List.
+the next Filled Template, simply modify the Namespaces in the Search List.
 
 \begin{verbatim}
 >>> nameSpace['contents'] = 'Goodbye, cruel world!'
@@ -139,7 +159,7 @@ Goodbye, cruel world!
 </HTML>
 \end{verbatim}
 
-Or for templateObj2:
+Or for templateObj's 2 and 3:
 
 \begin{verbatim}
 >>> templateObj2.contents = 'Goodbye, cruel world!'
@@ -147,31 +167,36 @@ Or for templateObj2:
 1
 \end{verbatim}
 
-templateObj3 didn't have to be modified because it's reading the same
-\code{nameSpace} dictionary we already modified.  
+(templateObj3 didn't have to be modified because it's reading the same
+\code{nameSpace} dictionary we already modified.)
 
-All the Namespace values above are strings, but they can actually be any Python
-type.  You can even change values from one type to another.  However, if you
+All the Namespace Values above are strings, but they can actually be any Python
+type.  You may even change values from one type to another.  However, if you
 change a value from an autocalled type (a function or method) to a
 non-autocalled type (any other type) or vice-versa, you must recompile the
-template by calling the \code{.startServer()} method before
-filling the template.  Otherwise, Cheetah will autocall when it shouldn't or
+TO by calling the \code{.startServer()} method \em{before filling it}.
+Otherwise, Cheetah will autocall when it shouldn't or
 won't autocall when it should.  For the reason why, see the section
 ``Autocalling'' in the chapter ``Placeholder Tags''.
+
+% Mention the exact consequences of wrongly autocalling or wrongly not
+% autocalling.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Other keyword arguments accepted by the constructor)
 
+None of these keyword arguments are necessary for normal usage of a TO.
+
 \begin{description}
 
 \item{macros} Dictionary of macro name (string) -> macro definition (function).
-     These macros are defined before the template is parsed.
+     These macros are defined before the TO is compiled.
 
 \item{cheetahBlocks} Dictionary of block name (string) -> block definition
      (string).
 
-% Of what use is this?
+% Why would a programmer want to call this?
 
 \item{settings}  Dictionary of configuration settings to merge in.
 
@@ -179,10 +204,8 @@ won't autocall when it should.  For the reason why, see the section
      configuration settings are erased.
 
 \item{plugins}  List of Cheetah plugins to register, in addition to those
-     specified by the configuration setting `plugins'.  The two plugins that
-     come with Cheetah are a debugger and a PSP interface.
-
-% What are plugins?
+     specified by the configuration setting `plugins'.  Cheetah ships with two
+     plugins so far: a debugger and a PSP interface.
 
 \end{description}
 
@@ -190,7 +213,7 @@ won't autocall when it should.  For the reason why, see the section
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Methods}
 
-None of these methods are necessary for normal usage of a template.
+None of these methods are necessary for normal usage of a TO.
 
 \begin{description)
 
@@ -212,9 +235,10 @@ template.  Both arguments must be strings.
 \item(.killTemplateBlock(*blockNames))  Delete the named blocks from the 
 Template Definition.  They will no longer show up in Filled Templates.
 
-% I don't think we need .killTemplateBlock -- it doesn't make much sense in
-% Cheetah.  A conditional block is better because it can reappear and
-% disappear as desired.
+% I propose we delete .killTemplateBlock.  The #if directive covers all its
+% functionality and more.  Also, .killTemplateBlock is destructive in regard to
+% future Filled Templates: there's no way to get the block back if you need it
+% again later, whereas #if will happily hide and show blocks as appropriate.
 
 \item{.loadMacro, .loadMacros and .loadMacrosFromModule}  See the chapter
      ``Functions and Macros''.
@@ -223,16 +247,15 @@ Template Definition.  They will no longer show up in Filled Templates.
      file.  May be overridded to do, e.g., URL retrievals.
 
 \item{.registerServerPlugin(plugin)}  Register a plugin that extends the
-     functionality of the Template.
-
-% Say what?
+     functionality of the Template.  See ``plugins'' in the section on keyword
+     arguments.
 
 \item{.runAsMainProgram()}
 
 \item{.searchList()}  Return the Search List.  It's a UserList subclass, so you
      can use Python's standard list operations on it.  If you add or delete
      namespaces, call \code{.startServer()} afterwards to recompile the template
-     before trying to fill it.
+     \em{before trying to fill it}.
 
 \item{.startServer()}  Recompile the template.  
 
@@ -241,16 +264,18 @@ Template Definition.  They will no longer show up in Filled Templates.
 
 \end{description}
 
-Since Template uses the SettingsManager mixin, those methods are available to
-to change configuration settings after instantiation.
+Since the Template class inherits from the SettingsManager mixin, those methods
+are available to change configuration settings after instantiation.
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Debugging}
 
-If the environmental variable \code{CHEETAH\_DEBUG} is True, the template will
+If the environmental variable \code{CHEETAH\_DEBUG} is True, the TO will
 run in debug mode.
+
+% What does this do?
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -259,16 +284,17 @@ run in debug mode.
 \begin{description}
 
 \item{Cheetah.Servlet.TemplateServlet}  ``An asbstract base class for Cheetah
-     servlets that can be used with Webware.''  The constructor is the same.
-     There is an \code{.initializeTemplate()} method you can override to do
-     setup before the template is compiled.  This class also inherits from
-     \code{WebKit.HTTPServlet.HTTPServlet} if Webware is available.  (If not,
-     it fakes it with an empty class called HTTPServlet.)
+     servlets that can be used with Webware.''  The constructor is the same
+     as the Template class'.  There is an \code{.initializeTemplate()} method
+     you can override to do setup before the template is compiled.  This class
+     also inherits from \code{WebKit.HTTPServlet.HTTPServlet} if Webware is
+     available.  (If not, it fakes it with an empty superclass called
+     HTTPServlet to satisfy the inheritance.)
 
 \item{Cheetah.Templates.SkeletonPage}  A TemplateServlet subclass suitable as
      a \code{WebKit.Page}-like superclass for your site.  The Template 
      Definition encompasses an entire HTML page, with blocks for the content,
-     page header/footer, sidebars, etc, features for stylesheed dictionaries,
+     page header/footer, sidebars, etc, features for stylesheet dictionaries,
      HEAD tags, BODY attributes, etc.  An example of a site using this is in
      the \bf{examples/webware\_examples/} directory.
 

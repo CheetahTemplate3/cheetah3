@@ -1,10 +1,12 @@
 \section{Vocabulary}
 \label{vocabulary}
 
-To avoid repetition, all Cheetah-specific terms are defined here.
-Abbreviations are in parentheses after the term.  If you are
-a new user, you do not need to learn all of them now.  Just come back to this
-page when you encounter a term you don't recognize.
+To avoid repetition, all Cheetah-specific terms are defined here.  Terms are in
+\bf{boldface} at their main definition, and abbreviations are in (parentheses)
+immediately afterward.  
+
+If you are a new user, you do not need to learn all these terms now.
+Just come back to this page when you encounter a term you don't recognize.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Template object terms}
@@ -13,26 +15,29 @@ page when you encounter a term you don't recognize.
 
 \item{Template Object (TO, template)}  An instance of the class
      \code{Cheetah.Template.Template} or one of its subclasses.  A 
-     Template Object contains a Template Definition and a SearchList.
+     TO contains a Template Definition and a SearchList.  Informally, 
+     \bf{``the template''} means a certain TO.
 
 \item{Template Definition (TD)}  A string which is the source of the template.
+     People sometimes incorrectly call this ``the template'', but it's better
+     to call it ``the TD'' for clarity.
 
 \item{Template Definition Language (TDL)}  The markup language used for
-     Template Definitions.  The language defines Placeholder Tags and
+     Template Definitions.  This language defines Placeholder Tags and
      Directive Tags for the \bf{changeable data} in the template.
 
 \item{Search List (SL)}  A list of Python objects which will be searched to find
-     values for the placeholders in the template.  Each object is called a
-     \bf{Namespace} and must contain attributes, keys or subscripts to
+     values for the placeholders in the TO.  Each object is called a
+     \bf{Namespace (NS)} and must contain attributes, keys or subscripts to
      search in.  
 
 \item{Filled Template (FT)}  A string which is the result of filling in the
-     changeable data in the template with their current values.
-     Creating a Filled Template is called ``\bf{invoking} the
-     template'' or ``\bf{filling} the template''.
+     changeable data in the TO with their current values.
+     Creating a Filled Template is called ``\bf{filling} the TO'' or 
+     informally ``filling in the template''.
 
-\item{Parent Template Definition (Parent TD)}  The Template Definition that is
-     being extended when the \code{#extend} directive is used.
+\item{Parent Template Definition (Parent TD)}  The TD that is being extended
+     when the \code{#extend} directive is used.
 
 \end{description}
 
@@ -48,17 +53,43 @@ page when you encounter a term you don't recognize.
      \code{#if} and \code{#for}.
 
 \item{Placeholder Tag (\$P, placeholder)}  All tags that begin with ``\$''.
-     These contain a \bf{Placeholder Name} which is looked up in the Search
-     List.  A Placeholder Name may consist of one or more \bf{Identifiers}
-     separated by periods, like Python's dotted notation.  Identifiers may
-     be followed by \bf{arguments} in ``()'' or ``[]''.  See the section
-     ``Placeholder Tags'' for more information.
+     These contain a \bf{Placeholder Name (name)} which is looked up in the
+     Search List.  A Placeholder Name may consist of one or more
+     \bf{Identifiers} separated by periods, called \bf{Dotted Notation}.
+     Identifiers may be followed by \bf{arguments} in ``()'' or ``[]''.  See
+     the chapter ``Placeholder Tags'' for more details.  Note: this syntax is
+     very similar to Python's although not identical.
+
+\item{Namespace Key (NK)}  An attribute, key or subscript in one of the
+     Namespaces.  This will be compared with the first Identifier in a
+     Placeholder Name.
+
+\item{Namespace Value}  The value of a Namespace Key.
+
+\item{Placeholder Value (\$V, PV, value)}  The final value which will replace
+     a Placeholder after the appropriate Namespace Value has been found and all
+     conversions have been done.
 
 \item{function/method (FM)}  A Python function or method.  These are the only
-     types which may be \bf{autocalled}.  See the section ``Placeholder 
-     values'' for an explanation of autocalling.  Note: other callable objects
+     types which may be \bf{autocalled}.  See the definition of ``compile''
+     below for the reason.  Note: other callable objects
      (especially classes and instances) are \em{not} FMs and are never
      autocalled.
+
+\item{compile}  When you instantiate a TO or call its \code{.startServer()}
+     method, Cheetah compiles the Template Definition into Python code and then
+     compiles that into Python object code.  This greatly increases the speed
+     of producing a Filled Template, an important consideration when one TO
+     is used to produce several Filled Templates, and a feature most other
+     templating systems lack.  The compilation process looks up the Namespace
+     Value for each Placeholder and determines whether it is autocallable or
+     not; this is needed by the Python code, and is the reason you must not
+     change a Namespace Value from autocallable to non-autocallable without
+     recompiling the TO.  Further information about autocalling is in the
+     ``Placeholder Tags'' chapter.
+
+% What if the 
+     several Filled Templates much faster thn otherwise.  
 
 \end{description}
 

@@ -191,20 +191,80 @@ Esterbrook, Ian Bicking and Tom Schwaller are the core developers.
 \subsection{How mature is Cheetah?}
 \label{intro.mature}
 
-Cheetah is alpha/beta software as this Users' Guide is incomplete and several
-aspects of the design are still subject to change. We are hoping to release
-production version 1.0 in the summer of 2001.
+Cheetah is alpha software as some aspects of its design are
+still subject to change and the Users' Guide is incomplete.
+We plan to release a stable version later in 2001.
 
-Here's a summary of known issues and aspects of the design that are in flux.
+
+
+Here's a summary of known issues and aspects of the design that are in flux,
+as well as bugs in the implementation.
+
 \begin{itemize}
+
 \item The \#include directive is not working with relative path file includes
      when used with Webware. This should be resolved soon.
+
 \item The \#include directive is being reworked to monitor for changes in the
      included file at run-time. It currently does the include once-off at
      compile-time.
+
 \item The parsing of macros is currently being worked on to make it more
      robust.  However, the macro interface is stable.
 
+\item The current rules for the autocall feature are brand new and need
+     testing.
+
+\item Straightforward use of function arguments, macro arguments, and
+     #if and #for expressions is supported, but the limits of what kind of
+     expressions are allowed has not been well defined yet, and unanticipated
+     expression styles may cause breakage.  Macro arguments will soon follow
+     the same rules as function arguments, which will only be a minor change.
+
+\item Quoted string literals in arguments/expressions are supposed to follow
+     the same rules as Python, but there are some bugs.  
+     'string\'s' stops at the second '.  (Believed to be an easy fix.)
+     """ ... """ and ''' ... ''' fail when spanning multiple lines.
+     (Appears to be a bug in Python's Tokenizer module.)
+     Unknown whether letter prefixes (r"" and u"") and backslash escapes
+     are/will be supported.
+
+\item There are other issues which will be added to this list as they are
+     articulated in a summarizable form.
+
+\end{itemize}
+
+What \em{is} stable and permanent about Cheetah's API?  This list is not
+articulated yet, but probably includes:
+
+\begin{itemize}
+
+\item  Much of the vocabulary.  We are trying to use consistent terminology in
+      this guide.
+
+\item  The constructor and methods of the Template class, the Search List, 
+      and the cheetah-compile program.
+
+\item  Placeholder tags:  $placeholderName . $a.b.c.d  looks up attributes or
+      keys.  Case sensitivity.  Trailing periods are not part of the 
+      placeholder.  You can always use ${placeholderName} to make explicit 
+      where the Placeholder Name ends.  Functions and methods will probably
+      be autocalled by default; other callable types will never be autocalled
+      (provided you don't fool the TO).  The caching rules are "stable unless
+      something comes up".
+
+\item  There will be a syntax for fuction arguments in () and 
+      keys/subscripts in [].  It will be similar to the current syntax, 
+      although we may have to make some adjustments.
+
+\item  Directive tag syntax, /# or newline to end a directive tag, #end tags 
+      to terminate multiline directives.  The existence and intent of ##,
+      #comment, #raw, #include, #cache, #for, #if, #set, #block, #redefine,
+      #slurp.  Macro defining and calling is pretty stable, except for the
+      argument syntax.  #longmacro will remain for calling macros with
+      multi-line arguments, although the argument syntax may change.
+
+\end{itemize}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
