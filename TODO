@@ -70,6 +70,9 @@ Other TODO Items
   e.g., other cookie-handling methods can be grafted in.  Maybe use callback
   classes like the planned rewrite for CheetahWrapper.  Low priority.  (MO)
 
+- Look through Zope Page Templates (TAL) for ideas to borrow.
+  http://www.zope.org/Documentation/Books/ZopeBook/current/AppendixC.stx
+  http://www.owlfish.com/software/simpleTAL/index.html
 
 Dump Tools
 ==========
