@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: WebInputMixin.py,v 1.3 2002/08/10 20:11:18 hierro Exp $
+# $Id: WebInputMixin.py,v 1.4 2002/09/12 07:43:24 hierro Exp $
 """Mixin for Cheetah.Servlet for importing web transaction variables in bulk.
 
 This works for GET/POST fields both in Webware servlets and in CGI scripts, 
@@ -40,6 +40,11 @@ to preview the values is
     #silent $webInput(['name'], $debug=1)
 
 because this pretty-prints all the values inside HTML <PRE> tags.
+
+** KLUDGE: 'debug' is supposed to insert into the template output, but it
+wasn't working so I changed it to a 'print' statement.  So the debugging
+output will appear wherever standard output is pointed, whether at the
+terminal, in a Webware log file, or whatever. ***
 
 Since we didn't specify any coversions, the value is a string.  It's a "single"
 value because we specified it in 'names' rather than 'namesMulti'.  Single
@@ -160,12 +165,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2002/03/17
-Last Revision Date: $Date: 2002/08/10 20:11:18 $
+Last Revision Date: $Date: 2002/09/12 07:43:24 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.3 $"[11:-2]
+__revision__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -177,6 +182,7 @@ True, False = (1==1), (1==0)
 
 import cgi     # Used by WebInputMixin.cgiImport() if this is a CGI script.
 import pprint
+import types
 from Cheetah.Utils.Misc import UseOrRaise
 
 ##################################################
@@ -230,7 +236,7 @@ def _lookup(name, func, multi, converters):
     # Step 3 -- Coerce 'values' to a list of zero, one or more strings.
     if   values is None:
         values = []
-    elif type(values) == str:
+    elif type(values) == types.StringType:
         values = [values]
 
     # Step 4 -- Find a _Converter object or raise TypeError.
@@ -325,7 +331,7 @@ class WebInputMixin:
         # 'dic = super(ThisClass, self).webInput(names, namesMulti, ...)'
         # and then the code below.
         if debug:
-           self.write("<PRE>\n" + pprint.pformat(dic) + "\n</PRE>\n\n")
+           print "<PRE>\n" + pprint.pformat(dic) + "\n</PRE>\n\n"
         self.prependToSearchList(dic)
         return dic
 
