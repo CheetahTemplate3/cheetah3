@@ -282,10 +282,9 @@ void init_namemapper()
   
   /* add symbolic constants to the module */
   d = PyModule_GetDict(m);
-  NotFound = Py_BuildValue("s", "NameMapper.NotFound");   /* export exception */
+  NotFound = PyErr_NewException("NameMapper.NotFound",NULL,NULL);
+  TooManyPeriods = PyErr_NewException("NameMapper.TooManyPeriodsInName",NULL,NULL);
   PyDict_SetItemString(d, "NotFound", NotFound);
-  
-  TooManyPeriods = Py_BuildValue("s", "NameMapper.TooManyPeriodsInName"); /* export exception */
   PyDict_SetItemString(d, "TooManyPeriodsInName", TooManyPeriods);
 
   /* check for errors */
