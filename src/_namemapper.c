@@ -10,7 +10,7 @@ static PyObject *NotFound;   /* locally-raised exception */
 #define notFound(message) \
     { PyErr_SetString(NotFound, message); return NULL; }
 
-#define MAXCHUNKS 25		/* max num of nameChunks for the arrays */
+#define MAXCHUNKS 15		/* max num of nameChunks for the arrays */
 
 /* *************************************************************************** */
 /* First the c versions of the functions */
@@ -95,36 +95,9 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
       currentVal = nextVal;
     }
   }
+
   return currentVal;
 } /* end - valueForName */
-
-
-static PyObject *
-PyNamemapper_valueFromSearchList(PyObject *searchList, 
-				 char *nameChunks[], 
-				 int numChunks, 
-				 int executeCallables)
-{
-  PyObject *nameSpace = NULL;
-  PyObject *theValue = NULL;
-  int i;
-  int listLen;
-
-  listLen = PyList_Size(searchList);
-
-  for (i=0; i < listLen; i++){
-    nameSpace = PyList_GetItem(searchList, i);
-    theValue = PyNamemapper_valueForName(nameSpace, nameChunks, numChunks, executeCallables);
-
-    if (theValue) {		/* it might be NULL */
-      PyErr_Clear();		/* clear possible NotFound errors */
-      return theValue;
-    } else if (PyErr_Occurred() != NotFound) {
-      return NULL;
-    } 
-  }
-  return NULL;	/* the first key wasn't found in any namespace -- NotFound is raised */
-}
 
 
 static int getNameChunks(char *nameChunks[], char *name) 
@@ -177,8 +150,8 @@ namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)
   int executeCallables = 0;
 
   char *nameCopy = NULL;
-  char *pa = NULL;
-  char c;
+  char *tmpPntr1 = NULL;
+  char *tmpPntr2 = NULL;
   char *nameChunks[MAXCHUNKS];
   int numChunks;
 
@@ -191,13 +164,9 @@ namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)
   }
   
   nameCopy = malloc(strlen(name) + 1);
-  pa = nameCopy;
-  while ((c = *name++)) {
-    if (!isspace(c)) {
-      *pa++ = c;
-    }
-  }
-  *pa = '\0';
+  tmpPntr1 = name; tmpPntr2 = nameCopy;
+  while ((*tmpPntr2++ = *tmpPntr1++));
+
   numChunks = getNameChunks(nameChunks, nameCopy);
 
   theValue = PyNamemapper_valueForName(obj, nameChunks, numChunks, executeCallables);
@@ -214,13 +183,15 @@ namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
   int executeCallables = 0;
 
   char *nameCopy = NULL;
-  char *tmpPointer1 = NULL;
-  char *tmpPointer2 = NULL;
-  char c;
+  char *tmpPntr1 = NULL;
+  char *tmpPntr2 = NULL;
   char *nameChunks[MAXCHUNKS];
   int numChunks;
 
-  PyObject *theValue;
+  PyObject *nameSpace = NULL;
+  PyObject *theValue = NULL;
+  int i;
+  int listLen;
 
   static char *kwlist[] = {"searchList", "name", "executeCallables", NULL};
 
@@ -230,27 +201,26 @@ namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
   }
 
   nameCopy = malloc(strlen(name) + 1);
-  tmpPointer1 = name;
-  tmpPointer2 = nameCopy;
-  while ((c = *tmpPointer1++)) {
-    if (!isspace(c)) {
-      *tmpPointer2++ = c;
-    }
-  }
-  *tmpPointer2 = '\0';
+  tmpPntr1 = name; tmpPntr2 = nameCopy;
+  while ((*tmpPntr2++ = *tmpPntr1++));
   numChunks = getNameChunks(nameChunks, nameCopy);
 
-  theValue = PyNamemapper_valueFromSearchList(searchList, nameChunks, numChunks, executeCallables);
-  if (theValue) {
-    free(nameCopy);
-    return theValue;
-  } else if (PyErr_Occurred() == NotFound) {
-    PyErr_Clear();
-    free(nameCopy);
-    notFound(name);
-  } else {
-    return NULL;
+  listLen = PyList_Size(searchList);
+  for (i=0; i < listLen; i++){
+    nameSpace = PyList_GetItem(searchList, i);
+    theValue = PyNamemapper_valueForName(nameSpace, nameChunks, numChunks, executeCallables);
+    if (theValue) {		/* it might be NULL */
+      PyErr_Clear();		/* clear possible NotFound errors */
+      free(nameCopy);
+      return theValue;
+    } else if (PyErr_Occurred() != NotFound) {
+      free(nameCopy);
+      return NULL;
+    } 
+    PyErr_Clear();		/* clear possible NotFound errors */
   }
+  free(nameCopy);
+  notFound(name);
 }
 
 /* *************************************************************************** */
@@ -283,5 +253,4 @@ void init_namemapper()
   if (PyErr_Occurred())
     Py_FatalError("can't initialize module _namemapper");
 }
-
 
