@@ -5,9 +5,14 @@
 \subsection{Requirements}
 \label{gettingStarted.requirements}
 
-Cheetah requires Python release 2.0 or greater and should run on any
-operating system that Python 2.0 runs on.  It has been tested on
-Python 2.0, 2.1 and 2.2b1.
+Cheetah requires Python release 2.0 or greater.  , and should run anywhere
+Python runs.  It has been tested with Python 2.0, 2.1 and 2.2.  It is known to
+run on Linux, Windows NT/98/XP, FreeBSD and Solaris, and should run anywhere
+Python runs.  
+
+99\% of Cheetah is written in Python.  There is one small C module
+(\code{\_namemapper.so}) for speed, but Cheetah automatically falls back to a
+Python equivalent if the C module is not available.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Installation}
@@ -22,8 +27,9 @@ To install Cheetah to your system-wide Python library:
 
 \item Run \code{python setup.py install} at the command prompt.
 
-\item The setup program will install the wrapper script {\bf cheetah} to the
-     "/usr/bin" or something like that.
+\item The setup program will install the wrapper script {\bf cheetah} to 
+     wherever it usually puts Python binaries ("/usr/bin/", "bin/" in the 
+     Python install directory, etc.)
 \end{enumerate}
 
 %% @@MO: What about cheetah-compile on non-POSIX systems? 
@@ -32,7 +38,9 @@ To install Cheetah to an alternate location use the options to setup.py's
 \code{install} command:
 \begin{verbatim}
     python setup.py install --home /home/tavis 
+\end{verbatim}
 and
+\begin{verbatim}
     python setup.py install --install-lib /home/tavis/lib/python
 both install to /home/tavis/lib/python/Cheetah
 \end{verbatim}
@@ -40,6 +48,43 @@ both install to /home/tavis/lib/python/Cheetah
 Cheetah's installation is managed by Python's Distribution Utilities
 ('distutils').  There are many options for customization.  Type \code{``python
   setup.py help''} for more information.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Files}
+\label{gettingstarted.files}
+
+If you do the systemwide install, all Cheetah modules are installed in the
+{\bf site-packages/Webware/Cheetah/} subdirectory of your standard library
+directory; e.g., /opt/Python2.2/lib/python2.2/site-packages/Webware/Cheetah.
+
+A file site-packages/Webware.pth causes Python to put 
+site-packages/Webware in the standard Python path, so that when you or a
+script executes \code{from Cheetah.Template import Template}, it works as
+expected.
+
+This site-packages/Webware/ directory is otherwise empty unless you've 
+installed the WebwareExperimentalRefactoring package (not the standard
+Webware--unless perhaps Webware switches to distutils in the future).  You
+may be surprised to have a site-packages/Webware/ directory when you're not
+using Webware, but don't worry: Cheetah's author just chose to package Cheetah
+that way, and Cheetah works the same whether Webware is installed or not.
+
+Two commands are installed in Python's \code{bin/} directory or a system
+bin directory: \code{cheetah} (section \ref{gettingStarted.cheetah}) and
+\code{cheetah-compile} (section \ref{howWorks.cheetah-compile}).  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Uninstalling}
+\label{gettingstarted.uninstalling}
+
+% @@MO: When 'python setup.py uninstall' is implemented, mention it here.
+
+If you play with Cheetah a while and decide not to use it, it's easy to
+uninstall.  Merely delete the site-packages/Webware/Cheetah/ directory
+(or site-packages/Webware/ if it's otherwise empty) and the
+site-packages/Webware.pth file.
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The 'cheetah' command}
@@ -58,30 +103,30 @@ cheetah test|-t [test options]
           - Run Cheetah's test suite ('cheetah test --help' for more)
 cheetah --version|-v
           - Print Cheetah's version number
+cheetah fill|-f
+          - Fill template(s) [not implemented yet]
 \end{verbatim}
 
 The test suite is described in the next section.  The compiler will be
-described in section \ref{howItWorks.cheetah-compile}.
-
-For backward compatibility, the separate \code{cheetah-compile} program
-does the same thing as \code{cheetah compile}.
+described in section \ref{howItWorks.cheetah-compile}, along with the
+separate \code{cheetah-compile} command which does the same thing.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Testing your installation}
 \label{gettingStarted.test}
 
-You can run the test suite to insure that your installation is correct by
-following these steps:
-\begin{enumerate}
-\item install Cheetah as explained above
-\item type: \code{cheetah test} 
-\end{enumerate}
+After installing Cheetah, you can run its self-test routine to verify it's
+working properly on your system.  Type the following at the command prompt:
+\begin{verbatim}
+cheetah test 
+\end{verbatim}
 
+The tests will run for a minute or so and then print a success/failure message.
 If the tests pass, start Python in interactive mode and try the example in the
-Introduction section of this guide.
+next section.
 
-If any of the tests fail please send a message to the email list with a copy of
-the test output and the following details about your installation:
+If any of the tests fail, please send a message to the e-mail list with a copy
+of the test output and the following details about your installation:
 
 \begin{enumerate}
 \item your version of Cheetah
@@ -95,12 +140,10 @@ the test output and the following details about your installation:
 \label{gettingStarted.tutorial}
 
 This tutorial briefly introduces the basic usage of Cheetah.  See the
-following chapters for more detailed explanations.  
-
-{\bf This tutorial will be fleshed out further at later date.} 
+following chapters for more features and more detailed explanations.  
 
 The core of Cheetah is the \code{Template} class in the \code{Cheetah.Template}
-module. The following example shows how to use the \code{Template} class from an
+module. The following example shows how to use the \code{Template} class in an
 interactive Python session. Lines prefixed with \code{>>>} and \code{...} are
 user input.  The remaining lines are Python output.
 
@@ -128,11 +171,10 @@ Hello World!
 </BODY>
 </HTML>
 >>> print templateObj    # print it as many times as you want
-      [ ... identical output not shown ... ]
+      [ ... same output as above ... ]
 >>> nameSpace['title'] = 'Example #2'
 >>> nameSpace['contents'] = 'Hiya Planet Earth!'
 >>> print templateObj   # Now with different plug-in values.
-      [ ... the output it the same as the first example above ... ]
 <HTML>
 <HEAD><TITLE>Example #2</TITLE></HEAD>
 <BODY>
@@ -150,7 +192,7 @@ way:
 >>> templateObj2.title = 'Hello World Example!'
 >>> templateObj2.contents = 'Hello World'
 >>> print templateObj2
-      [ ... the output is the same as the first example above ... ]
+      [ ... same output as the first example above ... ]
 >>> templateObj2.title = 'Example #2'
 >>> templateObj2.contents = 'Hello World!'
 >>> print templateObj2
@@ -175,7 +217,8 @@ The above is all fine for short templates, but for long templates or
 for an application that depends on many templates in a hierarchy, it's
 easier to store the templates in separate *.tmpl files and use the
 {\bf cheetah compile} program to convert them into Python classes in
-their own modules.  This will be covered in section ??.  
+their own modules.  This will be covered in section
+\ref{howWorks.cheetah-compile}.  
 
 As an appetizer, we'll just briefly mention that you can store constant values
 {\em inside} the template definition, and they will be converted to attributes
@@ -186,7 +229,7 @@ templates (e.g., a "page" template overriding a sidebar in a "section"
 template).
 
 For the minimalists out there, here's a template definition,
-instantiation and filling all in Python statement:
+instantiation and filling all in one Python statement:
 
 \begin{verbatim}
 >>> print Template("Templates are pretty useless without placeholders.")

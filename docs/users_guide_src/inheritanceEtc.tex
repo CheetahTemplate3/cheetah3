@@ -45,26 +45,33 @@ subclass of Cheetah.Template.Template:
 #extends SkeletonPage, MyMixin
 \end{verbatim}
 
+In the very near future, you won't need those \code{\#from ... import}
+directives because \code{\#extends} will implicitly import whatever 
+classes it needs, but for now the explicit imports are necessary.
+
 (There is a discussion about removing multiple inheritance from Cheetah.
 If that happens, you'll be able to list only one class in the 
 \code{\#extends} directive.  Each template would then inherit from its
 pure Python class if any (a class that provides attributes and methods
 needed by the particular template) or from its parent template if none.
 Each Python class would inherit from its parent template.  If the top of
-the hierarchy is a Cheetah template, it would not have an \code{\#extends}
-directive.  If the top of the hierarchy is a Python class, it would have to
-subclass \code{Cheetah.Template.Template} explicitly.  Python classes in the
-inheritance chain would be free to do multiple inheritance if they wish--only
-templates would be prohibited from doing multiple inheritance.  Currently there
-is support both for keeping multiple inheritance and for removing it, so it's
-too early to say which way it will go.)
+the hierarchy (the most general superclass) is a Cheetah template, it would not
+have an \code{\#extends} directive.  If the top of the hierarchy is a Python
+class, it would have to subclass \code{Cheetah.Template.Template} explicitly.
+Python classes in the inheritance chain would be free to do multiple
+inheritance if they wish--only templates would be prohibited from doing
+multiple inheritance.  The Cheetah developers are divided over whether to keep
+or remove multiple inheritance, so it's too early to say which way it will
+go.)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#implements}
 \label{inheritanceEtc.implements}
 
-A template object has several methods, but there is always one {\bf core
+% @@MO: Fully describe the main methods.
+
+A template object has several methods, but there is always one {\bf main
 method}, the one you call to fill the template.  By default, this method is
 called \code{.respond()}.  However, you can use the \code{\#implements}
 directive to change the name of that method.  You have to do this if you're
@@ -72,15 +79,15 @@ integrating Cheetah with an existing system, and the calling routine wants to
 call another method name rather than \code{.respond()}.
 
 EXCEPTION: if your template contains an \code{\#extends} directive but no
-\code{\#implements}, the core method is \code{.writeBody()} instead of
+\code{\#implements}, the main method is \code{.writeBody()} instead of
 \code{.respond()}.  Why?  Because that helps templates that are Webware
 servlets function correctly.
 
 So you must think about what your main method should be called and set
 \code{\#implements} accordingly if necessary.
 
-In any case, \code{\/\_\_str\_\_()} is always an alias for the core method, no
-matter what the core method is called.  So you can always call \code{str(t)} to
+In any case, \code{.\/\_\_str\_\_()} is always an alias for the main method, no
+matter what the main method is called.  So you can always call \code{str(t)} to
 fill your template, or \code{print t} to fill and print it.  But of course, in
 a Webware servlet you never use the \code{print} statement directly except for
 debugging.
