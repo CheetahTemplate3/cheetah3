@@ -9,14 +9,26 @@ Cheetah TODO list
 Languague Specification
 ================================================================================
 
+- decide if #extends should continue to work with multiple inheritance or if we
+  should delegate multiple inheritance (mixins, etc.) to pure Python base
+  classes.
+
+- revisit parsed #include directives.  Are the necessary at all??
+
 - finish the #cache directive's varyBy keyword
+
 - write a formalized grammar for Cheetah in BNF 
+
 
 Implementation
 ================================================================================
 
+- implement the automatic importing behaviour for the #extends directive
+
 - redesign and implement the Servlet Factory for Webware so the #extend
-  directive will work with .tmpl files as well as .py files
+  directive will work with .tmpl files as well as .py files.  This will require
+  a custom import method using python import hooks.
+
 - implement the #cache directive's varyBy keyword
 
 Test Suite
@@ -28,7 +40,7 @@ Test Suite
 Documentation
 ================================================================================
 - finish up the Webware section
-- quick-reference guide (MO)
+- beginners guide (MO)
 
 Website
 ================================================================================
@@ -41,10 +53,5 @@ Examples
   - SQL
   - LaTeX
   - form email
-
-Packaging
-================================================================================
-- Consider moving SettingsManager.py and NameMapper.py into the 
-  third_party_packages dir and making setup_all.py the main install script
 
 
