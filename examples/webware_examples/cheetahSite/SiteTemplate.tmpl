@@ -135,91 +135,91 @@ stylesheetsOrder = ["H1.mainText",
 
 #####################
 #block writeHeader
-<DIV ALIGN="center"><IMG SRC="cheetah-face-black-medium.jpg" ALT="">$spacer(35)<IMG SRC="banner_text.gif" 
-    ALT="Cheetah: The Python-Powered Template Engine"></DIV>                   
+<div align="center"><img src="cheetah-face-black-medium.jpg" alt="" />$spacer(35)<img src="banner_text.gif" 
+    alt="Cheetah: The Python-Powered Template Engine" /></div>                   
 #end block 
 #####################
 
 
-<TABLE ALIGN=$mainTbl.align BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=$mainTbl.width>
-  <TR>
-    <TD WIDTH=1 HEIGHT=1 bgcolor="$mainTbl.outerBorder.color">$spacer</TD>
-  </TR>
-  <TR>
-    <TD>
-	<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
-	  <TR>
-	    <TD WIDTH=1 bgcolor="$mainTbl.outerBorder.color">$spacer</TD>
-	    <TD WIDTH=900> ## force to full width in Netscape
+<table align=$mainTbl.align border="0" cellpadding="0" cellspacing="0" width=$mainTbl.width>
+  <tr>
+    <td width="1" height=1 bgcolor="$mainTbl.outerBorder.color">$spacer</td>
+  </tr>
+  <tr>
+    <td>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	  <tr>
+	    <td width="1" bgcolor="$mainTbl.outerBorder.color">$spacer</td>
+	    <td width="900"> ## force to full width in Netscape
 	    ##############
 	    #block writeNavBar
-	    <TABLE WIDTH=100% BGCOLOR="$navBar.bgcolor" BORDER=0 CELLPADDING=0 CELLSPACING=0>
-	      <TR>
-		<TD>
-		    <DIV ALIGN="center" CLASS="navBarContainer">
-		    <A CLASS="navBar" HREF="index">Home</A>$navDivider
-		    <A CLASS="navBar" HREF="learn">Learn</A>$navDivider
-		    <A CLASS="navBar" HREF="download">Download</A>$navDivider
-		    <A CLASS="navBar" HREF="contribute">Contribute</A>
-		    </DIV>
-		</TD>
-	      </TR>
-	    </TABLE>
+	    <table width="100%" bgcolor="$navBar.bgcolor" border="0" cellpadding="0" cellspacing="0">
+	      <tr>
+		<td>
+		    <div align="center" class="navBarContainer">
+		    <A class="navBar" HREF="index">Home</A>$navDivider
+		    <A class="navBar" HREF="learn">Learn</A>$navDivider
+		    <A class="navBar" HREF="download">Download</A>$navDivider
+		    <A class="navBar" HREF="contribute">Contribute</A>
+		    </div>
+		</td>
+	      </tr>
+	    </table>
 	    #end block writeNavBar
 	    ##############
 
-	    </TD>
-	    <TD WIDTH="1" bgcolor="$mainTbl.outerBorder.color">$spacer</TD>
-          </TR>
-        </TABLE>
-     </TD>
-  </TR>
-  <TR>
-    <TD>
-	<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
-	  <TR>
-	    <TD WIDTH=1 BGCOLOR="$mainTbl.outerBorder.color">$spacer</TD>
-	    <TD WIDTH=$mainTbl.frame.width bgcolor="$mainTbl.frame.color">$spacer</TD>
-	    <TD WIDTH=900 BGCOLOR="$mainTbl.innerBorder.color">$spacer</TD> 
-	    <TD WIDTH=$mainTbl.frame.width bgcolor="$mainTbl.frame.color">$spacer</TD>
-	    <TD WIDTH="1" BGCOLOR="$mainTbl.outerBorder.color">$spacer</TD>
-	  </TR>
-        </TABLE>
+	    </td>
+	    <td width="1" bgcolor="$mainTbl.outerBorder.color">$spacer</td>
+          </tr>
+        </table>
+     </td>
+  </tr>
+  <tr>
+    <td>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	  <tr>
+	    <td width="1" bgcolor="$mainTbl.outerBorder.color">$spacer</td>
+	    <td width=$mainTbl.frame.width bgcolor="$mainTbl.frame.color">$spacer</td>
+	    <td width="900" bgcolor="$mainTbl.innerBorder.color">$spacer</td> 
+	    <td width=$mainTbl.frame.width bgcolor="$mainTbl.frame.color">$spacer</td>
+	    <td width="1" bgcolor="$mainTbl.outerBorder.color">$spacer</td>
+	  </tr>
+        </table>
 
-    </TD>
-  </TR>
-  <TR>
-    <TD>
-	<TABLE VALIGN="top" BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
-	  <TR>
-	    <TD WIDTH=1 BGCOLOR="$mainTbl.outerBorder.color">$spacer</TD>
-	    <TD WIDTH=$mainTbl.frame.width bgcolor="$mainTbl.frame.color">$spacer</TD>
-	    <TD WIDTH=1 BGCOLOR="$mainTbl.innerBorder.color">$spacer</TD>
+    </td>
+  </tr>
+  <tr>
+    <td>
+	<table Valign="top" border="0" cellpadding="0" cellspacing="0" width="100%">
+	  <tr>
+	    <td width="1" bgcolor="$mainTbl.outerBorder.color">$spacer</td>
+	    <td width=$mainTbl.frame.width bgcolor="$mainTbl.frame.color">$spacer</td>
+	    <td width="1" bgcolor="$mainTbl.innerBorder.color">$spacer</td>
     
-	    <TD WIDTH=900 BGCOLOR="$mainTbl.contentsBgColor">
+	    <td width="900" bgcolor="$mainTbl.contentsBgColor">
 
 #end cache
 
 	    ###################
 	    #cache id='locationBar'
 	    #block writeLocationBar
-	    <TABLE WIDTH=100% BGCOLOR="#EBEBEB" BORDER=0 CELLPADDING=0 CELLSPACING=0>
-	      <TR>
-		<TD>
-		    <DIV CLASS="locationBarContainer">
+	    <table width="100%" bgcolor="#EBEBEB" border="0" cellpadding="0" cellspacing="0">
+	      <tr>
+		<td>
+		    <div class="locationBarContainer">
 		    ###################
 		    #block writeCrumbs
-		    <A CLASS="locationBar" HREF="index">Home</A>&nbsp;&gt;&nbsp; 
-		    <A CLASS="locationBar" HREF="download">Download</A>
+		    <A class="locationBar" HREF="index">Home</A>&nbsp;&gt;&nbsp; 
+		    <A class="locationBar" HREF="download">Download</A>
 		    #end block
 		    ###################
-		    </DIV>
-		</TD>
-	      </TR>
-	      <TR>
-		<TD HEIGHT=1 BGCOLOR="$locationBar.border.color">$spacer</TD>
-	      </TR>
-	    </TABLE>
+		    </div>
+		</td>
+	      </tr>
+	      <tr>
+		<td height="1" bgcolor="$locationBar.border.color">$spacer</td>
+	      </tr>
+	    </table>
     
 	    #end block writeLocationBar
 	    #end cache
@@ -231,9 +231,9 @@ stylesheetsOrder = ["H1.mainText",
 
 	    $spacer(1,25)
     
-	    <TABLE VALIGN="top" WIDTH=100% BORDER=0 CELLPADDING=10 CELLSPACING=0>
-	      <TR>
-		<TD VALIGN="top">
+	    <table Valign="top" width="100%" border="0" cellpadding="10" cellspacing="0">
+	      <tr>
+		<td Valign="top">
 		################
 		#block writeLeftSideBar
 		
@@ -241,78 +241,78 @@ stylesheetsOrder = ["H1.mainText",
 		#end block writeLeftSideBar
 		################
 	    
-		</TD>
-		<TD VALIGN="top">
+		</td>
+		<td Valign="top">
 		########################
 		#block writeMainContentsCell
 		#end block 
 		########################
-		</TD>	    
-	      </TR>
-	    </TABLE>
+		</td>	    
+	      </tr>
+	    </table>
 
 	    $spacer(1,200)
 	    #end block writeMainTblContents
 	    ######################
 	    
 #cache id='bottomOfPage'      
-	    </TD>
-	    <TD WIDTH=1 BGCOLOR="$mainTbl.innerBorder.color">$spacer</TD>
-	    <TD WIDTH=$mainTbl.frame.width BGCOLOR="$mainTbl.frame.color">$spacer</TD>
-	    <TD WIDTH="1" BGCOLOR="$mainTbl.outerBorder.color">$spacer</TD>
-        </TR>
-      </TABLE>
-    </TD>
-  </TR>
-  <TR>
-    <TD>
-	<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
-	  <TR>
-	    <TD WIDTH=1 BGCOLOR="$mainTbl.outerBorder.color">$spacer</TD>
-	    <TD WIDTH=$mainTbl.frame.width bgcolor="$mainTbl.frame.color">$spacer</TD>
-	    <TD WIDTH=900 BGCOLOR="$mainTbl.innerBorder.color">$spacer</TD>
-	    <TD WIDTH=$mainTbl.frame.width bgcolor="$mainTbl.frame.color">$spacer</TD>
-	    <TD WIDTH="1" BGCOLOR="$mainTbl.outerBorder.color">$spacer</TD>
-	  </TR>
-        </TABLE>
-    </TD>
-  </TR>
-  <TR>
-    <TD>
-	<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
-	  <TR>
-	    <TD WIDTH=1 BGCOLOR="$mainTbl.outerBorder.color">$spacer</TD>
-	    <TD WIDTH=900 BGCOLOR="$mainTbl.frame.color">$spacer(1,25)</TD> 
-	    <TD WIDTH="1" BGCOLOR="$mainTbl.outerBorder.color">$spacer</TD>
-	  </TR>
-        </TABLE>
-    </TD>
-  </TR>
-  <TR>
-    <TD>
-	<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
-	  <TR>
-	    <TD WIDTH=1 HEIGHT=1 BGCOLOR="$mainTbl.outerBorder.color">$spacer</TD>
-	  </TR>
-        </TABLE>
-    </TD>
-  </TR>
-</TABLE>
+
+	    </td>
+	    <td width="1" bgcolor="$mainTbl.innerBorder.color">$spacer</td>
+	    <td width=$mainTbl.frame.width bgcolor="$mainTbl.frame.color">$spacer</td>
+	    <td width="1" bgcolor="$mainTbl.outerBorder.color">$spacer</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	  <tr>
+	    <td width="1" bgcolor="$mainTbl.outerBorder.color">$spacer</td>
+	    <td width=$mainTbl.frame.width bgcolor="$mainTbl.frame.color">$spacer</td>
+	    <td width="900" bgcolor="$mainTbl.innerBorder.color">$spacer</td>
+	    <td width=$mainTbl.frame.width bgcolor="$mainTbl.frame.color">$spacer</td>
+	    <td width="1" bgcolor="$mainTbl.outerBorder.color">$spacer</td>
+	  </tr>
+        </table>
+    </td>
+  </tr>
+  <tr>
+    <td>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	  <tr>
+	    <td width="1" bgcolor="$mainTbl.outerBorder.color">$spacer</td>
+	    <td width="900" bgcolor="$mainTbl.frame.color">$spacer(1,25)</td> 
+	    <td width="1" bgcolor="$mainTbl.outerBorder.color">$spacer</td>
+	  </tr>
+        </table>
+    </td>
+  </tr>
+  <tr>
+    <td>
+	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	  <tr>
+	    <td width="1" height="1" bgcolor="$mainTbl.outerBorder.color">$spacer</td>
+	  </tr>
+        </table>
+    </td>
+  </tr>
+</table>
 
 #####################
 #block writeFooter
-<DIV CLASS="copyrightFooter" ALIGN="center">
+<div class="copyrightFooter" align="center">
 Copyright &copy; $currentYr $siteCopyrightName. All rights reserved.
-</DIV>
+</div>
 <BR>
-<DIV CLASS="copyrightFooter" ALIGN="center">Hosted on<BR>
+<div class="copyrightFooter" align="center">Hosted on<BR>
 <a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=28961&type=1" 
-alt="SourceForge Home" height=31 width=88 border=0></a>
-</DIV>
+alt="SourceForge Home" height="31" width="88" border="0" /></a>
+</div>
 <BR>
 <BR>
 <BR>
 #end block 
 #####################
-
-#end cache 
+#end cache
