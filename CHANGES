@@ -14,14 +14,20 @@ release
     template def contained a '$placeholder' surrounded in single quotes and
     multiple \n newlines ... plus added new test case.(TR)
   - Utils.optik: Optik 1.3 package by Gregory P Ward, for parsing
-    command-line options in 'cheetah' comamnd. (MO)
+    command-line options in 'cheetah' comamnd.  Copied unchanged into
+    Cheetah except added "Cheetah.Utils.optik." prefix to intra-package
+    imports.  Optik's copyright and license is in an appendix in the
+    Cheetah Users' Guide.  (MO)
   - rewrite of the "cheetah" and "cheetah-compile" commands. 
-    The command-line options have changed! 
+    The command-line options have changed!  Removed CheetahCompile module
+    removed and its test suite too; CheetahWrapper now takes its place. (MO)
   - Utils.dualglob: new module to recursively generate source+destination
     filenames from command-line filespecs. (MO)
   - The command-line options of .py template modules have also changed
     to conform with the "cheetah" command.  Also a --pickle bug was
-    fixed. (MO)
+    fixed.  (MO)
+  - Utils.WebMixin: made a string type comparision backward compatible.
+    This was why the Cheetah test suite was failing on Python < 2.2! (MO)
 
 
 0.9.14 (July 14, 2002)

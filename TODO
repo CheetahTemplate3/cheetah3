@@ -1,17 +1,21 @@
 Cheetah TODO list
 -----------------
-
 * If you are working on a task please put your initials at the end of the
   description
-
 * When a task is completed please remember to note it in the CHANGES file
+* Unresolved bugs are listed in the BUGS file.  Resolved bugs are be listed
+  in the CHANGES file if the bug is considered significant enough and it
+  affected a released version of Cheetah.
 
 
 Goals for 1.0
 =========================================================================
 - Change #compiler-settings to #compiler
-- Revamp 'cheetah' command-line arguments (see below)
 - write a formalized grammar for Cheetah in BNF 
+- update User's Guide about changes to SkeletonPage (no more #settings,
+  etc) (TR)
+- decide whether/when to change the way local/global/builtin variables
+  are looked up (see below).
 
 
 Other TODO Items
@@ -24,7 +28,6 @@ Other TODO Items
   something else do a parsed include ('#include parsed', '#include cheetah'?),
   so that users get parsing only if they explicitly request it.
 
-
 - implement some better error handling for misformed #for, #if, #try directives,
   etc.  At the moment these errors are not caught until Python executes the
   code.
@@ -33,29 +36,6 @@ Other TODO Items
   ##cache
   This is a cached region.  $voom
   #end cache
-
-- fix bug in Parser.getDefArgList() that is mucking up lists where the comma has
-  been forgotten:
-
-  > #cache timer='.5m' id='cache1'
-  > This is a cached region.  $voom
-  > #end cache
-  > 
-  > the error is:
-  > 
-  > "/local/opt/Python/lib/python2.2/site-packages/Webware/Cheetah/Compiler.py",
-  > line 102, in genCacheInfoFromArgList
-  >     val = self.genTimeInterval(val)
-  >   File
-  > "/local/opt/Python/lib/python2.2/site-packages/Webware/Cheetah/Compiler.py",
-  > line 75, in genTimeInterval
-  >     interval = float(timeString)*60
-  > ValueError: invalid literal for float(): .5m' id'cache1
-  > 
-  > 
-  > Running under pdb shows that Parser.getDefArgList() returned:
-  > "30m' id'cache1" .
-
 
 - Delete whitespace before a comment on the same line.  The methods are
   Parser.eatComment() and Parser.eatMultiLineComment().  It's already
@@ -92,45 +72,39 @@ Rewrite the caching framework
 
 - Other ideas in Tavis' head.
 
+- Have an option to refresh the cache whenever an external
+  file is updated.  This would allow a data structure to be kept in
+  sync whenever its text configuration file is changed.
 
-Cheetah command revamp
-===============================================================================
-- Usage: cheetah COMMAND ARGUMENTS
-- Commands:
-     cheetah --help | -h
-     cheetah --version
-     cheetah compile | c           # .tmpl -> .py
-     cheetah fill | f              # .tmpl -> .html       (Not implemented yet)
 
-- Options common to 'compile', 'fill' and 'cgi':
-    -i EXT                         # input file extension  (-i '' for no ext)
-    -o EXT                         # output file extension (-o '' for no ext)
-    -R                             # recurse subdirectories
-    -                              # (as input filename) input from stdin
-    -p                             # output to stdout
 
-- Options for 'fill' (and .py template modules):
-    --env                          # Push environment onto searchList.
-    --pickle=FILE                  # Unpickle FILE and push onto searchList.
-                                   # (--pickle=-  => unpickle from stdin)
+local/global/builtin variable lookup
+==============================================================================
+Cheetah currently does not allow users to override Python's builtin functions.
+This provides safety because it prevents users from overriding e.g. $str and
+breaking Cheetah horribly.  However, it also prevents users from using common
+placeholder names such as $file, $max, $property, etc.; often requiring
+convoluted circumlocutions to shadow a database field that's named one of
+those.  Worse, the application developer (template maintainer) can't be sure
+the user's version of Python won't have a new builtin defined that will make
+the template fail.  
 
-- Remove options:
-    cheetah-compile -w             # Same as 'cheetah fill' but less powerful.
-    cheetah -c                     # 'cheetah c' is easier to type.
-    -p (pickle)                    # Conflicts with -p (to stdout)
+Related to this is the question of whether to use bare variable names for
+lookup of local/global/builtin variables.  Currently at compile time, Cheetah
+looks for a local/global/builtin variable and, if found, generates a bare
+variable name.  If it's not found, it generates a a NameMapper lookup instead.  
+Lookup of bare variable names is much faster, but it complicates the
+implementation and may contribute to the can't-override-builtins problem.
 
-- Input extension, unless overridden by -i, is ".tmpl".  If an input file is 
-  specified but does not exist, try adding this extension.  When recursing,
-  consider only files with this extension.
-
-- Output extension, unless overridden by -o, is ".py" for 'cheetah compile'
-  and 'cheetah cgi', and ".html" for 'cheetah fill'.
-
-- Program will examine its own name ( os.path.basename(sys.argv[0]) ), and if
-  it looks like "cheetah-WORD", use WORD as the command instead of sys.argv[1] .
-  Then cheetah-compile can be a symlink or copy of this, and people can create
-  cheetah-fill etc if desired.
-
+To get rid of bare variable names in compiled templates, we'd need to add
+the equivalent objects to the searchList:
+    1) locals()
+    2) "#set global" variables
+    3) ... [user-defined searchList] ...
+    4) self  -- the compiled template object
+    4) globals()   -- for imported objects
+    5) __builtins__
+The order these objects appear in the searchList may be subject to debate.
 
 #entry $func($arg1, $arg2="default", $**kw)
 ===============================================================================
@@ -202,4 +176,3 @@ Examples
   database?  Caching template classes and/or instances extracted from
   a database.
 - Pickled templates?
-
