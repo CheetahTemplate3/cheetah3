@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.63 2005/01/06 13:05:14 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.64 2005/01/17 18:14:21 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.63 $
+Version: $Revision: 1.64 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/01/06 13:05:14 $
+Last Revision Date: $Date: 2005/01/17 18:14:21 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.63 $"[11:-2]
+__revision__ = "$Revision: 1.64 $"[11:-2]
 
 import sys
 import os
@@ -1320,15 +1320,22 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self._importStatements.append(impStatement)
 
         #@@TR 2005-01-01: there's almost certainly a cleaner way to do this!
-        ## this doesn't work with from math import *, etc.
         importVarNames = impStatement[impStatement.find('import') + len('import'):].split(',')
-        importVarNames = [var.split()[-1] for var in importVarNames]
+        importVarNames = [var.split()[-1] for var in importVarNames] # handles aliases
+        importVarNames = [var for var in importVarNames if var!='*']
         self.addImportedVarNames(importVarNames) #used by #extend for auto-imports
         
         if self._templateObj:
             import Template as TemplateMod
             mod = self._templateObj._importAsDummyModule(impStatement)
-            for varName in importVarNames:
+
+            # @@TR 2005-01-15: testing this approach to support
+            # 'from foo import *'
+            self._templateObj._searchList.append(mod)
+
+            # @@TR: old buggy approach is still needed for now
+            for varName in importVarNames: 
+                if varName == '*': continue
                 val = getattr(mod, varName.split('.')[0])
                 setattr(TemplateMod, varName, val)
 
