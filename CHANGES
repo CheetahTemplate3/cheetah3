@@ -1,5 +1,12 @@
 Please initial your changes (there's a key at bottom) and add a date for each release
 ================================================================================
+0.9.9 (?)
+   - implemented one-line #def's and #block's (TR)
+        #def aTest: This is a $adj test
+        #def aTest: This is a \$adj test
+     NOTE: leading and trailing whitespace is stripped.  These should only be used on
+     lines by themselves as it reads to the end of the line.
+
 0.9.9b1 (Dec 6, 2001)
    - template constructor arg 'outputFilter' now 'filter', for consistency
      with #filter (MO)
