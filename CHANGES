@@ -17,6 +17,12 @@ Please initial your changes and a date for each release
     (MO)
   - Template.getUnknowns (new method): returns a list of Placeholder Names
     missing in the Search List. (MO)
+  - made changes to Template.py, CodeGenerator.py, PlaceholderProcessor.py,
+    and TagProcessor.py to enable customization of the placeholderStartToken so 
+    it can be set to any character sequence, rather than just the default '$'.
+    This is configurable by the Template setting 'placeholderStartToken' (TR)
+  - fixed a small bug in PlaceholderProcessor.processTag() that prevented
+    static caching (i.e. $*) of a value containing ''' style quotes
 
 0.9.7 (July 13, 2001)
   - reimplemented the parsing of $placeholders using the Python tokenizer module (TR)
