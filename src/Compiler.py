@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.3 2001/07/16 03:43:28 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.4 2001/08/14 06:04:43 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/16 03:43:28 $
+Last Revision Date: $Date: 2001/08/14 06:04:43 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -31,7 +31,6 @@ from os.path import \
 from glob import glob
 
 #intra-package imports ...
-from Delimiters import delimiters
 from Version import version
 
 ##################################################
@@ -44,7 +43,15 @@ CHEETAH_EXTENSION = '.tmpl'
 SERVLET_EXTENSION = '.py'
 SERVLET_BACKUP_EXT = '.py_bak'
 
-extendDirectiveRE = delimiters['extendDirective']
+
+
+escCharLookBehind = r'(?:(?<=\A)|(?<!\\))'
+tagClosure = r'(?:/#|\r\n|\n|\r)'
+lazyTagClosure = r'(?:\r\n|\n|\r)'
+extendDirectiveRE = re.compile(escCharLookBehind +
+                               r'#extend[\f\t ]+(?P<parent>.*?)' +
+                               r'[\f\t ]*' + tagClosure, re.DOTALL)
+
                     
 ##################################################
 ## FUNCTIONS ##
