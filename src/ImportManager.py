@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-# $Id: ImportManager.py,v 1.1 2002/04/27 01:36:33 tavis_rudd Exp $
+# $Id: ImportManager.py,v 1.2 2005/01/03 20:03:32 tavis_rudd Exp $
 
 """Provides an emulator/replacement for Python's standard import system.
+
+@@TR: This code is now unsupported.  You're on your own with it!
 
 This is a hacked/documented version of Gordon McMillan's iu.py. I have:
 
@@ -18,12 +20,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>  based on Gordon McMillan's iu.py
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/04/27 01:36:33 $
+Last Revision Date: $Date: 2005/01/03 20:03:32 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.1 $"[11:-2]
+__revision__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
