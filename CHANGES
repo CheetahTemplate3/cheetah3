@@ -2,7 +2,7 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-0.9.13b1 (unreleased)
+0.9.13b1 (May 1, 2002)
   - Was going to import cStringIO instead of StringIO, but it made the 
     DummyTransaction.py unittest fail so I undid it.  Cheetah aims to provide
     Unicode support, which cStringIO does not provide. (TR/MO)
@@ -194,7 +194,7 @@ release
 
    - made #set distinguish between local and global vars.  See the docs. (TR)
 
-   - added a hundreds of new test cases (TR)
+   - added hundreds of new test cases (TR)
 
    - added the #breakpoint and #compiler-settings directives (TR)
 
