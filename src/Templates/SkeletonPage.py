@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SkeletonPage.py,v 1.5 2001/08/10 04:52:06 tavis_rudd Exp $
+# $Id: SkeletonPage.py,v 1.6 2001/08/15 02:54:16 tavis_rudd Exp $
 """A skeleton page template for use with the Cheetah package
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/08/10 04:52:06 $
+Last Revision Date: $Date: 2001/08/15 02:54:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -183,7 +183,7 @@ class SkeletonPage(TemplateServlet):
         if not hasattr(self,'_bodyTagAttribs'):
             self._bodyTagAttribs = {}
 
-        bodyTagTxt = formHTMLTag('BODY', self.bodyTagAttribs)
+        bodyTagTxt = formHTMLTag('BODY', self._bodyTagAttribs)
         return bodyTagTxt
 
 
