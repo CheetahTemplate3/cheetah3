@@ -10,21 +10,26 @@ Cheetah TODO list
 
 Requirements for 1.0
 =========================================================================
-- write a formalized grammar for Cheetah in BNF 
+- write a formalized grammar for Cheetah in BNF (MO)
 - update User's Guide about changes to SkeletonPage (no more #settings,
   etc) (TR)
-- document all methods/attributes inherited from Template and
-  WebKit.Servlet/Cheetah.DummyServlet, for section 11.5 of the Users' Guide.
-  Distinguish those that are frequently used by the template maintainer,
-  those occasionally used, and those never used.  These must be documented
-  to avoid unknowingly overriding a Template/Servlet variable and causing
-  side effects.
-- decide whether/when to change the way local/global/builtin variables
-  are looked up (see below).
+- allow searchList variables to override Python builtins. (TR)
+- remove magic underscore feature ($var -> _var if var does not exist) (TR)
+- patch on SourceForge for "%" in default arguments of a block (TR)
+- something about globals (TR)
+- Install Cheetah into Cheetah/ rather than Webware/Cheetah/ .  Have a 
+  migration plan for existing users. (TR)
 
 
 Other TODO Items
 ================================================================================
+
+- Debugging tools.  $dumpSearchList() reduces each searchList element to a
+Python primitive type (using dir() on non-dictionaries) and prints it using
+pprint.pformat() with a comment before each: "*** searchList[1] ***".
+Boolean argument 'all' adds local variables, builtins, etc.  Boolean argument
+'allExceptLarge' skips any element with >20 variables, printing a warning:
+"skipping, ### variables".
 
 - revisit parsed #include directives.  Are they necessary at all??
   (This is a rhetorical question.  They are necessary.  However, the
