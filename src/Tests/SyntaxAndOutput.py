@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.53 2005/01/03 20:10:16 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.54 2005/01/06 13:06:03 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.53 $
+Version: $Revision: 1.54 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/01/03 20:10:16 $
+Last Revision Date: $Date: 2005/01/06 13:06:03 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.53 $"[11:-2]
+__revision__ = "$Revision: 1.54 $"[11:-2]
 
 
 ##################################################
@@ -1591,14 +1591,19 @@ class IfDirective(OutputTest):
                     "1 - 1")
 
     def test14(self):
-        """#if <condition> then <true> else <false> """
+        """single-line #if: simple"""
         self.verify("#if $emptyString then 'true' else 'false'",
                     "false")
 
     def test15(self):
-        """#if <condition> then <true> else <false> """
+        """single-line #if: more complex"""
         self.verify("#if $anInt then 'true' else 'false'",
                     "true")
+
+    def test16(self):
+        """single-line #if: with the words 'else' and 'then' in the output """
+        self.verify("#if ($anInt and not $emptyString==''' else ''') then $str('then') else 'else'",
+                    "then")
 
 class UnlessDirective(OutputTest):
     
