@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.11 2001/11/02 16:44:15 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.12 2001/11/06 03:50:38 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2001/11/02 16:44:15 $
+Last Revision Date: $Date: 2001/11/06 03:50:38 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.11 $"[11:-2]
+__version__ = "$Revision: 1.12 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -661,7 +661,7 @@ class ClassCompiler(SettingsManager, GenUtils):
                           ') > self._fileMtime:')
             self.indent()
             self.addChunk('self.compile(file=' + repr(fileName) + ')')
-            self.addChunk('write(self.' + mainMethodName + '(trans=trans))')            
+            self.addChunk('write(self.__mainCheetahMethod' + str(id(self)) + '(trans=trans))')            
             self.addStop()
             self.dedent()
 
@@ -717,6 +717,7 @@ class ClassCompiler(SettingsManager, GenUtils):
     def cleanupState(self):
         if self._mainMethodName == 'respond':
             self._generatedAttribs.append('__str__ = respond')
+        self._generatedAttribs.append('__mainCheetahMethod' + str(id(self)) + '= ' + self._mainMethodName)
         while self._activeMethods:
             methCompiler = self.getActiveMethodCompiler()
             self.swallowMethodCompiler(methCompiler)
@@ -815,25 +816,25 @@ class ClassCompiler(SettingsManager, GenUtils):
         methodName = '__errorCatcher' + str(self._errorCatcherCount)
         self._placeholderToErrorCatcherMap[rawCode] = methodName
         
-        checherMeth = self.spawnMethodCompiler(methodName, klass=MethodCompiler)
-        checherMeth.setupState()
-        checherMeth.setMethodSignature('def ' + methodName +
+        catcherMeth = self.spawnMethodCompiler(methodName, klass=MethodCompiler)
+        catcherMeth.setupState()
+        catcherMeth.setMethodSignature('def ' + methodName +
                                      '(self, localsDict={})')
-        checherMeth.addMethDocString('Generated from ' + rawCode +
+        catcherMeth.addMethDocString('Generated from ' + rawCode +
                                    ' at line, col ' + lineCol + '.') 
-        checherMeth.addChunk('try:')
-        checherMeth.indent()
-        checherMeth.addChunk("return eval('''" + codeChunk + "''', globals(), localsDict)")
-        checherMeth.dedent()
-        checherMeth.addChunk('except self._errorCatcher.exceptions(), e:')
-        checherMeth.indent()        
-        checherMeth.addChunk("return self._errorCatcher.warn(exc_val=e, code= " +
+        catcherMeth.addChunk('try:')
+        catcherMeth.indent()
+        catcherMeth.addChunk("return eval('''" + codeChunk + "''', globals(), localsDict)")
+        catcherMeth.dedent()
+        catcherMeth.addChunk('except self._errorCatcher.exceptions(), e:')
+        catcherMeth.indent()        
+        catcherMeth.addChunk("return self._errorCatcher.warn(exc_val=e, code= " +
                              repr(codeChunk) + " , rawCode= " +
                              repr(rawCode) + " , lineCol=" + str(lineCol) +")")
         
-        checherMeth.cleanupState()
+        catcherMeth.cleanupState()
         
-        self.swallowMethodCompiler(checherMeth)
+        self.swallowMethodCompiler(catcherMeth)
         return methodName
 
     ## code wrapping methods

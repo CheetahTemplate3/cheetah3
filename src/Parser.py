@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.27 2001/11/01 09:38:21 tavis_rudd Exp $
+# $Id: Parser.py,v 1.28 2001/11/06 03:49:43 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.27 $
+Version: $Revision: 1.28 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/11/01 09:38:21 $
+Last Revision Date: $Date: 2001/11/06 03:49:43 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.27 $"[11:-2]
+__version__ = "$Revision: 1.28 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1491,25 +1491,34 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.getDirectiveStartToken()
         self.advance(len('filter'))
         self.getWhiteSpace()
-        theFilter = self.getIdentifier()
-        if self._templateObj:
-            self._templateObj._currentFilter = \
-                   getattr(Filters,theFilter)(self._templateObj).filter
+        
+        if self.matchCheetahVarStart():
+            isKlass = True
+            theFilterExpr = self.getExpression()
+        else:
+            isKlass = False
+            theFilter = self.getIdentifier()
             
         self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
-        self.addChunk('if self._filters.has_key("' + theFilter+ '"):')
-        self.indent()
-        self.addChunk(
-            'filter = self._currentFilter = self._filters["' +
-            theFilter + '"]')
-        self.dedent()
-        self.addChunk('else:')
-        self.indent()
-        self.addChunk('filter = self._currentFilter = \\\n\t\t\tself._filters["'
-                      + theFilter + '"] = Filters.'
-                      + theFilter + '(self).filter'
-                      )
-        self.dedent()
+
+        if isKlass:
+            self.addChunk('filter = self._currentFilter = ' + theFilterExpr.strip() +
+                          '(self).filter')
+        else:
+            if theFilter.lower() == 'none':
+                self.addChunk('filter = self._initialFilter')
+            else:
+                # is string representing the name of builtin filter
+                self.addChunk('if self._filters.has_key("' + theFilter + '"):')
+                self.indent()
+                self.addChunk('filterName = ' + repr(theFilter))
+                self.addChunk('filter = self._currentFilter = self._filters[filterName]')
+                self.dedent()
+                self.addChunk('else:')
+                self.indent()
+                self.addChunk('filter = self._currentFilter = \\\n\t\t\tself._filters[filterName] = '
+                              + 'getattr(self._filtersLib, filterName)(self).filter')
+                self.dedent()
         
     def eatErrorCatcher(self):
         lineClearToStartToken = self.lineClearToStartToken()

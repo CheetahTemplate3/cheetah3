@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.62 2001/10/17 22:38:03 tavis_rudd Exp $
+# $Id: Template.py,v 1.63 2001/11/06 03:50:11 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.62 $
+Version: $Revision: 1.63 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/10/17 22:38:03 $
+Last Revision Date: $Date: 2001/11/06 03:50:11 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.62 $"[11:-2]
+__version__ = "$Revision: 1.63 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -65,6 +65,7 @@ class Template(SettingsManager, Servlet):
     def __init__(self, source=None, searchList=[], file=None,
                  settings={},           # user settings that are visible in templates
                  outputFilter='ReplaceNone', # which filter from Cheetah.Filters
+                 filtersLib=Filters,
                  errorCatcher=None,
                  
                  compilerSettings = {}, # control the behaviour of the compiler
@@ -104,10 +105,15 @@ class Template(SettingsManager, Servlet):
                 
         ##################################################
         ## setup the ouput filters
+        self._filtersLib = filtersLib
         self._filters = {}
         if outputFilter:
-            filter = outputFilter
-            klass = getattr(Filters, filter)
+            if type(outputFilter) == StringType:
+                filter = outputFilter
+                klass = getattr(self._filtersLib, filter)
+            else:
+                klass = outputFilter
+                filter = klass.__name__
             self._currentFilter = self._filters[filter] = klass(self).filter
         else:
             self._currentFilter = str
