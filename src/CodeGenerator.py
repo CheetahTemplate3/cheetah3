@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.10 2001/07/13 22:59:36 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.11 2001/07/31 05:41:32 hierro Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/13 22:59:36 $
+Last Revision Date: $Date: 2001/07/31 05:41:32 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.10 $"[11:-2]
+__version__ = "$Revision: 1.11 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -616,3 +616,6 @@ def varNotFound_echo(templateObj, tag):
 
 def varNotFound_bigWarning(templateObj, tag):
     return "="*15 + "&lt;$" + tag + " could not be found&gt;" + "="*15
+
+def varNotFound_KeyError(templateObj, tag):
+    raise KeyError("no '%s' in this Template Object's Search List" % tag)
