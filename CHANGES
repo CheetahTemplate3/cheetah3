@@ -1,6 +1,39 @@
 Please initial your changes and add a date for each release
 ================================================================================
-0.9.8 (not released yet)
+
+
+0.9.8a4 (September 7, 2001)
+
+  - Added -g (appendGen function argument), which compiles x.tmpl to xGen.py,
+    with x.py being for non-generated Python code. Also changed option handling
+    a little and added a comment to the top of compiled files. (IB + MO)
+
+  - finalized the #include syntax after a lengthy discussion on the list 
+    This is different from in 0.9.8a3 (TR)
+        #include <ARGS> <EXPR> 
+        ... uses the value of EXPR as the path of the file to include.
+        
+        #include <ARGS> source = <EXPR> 
+        ... includes the value of the EXPR 
+
+        where <ARGS> is 'raw' or ''
+
+  - re-implemented the output mechanism to use streaming via Webware's
+    Transaction and Response objects when available and fake it with the
+    DummyTransaction DummyResponse classes when the Webware Transaction is not
+    avialable. This behaviour is roughly the same as in Webware's PSP.  Will
+    implement output buffering PHP-style later if there is any demand. (TR)
+
+  - made #include a run-time directive rather than compile-time.  This is
+    slower, but the semantics are better. (TR)
+
+  - various small optimizations to the generated code (TR)
+
+  - updated the docs (TR)
+
+
+0.9.8a3 (August 22, 2001) [includes changes for 0.9.8a1 and 0.9.8a2]
+
   - Added package ./src/Tools/ for contributed classes/functions/packages not
     necessary to run Cheetah.  The first such class is RecursiveNull.py by Ian
     Bicking.  Added package Cheetah.Tools to list in ./setup.py . (MO)
@@ -55,31 +88,22 @@ Please initial your changes and add a date for each release
     - #raw
     - the parsing of the core tags (the state-dependent ones) after they have been
       translated to the internal delimiters
-
   - made a Template.shutdown() method for cleaning up reference cycles before a 
     template object is deleted. (TR)
   - made the parsing and processing of #macros() more robust (TR)
   - implemented the file update checking mechanism (TR)
     NOTE, the syntax for the #include is now:
-        #include <ARGS> <EXPR> 
+        #include <ARGS> file = <EXPR> 
         ... uses the value of EXPR as the path of the file to include.
 
-        
-        #include <ARGS> source = <EXPR> 
+        #include <ARGS> <EXPR> 
         ... includes the value of the EXPR 
 
         where <ARGS> is 'raw' or 'direct'
 
-  - re-implemented the output mechanism to use streaming via Webware's
-    Transaction and Response objects when available and fake it with the
-    DummyTransaction DummyResponse classes when the Webware Transaction is not
-    avialable. This behaviour is roughly the same as in Webware's PSP.  Will
-    implement output buffering PHP-style later if there is any demand. (TR)
-
-  - made #include a run-time tag rather than compile-time.  This is slower, but
-    the semantics are better. (TR)
  
 0.9.7 (July 13, 2001)
+
   - reimplemented the parsing of $placeholders using the Python tokenize module (TR)
     - now translates into Python code instead of going through NameMapper for
       each request
