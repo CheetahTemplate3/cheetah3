@@ -10,6 +10,11 @@ Cheetah TODO list
 
 Requirements for 1.0
 =========================================================================
+- Python 2.3(b1) causes 16 failures in SyntaxAndOutput.py because the result
+  of boolean expressions is now True and False instead of 1 and 0 (or 'True'
+  and 'False' instead of '1' and '0' when used as placeholders).  The same
+  thing happens with $True and $False.  Do we need a set of parallel tests
+  for Python >= 2.3?  
 - Simplify NameMapper.py while maintaining new behavior (ignore dictionary
   attributes/methods when searching for match of first chunk in searchList
   lookup).  Modify _namemapper.c to conform.  Make valueForKey error
