@@ -18,7 +18,7 @@ release
     blag
     .end for
 
-
+  - fixed #include bug that was resulting in non-unique includeIDs (TR)
 
 0.9.13b2 (May 3, 2002)
   - fixed the bug in Cheetah.Servlet.Servlet.serverSidePath that Jeff Johnson
