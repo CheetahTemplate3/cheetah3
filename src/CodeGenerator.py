@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.14 2001/08/02 06:16:17 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.15 2001/08/02 19:50:11 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.14 $
+Version: $Revision: 1.15 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/02 06:16:17 $
+Last Revision Date: $Date: 2001/08/02 19:50:11 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.14 $"[11:-2]
+__version__ = "$Revision: 1.15 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -409,19 +409,21 @@ def preProcessRawDirectives(templateObj, templateDef):
     return templateDef
 
 
-import Template                         # import it here to avoid circ. imports
+
 def preProcessIncludeDirectives(templateObj, templateDef):
     """replace any #include statements with their substitution value.  This method
     can handle includes from file (absolute paths only at the moment) and from
     placeholders such as $getBodyTemplate"""
 
+    import Template                         # import it here to avoid circ. imports
+    
     if not hasattr(templateObj, '_rawIncludes'):
         templateObj._rawIncludes = {}
     if not hasattr(templateObj, '_parsedIncludes'):
         templateObj._parsedIncludes = {}
 
     RESTART = [False,]
-    def subber(match, templateObj=templateObj, RESTART=RESTART):
+    def subber(match, templateObj=templateObj, RESTART=RESTART, Template=Template):
         args = match.group(1).strip()
         # do a safety/security check on this tag
         validateIncludeDirective(templateObj, args)
