@@ -53,9 +53,6 @@ Implementation
   > "30m' id'cache1" .
 
 
-- finish the #cache directive's varyBy keyword (tied to Tavis' proposed caching
-  framework for Webware)
-
 - Delete whitespace before comments.  If the rest of the line consists
   of only non-outputting directives and whitespace, delete the line from the
   output.  The only outputting directives I see are #echo, #block and
@@ -65,6 +62,21 @@ Implementation
   into distutils.
 
 - 'errorCatcher None' to stop catching errors in the middle of a template.
+
+
+Rewrite the caching framework
+=============================
+- add #cache varyBy= (tied to Tavis' proposed caching framework for Webware)
+
+- #cache test= with a one-variable test produces invalid Python (an empty
+  if-block).  Example in Cheetah Developers' Guide, section
+  "#cache with test: expression and method conditions".
+
+- #cache id= seems to be ignoring the ID and generating a random numeric
+  ID instead.  Is it working?  Do cache IDs have to be numeric?
+
+- Other ideas in Tavis' head.
+
 
 Cheetah command revamp
 ===============================================================================
