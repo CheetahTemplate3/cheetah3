@@ -60,7 +60,14 @@ Please initial your changes and add a date for each release
     template object is deleted. (TR)
   - made the parsing and processing of #macros() more robust (TR)
   - implemented the file update checking mechanism (TR)
+    NOTE, the syntax for the #include is now:
+        #include <ARGS> <EXPR> 
+        ... includes the value of the EXPR 
+        
+        #include <ARGS> file = <EXPR> 
+        ... uses the value of EXPR as the path of the file to  include.
 
+        where <ARGS> is 'raw' or 'direct'
  
 0.9.7 (July 13, 2001)
   - reimplemented the parsing of $placeholders using the Python tokenize module (TR)
