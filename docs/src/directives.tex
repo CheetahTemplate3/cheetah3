@@ -215,31 +215,32 @@ Cheetah!
 \label{directives.include}
 
 \code{\#include} directives are used to include text from outside the template
-definition.  The text can come from \code{\$placeholder} variables or from
-external files.  When working with external files Cheetah will monitor for
-changes to the included file and update as necessary (NOT IMPLEMENTED YET).
-Please note that \code{\#include} directives are processed at compile-time not
-run-time.  Therefore, any \$placeholders used in them must be available at
-compile-time.
+definition.  The text can come from external files or from \code{\$placeholder}
+variables.  When working with external files Cheetah will monitor for changes to
+the included file and update as necessary.  
 
-This example demonstrates use with \code{\$placeholder} variables:
-
+This demonstrates its use with external files:
 \begin{verbatim}
-#include $myParseText
+#include "includeFileName.txt"
 \end{verbatim}
+The content of "includeFileName.txt" will be parsed for Cheetah syntax.
 
-And this demonstrates its use with external files:
+And this example demonstrates use with \code{\$placeholder} variables:
 \begin{verbatim}
-#include file="includeFileName.txt"
+#include source=$myParseText
 \end{verbatim}
+The value of \code{\$myParseText} will be parsed for Cheetah syntax. This is not
+the same as simple placing the \$placeholder tag ``\code{\$myParseText}'' in
+your template definition.  In the latter case the value of \$myParseText would
+not be parsed.
 
 By default, included text will be parsed for Cheetah tags.  The argument
 ``\code{raw}'' can be used to mark the text for verbatim inclusion without any tag
 parsing.
 
 \begin{verbatim}
-#include raw $myParseText
-#include raw file = "includeFileName.txt"
+#include raw "includeFileName.txt"
+#include raw source=$myParseText
 \end{verbatim}
 
 By default, Cheetah wraps each chunk of \code{\#include} text inside a nested
@@ -259,9 +260,16 @@ are also slightly faster.  Note that direct includes cannot monitor for changes
 to the include src file.
 
 \begin{verbatim}
-#include direct $myParseText
-#include direct file = "includeFileName.txt"
+#include direct includeFileName.txt"
+#include direct source=$myParseText
 \end{verbatim}
+
+Please note that \code{\#include} directives are processed at compile-time not
+run-time.  Therefore, any \$placeholders used in them must be available at
+compile-time.  The \code{\#set} directive is a run-time directive so you can't
+use it to specify the path of a file to include.  If you need to do something
+like this please remember the philosophy behind Cheetah: Python for the complex
+tasks, Cheetah for the simple ones!  Do it in Python.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#cache ... \#end cache}
@@ -403,6 +411,17 @@ template is parsed and compiled.
 The formal arguments in a macro definition are defined in regular Python syntax:
 The ARE NOT prefaced with \$.  Default values for arguments
 may be provided in the usual Python manner.
+
+Note that the whitespace handling with the \code{\#macro} directive is the same
+as with other directives.  If you don't want the trailing end-of-line included
+in your macro definition you must place the end tag on the same line as the last
+bit of text in the macro definition. Here's an example:
+
+\begin{verbatim}
+#macro myMacro()
+My macro doesn't include the trailing EOL#end macro
+\end{verbatim}
+
 
 Here's a large example of a macro definition from the file
 {\bf examples/webware\_examples/cheetahSite/SiteTemplate.tmpl}:
@@ -762,4 +781,6 @@ contains the parent Template.
 Appendix \ref{examples} contains extended examples of how \code{\#extend} is
 used.
 
-
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      
