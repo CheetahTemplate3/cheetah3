@@ -1,24 +1,23 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.11 2001/11/08 07:12:25 hierro Exp $
+# $Id: SyntaxAndOutput.py,v 1.12 2001/11/09 19:27:18 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
-- test escaping slashes when read from file
-
 - #finally
 - #filter (output filtering, was #formatter)
 - #errorCatcher
-
+- #echo
+- #silent
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/08 07:12:25 $
+Last Revision Date: $Date: 2001/11/09 19:27:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.11 $"[11:-2]
+__version__ = "$Revision: 1.12 $"[11:-2]
 
 
 ##################################################
@@ -1776,8 +1775,8 @@ class FilterDirective(OutputTest):
                     "")
 
     def test3(self):
-        """#filter MaxLen -- maxlen of 5
-        """
+        """#filter MaxLen -- maxlen of 5"""
+
         self.verify("#filter MaxLen  \n${tenDigits, maxlen=5}",
                     "12345")
 
@@ -1798,7 +1797,20 @@ class FilterDirective(OutputTest):
         """
         self.verify("#filter WebSafe  \n${webSafeTest, also=' '}",
                     "abc&nbsp;&lt;=&gt;&nbsp;&amp;")
+        
+class EchoDirective(OutputTest):
+    def test1(self):
+        """#echo 1234
+        """
+        self.verify("#echo 1234",
+                    "1234")
 
+class SilentDirective(OutputTest):
+    def test1(self):
+        """#silent 1234
+        """
+        self.verify("#silent 1234",
+                    "")
 
 class ErrorCatcherDirective(OutputTest):
     pass
