@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.72 2001/11/24 04:40:43 tavis_rudd Exp $
+# $Id: Template.py,v 1.73 2001/11/24 04:41:54 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.72 $
+Version: $Revision: 1.73 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/24 04:40:43 $
+Last Revision Date: $Date: 2001/11/24 04:41:54 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.72 $"[11:-2]
+__version__ = "$Revision: 1.73 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -256,14 +256,14 @@ class Template(SettingsManager, Servlet):
             
     ## utility functions ##   
 
-    def getVar(self, varName, default=NoDefault):
+    def getVar(self, varName, default=NoDefault, autoCall=True):
         
         """Get a variable from the searchList.  If the variable can't be found
         in the searchList, it returns the default value if one was given, or
         raises NameMapper.NotFound."""
         
         try:
-            return VFS(self.searchList(), varName.replace('$',''), 1)
+            return VFS(self.searchList(), varName.replace('$',''), autoCall)
         except NotFound:
             if default != NoDefault:
                 return default
