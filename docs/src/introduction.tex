@@ -4,18 +4,19 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{What is Cheetah?}
 \label{intro.whatIs}
-Cheetah is a Python-based template engine and code-generator.  
 
-A template is like a form letter, with placeholders for the data that needs to
-be filled in.  Python's \code{\%} operator provides a primitive tool for working
-with templates:
+Cheetah is a Python-based template engine and code generator.  
+
+A template is like a form letter: text with placeholders for the data that
+needs to be filled in.  Python's \code{\%} operator provides a primitive tool
+for working with templates:
 
 \begin{verbatim}
 >>> print """
 ... <HTML>
-... <HEAD><TITLE>$title</TITLE></HEAD>
+... <HEAD><TITLE>%(title)s</TITLE></HEAD>
 ... <BODY>
-... $contents
+... %(contents)s
 ... </BODY>
 ... </HTML>""" % {'title': 'Hello World Example', 'contents': 'Hello World!'}
 
@@ -27,11 +28,17 @@ Hello World!
 </HTML>
 \end{verbatim}
 
-Cheetah is the \code{\%} operator on steroids.  It's fast, flexible, and
-powerful.  The ``philosophy'' section below introduces some of its advanced
-features. 
+Cheetah is like the \code{\%} operator on steroids.  It's fast, flexible and
+powerful.  (The ''philosophy'' section below describes some of Cheetah's
+advanced features.) 
 
-Here's Cheetah's equivalent of the example:
+Cheetah was designed for Internet development and provides integration with
+{\bf Webware for Python} (\url{http://webware.sourceforge.net/}).  Together
+with Webware, Cheetah is a compelling alternative to ASP, JSP, PHP and PSP for
+building dynamic web sites.  (However, Cheetah is not limited to HTML: it can
+produce any text-based format.)
+
+Here is Cheetah's equivalent of the above example:
 
 \begin{verbatim}
 >>> from Cheetah.Template import Template
@@ -54,9 +61,6 @@ Hello World!
 </HTML>
 \end{verbatim}
 
-Cheetah was designed for internet development and provides integration
-with {\bf Webware for Python}.  Together with Webware, Cheetah is a compelling
-alternative to ASP, JSP, PHP, PSP, and other HTML-embedded languages.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{What is the philosophy behind Cheetah?}
@@ -65,48 +69,45 @@ Cheetah aims:
 \begin{itemize}
 \item {\bf to make it easy to separate content, graphic design, and program code.}
      
-     Program code should not pollute HTML and HTML should not pollute program
-     code. Nor should content pollute the structure of complex HTML designs and
-     vice versa.
+     A clean separation makes it easier for a team of content writers,
+     HTML/graphic designers, and programmers to work together without stepping
+     on each other's toes and polluting each other's work.  The HTML framework
+     and the content it contains are two separate things, and analytical
+     calculations (program code) is a third thing.  Each team member should be
+     able to concentrate on her specialty and to implement her changes without
+     having to go through one of the others (usually a technical ''webmaster'').
 
-     There should be no need for a designer to work through a programmer to
-     change a website's design or to use dynamic components that have already
-     been coded.  Likewise, content-providers should not have to work through a
-     'webmaster' to add new content to a site.  All members of the team should
-     be able to work independently and in parallel.
-     
-     A clean separation makes it easier for a team of content-providers,
-     designers, and programmers to work together without stepping on each
-     other's toes and polluting each other's work. Other advantages include
-     faster development time; HTML and program code that are easier to
-     understand and maintain; content that can be displayed in a variety of
-     non-HTML formats such as PDF; and highly modular, flexible, and reusable
-     site architectures.       
+     Other advantages to separation include:
+     \begin{itemize}
+     \item faster development time.
+     \item HTML and program code that is easier to understand and maintain.
+     \item content that can be displayed in a variety of non-HTML formats such
+          as PDF.
+     \item highly modular, flexible, and reusable site architectures.       
+     \end{itemize}
      
 \item {\bf to make it easy to integrate content, graphic design, and program code.}
      
-     While it should be easy to develop content, graphic design, and program
-     code separately, it should NOT be difficult to integrate them as part of a
-     website.  There should be no difficult hoops to jump through.
-     
-     It should be easy:
+     While it should be easy to develop content, graphics and program
+     code separately, it should be easy to integrate them together into a 
+     web site.  In particular, it should be easy:
+
      \begin{itemize}
-     \item for programmers to create reusable components and functions that are
-          accessible and understandable to designers.
-     \item for designers to mark out placeholders for content and dynamic components
-          in their templates.
-     \item for designers to soft-code aspects of their design that are either
-          repeated in several places or are subject to change.
-     \item for designers to extend and customize existing templates and thus minimize
-          duplication of effort and code.
-     \item and, of course, for content-providers to use the templates that
+     \item for \bf{programmers} to create reusable components and functions
+          that are accessible and understandable to designers.
+     \item for \bf{designers} to mark out placeholders for content and 
+          dynamic components in their templates.
+     \item for \bf{designers} to soft-code aspects of their design that are
+          either repeated in several places or are subject to change.
+     \item for \bf{designers} to extend and customize existing templates and
+          thus minimize duplication of effort and code.
+     \item and, of course, for \bf{content writers} to use the templates that
           designers have created.
      \end{itemize}
 
      
 \item {\bf to provide template designers with a small set of 'Display Logic'
-       programming structures such as conditional blocks and 
-       for loops}
+       programming structures such as conditional blocks and for loops}
      
      Graphic designers often do tasks that would be easier, faster, and less
      error prone if they had access to {\bf conditional blocks} and {\bf for
@@ -117,11 +118,10 @@ Cheetah aims:
 \item {\bf to be equally well-suited for HTML, SGML, XML, SQL, Postscript, form
        email, LaTeX, or any other text-based format.}
      
-     Although it was designed with dynamic websites and web applications in mind,
-     Cheetah is not HTML-specific.
+     Although Cheetah was designed with dynamic web sites and web applications
+     in mind, it is not HTML-specific.
      
-\item {\bf to achieve all these aims in a manner that is efficient, flexible, and
-       extendable.}
+\item {\bf to be efficient, flexible and extendable.}
      
 \end{itemize}
 
@@ -130,23 +130,39 @@ Cheetah achieves these aims by:
 \begin{itemize}     
      
 \item blending the power and flexibility of Python with the simplicity of a
-     small Template Definition language that non-programmers can understand.
+     small Template Definition Language (TDL) that non-programmers can
+     understand.
      
 \item giving template designers a simple way of accessing Python variables,
      objects, and functions in their templates.
      
-\item providing a modular, object-orientated framework that makes it easy to
-     create and maintain large websites.
+\item providing a modular, object-oriented framework that makes it easy to
+     create and maintain large web sites.
      
 \item compiling 'Template Definitions' into native Python code at startup.
-     Thereafter this code is executed for each request.  This approach is
-     dramatically faster than the string substitution approach used by many
+     The code is then executed for each request.  This approach is
+     dramatically faster than the string-substitution approach used by many
      templating engines.
 
-\item providing a very simple, yet powerful, caching mechanism that can
-     significantly increase the responsiveness of a dynamic website.
+\item providing a very simple--yet powerful--caching mechanism that can
+     significantly increase the responsiveness of a dynamic web site.
 
 \end{itemize}
+
+Cheetah's Template Definition Language is robust but limited.  It's
+\bf{robust} because your templates can have named portions (''blocks'') which
+you can override individually, conditional portions (displayed only if X is
+true), and repeated portions (equivalent to ''for'' loops).  While the
+\code{\%} operator looks up placeholders in a single flat dictionary, Cheetah
+looks them up in a user-supplied list of objects (the SearchList).  The
+searchable objects can be instances or dictionaries--Cheetah will search
+attributes and/or keys as appropriate.  A neat trick is to subclass the
+template object, assign your data values as attributes, and put 'self' in the
+SearchList!  But the language is \bf{limited} because it's meant to complement
+Python, not replace it.  A placeholder may be a method call or an
+attribute.subattribute, but it may not be an expression with operators.
+Complex calculations should be done outside the template and the results
+assigned to simple attributes in the SearchList.
 
 
 
@@ -154,7 +170,9 @@ Cheetah achieves these aims by:
 \subsection{Why is it called Cheetah?}
 \label{intro.name}
 
-Cheetah is fast, flexible, and powerful - like its namesake. 
+Cheetah is fast, flexible, agile and graceful - like its namesake. 
+
+[INSERT: picture of a cheetah.]
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -162,38 +180,27 @@ Cheetah is fast, flexible, and powerful - like its namesake.
 \label{intro.developers}
 
 Cheetah is one of several templating frameworks that grew out of a 'templates'
-thread on the 'Webware For Python' email list.  Tavis Rudd, Mike Orr, Chuck
+thread on the Webware For Python email list.  Tavis Rudd, Mike Orr, Chuck
 Esterbrook, Ian Bicking and Tom Schwaller are the core developers.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{How mature is Cheetah?}
 \label{intro.mature}
 
-Cheetah is alpha/beta software as this User's Guide is incomplete and several
-aspects of the design are still subject to change. We are hoping to release
-production version 1.0 in the summer of 2001.
-
-Here's a summary of known issues and aspects of the design that are in flux.
-\begin{itemize}
-\item The \#include directive is not working with relative path file includes
-     when used with Webware. This should be resolved soon.
-\item The \#include directive is being reworked to monitor for changes in the
-     included file at run-time. It currently does the include once-off at
-     compile-time.
-\end{itemize}
+Cheetah is alpha-level software because the user interface is still evolving.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Where can I get releases?}
 \label{intro.releases}
 
-Cheetah releases can be downloaded from
+Download Cheetah releases from
 \url{http://CheetahTemplate.sourceforge.net}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Where can I get news?}
 \label{intro.news}
 
-News and updates can be obtained from the the Cheetah website:
+News and updates can be obtained from the the Cheetah web site:
 \url{http://CheetahTemplate.sourceforge.net}
 
 Cheetah discussions take place on the list
@@ -224,12 +231,12 @@ with the following information:
 \end{enumerate}
 
 \subsubsection{Example sites and tutorials}
-If you're developing a website with Cheetah, please send a link to the
+If you're developing a web site with Cheetah, please send a link to the
 email list so we can keep track of Cheetah sites.  Also, if you discover
 new and interesting ways to use Cheetah please share your experience and
 write a quick tutorial about your technique.
 
-\subsubsection{Macro libraries}
+\subsubsection{Macro libraries and function libraries}
 We hope to build up a framework of macros libraries (see section
 \ref{macros.libraries}) to distribute with Cheetah and would appreciate
 any contributions.
@@ -255,7 +262,7 @@ Bitorika, Jeremiah Bellomy, Baruch Even, Paul Boddie, Stephan Diehl, and Geir
 Magnusson.
     
 The Velocity, WebMacro and Smarty projects provided inspiration and design
-ideas.  Cheetah has benefited from the creativity and energy of their
+ideas.  Cheetah has benefitted from the creativity and energy of their
 developers. Thank you.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
