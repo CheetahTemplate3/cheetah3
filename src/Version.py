@@ -1,1 +1,1 @@
-from _properties import Version
+Version = '0.9.16'
