@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.44 2001/08/16 22:20:37 tavis_rudd Exp $
+# $Id: Template.py,v 1.45 2001/08/16 23:28:01 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.44 $
+Version: $Revision: 1.45 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/16 22:20:37 $
+Last Revision Date: $Date: 2001/08/16 23:28:01 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.44 $"[11:-2]
+__version__ = "$Revision: 1.45 $"[11:-2]
 
 
 ##################################################
@@ -154,7 +154,7 @@ class Template(SettingsManager, Parser):
         
         ## Read in the Template Definition
         #  unravel whether the user passed in a string, filename or file object.
-        self._fileName = None
+        self._filePath = None
         self._fileMtime = None
         file = kw.get('file', None)
         if templateDef and file:
@@ -168,7 +168,7 @@ class Template(SettingsManager, Parser):
             f = open(file) # Raises IOError.
             templateDef = f.read()
             f.close()
-            self._fileName = file
+            self._filePath = file
             self._fileMtime = os.path.getmtime(file)
             ## @@ add the code to do file modification checks and updates
             
@@ -297,16 +297,26 @@ class Template(SettingsManager, Parser):
         generatedFunction = self._codeGenerator( self._templateDef )
         self.__str__ = self._bindFunctionAsMethod( generatedFunction )
         self.respond = self._bindFunctionAsMethod( generatedFunction )
-        self._cleanupProcessors()
-            
+        
         if not self._settings['debug']:
             del self._codeGeneratorResults
             del self._templateDef
-            del self._cheetahBlocks
-            del self._perResponseSetupCodeChunks
-            del self._localVarsList
-            # but don't delete self._generatedCode!
+            self._cheetahBlocks.clear()
+            # but don't delete self._generatedCode
 
+    def recompileFromFile(self, path):
+        
+        """Get an updated templateDef from the specified file. This method is
+        used when a file the templateObj is bound to is updated."""
+
+        path = self.normalizePath(path)
+        f = open(path) # Raises IOError.
+        self._templateDef = f.read()
+        f.close()
+        self._filePath = path
+        self._fileMtime = os.path.getmtime(path)
+        self.compileTemplate()
+        
     ##################################################
     ## internal methods -- not to be called by end-users
             
@@ -412,7 +422,11 @@ class Template(SettingsManager, Parser):
         #end of self._setupTagProcessors()
 
     def _cleanupProcessors(self):
-        """Cleanup after compiling."""
+        
+        """Cleanup after the tag processors.  Don't call this before shutdown if
+        you want to be able to recompile with a new templateDef or monitor for
+        file updates."""
+        
         for key, processor in self._processors.items():
             processor.shutdown()
         self._processors.clear()
@@ -517,6 +531,9 @@ class Template(SettingsManager, Parser):
             indent = settings['indentationStep']
             generatedCode = \
                           "def generatedFunction(self, trans=None, iAmNested=False," + \
+                          "getmtime=os.path.getmtime,\n " + \
+                          "filePath=self._filePath,\n " + \
+                          "fileMtime=self._fileMtime,\n " + \
                           "format=self._initialFormatter,\n " + \
                           "searchList=self._searchList, " + \
                           "setVars=self._setVars,\n " + \
@@ -528,6 +545,9 @@ class Template(SettingsManager, Parser):
                           "):\n" \
                           + indent * 1 + "try:\n" \
                           + indent * 2 + "#setupCodeInsertMarker\n" \
+                          + indent * 2 + "if filePath and getmtime(filePath) > fileMtime:\n"\
+                          + indent * 3 + "self.recompileFromFile(filePath)\n"\
+                          + indent * 3 + "return self.respond(trans=trans, iAmNested=iAmNested)\n"\
                           + indent * 2 + "if checkForCacheRefreshes:\n"\
                           + indent * 3 + "currTime = currentTime()\n"\
                           + indent * 3 + "timedRefreshList.sort()\n"\
@@ -786,6 +806,7 @@ class Template(SettingsManager, Parser):
     def shutdown(self):
         """Make sure all reference cycles have been broken this object is
         deleted. """
+        self._cleanupProcessors()
         
         for key in dir(self):
             setattr(self, key, None)
