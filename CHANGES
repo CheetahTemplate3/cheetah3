@@ -1,6 +1,10 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
+0.9.15rc2 (Mar 23, 2003)
+  - Fixed a python version dependency bug related to Compiler.py's use of 
+    isinstance() [TR]
+
 0.9.15rc1 (Mar 21, 2003)
   This is just 0.9.15b1 renamed.
 
