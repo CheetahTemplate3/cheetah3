@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.30 2002/08/19 02:56:04 hierro Exp $
+# $Id: Servlet.py,v 1.31 2002/09/29 23:54:33 hierro Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.30 $
+Version: $Revision: 1.31 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2002/08/19 02:56:04 $
+Last Revision Date: $Date: 2002/09/29 23:54:33 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.30 $"[11:-2]
+__revision__ = "$Revision: 1.31 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -84,8 +84,10 @@ class Servlet(BaseServlet):
         self.response = response = transaction.response
         self.request = transaction.request
 
-        # temporary hack to accomodate bug in WebKit.Servlet.Servlet.serverSidePath
-        # this attribute WILL disappear in the future
+        # Temporary hack to accomodate bug in
+        # WebKit.Servlet.Servlet.serverSidePath: it uses 
+        # self._request even though this attribute does not exist.
+        # This attribute WILL disappear in the future.
         self._request = transaction.request()
 
         
