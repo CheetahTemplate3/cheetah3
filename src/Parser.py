@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.25 2001/10/12 02:57:01 tavis_rudd Exp $
+# $Id: Parser.py,v 1.26 2001/10/25 21:10:51 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.25 $
+Version: $Revision: 1.26 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/10/12 02:57:01 $
+Last Revision Date: $Date: 2001/10/25 21:10:51 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.25 $"[11:-2]
+__version__ = "$Revision: 1.26 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -266,7 +266,6 @@ class _LowLevelSemanticsParser(Lexer):
     def configureParser(self):
         self.makeCheetahVarREs()
         self.makeCommentREs()
-        self.makeMultiLineCommentREs()
         self.makeDirectiveREs()
         self.makePspREs()
         self._possibleNonStrConstantChars = (
@@ -326,10 +325,12 @@ class _LowLevelSemanticsParser(Lexer):
             validCharsLookAhead)
 
     def makeCommentREs(self):
+        """Construct the regex bits that are used in comment parsing."""
+        
         startTokenEsc = escapeRegexChars(self.setting('commentStartToken'))
         self.commentStartTokenRE = re.compile(escCharLookBehind + startTokenEsc)
+        del startTokenEsc
         
-    def makeMultiLineCommentREs(self):
         startTokenEsc = escapeRegexChars(
             self.setting('multiLineCommentStartToken'))
         endTokenEsc = escapeRegexChars(
@@ -341,7 +342,7 @@ class _LowLevelSemanticsParser(Lexer):
         
     def makeDirectiveREs(self):
         
-        """Construct the regex bits that are used in directive parsing."""
+        """Construct the regexs that are used in directive parsing."""
         
         startToken = self.setting('directiveStartToken')
         endToken = self.setting('directiveEndToken')
@@ -920,49 +921,58 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
 
     def initDirectives(self):
         self.directiveEaters = {
-            'breakpoint':self.eatBreakPoint,
-            'compiler-settings':self.eatCompilerSettings,
-            'settings':self.eatSettings,
-            
-            'shBang': self.eatShbang,
+
+            # importing and inheritance
             'import':self.eatImport,
             'from':self.eatImport,
             'extends': self.eatExtends,
             'implements': self.eatImplements,
-            
+
+            # output, filtering, and caching
             'slurp': self.eatSlurp,
             'raw': self.eatRaw,
             'include': self.eatInclude,
-            
             'cache': self.eatCache,
             'filter': self.eatFilter,
+            'echo': self.eatEcho,
+            'silent': self.eatSilent,
 
+            # declaration and assignment
             'attr':self.eatAttr,
             'def': self.eatDef,
             'block': self.eatBlock,
-
-            'silent': self.eatSilent,
-            'echo': self.eatEcho,
-            
             'set': self.eatSet,
+            'settings':self.eatSettings,
             
+            # flow control
             'while': self.eatWhile,
             'for': self.eatFor,
             'if': self.eatIf,
             'else': self.eatElse,
             'elif': self.eatElse,
-
             'pass': self.eatPass,
             'break': self.eatBreak,
             'continue': self.eatContinue,
             'stop': self.eatStop,
 
+            # little wrappers
+            'repeat': self.eatRepeat,
+            'unless': self.eatUnless,
+
+            # error handling
             'assert': self.eatAssert,
             'raise': self.eatRaise,
             'try': self.eatTry,
             'except': self.eatExcept,
             'finally': self.eatFinally,
             'errorCatcher':self.eatErrorCatcher,
+
+            # intructions to the parser and compiler
+            'breakpoint':self.eatBreakPoint,
+            'compiler-settings':self.eatCompilerSettings,
+
+            # misc
+            'shBang': self.eatShbang,
             
             'end': self.eatEndDirective,
             }
@@ -980,6 +990,10 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             'for': self.eatEndFor,
             'if': self.eatEndIf,
             'try': self.eatEndIf,
+            
+            'repeat': self.eatEndRepeat,
+            'unless': self.eatEndUnless,
+            
             }
 
     ## main parse loop
@@ -1571,14 +1585,25 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
     def eatStop(self):
         self.addStop(self.eatSimpleExprDirective())
 
-    ## end directive eaters
-
-    def eatDedentDirective(self, lineClearToStartToken=False):        
+    def eatRepeat(self):
+        lineClearToStartToken = self.lineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
-        self.getExpression()
+        self.getDirectiveStartToken()
+        self.advance(len('repeat'))
+        expr = self.getExpression()
         self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
-        self.commitStrConst()            
-        self.dedent()
+        self.addFor('for i in range(' + expr + ')')
+
+    def eatUnless(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        self.getDirectiveStartToken()
+        self.advance(len('unless'))
+        expr = self.getExpression()
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.addIf('if not ' + expr)
+
+    ## end directive eaters
 
     def eatEndDef(self, lineClearToStartToken=False):
         endOfFirstLinePos = self.findEOL()
@@ -1613,8 +1638,6 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         if self.setting('outputRowColComments'):
             self.appendToPrevChunk(' at line, col '+ str(lineCol) + '.')
 
-
-
     def eatEndCache(self, lineClearToStartToken=False):
         endOfFirstLinePos = self.findEOL()
         self.getExpression()
@@ -1633,19 +1656,22 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
         self.turnErrorCatcherOff()
 
-    def eatEndWhile(self, lineClearToStartToken=False):
-        self.eatDedentDirective(lineClearToStartToken=lineClearToStartToken)
-    
-    def eatEndIf(self, lineClearToStartToken=False):
-        self.eatDedentDirective(lineClearToStartToken=lineClearToStartToken)
+    def eatDedentDirective(self, lineClearToStartToken=False):        
+        endOfFirstLinePos = self.findEOL()
+        self.getExpression()
+        self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        self.commitStrConst()            
+        self.dedent()
 
-    def eatEndFor(self, lineClearToStartToken=False):
-        self.eatDedentDirective(lineClearToStartToken=lineClearToStartToken)
-
-    def eatEndTry(self, lineClearToStartToken=False):
-        self.eatDedentDirective(lineClearToStartToken=lineClearToStartToken)
-
+    # aliases
+    eatEndWhile = eatDedentDirective
+    eatEndIf = eatDedentDirective
+    eatEndFor = eatDedentDirective
+    eatEndTry = eatDedentDirective
+    eatEndRepeat = eatDedentDirective
+    eatEndUnless = eatDedentDirective
 
 ##################################################
-## Make an alias to export        
+## Make an alias to export
+    
 Parser = _HighLevelSemanticsParser
