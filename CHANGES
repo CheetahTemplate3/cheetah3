@@ -2,6 +2,10 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 0.9.16a1 (??? 2003)
+  - fixed a unicode bug in Compiler.py [TR]
+  - added new EncodeUnicode filter that Rene Pijlman contributed (I optimized it
+    slightly) and made it the default filter for all templates. [TR]
+  - added test cases for handling unicode with the default filter [TR]
   - fixed a caching bug related to the #include directive. Thanks to Michael
     Engelhart for reporting it.[TR]
   - added the new #encoding directive to handle PEP 263
