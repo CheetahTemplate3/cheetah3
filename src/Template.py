@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.73 2001/11/24 04:41:54 tavis_rudd Exp $
+# $Id: Template.py,v 1.74 2001/11/24 04:42:47 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.73 $
+Version: $Revision: 1.74 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/24 04:41:54 $
+Last Revision Date: $Date: 2001/11/24 04:42:47 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.73 $"[11:-2]
+__version__ = "$Revision: 1.74 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -270,10 +270,10 @@ class Template(SettingsManager, Servlet):
             else:
                 raise
     
-    def varExists(self, varName):
+    def varExists(self, varName, autoCall=True):
         """Test if a variable name exists in the searchList."""
         try:
-            VFS(self.searchList(), varName.replace('$',''))
+            VFS(self.searchList(), varName.replace('$',''), autoCall)
             return True
         except NotFound:
             return False
