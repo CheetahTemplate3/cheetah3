@@ -89,7 +89,10 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
     }
     if (executeCallables && PyCallable_Check(nextVal) && (!PyInstance_Check(nextVal)) 
 	&& (!PyClass_Check(nextVal)) ) {
-      currentVal = PyObject_CallObject(nextVal, NULL);
+      if (!(currentVal = PyObject_CallObject(nextVal, NULL))){
+	Py_DECREF(nextVal);
+	return NULL;
+      };
       Py_DECREF(nextVal);
     } else {
       currentVal = nextVal;
@@ -244,9 +247,11 @@ namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
   if (theValue) {
     free(nameCopy);
     return theValue;
-  } else {
+  } else if (PyErr_Occurred() == NotFound) {
     free(nameCopy);
     notFound(name);
+  } else {
+    return NULL;
   }
 }
 
