@@ -1,21 +1,25 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.1 2002/10/20 09:18:44 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.2 2002/10/20 19:55:24 hierro Exp $
 """Tests for the 'cheetah' command.
 
 Besides unittest usage, recognizes the following options:
     --list CheetahWrapper.py
         List all scenarios that are tested.  The argument is the path
         of this script.
+     --nodelete
+        Don't delete scratch directory at end.
+     --output
+        Show the output of each subcommand.  (Normally suppressed.)
 
 Meta-Data
 ================================================================================
 Author: Mike Orr <iron@mso.oz.net>,
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2002/10/20 09:18:44 $
+Last Revision Date: $Date: 2002/10/20 19:55:24 $
 """
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.1 $"[11:-2]
+__revision__ = "$Revision: 1.2 $"[11:-2]
 
 
 ##################################################
@@ -36,7 +40,7 @@ except NameError:
     True, False = (1==1),(1==0)
 
 DELETE = True # True to clean up after ourselves, False for debugging.
-VERBOSE = False # Normally False, True for debugging.
+OUTPUT = False # Normally False, True for debugging.
 
 def warn(msg):
     sys.stderr.write(msg + '\n')
@@ -158,7 +162,7 @@ Found %(result)r"""
         # non-Unix platforms.
         exit, output = commands.getstatusoutput(cmd)
         status, signal = divmod(exit, 256)
-        if VERBOSE:
+        if OUTPUT:
             if output.endswith("\n"):
                 output = output[:-1]
             print
@@ -191,7 +195,7 @@ Found %(result)r"""
         self.failUnlessEqual(signal, 0, msg)
         msg = "subcommand exit status %s: %s" % (status, cmd)
         self.failUnlessEqual(status, 0, msg)
-        if VERBOSE:
+        if OUTPUT:
             if output.endswith("\n"):
                 output = output[:-1]
             print
@@ -203,46 +207,124 @@ Found %(result)r"""
 ##################################################
 ## TEST CASE CLASSES
 
-class CompileTests(CFBase):
-    # Compile one file.
-    def test1a(self):
+class OneFile(CFBase):
+    def testCompile(self):
         self.go("cheetah compile a.tmpl")
         self.checkCompile("a.py")
 
-    def test1b(self):
+    def testFill(self):
+        self.go("cheetah fill a.tmpl")
+        self.checkFill("a.html")
+
+    def testText(self):
+        self.go("cheetah fill --oext txt a.tmpl")
+        self.checkFill("a.txt")
+
+
+class OneFileNoExtension(CFBase):
+    def testCompile(self):
         self.go("cheetah compile a")
         self.checkCompile("a.py")
 
-    def test1c(self):
+    def testFill(self):
+        self.go("cheetah fill a")
+        self.checkFill("a.html")
+
+    def testText(self):
+        self.go("cheetah fill --oext txt a")
+        self.checkFill("a.txt")
+
+
+class SplatTmpl(CFBase):
+    def testCompile(self):
         self.go("cheetah compile *.tmpl")
         self.checkCompile("a.py")
 
-    # Compile three files with subdirectories.
-    def test2a(self):
+    def testFill(self):
+        self.go("cheetah fill *.tmpl")
+        self.checkFill("a.html")
+
+    def testText(self):
+        self.go("cheetah fill --oext txt *.tmpl")
+        self.checkFill("a.txt")
+
+class ThreeFilesWithSubdirectories(CFBase):
+    def testCompile(self):
         self.go("cheetah compile a.tmpl child/a.tmpl child/grandkid/a.tmpl")
         self.checkCompile("a.py")
         self.checkCompile("child/a.py")
         self.checkCompile("child/grandkid/a.py")
 
-    def test2b(self):
+    def testFill(self):
+        self.go("cheetah fill a.tmpl child/a.tmpl child/grandkid/a.tmpl")
+        self.checkFill("a.html")
+        self.checkFill("child/a.html")
+        self.checkFill("child/grandkid/a.html")
+
+    def testText(self):
+        self.go("cheetah fill --oext txt a.tmpl child/a.tmpl child/grandkid/a.tmpl")
+        self.checkFill("a.txt")
+        self.checkFill("child/a.txt")
+        self.checkFill("child/grandkid/a.txt")
+
+
+class ThreeFilesWithSubdirectoriesNoExtension(CFBase):
+    def testCompile(self):
         self.go("cheetah compile a child/a child/grandkid/a")
         self.checkCompile("a.py")
         self.checkCompile("child/a.py")
         self.checkCompile("child/grandkid/a.py")
 
-    def test2c(self):
+    def testFill(self):
+        self.go("cheetah fill a child/a child/grandkid/a")
+        self.checkFill("a.html")
+        self.checkFill("child/a.html")
+        self.checkFill("child/grandkid/a.html")
+
+    def testText(self):
+        self.go("cheetah fill --oext txt a child/a child/grandkid/a")
+        self.checkFill("a.txt")
+        self.checkFill("child/a.txt")
+        self.checkFill("child/grandkid/a.txt")
+
+
+class SplatTmplWithSubdirectories(CFBase):
+    def testCompile(self):
         self.go("cheetah compile *.tmpl child/*.tmpl child/grandkid/*.tmpl")
         self.checkCompile("a.py")
         self.checkCompile("child/a.py")
         self.checkCompile("child/grandkid/a.py")
 
-    # Test --odir.
-    def test3a(self):
+    def testFill(self):
+        self.go("cheetah fill *.tmpl child/*.tmpl child/grandkid/*.tmpl")
+        self.checkFill("a.html")
+        self.checkFill("child/a.html")
+        self.checkFill("child/grandkid/a.html")
+
+    def testText(self):
+        self.go("cheetah fill --oext txt *.tmpl child/*.tmpl child/grandkid/*.tmpl")
+        self.checkFill("a.txt")
+        self.checkFill("child/a.txt")
+        self.checkFill("child/grandkid/a.txt")
+
+
+class OneFileWithOdir(CFBase):
+    def testCompile(self):
         self.go("cheetah compile --odir DEST a.tmpl")
         self.checkSubdirPyInit("DEST")
         self.checkCompile("DEST/a.py")
 
-    def test3b(self):
+    def testFill(self):
+        self.go("cheetah fill --odir DEST a.tmpl")
+        self.checkFill("DEST/a.html")
+
+    def testText(self):
+        self.go("cheetah fill --odir DEST --oext txt a.tmpl")
+        self.checkFill("DEST/a.txt")
+
+
+class VarietyWithOdir(CFBase):
+    def testCompile(self):
         self.go("cheetah compile --odir DEST a.tmpl child/a child/grandkid/*.tmpl")
         self.checkSubdirPyInit("DEST")
         self.checkSubdirPyInit("DEST/child")
@@ -251,86 +333,13 @@ class CompileTests(CFBase):
         self.checkCompile("DEST/child/a.py")
         self.checkCompile("DEST/child/grandkid/a.py")
 
-
-
-class FillTests(CFBase):
-    def test1a(self):
-        self.go("cheetah fill a.tmpl")
-        self.checkFill("a.html")
-
-    def test1b(self):
-        self.go("cheetah fill a")
-        self.checkFill("a.html")
-
-    def test1c(self):
-        self.go("cheetah fill *.tmpl")
-        self.checkFill("a.html")
-
-    def test2a(self):
-        self.go("cheetah fill a.tmpl child/a.tmpl child/grandkid/a.tmpl")
-        self.checkFill("a.html")
-        self.checkFill("child/a.html")
-        self.checkFill("child/grandkid/a.html")
-
-    def test2b(self):
-        self.go("cheetah fill a child/a child/grandkid/a")
-        self.checkFill("a.html")
-        self.checkFill("child/a.html")
-        self.checkFill("child/grandkid/a.html")
-
-    def test2c(self):
-        self.go("cheetah fill *.tmpl child/*.tmpl child/grandkid/*.tmpl")
-        self.checkFill("a.html")
-        self.checkFill("child/a.html")
-        self.checkFill("child/grandkid/a.html")
-
-    def test3a(self):
-        self.go("cheetah fill --odir DEST a.tmpl")
-        self.checkFill("DEST/a.html")
-
-    def test3b(self):
+    def testFill(self):
         self.go("cheetah fill --odir DEST a.tmpl child/a child/grandkid/*.tmpl")
         self.checkFill("DEST/a.html")
         self.checkFill("DEST/child/a.html")
         self.checkFill("DEST/child/grandkid/a.html")
 
-
-class FillTextTests(CFBase):
-    def test1a(self):
-        self.go("cheetah fill --oext txt a.tmpl")
-        self.checkFill("a.txt")
-
-    def test1b(self):
-        self.go("cheetah fill --oext txt a")
-        self.checkFill("a.txt")
-
-    def test1c(self):
-        self.go("cheetah fill --oext txt *.tmpl")
-        self.checkFill("a.txt")
-
-    def test2a(self):
-        self.go("cheetah fill --oext txt a.tmpl child/a.tmpl child/grandkid/a.tmpl")
-        self.checkFill("a.txt")
-        self.checkFill("child/a.txt")
-        self.checkFill("child/grandkid/a.txt")
-
-    def test2b(self):
-        self.go("cheetah fill --oext txt a child/a child/grandkid/a")
-        self.checkFill("a.txt")
-        self.checkFill("child/a.txt")
-        self.checkFill("child/grandkid/a.txt")
-
-    def test2c(self):
-        self.go("cheetah fill --oext txt *.tmpl child/*.tmpl child/grandkid/*.tmpl")
-        self.checkFill("a.txt")
-        self.checkFill("child/a.txt")
-        self.checkFill("child/grandkid/a.txt")
-
-    def test3a(self):
-        self.go("cheetah fill --odir DEST --oext txt a.tmpl")
-        self.checkFill("DEST/a.txt")
-
-    def test3b(self):
+    def testText(self):
         self.go("cheetah fill --odir DEST --oext txt a.tmpl child/a child/grandkid/*.tmpl")
         self.checkFill("DEST/a.txt")
         self.checkFill("DEST/child/a.txt")
@@ -358,13 +367,38 @@ def listTests(cheetahWrapperFile):
 ##################################################
 ## MAIN ROUTINE ##
 
+class MyOptionParser(OptionParser):
+    """Disable the standard --help and --verbose options since
+       --help is used for another purpose.
+    """
+    standard_option_list = []
+
 def main():
-    parser = OptionParser()
-    parser.add_option("--list", action="store", dest="listTests", default=None)
+    global DELETE, OUTPUT
+    parser = MyOptionParser()
+    parser.add_option("--list", action="store", dest="listTests")
+    parser.add_option("--nodelete", action="store_true")
+    parser.add_option("--output", action="store_true")
+    # The following options are passed to unittest.
+    parser.add_option("-e", "--explain", action="store_true")
+    parser.add_option("-h", "--help", action="store_true")
+    parser.add_option("-v", "--verbose", action="store_true")
+    parser.add_option("-q", "--quiet", action="store_true")
     opts, files = parser.parse_args()
+    if opts.nodelete:
+        DELETE = False
+    if opts.output:
+        OUTPUT = True
     if opts.listTests:
         listTests(opts.listTests)
     else:
+        # Eliminate script-specific command-line arguments to prevent
+        # errors in unittest.
+        del sys.argv[1:]
+        for opt in ("explain", "help", "verbose", "quiet"):
+            if getattr(opts, opt):
+                sys.argv.append("--" + opt)
+        sys.argv.extend(files)
         unittest.main()
         
 ##################################################
