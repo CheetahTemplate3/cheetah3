@@ -1,5 +1,8 @@
 Please initial your changes and add a date for each release
 ================================================================================
+0.9.9a5 (October 31, 2001) 
+   - fixed a bug I created yesterday (TR)
+
 0.9.9a4 (October 30, 2001) 
    - added #repeat (TR implementing Chuck's suggestion)
    - added #unless (TR implementing Mike's suggestion)

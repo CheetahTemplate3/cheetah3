@@ -162,14 +162,15 @@ FILENAME.py contains.} For this reason, you should make changes to the
 automatically backed up with the extension \code{.py\_bak}.
 
 For the same reason, if your template requires custom Python methods or
-other Python code, don't put it in the FILENAME.py file.  Instead, put
-it in a separate base class and use the \code{#extends} directive in the
+other Python code, don't put it in the \code{FILENAME.py} file.  Instead, put
+it in a separate base class and use the \code{\#extends} directive in the
 template definition to indicate the superclass.  Or put the Python code
 in the calling routine (the routine that instantiates and uses the template
 object).
 
 %% @@MSO: Not using the term '.tmpl/.py servlet files' here because they
 %% aren't necessarily Webware servlets.
+%% @@TR: but it might be best for simplicity to assume that
 
 % Local Variables:
 % TeX-master: "users_guide"
