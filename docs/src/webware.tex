@@ -6,38 +6,124 @@
 \subsection{Background}
 \label{webware.background}
 
-Webware is a 'Python-Powered Internet Platform' that uses servlets in a manner
-similar to Java servlets.  'WebKit' is the name of Webware's application server.
-For more details please visit http://webware.sourceforge.net.
+{\bf Webware} is a 'Python-Powered Internet Platform' that uses servlets in a
+manner similar to Java servlets.  {\bf WebKit} is the name of Webware's
+application server.  For more details please visit
+\url{http://webware.sourceforge.net}.
 
 As Cheetah's core is flexible there are many ways to use it with Webware
-servlets.  There are two broad categories: the Inheritance approach and
-the Containment approach.  In the Inheritance approach a servlet is created that
-subclasses both the Template class and Webware's HTTPServlet class.  The
-Template instance IS the servlet and its .respond() method is
+servlets.  There are two broad categories: the {\bf Inheritance} approach and the
+{\bf Containment} approach.  In the Inheritance approach a servlet is created that
+subclasses both the \code{Template} class and Webware's \code{HTTPServlet}
+class.  The Template object {\em IS} the servlet and its \code{.respond()} method is
 automatically called by WebKit for each request.  All pre-request processing is
 handled via Cheetah.
 
-In the Containment approach an instance of the Template class is wrapped
-up inside of a Webware servlet class.  Instances of the servlet class must
-explicitly call the Template instance's .respond(), or .__str__(), method
-for each request.  In this case the servlet class can handle whatever
-per-request processing needs to be done before it calls Cheetah.respond().
+In the Containment approach an instance of the Template class is contained
+inside of a Webware servlet.  The servlet must explicitly call the Template
+object's \code{.respond()}, or \code{.__str__()}, method for each request.  In
+this case the servlet class can handle whatever per-request processing needs to
+be done before it calls Cheetah.respond().
 
 The Inheritance approach is the simplest and is best suited for building sites
-from scratch.
+from scratch. The Containment approach is slightly more complex and is best
+suited for use with existing Webware servlets.  It is also ideal for cases where
+you wish to use Cheetah for only a portion of the servlet's output, such as a
+discussion-forum table at the bottom of a webpage.
 
-The Containment approach is slightly more complex and is best suited for use
-with existing Webware servlets.  It is also ideal for cases where you wish to
-use Cheetah for only a portion of the servlet's output, such as a
-discussion-forum table at the bottom of a webpage. 
+There are two ways to use the Inheritance approach: automatically by creating
+{\bf \code{.tmpl servlet files}} (e.g. ``myTemplate.tmpl'') or manually by
+creating {\bf \code{.py servlet files}} (e.g. ``myServlet.py''). \code{.py
+  servlet files} are Webware's default type of servlet file.  A \code{.tmpl
+  servlet file} is a Cheetah specific type of servlet file that is converted
+automatically into a \code{.py servlet file} that Webware understands.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Using the Inheritance approach}
+\subsection{Using .tmpl servlet files}
+\label{webware.tmpl}
+
+As mentioned above a \code{.tmpl servlet file} is a Cheetah specific type of
+servlet file that is converted automatically, or semi-automatically, into a
+\code{.py servlet file} that Webware understands.  Working with \code{.tmpl
+  servlet files} hides alot of extraneous details and is recommended for Cheetah
+users who don't have a deep understanding of Python.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Converting .tmpl files into .py files}
+\label{webware.tmpl.converting}
+
+There are two ways to convert \code{.tmpl servlet files} into \code{.py servlet
+  files}.  You can let Cheetah's Webware plugin do it automatically when a
+\code{.tmpl servlet file} is requested by a browser. Or you can generate the
+\code{.py servlet files} using \code{cheetah-compile}, a small script that is
+installed with Cheetah.
+
+Cheetah's Webware plugin is being re-designed at the moment.  The redesign will
+be complete for the 0.9.9 release.  Until then use the \code{cheetah-compile}
+script.
+
+\code{cheetah-compile} parses the template definitions written in files with the
+.tmpl extension and generates a \code{.py servlet file} for each \code{.tmpl
+  servlet file}.  On Unix systems, it is installed into a system directory like
+\code{/usr/local/bin}, so you can use it without specifying the absolute path of
+the script.  On Windows systems, you need to specify the full path
+(\code{<cheetahRoot>/bin/cheetah-compile}). Type ``\code{cheetah-compile}'' from the
+command line after installing Cheetah to get usage information.  The most common
+usage is ``\code{cheetah-compile -R .}'', which will convert all the \code{.tmpl
+  servlet file} in the current directory and its subdirectories.
+
+\code{cheetah-compile} overwrites \code{.py servlet files} with the same
+basename as \code{.tmpl servlet files} in a directory. For this reason, you
+should make changes to the \code{.tmpl} version of the template rather than the
+\code{.py} version.  Any \code{.py servlet files} that are about to be
+overwritten will are automatically backed up with the extension \code{.py_bak}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Writing .tmpl servlet files}
+\label{webware.tmpl.writing}
+
+Here's an example \code{.tmpl servlet file} with no Cheetah syntax in it:
+
+\begin{verbatim}
+## FILE: hello_world.tmpl ##
+<HTML>
+<HEAD><TITLE>Hello World - Test Servlet</TITLE></HEAD>
+<BODY>
+Hello World!
+</BODY>
+</HTML>
+\end{verbatim}
+
+Here's the previous example with some Cheetah syntax.  Note that all lines that begin with
+\code{\#\#} are comment lines.
+
+\begin{verbatim}
+## FILE: hello_world.tmpl ##
+##===================================
+#data
+title = 'Hello World - Test Servlet'
+def contents():
+    return 'Hello World!'
+#end data
+##===================================
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+$contents
+</BODY>
+</HTML>
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Using .py servlet files}
 \label{webware.inheritance}
 
-Cheetah.Servlet provides a servlet class that can be subclassed to create 
-Webware servlets, as in the trivial example below.
+When you manually create your Webware \code{.py servlet files} you need to
+include some boiler-plate code that is handled automatically in \code{.tmpl
+  servlet files}. Specifically, you need to create a Python class that inherits
+from Cheetah.Servlet, or a subclass, as in the trivial example below.
 
 \begin{verbatim}
 ## FILE: hello_world.py ##
@@ -81,56 +167,13 @@ class hello_world(TemplateServlet):
 \end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Using .tmpl files}
-\label{webware.inheritance.tmpl}
+\subsection{The SkeletonPage framework}
+\label{webware.skeletonPage}
 
-This process can be simplified for non-programmers. All the Python wrapper code
-in these examples can be generated automatically by \code{cheetah-compile}, a small program
-that is installed with Cheetah. \code{cheetah-compile} parses Template Definitions
-written in files with the .tmpl extension and generates a Webware servlet file
-with the .py extension for each .tmpl file.  Type \code{cheetah-compile} after
-installing Cheetah to get information on how to use it.
-
-Here's the first example as a \code{.tmpl} file:
-
-\begin{verbatim}
-## FILE: hello_world.tmpl ##
-<HTML>
-<HEAD><TITLE>Hello World - Test Servlet</TITLE></HEAD>
-<BODY>
-Hello World!
-</BODY>
-</HTML>
-\end{verbatim}
-
-Here's the second example as a \code{.tmpl} file.  Note that all lines that begin with
-\code{\#\#} are comment lines.
-
-\begin{verbatim}
-## FILE: hello_world.tmpl ##
-##===================================
-#data
-title = 'Hello World - Test Servlet'
-def contents():
-    return 'Hello World!'
-#/data
-##===================================
-<HTML>
-<HEAD><TITLE>$title</TITLE></HEAD>
-<BODY>
-$contents
-</BODY>
-</HTML>
-\end{verbatim}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{The SkeletonPage framework}
-\label{webware.inheritance.skeletonPage}
-
-%\subsubsection{PlateKit}
-%Forget what you knew about PlateKit. It's undergoing some changes and is out of
-%action for the time-being.
+Sect \ref{libraries.templates.skeletonPage} contains information on a stock
+template that greatly simplifies defining the basic HTML structure of your web
+page templates.  It is equivalent to Webware's \code{WebKit.Page} servlet and
+is well worth the time spent learning how to use it.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Using the Containment approach}
@@ -140,6 +183,9 @@ $contents
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{User interaction in either approach}
 \label{webware.userInteraction}
+
+By {\bf user interaction} we mean the use of forms, query strings or sessions to
+create interactive pages that allow user interation with a website.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Components}

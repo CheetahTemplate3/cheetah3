@@ -345,15 +345,19 @@ The \code{\#slurp} directive, which is covered in more depth in section
 \ref{directives.slurp} is a dummy directive that exists only to facilitate
 gobbling of whitespace.
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Function and class libraries}
-%
-%Cheetah comes ``batteries included'' with functions, classes, packages and
-%other objects you can use in your program.  Functions and constants that are
-%also used by Cheetah itself are in the \code{Cheetah.Utilities} module.
-%Functions, classes and packages contributed by third parties are in the
-%\code{Cheetah.Tools} package.  
+\subsubsection{Variables in directives}
+\label{TDL.directives.variables}
 
+In general any variable names used inside a directive tag should be prefaced by
+\$, like in this example:
 
+\begin{verbatim}
+#for $clientName, $address in $clients.addresses()
+$clientName: $address
+#end for
+\end{verbatim}
 
+Arguments to macro definitions with the \code{\#macro} directive are an exception.  You
+should leave off the \$ for now.  This might change in the future, but it will
+be backwards compatible.

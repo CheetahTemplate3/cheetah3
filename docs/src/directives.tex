@@ -36,9 +36,9 @@ comment.
 
 Any section of a Template Definition that is inside a \code{\#raw} ...
 \code{\#end raw} tag pair will be printed verbatim without any parsing of
-\$placeholders or other directives.  This can be very useful for debugging, or
+\$placeholders or other directives. The \code{\#raw} directive is inspired by
+\LaTeX's \code{verbatim} environment.  This can be very useful for debugging, or
 writing Cheetah examples and tutorials.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#for ... \#end for}
@@ -216,25 +216,48 @@ Cheetah!
 
 \code{\#include} directives are used to include text from outside the template
 definition.  The text can come from \code{\$placeholder} variables or from
-external files.  The example below demonstrates use with \code{\$placeholder}
-variables.
+external files.  When working with external files Cheetah will monitor for
+changes to the included file and update as necessary (NOT IMPLEMENTED YET).
+
+This example demonstrates use with \code{\$placeholder} variables:
 
 \begin{verbatim}
 #include $myParseText
 \end{verbatim}
 
-This example demonstrates its use with external files.
+And this demonstrates its use with external files:
 \begin{verbatim}
 #include "includeFileName.txt"
 \end{verbatim}
 
 By default, included text will be parsed for Cheetah tags.  The argument
-{\bf raw} can be used to mark the text for verbatim inclusion without any tag
+``\code{raw}'' can be used to mark the text for verbatim inclusion without any tag
 parsing.
 
 \begin{verbatim}
 #include raw $myParseText
 #include raw "includeFileName.txt"
+\end{verbatim}
+
+By default, Cheetah wraps each chunk of \code{\#include} text inside a nested
+\code{Template} object.  These nested templates share the same \code{searchList}
+and macros as the top-level template. But, unlike PHP, their Cheetah code must be
+self-contained.  For example, all \code{\#for} and \code{\#if} blocks started
+inside an \code{\#include} must be terminated in that include.  The same applies
+for \code{\#data}, \code{\#macro} and \code{\#raw}.  Furthermore, \code{\#set}
+values are only visible inside the included code and \code{\#set} values from
+the top-level template are not visible in the included code.
+
+The argument ``\code{direct}'' can be used to tell Cheetah to parse the included
+code as part the top-level template rather than inside a nested \code{Template}
+object.  In this case, there is no requirement that the included Cheetah code be
+self-contained and \code{\#set} values are visible throughout.  Direct includes
+are also slightly faster.  Note that direct includes cannot monitor for changes
+to the include src file.
+
+\begin{verbatim}
+#include direct $myParseText
+#include direct "includeFileName.txt"
 \end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -268,6 +291,36 @@ $*5*var3            ## timed refresh every 5 minutes
 
 </BODY>
 </HTML>
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#stop}
+\label{directives.stop}
+
+The \code{\#stop} directive is used to stop processing of a template at a
+certain point and return ONLY what has been processed up to that point.
+
+\begin{verbatim}
+the beginning
+#if 1
+  inside the if block
+  #stop
+#end if
+the end
+\end{verbatim}
+
+will print 
+\begin{verbatim}
+the beginning
+  inside the if block
+\end{verbatim}
+
+instead of 
+\begin{verbatim}
+the beginning
+  inside the if block
+the end
 \end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -408,7 +461,7 @@ the author calls macros inside macros (e.g., \code{\#spacer()}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Using existing functions as macros}
-
+\label{directives.macros.existingFunctions}
 Existing functions or object methods may registered as Cheetah macros.  To do
 this, execute one of these statements in your Template subclass or inside a
 \code{\#data} directive.  
@@ -513,7 +566,8 @@ and \ref{directives.extend} for more information.
 \label{directives.macros.libraries}
 
 Cheetah comes ``batteries included'', with a library of useful macros in the
-\code{Cheetah.Macros} package.  
+\code{Cheetah.Macros} package.  See section \ref{libraries.macros} for more
+information.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -642,13 +696,14 @@ inner block2 contents
 #end block outerBlock
 \end{verbatim}
 
-The implementation of \#block is quite simple.  Each block is the template
-definition is replaced with \code{\#include \$cheetahBlocks.<blockName>} and it's
-contents are stored in the dictionary Template._cheetahBlocks using the
-'blockName' as the dictionary key.  To {\bf redefine} the contents of a block
-Cheetah just replaces the blockName's entry in Template._cheetahBlocks.  The
-Template class' \code{redefineBlock(blockName, contents)} or
-\code{killBlock(blockName)} methods provide a easy way to redefine blocks.
+The implementation of \code{\#block} is quite simple.  Each block in the
+template definition is replaced with \code{\#include direct
+  \$cheetahBlocks.<blockName>} and its contents are stored in the dictionary
+\code{Template.\_cheetahBlocks} using the 'blockName' as the dictionary key.  To
+{\bf redefine} the contents of a block Cheetah just replaces the blockName's
+entry in \code{Template.\_cheetahBlocks}.  The Template class'
+\code{redefineBlock(blockName, contents)} and \code{killBlock(blockName)}
+methods provide a easy way to redefine blocks.
 
 Appendix \ref{examples} contains extended examples of how blocks can be used to
 simplify the creation and maintenance of large websites.
@@ -690,13 +745,14 @@ ones, and any other Cheetah syntax, except \code{\#data}, \code{\#macro}, and
 \label{directives.extend}
 
 The \code{\#extend} directive is a wrapper around
-\code{Template.extendTemplate(extensionStr)} that is used with .tmpl and Webware
-(see section \ref{webware} for more). If your .tmpl file contains needs to
-\code{\#redefine} blocks and \code{\#data} from a parent Template, rather than
-define a new top-level template use this directive to specify the Python module
-or .tmpl file that contains the parent Template. 
+\code{Template.extendTemplate(extensionStr)} that is used with Webware and {\bf
+  \code{.tmpl servlet files}} (see section \ref{webware.tmpl} for more). If your
+\code{.tmpl servlet file} needs to \code{\#redefine} blocks and/or \code{\#data}
+from a parent Template, rather than define a new top-level template use this
+directive to specify the Python module or \code{.tmpl servlet file} that
+contains the parent Template.
 
-\code{\#extend <parentTemplateModule>}
+\code{\#extend <parentTemplateFile-withoutTheExtension>}
 
 Appendix \ref{examples} contains extended examples of how \code{\#extend} is
 used.
