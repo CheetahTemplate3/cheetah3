@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.5 2001/08/27 16:22:11 ianbicking Exp $
+# $Id: Compiler.py,v 1.6 2001/08/30 04:45:14 hierro Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/27 16:22:11 $
+Last Revision Date: $Date: 2001/08/30 04:45:14 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -93,7 +93,7 @@ class %(name)s%(gen_ext)s(%(parentServlet)s):
         servletCode += """'''
 from Cheetah.Servlet import TemplateServlet
 
-class %(name)s%s(gen_ext)s(TemplateServlet):
+class %(name)s%(gen_ext)s(TemplateServlet):
     def __init__(self):
         TemplateServlet.__init__(self, template=templateExt)
 
