@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SettingsManager.py,v 1.11 2001/08/30 18:37:18 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.12 2001/08/30 19:32:21 tavis_rudd Exp $
 """Provides a mixin/base class for managing application settings 
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2001/08/30 18:37:18 $
+Last Revision Date: $Date: 2001/08/30 19:32:21 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.11 $"[11:-2]
+__version__ = "$Revision: 1.12 $"[11:-2]
 
 
 ##################################################
@@ -33,7 +33,12 @@ from types import StringType, \
      UnicodeType, \
      DictType
 import types
-from StringIO import StringIO
+
+try:
+    from StringIO import StringIO
+except:
+    from cStringIO import StringIO
+
 import imp                 # used by SettingsManager.updateFromPySrcFile()
 
 try:
