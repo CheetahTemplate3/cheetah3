@@ -13,6 +13,12 @@ release
     triple single quotes followed immediately by another single quote if the
     template def contained a '$placeholder' surrounded in single quotes and
     multiple \n newlines ... plus added new test case.(TR)
+  - Utils.optik: Optik 1.3 package by Gregory P Ward, for parsing
+    command-line options in 'cheetah' comamnd. (MO)
+  - rewrite of the "cheetah" and "cheetah-compile" commands. 
+    The command-line options have changed! (MO)
+  - Utils.dualglob: new module to recursively generate source+destination
+    filenames from command-line filespecs. (MO)
 
 
 0.9.14 (July 14, 2002)

@@ -1,3 +1,5 @@
 #!/usr/bin/env python
-from Cheetah.CheetahCompile import CheetahCompile
-CheetahCompile().run()
+import sys
+from Cheetah.CheetahWrapper import CheetahWrapper
+sys.argv.insert(1, "compile")
+CheetahWrapper().main()
