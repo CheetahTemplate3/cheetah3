@@ -72,6 +72,8 @@ Implementation
   '#del searchList $var["key"]' too.  I don't know about '#del searchList $var':
   that could be hard to implement, but maybe somebody will want it someday.
 
+- Finish up changes to #indent so that it matches the Users' Guide. (MO)
+
 
 Rewrite the caching framework
 =============================
