@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: TagProcessor.py,v 1.8 2001/08/13 01:58:28 tavis_rudd Exp $
+# $Id: TagProcessor.py,v 1.9 2001/08/13 22:14:31 tavis_rudd Exp $
 """Tag Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/13 01:58:28 $
+Last Revision Date: $Date: 2001/08/13 22:14:31 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -98,7 +98,6 @@ class TagProcessor(Parser):
         return "''',])\n" + translatedTag + "outputList.extend(['''"
 
     def wrapEvalTag(self, translatedTag):
-        templateObj = self.templateObj()
         indent = self.setting('indentationStep') * \
                  self.state()['indentLevel']
         return "''',\n" + indent + translatedTag + ", '''"
