@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.2 2002/04/18 23:53:32 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.3 2002/04/18 23:55:08 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
@@ -15,12 +15,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/04/18 23:53:32 $
+Last Revision Date: $Date: 2002/04/18 23:55:08 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.2 $"[11:-2]
+__revision__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -108,5 +108,3 @@ def install ():
 
 if __name__ == '__main__':
     install()
-    import myTest
-    print myTest.myTest()
