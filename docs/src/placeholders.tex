@@ -261,11 +261,12 @@ in place when you create the TO.
 If there is no value defined in the Search List for a placeholder name,
 Cheetah will search for an leading underscore version of the name.  For
 example, if it can't find \code{\$varName} it will attempt to find
-\code{\$\_varName}.  If that fails, Cheetah will include the placeholder
-tag verbatim in the filled template output.
+\code{\$\_varName}.  (This is a provisional feature and may be removed.)
 
-This behaviour can be customized and a default value can be set for names
-that are not found. See section \ref{customizing} for more details.
+If all attempts to find a value fail, Cheetah inserts the placeholder tag
+verbatim in the filled template output.  This behaviour can be customized and a
+default value set for names that are not found.  See section
+\ref{customizing} for more details.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -295,3 +296,14 @@ $*5*var3            ## timed refresh - will be updated every 5 minutes.
 
 You can also use the \code{\#cache ... \#end cache} directive to change the
 caching policy for \$P's with no ``*''.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Function and class libraries}
+
+Cheetah comes ``batteries included'' with functions, classes, packages and
+other objects you can use in your program.  Functions and constants that are
+also used by Cheetah itself are in the \code{Cheetah.Utilities} module.
+Functions, classes and packages contributed by third parties are in the
+\code{Cheetah.Tools} package.  
+

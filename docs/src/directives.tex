@@ -138,20 +138,20 @@ instruction (i.e., those without a ``*'').
 <HEAD><TITLE>$title</TITLE></HEAD>
 <BODY>
 
-$var                ## dynamic - will be reinterpolated for each request
-$*var2              ## static - will be interpolated only once at start-up
-$*5*var3            ## timed refresh - will be updated every 5 minutes.
+\$var                ## dynamic - will be reinterpolated for each request
+\$*var2              ## static - will be interpolated only once at start-up
+\$*5*var3            ## timed refresh - will be updated every 5 minutes.
 
 #cache
-$var                ## static
-$*var2              ## static
-$*5*var3            ## timed refresh
+\$var                ## static
+\$*var2              ## static
+\$*5*var3            ## timed refresh
 #end cache
 
 #cache 0.5
-$var                ## timed refresh every 30 seconds (0.5 minutes)
-$*var2              ## static
-$*5*var3            ## timed refresh every 5 minutes
+\$var                ## timed refresh every 30 seconds (0.5 minutes)
+\$*var2              ## static
+\$*5*var3            ## timed refresh every 5 minutes
 #end cache
 
 
@@ -168,6 +168,9 @@ Definition.  The code is in full Python syntax.  It is run in the namespace of
 the Template Object (that is, its \code{self} attribute).  Since the Template
 Object is always a Namespace in the Search List, any variable assignments in a
 \code{\#data} section may be referred to in Placeholder Tags!
+
+You must use Python variable names inside a \code{\#data} section--you may not
+use placeholders.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#extend}
