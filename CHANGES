@@ -17,6 +17,14 @@ release
     being shared between calls and thus leading to parsing errors as reported by
     Greg Czajkowski (TR)
   - Filter: fixed an '== None' expression (should be 'is None'). (MO)
+  - TemplateMisc: new base class for Template.  This is for optional
+    convenience methods that don't require Webware. (MO)
+  - Enhancements for CGI scripts: new methods .isCgi, .cgiHeaders and
+    .cgiHeadersHook in TemplateMisc; updated .cgiImport in Utils.CGIImportMixin
+    to handle GET/POST variables from CGI scripts as well as from Webware. (MO)
+  - User's Guide: new sections "Non-Webware HTML Output" and "Non-HTML
+    Output". (MO)
+
 
 0.9.13 (May 8, 2002)
   - changed Cheetah.Servlet.isRunningFromWebKit to isWebwareInstalled (TR)
