@@ -1,9 +1,13 @@
 Please initial your changes (there's a key at bottom) and add a date for each release
 ================================================================================
 
+0.9.13b1 (unreleased)
+  - fixed a silly buglet that resulted in StringIO being used instead of
+    cStringIO (TR)
+
 0.9.12 (April 3, 2002)
    - no code changes from beta 2
-   - a few alterations to the docs (MO)
+   - more work on the docs (MO)
 
 0.9.12b2 (Mar 28, 2002)
    - fixed Win32 path bug in Template._makeDummyPackageForDir() (TR)
