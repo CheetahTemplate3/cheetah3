@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.49 2003/12/03 04:53:11 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.50 2004/12/15 23:27:00 jjinux Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.49 $
+Version: $Revision: 1.50 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2003/12/03 04:53:11 $
+Last Revision Date: $Date: 2004/12/15 23:27:00 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.49 $"[11:-2]
+__revision__ = "$Revision: 1.50 $"[11:-2]
 
 
 ##################################################
@@ -112,6 +112,7 @@ defaultTestNameSpace = {
         ],
     'nameList': [('john', 'doe'), ('jane', 'smith')],
     'letterList': ['a', 'b', 'c'],
+    '_': lambda x: x,
     'unicodeData':u'aoeu12345\u1234',
     }
 
@@ -538,6 +539,15 @@ class Placeholders_Vals(OutputTest):
         """True, False
         """
         self.verify("$True $False", "1 0")
+
+    def test9(self):
+        """$_ should not do a namespace lookup
+        """
+        def test(self=self):
+            self.verify("$_('gettext')", "")
+
+        self.assertRaises(NameError,test)
+            
 
 class UnicodeStrings(OutputTest):
     def test1(self):
