@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: VerifyType.py,v 1.1 2001/11/08 06:24:09 hierro Exp $
+# $Id: VerifyType.py,v 1.2 2001/12/19 02:10:25 tavis_rudd Exp $
 """Functions to verify an argument's type
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/11/07
-Last Revision Date: $Date: 2001/11/08 06:24:09 $
+Last Revision Date: $Date: 2001/12/19 02:10:25 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__revision__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES

@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: TemplateCmdLineIface.py,v 1.5 2001/12/11 04:41:03 tavis_rudd Exp $
+# $Id: TemplateCmdLineIface.py,v 1.6 2001/12/19 02:10:25 tavis_rudd Exp $
 
 """Provides a command line interface to compiled Cheetah template modules.
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/12/06
-Last Revision Date: $Date: 2001/12/11 04:41:03 $
+Last Revision Date: $Date: 2001/12/19 02:10:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -28,7 +28,7 @@ except ImportError:
 
 
 #intra-package imports ...
-from Version import version
+from _properties import Version
 
 ##################################################
 ## GLOBALS & CONTANTS
@@ -83,7 +83,7 @@ class CmdLineIface:
                     self._template.prependToSearchList( load(a) )
 
     def usage(self):
-        return """Cheetah %(version)s template module command-line interface
+        return """Cheetah %(Version)s template module command-line interface
 
 Usage
 -----
@@ -109,7 +109,7 @@ Python dictionary to the template's $placeholder searchList, overriding the
 defaults for the $placeholders.
 
 """ % {'scriptName':self._scriptName,
-       'version':version,
+       'Version':Version,
        }
 
 

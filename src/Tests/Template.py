@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.3 2001/10/10 06:57:22 tavis_rudd Exp $
+# $Id: Template.py,v 1.4 2001/12/19 02:10:25 tavis_rudd Exp $
 """Tests of the Template class API
 
 THIS TEST MODULE IS JUST A SHELL AT THE MOMENT. Feel like filling it in??
@@ -7,12 +7,12 @@ THIS TEST MODULE IS JUST A SHELL AT THE MOMENT. Feel like filling it in??
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2001/10/10 06:57:22 $
+Last Revision Date: $Date: 2001/12/19 02:10:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__revision__ = "$Revision: 1.4 $"[11:-2]
 
 
 ##################################################

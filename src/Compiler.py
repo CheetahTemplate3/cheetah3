@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.20 2001/11/09 19:18:33 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.21 2001/12/19 02:10:25 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.20 $
+Version: $Revision: 1.21 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2001/11/09 19:18:33 $
+Last Revision Date: $Date: 2001/12/19 02:10:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.20 $"[11:-2]
+__revision__ = "$Revision: 1.21 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -33,7 +33,7 @@ import time
 import random
 
 # intra-package imports ...
-from Version import version
+from _properties import Version
 from SettingsManager import SettingsManager
 from Parser import Parser, ParseError, specialVarRE, STATIC_CACHE, REFRESH_CACHE
 
@@ -1184,8 +1184,8 @@ class ModuleCompiler(Parser, GenUtils):
     def wrapModuleDef(self):
         self.addModuleDocString('')
         self.addModuleDocString(self.setting('defDocStrMsg'))
-        self.addModuleDocString(' CHEETAH VERSION: ' + version)
-        self.addSpecialVar('CHEETAH_version', version)
+        self.addModuleDocString(' CHEETAH VERSION: ' + Version)
+        self.addSpecialVar('CHEETAH_version', Version)
         self.addModuleDocString(' Generation time: ' + self.timestamp())
         self.addSpecialVar('CHEETAH_genTime', self.timestamp())
         if self._filePath:

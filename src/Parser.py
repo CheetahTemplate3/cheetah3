@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.35 2001/12/11 06:10:49 tavis_rudd Exp $
+# $Id: Parser.py,v 1.36 2001/12/19 02:10:25 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.35 $
+Version: $Revision: 1.36 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/12/11 06:10:49 $
+Last Revision Date: $Date: 2001/12/19 02:10:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.35 $"[11:-2]
+__revision__ = "$Revision: 1.36 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1408,7 +1408,8 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.advance(len('extends'))
         self.getWhiteSpace()
         self.setMainMethodName('writeBody') # change from the default 'respond'
-        self.setBaseClasses( self.getTargetVarsList() )
+        baseClassList = self.getTargetVarsList()
+        self.setBaseClasses( baseClassList )
         mainBaseClass =  self._baseClasses[0]
         self.closeDirective(lineClearToStartToken, endOfFirstLine)
         

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: FileRefresh.py,v 1.1 2001/11/06 02:58:08 tavis_rudd Exp $
+# $Id: FileRefresh.py,v 1.2 2001/12/19 02:10:25 tavis_rudd Exp $
 """Tests to make sure that the file-update-monitoring code is working properly
 
 THIS TEST MODULE IS JUST A SHELL AT THE MOMENT. Feel like filling it in??
@@ -7,12 +7,12 @@ THIS TEST MODULE IS JUST A SHELL AT THE MOMENT. Feel like filling it in??
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2001/11/06 02:58:08 $
+Last Revision Date: $Date: 2001/12/19 02:10:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__revision__ = "$Revision: 1.2 $"[11:-2]
 
 
 ##################################################

@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SettingsManager.py,v 1.15 2001/11/26 22:17:46 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.16 2001/12/19 02:10:25 tavis_rudd Exp $
 """Provides a mixin/base class for managing application settings 
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.15 $
+Version: $Revision: 1.16 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2001/11/26 22:17:46 $
+Last Revision Date: $Date: 2001/12/19 02:10:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.15 $"[11:-2]
+__revision__ = "$Revision: 1.16 $"[11:-2]
 
 
 ##################################################
@@ -95,7 +95,7 @@ def stringIsNumber(theString):
         return True
         
 def convStringToNum(theString):
-    """Convert a string representation of a Python number to the Python version"""
+    """Convert a string representation of a Python number to the Python Version"""
     if not stringIsNumber(theString):
         raise Error(theString + ' cannot be converted to a Python number')
     return eval(theString, {}, {})
@@ -110,7 +110,7 @@ class NoDefault:
     pass
 
 class ConfigParserCaseSensitive(ConfigParser):
-    """A case sensitive version of the standard Python ConfigParser."""
+    """A case sensitive Version of the standard Python ConfigParser."""
     def optionxform(self, optionstr):
         return optionstr
 

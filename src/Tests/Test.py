@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.30 2001/11/06 02:59:22 tavis_rudd Exp $
+# $Id: Test.py,v 1.31 2001/12/19 02:10:25 tavis_rudd Exp $
 """Core module of Cheetah's Unit-testing framework
 
 TODO
@@ -16,12 +16,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.30 $
+Version: $Revision: 1.31 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/06 02:59:22 $
+Last Revision Date: $Date: 2001/12/19 02:10:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.30 $"[11:-2]
+__revision__ = "$Revision: 1.31 $"[11:-2]
 
 
 ##################################################

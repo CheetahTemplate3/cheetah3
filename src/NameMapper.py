@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.14 2001/11/06 03:57:12 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.15 2001/12/19 02:10:25 tavis_rudd Exp $
 
 """This module implements Cheetah's optional NameMapper syntax.
 
@@ -135,8 +135,8 @@ Implementation details
 
 Performance and the C version
 ================================================================================
-Cheetah comes with both a C version and a Python version of NameMapper.  The C
-version is up to 6 times faster.  It's slightly slower than standard Python
+Cheetah comes with both a C version and a Python Version of NameMapper.  The C
+Version is up to 6 times faster.  It's slightly slower than standard Python
 syntax, but you won't notice the speed difference in normal usage scenarios.
 
 Cheetah uses the optimized C version (_namemapper.c) if it has
@@ -146,13 +146,13 @@ Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.14 $
+Version: $Revision: 1.15 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/11/06 03:57:12 $
+Last Revision Date: $Date: 2001/12/19 02:10:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__version__ = "$Revision: 1.14 $"[11:-2]
+__revision__ = "$Revision: 1.15 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -260,7 +260,7 @@ except:
 
 
 ##################################################
-# these functions are not in the c version
+# these functions are not in the C version
 
 def hasKey(obj, key):
     """Determine if 'obj' has 'key' """

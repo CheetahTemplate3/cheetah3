@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.1 2001/11/05 06:50:27 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.2 2001/12/19 02:10:25 tavis_rudd Exp $
 """Tests of the cheetah-compile tool.
 
 THIS TEST MODULE IS JUST A SHELL AT THE MOMENT. Feel like filling it in??
@@ -7,12 +7,12 @@ THIS TEST MODULE IS JUST A SHELL AT THE MOMENT. Feel like filling it in??
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2001/11/05 06:50:27 $
+Last Revision Date: $Date: 2001/12/19 02:10:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__revision__ = "$Revision: 1.2 $"[11:-2]
 
 
 ##################################################

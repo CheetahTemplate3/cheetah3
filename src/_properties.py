@@ -1,8 +1,8 @@
 PackageName = "Cheetah"
 Title = "Cheetah: The Python-Powered Template Engine"
-Description = "Provides Cheetah, a Python powered template engine and code generator"
+Description = "Provides Cheetah, a Python-powered template engine and code generator"
 Status = 'Alpha'
-Version = '0.9.9a7'
+Version = '1.0.0a1'
 Maintainer = "Tavis Rudd"
 Author = "The Cheetah Development Team"
 AuthorEmail = "cheetahtemplate-discuss@lists.sf.net"
