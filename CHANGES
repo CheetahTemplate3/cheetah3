@@ -9,8 +9,10 @@ Please initial your changes (there's a key at bottom) and add a date for each re
    - fixed nested-NotFound bug in _namemapper.c's valueFromSearchList (TR)
    - 'cheetah' wrapper script has abbreviation -c for the 'compile' command,
      -t for 'test', and an ASCII-art cheetah face in the help message. (MO)
-   - CheetahCompile: fixed to recognize --help option and to show --help/-h
+   - CheetahCompile.py: fixed to recognize --help option and to show --help/-h
      in help message. (MO)
+   - CheetahCompile.py: 
+     changed the order of the VERBOSE mode printouts, as per Mike's request (TR)
 
 0.9.11 (Mar 07, 2002)
    - fixed a careless bug in cheetah-compile (TR)
