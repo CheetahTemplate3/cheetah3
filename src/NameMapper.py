@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.7 2001/08/12 19:09:57 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.8 2001/08/12 19:19:13 tavis_rudd Exp $
 
 """Utilities for accessing the members of an object via string representations
 of those members.  Template processing is its primary intended use.
@@ -58,13 +58,13 @@ Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
 License: This software is released for unlimited distribution
          under the terms of the Python license.
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/08/12 19:09:57 $
+Last Revision Date: $Date: 2001/08/12 19:19:13 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -79,9 +79,6 @@ import re
 
 True = (1==1)
 False = (0==1)
-digitsRE = re.compile(r'[0-9]+')
-isDigit = digitsRE.match
-digits = ['0','1','2','3','4','5','6','7','8','9']
 
 class NoDefault:
     pass
