@@ -1,6 +1,12 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
+0.9.15a2 (unreleased)
+  - Filters now have access to the name of the placeholder they're filtering.
+    In the .filter() method, kw['rawExpr'] gives the entire placeholder name
+    including subscripts and arguments, exactly as it appears in the template
+    definition. (TR)
+
 0.9.15a1 (Oct 6th, 2002)
   - fixed a package-relative import bug in ImportHooks.py (TR)
   - set 'monitorSrcFile' to false as it was causing problems with the
