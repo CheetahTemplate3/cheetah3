@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: TagProcessor.py,v 1.11 2001/08/15 17:49:51 tavis_rudd Exp $
+# $Id: TagProcessor.py,v 1.12 2001/08/16 05:01:37 tavis_rudd Exp $
 """Tag Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/15 17:49:51 $
+Last Revision Date: $Date: 2001/08/16 05:01:37 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.11 $"[11:-2]
+__version__ = "$Revision: 1.12 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -41,8 +41,32 @@ class TagProcessor(Parser):
     _tagType = EVAL_TAG_TYPE
     #_token is only used by the coreTagProcessors such as PlaceholderProcessor
 
-    ## Methods called automatically by the Template object   ##
 
+    def __init__(self, templateObj):
+        self._templateObj = templateObj
+        
+        ## setup some method mappings
+        self.state = templateObj.state
+        self.mergeNewTemplateData = templateObj.mergeNewTemplateData
+        self._setTimedRefresh = templateObj._setTimedRefresh
+        self.normalizePath = templateObj.normalizePath
+        self.getFileContents = templateObj.getFileContents
+
+        ## setup some attribute mappings        
+        self._macros = templateObj._macros
+        self._cheetahBlocks = templateObj._cheetahBlocks
+        self._localVarsList = templateObj._localVarsList
+        self._theFormatters = templateObj._theFormatters
+        self._errorChecker = templateObj._errorChecker
+        self._rawIncludes = templateObj._rawIncludes
+        self._parsedIncludes = templateObj._parsedIncludes
+        self._rawTextBlocks = templateObj._rawTextBlocks
+        self._setVars = templateObj._setVars
+
+        Parser.__init__(self,templateObj)
+
+
+    ## Methods called automatically by the Template object   ##
     def preProcess(self, templateDef):
         delims = self.setting('internalDelims')
         tagTokenSeparator = self.setting('tagTokenSeparator')
@@ -62,6 +86,10 @@ class TagProcessor(Parser):
             templateDef = RE.sub(subber, templateDef)
 
         return templateDef
+
+    def templateObj(self):
+        """Return a reference to the templateObj that controls this processor"""
+        return self._templateObj
    
     def initializeTemplateObj(self):
         """Initialize the templateObj so that all the necessary attributes are
@@ -78,6 +106,15 @@ class TagProcessor(Parser):
     def processTag(self, tag):
         return self.wrapTagCode( self.translateTag(tag) )
 
+    def shutdown(self):
+        """This hook is called once the templateObj has been compiled, and is
+        used to remove any circular references, etc."""
+
+        self._templateObj = None        
+        del self._templateObj
+        for key in dir(self):
+            setattr(self, key, None)
+            delattr(self, key)
 
 
     ## generic methods used internally  ##

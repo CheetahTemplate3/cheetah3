@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.41 2001/08/15 17:49:51 tavis_rudd Exp $
+# $Id: Template.py,v 1.42 2001/08/16 05:01:37 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.41 $
+Version: $Revision: 1.42 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/15 17:49:51 $
+Last Revision Date: $Date: 2001/08/16 05:01:37 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.41 $"[11:-2]
+__version__ = "$Revision: 1.42 $"[11:-2]
 
 
 ##################################################
@@ -305,10 +305,7 @@ class Template(SettingsManager, Parser):
         
         if not self._settings['keepCodeGeneratorResults']:
             self._codeGeneratorResults = {}       
-
-    ## make an alias
-    recompile = compileTemplate
-
+        
     def finalizeSettings(self):
         """A hook for calculated settings. This method is called by
         self.compileTemplate() after it calls self.setupTagProcessors().
@@ -567,15 +564,27 @@ class Template(SettingsManager, Parser):
             
             ##
             self._generatedCode = generatedCode
-            
             return generatedFunction
                 
         except:
             ## call codeGenErrorHandler, which in turn calls the ErrorHandler ##
             # for the stage in which the error occurred
             print settings['codeGenErrorHandler'](self)
+            self.cleanup()
             raise          
-        
+
+
+    def shutdown(self):
+        """Cleanup after compiling."""
+        for key, processor in self._processors.items():
+            processor.shutdown()
+        self._processors.clear()
+        for key in dir(self):
+            setattr(self, key, None)
+            delattr(self, key)
+
+
+
     def searchList(self):
         """Return a reference to the searchlist"""
         return self._searchList
@@ -722,6 +731,8 @@ class Template(SettingsManager, Parser):
         'extensionStr'.
 
         #redefine and #data directives MUST NOT be nested!!
+
+        This method can only be used before the templateObj has been compiled.
         """
         bits = self._directiveREbits
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: DataDirective.py,v 1.2 2001/08/15 17:49:51 tavis_rudd Exp $
+# $Id: DataDirective.py,v 1.3 2001/08/16 05:01:37 tavis_rudd Exp $
 """DataDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/15 17:49:51 $
+Last Revision Date: $Date: 2001/08/16 05:01:37 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -56,9 +56,9 @@ class DataDirective(TagProcessor.TagProcessor):
 
 
         self._delimRegexs = [gobbleWS, plain]
-        
+            
     def preProcess(self, templateDef):
-        templateObj = self.templateObj
+        templateObj = self.templateObj()
         
         def dataDirectiveProcessor(match, self=self, templateObj=templateObj):
             """process any #data directives that are found in the template
@@ -67,12 +67,12 @@ class DataDirective(TagProcessor.TagProcessor):
             args = match.group('args').split(',')
             contents = match.group('contents')
             
-            newDataDict = {'self':templateObj}
+            newDataDict = {'self':templateObj} 
             exec contents in {}, newDataDict
-    
             del newDataDict['self']
+            
             if not 'nomerge' in args:
-                self.mergeNewTemplateData(newDataDict)
+                templateObj.mergeNewTemplateData(newDataDict)
             else:
                 for key, val in newDataDict.items():
                     setattr(templateObj,key,val)

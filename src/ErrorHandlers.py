@@ -5,12 +5,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/14 19:29:50 $
+Last Revision Date: $Date: 2001/08/16 05:01:37 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -120,7 +120,7 @@ class CodeGeneratorErrorHandler(ErrorHandler):
     def __init__(self, templateObj):
         ErrorHandler.__init__(self, templateObj)
         self._stage = stage = self._localvars['stage']
-        self._stageSettings = templateObj._settings['stages'][stage]
+        self._stageSettings = templateObj.setting('stages')[stage]
 
     def introText(self):
         fillValues = {'stage': self._stage,

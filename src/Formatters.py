@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Formatters.py,v 1.2 2001/08/15 17:49:51 tavis_rudd Exp $
+# $Id: Formatters.py,v 1.3 2001/08/16 05:01:37 tavis_rudd Exp $
 """Formatters Cheetah's $placeholders
 
 Meta-Data
@@ -7,18 +7,17 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/15 17:49:51 $
+Last Revision Date: $Date: 2001/08/16 05:01:37 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
 
 # intra-package imports ...
-from Parser import Parser
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
@@ -32,12 +31,13 @@ False = (0==1)
 class Error(Exception):
     pass
 
-class BaseClass(Parser):
+class BaseClass:
     """A baseclass for the Cheetah Formatters."""
     
     def __init__(self, templateObj):
         """Setup a ref to the templateObj.  Subclasses should call this method."""
-        Parser.__init__(self, templateObj)
+        self.setting = templateObj.setting
+        self.settings = templateObj.settings
     
     def format(self, val, **kw):
         """Replace None with an empty string """
