@@ -7,7 +7,7 @@
 \subsection{\#import and \#from directives}
 \label{inheritanceEtc.extend}
 
-The \code{\#import} and \code{\#from} directives is used to import Python
+The \code{\#import} and \code{\#from} directives are used to import Python
 modules or stuff from inside modules.  The syntax is identical to the import
 syntax in Python.  Imported modules are visible globally to all methods in the
 generated Python class.
@@ -18,6 +18,10 @@ generated Python class.
 #from math import sin, cos
 #from math import sin as _sin
 \end{verbatim}
+
+After the above imports, \code{\$math}, \code{\$mathModule}, 
+\code{\$sin}, \code{\$cos} and \code{\$\_sin} may be used in 
+\code{\$placeholders} and expressions.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#extends}
@@ -44,19 +48,25 @@ subclass of Cheetah.Template.Template:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#implements}
-\label{inheritanceEtc.def}
+\label{inheritanceEtc.implements}
 
 The \code{\#implements} directive is used specify the name of the method that a
 template implements.  It is equivalent to PSP's \code{@page method=} directive.
+The default method is \code{.writebody()}.  If this directive doesn't make sense
+to you, you don't need it.
+
+% @@ MO: This still doesn't make any sense to somebody who doesn't use PSP.
+% What does it mean for a template to "implement a method"?  A template "has"
+% methods, it doesn't "implement" a method.  
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#set}
 \label{inheritanceEtc.set}
 
-\code{\#set} is used for run-time creation of, and assignment to, local
-variables.  \code{\#set \$var = EXPRESSION}. The expression may be any Python
-expression. Remember to preface variable names with \$, unless it is part of an
+\code{\#set} is used to create and update local variables at run time.
+\code{\#set \$var = EXPRESSION}. The expression may be any Python expression.
+Remember to preface variable names with \$, unless it is part of an
 intermediate result in a list comprehension.
 
 Here are some examples:
@@ -64,11 +74,18 @@ Here are some examples:
 #set $size = $length * 1096
 #set $buffer = $size + 1096
 #set $area = $length * $width
-#set $namesList = ['Mo','Larry','Curly']
+#set $namesList = ['Moe','Larry','Curly']
+#set $prettyCountry = $country.replace(' ', '&nbsp;')
 \end{verbatim}
 
-It is probably most useful in conjunction with the \code{\#if} directive, but
-remember that more complex logical routines should be coded in Python, not in
+\code{\#set} variables are useful to assign a short name to a
+\code{\$deeply.nested.value}, to a calculation, or to a printable version of
+a value.  The last example above converts any spaces in the 'country' value
+into HTML non-breakable-space entities, to ensure the entire value appears on
+one line in the web browser.
+
+\code{\#set} variables are also useful in \code{\#if} expressions, but
+remember that complex logical routines should be coded in Python, not in
 Cheetah!
 \begin{verbatim}
 #if $size > 1500
@@ -78,10 +95,10 @@ Cheetah!
 #end if
 \end{verbatim}
 
-\code{\#set global} is used for run-time creation of, and assignment to, global
-variables. \code{\#set global \$var = EXPRESSION}. Global variables set in this
-manner are visible to all methods of the template class and all methods of
-included templates.
+By default, \code{\#set} variables are not visible in method calls or include
+files unless you use the \code{global} attribute: \code{\#set global \$var =
+EXPRESSION}.  Global variables are visible in all methods, nested templates and
+included files.  Use this feature with care to prevent surprises.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -191,7 +208,9 @@ Note that the name of the block is optional for the \code{\#end block} tag.
 
 Like methods defined with \code{\#def}, blocks are compiled into methods of the
 generated Python class and can be reimplemented in subclasses using the
-\code{\#def} directive.
+\code{\#def} directive.  The only technical difference between
+\code{\#block} and \code{\#def} is that 
+\code{\#block} is evaluated once where it is defined
 
 % Local Variables:
 % TeX-master: "users_guide"

@@ -34,28 +34,20 @@ can't be written as simple \$placeholders.  It serves the same purpose as ASP's
 Here is my #echo ','.join(['silly']*5) # example 
 \end{verbatim}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Output From Complex Expressions: \#echo}
-\label{output.echo}
-
-The \code{\#echo} directive is used to echo the output from expressions that
-can't be written as simple \$placeholders.  It serves the same purpose as ASP's
-<\%=EXPR\%> tag.
-
-\begin{verbatim}
-Here is my #echo ','.join(['silly']*5) # example 
-\end{verbatim}
-
+In this example, the second \code{\#} serves to end the \code{\#echo} directive,
+allowing plain text to follow it.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Silencing The Output From Expressions: \#silent}
 \label{output.silent}
 
-The \code{\#silent} directive is used to silence the output from any expressions that
-must excuted.  It is similar to ASP's <\% EXPR \%> tag.
+The \code{\#silent} directive is used to silence the output from any
+expressions that must be excuted.  It is similar to ASP's $<$\% EXPR \%$>$ tag.
 
 \begin{verbatim}
-Here is #silent $doSomething() # nothing
+#silent $myList.reverse()
+#silent $myList.sort()
+Here is #silent $covertOperation() # nothing
 \end{verbatim}
 
 
@@ -137,17 +129,22 @@ ASP.net's varyByParam and varyByBrowser output caching keywords.
 Any section of a Template Definition that is inside a \code{\#raw} ...
 \code{\#end raw} tag pair will be printed verbatim without any parsing of
 \$placeholders or other directives. This can be very useful for debugging, or
-writing Cheetah examples and tutorials.
+for Cheetah examples and tutorials.
+
+\code{\#raw} may appear similar to HTML's \code{<PRE>} tag and LaTeX's
+\code{\\verbatim\{\}} tag, but unlike those tags, \code{\#raw} does not cause
+the body to appear in a special font or typeface.  It can't, because Cheetah
+doesn't what a font is.  
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#include}
 \label{output.include}
 
-\code{\#include} directives are used to include text from outside the template
-definition.  The text can come from external files or from \code{\$placeholder}
-variables.  When working with external files Cheetah will monitor for changes to
-the included file and update as necessary.  
+The \code{\#include} directive is  used to include text from outside the
+template definition.  The text can come from external files or from
+\code{\$placeholder} variables.  When working with external files Cheetah will
+monitor for changes to the included file and update as necessary.  
 
 This demonstrates its use with external files:
 \begin{verbatim}
@@ -161,7 +158,7 @@ And this example demonstrates use with \code{\$placeholder} variables:
 \end{verbatim}
 The value of \code{\$myParseText} will be parsed for Cheetah syntax. This is not
 the same as simple placing the \$placeholder tag ``\code{\$myParseText}'' in
-your template definition.  In the latter case the value of \$myParseText would
+your template definition.  In the latter case, the value of \$myParseText would
 not be parsed.
 
 By default, included text will be parsed for Cheetah tags.  The argument
@@ -185,19 +182,19 @@ used.
 \subsection{\#slurp}
 \label{output.slurp}
 
-The \code{\#slurp} directive is used for {\bf slurping up} trailing whitespace
-and extra newline characters.
+The \code{\#slurp} directive eats up the trailing newline on the line it
+appears in, joining the following line onto the current line.
 
 
 It is particularly useful in \code{\#for} loops:
 \begin{verbatim}
 #for $i in range(5)
-$i - #slurp
+$i #slurp
 #end for
 \end{verbatim}
 outputs:
 \begin{verbatim}
-01234
+0 1 2 3 4
 \end{verbatim}
 
 
@@ -209,11 +206,33 @@ Output from \code{\$placeholders} is passed through an ouput filter.  By default
 the filter just returns a string representation of the placeholder's value,
 unless it is \code{'None'}, in which case it returns an empty string. 
 
-The ouput filter can be specified via the \code{'filter'} keyword to the
-\code{Template} class' constructor or at run-time using the \code{\#filter}
+The ouput filter can be specified via the \code{'outputFilter'} keyword to the
+\code{Template} class' constructor, or at run-time using the \code{\#filter}
 directive. The \code{Cheetah.Filters} module contains several filters.
+The current filters are:
+
+\begin{description}
+\item{\code{Filter}}
+     The default filter, which converts None to '' and everything else to
+     \code{str(whateverItIs)}.  This is the base class for all other filters.
+\item{\code{ReplaceNone}}
+     Same.
+\item{\code{MaxLen}}
+     Same but truncate the value if it's longer than a certain length.
+     (TODO: how to specify the length?)
+\item{\code{Pager}}
+     Output a "pageful" of a long string.  After the page, output HTML
+     hyperlinks to the previous and next pages.  This filter uses several
+     environmental variables and other variables, which will be documented in
+     the future.
+\item{\code{WebSafe}}
+     Same as default but convert HTML-sensitive characters ('<', '\&', '>')
+     to HTML entities.  This filter is currently untested.
+\end{description}
 
 More will be written about output filtering in future versions of this guide.
+
+%% @@MO: Tavis TODO: rewrite this subsection.
 
 
 % Local Variables:

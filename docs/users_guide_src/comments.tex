@@ -26,29 +26,39 @@ comment.
 *#
 \end{verbatim}
 
+After a directive on the same line, you need an extra \code{\#*} to end the
+directive:
+\begin{verbatim}
+#if $count == 0 # ## if the records are missing
+\end{verbatim}
+
+
 
 \subsection{Docstring Comments}
 \label{directives.comments.docstring}
 Python modules, classes, and methods can be documented with inline
 'documentation strings' (aka 'docstrings').  Docstrings, unlike comments, are
 accesible at run-time. Thus, they provide a useful hook for interactive help
-utilities.
+utilities.  
 
 Cheetah comments can be transformed into doctrings by adding one of the
 following prefixes:
 
 \begin{verbatim}
 ##doc: This text will be added to the method docstring
-#*doc: This text will be added to the method docstring *#
+#*doc: If your template file is MyTemplate.tmpl, running cheetah-compile
+       on it will produce MyTemplate.py, with a class MyTemplate in it,
+       containing a method .respond().  This text will be in the .respond()
+       method's docstring. *#
 
-##doc-method: so will this
-#*doc-method: so will this *#
+##doc-method: This text will also be added to .respond()'s docstring
+#*doc-method: This text will also be added to .respond()'s docstring *#
 
-##doc-class: This text will be added to the class docstring
-#*doc-class: This text will be added to the class docstring *#
+##doc-class: This text will be added to the MyTemplate class docstring
+#*doc-class: This text will be added to the MyTemplate class docstring *#
 
-##doc-module: This text will be added to the module docstring
-#*doc-module: This text will be added to the module docstring *#
+##doc-module: This text will be added to the module docstring MyTemplate.py
+#*doc-module: This text will be added to the module docstring MyTemplate.py*#
 \end{verbatim}
 
 \subsection{Header Comments}
@@ -60,6 +70,10 @@ following syntax:
 ##header: This text will be added to the module header comment
 #*header: This text will be added to the module header comment *#
 \end{verbatim}
+
+Note the difference between \code{\#\#doc-module: } and \code{header: }:
+\code{cheetah-compile} puts \code{\#\#doc-module: } text inside the module docstring.  \code{header: } makes the text go {\em above} the docstring, as a
+set of \#-prefixed comment lines.
 
 % Local Variables:
 % TeX-master: "users_guide"

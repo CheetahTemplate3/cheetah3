@@ -107,10 +107,12 @@ for other systems.
 \subsection{Constructing Template Objects}
 \label{howWorks.constructing}
 
-The \code{Template} class' constructor accepts either a source string or a
-'file' keyword argument, but not both.
+% The \code{Template} class' constructor accepts either a source string or a
+% 'file' keyword argument, but not both.  In addition, you may use the
+% 'searchList' keyword argument to pass a list of Namespaces for the
+% searchList.  
 
-Here are some examples of the various ways to create a template object:
+Here are typical ways to create a template object:
 \begin{description}
 \item{\code{templateObj = Template("The king is a \$placeholder1.")}}
      Pass the Template Definition as a string.
@@ -118,16 +120,54 @@ Here are some examples of the various ways to create a template object:
      Read the Template Definition from a file named "fink.tmpl".  
 \item{\code{templateObj = Template(file=f)}}
      Read the Template Definition from file-like object 'f'.
-\item{\code{templateObj = Template("The king is a \$placeholder1.", searchList=[dict, obj])}}
+\item{\code{templateObj = Template("The king is a \$placeholder1.", searchList=\[dict, obj\])}}
      Pass the Template Definition as a string.  Also pass two Namespaces for the
      searchList: a dictionary 'dict' and an instance 'obj'.
-\item{\code{templateObj = Template(file="fink.txt", searchList=[dict, obj])}}
+\item{\code{templateObj = Template(file="fink.txt", searchList=\[dict, obj\])}}
      Same, but pass a filename instead of a string.  The \code{None} is required
      here to represent the missing Template Definition string -- this due to
      Python's rules for positional parameters.
-\item{\code{templateObj = Template(file=f, searchList=[dict, obj])}}
+\item{\code{templateObj = Template(file=f, searchList=\[dict, obj\])}}
      Same with a file object.
 \end{description}
+
+The constructor accepts the following keyword arguments:
+
+\begin{description}
+\item{{\bf source}}
+     The template definition as a string.  
+\item{{\bf file}}
+     A filename or file object containing the template definition.
+     A filename must be a string, and a file object must be open for reading.
+\item{{\bf searchList}}
+     A list of objects to search for \code{\$placeholder} values.
+\item{{\bf outputFilter}}
+     A class that will format every \code{\$placeholder} value.  You may
+     specify a class object or string.  If a class object,
+     it must be a subclass of \code{Cheetah.Filters.Filter}.  If a string, it
+     must be the name of one of the filters in \code{Cheetah.Filters}.
+     This is similar to the \code{\#filter} directive (section
+     \label{output.filter}).
+\item{{\bf errorCatcher}}
+     A class to handle \code{\$placeholder} errors.  You may
+     specify a class object or string.  If a class object,
+     it must be a subclass of \code{Cheetah.ErrorCatchers.ErrorCatcher}.  
+     If a string, it must be the name of one of the error catchers in
+     \code{Cheetah.ErrorCatchers}.  This is similar to the 
+     \code{\#errorCatcher} directive 
+     (section \ref{errorHandling.errorCatcher}).
+\item{{\bf compilerSettings}}
+     A dictionary (or dictionary hierarchy) of settings that change Cheetah's
+     behavior.  Not yet documented.
+\end{description}
+
+You must specify either {\bf source} or {\bf file}, but not both.  All other
+arguments are optional.  If you are using {\bf source}, you may omit the
+\code{source=} prefix {\em if it is the first argument}, as in all the examples
+above.
+
+If you spell a keyword wrong, it will be ignored rather than causing an error.
+So check your spelling!
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

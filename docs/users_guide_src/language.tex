@@ -34,9 +34,9 @@ the following reasons:
 \item HTML-style tags aren't compatible with most WYSIWYG editors
 \end{itemize}
 
-Besides being much more compact, Cheetah also has some advantages over template
-systems, such as Zope Page Templates, that use the structure of the HTML and put
-information inside the HTML tags:
+Besides being much more compact, Cheetah also has some advantages over
+languages that put information inside the HTML tags, such as Zope Page
+Templates or PHP:
 
 \begin{itemize}
 \item HTML or XML-bound languages do not work well with other languages.
@@ -48,7 +48,7 @@ information inside the HTML tags:
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Language Constructs}
+\subsection{Language Constructs -- Summary}
 \label{language.constructs}
 
 \begin{enumerate}
@@ -73,7 +73,7 @@ information inside the HTML tags:
      \item set the output filter: \code{\#filter} \ldots
      \end{enumerate}
           
-\item Importing other modules and from other modules: \code{\#import} \ldots,
+\item Importing Python modules and objects: \code{\#import} \ldots,
      \code{\#from} \ldots
 
 \item Inheritance 
@@ -165,7 +165,7 @@ These tags may not be used inside other Cheetah tags.
      Use \$func(\$arg=1234) instead of \$func(arg=1234).  This rule also applies
      for *arg and **kw forms: \$func(\$*args) instead of \$func(*args).
     
-\item Trailing periods are ignored.  Cheetah will recognize that placeholder
+\item Trailing periods are ignored.  Cheetah will recognize that the placeholder
      name in \code{\$varName.} is \code{varName} and the period will be left
      alone in the template output.
      
@@ -212,19 +212,19 @@ directives will be printed verbatim.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Directive closures and whitespace handling}
 \label{language.directives.closures}
-Directive tags can closed explicitly with \code{\#} or implicitly with the end
-of the line if you're feeling lazy.
+Directive tags can be closed explicitly with \code{\#}, or implicitly with the
+end of the line if you're feeling lazy.
 
 \begin{verbatim}
 #block testBlock #
-Text in the contents area of the
+Text in the body of the
 block directive
 #end block testBlock #
 \end{verbatim}
 is identical to:
 \begin{verbatim}
 #block testBlock
-Text in the contents area of the
+Text in the body of the
 block directive
 #end block testBlock
 \end{verbatim}
@@ -236,7 +236,7 @@ the same line:
 bah, bah, #if $sheep.color == 'black'# black#end if # sheep.
 \end{verbatim}
 
-When a directive tag is closed implicitly with the end of the line all trailing
+When a directive tag is closed implicitly with the end of the line, all trailing
 whitespace is gobbled, including the newline character:
 \begin{verbatim}
 """
@@ -287,15 +287,14 @@ foo
 """
 \end{verbatim}
 
-The \code{\#slurp} directive, which is covered in more depth in section
-\ref{directives.slurp} is a dummy directive that exists only to facilitate
-gobbling of whitespace.
+The \code{\#slurp} directive (section
+\ref{directives.slurp}) also gobbles up whitespace.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Variables in directives}
 \label{language.directives.variables}
 
-Variable names used inside a directive tag should be prefaced by \$, like in this
+Variable names used inside a directive tag should be prefaced by \$, as in this
 example:
 
 \begin{verbatim}
@@ -309,10 +308,10 @@ $clientName: $address
 \subsection{NameMapper Syntax}
 \label{language.namemapper}
 
-One of our core aims with Cheetah was to make it easy for non-programmers to
-use. To achieve this aim, Cheetah uses a simplified syntax for mapping variable
+One of our core aims for Cheetah was to make it easy for non-programmers to
+use. Therefore, Cheetah uses a simplified syntax for mapping variable
 names in Cheetah to values in Python. It's known as the{\bf NameMapper syntax}
-and makes it possible for non-programmers to use Cheetah without knowing (a)
+and allows for non-programmers to use Cheetah without knowing (a)
 what the difference is between an object and a dictionary, (b) what functions
 and methods are, and (c) what 'self' is. A side benefit is that NameMapper
 syntax insulates the code in Cheetah templates from changes in the implementation
@@ -338,16 +337,15 @@ The designers working for your client want to use information from your system
 on the client's website --AND-- they want to maintain the display code
 themselves.
 
-Using PSP, the display code for the website would look something like the
-following, assuming your servlet subclasses the class you created for managing
-customer information:
+Using PSP, the display code for the website would look something like this,
+assuming your servlet is a subclass of your customer class:
 
 
 \begin{verbatim}
   <%= self.customer()[ID].address()['city'] %>   (42 chars)
 \end{verbatim}
 
-Using Cheetah's NameMapper syntax it could be any of the following:
+With Cheetah's NameMapper syntax, you can use any of the following:
 
 \begin{verbatim}
    $self.customers()[$ID].address()['city']       (39 chars)
@@ -365,28 +363,27 @@ Using Cheetah's NameMapper syntax it could be any of the following:
 
 Which of these would you prefer to explain to the designers, who have no
 programming experience?  The last form is 15 characters shorter than the PSP
-and -- conceptually -- is far more accessible. With PHP or ASP, the code would be
-even messier than the PSP
+version and -- conceptually -- far more accessible. With PHP or ASP, the
+code would be even messier than with PSP.
 
 This is a rather extreme example and, of course, you could also just implement
 \code{\$customer(\$ID).city} and obey the Law of Demeter (search Google for more
-on that).  But good object orientated design isn't the point here.
+on that).  But good object orientated design isn't the point of this example.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Dictionary Access}
 \label{language.namemapper.dict}
 
-NameMapper syntax allows access to items in a dictionary using the same dotted
+NameMapper syntax allows access to dictionary items using the same dotted
 notation used to access object attributes in Python.  This aspect of NameMapper
 syntax is known as 'Unified Dotted Notation'.
-
 For example, with Cheetah it is possible to write:
 \begin{verbatim}
    $customers()['kerr'].address()  --OR--  $customers().kerr.address()
 \end{verbatim}
 where the second form is in NameMapper syntax.
 
-This only works with dictionary keys that are also valid python identifiers.
+This works only with dictionary keys that are also valid Python identifiers.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Autocalling}
@@ -415,13 +412,14 @@ where 'c' is a key in the dictionary that a.b() returns.
 Further notes:
 \begin{itemize}
 \item Cheetah autocalls the function or method without any arguments.  Thus
-autocalling can only be used with functions or methods that either have no
+autocalling can be used only with functions or methods that either have no
 arguments or have default values for all arguments.
 
-\item Cheetah only autocalls functions and methods.  Classes and callable objects
-will not be autocalled.  
+\item Cheetah autocalls only functions and methods.  Classes and other callable
+objects are not autocalled.  
 
-\item Autocalling can be disabled using Cheetah's 'useAutocalling' setting.
+\item Autocalling can be disabled via Cheetah's 'useAutocalling' compiler
+setting.
 \end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -429,19 +427,19 @@ will not be autocalled.
 \label{language.namemapper.underscore}
 
 If a 'name' in Cheetah doesn't correspond to a valid object attribute name in
-Python, but there is an attribute in the form '_<name>' NameMapper will return
+Python, but there is an attribute in the form '\_name', NameMapper will return
 the underscored attribute.
 
-Thus, it removes the need to change all placeholders like \code{\$clients.list} to
-\code{\$clients._list} when the 'list' attribute of 'clients' is changed to underscored
-attribute, and vice-versa.
+This removes the need to change all placeholders like \code{\$clients.list} to
+\code{\$clients.\_list} when the 'list' attribute of 'clients' is changed to or
+from an underscored attribute.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Namespace cascading and the searchList}
 \label{language.namemapper.searchList}
 
-When Cheetah maps variable name in a template to a Python value it searches
+When Cheetah maps variable name in a template to a Python value, it searches
 through a list of namespaces known as the Template object's \code{searchList}.
 By default, the only namespace in the \code{searchList} is the template object
 itself. This means that its attributes or methods can be accessed in templates
@@ -456,13 +454,14 @@ finds a value for \code{myVar}.  Thus, if three namespaces are loaded and two of
 them contain a value for \code{\$myVar}, the value for \code{myVar} from the
 namespace that is closest to the start of the searchList will be returned.
 
-If you add a Python object to the searchList, its attributes and methods will be
-accessible as \$placeholder names.  For example, \code{myObject} contains
-\code{myAttrib} and \code{myMethod}.  If \code{myObject} is added to the
-searchList, \code{\$myAttrib} and \code{\$myMethod} can be used as placeholder
-names.
+If you add a Python object to the searchList, its attributes and methods will
+be accessible as \$placeholder names.  If the object is a dictionary, its keys
+are accessible as if they were attributes.  For example, \code{myObject}
+contains \code{myAttrib} and \code{myMethod}.  If \code{myObject} is added to
+the searchList, \code{\$myAttrib} and \code{\$myMethod} can be used as
+placeholder names.
 
-The\code{__init__} method of the \code{Template} class, and the subclasses
+The\code{\_\_init\_\_} method of the \code{Template} class, and the subclasses
 generated by the Cheetah compiler, accept a list of namespaces that will be
 added to the start of the \code{searchList}.  Extra namespaces can be added to
 the end of the searchList at at any time using the
@@ -476,8 +475,11 @@ method of the template object, include 'self' in the reference:
 \subsubsection{Missing values}
 \label{language.namemapper.missing}
 
-If NameMapper can not find a Python value for a Cheetah variable name it will
-raise the NameMapper.NotFound exception.
+If NameMapper can not find a Python value for a Cheetah variable name, it will
+raise the NameMapper.NotFound exception.  You can use the \code{\#errorCatcher}
+directive (section \ref{errorHandling.errorCatcher}) or {\bf errorCatcher }
+constructor argument (section \ref{howWorks.constructing}) to specify an
+alternate behaviour.
 
 % Local Variables:
 % TeX-master: "users_guide"
