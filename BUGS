@@ -5,15 +5,6 @@ See the file CHANGES for a list of bugs that have been resolved.
 Developers: if a bug was significant and affected a released version of
 Cheetah, be sure to note its fix in the CHANGES file!
 
-
-Warm init
-=========
-If you call the Cheetah constructor with a template definition containing
-"#extends", the template instance gets initialized twice, throwing away your
-searchList and settings.  One possible solution is a "warm init" method for 
-the second time that does the other initialization and then reintroduces your
-searchList and settings.
-
 Compiler forgets commas
 =======================
 Affects Cheetah 0.9.14, CVS and possibly earlier.
@@ -40,55 +31,3 @@ Affects Cheetah 0.9.14, CVS and possibly earlier.
   > "30m' id'cache1" .
 
 
-
-
-
-IOError shouldn't be changed to NameMapper.NotFound
-=====================================================================
-Reproducable in CVS 2002-09-11 / Python 2.2  and 
-Cheetah 0.9.14 / Python 2.2.1.  
-
-I think this behavior is incorrect; it's deceptive. I suspect that it's
-coming from Cheetah, since Python's own getattr() allows the IOError to
-rise up to the top. Perhaps NameMapper has an overly aggressive
-"except:" somewhere.  
-- Chuck Esterbrook <ChuckEsterbrook@StockAlerts.com>
-
-I tried adding an empty "raise" after every "except:" in NameMapper.py,
-but was unable to change the NotFound to IOError.  Ergo, the change is
-happening somewhere else.  Decide whether this behavior is a bug: 
-t'ain't necessarily so just because Chuck says it is.
-- Mike Orr <iron@mso.oz.net>
-
-#### BEGIN notFoundErrorDemo.py
-#!/usr/bin/env python
-from Cheetah.Template import Template as T
-
-class obj:
-
-    def __getattr__(self, name):
-        if name.startswith('__') or name.startswith('get_'):
-            raise AttributeError, name
-        meth = getattr(self, 'get_'+name, None)
-        if meth:
-            return meth()
-        else:
-            raise AttributeError, name
-
-    def get_baz(self):
-        raise IOError
-
-    #def baz(self):
-    #    raise IOError
-
-x = obj()
-
-if 0:
-    # raises IOError, as expected
-    print getattr(x, 'baz')
-else:
-    # should raise IOError
-    # instead, raises:  NameMapper.NotFound: baz
-    t = T('$baz', searchList=[x])
-    print str(t)
-#### END notFoundErrorDemo.py
