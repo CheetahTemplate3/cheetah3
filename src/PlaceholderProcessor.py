@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.14 2001/08/02 06:15:57 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.15 2001/08/02 19:50:33 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.14 $
+Version: $Revision: 1.15 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/02 06:15:57 $
+Last Revision Date: $Date: 2001/08/02 19:50:33 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.14 $"[11:-2]
+__version__ = "$Revision: 1.15 $"[11:-2]
 
 
 ##################################################
@@ -26,11 +26,10 @@ from tokenize import tokenprog
 
 #intra-package dependencies ...
 from TagProcessor import TagProcessor
-import Template
 from Components import Component
 import NameMapper
 from Utilities import lineNumFromPos
-
+#import Template                    # imported below to avoid circ. imports
 ##################################################
 ## GLOBALS AND CONSTANTS ##
 
@@ -242,6 +241,8 @@ class PlaceholderProcessor(TagProcessor):
         def translateName(name, prefix=prefix, searchList=searchList,
                             templateObj=templateObj,
                             executeCallables=executeCallables):
+            
+            import Template                         # import it here to avoid circ. imports
 
             ## get rid of the 'cache-type' tokens
             # - these are handled by the tag-processor instead
