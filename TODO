@@ -15,8 +15,6 @@ Requirements for 1.0
   etc) (TR)
 - allow searchList variables to override Python builtins. (TR)
 - something about globals (TR)
-- Install Cheetah into Cheetah/ rather than Webware/Cheetah/ .  Have a 
-  migration plan for existing users. (TR)
 - Decide on Cheetah's 1.0 license and update the Users' Guide. (TR)
 
 
