@@ -10,9 +10,11 @@ Cheetah TODO list
 
 Requirements for 1.0
 =========================================================================
-- Modify _namemapper.c to reflect new changes in NameMapper.py: ignore
-  dictionary attributes/methods for the first chunk in a searchList
-  lookup.  (TR)
+- Simplify NameMapper.py while maintaining new behavior (ignore dictionary
+  attributes/methods when searching for match of first chunk in searchList
+  lookup).  Modify _namemapper.c to conform.  Make valueForKey error
+  messages more meaningful: for $placeholder.html it raises "NotFound: html";
+  it should raise "NotFound: 'html' in $placeholder.html". (TR)
 - update User's Guide about changes to SkeletonPage (no more #settings,
   etc) (TR)
 - Decide on Cheetah's 1.0 license and update the Users' Guide.  Cheetah
