@@ -1,18 +1,43 @@
 #!/usr/bin/env python
-# $Id: TemplateMisc.py,v 1.3 2002/06/08 05:58:58 hierro Exp $
-"""Convenience methods for Template that don't depend on Webware.
+# $Id: CGITemplate.py,v 1.1 2002/06/09 21:08:42 hierro Exp $
+"""A subclass of Cheetah.Template for use in CGI scripts.
+
+Usage in a template:
+    #extends Cheetah.Template.CGIMixin
+    #implements respond
+    $cgiHeaders
+
+Usage in a template inheriting a Python class:
+1. The template
+    #extends MyPythonClass
+    #implements respond
+    $cgiHeaders
+
+2. The Python class
+    from Cheetah.Tools import CGITemplate
+    class MyPythonClass(CGITemplate):
+        def cgiHeadersHook(self):
+            return "Content-Type: text/html; charset=koi8-r\n\n"
+
+To read GET/POST variables, use the .webInput method defined in
+Cheetah.Utils.WebInputMixin (available in all templates without importing
+anything), use Python's 'cgi' module, or make your own arrangements.
+
+This class inherits from Cheetah.Template to make it usable in Cheetah's
+single-inheritance model.  
+
 
 Meta-Data
 ================================================================================
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.1 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2002/06/08 05:58:58 $
+Last Revision Date: $Date: 2002/06/09 21:08:42 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.3 $"[11:-2]
+__revision__ = "$Revision: 1.1 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -26,13 +51,13 @@ except NameError:
 ## DEPENDENCIES
 
 import os
-from Cheetah.Utils.CGIImportMixin import CGIImportMixin
+from Cheetah.Template import Template
 
 
 ##################################################
 ## CLASSES
 
-class CGIMixin(CGIImportMixin):
+class CGITemplate(Template):
     """Methods useful in CGI scripts.
 
        Any class that inherits this mixin must also inherit Cheetah.Servlet.
@@ -65,8 +90,4 @@ class CGIMixin(CGIImportMixin):
 
 
     
-class TemplateMisc(CGIMixin):
-    pass
-
-
 # vim: shiftwidth=4 tabstop=4 expandtab
