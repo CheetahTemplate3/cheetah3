@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: setup.py,v 1.6 2001/08/03 19:20:50 tavis_rudd Exp $
+# $Id: setup.py,v 1.7 2001/09/06 03:51:55 tavis_rudd Exp $
 """A setup module for the Cheetah package, based on the disutils module
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/03 19:20:50 $
+Last Revision Date: $Date: 2001/09/06 03:51:55 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -74,6 +74,11 @@ if __name__ == '__main__':
     README.close()
     synopsis = __doc__.split('\n')[0]
 
+    if os.name == 'posix':
+        ext_modules=[Extension("Cheetah/_namemapper", ["src/_namemapper.c"])]
+    else:
+        ext_modules=[]
+
     packages = ['Cheetah',
                 'Cheetah.Templates',
                 'Cheetah.Plugins',
@@ -94,7 +99,7 @@ if __name__ == '__main__':
            packages = packages,
            package_dir = {'Cheetah':'src'},
            
-           #ext_modules=[Extension("Cheetah/_namemapper", ["src/_namemapper.c"])],
+           ext_modules=ext_modules,
 
            scripts = ['bin/cheetah-compile',],
 
