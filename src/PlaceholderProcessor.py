@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.2 2001/06/18 18:52:14 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.3 2001/07/09 00:59:23 echuck Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/18 18:52:14 $
-""" 
+Last Revision Date: $Date: 2001/07/09 00:59:23 $
+"""
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 
 ##################################################
@@ -72,13 +72,13 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
     def __init__(self, tagRE = placeholderTagsRE, marker='placeholderTag.',
            markerEscaped = 'placeholderTag\.',
            markerLookBehind=r'(?:(?<=placeholderTag\.)|(?<=placeholderTag\.\{))'):
-        
+
         nameCharLookForward = r'(?=[A-Za-z_])'
         cachedTags = re.compile(markerLookBehind + r'\*' + nameCharLookForward)
         refreshTags = re.compile(markerLookBehind +
                                  r'\s*\*([0-9\.]+?)\*' +
                                  nameCharLookForward)
-        
+
         self._tagRE = tagRE
         self._marker = marker
         self._markerEscaped = markerEscaped
@@ -95,7 +95,7 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
             return 'REFRESH_' + match.group(1).replace('.','_') + '.'
         txt = self._refreshTags.sub(refreshSubber, txt)
         return txt
-        
+
     def splitTxt(self, txt):
         """  """
         namechars = "abcdefghijklmnopqrstuvwxyz" \
@@ -130,11 +130,11 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
             elif nextchar in namechars:
                 chunks.append((0, txt[pos:markerPos]))
                 match, pos = matchTokenOrfail(txt, markerPos + MARKER_LENGTH)
-                
+
                 while pos < len(txt):
                     if txt[pos] == "." and \
                         pos+1 < len(txt) and txt[pos+1] in namechars:
-                        
+
                         match, pos = matchTokenOrfail(txt, pos+1)
                     elif txt[pos] in "([":
                         pos, level = pos+1, 1
@@ -174,8 +174,8 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
 
     def preProcess(self, templateObj, templateDef):
         return self.wrapPlaceholders(self.mark(templateDef))
-        
-    def translatePlaceholderString(self, txt, searchList, templateObj=None,
+
+    def translatePlaceholderString(self, txt, searchList, templateObj,
                                    prefix='searchList', executeCallables=False):
         def translateSubber(match, prefix=prefix, searchList=searchList,
                             templateObj=templateObj,
@@ -195,7 +195,7 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
                     name = 'valueForName(' + nameChunks[0] + ',"""' + \
                        '.'.join(nameChunks[1:]) + '""", exectuteCallables=True)'
                 return name
-            
+
         return self._nameRE.sub(translateSubber, txt)
 
     def translateRawPlaceholderString(self, txt, searchList, templateObj=None,
@@ -210,7 +210,7 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
                           templateObj._settings['initialIndentLevel']
 
         if not hasattr(templateObj,'_perResponseSetupCodeChunks'):
-            templateObj._perResponseSetupCodeChunks = {}    
+            templateObj._perResponseSetupCodeChunks = {}
         if not templateObj._perResponseSetupCodeChunks.has_key('placeholders'):
             ## setup the code to be included at the beginning of each response ##
             indent = templateObj._settings['indentationStep']
@@ -227,18 +227,18 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
                       + baseInd + indent + "                                   \n" \
                       + baseInd + "nestedTemplates = self._nestedTemplatesCache\n" \
                       + baseInd + "components = self._componentsDict\n"
-    
+
             ## initialize the caches, the localVarsList, and the timedRefreshList
             templateObj._timedRefreshCache = {} # caching timedRefresh vars
             templateObj._nestedTemplatesCache = {} # caching references to nested templates
             templateObj._componentsDict = {}       # you get the idea...
             templateObj._timedRefreshList = []
             templateObj._checkForCacheRefreshes = False
-            
+
         if not hasattr(templateObj, '_localVarsList'):
             # may have already been set by #set or #for
             templateObj._localVarsList = ['trans', 'self']
-    
+
         if not templateObj._codeGeneratorState.has_key('defaultCacheType'):
             templateObj._codeGeneratorState['defaultCacheType'] = None
 
@@ -261,7 +261,7 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
         if nameChunks[0].startswith('REFRESH'):
             cacheType = TIMED_REFRESH_CACHE
             cacheRefreshInterval = float('.'.join(nameChunks[0].split('_')[1:]))
-            del nameChunks[0]         
+            del nameChunks[0]
         tag = '.'.join(nameChunks)
 
 
@@ -274,13 +274,13 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
                        '.'.join(nameChunks[1:]) + '""", exectuteCallables=True)'
             return self.wrapEvalTag(templateObj, "str(" + translatedTag + ")")
 
-        
+
         searchList = templateObj.searchList()
         try:
-            translatedTag = self.translatePlaceholderString(self._marker + tag, searchList)
+            translatedTag = self.translatePlaceholderString(self._marker + tag, searchList, templateObj)
         except NameMapper.NotFound:
             return templateObj._settings['varNotFound_handler'](templateObj, tag)
-        
+
         if tag.find('(') == -1:
             safeToAutoCall = True
         else:
@@ -300,7 +300,7 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
             elif callable(tagValue):
                 isCallable = True
                 tagValue = tagValue()
-                
+
         if cacheType == STATIC_CACHE:
             if not safeToAutoCall:
                 tagValue = eval(translatedTag)
