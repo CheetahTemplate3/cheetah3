@@ -30,6 +30,7 @@ ManifestTemplates = ['recursive-include %(PackageDir)s *',
                      ]
 
 Scripts = ['bin/cheetah-compile',
+           'bin/cheetah',
            ]
 
 try:
