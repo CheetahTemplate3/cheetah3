@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.5 2001/10/25 21:10:09 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.6 2001/10/30 22:56:35 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -15,12 +15,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/10/25 21:10:09 $
+Last Revision Date: $Date: 2001/10/30 22:56:35 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 
 ##################################################
@@ -674,6 +674,11 @@ class Placeholders_Calls(OutputTest):
         """deeply nested argstring, () enclosure + *15*cache"""
         self.verify("$*15*(aFunc(  $arg = $aMeth( $arg = $aFunc( 1 ) ) ) )",
                     "1")
+
+    def test26(self):
+        """a function call with the Python None kw."""
+        self.verify("$aFunc(None)",
+                    "")
 
 class NameMapper(OutputTest):
     def test1(self):
