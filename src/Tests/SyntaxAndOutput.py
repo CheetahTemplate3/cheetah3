@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.52 2004/12/30 14:56:37 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.53 2005/01/03 20:10:16 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.52 $
+Version: $Revision: 1.53 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2004/12/30 14:56:37 $
+Last Revision Date: $Date: 2005/01/03 20:10:16 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.52 $"[11:-2]
+__revision__ = "$Revision: 1.53 $"[11:-2]
 
 
 ##################################################
@@ -30,6 +30,7 @@ from copy import deepcopy
 import os
 import os.path
 import new
+import warnings
 
 from Cheetah.NameMapper import NotFound
 from Cheetah.NameMapper import C_VERSION as NameMapper_C_VERSION
@@ -136,13 +137,9 @@ Template output mismatch: %(notes)s
     convertEOLs = True
     DEBUGLEV = 0
     _searchList = [defaultTestNameSpace]
-    _templateSettings = {}
     
     def searchList(self):
         return self._searchList
-
-    def settings(self):
-        return self._templateSettings
 
     def verify(self, input, output):
         self._gen(input)
@@ -152,8 +149,7 @@ Template output mismatch: %(notes)s
     def _gen(self, input):
         self._input = input
         self.template = templateObj = Template(input,
-                                               searchList=self.searchList(),
-                                               settings=self.settings(),
+                                               searchList=self.searchList()
                                                )
         if self.DEBUGLEV == 1:
             print self.genClassCode()
@@ -163,8 +159,9 @@ Template output mismatch: %(notes)s
     def _verify(self, expectedOutput, notes=''):
         templateObj = self.template
         output = templateObj.respond()
+        #print self.genClassCode() #@@ DEBUG
         templateObj.shutdown()
-            
+
         assert output == expectedOutput, self.report \
                % {'notes': notes,
                   'template': self._input,
@@ -186,8 +183,25 @@ class EmptyTemplate(OutputTest):
     convertEOLs = False
     def test1(self):
         """an empty string for the template"""
-        self.verify("",
-                    "")
+        
+        warnings.filterwarnings('error',
+                                'You supplied an empty string for the source!',
+                                UserWarning)
+        try:
+            self.verify("", "")
+        except UserWarning:
+            pass
+        else:
+            self.fail("Should warn about empty source strings.")
+        
+        try:
+            self.verify("#implements foo", "")
+        except NotImplementedError:
+            pass
+        else:
+            self.fail("This should barf about respond() not being implemented.")
+
+        self.verify("#implements respond", "")
 
 class Backslashes(OutputTest):
     convertEOLs = False
@@ -1667,7 +1681,7 @@ class ContinueDirective(OutputTest):
 #if $i == 3
   #set $i += 1        
   #continue
-#end try
+#end if
 $i#slurp
 #set $i += 1
 #end while""",
@@ -1678,7 +1692,7 @@ $i#slurp
         self.verify("""#for $i in range(5)
 #if $i == 3
   #continue
-#end try
+#end if
 $i#slurp
 #end for""",
         "0124")
@@ -1690,7 +1704,7 @@ class BreakDirective(OutputTest):
 #while $i < 5
 #if $i == 3
   #break
-#end try
+#end if
 $i#slurp
 #set $i += 1
 #end while""",
@@ -1701,7 +1715,7 @@ $i#slurp
         self.verify("""#for $i in range(5)
 #if $i == 3
   #break
-#end try
+#end if
 $i#slurp
 #end for""",
         "012")
@@ -1958,19 +1972,6 @@ $anInt//comment
 
 class ExtendsDirective(OutputTest):
 
-    def setUp(self):
-        fp = open('SampleBaseClass.py','w')
-        fp.write(str(Compiler(source="#extends Cheetah.Templates.SkeletonPage",
-                               moduleName='SampleBaseClass',
-                               mainClassName='SampleBaseClass')))
-        fp.flush()
-        fp.close
-
-    def tearDown(self):
-        for ext in ('py','pyc','pyo'):
-            if os.path.exists('SampleBaseClass.' + ext):
-                os.remove('SampleBaseClass.' + ext)
-
     def test1(self):
         """#extends Cheetah.Templates._SkeletonPage"""
         self.verify("""#from Cheetah.Templates._SkeletonPage import _SkeletonPage
@@ -1996,13 +1997,6 @@ $spacer()
 """,
                     '<img src="spacer.gif" width="1" height="1" alt="" />\n')
 
-    def test4(self):
-        """#extends SampleBaseClass without #import"""
-        self.verify("""#extends SampleBaseClass
-#implements respond
-$spacer()
-""",
-                    '<img src="spacer.gif" width="1" height="1" alt="" />\n')
 
 class ImportantExampleCases(OutputTest):
     def test1(self):

@@ -1,36 +1,27 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.9 2002/10/05 19:35:25 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.10 2005/01/03 20:11:13 tavis_rudd Exp $
 """NameMapper Tests
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>,
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2002/10/05 19:35:25 $
+Last Revision Date: $Date: 2005/01/03 20:11:13 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.9 $"[11:-2]
+__revision__ = "$Revision: 1.10 $"[11:-2]
 
-
-##################################################
-## DEPENDENCIES ##
-
+from __future__ import generators
 import sys
 import types
 import os
 import os.path
 
 import unittest_local_copy as unittest
-from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList
+from Cheetah.NameMapper import NotFound, valueForKey, \
+     valueForName, valueFromSearchList, valueFromFrame, valueFromFrameOrSearchList
 
-##################################################
-## CONSTANTS & GLOBALS ##
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
 
 ##################################################
 ## TEST DATA FOR USE IN THE TEMPLATES ##
@@ -75,6 +66,7 @@ def dummyFunc(arg="Scooby"):
 def funcThatRaises():
     raise ValueError
 
+                 
 testNamespace = {
     'aStr':'blarg',
     'anInt':1,
@@ -96,20 +88,26 @@ testNamespace = {
     'emptyString':'',
     'funcThatRaises':funcThatRaises,
     }
+    
 autoCallResults = {'aFunc':'Scooby',
                    'aMeth':'doo',
                    }
 
-nestingResults =  {'anObj.meth1':'doo',
-                   'aDict.one':'item1',
-                   'aDict.nestedDict':testNamespace['aDict']['nestedDict'],
-                   'aDict.nestedDict.one':'nestedItem1',
-                   'aDict.nestedDict.aClass':DummyClass,
-                   'aDict.nestedFunc':'Scooby',
-                   'aClass.classVar1':123,
-                   'anObj.instanceVar1':123,
-                   'anObj.meth3':'A string',
-                   }
+results = testNamespace.copy()
+results.update({'anObj.meth1':'doo',
+                'aDict.one':'item1',
+                'aDict.nestedDict':testNamespace['aDict']['nestedDict'],
+                'aDict.nestedDict.one':'nestedItem1',
+                'aDict.nestedDict.aClass':DummyClass,
+                'aDict.nestedFunc':'Scooby',
+                'aClass.classVar1':123,
+                'anObj.instanceVar1':123,
+                'anObj.meth3':'A string',
+                })
+
+for k in testNamespace.keys():
+    # put them in the globals for the valueFromFrame tests
+    exec '%s = testNamespace[k]'%k
 
 ##################################################
 ## TEST BASE CLASSES
@@ -117,6 +115,7 @@ nestingResults =  {'anObj.meth1':'doo',
 class NameMapperTest(unittest.TestCase):
     failureException = (NotFound,AssertionError)
     _testNamespace = testNamespace
+    _results = results
     
     def namespace(self):
         return self._testNamespace
@@ -127,6 +126,7 @@ class NameMapperTest(unittest.TestCase):
     def VFS(self, searchList, name, autocall=True):
         return valueFromSearchList(searchList, name, autocall)
 
+    
     # alias to be overriden later
     get = VFN
 
@@ -134,10 +134,8 @@ class NameMapperTest(unittest.TestCase):
         got = self.get(name)
         if autoCallResults.has_key(name):
             expected = autoCallResults[name]
-        elif self.namespace().has_key(name):
-            expected = self.namespace()[name]
         else:
-            expected = nestingResults[name]
+            expected = self._results[name]
         assert got == expected
         
 
@@ -438,25 +436,98 @@ class VFN(NameMapperTest):
             self.get('aDict.nestedDict.funcThatRaises', False)    
 
 class VFS(VFN):
-    def searchList(self):
-        return [self.namespace()]
+    _searchListLength = 1
     
+    def searchList(self):
+        lng = self._searchListLength
+        if lng == 1:
+            return [self.namespace()]
+        elif lng == 2:
+            return [self.namespace(),{'dummy':1234}]
+        elif lng == 3:
+            # a tuple for kicks
+            return ({'dummy':1234}, self.namespace(),{'dummy':1234})
+        elif lng == 4:
+            # a generator for more kicks
+            return self.searchListGenerator()
+
+    def searchListGenerator(self):
+        class Test:
+            pass
+        for i in [Test(),{'dummy':1234}, self.namespace(),{'dummy':1234}]:
+            yield i
+  
     def get(self, name, autocall=True):
         return self.VFS(self.searchList(), name, autocall)
         
 class VFS_2namespaces(VFS):
-    def searchList(self):
-        return [self.namespace(),{'dummy':1234}]
+    _searchListLength = 2
     
 class VFS_3namespaces(VFS):
-    def searchList(self):
-        return [{'dummy':1234}, self.namespace(),{'dummy':1234}]
+    _searchListLength = 3
 
 class VFS_4namespaces(VFS):
-    def searchList(self):
-        class Test:
-            pass
-        return [Test(),{'dummy':1234}, self.namespace(),{'dummy':1234}]
+    _searchListLength = 4
+    
+class VFF(VFN): 
+    def get(self, name, autocall=True):
+        ns = self._testNamespace
+        aStr = ns['aStr'] 
+        aFloat = ns['aFloat']
+        none = 'some'
+        return valueFromFrame(name, autocall)
+
+    def setUp(self):
+        """Mod some of the data
+        """
+        self._testNamespace = ns = self._testNamespace.copy()
+        self._results = res = self._results.copy()
+        ns['aStr'] = res['aStr'] = 'BLARG'
+        ns['aFloat'] = res['aFloat'] = 0.1234
+        res['none'] = 'some'
+        res['True'] = True
+        res['False'] = False
+        res['None'] = None
+        res['eval'] = eval
+
+    def test_VFF_1(self):
+        """Builtins"""
+        self.check('True')
+        self.check('None')
+        self.check('False')
+        assert self.get('eval', False)==eval
+        assert self.get('range', False)==range
+
+class VFFSL(VFS):
+    _searchListLength = 1
+
+    def setUp(self):
+        """Mod some of the data
+        """
+        self._testNamespace = ns = self._testNamespace.copy()
+        self._results = res = self._results.copy()
+        ns['aStr'] = res['aStr'] = 'BLARG'
+        ns['aFloat'] = res['aFloat'] = 0.1234
+        res['none'] = 'some'
+        
+        del ns['anInt'] # will be picked up by globals
+        
+    def VFFSL(self, searchList, name, autocall=True):
+        anInt = 1
+        none = 'some'
+        return valueFromFrameOrSearchList(searchList, name, autocall)
+    
+    def get(self, name, autocall=True):
+        return self.VFFSL(self.searchList(), name, autocall)
+
+class VFFSL_2(VFFSL):
+    _searchListLength = 2
+
+class VFFSL_3(VFFSL):
+    _searchListLength = 3
+
+class VFFSL_4(VFFSL):
+    _searchListLength = 4
 
 ##################################################
 ## if run from the command line ##
