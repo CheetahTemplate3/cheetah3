@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.95 2002/06/08 03:36:43 hierro Exp $
+# $Id: Template.py,v 1.96 2002/06/09 22:13:28 hierro Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.95 $
+Version: $Revision: 1.96 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/06/08 03:36:43 $
+Last Revision Date: $Date: 2002/06/09 22:13:28 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.95 $"[11:-2]
+__revision__ = "$Revision: 1.96 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -35,11 +35,12 @@ from tempfile import mktemp
 import imp
 import traceback
 
-# intra-package imports ...
-from SettingsManager import SettingsManager # baseclass for Template
-from Servlet import Servlet                 # baseclass for Template
-from TemplateMisc import TemplateMisc       # baseclass for Template
+# Base classes for Template (intra-package imports)
+from SettingsManager import SettingsManager  
+from Servlet import Servlet                 
+from Cheetah.Utils.WebInputMixin import WebInputMixin
 
+# More intra-package imports ...
 import ErrorCatchers              # for placeholder tags
 import Filters                          # the output filters
 from DummyTransaction import DummyTransaction
@@ -67,7 +68,7 @@ class NoDefault:
 class Error(Exception):
     pass
     
-class Template(SettingsManager, Servlet, TemplateMisc):
+class Template(SettingsManager, Servlet, WebInputMixin):
     
     """The core template engine.  It serves as a base class for Template
     servlets and also knows how to compile a template."""
