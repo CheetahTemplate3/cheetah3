@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SourceReader.py,v 1.7 2005/01/03 19:43:21 tavis_rudd Exp $
+# $Id: SourceReader.py,v 1.8 2005/01/17 14:54:54 tavis_rudd Exp $
 """SourceReader class for Cheetah's Parser and CodeGenerator
 
 Meta-Data
@@ -7,23 +7,50 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/01/03 19:43:21 $
+Last Revision Date: $Date: 2005/01/17 14:54:54 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.7 $"[11:-2]
+__revision__ = "$Revision: 1.8 $"[11:-2]
 
 import re
+import sys
 
 EOLre = re.compile(r'[ \f\t]*(?:\r\n|\r|\n)')
 EOLZre = re.compile(r'(?:\r\n|\r|\n|\Z)')
+ENCODINGsearch = re.compile("coding[=:]\s*([-\w.]+)").search
 
 class Error(Exception):
     pass
-
+                                
 class SourceReader:
-    def __init__(self, src, filename=None, breakPoint=None):
+    def __init__(self, src, filename=None, breakPoint=None, encoding=None):
+
+        ## @@TR 2005-01-17: the following comes from a patch Terrel Shumway
+        ## contributed to add unicode support to the reading of Cheetah source
+        ## files with dynamically compiled templates. All the existing unit
+        ## tests pass but, it needs more testing and some test cases of its
+        ## own. My instinct is to move this up into the code that passes in the
+        ## src string rather than leaving it here.  As implemented here it
+        ## forces all src strings to unicode, which IMO is not what we want.
+        if encoding is None:
+            # peek at the encoding in the first two lines
+            m = EOLZre.search(src)
+            pos = m.end()
+            if pos<len(src):
+                m = EOLZre.search(src,pos)
+                pos = m.end()
+            m = ENCODINGsearch(src,0,pos)
+            if m:
+                encoding = m.group(1)
+            else:
+                encoding  = sys.getfilesystemencoding()
+        self._encoding = encoding
+        if type(src) is not unicode:
+            src = src.decode(encoding)
+        ## end of Terrel's patch
+
         self._src = src
         self._filename = filename
 
