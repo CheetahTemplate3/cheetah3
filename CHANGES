@@ -35,13 +35,14 @@ release
     the template definition did not come from a named file.  (MO)
   - applied patch on SourceForge for "%" in default arguments of a block (TR)
   - removed the _underscored attribute lookup step from NameMapper NOTE THIS
-    MIGHT BREAK EXISTING CODE (TR)
+    MIGHT BREAK EXISTING TEMPLATES (TR)
   - Install Cheetah into site-packages/Cheetah/ rather than
-    site-packages/Webware/Cheetah/. Added code to automatically remove the old dir.(TR)
+    site-packages/Webware/Cheetah/. Added code to automatically remove the old
+    dir.(TR)
   - fixed the variable name resolution order bug in $placeholders.  The new
     implementation uses 
-     valueFromSearchList([locals()] + searchList + [globals(), __builtin__], rest of the args) 
-    for all lookups. (TR)
+     valueFromSearchList([locals()] + searchList + [globals(), __builtin__],
+     rest of the args) for all lookups. (TR)
   - removed the #settings directive (TR)
   - added the #del directive, for using Python's del statement (TR)
    
