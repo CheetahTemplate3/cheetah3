@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.2 2001/07/09 00:52:43 echuck Exp $
+# $Id: Test.py,v 1.3 2001/07/11 22:00:48 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/09 00:52:43 $
+Last Revision Date: $Date: 2001/07/11 22:00:48 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 
 ##################################################
@@ -38,15 +38,16 @@ newPath = os.path.abspath(os.path.join(os.pardir, os.pardir))
 sys.path.insert(1, newPath)
 
 if os.path.exists(os.path.join(newPath, 'src')):
-	import src.NameMapper as NameMapper
-	from src.Template import Template
-	from src.Delimeters import *
+    import src.NameMapper as NameMapper
+    from src.Template import Template
+    from src.Delimiters import *
 elif os.path.exists(os.path.join(newPath, 'Cheetah')):
-	import Cheetah.NameMapper as NameMapper
-	from Cheetah.Template import Template
-	from Cheetah.Delimeters import *
+    import Cheetah.NameMapper as NameMapper
+    from Cheetah.Template import Template
+    from Cheetah.Delimiters import *
 else:
-	raise Exception, "Not sure where to find Cheetah. I do not see src/ or Cheetah/ two directories up."
+    raise Exception, "Not sure where to find Cheetah. I do not see src/ or" + \
+	  " Cheetah/ two directories up."
 
 try:
     import unittest
@@ -530,26 +531,25 @@ posixCases += callMacroTests
 # @@ at the moment the #entend directive is only caught by Servlet.extendTemplate()
 
 
-if 0:
-	miscBugCases = [
-		['bug: failure with comma right after ${foo} - jeff johnson',
-		'''#for name, last in $nameList
-			<li>${name}, $last
-	#end for''',
-		'''		<li>john, doe
-			<li>jane, smith
-	'''],
+if 1:
+    miscBugCases = [
+	    ['bug: failure with comma right after ${foo} - jeff johnson',
+	     """#for name, last in $nameList
+<li>${name}, $last
+#end for""",
+	     """<li>john, doe
+<li>jane, smith
+"""],
 
-		['bug: variation on: failure with comma right after ${foo} - jeff johnson',
-		'''#for item in $list
-			<li>${item.index}, $item.numOne
-	#end for''',
-		'''		<li>0, 1
-			<li>1, 1
-	'''],
-
-		]
-	posixCases += miscBugCases
+	    ['bug: variation on: failure with comma right after ${foo} - jeff johnson',
+	     """#for item in $list
+<li>${item.index}, $item.numOne
+#end for""",
+	     """<li>0, 1
+<li>1, 1
+"""],
+	    ]
+    posixCases += miscBugCases
 
 
 windowsCases = deepcopy(posixCases)
