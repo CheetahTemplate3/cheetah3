@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.54 2003/03/23 20:39:48 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.55 2003/10/22 21:21:47 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.54 $
+Version: $Revision: 1.55 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2003/03/23 20:39:48 $
+Last Revision Date: $Date: 2003/10/22 21:21:47 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.54 $"[11:-2]
+__revision__ = "$Revision: 1.55 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -1034,6 +1034,7 @@ class ModuleCompiler(Parser, GenUtils):
         
         self._moduleDef = None
         self._moduleShBang = '#!/usr/bin/env python'
+        self._moduleEncoding = ''
         self._moduleHeaderLines = []
         self._moduleDocStringLines = []
         self._specialVars = {}
@@ -1145,9 +1146,12 @@ class ModuleCompiler(Parser, GenUtils):
     
     ## methods for adding stuff to the module and class definitions
     
-    def addShBang(self, shBang):
+    def setShBang(self, shBang):
         self._moduleShBang = shBang
     
+    def setModuleEncoding(self, encoding):
+        self._moduleEncoding = '# -*- coding: %s -*-' %encoding
+
     def addModuleHeader(self, line):
         self._moduleHeaderLines.append(line)
         
@@ -1257,6 +1261,7 @@ class ModuleCompiler(Parser, GenUtils):
     
     def moduleHeader(self):
         header = self._moduleShBang + '\n'
+        header += self._moduleEncoding + '\n'
         if self._moduleHeaderLines:
             offSet = self.setting('commentOffset')
         

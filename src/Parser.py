@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.63 2003/04/07 23:00:25 tavis_rudd Exp $
+# $Id: Parser.py,v 1.64 2003/10/22 21:21:47 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.63 $
+Version: $Revision: 1.64 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2003/04/07 23:00:25 $
+Last Revision Date: $Date: 2003/10/22 21:21:47 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.63 $"[11:-2]
+__revision__ = "$Revision: 1.64 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -999,6 +999,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             
             # misc
             'shBang': self.eatShbang,
+            'encoding': self.eatEncoding,
             
             'end': self.eatEndDirective,
             }
@@ -1185,7 +1186,14 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.advance(len('shBang'))
         self.getWhiteSpace()
         shBang = self.readToEOL()
-        self.addShBang(shBang.strip())
+        self.setShBang(shBang.strip())
+
+    def eatEncoding(self):
+        self.getDirectiveStartToken()
+        self.advance(len('encoding'))
+        self.getWhiteSpace()
+        encoding = self.readToEOL()
+        self.setModuleEncoding(encoding.strip())
         
     def eatCompiler(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
