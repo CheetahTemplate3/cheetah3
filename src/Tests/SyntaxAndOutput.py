@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.41 2002/07/01 03:19:46 hierro Exp $
+# $Id: SyntaxAndOutput.py,v 1.42 2002/08/21 18:51:01 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.41 $
+Version: $Revision: 1.42 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/07/01 03:19:46 $
+Last Revision Date: $Date: 2002/08/21 18:51:01 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.41 $"[11:-2]
+__revision__ = "$Revision: 1.42 $"[11:-2]
 
 
 ##################################################
@@ -490,6 +490,11 @@ class Placeholders(OutputTest):
     def test18(self):
         """1 placeholder *<float>*cache"""
         self.verify("$*0.5h*aStr", "blarg")
+
+    def test19(self):
+        """1 placeholder surrounded by single quotes and multiple newlines"""
+        self.verify("""'\n\n\n\n'$aStr'\n\n\n\n'""",
+                    """'\n\n\n\n'blarg'\n\n\n\n'""")
 
 class Placeholders_Vals(OutputTest):
     convertEOLs = False
