@@ -14,6 +14,7 @@ release
     template def contained a '$placeholder' surrounded in single quotes and
     multiple \n newlines ... plus added new test case.(TR)
 
+
 0.9.14 (July 14, 2002)
   - Precompiled template Templates/SkeletonPage.py added to CVS.  This file is
     needed for Cheetah's regression tests. (MO)
