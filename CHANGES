@@ -9,7 +9,11 @@ release
     the object has keys (i.e., .__getitem__() is defined) and (2) this
     is the first "chunk" (component, identifier) in a searchList lookup.
     This is to prevent $update from matching a dictionary method if there
-    happens to be a dictionary container in the searchList.  (MO)
+    happens to be a dictionary container in the searchList.  
+        COMPATIBILITY NOTE: NameMapper used to look for an attribute first.
+    So if $a has both an attribute 'foo' and a key 'foo', $a.foo now finds
+    a['foo'] instead of a.foo.  To get the attribute, you must do 
+    $getattr($a, 'foo') or turn NameMapper off. (MO)
 
 0.9.15a3 (Nov 10, 2002)
   - corrected a dictionary bug in the Python version of NameMapper (TR)
