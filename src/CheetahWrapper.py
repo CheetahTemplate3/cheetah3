@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.12 2002/11/10 09:08:16 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.13 2002/11/10 09:36:22 hierro Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -9,12 +9,12 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/11/10 09:08:16 $
+Last Revision Date: $Date: 2002/11/10 09:36:22 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.12 $"[11:-2]
+__revision__ = "$Revision: 1.13 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -114,13 +114,13 @@ OPTIONS FOR "compile" AND "fill":
   --idir DIR, --odir DIR : input/output directories (default: current dir)
   --iext EXT, --oext EXT : input/output filename extensions
     (default for compile: tmpl/py,  fill: tmpl/html)
-  -R : recurse subdirectories looking for input files
-  --debug : print lots of diagnostic output to standard error
-  --env : put the environment in the searchList
-  --flat : no destination subdirectories
-  --nobackup : don't make backups
+  -R            : recurse subdirectories looking for input files
+  --debug       : print lots of diagnostic output to standard error
+  --env         : put the environment in the searchList
+  --flat        : no destination subdirectories
+  --nobackup    : don't make backups
   --pickle FILE : unpickle FILE and put that object in the searchList
-  --stdout, -p : output to standard output (pipe)
+  --stdout, -p  : output to standard output (pipe)
 
 Run "cheetah help" for the main help screen.
 """
