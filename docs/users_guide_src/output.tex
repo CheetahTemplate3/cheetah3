@@ -3,7 +3,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Output From Simple Expressions: Placeholders}
-\label{TDL.placeholders}
+\label{output.placeholders}
 
 Placeholders are like 'primaries' in Python (see section 5.3 of Python's
 Language Reference for more). If you don't know what a 'primary' is, think of
@@ -24,7 +24,7 @@ math \ldots \$math.sin(0.5)}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Output From Complex Expressions: \#echo}
-\label{TDL.echo}
+\label{output.echo}
 
 The \code{\#echo} directive is used to echo the output from expressions that
 can't be written as simple \$placeholders.  It serves the same purpose as ASP's
@@ -36,7 +36,7 @@ Here is my #echo ','.join(['silly']*5) # example
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Output From Complex Expressions: \#echo}
-\label{TDL.echo}
+\label{output.echo}
 
 The \code{\#echo} directive is used to echo the output from expressions that
 can't be written as simple \$placeholders.  It serves the same purpose as ASP's
@@ -132,7 +132,7 @@ ASP.net's varyByParam and varyByBrowser output caching keywords.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#raw}
-\label{directives.raw}
+\label{output.raw}
 
 Any section of a Template Definition that is inside a \code{\#raw} ...
 \code{\#end raw} tag pair will be printed verbatim without any parsing of
@@ -142,7 +142,7 @@ writing Cheetah examples and tutorials.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#include}
-\label{directives.include}
+\label{output.include}
 
 \code{\#include} directives are used to include text from outside the template
 definition.  The text can come from external files or from \code{\$placeholder}
@@ -183,7 +183,7 @@ used.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#slurp}
-\label{directives.slurp}
+\label{output.slurp}
 
 The \code{\#slurp} directive is used for {\bf slurping up} trailing whitespace
 and extra newline characters.
@@ -203,7 +203,7 @@ outputs:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Ouput Filtering and \#filter}
-\label{directives.filter}
+\label{output.filter}
 
 Output from \code{\$placeholders} is passed through an ouput filter.  By default
 the filter just returns a string representation of the placeholder's value,
