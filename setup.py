@@ -1,5 +1,12 @@
 #!/usr/bin/env python
-# $Id: setup.py,v 1.13 2002/03/08 17:01:00 tavis_rudd Exp $
+# $Id: setup.py,v 1.14 2002/03/28 18:14:48 tavis_rudd Exp $
+import os
+
+try:
+    os.remove('MANIFEST')               # to avoid those bloody out-of-date manifests!!
+except:
+    pass
+    
 
 try:                           # see if WebwareExp's Setup procedure can be used
     from src._properties import Version, Description
