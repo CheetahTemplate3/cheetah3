@@ -50,28 +50,7 @@ docs at the moment. Cheetah, however, has a number of advantages over
 Velocity:
 \begin{itemize}
 \item Cheetah is written in Python. Thus, it's easier to use and extend.
-\item Cheetah's syntax is cleaner, more flexible and is closer to Python's.
-     Here's an example
-\begin{verbatim}
-#for $i in range(15)
-$i
-#end for 
-\end{verbatim}
-     instead of 
-\begin{verbatim}
-#foreach($i in range(15))  
-$i
-#end
-\end{verbatim}
-
-     The following is possible Cheetah but not in Velocity:
-\begin{verbatim}
-#for $key, $val in $myDict
-$key, $val
-#end for 
-\end{verbatim}
-
-
+\item Cheetah's is closer to Python's than Velocities is to Java's.
 \item Cheetah has a powerful caching mechanism.  Velocity has no equivalent.
 \item It's far easier to add data/objects into the namespace where \$placeholder
      values are extracted from in Cheetah.  Velocity calls this namespace a 'context'.
@@ -102,23 +81,11 @@ context1.put("duplicate", "I am in context1");
     dictionary keys for `spam'.  Finding it, Cheetah will select
     \code{foofoo['spam']} as \code{\$spam}'s value.
 
-\item Cheetah has better whitespace handling around \#directive tags
-\item Cheetah integrates tightly with Webware.  Velocity doesn't integrate as
-     easily with Turbine.
-\item Cheetah has a plugin that enables PSP-style coding to be freely mixed in
-     with the Cheetah syntax. Velocity doesn't.
-\item It is easy to add new \#directives to Cheetah. You can't do this easily in
-     Velocity.
 \item In Cheetah, the tokens that are used to signal the start of
      \$placeholders and \#directives are configurable. You can set them to any
      character sequences, not just \$ and \#.
 \end{itemize}
 
-
-% @MO: Removed because macros no longer exist:
-% \item Cheetah has an extension to the \#macro syntax that makes it easier to
-%     call macros that accept large strings as arguments: e.g. a macro that
-%     pretty-prints a chunk of source code.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Cheetah vs. WebMacro}
