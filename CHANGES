@@ -1,11 +1,12 @@
 Please initial your changes (there's a key at bottom) and add a date for each release
 ================================================================================
 
-0.9.12b2 (not released yet)
+0.9.12b2 (Mar 28, 2002)
    - fixed Win32 path bug in Template._makeDummyPackageForDir() (TR)
    - prettied up the format of the debug comments in the Cheetah generated
      Python code (TR)
    - fixed the non-unique key error in Template._includeCheetahSource (TR)
+   - fixed the module import bug in 'cheetah compile -w' (TR)
 
 0.9.12b1 (Mar 24, 2002)
    - $request().field(args) now works, identical to $request.field(args)
