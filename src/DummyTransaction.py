@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: DummyTransaction.py,v 1.7 2002/04/08 04:34:07 hierro Exp $
+# $Id: DummyTransaction.py,v 1.8 2002/04/08 04:48:42 tavis_rudd Exp $
 
 """Provides dummy Transaction and Response classes is used by Cheetah in place
 of real Webware transactions when the Template obj is not used directly as a
@@ -8,28 +8,18 @@ Webware servlet.
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/08/30
-Last Revision Date: $Date: 2002/04/08 04:34:07 $
+Last Revision Date: $Date: 2002/04/08 04:48:42 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.7 $"[11:-2]
+__revision__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
 
-try:
-    from StringIO import StringIO
-except:
-    from cStringIO import StringIO
 
-# @@MO: Backed out this change because it made the tests fail for me and
-# Edmund.  
-#
-#try:
-#    from cStringIO import StringIO
-#except:
-#    from StringIO import StringIO
+from StringIO import StringIO  # not cStringIO because of Unicode support, and some strange bug
 
 ##################################################
 ## CONSTANTS & GLOBALS
