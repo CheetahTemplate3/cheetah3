@@ -26,6 +26,10 @@ Requirements for 1.0
 - Add an example in the distribution of a simplified SkeletonPage
   that used #block but does not have fancy esoteric methods like
   style stuff. (MO)
+- Eliminate obsolete #settings directive from 
+  examples/webware_examples/cheetahSite/siteTemplate.tmpl  (TR)
+- Recognize the exception value as a local variable inside the
+  '#except Exception, ex' clause.  Currently $ex raises NotFound.
 
 
 Other TODO Items
