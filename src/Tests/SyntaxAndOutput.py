@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.9 2001/11/05 06:40:34 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.10 2001/11/08 06:56:37 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -13,12 +13,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/05 06:40:34 $
+Last Revision Date: $Date: 2001/11/08 06:56:37 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.9 $"[11:-2]
+__version__ = "$Revision: 1.10 $"[11:-2]
 
 
 ##################################################
@@ -1764,7 +1764,13 @@ class FilterDirective(OutputTest):
     def test1(self):
         """#filter ReplaceNone
         """
-        self.verify("#filter ReplaceNone",
+        self.verify("#filter ReplaceNone\n$none",
+                    "")
+
+    def test2(self):
+        """#filter ReplaceNone with WS
+        """
+        self.verify("#filter ReplaceNone  \n$none",
                     "")
 
 class ErrorCatcherDirective(OutputTest):
