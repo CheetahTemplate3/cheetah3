@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SetupTools.py,v 1.3 2001/11/25 19:53:57 tavis_rudd Exp $
+# $Id: SetupTools.py,v 1.4 2002/01/01 20:02:33 tavis_rudd Exp $
 """Some tools for extending and working with distutils
 
 CREDITS: This module borrows code and ideas from M.A. Lemburg's excellent setup
@@ -8,7 +8,7 @@ tools for the mxBase package.
 """
 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 
 ##################################################
@@ -177,88 +177,6 @@ class sdist_docs(sdist):
         sdist.run(self)
 
 
-class uninstall(Command):
-
-    description = "uninstall the package files and directories"
-
-    user_options = []
-
-    def initialize_options(self):
-        pass
-
-    def finalize_options(self):
-        pass
-        
-    def run(self):
-
-        # Execute build
-        self.announce('determining installation files')
-        self.announce('(re)building package')
-        savevalue = self.distribution.dry_run
-        self.distribution.dry_run = 0
-        self.run_command('build')
-
-        # Execute install in dry-run mode
-        self.announce('dry-run package install')
-        self.distribution.dry_run = 1
-        self.run_command('install')
-        self.distribution.dry_run = savevalue
-        build = self.get_finalized_command('build')
-        install = self.get_finalized_command('install')
-
-        # Remove all installed files
-        self.announce("removing files")
-        dirs = {}
-        filenames = install.get_outputs()
-        for filename in filenames:
-            if not os.path.isabs(filename):
-                raise DistutilsError,\
-                      'filename %s from .get_output() not absolute' % \
-                      filename
-
-            if os.path.isfile(filename):
-                self.announce("removing %s" % filename)
-                if not self.dry_run:
-                    try:
-                        os.remove(filename)
-                    except OSError, details:
-                        self.warn("Could not remove file: %s" % details)
-                    dir = os.path.split(filename)[0]
-                    if not dirs.has_key(dir):
-                        dirs[dir] = 1
-                    if os.path.splitext(filename)[1] == '.py':
-                        # Remove byte-code files as well
-                        try:
-                            os.remove(filename + 'c')
-                        except OSError:
-                            pass
-                        try:
-                            os.remove(filename + 'o')
-                        except OSError:
-                            pass
-
-            elif os.path.isdir(filename):
-                # This functionality is currently not being used by distutils
-                if not dirs.has_key(dir):
-                    dirs[filename] = 1
-
-            elif not os.path.splitext(filename)[1] in ('.pyo', '.pyc'):
-                self.announce("skipping removal of %s (not found)" %
-                              filename)
-
-        # Remove the installation directories
-        self.announce("removing directories")
-        dirs = dirs.keys()
-        dirs.sort(); dirs.reverse() # sort descending
-        for dir in dirs:
-            self.announce("removing directory %s" % dir)
-            if not self.dry_run:
-                try:
-                    os.rmdir(dir)
-                except OSError, details:
-                    self.warn("could not remove directory: %s" % details)
-
-
 ##################################################
 ## FUNCTIONS ##
 
@@ -292,7 +210,6 @@ def run_setup(configurations):
     # Add setup extensions
     cmdclasses = {
         'install_data': mod_install_data,
-        'uninstall':uninstall,
         'contrib':contrib,
         'sdist_docs':sdist_docs,
         }
