@@ -12,23 +12,24 @@ operating system that Python 2.0 runs on.
 To install Cheetah for a single user:
 \begin{enumerate}
 \item copy the 'Cheetah' sub-directory  to a location that is in the user's
-     PYTHON_PATH
+     PYTHONPATH
 \end{enumerate}
 
 To install Cheetah for system-wide use:
 \begin{enumerate}
 \item on POSIX systems (AIX, Solaris, Linux, IRIX, etc.) become the 'root' user
-     and run: python ./setup.py install
+     and run: python setup.py install
      
 \item On non-POSIX systems, such as Windows NT, login as an administrator and
-     type this at the command-line:  python setup.py install
+     type this at the command prompt:  python setup.py install
 \end{enumerate}
 
 
 On POSIX systems, the system-wide installation will also install the Cheetah's
 command-line compiler program, cheetah-compile, to the "bin/" directory of your
 Python distribution.  Depending on your system, you may want to copy or symlink
-this file to a directory on your system path.
+this file to a directory on your system path for easy access.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Testing your installation}

@@ -1,41 +1,37 @@
 \section{The Template Definition Language}
 
+% This chapter will be rewritten, redundant info removed, and split into
+% several chapters.
+
 {\bf Template definitions} are text strings, or files, that have been marked up
-with Cheetah tags for special processing.  Cheetah has 2 types of tags:
+with Cheetah tags for special processing.  Cheetah has two types of tags:
+placeholder tags and directive tags.  
 
 \begin{enumerate}
-\item {\bf placeholders}: for marking areas of the template that should be
-     replaced with something. 
-     
-     Placeholders begin with a dollar sign (\code{\$varName}).
 
-\item {\bf directives}: for everything else:
-     \begin{enumerate}   % level 2
-     \item {\bf raw text} for marking verbatim blocks should not be parsed for
-          Cheetah tags.
-     \item {\bf comments} that should not appear in the output
-     \item {\bf includes} to include external text.  The text can be included
-          verbatim or with parsing for Cheetah tags.
-     \item {\bf display logic} such as {\bf conditional blocks} (if-blocks) and
-          {\bf for loops}
-     \item {\bf blocks}, which are named sections of a template that can be
-          redefined (overridden) in a subclass or by template users
-     \item etc.
-     \end{enumerate}  % level 2
+    \item \bf{Placeholder tags} begin with a dollar sign;
+	e.g., \code{\$varName}.  They are used for the basic function of
+	any templating system--showing where to put the changeable data when
+	the template is filled in.  Placeholder tags are also called
+	``placeholders'' for short, and abbreviated as \bf{\$P}.
 
-     Directives begin with a hash character (\#).
+     \item \bf{Directive tags} (``directives'') begin with a hash sign and are
+	limited to a few specific commands; e.g., \code{#if}.  They are for
+        everything else--raw text, comments, display logic, blocks, etc.
+	Directive tags are called ``directives'' for short, and abbreviated as
+	\bf{#D}.
 
-\end{enumerate}
+% And macro calls?
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Placeholder tags}
-Cheetah uses placeholder tags in the form \code{\$varName} to mark out
-areas of the template definition that should be replaced with something.  Placeholders are
-equivalent to {\bf fields} on a form.  Placeholders can be replaced with plain
-content or variables, objects and function output from Python.
 
-The example below demonstrates the use of placeholders in an HTML document.
+Cheetah's placeholder tags are equivalent to data fields in a form letter, or to
+\code{\%(key)s} fields in the \code{\%} operator's format string.
+In other words, placeholder tags are used as lookup keys, and are replaced by
+their corresponding values when the template is filled in.
+Let's look again at the example from the introduction:
 
 \begin{verbatim}
 <HTML>
@@ -50,36 +46,104 @@ When this template is filled in, the placeholders \code{\$title} and
 \code{\$content} will be replaced with the values of the variables \code{title}
 and \code{content}.
 
+[MOVE DOWN
+Each object's attributes and/or
+keys is consulted.  If a match is found, the corresponding value is used.
+If the value is a function or method, it is automatically called without
+arguments.  The value is converted through a string via Python's built-in
+\code{str()} method before being used.
+]
+
+
 \subsubsection{Rules for placeholder names}
 \begin{itemize} 
 
-\item Cheetah ignores all dollar signs (\code{\$}) that are not followed
-     by a letter or an underscore.  As a corollary, dollar amounts
-     (\code{\$2.50})are not placeholders but are instead output literally as
-     they should be.  Cheetah also ignores any placeholder escaped by a
-     backslash (\code{$\backslash$\$placeholderName}).
+\item A placeholder always has the format \code{\$name} or \code{\$\{name\}}.
+     In the latter case, Cheetah knows exactly where the name begins an ends
+     because it's surrounded by ``{'' and ``}'' characters.  In the former
+     case, Cheetah infers where the name ends according to the rules below.  In
+     complex templates that may confuse either Cheetah or the human maintainer,
+     use the ``{}''.
+
+\item The name must begin with a letter or an underscore (_).  If it's a digit
+     or a symbol, it's not a placeholder and will be output literally.  This 
+     means that dollar amounts require no special treatment: \code{\$2.50}
+     and \code{\$-1,234.56} (or \code{\$2,50} and \code{\$-1.234,56} for
+     Europeans) will be left as is.
      
-\item The first character of a placeholder name must be either an underscore or
-     a letter. Valid characters for the rest of the name are underscores,
-     letters, numbers and periods.  These names are valid: \code{\$a},
+\item To prevent Cheetah from treating something that looks like a placeholder
+     as a placeholder, precede it with a backslash: 
+     (\code{$\backslash$\$variable}).  Cheetah will treat it as regular text.
+     This is useful if your document contains examples of Perl code, for
+     instance, because Perl variables look like Cheetah placeholders.
+
+\item A placeholder name consists of one or more \bf{components} seprated by
+     periods:  \code{\$a.b.c.d} .
+
+\item Each component consists of one or more letters, digits or underscores.
+     However, as we said above, the first character of the \em{first}
+     component may not be a digit.  These names are valid: \code{\$a},
      \code{\$_}, \code{\$var}, \code{\$_var}, \code{\$var1}, \code{\$_1var},
      \code{\$var2_}, \code{\$dict.key}, \code{\$list.item},
      \code{\$object.method}.  These names are not: \code{\$1}, \code{\$var@2},
      \code{\$\^var}.
 
+% Are all-numeric components allowed?  If so, need an example.
+
+\item Each component may optionally be followed by one or more sets of 
+     arguments in ``()'' or ``[]''.  Each pair of ``()'' implies a function
+     call; each pair of ``[]'' implies dictionary lookup or list
+     subscripting.  The format of arguments will be dealt with below.
+
 \item names are case-sensitive. \code{\$var} does not equal \code{\$Var}
      or \code{\$vAr} or \code{\$VAR}.     
      
-\item Trailing periods are ignored.  Cheetah will recognize that
-     placeholder name in \code{\$varName.} is \code{varName} and the period will
-     be left alone in the filled template output.
-     
-\item Placeholders can also be written in the form \code{\$\{placeholderName\}}.
-     This is useful for cases where there is no whitespace between the
-     placeholder and surrounding text (\code{surrounding\$\{embeddedVar\}text}).
-\end{itemize} 
+\item If a trailing period is found (that is, a period not followed by a valid
+     component character), it is not considered part of the placeholder.  This
+     is to allow placeholders at the end of sentences to be written in the 
+     natural manner: \code{\$varName.  Surrounding text.} or
+     \code{\$dict.key.  Surrounding text.}  In these examples, the 
+     placeholder names are `varName' and `dict.key'.
 
-\subsubsection{The searchList}
+\item Commas, quotation marks (single, double and backtick) and other symbols
+     are never allowed in placeholder names, so they will always be treated
+     as part of the surrounding text.  This is convenient for writing a 
+     placeholder followed by a comma or a quotation mark.  If an illegal
+     character occurs inside a ``\${}'' construct, e.g., \code{\$\{name,\}},
+     it's an error.  But commas and quotes \em{are} allowed inside argument
+     lists.  (Again, we'll get into argument lists more later.)
+
+\end{itemize}
+     
+
+\subsubsection{The SearchList}
+
+A \bf{SearchList (SL)} is simply a list of objects which will be searched to
+find the values for the placeholder names.  Every Template Object
+contains both a Template Definition and a SearchList.  
+When you create a Template Object in Python, you provide not only a
+Template Definition, but also a , which is simply a list of
+objects.  Later when you invoke the template to fill it in, Cheetah resolves
+the placeholders by consulting the SearchList.  For each placeholder name, it
+looks up the first component in the first object in the SearchList.
+
+Normally, the Template Object's \code{self} is the
+first (and perhaps the only) item in the SearchList.  
+When you later invoke a Template
+Object to fill it in, Cheetah resolves each placeholder as follows:
+
+
+\begin{enumerate}
+
+\item Cheetah takes the first component in the placeholder name and looks it up
+     in the first object in the SearchList.  Cheetah knows how to read both
+     attributes and keys, so the object can either be an instance
+     dictionary.  If the object has attributes, Cheetah looks for an attribute
+     of the same name.  Otherwise Cheetah
+     find a 1
+
+\end{enumerate}
+
 A {\bf namespace} is a Python dictionary that links names to values. Each
 template definition that has been loaded into a \code{Template} objet is
 associated with an ordered list of namespaces in which values for placeholder
@@ -114,9 +178,8 @@ not a String, Cheetah will call \code{str()} on it to obtain a string
 representation that can be inserted into the template.  But if the value is a
 callable object (e.g., a function or a method), Cheetah will first call it and
 then call \code{str()} on the result.  You may include or omit the () after
-callable placeholders such as functions.  If you omit the () Cheetah will call
-them without arguments.  Functions that are used without explicit parentheses
-must either accept no arguments, or all arguments must have default values.
+callable placeholders: Cheetah will call it (without arguments) in either case.
+
 
 \begin{verbatim}
 <HTML>
@@ -128,13 +191,22 @@ $aNumber                        ## type of value they map to.  They could be
 $aList                          ## any valid placeholder name.
 $aDictionary
 $aFunction
-$aFunction()
-$aFunction(myArg=1234)
 $anObject
 
 </BODY>
 </HTML>
 \end{verbatim}
+
+Note that you don't need to include () after \code{\$aFunction}.  Cheetah
+will recognize callable variables like functions and methods, call them and
+interpolate their return value in the filled template output.
+
+You cannot pass arguments to a function or method called this way.  (Actually,
+you can, but this feature may be removed soon, because it introduces too much
+complexity that is better done in Python outside the template.)  The function or
+method must either accept no arguments, or all its arguments must have default
+values.  Macro calls (see the Macros section) can accept arguments, but we
+aren't talking about macros here.
 
 Templates can be nested. It is valid to embed a placeholder name that maps to
 another \code{Template} object.  The filled output of the nested template will be

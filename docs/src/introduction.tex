@@ -7,9 +7,9 @@
 
 Cheetah is a Python-based template engine and code generator.  
 
-A template is like a form letter: text with placeholders for the data that
-needs to be filled in.  Python's \code{\%} operator provides a primitive tool
-for working with templates:
+A template is like a form letter: it contains text with placeholders for the
+changeable data that needs to be filled in.  Python's \code{\%} operator
+provides a primitive tool for working with templates:
 
 \begin{verbatim}
 >>> print """
@@ -29,16 +29,13 @@ Hello World!
 \end{verbatim}
 
 Cheetah is like the \code{\%} operator on steroids.  It's fast, flexible and
-powerful.  While the \code{\%} operator looks up placeholders in a single flat
-dictionary, Cheetah looks them up in a user-supplied list of items (the
-SearchList).  The searchable items can be objects or dictionaries. Cheetah
-will search attributes and/or keys as appropriate. The ''philosophy'' section
-below describes some of Cheetah's advanced features.
+powerful.  (The ``philosophy'' section below describes some of Cheetah's
+advanced features.) 
 
 Cheetah was designed for Internet development and provides integration with
 {\bf Webware for Python} (\url{http://webware.sourceforge.net/}).  Together
 with Webware, Cheetah is a compelling alternative to ASP, JSP, PHP and PSP for
-building dynamic web sites.  
+building dynamic web sites.
 
 Here is Cheetah's equivalent of the above example:
 
@@ -64,6 +61,10 @@ Hello World!
 \end{verbatim}
 
 
+But you can do much more with Cheetah than just this.
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{What is the philosophy behind Cheetah?}
 \label{intro.aims}
@@ -75,9 +76,10 @@ Cheetah aims:
      HTML/graphic designers, and programmers to work together without stepping
      on each other's toes and polluting each other's work.  The HTML framework
      and the content it contains are two separate things, and analytical
-     calculations (program code) are another.  Each team member should be able
-     to concentrate on their specialty and to implement their changes without
-     having to go through one of the others: i.e. the webmaster bottleneck.
+     calculations (program code) is a third thing.  Each team member should be
+     able to concentrate on her specialty and to implement her changes without
+     having to go through one of the others (i.e., the ``webmaster
+     bottleneck'').
 
      Other advantages to separation include:
      \begin{itemize}
@@ -92,7 +94,7 @@ Cheetah aims:
      
      While it should be easy to develop content, graphics and program
      code separately, it should be easy to integrate them together into a 
-     web site.  In particular, it should be easy:
+     website.  In particular, it should be easy:
 
      \begin{itemize}
      \item for \bf{programmers} to create reusable components and functions
@@ -108,7 +110,7 @@ Cheetah aims:
      \end{itemize}
 
      
-\item {\bf to provide template designers with a small set of 'Display Logic'
+\item {\bf to provide template designers with a small set of `Display Logic'
        programming structures such as conditional blocks and for loops}
      
      Graphic designers often do tasks that would be easier, faster, and less
@@ -120,7 +122,7 @@ Cheetah aims:
 \item {\bf to be equally well-suited for HTML, SGML, XML, SQL, Postscript, form
        email, LaTeX, or any other text-based format.}
      
-     Although Cheetah was designed with dynamic web sites and web applications
+     Although Cheetah was designed with dynamic websites and web applications
      in mind, it is not HTML-specific.
      
 \item {\bf to be efficient, flexible and extendable.}
@@ -135,27 +137,36 @@ Cheetah achieves these aims by:
      small Template Definition Language (TDL) that non-programmers can
      understand.
      
-     Cheetah's Template Definition Language is robust, but limited.  It's
-     limited because it's meant to complement Python, not replace it.  A
-     placeholder may be a simple attribute, a function call, or a method call,
-     but it may not be a complex expression with operators.  Complex
-     calculations should be done outside the template in Python code.
-     
 \item giving template designers a simple way of accessing Python variables,
      objects, and functions in their templates.
      
-\item providing a modular, object-oriented framework that makes it easy to
-     create and maintain large web sites.
+\item providing a modular, object-orientated framework that makes it easy to
+     create and maintain large websites.
      
-\item compiling 'Template Definitions' into native Python code at startup.  The
-     code is then executed for each request.  This approach is dramatically
-     faster than the string-substitution approach used by many templating
-     engines.
+\item compiling `Template Definitions' into native Python code at startup.
+     The code is then executed for each request.  This approach is
+     dramatically faster than the string-substitution approach used by many
+     templating engines.
 
 \item providing a very simple--yet powerful--caching mechanism that can
-     significantly increase the responsiveness of a dynamic web site.
+     significantly increase the responsiveness of a dynamic website.
 
 \end{itemize}
+
+Cheetah's Template Definition Language is robust but limited.  It's
+\bf{robust} because your templates can have named portions (``blocks'') which
+you can override individually, conditional portions (displayed only if X is
+true), and repeated portions (equivalent to ``for'' loops).  While the
+\code{\%} operator looks up placeholders in a single flat dictionary, Cheetah
+looks them up in a user-supplied list of objects (the SearchList).  The
+searchable objects can be instances or dictionaries--Cheetah will search
+attributes and/or keys as appropriate.  A neat trick is to subclass the
+template object, assign your data values as attributes, and put `self' in the
+SearchList!  But the language is \bf{limited} because it's meant to complement
+Python, not replace it.  A placeholder may be a method call or an
+attribute.subattribute, but it may not be an expression with operators.
+Complex calculations should be done outside the template and the results
+assigned to simple attributes in the SearchList.
 
 
 
@@ -165,14 +176,14 @@ Cheetah achieves these aims by:
 
 Cheetah is fast, flexible, agile and graceful - like its namesake. 
 
-% [INSERT: picture of a cheetah.]
+[INSERT: picture of a cheetah.]
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Who developed Cheetah?}
 \label{intro.developers}
 
-Cheetah is one of several templating frameworks that grew out of a 'templates'
+Cheetah is one of several templating frameworks that grew out of a `templates'
 thread on the Webware For Python email list.  Tavis Rudd, Mike Orr, Chuck
 Esterbrook, Ian Bicking and Tom Schwaller are the core developers.
 
@@ -180,21 +191,7 @@ Esterbrook, Ian Bicking and Tom Schwaller are the core developers.
 \subsection{How mature is Cheetah?}
 \label{intro.mature}
 
-Cheetah is alpha/beta software as this Users' Guide is incomplete and several
-aspects of the design are still subject to change. We are hoping to release
-production version 1.0 in the summer of 2001.
-
-Here's a summary of known issues and aspects of the design that are in flux.
-\begin{itemize}
-\item The \#include directive is not working with relative path file includes
-     when used with Webware. This should be resolved soon.
-\item The \#include directive is being reworked to monitor for changes in the
-     included file at run-time. It currently does the include once-off at
-     compile-time.
-\item The parsing of macros is currently being worked on to make it more
-     robust.  However, the macro interface is stable.
-
-\end{itemize}
+Cheetah is alpha-level software because the user interface is still evolving.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Where can I get releases?}
@@ -207,7 +204,7 @@ Download Cheetah releases from
 \subsection{Where can I get news?}
 \label{intro.news}
 
-News and updates can be obtained from the the Cheetah web site:
+News and updates can be obtained from the the Cheetah website:
 \url{http://CheetahTemplate.sourceforge.net}
 
 Cheetah discussions take place on the list
@@ -238,7 +235,7 @@ with the following information:
 \end{enumerate}
 
 \subsubsection{Example sites and tutorials}
-If you're developing a web site with Cheetah, please send a link to the
+If you're developing a website with Cheetah, please send a link to the
 email list so we can keep track of Cheetah sites.  Also, if you discover
 new and interesting ways to use Cheetah please share your experience and
 write a quick tutorial about your technique.
