@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.25 2002/05/02 23:57:01 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.26 2002/05/04 02:49:43 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.25 $
+Version: $Revision: 1.26 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2002/05/02 23:57:01 $
+Last Revision Date: $Date: 2002/05/04 02:49:43 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.25 $"[11:-2]
+__revision__ = "$Revision: 1.26 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -68,13 +68,18 @@ class Servlet(CGIImportMixin, BaseServlet):
     
     def __init__(self):
         BaseServlet.__init__(self)
-	self.isRunningFromWebKit = isRunningFromWebKit
-
+       
+        # this default will be changed by the .awake() method
+	self.isControlledByWebKit = False 
         
     ## methods called by Webware during the request-response
         
     def awake(self, transaction):
-        BaseServlet.awake(self, transaction)        
+        BaseServlet.awake(self, transaction)
+        
+        # a hack to signify that the servlet is being run directly from WebKit
+        self.isControlledByWebKit = True
+        
         self.transaction = transaction        
         self.application = transaction.application
         self.response = response = transaction.response
@@ -109,7 +114,8 @@ class Servlet(CGIImportMixin, BaseServlet):
                        normpath=os.path.normpath,
                        abspath=os.path.abspath
                        ):
-        if self.isRunningFromWebKit:
+        
+        if self.isControlledByWebKit:
             return BaseServlet.serverSidePath(self, path)
         elif path:
             return normpath(abspath(path.replace("\\",'/')))
