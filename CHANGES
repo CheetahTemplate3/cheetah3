@@ -16,6 +16,7 @@ release
     related to the default enclosures=[] argument.  This arg was unintentionally
     being shared between calls and thus leading to parsing errors as reported by
     Greg Czajkowski (TR)
+  - Filter: fixed an '== None' expression (should be 'is None'). (MO)
 
 0.9.13 (May 8, 2002)
   - changed Cheetah.Servlet.isRunningFromWebKit to isWebwareInstalled (TR)
