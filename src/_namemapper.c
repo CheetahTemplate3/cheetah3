@@ -11,6 +11,7 @@ static PyObject *ErrorObject;   /* locally-raised exception */
     { PyErr_SetString(ErrorObject, message); return NULL; }
 
 #define MAXCHUNKS 25		/* max num of nameChunks for the arrays */
+#define MAXNAMELEN 200		/* max num of chars in name */
 
 /* *************************************************************************** */
 /* First the c versions of the functions */
@@ -21,9 +22,7 @@ PyNamemapper_valueForKey(PyObject *obj, char *key)
 {
   PyObject *theValue = NULL;
   const char *underscore = "_";
-  static char * underscoreKey = NULL;
-  static int bufSize = 0;
-  static int newBufSize = 0;
+  char * underscoreKey = NULL;
 
   if (PyObject_HasAttrString(obj, key)) {
     theValue = PyObject_GetAttrString(obj, key);
@@ -31,22 +30,15 @@ PyNamemapper_valueForKey(PyObject *obj, char *key)
     theValue =  PyMapping_GetItemString(obj, key);
   } else {
 
-    newBufSize = strlen(key) + 2; /* +1 for "_", +1 for \0 terminator */
-    if(newBufSize>bufSize) {
-      bufSize = newBufSize;
-      if(underscoreKey) {
-	underscoreKey = realloc(underscoreKey, bufSize);
-      } else {
-	underscoreKey = malloc(bufSize);
-      }
-    }
-
+    underscoreKey = malloc(strlen(key) + 2); /* 1 for \0 and 1 for '_' */
     strcpy(underscoreKey, underscore);
     strcat(underscoreKey, key);
 
     if (PyObject_HasAttrString(obj, underscoreKey)) {
       theValue = PyObject_GetAttrString(obj, underscoreKey);
+      free(underscoreKey);
     } else {
+      free(underscoreKey);
       onError(key);
     }
   }
@@ -127,9 +119,8 @@ namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)
   char *name;
   int executeCallables = 0;
 
-  static char *copyOfName = NULL;
-  static int bufSize = 0;
-  static int newBufSize = 0;
+  PyObject *theValue;
+  char *copyOfName = NULL;
 
   const char *dot = ".";
   char *nameChunks[MAXCHUNKS];
@@ -141,23 +132,16 @@ namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)
   if (!PyArg_ParseTupleAndKeywords(args, keywds, "Os|i", kwlist,  &obj, &name, &executeCallables)) {
     return NULL;
   }
-
-  newBufSize = strlen(name) + 1; /* +1 for \0 terminator */
-  if (newBufSize > bufSize) {
-    bufSize = newBufSize;
-    if (copyOfName) {
-      copyOfName = realloc(copyOfName, bufSize);
-    } else {
-      copyOfName = malloc(bufSize);
-    }
-  }
-
+  
+  copyOfName = malloc(strlen(name) + 1);
   copyOfName = strcpy(copyOfName, name);
   nameChunks[0] = strtok(copyOfName, dot);
   while ((nextChunk = strtok(NULL, dot)) != NULL) {
     nameChunks[numChunks++] = nextChunk;
   }
-  return PyNamemapper_valueForName(obj, nameChunks, numChunks, executeCallables);
+  theValue = PyNamemapper_valueForName(obj, nameChunks, numChunks, executeCallables);
+  free(copyOfName);
+  return theValue;
 }
 
 
@@ -169,9 +153,8 @@ namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
   const char *name;
   int executeCallables = 0;
 
-  static char *copyOfName = NULL;
-  static int bufSize = 0;
-  static int newBufSize = 0;
+  PyObject *theValue;
+  char *copyOfName = NULL;
 
   const char *dot = ".";
   char *nameChunks[MAXCHUNKS];
@@ -185,22 +168,15 @@ namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
     return NULL;
   }
 
-  newBufSize = strlen(name) + 1; /* +1 for \0 terminator */
-  if (newBufSize > bufSize) {
-    bufSize = newBufSize;
-    if (copyOfName) {
-      copyOfName = realloc(copyOfName, bufSize);
-    } else {
-      copyOfName = malloc(bufSize);
-    }
-  }
+  copyOfName = malloc(strlen(name) + 1);
   copyOfName = strcpy(copyOfName, name);
 
   nameChunks[0] = strtok(copyOfName, dot);
   while ((nextChunk = strtok(NULL, dot)) != NULL) {
     nameChunks[numChunks++] = nextChunk;
   }
-  return PyNamemapper_valueFromSearchList(searchList, nameChunks, numChunks, executeCallables);
+  theValue = PyNamemapper_valueFromSearchList(searchList, nameChunks, numChunks, executeCallables);
+  return theValue;
 }
 
 /* *************************************************************************** */
