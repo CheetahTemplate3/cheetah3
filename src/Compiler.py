@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.45 2002/10/05 21:38:09 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.46 2002/10/05 22:12:00 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.45 $
+Version: $Revision: 1.46 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/10/05 21:38:09 $
+Last Revision Date: $Date: 2002/10/05 22:12:00 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.45 $"[11:-2]
+__revision__ = "$Revision: 1.46 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -176,7 +176,7 @@ class GenUtils:
         #                      + chunk[2])            
         #else:
         
-        translatedName = ('VFS([locals()] + SL + [globals()],"' + chunk[0] +
+        translatedName = ('VFS([locals()] + SL + [globals(), __builtin__],"' + chunk[0] +
                           '",' + str(autoCall and chunk[1]) + ')'
                           + chunk[2])
         
@@ -566,6 +566,7 @@ class AutoMethodCompiler(MethodCompiler):
                                       ("currentTime","time.time"),
                                       ("globals","globals"),
                                       ("locals","locals"),
+                                      ("__builtin__","__builtin__"),
                                       ]:
                 self.addMethArg(argName, defVal)
         
@@ -1032,6 +1033,7 @@ class ModuleCompiler(Parser, GenUtils):
             "from os.path import getmtime, exists",
             "import time",
             "import types",
+            "import __builtin__",
             "from Cheetah.Template import Template",
             "from Cheetah.DummyTransaction import DummyTransaction",
             "from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList",

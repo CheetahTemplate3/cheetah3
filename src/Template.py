@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.102 2002/10/05 21:41:17 tavis_rudd Exp $
+# $Id: Template.py,v 1.103 2002/10/05 22:12:00 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.102 $
+Version: $Revision: 1.103 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/10/05 21:41:17 $
+Last Revision Date: $Date: 2002/10/05 22:12:00 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.102 $"[11:-2]
+__revision__ = "$Revision: 1.103 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -35,7 +35,8 @@ from tempfile import mktemp
 import imp
 import traceback
 
-import __builtin__ # this is added to the end of the searchList
+import __builtin__
+
 # Base classes for Template (intra-package imports)
 from SettingsManager import SettingsManager  
 from Servlet import Servlet                 
@@ -163,7 +164,6 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             self._searchList = [self._globalSetVars]            
             self._searchList.extend(list(searchList))
             self._searchList.append( self )
-            self._searchList.append( __builtin__ )
                 
         ##################################################
         ## setup the ouput filters

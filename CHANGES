@@ -38,12 +38,9 @@ release
     MIGHT BREAK EXISTING CODE (TR)
   - Install Cheetah into site-packages/Cheetah/ rather than
     site-packages/Webware/Cheetah/. Added code to automatically remove the old dir.(TR)
-  - added __builtin__ to the end of the searchList so that other searchList
-    variables can override Python builtins. The old implementation allowed
-    builtins to trump searchList vars. (TR)
   - fixed the variable name resolution order bug in $placeholders.  The new
     implementation uses 
-     valueFromSearchList([locals()] + searchList + [globals()], rest of the args) 
+     valueFromSearchList([locals()] + searchList + [globals(), __builtin__], rest of the args) 
     for all lookups. (TR)
   - removed the #settings directive (TR)
   - added the #del directive, for using Python's del statement (TR)
