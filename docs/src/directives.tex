@@ -24,9 +24,10 @@ with function arguments and macro arguments, which are different things.)
 
 Some Directives consist of a single tag, while others have a matching end tag
 that looks like this: \code{\#end theDirective/\#}.  The text between a tag and
-its matching end tag is called the \em{body} of the tag.  Note that the body
-does not include any part of either tag: it's the text \em{outside} the tags.
-However, a directive body may have other directives inside \em{it|.
+its matching end tag is called the \em{body} of the tag or a \em{block}.  Note
+that the body does not include any part of either tag: it's the text
+\em{outside} the tags.  However, a directive body may have other directives
+inside \em{it|.
 
 To escape something that looks like a #D so that Cheetah will treat it as
 ordinary text, place a backslash before the ``#'':
@@ -104,16 +105,17 @@ $contents                               ## an end-of-line comment
 \subsection{\#block ... \#end block}
 
 \code{\#block} assigns a name to the portion of the TD that is the body of the
-directive.  \code{\#block} takes one attribute, That named portion is called a
-``block''.  One argument is required: the block name.  It must follow the same
-naming rules as an Identifier.
+directive.   The result is a \em{named block}.  One argument is required: the
+block name.  It must follow
+the same naming rules as an Identifier.
 
-The only thing you can do with a block is to \#redefine it.  This replaces
-the content of the block with something else \em{at the location where the
-original block was defined}.  In other words, the original block serves to
-show \em{where} the \code{#redefine}'d text should go, and to be a fallback to
-display if there is no \code{\#redefine}.  \code{\#redefine} also requires one
-argument, again the block name.
+A named block will appear in the output as if it were ordinary text, but a
+later \code{#redefine} directive can override it.  This replaces the content of
+the block with something else \em{at the location where the original block was
+defined}.  In other words, the original block serves to show \em{where} the
+\code{#redefine}'d text should go, and to be a fallback to display if there is
+no \code{\#redefine}.  \code{\#redefine} also requires one argument, again the
+block name.
 
 A frequent use of \code{\#block} and \code{\#redefine} is to combine a pair of
 templates, one a general site framework with the common header and footer, and
@@ -175,8 +177,12 @@ use placeholders.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#extend}
 
-% Is this directive still valid?  What is it supposed to do?
+\code{#extend} is related to but separate from 
+\code{.extendTemplate(newTemplateDef)}.  More documentation to come later.
 
+Essentially, \code{#extend parentTemplateClass} allows you to inherit from
+a more general template definition.  You may then \code{#redefine} some of its
+named blocks.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#for ... \#end for}
