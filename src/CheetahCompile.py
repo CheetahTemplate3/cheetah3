@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.23 2002/03/07 04:09:12 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.24 2002/03/13 03:37:48 hierro Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.23 $
+Version: $Revision: 1.24 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/03/07 04:09:12 $
+Last Revision Date: $Date: 2002/03/13 03:37:48 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.23 $"[11:-2]
+__revision__ = "$Revision: 1.24 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -75,7 +75,7 @@ class CheetahCompile:
     def _processCmdLineArgs(self):
         try:
             self._opts, self._args = getopt.getopt(
-                self._cmdLineArgs, 'hpdRwv', [])
+                self._cmdLineArgs, 'hpdRwv', ['help'])
 
         except getopt.GetoptError, v:
             # print help information and exit:
@@ -84,7 +84,7 @@ class CheetahCompile:
             sys.exit(2)
         
         for o, a in self._opts:
-            if o in ('-h',):
+            if o in ('-h', '--help'):
                 self.usage()
                 sys.exit()
             if o in ('-R',):
@@ -202,6 +202,7 @@ Usage:
   -p                          Print generated Python code to stdout
   -w                          Write output of template to *.html
   -v                          Be verbose
+  -h | --help                 Print this help message
 """ % {'scriptName':self._scriptName,
        'Version':Version,
        'author':'Tavis Rudd and Ian Bicking',
