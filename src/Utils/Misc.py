@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Misc.py,v 1.6 2002/10/20 09:20:42 hierro Exp $
+# $Id: Misc.py,v 1.7 2005/01/03 18:12:20 tavis_rudd Exp $
 """Miscellaneous functions/objects used by Cheetah but also useful standalone.
 
 Meta-Data
@@ -7,59 +7,16 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/11/07
-Last Revision Date: $Date: 2002/10/20 09:20:42 $
+Last Revision Date: $Date: 2005/01/03 18:12:20 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.6 $"[11:-2]
-
-##################################################
-## DEPENDENCIES
+__revision__ = "$Revision: 1.7 $"[11:-2]
 
 import os          # Used in mkdirsWithPyInitFile.
 import types       # Used in useOrRaise.
-
-##################################################
-## CONSTANTS
-
-try:
-    True, False
-except NameError:
-    True, False = (1==1),(1==0)
-
-##################################################
-## PRIVATE FUNCTIONS
-
-
-##################################################
-## MISCELLANEOUS FUNCTIONS
-
-#!/usr/bin/env python
-# $Id: Misc.py,v 1.6 2002/10/20 09:20:42 hierro Exp $
-"""Miscellaneous functions/objects used by Cheetah but also useful standalone.
-
-Meta-Data
-================================================================================
-Author: Mike Orr <iron@mso.oz.net>
-License: This software is released for unlimited distribution under the
-         terms of the Python license.
-Version: $Revision: 1.6 $
-Start Date: 2001/11/07
-Last Revision Date: $Date: 2002/10/20 09:20:42 $
-""" 
-__author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.6 $"[11:-2]
-
-##################################################
-## DEPENDENCIES
-
 import sys         # Used in die.
-import types       # Used in useOrRaise.
-
-##################################################
-## PRIVATE FUNCTIONS
-
 
 ##################################################
 ## MISCELLANEOUS FUNCTIONS
@@ -67,7 +24,6 @@ import types       # Used in useOrRaise.
 def die(reason):
     sys.stderr.write(reason + '\n')
     sys.exit(1)
-
 
 def useOrRaise(thing, errmsg=''):
     """Raise 'thing' if it's a subclass of Exception.  Otherwise return it.

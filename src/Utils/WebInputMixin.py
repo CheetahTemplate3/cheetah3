@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# $Id: WebInputMixin.py,v 1.7 2002/11/25 09:23:24 hierro Exp $
+# $Id: WebInputMixin.py,v 1.8 2005/01/03 18:12:20 tavis_rudd Exp $
 """Mixin for Cheetah.Servlet for importing web transaction variables in bulk.
 
 This works for GET/POST fields both in Webware servlets and in CGI scripts, 
 and for cookies and session variables in Webware servlets.  If you try to
 read a cookie or session variable in a CGI script, you'll get a RuntimeError.
-"In a CGI script" here means "not running as a Webware servlet".  If the CGI
+'In a CGI script' here means 'not running as a Webware servlet'.  If the CGI
 environment is not properly set up, Cheetah will act like there's no input.
 
 The public method provided is:
@@ -20,7 +20,7 @@ searchList.  It handles:
     * conversion to integer or float for specified names
     * default values/exceptions for missing or bad values
     * printing a snapshot of all values retrieved for debugging
-All the 'default*' and 'bad*' arguments have "use or raise" behavior, meaning 
+All the 'default*' and 'bad*' arguments have 'use or raise' behavior, meaning 
 that if they're a subclass of Exception, they're raised.  If they're anything
 else, that value is substituted for the missing/bad value.  
 
@@ -34,7 +34,7 @@ The simplest usage is:
     write(dic['choice'])
 
 Both these examples retrieves the GET/POST field 'choice' and print it.  If you
-leave off the "#silent", all the values would be printed too.  But a better way
+leave off the '#silent', all the values would be printed too.  But a better way
 to preview the values is
 
     #silent $webInput(['name'], $debug=1)
@@ -46,7 +46,7 @@ wasn't working so I changed it to a 'print' statement.  So the debugging
 output will appear wherever standard output is pointed, whether at the
 terminal, in a Webware log file, or whatever. ***
 
-Since we didn't specify any coversions, the value is a string.  It's a "single"
+Since we didn't specify any coversions, the value is a string.  It's a 'single'
 value because we specified it in 'names' rather than 'namesMulti'.  Single
 values work like this:
     * If one value is found, take it.
@@ -60,7 +60,7 @@ Multi values work like this:
       arguments are *not* consulted in this case.
 
 Example: assume 'days' came from a set of checkboxes or a multiple combo box
-on a form, and the user chose "Monday", "Tuesday" and "Thursday".
+on a form, and the user chose 'Monday', 'Tuesday' and 'Thursday'.
 
     #silent $webInput([], ['days'])
     The days you chose are: #slurp
@@ -69,18 +69,18 @@ on a form, and the user chose "Monday", "Tuesday" and "Thursday".
     #end for
 
     dic = self.webInput([], ['days'])
-    write("The days you chose are: ")
+    write('The days you chose are: ')
     for day in dic['days']:
-        write(day + " ")
+        write(day + ' ')
 
-Both these examples print:  "The days you chose are: Monday Tuesday Thursday".
+Both these examples print:  'The days you chose are: Monday Tuesday Thursday'.
 
-By default, missing strings are replaced by "" and missing/bad numbers by zero.
-(A "bad number" means the converter raised an exception for it, usually because
+By default, missing strings are replaced by '' and missing/bad numbers by zero.
+(A 'bad number' means the converter raised an exception for it, usually because
 of non-numeric characters in the value.)  This mimics Perl/PHP behavior, and
 simplifies coding for many applications where missing/bad values *should* be
 blank/zero.  In those relatively few cases where you must distinguish between
-""/zero on the one hand and missing/bad on the other, change the appropriate
+''/zero on the one hand and missing/bad on the other, change the appropriate
 'default*' and 'bad*' arguments to something like: 
     * None
     * another constant value
@@ -113,7 +113,7 @@ sources:
     'f'   fields (CGI GET/POST parameters)
     'c'   cookies
     's'   session variables
-    'v'   "values", meaning fields or cookies
+    'v'   'values', meaning fields or cookies
 
 In many forms, you're dealing only with strings, which is why the
 'default' argument is third and the numeric arguments are banished to
@@ -132,15 +132,15 @@ write a bunch of conversion/exception handling code.  Example:
     dic = self.webInput(['name', 'height:int'])
     name = dic[name]
     height = dic[height]
-    write("%s is %s cm tall." % (name, height))
+    write('%s is %s cm tall.' % (name, height))
     if height > 300:
-        write("Wow, you're tall!")
+        write('Wow, you're tall!')
     else:
-        write("Pshaw, you're short.")
+        write('Pshaw, you're short.')
 
-To convert a value to a number, suffix ":int" or ":float" to the name.  The
-method will search first for a "height:int" variable and then for a "height"
-variable.  (It will be called "height" in the final dictionary.)  If a numeric
+To convert a value to a number, suffix ':int' or ':float' to the name.  The
+method will search first for a 'height:int' variable and then for a 'height'
+variable.  (It will be called 'height' in the final dictionary.)  If a numeric
 conversion fails, use or raise 'badInt' or 'badFloat'.  Missing values work
 the same way as for strings, except the default is 'defaultInt' or
 'defaultFloat' instead of 'default'.
@@ -154,10 +154,10 @@ Webware's Servlet or HTTPServlet.  Otherwise you'll get an AttributeError
 on 'self.request'.
 
 EXCEPTIONS: ValueError if 'source' is not one of the stated characters.
-TypeError if a conversion suffix is not ":int" or ":float".
+TypeError if a conversion suffix is not ':int' or ':float'.
 
 FUTURE EXPANSION: a future version of this method may allow source
-cascading; e.g., 'vs' would look first in "values" and then in session
+cascading; e.g., 'vs' would look first in 'values' and then in session
 variables.
 
 Meta-Data
@@ -165,28 +165,17 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2002/03/17
-Last Revision Date: $Date: 2002/11/25 09:23:24 $
+Last Revision Date: $Date: 2005/01/03 18:12:20 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.7 $"[11:-2]
-
-##################################################
-## CONSTANTS & GLOBALS
-
-True, False = (1==1), (1==0)
-
-##################################################
-## DEPENDENCIES
+__revision__ = "$Revision: 1.8 $"[11:-2]
 
 import cgi     # Used by WebInputMixin.cgiImport() if this is a CGI script.
 import pprint
 import types
 from Cheetah.Utils.Misc import useOrRaise
-
-##################################################
-## EXCEPTIONS
 
 class NonNumericInputError(ValueError):
     pass

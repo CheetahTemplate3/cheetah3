@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: FileUtils.py,v 1.9 2003/08/18 06:21:20 tavis_rudd Exp $
+# $Id: FileUtils.py,v 1.10 2005/01/03 18:10:15 tavis_rudd Exp $
 """File utitilies for Python:
 
 Meta-Data
@@ -7,15 +7,13 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/09/26
-Last Revision Date: $Date: 2003/08/18 06:21:20 $
+Last Revision Date: $Date: 2005/01/03 18:10:15 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.9 $"[11:-2]
+__revision__ = "$Revision: 1.10 $"[11:-2]
 
-##################################################
-## DEPENDENCIES
 
 from glob import glob
 import os
@@ -24,16 +22,6 @@ import os.path
 import re
 from types import StringType
 from tempfile import mktemp
-
-##################################################
-## CONSTANTS & GLOBALS
-
-True = (1==1)
-False = (1==0)
-
-
-##################################################
-## FUNCTIONS
 
 def _escapeRegexChars(txt,
                      escapeRE=re.compile(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])')):

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 """
+@@TR: This code is pretty much unsupported.
+
 MondoReport.py -- Batching module for Python and Cheetah.
 
 Version 2001-Nov-18.  Doesn't do much practical yet, but the companion

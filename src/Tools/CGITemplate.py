@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# $Id: CGITemplate.py,v 1.3 2003/06/14 16:14:43 hierro Exp $
+# $Id: CGITemplate.py,v 1.4 2005/01/03 18:11:20 tavis_rudd Exp $
 """A subclass of Cheetah.Template for use in CGI scripts.
 
 Usage in a template:
-    #extends Cheetah.Tools.CGIMixin
+    #extends Cheetah.Tools.CGITemplate
     #implements respond
     $cgiHeaders#slurp
 
@@ -32,30 +32,15 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2003/06/14 16:14:43 $
+Last Revision Date: $Date: 2005/01/03 18:11:20 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.3 $"[11:-2]
-
-##################################################
-## CONSTANTS & GLOBALS
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
-
-##################################################
-## DEPENDENCIES
+__revision__ = "$Revision: 1.4 $"[11:-2]
 
 import os
 from Cheetah.Template import Template
-
-
-##################################################
-## CLASSES
 
 class CGITemplate(Template):
     """Methods useful in CGI scripts.
