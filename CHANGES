@@ -12,6 +12,7 @@ Please initial your changes and add a date for each release
    - more work on the Users' Guide (MO)
    - fixed bug with adding Python's __builtins__ to the local vars list (TR)
    - fixed bug with #echo (TR)
+   - fixed bug that was preventing ${a, $b=1234} from working like ${a, b=1234} (TR)
 
 0.9.9a6 (Nov 6, 2001) 
    - fixed bug with quotations in longer constant string chunks (TR)
