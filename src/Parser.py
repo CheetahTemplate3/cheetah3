@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.41 2002/02/25 04:02:56 tavis_rudd Exp $
+# $Id: Parser.py,v 1.42 2002/02/26 07:12:56 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.41 $
+Version: $Revision: 1.42 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/02/25 04:02:56 $
+Last Revision Date: $Date: 2002/02/26 07:12:56 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.41 $"[11:-2]
+__revision__ = "$Revision: 1.42 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -110,15 +110,15 @@ tripleQuotedStringStarts =  ("'''", '"""',
                              "uR'''", 'uR"""', "UR'''", 'UR"""')
 
 tripleQuotedStringPairs = {"'''": single3, '"""': double3,
-                        "r'''": single3, 'r"""': double3,
-                        "u'''": single3, 'u"""': double3,
-                        "ur'''": single3, 'ur"""': double3,
-                        "R'''": single3, 'R"""': double3,
-                        "U'''": single3, 'U"""': double3,
-                        "uR'''": single3, 'uR"""': double3,
-                        "Ur'''": single3, 'Ur"""': double3,
-                        "UR'''": single3, 'UR"""': double3,
-                        }
+                           "r'''": single3, 'r"""': double3,
+                           "u'''": single3, 'u"""': double3,
+                           "ur'''": single3, 'ur"""': double3,
+                           "R'''": single3, 'R"""': double3,
+                           "U'''": single3, 'U"""': double3,
+                           "uR'''": single3, 'uR"""': double3,
+                           "Ur'''": single3, 'Ur"""': double3,
+                           "UR'''": single3, 'UR"""': double3,
+                           }
 
 closurePairs= {')':'(',']':'[','}':'{'}
 closurePairsRev= {'(':')','[':']','{':'}'}
@@ -1432,8 +1432,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         
         ##################################################
         ## dynamically bind to and __init__ with this new baseclass
-        #  - this is required for COMPILE_TIME_CACHE to work properly
-        #    and for dynamic use of templates compiled directly from file
+        #  - this is required for dynamic use of templates compiled directly from file
         #  - also necessary for the 'monitorSrc' fileMtime triggered recompiles
         
         if self._templateObj:
@@ -1658,7 +1657,6 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
 
     def eatFinally(self):
         self.addFinally(self.eatSimpleExprDirective())
-
 
     def eatPass(self):
         self.addChunk(self.eatSimpleExprDirective())
