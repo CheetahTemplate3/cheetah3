@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.26 2002/03/18 21:27:36 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.27 2002/03/18 21:30:19 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.26 $
+Version: $Revision: 1.27 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/03/18 21:27:36 $
+Last Revision Date: $Date: 2002/03/18 21:30:19 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.26 $"[11:-2]
+__revision__ = "$Revision: 1.27 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -1043,6 +1043,7 @@ class ModuleCompiler(Parser, GenUtils):
                             'ErrorCatchers',
                             'True',
                             'False',
+                            'None',
                             ]
         
         self._moduleConstants = [
