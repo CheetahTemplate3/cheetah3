@@ -16,7 +16,8 @@ release
   - Utils.optik: Optik 1.3 package by Gregory P Ward, for parsing
     command-line options in 'cheetah' comamnd. (MO)
   - rewrite of the "cheetah" and "cheetah-compile" commands. 
-    The command-line options have changed! (MO)
+    The command-line options have changed! So have the command-line
+    options of .py template moodules.  (MO)
   - Utils.dualglob: new module to recursively generate source+destination
     filenames from command-line filespecs. (MO)
 

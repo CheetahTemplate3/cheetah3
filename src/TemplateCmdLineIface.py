@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: TemplateCmdLineIface.py,v 1.8 2002/04/15 06:22:53 tavis_rudd Exp $
+# $Id: TemplateCmdLineIface.py,v 1.9 2002/09/03 01:53:23 hierro Exp $
 
 """Provides a command line interface to compiled Cheetah template modules.
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/12/06
-Last Revision Date: $Date: 2002/04/15 06:22:53 $
+Last Revision Date: $Date: 2002/09/03 01:53:23 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.8 $"[11:-2]
+__revision__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -61,7 +61,7 @@ class CmdLineIface:
     def _processCmdLineArgs(self):
         try:
             self._opts, self._args = getopt.getopt(
-                self._cmdLineArgs, 'hep:', ['help',
+                self._cmdLineArgs, 'h', ['help',
                                             'env',
                                             'pickle=',
                                             ])
@@ -76,13 +76,17 @@ class CmdLineIface:
             if o in ('-h','--help'):
                 print self.usage()
                 sys.exit()
-            if o in ('-e','--env'):
+            if o == '--env':
                 self._template.prependToSearchList(os.environ)
-            if o in ('-p','--pickle'):
+            if o == '--pickle':
                 if a == '-':
-                    self._template.prependToSearchList( load( sys.stdin ) )
+                    unpickled = load(sys.stdin)
+                    self._template.prependToSearchList(unpickled)
                 else:
-                    self._template.prependToSearchList( load(a) )
+                    f = open(a)
+                    unpickled = load(f)
+                    f.close()
+                    self._template.prependToSearchList(unpickled)
 
     def usage(self):
         return """Cheetah %(Version)s template module command-line interface
@@ -95,12 +99,13 @@ Options
 -------
   -h, --help                 Print this help information
   
-  -e, --env                  Use shell ENVIRONMENT variables to fill the
+  --env                      Use shell ENVIRONMENT variables to fill the
                              $placeholders in the template.
                              
-  -p <file>, --pickle <file> Use a variables from a dictionary stored in Python
+  --pickle <file>            Use a variables from a dictionary stored in Python
                              pickle file to fill $placeholders in the template.
-                             If <file> is - stdin is used: '%(scriptName)s -p -'
+                             If <file> is - stdin is used: 
+                             '%(scriptName)s --pickle -'
 
 Description
 -----------
@@ -114,4 +119,4 @@ defaults for the $placeholders.
        'Version':Version,
        }
 
-
+# vim: shiftwidth=4 tabstop=4 expandtab
