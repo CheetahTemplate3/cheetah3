@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.80 2001/12/22 00:52:58 tavis_rudd Exp $
+# $Id: Template.py,v 1.81 2002/02/25 17:10:13 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.80 $
+Version: $Revision: 1.81 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/12/22 00:52:58 $
+Last Revision Date: $Date: 2002/02/25 17:10:13 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.80 $"[11:-2]
+__revision__ = "$Revision: 1.81 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -64,7 +64,9 @@ class Error(Exception):
     pass
     
 class Template(SettingsManager, Servlet):
-    """The core template engine: parses, compiles, and serves templates."""
+    
+    """The core template engine.  It serves as a base class for Template
+    servlets and also knows how to compile a template."""
 
     def __init__(self, source=None, searchList=[], file=None,
                  settings={},           # user settings that are visible in templates
@@ -81,8 +83,9 @@ class Template(SettingsManager, Servlet):
 
         Configuration settings should be passed in as a dictionary via the
         'settings' keyword.
-        
-        """
+
+        This method can also be called without arguments in cases where it is
+        called as a baseclass from a pre-compiled Template servlet."""
         
         ##################################################           
         ## Verify argument types
@@ -310,14 +313,12 @@ class Template(SettingsManager, Servlet):
         
     ##################################################
     ## internal methods -- not to be called by end-users
-          
-    def _bindFunctionAsMethod(self, function):
-        """Used to dynamically bind a plain function as a method of the
-        Template instance"""
-        return new.instancemethod(function, self, self.__class__)
-
 
     def _bindCompiledMethod(self, methodCompiler):
+        
+        """Called by the Compiler class, to add new methods at runtime as the
+        compilation process proceeds."""
+        
         genCode = str(methodCompiler).strip() + '\n'
         methodName  = methodCompiler.methodName()
         try:
@@ -336,6 +337,13 @@ class Template(SettingsManager, Servlet):
         setattr(self,methodName, genMeth)
         if methodName == 'respond':
             self.__str__ = genMeth
+
+          
+    def _bindFunctionAsMethod(self, function):
+        """Used to dynamically bind a plain function as a method of the
+        Template instance."""
+        return new.instancemethod(function, self, self.__class__)
+
 
     def _includeCheetahSource(self, srcArg, trans=None, includeFrom='file', raw=False):
         
