@@ -67,6 +67,10 @@ Implementation
   output.  The only outputting directives I see are #echo, #block and
   #include.
 
+- Change all True/False definitions to try blocks that don't override
+  the built-in names if they exist.  (True & False were added to Python
+  2.2.1.)
+
 Test Suite
 ================================================================================
 - test cases for the SkeletonPage framework
