@@ -1,6 +1,9 @@
 \section{Language Overview}
 \label{language}
 
+{\em Note:} there are some square brackets and backslashes missing from this
+chapter because I can't get \LaTeX\ to display them properly outside program
+listings.  Hopefully, this is just a temporary situation.
 
 Cheetah's basic syntax was inspired by the Java-based template engines Velocity
 and WebMacro. It has two types of tags: {\bf \$placeholders} and {\bf
@@ -17,9 +20,8 @@ uses a Python-like syntax inside directive tags and understands any valid
 Python expression.  However, unlike Python, Cheetah does not use colons (:) and
 indentation to mark off multi-line directives.  That doesn't work in an
 environment where whitespace is significant as part of the text.  Instead,
-multi-line directives like \code{\#for}, have  corresponding closing tags
- (\code{\#end for}).  Most directive tags are direct
-mirrors of Python statements.
+multi-line directives like \code{\#for} have  corresponding closing tags
+ (\code{\#end for}).  Most directives are direct mirrors of Python statements.
 
 Cheetah does not use HTML/XML-style tags like some other template languages for
 the following reasons:
@@ -27,7 +29,7 @@ the following reasons:
  HTML-style tags are hard to distinguish from real HTML tags,
  HTML-style tags are not visible in rendered HTML when something goes wrong,
  HTML-style tags often lead to invalid HTML (e.g., 
-\code{<img src=''<template-directive>''>}),
+\code{<img src="<template-directive>">}),
 Cheetah tags are less verbose and easier to understand than HTML-style tags, 
 and HTML-style tags aren't compatible with most WYSIWYG editors
 
@@ -63,6 +65,7 @@ bracket or brace pending, you don't need the backslash.
 <h1>hola, senorita!</h1>
 #end if
 \end{verbatim}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Language Constructs -- Summary}
 \label{language.constructs}
@@ -134,8 +137,8 @@ bracket or brace pending, you don't need the backslash.
      \item \code{\#try} \ldots \code{\#except} \ldots \code{\#else} \ldots
           \code{\#end try} 
      \item \code{\#try} \ldots \code{\#finally} \ldots \code{\#end try}
-     \item \code{\#errorCatcher} \ldots sets a default exception catcher/handler for
-          exceptions raised by \$placeholder calls.
+     \item \code{\#errorCatcher} \ldots sets a default exception
+          catcher/handler for exceptions raised by \$placeholder calls.
      \end{enumerate}
 
 \item Instructions to the parser/compiler
@@ -145,9 +148,9 @@ bracket or brace pending, you don't need the backslash.
      \end{enumerate}
 \end{enumerate}
 
-Cheetah also supports two ASP (Active Server Pages) style tags as escapes to
+Cheetah also supports two PSP (Python Server Pages) style tags as escapes to
 pure Python code. These are not part of Cheetah's core language, but are
-included to facilitate migration from ASP-style markup languages to Cheetah.
+included to facilitate migration from PSP-style markup languages to Cheetah.
 These tags may not be used inside other Cheetah tags.
 \begin{enumerate}
 \item evalute expression and print the output: \code{<\%=} \ldots \code{\%>} 
@@ -159,55 +162,72 @@ The use of all these directives will be covered in the next few chapters.
 %% @@MO: TODO: reconcile the order of this summary with the order in the
 %% detail sections.
 
-% @@MO: ASP chapter with examples.  What does write() do?  Print?
+% @@MO: PSP chapter with examples.  What does write() do?  Print?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Placeholder Syntax Rules}
-\label{language.placeholdersRules}
+\label{language.placeholders.syntax}
 
 \begin{itemize} 
-     
-\item Placeholder names consist of one or more identifiers separated by periods.
-     Each identifier follows the same rules as a Python variable name or
-     attribute name: it must start with a letter or an underscore, and the
-     subsequent characters must be letters, digits or underscores.  An
-     identifier may be followed by argument sets enclosed in ``()'' and/or
-     key/subscript arguments in ``[]''.
 
-\item Identifiers are case-sensitive. \code{\$var} does not equal \code{\$Var}
+\item Placeholders follow the same syntax rules as Python variables except
+     that they are preceded by \code{\$} or enclosed in \code{\$\{\}}.
+     Examples:
+\begin{verbatim}
+$var                                        
+${var}                                      
+$var2.abc['def']('gh', $subplaceholder, 2)  
+${var2.abc['def']('gh', $subplaceholder, 2)}
+\end{verbatim}
+     We recommend \code{\$} in simple cases, and \code{\$\{\}} when followed
+     directly by a letter or when Cheetah or a human template maintainer might
+     get confused about where the placeholder ends.  Cheetah also allows you
+     to enclose the placeholder in \code{\$()} or \$[], although this may make
+     it harder for the maintainer to see where the placeholder begins and ends:
+\begin{verbatim}
+$(var)                                      
+$[var]                                      
+$(var2.abc['def']('gh', $subplaceholder, 2))
+$[var2.abc['def']('gh', $subplaceholder, 2)]
+\end{verbatim}
+     {\em Note:} Advanced users can change the delimeters to anything they
+     want via the \code{\#compiler} directive.
+
+\item To reiterate Python's rules, placeholders consist of one or more
+     components separated by periods.  Each component must start with a letter
+     or an underscore, and the subsequent characters must be letters, digits or
+     underscores.  Any component may be followed by argument sets enclosed in
+     ``()'' and/or key/subscript arguments in ``$[]$''.
+
+\item Components are case sensitive. \code{\$var} does not equal \code{\$Var}
      or \code{\$vAr} or \code{\$VAR}.     
      
-\item String literals inside argument sets must be quoted, just like in Python.
-     All Python quoting styles are allowed.
-     
-\item All variable names inside argument sets should be prefixed with a \$.
-     Use \$func(\$var) instead of \$func(var).  Python's builtin functions also
-     follow this rule: \code{\$hex(\$myVar)}.
-
-\item All argument names inside argument sets should be prefixed with a \$.
-     Use \$func(\$arg=1234) instead of \$func(arg=1234).  This rule also applies
-     for *arg and **kw forms: \$func(\$*args) instead of \$func(*args).
+\item Arguments inside ``()'' or ``$[]$'' are just like in Python.  Strings may
+     be quoted using any Python quoting style.  Each argument is an expression
+     and may use any of Python's expression operators.  Variables used in
+     argument expressions are placeholders and should be prefixed with 
+     \code{\$}.  This also applies to the *arg and **kw forms.  
+     However, you do {\em not} need the \code{\$} with the special Python
+     constants \code{None}, \code{True} and \code{False}.
+     Examples:
+\begin{verbatim}
+$hex($myVar)
+$func($arg=1234)
+$func2($*args, $**kw)
+$func3(3.14159, $arg2, None, True)
+$myList[$mySubscript]
+\end{verbatim}
     
 \item Trailing periods are ignored.  Cheetah will recognize that the placeholder
-     name in \code{\$varName.} is \code{varName} and the period will be left
+     name in \code{\$varName.} is \code{varName}, and the period will be left
      alone in the template output.
      
-\item Placeholders can also be written in the form \code{\$\{placeholderName\}}
-     and \code{\$(placeholderName)}.  This is useful for cases where there is no
-     whitespace between the placeholder and surrounding text
-     (\code{surrounding\$\{embeddedVar\}text}).
-
 \item The syntax \code{\$\{placeholderName, arg1="val1"\}} passes arguments to
      the output filter (see \code{\#filter}, section \ref{output.filter}.
      The braces and comma are required in this case.  Note that you don't need
      the \code{\$} prefix in this case since filter arguments are not ordinary
      method arguments, and omiting the \code{\$} reminds you of this fact.
      However, you may use \code{\$} anyway if you wish.
-
-\item The special Python names \code{None}, \code{True} and \code{False} in
-     expressions do not require a \code{\$} prefix (but you can use \code{\$}
-     if you want).  \code{True} and \code{False} were added to Python 2.2.1, and
-     are simulated in Cheetah for earlier versions of Python.
 
 \item EXCEPTION: You must {\em not} use the \code{\$} prefix for intermediate
      variables in a Python list comprehensions.  This is a limitation of
@@ -219,11 +239,16 @@ The use of all these directives will be covered in the next few chapters.
      \code{\$theRange} is a regular \code{\#set} variable.  \code{\$range} is a
      Python built-in function.  But \code{x} is a scratch variable internal to
      the list comprehension: if you type \code{\$x}, Cheetah will miscompile it.
+
 \item Cheetah ignores all dollar signs (\code{\$}) that are not followed by a
      letter or an underscore.  Cheetah also ignores any placeholder escaped by a
-     backslash (\code{$\backslash$\$placeholderName}).
-
+     backslash. 
+     
 \end{itemize} 
+
+% @@MO: Removed example (\code{$\backslash$\$placeholderName}) because
+% the HTML version didn't show the backslash.
+
 
 The following are valid \$placeholders:
 \begin{verbatim}
@@ -237,133 +262,75 @@ These are not \$placeholders but are treated as literal text:
 $@var $^var $15.50 $$
 \end{verbatim}
 
-You can use compiler settings to change the placeholder delimiters if
-\code{\$}, \code{\{} and \code{\}} are not suitable.  This will be documented
-in the future.  None of the examples in this Guide use this feature.
-
-Why all the \$s in directives and expressions?  Think of an \$-prefixed
-variable as a ``smart variable''.  At compile time, Cheetah checks whether the
-name corresponds to a known local variable or Python builtin.  If so, it puts
-a bare variable name in the generated method.  If not, Cheetah puts in a 
-function call that will look up the value in the searchList.  Sometimes you
-will see templates where people have omitted some of the \$s in directives or
-expressions.  These may work if the name is a local variable or builtin.
-They will {\em not} work if the value comes from the searchList.  It's easier
-and less error-prone to just use the \$ everywhere and let Cheetah figure out
-the Best Thing To Do.  With ordinary placeholders in the text, of course, you
-{\em must} use the \$, because otherwise the name will be considered normal 
-text.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% @@MO: deleted, no new information.
-%\subsection{Directive Syntax Rules}
-%\label{language.directives}
-%
-%Directives tags are used for all functionality that cannot be handled with
-%simple placeholders. Some directives consist of a single tag while others
-%consist of a pair of {\bf start} and {\bf end} tags that surround a chunk of
-%text.  End tags are written in the form \code{\#end [directive-name]}.
-%Directives are case-sensitive.
+\subsection{Where can you use placeholders?}
+\label{language.placeholders.positions}
 
+There are three places you can use placeholders.  One is {\em placeholder
+position}, which means interspersed in ordinary text.  The others are expression
+position and LVALUE position.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Directive closures and whitespace handling}
-\label{language.directives.closures}
-Directive tags can be closed explicitly with \code{\#}, or implicitly with the
-end of the line if you're feeling lazy.
+{\em Expression position} means inside a Cheetah expression, which is the same
+as a Python expression.  The placeholder names a searchList or other variable
+which is read.  Expression position occurs inside () and $[]$ arguments within
+placeholder tags (i.e., a placeholder inside a placeholder), and in several
+directive tags.
 
+{\em LVALUE position} means naming a variable which will be written to.  LVALUE
+is a computer-science term that means ``the left side of an assignment 
+statement''.  The first argument of directives \code{\#set}, \code{\#for},
+\code{\#def}, \code{\#block} and \code{\#attr} is an LVALUE.
+
+This stupid example shows the three positions.  Placeholder position is shown
+in \code{courier}, expression position is {\em italic}, and LVALUE position is
+{\bf bold}.
+
+\begin{quote}
+\#for {\bf \$count} in {\em \$range}({\em \$ninetyNine}), 0, -1)\\
+\#set {\bf \$after} = {\em \$count} - 1\\
+\code{\$count} bottles of beer on the wall.  \code{\$count} bottles of beer!\\
+~~~~Take one down, pass it around.  \code{\$after} bottles of beer on the wall.\\
+\#end for\\
+\code{\$hex}({\em \$myVar}, {\bf \$default}={\em None})
+\end{quote}
+
+The output of course is:
 \begin{verbatim}
-#block testBlock #
-Text in the body of the
-block directive
-#end block testBlock #
+99 bottles of beer on the wall.  99 bottles of beer!
+    Take one down, pass it around.  98 bottles of beer on the wall.
+98 bottles of beer on the wall.  98 bottles of beer!
+    Take one down, pass it around.  97 bottles of beer on the wall.
+...
 \end{verbatim}
-is identical to:
-\begin{verbatim}
-#block testBlock
-Text in the body of the
-block directive
-#end block testBlock
-\end{verbatim}
-
-When a directive tag is closed explicitly, it can be followed with other text on
-the same line:
-
-\begin{verbatim}
-bah, bah, #if $sheep.color == 'black'# black#end if # sheep.
-\end{verbatim}
-
-When a directive tag is closed implicitly with the end of the line, all trailing
-whitespace is gobbled, including the newline character:
-\begin{verbatim}
-"""
-foo #set $x = 2 
-bar
-"""
-outputs 
-"""
-foo bar
-"""
-
-while 
-"""
-foo #set $x = 2 #
-bar
-"""
-outputs 
-"""
-foo 
-bar
-"""
-\end{verbatim}
-
-When a directive tag is closed implicitly AND there is no other text on the
-line, the ENTIRE line is gobbled up including any preceeding whitespace:
-\begin{verbatim}
-"""
-foo 
-   #set $x = 2 
-bar
-"""
-outputs 
-"""
-foo
-bar
-"""
-
-while 
-"""
-foo 
- - #set $x = 2
-bar
-"""
-outputs 
-"""
-foo 
- - bar
-"""
-\end{verbatim}
-
-The \code{\#slurp} directive (section \ref{output.slurp}) also gobbles up
-whitespace.
-
-Whitespace handling around comment directives is discussed in section
-\ref{comments.whitespace}.
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Variables in directives}
-\label{language.directives.variables}
+\subsection{Are all those dollar signs really necessary?}
+\label{language.placeholders.dollar-signs}
 
-Variable names used inside a directive tag should be prefaced by \$ as in this
-example:
+If you value simplicity, just follow the \code{\$} rules above and skip this
+section.  If you don't like that many dollar signs, read on.
 
-\begin{verbatim}
-#for $clientName, $address in $clients.addresses
-$clientName: $address
-#end for
-\end{verbatim}
+\code{\$} is a ``smart variable prefix''.  When Cheetah sees \code{\$}, it
+determines both the variable's position and whether it's a searchList value or
+a non-searchList value, and generates the appropriate Python code.  
+
+In placeholder position, the \code{\$} is {\em required}.  Otherwise there's
+nothing to distinguish the variable from ordinary text, and the variable name
+is output verbatim.
+
+In expression position, the \code{\$} is {\em required} if the value comes from
+the searchList, {\em recommended} for local/global/builtin variables, and 
+{\em not necessary} for the special constants \code{None}, \code{True} and
+\code{False}.  This works because Cheetah generates a function call for a
+searchList placeholder, but a bare variable name for a local/global/builtin
+variable.  The bare variable name happens to be what you get if you remove the
+delimeters from the placeholder, so this works.
+
+In LVALUE position, the \code{\$} is {\em recommended}.  Cheetah knows where
+an LVALUE is expected, so it can handle your variable name whether it has
+\code{\$} or not.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -446,7 +413,7 @@ For example, with Cheetah it is possible to write:
 \end{verbatim}
 where the second form is in NameMapper syntax.
 
-This works only with dictionary keys that are also valid Python identifiers.
+This works only with dictionary keys that are also valid Python components.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Autocalling}
@@ -618,6 +585,92 @@ raise the NameMapper.NotFound exception.  You can use the \code{\#errorCatcher}
 directive (section \ref{errorHandling.errorCatcher}) or {\bf errorCatcher}
 Template constructor argument (section \ref{howWorks.constructing}) to specify
 an alternate behaviour.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Directive closures and whitespace handling}
+\label{language.directives.closures}
+Directive tags can be closed explicitly with \code{\#}, or implicitly with the
+end of the line if you're feeling lazy.
+
+\begin{verbatim}
+#block testBlock #
+Text in the body of the
+block directive
+#end block testBlock #
+\end{verbatim}
+is identical to:
+\begin{verbatim}
+#block testBlock
+Text in the body of the
+block directive
+#end block testBlock
+\end{verbatim}
+
+When a directive tag is closed explicitly, it can be followed with other text on
+the same line:
+
+\begin{verbatim}
+bah, bah, #if $sheep.color == 'black'# black#end if # sheep.
+\end{verbatim}
+
+When a directive tag is closed implicitly with the end of the line, all trailing
+whitespace is gobbled, including the newline character:
+\begin{verbatim}
+"""
+foo #set $x = 2 
+bar
+"""
+outputs 
+"""
+foo bar
+"""
+
+while 
+"""
+foo #set $x = 2 #
+bar
+"""
+outputs 
+"""
+foo 
+bar
+"""
+\end{verbatim}
+
+When a directive tag is closed implicitly AND there is no other text on the
+line, the ENTIRE line is gobbled up including any preceeding whitespace:
+\begin{verbatim}
+"""
+foo 
+   #set $x = 2 
+bar
+"""
+outputs 
+"""
+foo
+bar
+"""
+
+while 
+"""
+foo 
+ - #set $x = 2
+bar
+"""
+outputs 
+"""
+foo 
+ - bar
+"""
+\end{verbatim}
+
+The \code{\#slurp} directive (section \ref{output.slurp}) also gobbles up
+whitespace.
+
+Whitespace handling around comment directives is discussed in the next
+chapter.
+
 
 
 % Local Variables:

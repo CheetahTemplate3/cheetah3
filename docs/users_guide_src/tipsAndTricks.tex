@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Miscellaneous Placeholder and Directive Tips}
+\section{Tips, Tricks and Troubleshooting}
 \label{tips}
 
 This chapter contains short stuff that doesn't fit anywhere else.
@@ -7,10 +7,6 @@ This chapter contains short stuff that doesn't fit anywhere else.
 Remember to look at the wiki periodically for the most recent tips contributed
 by users.  The mailing list also reveals tips as somebody posts a problem
 they're having and others troubleshoot it.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{ASP-style tags}
-\label{tips.ASP}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Placeholder Tips}
@@ -194,6 +190,35 @@ then the template can handle all the NameMapper lookups for you:
 Otherwise you'd have to call \code{self.getVar('arg1')} etc in your
 method, which is more wordy, and tedious.
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PSP-style tags}
+\label{tips.PSP}
+
+\code{<\%= \ldots \%>} and \code{<\%= \ldots \%>} allow an ecape
+to Python syntax inside the template.  You do not need it to use Cheetah
+effectively, and we're hard pressed to think of a case to recommend it.
+Nevertheless, it's there in case you encounter a situation you can't
+express adequately in Cheetah syntax.
+
+\code{<\%= \ldots \%>} encloses a Python expression whose result will
+be printed in the output.  
+
+\code{<\%= \ldots \%>} encloses a Python statement or expression (or set of
+statements or expressions) that will be included as-is into the generated
+method.  The statements themselves won't produce any output, but you can use
+the local function \code{write(EXPRESSION)} to produce your own output.
+
+{\em Warning:} {\bf No error checking is done!}  If you write:
+\begin{verbatim}
+<% break %>      ## Wrong!
+\end{verbatim}
+you'll get a \code{SyntaxError} when you fill the template, but that's what you
+deserve.
+
+Note that these are PSP-{\em style} tags, not PSP tags.  A Cheetah template
+is not a PSP document, and you can't use PSP commands in it.
 
 
 % Local Variables:

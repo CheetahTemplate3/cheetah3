@@ -43,14 +43,21 @@ template to subclass another template or a pure Python class.  This is where
 \code{\#extends} steps in: it specifies the parent class.  It's equivalent to
 PSP's \code{``@page extends=''} directive. 
 
+Cheetah imports the class mentioned in an
+\code{\#extends} directive if you haven't imported it yet, so you can skip the
+\code{\#import} or \code{\#from} directive and save some clutter in your
+template.  The implicit importing works like this:
+
 \begin{verbatim}
-#from Cheetah.Templates.SkeletonPage import SkeletonPage
-#extends SkeletonPage
+#extends Superclass   
+## Implicitly does '#from Superclass import Superclass'.
+
+#extends Cheetah.Templates.SkeletonPage
+## Implicitly does '#from Cheetah.Templates.SkeletonPage import SkeletonPage'.
 \end{verbatim}
 
-In the very near future, you won't need that \code{\#from ... import}
-because \code{\#extends} will implicitly import whatever 
-class it needs, but for now the explicit import is necessary.
+If your superclass is in an unusual location or is in a module named 
+differently than the class, you must import it explicitly.
 
 There can be only one \code{\#extends} directive in a template and it
 may list only one class.  In other words, templates don't do multiple
