@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.25 2001/08/10 03:57:58 tavis_rudd Exp $
+# $Id: Template.py,v 1.26 2001/08/10 04:53:47 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.25 $
+Version: $Revision: 1.26 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/10 03:57:58 $
+Last Revision Date: $Date: 2001/08/10 04:53:47 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.25 $"[11:-2]
+__version__ = "$Revision: 1.26 $"[11:-2]
 
 
 ##################################################
@@ -257,10 +257,21 @@ class Template(SettingsManager):
         # to be passed in
 
 
+
+        ## process the settings
+        self.initializeSettings()
+        if kw.has_key('overwriteSettings'):
+            # this is intended to be used internally by Nested Templates in #include's
+            self._settings = kw['overwriteSettings']
+        elif kw.has_key('settings'):
+            self.updateSettings(kw['settings'])
+        self.placeholderProcessor.setTagStartToken(self.setting('placeholderStartToken'))
+
+
         ## Setup the searchList of namespaces in which to search for $placeholders
         # + setup a dict of #set directive vars - include it in the searchList
         if kw.has_key('setVars'):
-            # happens with nested Template obj creation from #include's
+            # this is intended to be used internally by Nested Templates in #include's
             self._setVars = kw['setVars']
         else:
             self._setVars = {}
@@ -277,16 +288,8 @@ class Template(SettingsManager):
                 tup = tuple(kw['searchList'])
                 self._searchList.extend(tup) # .extend requires a tuple.
 
-
-        ## process the settings
-        self.initializeSettings()
-        if kw.has_key('overwriteSettings'):
-            self._settings = kw['overwriteSettings']
-        elif kw.has_key('settings'):
-            self.updateSettings(kw['settings'])
-        self.placeholderProcessor.setTagStartToken(self.setting('placeholderStartToken'))
-
-        ## deal with other keywd args
+        ## deal with other keywd args 
+        # - these are for internal use by Nested Templates in #include's
         if kw.has_key('macros'):
             self._macros = kw['macros']
             
@@ -297,12 +300,11 @@ class Template(SettingsManager):
             
         if os.environ.get('CHEETAH_DEBUG'):
             self._settings['debug'] = True
-        if kw.has_key('plugins'):
-            self._settings['plugins'] += kw['plugins']
         for plugin in self._settings['plugins']:
             self._registerCheetahPlugin(plugin)
 
-        
+
+        ## Now, start compile if we're meant to
         if not self.setting('delayedCompile'):
             self.compileTemplate()
                    
@@ -540,23 +542,19 @@ class Template(SettingsManager):
         """Define a block.  See the user's guide for info on blocks."""            
         self._cheetahBlocks[blockName]= blockContents
 
+    ## make an alias
+    redefineTemplateBlock = defineTemplateBlock
+    
     def killTemplateBlock(self, *blockNames):
         """Fill a block with an empty string so it won't appear in the filled
         template output."""
         
-        if not hasattr(self, '_cheetahBlocks'):
-            return False
         for blockName in blockNames:
             self._cheetahBlocks[blockName]= ''
 
     def loadMacro(self, macroName, macro):
         """Load a macro into the macros dictionary, using the specified macroName"""
-        
-        if not hasattr(self, '_macros'):
-            self._macros = {}
-
         self._macros[macroName] = macro
-
 
     def loadMacros(self, *macros):
         """Create macros from any number of functions and/or bound methods.  For
@@ -597,9 +595,6 @@ class Template(SettingsManager):
         """
         import re
         
-        if not hasattr(self, '_blocks'):
-            self._blocks = {}
-
         redefineDirectiveRE = re.compile(
             r'(?<!#)#redefine[\t ]+' +
             r'(?P<blockName>[A-Za-z_][A-Za-z_0-9]*?)' +
