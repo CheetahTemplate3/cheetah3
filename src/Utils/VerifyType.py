@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: VerifyType.py,v 1.2 2001/12/19 02:10:25 tavis_rudd Exp $
+# $Id: VerifyType.py,v 1.3 2002/03/16 19:13:15 hierro Exp $
 """Functions to verify an argument's type
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/11/07
-Last Revision Date: $Date: 2001/12/19 02:10:25 $
+Last Revision Date: $Date: 2002/03/16 19:13:15 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.2 $"[11:-2]
+__revision__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -73,5 +73,10 @@ def VerifyTypeClass(arg, argname, legalTypes, ltd, klass, errmsgExtra=''):
         m = _errmsg(argname, ltd, errmsgExtra)
         raise TypeError(m)
 
+# @@MO: Commented until we determine whether it's useful.
+#def VerifyClass(arg, argname, klass, ltd):
+#    """Same, but allow *only* a subclass of the right class.
+#    """
+#    VerifyTypeClass(arg, argname, [types.ClassType], ltd, klass)
 
 # vim: shiftwidth=4 tabstop=4 expandtab
