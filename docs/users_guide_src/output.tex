@@ -15,6 +15,13 @@ representation of its value.  These string representations are identical to
 those returned by Python's str() function, with the exception of \code{None}.
 \code{None} is replaced with an empty string, or in other words nothing.
 
+Cheetah finds the values for Placeholders in several places.  First, the
+placeholder name can be one of Python's builtins, like \code{\$range} or
+\code{\$len}.  Second, the name can refer to a variable in Cheetah's
+\code{``searchList''}.  Third, the name can refer to a local variable, such as
+\code{\$i} in a for loop, or an imported module name, such as \code{\#import
+math \ldots \$math.sin(0.5)}.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Output From Complex Expressions: \#echo}
 \label{TDL.echo}
