@@ -71,11 +71,10 @@ She loves me.
 If the argument is zero or negative, the loop will execute zero times.
 
 Inside the loop, there's no way to tell which iteration you're on.  If you
-need a counter variable, use \code{#for} instead with Python's \code{range}
+need a counter variable, use \code{\#for} instead with Python's \code{range}
 function.  Since Python's ranges are base 0 by default, there are two ways
 to start counting at 1.  Say we want to count from 1 to 5, and that
-<CODE>$count</CODE> is 5.
-is 
+<CODE>\$count</CODE> is 5.
 \begin{verbatim}
 #for $i in $range($count)
 #set $step = $i + 1
@@ -144,9 +143,9 @@ Here's an example that combines an \code{\#if} tag with a \code{\#for} tag.
 \subsection{\#unless ... \#end unless}
 \label{flowControl.unless}
 
-\code{#unless} is the opposite of \code{#if}: the text is executed if the
+\code{\#unless} is the opposite of \code{\#if}: the text is executed if the
 condition is {\bf false}.  Sometimes this is more convenient.
-\code{#unless EXPR} is equivalent to \code{#if not (EXPR)}.
+\code{\#unless EXPR} is equivalent to \code{\#if not (EXPR)}.
 
 \begin{verbatim}
 #unless $alive
@@ -156,8 +155,8 @@ THIS IS AN EX-PARROT!!
 #end unless
 \end{verbatim}
 
-You cannot use \code{#else if} or \code{#else} inside an \code{#unless}
-construct.  If you need these, you should use \code{#if} instead.
+You cannot use \code{\#else if} or \code{\#else} inside an \code{\#unless}
+construct.  If you need these, you should use \code{\#if} instead.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#break and \#continue}
