@@ -1,5 +1,10 @@
 Please initial your changes and a date for each release
 ================================================================================
+0.9.8 (not released yet)
+  - the docs directory (./docs/src/) is rapidly changing until further notice.
+(MO)
+
+
 0.9.7 (July 13, 2001)
   - reimplemented the parsing of $placeholders using the Python tokenizer module (TR)
     - now translates into Python code instead of going through NameMapper for
