@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.11 2001/07/31 04:20:02 hierro Exp $
+# $Id: Template.py,v 1.12 2001/07/31 05:39:17 hierro Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/31 04:20:02 $
+Last Revision Date: $Date: 2001/07/31 05:39:17 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.11 $"[11:-2]
+__version__ = "$Revision: 1.12 $"[11:-2]
 
 
 ##################################################
@@ -574,29 +574,29 @@ class Template(SettingsManager):
         """
         class Accumulator:
             """
-            Accumulate unique values.  This is a set, but the 'include' method
-            calls the original handler as a side effect.
+            Accumulate unique values.  This is essentially a set class.
+            The 'include' method returns '' as a side effect so that it may
+            be used as a CodeGenerator.varNotFound_* replacement.
             """
-            def __init__(self, originalHandler):
+            def __init__(self):
                 self.data = {}
-                self.originalHandler = originalHandler
             def include(self, templateObj, tag):
                 """Add a tag to the set."""
                 self.data[tag] = 1
-                return self.originalHandler(templateObj, tag)
+                return ''
             def result(self):
                 """Return the list of tags in the set, sorted."""
                 ret = self.data.keys()
                 ret.sort()
                 return ret
-        originalHandler = self._settings['varNotFound_handler']
-        accum = Accumulator(originalHandler)
-        self._settings['varNotFound_handler'] = accum.include
+        originalHandler = self.setting('varNotFound_handler')
+        accum = Accumulator()
+        self.setSetting('varNotFound_handler', accum.include)
         try:
             str(self) # Fill the Template Object and throw away the result.
             unknowns = accum.result()
         finally:
-            self._settings['varNotFound_handler'] = originalHandler
+            self.setSetting('varNotFound_handler', originalHandler)
         return unknowns
             
     
