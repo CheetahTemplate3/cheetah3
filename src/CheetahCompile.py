@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.18 2001/12/19 01:46:37 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.19 2001/12/19 01:55:16 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.18 $
+Version: $Revision: 1.19 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/12/19 01:46:37 $
+Last Revision Date: $Date: 2001/12/19 01:55:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.18 $"[11:-2]
+__version__ = "$Revision: 1.19 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -26,7 +26,7 @@ from glob import glob
 import shutil
 
 #intra-package imports ...
-from Version import version
+from _properties import Version
 from Compiler import Compiler
 
 ##################################################
@@ -191,7 +191,7 @@ class CheetahCompile:
         
     def usage(self):
         print \
-"""Cheetah %(version)s command-line compiler by %(author)s
+"""Cheetah %(Version)s command-line compiler by %(author)s
 
 Compiles Cheetah files (.tmpl) into Webware servlet modules (.py)
 
@@ -203,7 +203,7 @@ Usage:
   -w                          Write output of template to *.html
   -v                          Be verbose
 """ % {'scriptName':self._scriptName,
-       'version':version,
+       'Version':Version,
        'author':'Tavis Rudd and Ian Bicking',
        }
    
