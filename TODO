@@ -74,5 +74,8 @@ Examples
   - SQL
   - LaTeX
   - form email
-
+- Template definitions in a database.  .py template modules in a 
+  database?  Caching template classes and/or instances extracted from
+  a database.
+- Pickled templates?
 
