@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.15 2002/03/10 04:27:19 hierro Exp $
+# $Id: Servlet.py,v 1.16 2002/03/12 07:49:19 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.15 $
+Version: $Revision: 1.16 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2002/03/10 04:27:19 $
+Last Revision Date: $Date: 2002/03/12 07:49:19 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.15 $"[11:-2]
+__revision__ = "$Revision: 1.16 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -56,19 +56,19 @@ class Servlet(BaseServlet):
     
     def __init__(self):
         BaseServlet.__init__(self)
+	self.isRunningFromWebKit = isRunningFromWebKit
+
         
     ## methods called by Webware during the request-response
         
     def awake(self, transaction):
         self.transaction = transaction        
         self.application = transaction.application
-        self.response    = transaction.response
-        self.request     = transaction.request
-        self._session     = None  # don't create unless needed
-	response         = self.response()
+        self.response = response = transaction.response
+        self.request = transaction.request
+        self.session = transaction.session
         self.write = response.write
         #self.writeln = response.writeln
-	self.isRunningFromWebKit = isRunningFromWebKit
         
     def respond(self, trans=None):
         return ''
