@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.12 2001/07/31 05:39:17 hierro Exp $
+# $Id: Template.py,v 1.13 2001/07/31 06:59:57 hierro Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/31 05:39:17 $
+Last Revision Date: $Date: 2001/07/31 06:59:57 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.12 $"[11:-2]
+__version__ = "$Revision: 1.13 $"[11:-2]
 
 
 ##################################################
@@ -227,12 +227,11 @@ class Template(SettingsManager):
             f.close()
             self._fileName = file
             self._fileMtime = os.path.getmtime(file)
-        elif type(file) == types.FileType:
+        elif hasattr(file, 'read'):
             templateDef = file.read()
-            # Can't set filename or mtime; they're not accessible.
+            # Can't set filename or mtime--they're not accessible.
         else:
-            raise TypeError("'file' argument must be file name or file object")
-            # Not allowing UserFile out of laziness.
+            raise TypeError("'file' argument must be a filename or file-like object")
 
         if kw.has_key('macros'):
             self._macros = kw['macros']
