@@ -12,29 +12,33 @@ operating system that Python 2.0 runs on.
 \subsection{Installation}
 \label{gettingStarted.install}
 
-To install Cheetah for system-wide use:
+To install Cheetah to your system-wide Python library:
 \begin{enumerate}
-\item Login as a user with privileges to install Python packages.  On POSIX
-     systems (AIX, Solaris, Linux, IRIX, etc.), the command is normally
-     'su root'.  On non-POSIX systems such as Windows NT, login as an 
+\item Login as a user with privileges to install system-wide Python packages.
+     On POSIX systems (AIX, Solaris, Linux, IRIX, etc.), the command is normally
+     'su root'.  On non-POSIX systems such as Windows NT, login as an
      administrator.
 
 \item Run \code{python setup.py install} at the command prompt.
 
 \item The setup program will install the program {\bf cheetah-compile} to the
-     "bin/" directory of your Python distribution.  If that directory is not
-     in your users' normal path, copy or symlink it to a directory that is in
-     their path.  
+     "/usr/bin" or something like that.
 \end{enumerate}
 
 %% @@MO: What about cheetah-compile on non-POSIX systems? 
 
-We do not currently have instructions for non-privileged users installing
-Cheetah in their home directory.  It's basically a matter of copying the 'src'
-subdirectory to a location on your PYTHONPATH and renaming it as 'Cheetah'.
-However, the C module '\_namemapper.c' must be compiled, and the script
-'cheetah-compile' must be generated and placed in '~/bin'.
+To install Cheetah to an alternate location use the options to setup.py's
+\code{install} command:
+\begin{verbatim}
+    python setup.py install --home /home/tavis 
+and
+    python setup.py install --install-lib /home/tavis/lib/python
+both install to /home/tavis/lib/python/Cheetah
+\end{verbatim}
 
+Cheetah's installation is managed by Python's Distribution Utilities
+('distutils').  There are many options for customization.  Type \code{``python
+  setup.py help''} for more information.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Testing your installation}
