@@ -1,5 +1,5 @@
 # You must change PYTHONSRC to the path of your Python source distributon.
-PYTHONSRC=/home/tavis/tmp/Python-2.2b1
+PYTHONSRC=/home/iron/nobackup/PYTHON/Python-2.2b1
 DOCNAME=users_guide
 MKHOWTO=$(PYTHONSRC)/Doc/tools/mkhowto
 MAIN_TEX_FILE= users_guide.tex
@@ -16,13 +16,13 @@ ps:
 html:
 	-rm -rf $(DOCNAME)
 	$(MKHOWTO) --html --split 1 --iconserver . $(MAIN_TEX_FILE)
-	-rm -R ../$(DOCNAME)_html
+	-rm -Rf ../$(DOCNAME)_html
 	mv $(DOCNAME) ../$(DOCNAME)_html
 
 htmlMultiPage:
 	-rm -rf $(DOCNAME)
 	$(MKHOWTO) --html --iconserver . $(MAIN_TEX_FILE)
-	-rm -R ../$(DOCNAME)_html_multipage
+	-rm -Rf ../$(DOCNAME)_html_multipage
 	mv $(DOCNAME) ../$(DOCNAME)_html_multipage
 
 text:
