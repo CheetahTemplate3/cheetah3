@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.19 2001/09/16 05:51:09 tavis_rudd Exp $
+# $Id: Parser.py,v 1.20 2001/09/17 06:04:40 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.19 $
+Version: $Revision: 1.20 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/09/16 05:51:09 $
+Last Revision Date: $Date: 2001/09/17 06:04:40 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.19 $"[11:-2]
+__version__ = "$Revision: 1.20 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -155,6 +155,9 @@ class Parser:
             ## setup some attribute mappings
             self._placeholderREs = templateObj._placeholderREs
             self._directiveREbits = templateObj._directiveREbits
+            self._localVarsList = templateObj._localVarsList
+            self._theFormatters = templateObj._theFormatters
+            self._errorChecker = templateObj._errorChecker
 
         else:                           # iAmATemplateObj
             self.makePlaceholderREs()       # inherited from the Parser class

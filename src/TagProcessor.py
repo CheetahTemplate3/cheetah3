@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: TagProcessor.py,v 1.16 2001/08/31 23:12:58 tavis_rudd Exp $
+# $Id: TagProcessor.py,v 1.17 2001/09/17 06:04:40 tavis_rudd Exp $
 """Tag Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.16 $
+Version: $Revision: 1.17 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/31 23:12:58 $
+Last Revision Date: $Date: 2001/09/17 06:04:40 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.16 $"[11:-2]
+__version__ = "$Revision: 1.17 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -43,27 +43,17 @@ class TagProcessor(Parser):
 
 
     def __init__(self, templateObj):
-        self._templateObj = templateObj
-        
-        ## setup some method mappings
-        self.state = templateObj._state
-        self.mergeNewTemplateData = templateObj.mergeNewTemplateData
-        self._setTimedRefresh = templateObj._setTimedRefresh
-        self.normalizePath = templateObj.normalizePath
-        self.getFileContents = templateObj.getFileContents
-
-        ## setup some attribute mappings        
-        self._macros = templateObj._macros
-        self._cheetahBlocks = templateObj._cheetahBlocks
-        self._localVarsList = templateObj._localVarsList
-        self._theFormatters = templateObj._theFormatters
-        self._errorChecker = templateObj._errorChecker
-        self._rawIncludes = templateObj._rawIncludes
-        self._parsedIncludes = templateObj._parsedIncludes
-        self._rawTextBlocks = templateObj._rawTextBlocks
-        self._setVars = templateObj._setVars
-
         Parser.__init__(self,templateObj)
+
+        ## setup some method mappings
+        self._templateObj = templateObj
+        self.state = templateObj._state
+
+
+    def templateObj(self):
+        """Return a reference to the templateObj that controls this processor"""
+        return self._templateObj
+
 
     ## Methods called automatically by the Template object   ##
     def preProcess(self, templateDef):
@@ -85,10 +75,6 @@ class TagProcessor(Parser):
             templateDef = RE.sub(subber, templateDef)
 
         return templateDef
-
-    def templateObj(self):
-        """Return a reference to the templateObj that controls this processor"""
-        return self._templateObj
    
     def initializeTemplateObj(self):
         """Initialize the templateObj so that all the necessary attributes are
@@ -96,9 +82,9 @@ class TagProcessor(Parser):
         that are registered as 'coreTagProcessors'.
 
         This must be called by subclasses"""
-
+        
         if not self.state().has_key('basicInitDone'):
-            self.state()['indentLevel'] = self.settings()['initialIndentLevel']
+            self.state()['indentLevel'] = self.setting('initialIndentLevel')
             self.state()['defaultCacheType'] = None
             self.state()['basicInitDone'] = True
     

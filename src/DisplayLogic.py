@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: DisplayLogic.py,v 1.6 2001/09/10 02:37:45 tavis_rudd Exp $
+# $Id: DisplayLogic.py,v 1.7 2001/09/17 06:04:40 tavis_rudd Exp $
 """DisplayLogic Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/09/10 02:37:45 $
+Last Revision Date: $Date: 2001/09/17 06:04:40 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -41,7 +41,7 @@ class DisplayLogic(TagProcessor.TagProcessor):
     
     def __init__(self, templateObj):
         TagProcessor.TagProcessor.__init__(self, templateObj)
-
+        
         bits = self._directiveREbits
 
         reTemplate = (r'%(startGrp)s(' +

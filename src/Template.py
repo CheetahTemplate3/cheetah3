@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.56 2001/09/15 19:37:14 tavis_rudd Exp $
+# $Id: Template.py,v 1.57 2001/09/17 06:04:40 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.56 $
+Version: $Revision: 1.57 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/09/15 19:37:14 $
+Last Revision Date: $Date: 2001/09/17 06:04:40 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.56 $"[11:-2]
+__version__ = "$Revision: 1.57 $"[11:-2]
 
 
 ##################################################
@@ -166,8 +166,6 @@ class Template(SettingsManager, Parser):
         self._checkForCacheRefreshes = False
         self._perResponseSetupCodeChunks = {}
         self._rawTextBlocks ={}
-        self._rawIncludes = {}
-        self._parsedIncludes = {}
 
         ## setup the include dictionaries for run-time includes
         self._cheetahIncludes = {}

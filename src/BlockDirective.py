@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: BlockDirective.py,v 1.7 2001/08/31 23:12:58 tavis_rudd Exp $
+# $Id: BlockDirective.py,v 1.8 2001/09/17 06:04:40 tavis_rudd Exp $
 """BlockDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/31 23:12:58 $
+Last Revision Date: $Date: 2001/09/17 06:04:40 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -38,6 +38,8 @@ class BlockDirective(TagProcessor.TagProcessor):
 
     def __init__(self, templateObj):
         TagProcessor.TagProcessor.__init__(self,templateObj)
+        self._cheetahBlocks = templateObj._cheetahBlocks
+        
         reChunk = 'block[\f\t ]+(?P<blockName>[A-Za-z_][A-Za-z_0-9]*?)[\f\t ]*'
         self._startTagRegexs = self.simpleDirectiveReList(reChunk)
         

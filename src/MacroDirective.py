@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: MacroDirective.py,v 1.10 2001/09/16 00:05:57 tavis_rudd Exp $
+# $Id: MacroDirective.py,v 1.11 2001/09/17 06:04:40 tavis_rudd Exp $
 """MacroDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/09/16 00:05:57 $
+Last Revision Date: $Date: 2001/09/17 06:04:40 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.10 $"[11:-2]
+__version__ = "$Revision: 1.11 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -40,7 +40,8 @@ class MacroDirective(TagProcessor.TagProcessor):
     
     def __init__(self, templateObj):
         TagProcessor.TagProcessor.__init__(self,templateObj)
-
+        self._macros = templateObj._macros
+        
         bits = self._directiveREbits
         reChunk = 'macro[\f\t ]+(?P<macroSignature>.+?)'
         self._startTagRegexs = self.simpleDirectiveReList(reChunk)
@@ -156,7 +157,7 @@ class CallMacroDirective(TagProcessor.TagProcessor):
     
     def __init__(self, templateObj):
         TagProcessor.TagProcessor.__init__(self,templateObj)
-
+        self._macros = templateObj._macros
 
 
         bits = self._directiveREbits
@@ -253,6 +254,7 @@ class LazyMacroCall(TagProcessor.TagProcessor):
     
     def __init__(self, templateObj):
         TagProcessor.TagProcessor.__init__(self,templateObj)
+        self._macros = templateObj._macros
         
         from Parser import escCharLookBehind
         startToken = self.setting('directiveStartToken')
