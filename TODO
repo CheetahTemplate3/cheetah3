@@ -10,15 +10,17 @@ Cheetah TODO list
 
 Requirements for 1.0
 =========================================================================
-- Python 2.3(b1) causes 16 failures in SyntaxAndOutput.py because the result
-  of boolean expressions is now True and False instead of 1 and 0 (or 'True'
-  and 'False' instead of '1' and '0' when used as placeholders).  The same
-  thing happens with $True and $False.  Do we need a set of parallel tests
-  for Python >= 2.3?  
-- There's a kludge in CheetahWrapper.py to abort with a helpful error message
-  if the user runs 'cheetah test' but doesn't have write permission in the
-  current directory.  The tests should instead put their temporary files
-  under the system tmp directory.
+- "cheetah test" problem: Python 2.3(b1) causes 16 failures in
+  SyntaxAndOutput.py because the result of boolean expressions is now True and
+  False instead of 1 and 0 (or 'True' and 'False' instead of '1' and '0' when
+  used as placeholders).  The same thing happens with $True and $False.  Add a
+  preprocessing step to convert output to '1' and '0' before comparing to the
+  control string.
+
+- "cheetah test" problem: subcommands fail mysteriously on Windows.  Rewrite
+  to avoid using subcommands.  Instead, set sys.argv and call the appropriate
+  main() for each test.
+
 - Simplify NameMapper.py while maintaining new behavior (ignore dictionary
   attributes/methods when searching for match of first chunk in searchList
   lookup).  Modify _namemapper.c to conform.  Make valueForKey error
@@ -27,16 +29,33 @@ Requirements for 1.0
   the entire unparsed placeholder tag to all NameMapper functions for use in
   a potential error message, the same way we're passing it to the output
   filter.  Also consider passing it to the errorCatcher.  (TR)
+
+- One-line #if broken.  It's recognized only if 'else' is present, otherwise
+  it miscompiles as an unclosed and incorrect multi-line #if.  The presence
+  of 'else' should trigger the one-line #if.
+
+- Documentation: document #encoding.  Explain problems with one-line #if and
+  "cheetah test" if they haven't been fixed yet.
+
+- There's a kludge in CheetahWrapper.py to abort with a helpful error message
+  if the user runs 'cheetah test' but doesn't have write permission in the
+  current directory.  The tests should instead put their temporary files
+  under the system tmp directory.
+
 - update User's Guide about changes to SkeletonPage (no more #settings,
   etc) (TR)
+
 - Decide on Cheetah's 1.0 license and update the Users' Guide.  Cheetah
   will remain open source, and derived works (open or closed source) will be
   allowed.  The issue is how to make the second part more explicit. (TR)
+
 - Add an example in the distribution of a simplified SkeletonPage
   that used #block but does not have fancy esoteric methods like
   style stuff. (MO)
+
 - Eliminate obsolete #settings directive from 
   examples/webware_examples/cheetahSite/siteTemplate.tmpl  (TR)
+
 - Recognize the exception value as a local variable inside the
   '#except Exception, ex' clause.  Currently $ex raises NotFound.
 
@@ -52,6 +71,21 @@ Other TODO Items
   * Refactor, make compile/fill/code routines callbacks using a bundle arg.
   * If an input file ends in a dot, intelligently add the input extension if
     not found.
+
+- ##null: throw this comment away, do not place it in the compiled template
+  module in any manner.  Useful for obsolete text, unfinished text, or notes
+  to yourself.  Do for single- and multi-line comments.
+
+- Split out the code needed to run the generated
+  python into a base class of Template, and derive the compiled Python class
+  from that?  This would allow precompiled templates to be loaded much more
+  quickly.
+
+- A further 'nice to have' optimisation would be to be able to specify at
+  compile time that you are not using filters, Webware transactions etc, and
+  not generate code that uses them.  This would remove the need to import
+  DummyTransaction and the Filters module.  It would also simplify the code
+  and function calls in the compiled template module.
 
 - Debugging tools.  See section below.
 
@@ -252,6 +286,36 @@ of typing into the field or uploading a text file.  We need a method that
 updates the text field's value if there is an uploaded file, but not if there
 isn't.  This may be handled by the regular method(s) or may require a separate
 method.
+
+RPM Building
+============
+From: John Landahl <john@landahl.org>
+To: cheetahtemplate-discuss@lists.sourceforge.net
+Subject: [Cheetahtemplate-discuss] Building Cheetah RPMs
+Date: Wed, 05 Nov 2003 01:27:24 -0800
+
+If anyone is interested in building Cheetah RPMs, simply add the following
+lines to a file called MANIFEST.in in the Cheetah directory and you'll be
+able to use the "bdist_rpm" option to setup.py (i.e. "python setup.py
+bdist_rpm"):
+
+  include SetupTools.py
+  include SetupConfig.py
+  include bin/*
+
+Also, I've found that using /usr/lib/site-python for add-on Python
+packages is much more convenient than the default of
+/usr/lib/pythonX/site-packages, especially when jumping back and forth
+between 2.2 and 2.3.  If you'd like Cheetah in /usr/lib/site-python,
+createa a setup.cfg with the following contents:
+
+  [install]
+  install-lib = /usr/lib/site-python
+
+Of course if you do have version specific libraries they should stay in
+/usr/lib/pythonX/site-packages, but Cheetah seems happy in both 2.2 and
+2.3 and so is a good candidate for /usr/lib/site-python.
+
 
 User-defined directives
 =======================================================================
