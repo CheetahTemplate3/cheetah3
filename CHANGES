@@ -9,7 +9,15 @@ release
   - Fix three bugs in "cheetah compile -R": (1) the generated class name 
     contained the subdirectory, (2) the destination path did not contain the
     subdirectory, (3) Cheetah failed to create the destination subdirectory
-    if missing. (MO)
+    if missing.  All subdirectories created have an "__init__.py" file. 
+    "cheetah fill -R" does the same thing but does not create 
+    "__init__.py". (MO)  NOTE: this is still buggy!
+  - New directory "attic" in source contains code that has been abandoned
+    for now but may come in handy someday. (MO)
+  - Tests.CheetahWrapper: test suite for "cheetah compile" and
+    "cheetah fill".  If the module is run from the command line, the
+    option "--list PATH/CheetahWrapper.py", lists all scenarios that would be
+    tested; the argument is the path to the test module itself. (MO)
 
 0.9.15a1 (Oct 6th, 2002)
   - fixed a package-relative import bug in ImportHooks.py (TR)
