@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.47 2003/03/25 21:18:34 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.48 2003/11/25 08:38:48 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.47 $
+Version: $Revision: 1.48 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2003/03/25 21:18:34 $
+Last Revision Date: $Date: 2003/11/25 08:38:48 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.47 $"[11:-2]
+__revision__ = "$Revision: 1.48 $"[11:-2]
 
 
 ##################################################
@@ -112,6 +112,7 @@ defaultTestNameSpace = {
         ],
     'nameList': [('john', 'doe'), ('jane', 'smith')],
     'letterList': ['a', 'b', 'c'],
+    'unicodeData':u'aoeu12345\u1234',
     }
 
 
@@ -160,7 +161,7 @@ Template output mismatch: %(notes)s
         
     def _verify(self, expectedOutput, notes=''):
         templateObj = self.template
-        output = str(templateObj)
+        output = templateObj.respond()
         templateObj.shutdown()
             
         assert output == expectedOutput, self.report \
@@ -533,11 +534,22 @@ class Placeholders_Vals(OutputTest):
         """
         self.verify("$none", "")
 
-    def test7(self):
+    def test8(self):
         """True, False
         """
         self.verify("$True $False", "1 0")
 
+class UnicodeStrings(OutputTest):
+    def test1(self):
+        """unicode data in placeholder
+        """
+        self.verify("$unicodeData", "aoeu12345\xe1\x88\xb4")
+
+    def test2(self):
+        """unicode data in body
+        """
+        self.verify(u"aoeu12345\u1234", u"aoeu12345\u1234")
+        
 class Placeholders_Esc(OutputTest):
     convertEOLs = False
     def test1(self):
