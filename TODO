@@ -63,6 +63,15 @@ Implementation
 
 - 'errorCatcher None' to stop catching errors in the middle of a template.
 
+- #del is the only statement that's missing, and there seems to be no other way
+  to do it.  #silent wants an expression, not a statement.  I'm mainly thinking
+  about deleting keys from local dictionaries -- delattr() doesn't do this --
+  but there's no reason it shouldn't work on local subscripts, attributes and
+  variables too.  Leave open the possibility for '#del global' (opposite of
+  '#set global') in the future if it's needed, and 
+  '#del searchList $var["key"]' too.  I don't know about '#del searchList $var':
+  that could be hard to implement, but maybe somebody will want it someday.
+
 
 Rewrite the caching framework
 =============================
