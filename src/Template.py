@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.108 2002/11/28 18:51:27 tavis_rudd Exp $
+# $Id: Template.py,v 1.109 2002/12/17 15:58:02 hierro Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.108 $
+Version: $Revision: 1.109 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/11/28 18:51:27 $
+Last Revision Date: $Date: 2002/12/17 15:58:02 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.108 $"[11:-2]
+__revision__ = "$Revision: 1.109 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -31,7 +31,7 @@ import types                      # used in the constructor
 import os.path                    # used in Template.normalizePath()
 from os.path import getmtime, exists
 from random import randrange
-from tempfile import mktemp
+from tempfile import gettempdir, mktemp
 import imp
 import traceback
 
@@ -448,7 +448,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         if self._filePath:
             moduleDir = self._fileDirName
         else:
-            moduleDir = os.getcwd()
+            moduleDir = gettempdir()
             
         packageName = self._makeDummyPackageForDir(moduleDir)
         mod = self._impModFromDummyPackage(packageName, tmpFilename)            

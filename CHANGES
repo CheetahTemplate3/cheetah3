@@ -29,6 +29,9 @@ release
     See the TODO file for our future plans. (MO)
   - Apply 2 unicode-support patches from Rodrigo B. de Oliveira (rodrigobamboo)
     that affected the Template and ModuleCompiler classes. (TR)
+  - Template: compiling a template from a string now works if the current
+    directory doesn't have write permission.  (MO)
+
 
 0.9.15a3 (Nov 10, 2002)
   - corrected a dictionary bug in the Python version of NameMapper (TR)
