@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.1 2001/06/13 03:50:39 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.2 2001/06/13 16:49:52 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/13 03:50:39 $
+Last Revision Date: $Date: 2001/06/13 16:49:52 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -541,14 +541,12 @@ def setDirectiveTagProcessor(templateObj, directive):
 
 def placeholderTagProcessor(templateObj, tag, convertToString=True,
                             cacheType=NoDefault, cacheRefreshInterval=15):
-    """generate the python code that will be evaluated for an embedded name
+    """generate the python code that will be evaluated for $placeholder
     during each request.
 
-    By default all $vars are cached except 'components', nested templates, and
-    vars that have been set locally in for loops or with the #set directive. To
-    make the $var completely dynamic so it is reinterpolated during each request
-    use the form $*var.  For timed-refresh interpolation used
-    $*[timeInterval]*var -> $*15*var.  """
+    This implementation handles caching of $placeholders and will auto-detect
+    'components', nested templates, and vars that have been set locally in for
+    loops or with the #set directive."""
 
     ## setup a reference to templateObj so $placeholders in argstrings can be eval'd here
     self = templateObj
