@@ -13,11 +13,16 @@ Requirements for 1.0
 - Build test suite for "cheetah compile -R" and "cheetah fill -R", and
   fix existing and anticipated bugs re paths and "/./" showing up where
   they're not wanted. (MO)
-  Also, CheetahWrapper.py line 293 uses the standard 'func_name'
+- CheetahWrapper.py line 293 uses the standard 'func_name'
   attribute, which is incompatible with Python 2.0.
+  2002-11-01: I'm not getting the exception any more, am about to close
+  this bug.
 - update User's Guide about changes to SkeletonPage (no more #settings,
   etc) (TR)
 - Decide on Cheetah's 1.0 license and update the Users' Guide. (TR)
+- Add an example in the distribution of a simplified SkeletonPage
+  that used #block but does not have fancy esoteric methods like
+  style stuff. (MO)
 
 
 Other TODO Items
