@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.90 2002/04/15 06:22:53 tavis_rudd Exp $
+# $Id: Template.py,v 1.91 2002/04/28 17:22:34 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.90 $
+Version: $Revision: 1.91 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/04/15 06:22:53 $
+Last Revision Date: $Date: 2002/04/28 17:22:34 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.90 $"[11:-2]
+__revision__ = "$Revision: 1.91 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -50,7 +50,7 @@ from Utils.Misc import CheckKeywords     # Used in Template.__init__
 ## CONSTANTS & GLOBALS
 
 try:
-    True,False
+    True, False
 except NameError:
     True, False = (1==1),(1==0)
 
@@ -444,13 +444,7 @@ class Template(SettingsManager, Servlet):
 
         """Returns a Python Package that thinks it came from 'dirName'.
         """
-
-        if dirName.find(':') != -1:     # Windows drive letter included
-            packageName = 'Cheetah.Temp.' + \
-                          dirName.split(':')[1].replace('\\', '/').replace('/', '_')
-        else:
-            packageName = 'Cheetah.Temp.' + dirName.replace('\\', '/').replace('/', '_')
-            
+        packageName = 'Cheetah.Temp.' + dirName.replace('\\', '/').replace('/', '_').replace(':','_')
         baseDirName, finalDirName = os.path.split(dirName)
         
         initModulePath = os.path.join(dirName, '__init__.py')
