@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.8 2002/10/01 17:52:03 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.9 2002/10/05 19:35:25 tavis_rudd Exp $
 """NameMapper Tests
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>,
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2002/10/01 17:52:03 $
+Last Revision Date: $Date: 2002/10/05 19:35:25 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.8 $"[11:-2]
+__revision__ = "$Revision: 1.9 $"[11:-2]
 
 
 ##################################################
@@ -37,11 +37,9 @@ except NameError:
 
 class DummyClass:
     classVar1 = 123
-    _classVar2 = 321
 
     def __init__(self):
         self.instanceVar1 = 123
-        self._instanceVar2 = 321
         
     def __str__(self):
         return 'object'
@@ -109,9 +107,7 @@ nestingResults =  {'anObj.meth1':'doo',
                    'aDict.nestedDict.aClass':DummyClass,
                    'aDict.nestedFunc':'Scooby',
                    'aClass.classVar1':123,
-                   'aClass.classVar2':321,
                    'anObj.instanceVar1':123,
-                   'anObj.instanceVar2':321,
                    'anObj.meth3':'A string',
                    }
 
@@ -249,15 +245,6 @@ class VFN(NameMapperTest):
         for i in range(10):
             self.check('aClass.classVar1')
 
-    def test21(self):
-        
-        """aClass._classVar2 in dict lookup"""
-        self.check('aClass.classVar2')
-
-    def test22(self):
-        """aClass._classVar2 in dict lookup in a loop"""
-        for i in range(10):
-            self.check('aClass.classVar2')
 
     def test23(self):
         """anObj.instanceVar1 in dict lookup"""
@@ -268,15 +255,7 @@ class VFN(NameMapperTest):
         for i in range(10):
             self.check('anObj.instanceVar1')
 
-    def test25(self):
-        
-        """anObj._instanceVar2 in dict lookup"""
-        self.check('anObj.instanceVar2')
-
-    def test26(self):
-        """anObj._instanceVar2 in dict lookup in a loop"""
-        for i in range(10):
-            self.check('anObj.instanceVar2')
+    ## tests 22, 25, and 26 removed when the underscored lookup was removed
 
     def test27(self):
         """anObj.meth1 in dict lookup"""
