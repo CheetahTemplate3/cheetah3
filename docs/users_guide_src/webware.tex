@@ -45,10 +45,11 @@ template definition in a *.tmpl file and use {\bf cheetah-compile} (section
 \ref{howWorks.cheetah-compile}) to convert it to a Python class in a *.py
 module, and then import it into her servlet.
 
-Because template objects are probably not thread safe, you should not store a
+Because template objects are not thread safe, you should not store a
 template object in a module variable and allow multiple servlets to fill it
 simultaneously.  Instead, each servlet should instantiate its own template
-object.
+object.  (Template {\em classes}, however, are thread safe, since they don't
+change once created.  So they are safe to store in a module global variable.)
 
 One warning about using the \code{\#include} directive in the Containment
 approach: the current directory while your servlet is running is probably not

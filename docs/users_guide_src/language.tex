@@ -11,15 +11,15 @@ data fields in a form letter or the \code{\%(key)s} fields Python's \code{\%}
 operator uses. When a template is processed, placeholders are replaced with the
 value they refer to.
 
-Directive tags begin with a hash character (\#) and are used for comments, loops,
-conditional blocks, includes, and all other advanced features. Cheetah uses a
-Python-like syntax inside directive tags and understands any valid Python
-expression.  Some of the main differences from pure Python syntax are that
-variable names are prefaced with a dollar sign (\$), that colons (:) are not
-used to mark the beginning of a code block, and indentation is not significant.
-See section \ref{language.namemapper} below for details of another important
-difference. Most of the directive tags listed below are direct mirrors of Python
-statements.
+Directive tags begin with a hash character (\#) and are used for comments,
+loops, conditional blocks, includes, and all other advanced features. Cheetah
+uses a Python-like syntax inside directive tags and understands any valid
+Python expression.  Some of the main differences from pure Python syntax are
+that variable names are prefaced with a dollar sign (\$), that colons (:) are
+not used to mark the beginning of a code block, and indentation is not
+significant.  See section \ref{language.namemapper} below for details of
+another important difference. Most of the directive tags listed below are
+direct mirrors of Python statements.
 
 Cheetah does not use HTML/XML-style tags like some other template languages for
 the following reasons:
@@ -181,7 +181,10 @@ These tags may not be used inside other Cheetah tags.
 \item The syntax \code{\$\{placeholderName, arg1="val1"\}} passes arguments to
      the output filter (see \code{\#filter}, section \ref{output.filter}.
      The braces and comma are required in this case.  Note that filter arguments
-     don't have a \code{\$} on the left side of the equal sign.
+     don't need a \code{\$} on the left side of the equal sign.
+
+\item The special Python name \code{None} does not require a
+     \code{\$} prefix.
 
 \item There is one other place you omit the \code{\$} prefix: intermediate
      variables in Python list comprehensions.  This is a limitation of
@@ -490,12 +493,47 @@ added to the start of the \code{searchList}.  Extra namespaces can be added to
 the end of the searchList at at any time using the
 \code{Template.addToSearchList()} method.
 
-If you want to make absolutely sure that you are accessing an attribute or
-method of the template object, include 'self' in the reference:
-\code{\$self.attrib1} instead of \code{\$attrib1}.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Missing values}
+\subsection{Local variables}
+\label{language.namemapper.localVariables}
+
+The following names are accessible by \code{\$placeholders}, even though they
+are not in the searchList:  
+
+\begin{enumerate}
+\item \code{\#set} variables and \code{\#set global} variables.
+\item \code{\#for} loop counters.
+\item the template object's \code{self} (i.e., \code{\$self.attrib1}).
+\item Python's built-in functions and objects (everything in module
+     \code{\_\_builtin\_\_}).
+\end{enumerate}
+
+These are in fact local variables in the generated class method.  The compiler
+can tell by context which \code{\$placeholders} should be looked up in the
+searchList and which are local variables, so it generates the appropriate
+Python lookup code for either case.  The compiler can also tell when to do
+NameMapper lookup on a local variable; e.g.:
+\begin{verbatim}
+#for $client in $clients 
+$client.name
+#end for
+\end{verbatim}
+The compiler knows that \code{\$client} is a local variable because it's a
+\code{\#for} loop counter.  The compiler also knows it has to do NameMapper
+lookup on the \code{.name} suffix in case it's a dictionary key or 
+autocallable.  So the compiler generates the appropriate Python code.
+
+If you want to make absolutely sure that you are accessing an attribute or
+method of the template object, include 'self' in the reference:
+\code{\$self.attrib1} instead of \code{\$attrib1}.  (With \code{self.}, it's
+a local variable lookup.  Without \code{self.}, Cheetah consults the 
+searchList.  Since \code{self} is the {\em last} element in the searchList,
+any other 'attrib1' in the searchList will override that one.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Missing values}
 \label{language.namemapper.missing}
 
 If NameMapper can not find a Python value for a Cheetah variable name, it will
@@ -504,6 +542,117 @@ directive (section \ref{errorHandling.errorCatcher}) or {\bf errorCatcher }
 constructor argument (section \ref{howWorks.constructing}) to specify an
 alternate behaviour.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Variable tips}
+\label{language.namemapper.tips}
+
+{\bf Tips for any template}
+
+Here's how to do certain important lookups that may not be obvious.
+Forms beginning with \code{\$} are placeholders.  Forms beginning with
+\code{self.} do the equivalent from Python, assuming you are in a method in
+the template object (or inherited by the template object).
+
+To verify whether a variable exists in the searchList:
+\begin{verbatim}
+$varExists('theVariable')
+self.varExists('theVariable')
+\end{verbatim}
+This is useful in \code{\#if} or \code{\#unless} constructs to avoid a
+\code{\#NameMapper.NotFound} error if the variable doesn't exist.  For instance,
+a CGI GET parameter that is normally supplied but in this case the user typed
+the URL by hand and forgot the parameter (or didn't know about it).
+
+To look up a variable in the searchList from a Python method:
+\begin{verbatim}
+self.getVar('theVariable')
+self.getVar('theVariable', None)
+self.getVar('theVariable', myDefault)
+\end{verbatim}
+This is the equivalent to \code{\$theVariable} in the template.  \code{getVar}
+returns the second argument (\code{None} or \code{myDefault} if the variable is
+missing; or, if there is no second argument, it raises raises
+\code{NameMapper.NotFound}.
+
+To do a ``safe'' placeholder lookup that returns a default value if the
+variable is missing:
+\begin{verbatim}
+$getVar('theVariable', None)
+$getVar('theVariable', $myDefault)
+\end{verbatim}
+
+To get an environmental variable, put \code{os.environ} as one of the
+elements in the searchList.  Or read the envvar in Python code and set a
+placeholder variable for it.
+
+{\bf Tips for templates that are Webware servlets}
+
+[Note: these are currenty untested.]
+
+To look up a CGI GET or POST parameter (with POST overriding):
+\begin{verbatim}
+$request.field.myParameter           ## Uniform Dotted Notation and autocalling.
+$request.field('myParameter')        ## Using autocalling only.
+$request().field('myParameter')      ## Using neither, boring.
+self.request().field('myParameter')
+\end{verbatim}
+These will fail if Webware is not available, because \code{\$request}
+(aka \code{self.request()} will be \code{None} rather than a Webware
+\code{WebKit.Request} object.  If you plan to read a lot of CGI parameters,
+you may want to put the \code{.field} method in a local variable for
+convenience:
+\begin{verbatim}
+#set $field = $request.field
+$field.myParameter
+$field('myParameter')
+\end{verbatim}
+But remember to do complicated calculations in Python, and assign the results
+to simple variables in the searchList for display.  These \code{\$request}
+forms are useful only for occasions where you just need one or two simple
+request items that going to Python for would be overkill.
+
+To get a cookie or session parameter, subsitute ``cookie'' or ``session'' for
+``field'' above.  To get a dictionary of all CGI parameters, substitute
+``fields'' (ditto for ``cookies'').  To verify a field exists,
+substitute ``hasField'' (ditto for ``hasCookie'').  
+
+Other useful request goodies:
+\begin{verbatim}
+## Defined in WebKit.Request
+$request.time              ## Time this request began in Unix ticks.
+$request.timeStamp         ## Time in human-readable format ('asctime' format).
+## Defined in WebKit.HTTPRequest
+$request.hasField.myParameter  ## Is a CGI parameter defined?
+$request.fields            ## Dictionary of all CGI parameters.
+$request.cookie.myCookie   ## A cookie parameter (also .hasCookie, .cookies).
+$request.value.myValue     ## A field or cookie variable (field overrides,
+                           ## also .hasValue).
+$request.session.mySessionVar  # A session variable.
+$request.extraURLPath      ## URL path components to right of servlet, if any.
+$request.serverDictionary  ## Dict of environmental vars from web server.
+$request.remoteUser        ## Authenticated username.  HTTPRequest.py source
+                           ## suggests this is broken and always returns None.
+$request.remoteAddress  ## User's IP address (string).
+$request.remoteName     ## User's domain name, or IP address if none.
+$request.urlPath        ## URI of this servlet.
+$request.urlPathDir     ## URI of the directory containing this servlet.
+$request.serverSidePath ## Absolute path of this servlet on local filesystem.
+$request.serverURL      ## URL of this servlet, without "http://" prefix,
+                        ## extra path info or query string.
+$request.serverURLDir   ## URL of this servlet's directory, without "http://".
+$log("message")         ## Put a message in the Webware server log.  (Watch out:
+                        ## '#attr log', '#def log' or '#block log' will clobber
+                        ## this method, probably confusing Webware!)
+                        ## Other Webware methods easily clobberable: 'sleep'.
+\end{verbatim}
+
+% @@ MO: If getVar() is called from Python, does errorCatcher apply?
+
+% @@ MO: Move all Webware variables to webware.tex?
+
 % Local Variables:
 % TeX-master: "users_guide"
 % End:      
+
+% # vim: expandtab
