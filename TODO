@@ -44,10 +44,16 @@ Implementation
   -p (stdout) and -p (pickle); we'll have to rename -p (stdout) to something
   else, both in 'cheetah fill' and 'cheetah compile'.
 
-- Make template filling thread safe.  .__init__ initializes self.mutex.
+- Make template filling more thread safe.  .__init__ initializes self.mutex.
   .respond acquires lock at beginning, and unlocks at end.  Do not compile the
   template without acquiring the lock.  Remember to unlock in a try/finally
   clause in case there's an exception.
+     This will not be completely sufficient.  If the user changes a 'self'
+  variable or searchList variable, it will leak into the other threads.  How
+  to avoid this while still giving multithreaded applications the benefit of
+  Cheetah caching?  Add a second mutex the threads can explicitly lock before
+  setting their variables?  This could affect performance if the threads take
+  a long time to do that.
 
 Test Suite
 ================================================================================
