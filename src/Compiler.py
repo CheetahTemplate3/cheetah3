@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.32 2002/04/15 06:22:53 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.33 2002/04/20 21:22:56 hierro Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.32 $
+Version: $Revision: 1.33 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/04/15 06:22:53 $
+Last Revision Date: $Date: 2002/04/20 21:22:56 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.32 $"[11:-2]
+__revision__ = "$Revision: 1.33 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -41,9 +41,9 @@ from Parser import Parser, ParseError, specialVarRE, STATIC_CACHE, REFRESH_CACHE
 ## CONSTANTS & GLOBALS 
 
 try:
-    True,False
+    True, False
 except NameError:
-    True, False = (1==1),(1==0)
+    True, False = (1==1), (1==0)
 
 ##################################################
 ## CLASSES 
@@ -1040,8 +1040,10 @@ class ModuleCompiler(Parser, GenUtils):
                             ]
         
         self._moduleConstants = [
-            "True = (1==1)",
-            "False = (1==0)",
+            "try:",
+            "    True, False",
+            "except NameError:",
+            "    True, False = (1==1), (1==0)",
             ]
 
         self._errorCatcherOn = False
