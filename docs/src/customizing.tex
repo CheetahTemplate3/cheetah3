@@ -25,10 +25,11 @@ are for internal use and are of little interest to end-users.  Some, however,
 can be quite useful.  This section explains how to use them.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Using tokens other than the dollar sign for placeholders}
+\subsubsection{Using tokens other than \$ and \#}
 
 It is possible to use any character sequence to signal the start of a
-\$placeholder.  The ``\code{placeholderStartToken}'' setting controls this.
+\$placeholder or \#directive.  The ``\code{placeholderStartToken}'' and
+``\code{directiveStartToken}'' settings control this.
 
 \begin{verbatim}
 myTemplateDef = "Here's my @@adj template."
@@ -40,9 +41,17 @@ templateObj = Template(myTemplateDef, myNamespace,
 
 \code{placeholderStartToken} can be any character sequence of any length
 provided that it doesn't end or start with \code{\#} as this is used by the
-\#directives.  In the future we'd like to soft-code the
-\code{directiveStartToken} as well.  You can't use a sequence of spaces as
-the token, although you can have spaces mixed with other characters.
+\#directives.  You can't use a sequence of spaces as the token, although you can
+have spaces mixed with other characters.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Alternate comment tokens}
+
+It is possible to use any character sequence to signal the start of a single
+line comment and the start/end of a multiline comment.  The
+``\code{singleLineComment}'' and ``\code{multiLineComment}'' settings control
+this.  ``\code{singleLineComment}'' should be a string and
+``\code{multiLineComment}'' should be a tuple of two strings.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -57,7 +66,6 @@ from Cheetah.Template import Template
 templateObj = Template(myTemplateDef, myNamespace, 
                  settings={'useAutocalling':0,})
 \end{verbatim}
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -81,37 +89,111 @@ templateObj.compile()
 \code{Template.recompile()} is a synonym for \code{Template.compile()}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Unknown placeholder names}
-%% handlers
+\subsubsection{Error checking of \$placeholder tags}
 
-[{\bf THIS FEATURE IS CURRENTLY DISABLED AS WE CHANGE SOME CODE.  IT WILL BE
-  BACK LATER.}]
+[{\bf This description is a copy of an email.  It will be tidied up later.}]
 
-The 'varNotFound\_handler' setting controls what happens when a \$placeholder
-is not found in the searchList.  The default setting simply places the
-Placeholder Tag in the output.  The ``Big Warning'' handler puts some
-harder-to-miss decorations around it.  To switch to the Big Warning handler:
+I've replaced varNotFound_handler with a new feature/framework called
+'errorChecker'.  This is a debugging tool similar to, but more powerful than,
+varNotFound_handler.  Cheetah now comes with a Cheetah.ErrorCheckers module that
+contains various classes.  You can enable one of the classes by doing this:
 
 \begin{verbatim}
-from Cheetah import CodeGenerator, Template
-templateObj = Template(templateDef, namespace
-                settings={'varNotFound_handler':CodeGenerator.varNotFound\_bigWarning})
+templObj = Template(templDef, NS, 
+              settings={'errorChecker':NAME_OF_CLASS })
+or 
+templObj = Template(templDef, NS, 
+              settings={'errorCheckerClass': CLASS })
 \end{verbatim}
 
-Defining your own handler is easy too, as you can see from the reprint of
-Cheetah's handlers below.  Just define a function that takes two arguments, 
-(1) the current TO and (2) the Placeholder Name as a string.  Return whatever
-you want Cheetah to insert as the Placeholder Value.
+where NAME_OF_CLASS is a string referring to one of the classes in
+Cheetah.ErrorCheckers.  The current options are 'Echo', 'BigEcho', 'KeyError',
+'ListErrors'.
+
+These clases can catch any exception that occurs in a \$placeholderTag, not just
+NameMapper.NotFound.  They don't work with \$vars inside \#directives.
+
+If you used 'ListErrors' you can generate a list of errors and when they
+occurred:
 
 \begin{verbatim}
-## varNotFound handlers ##
-def varNotFound\_echo(templateObj, tag):
-    return "$" + tag
-
-def varNotFound_bigWarning(templateObj, tag):
-    return "="*15 + "&lt;$" + tag + " could not be found&gt;" + "="*15
-    
+print TO.errorChecker().listErrors()
+[('${aoeu}', 'Tue Aug 14 14:54:37 2001'), 
+  ('${a4}', 'Tue Aug 14 14:54:37 2001')]
 \end{verbatim}
+
+The ErrorCheckers framework is intended to be used as test and debugging tool.
+They are relatively slow and should not be used in production systems with high
+loads.  Furthermore, when they are used the caching framework is disabled. See
+Cheetah.ErrorCheckers if you want more on the ErrorChecker API.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Output filtering}
+
+[{\bf This description is a copy of an email.  It will be tidied up later.}]
+
+Cheetah now has an extended output filtering framework. It involves the
+'formatter' setting, the Cheetah.Formatters module, and the new #formatter
+directive.  This framework allows you to check and re-format your \$placeholder
+tag output as it is interpolated into the template output: doing such things as
+replacing None with an empty string, doing string translations, truncating the
+output at a max length, or even paging through the output dynamically when
+Cheetah is used with Webware.
+
+Cheetah.Formatters contains a number of classes that are ready made formatters.
+To use one do this
+\begin{verbatim}
+templObj = Template(templDef, NS, 
+              settings={'formatter':NAME_OF_CLASS })
+or 
+templObj = Template(templDef, NS, 
+              settings={'formatterClass': CLASS })
+
+\end{verbatim}
+
+where NAME_OF_CLASS is a string referring to one of the classes and CLASS is a
+ref to some other class that subclasses Cheetah.Formatters.BaseClass. The
+current options are 'ReplaceNone' and 'MaxLen'.
+
+If the 'formatter' settings is None, as is the default, then the formatter is
+str().
+
+You can use the \#formatter directive to change the 
+formatter at any point in your template.  Usage:
+
+\begin{verbatim}
+#formatter None   ---> set it back to str()
+#formatter 'MaxLen'  ---> use the class name in the quotes
+#formatter $myFormatterClass  ---> use this class (must be 
+available at compile time)
+\end{verbatim}
+
+Formatters can accept keyword args like this (note the commas!):
+\begin{verbatim}
+${c, maxlen=$x, dummyKW='1234'}
+${c, maxlen=7}
+${*c, maxlen=7}
+${*15*c, maxlen=7}
+\end{verbatim}
+
+The first example is translated to: 
+\begin{verbatim}
+format(valueFromSearchList(searchList, "c", 1), 
+           dummyKW=7, trans=trans),
+\end{verbatim}
+
+If you use keyword args then you must be using a formatter - using them with
+'formatter':None will raise an exception.
+
+Note the 'trans' arg (aka 'transaction') that is automatically fed to the
+formatter.  When Cheetah is used with Webware, this will allow the formatters to
+provide output paging and other interactive features, such as showing the full
+output of a truncated \$placeholder (overriding the 'maxlen' arg).
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Plugins}
