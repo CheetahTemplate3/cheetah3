@@ -20,11 +20,10 @@ html:
 	mv $(DOCNAME) ../$(DOCNAME)_html
 
 htmlMultiPage:
-        -rm -rf $(DOCNAME)
-        $(MKHOWTO) --html --iconserver . $(MAIN_TEX_FILE)
-        -rm -R ../$(DOCNAME)_html_multipage
-        mv $(DOCNAME) ../$(DOCNAME)_html_multipage
-
+	-rm -rf $(DOCNAME)
+	$(MKHOWTO) --html --iconserver . $(MAIN_TEX_FILE)
+	-rm -R ../$(DOCNAME)_html_multipage
+	mv $(DOCNAME) ../$(DOCNAME)_html_multipage
 
 text:
 	$(MKHOWTO) --text $(MAIN_TEX_FILE)
