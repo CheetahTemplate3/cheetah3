@@ -1,28 +1,26 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.3 2001/10/10 06:57:22 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.4 2001/10/12 02:56:16 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
 - test escaping slashes when read from file
 
 - #else if / #elif
-- #import, #from
-- #extend
 - #implement
 - #finally
 - #filter (output filtering, was #formatter)
-- #errorChecker
+- #errorCatcher
 
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/10/10 06:57:22 $
+Last Revision Date: $Date: 2001/10/12 02:56:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 
 ##################################################
@@ -977,33 +975,33 @@ class ForDirective(OutputTest):
                     "AA,BB\nCC,DD\n")
 
 
-class AttributeDirective(OutputTest):
+class AttrDirective(OutputTest):
 
     def test1(self):
-        """#attribute with int"""
-        self.verify("#attribute $test = 1234\n$test",
+        """#attr with int"""
+        self.verify("#attr $test = 1234\n$test",
                     "1234")
 
     def test2(self):
-        """#attribute with string"""
-        self.verify("#attribute $test = 'blarg'\n$test",
+        """#attr with string"""
+        self.verify("#attr $test = 'blarg'\n$test",
                     "blarg")
 
     def test3(self):
-        """#attribute with expression"""
-        self.verify("#attribute $test = 'blarg'.upper()*2\n$test",
+        """#attr with expression"""
+        self.verify("#attr $test = 'blarg'.upper()*2\n$test",
                     "BLARGBLARG")
 
     def test4(self):
-        """#attribute with string + WS
+        """#attr with string + WS
         Should gobble"""
-        self.verify("     #attribute $test = 'blarg'   \n$test",
+        self.verify("     #attr $test = 'blarg'   \n$test",
                     "blarg")
 
     def test5(self):
-        """#attribute with string + WS + leading text
+        """#attr with string + WS + leading text
         Shouldn't gobble"""
-        self.verify("  --   #attribute $test = 'blarg'   \n$test",
+        self.verify("  --   #attr $test = 'blarg'   \n$test",
                     "  --   \nblarg")
 
 
@@ -1181,21 +1179,21 @@ class IncludeDirective(OutputTest):
                     "  1 2  ")
 
 
-class CallDirective(OutputTest):
+class SilentDirective(OutputTest):
 
     def test1(self):
-        """simple #call"""
-        self.verify("#call $aFunc",
+        """simple #silent"""
+        self.verify("#silent $aFunc",
                     "")
 
     def test2(self):
-        """simple #call"""
-        self.verify("#call $anObj.callIt\n$anObj.callArg",
+        """simple #silent"""
+        self.verify("#silent $anObj.callIt\n$anObj.callArg",
                     "1234")
 
     def test3(self):
-        """simple #call"""
-        self.verify("#call $anObj.callIt(99)\n$anObj.callArg",
+        """simple #silent"""
+        self.verify("#silent $anObj.callIt(99)\n$anObj.callArg",
                     "99")
 
 class SetDirective(OutputTest):
@@ -1327,7 +1325,13 @@ class IfDirective(OutputTest):
         """#if block using $*5*emptyString"""
         self.verify("#if $*5*emptyString\n$aStr\n#end if\n",
                     "")
-       
+
+    def test12(self):
+        """#if ... #else if ... #else ... block using a $emptyString
+        Same as test 8 but using else if instead of elif"""
+        self.verify("#if $emptyString\n$c\n#else if $numOne\n$numOne\n#else\n$c - $c\n#end if",
+                    "1\n")
+
 class PSP(OutputTest):
     
     def test1(self):
