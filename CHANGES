@@ -3,6 +3,8 @@ release
 ================================================================================
 0.9.14b1 (not released yet)
   - added TypeType to the types that NameMapper won't do autocalling on (TR)
+  - in Template.py moved the global LegalKWs to Template._legalKWs (TR)
+
 
 0.9.13 (May 8, 2002)
   - changed Cheetah.Servlet.isRunningFromWebKit to isWebwareInstalled (TR)
