@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.5 2001/06/18 22:12:09 tavis_rudd Exp $
+# $Id: Template.py,v 1.6 2001/06/18 22:25:09 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/18 22:12:09 $
+Last Revision Date: $Date: 2001/06/18 22:25:09 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 
 ##################################################
@@ -78,26 +78,27 @@ class Template(SettingsManager):
 
 
         'delimeters':{'includeDirective': [delims['includeDirective_gobbleWS'],
-                                            delims['includeDirective'],
-                                            ],
-                         'dataDirective': [delims['dataDirective_gobbleWS'],
-                                           delims['dataDirective'],
+                                           delims['includeDirective'],
                                            ],
-                         'macroDirective': [delims['macroDirective'],
-                                            ],
-                         'blockDirectiveStart': [delims['blockDirectiveStart_gobbleWS'],
-                                                     delims['blockDirectiveStart'],
-                                            ],
-                         'lazyMacroCalls': [delims['lazyMacroCalls'],],
-                         'callMacro': [delims['callMacro'],],
-                         'callMacroArgs': delims['callMacroArgs'],
-                         'rawDirective': [delims['rawDirective'],],
-                         'comments': [delims['multiLineComment'],
-                                      delims['singleLineComment']],
-                         'slurp': [delims['slurpDirective_gobbleWS'],
-                                   delims['slurpDirective'],
-                                   ],
-                         },            
+                      'dataDirective': [delims['dataDirective_gobbleWS'],
+                                        delims['dataDirective'],
+                                        ],
+                      'macroDirective': [delims['macroDirective'],
+                                         ],
+                      'blockDirectiveStart': [delims['blockDirectiveStart_gobbleWS'],
+                                              delims['blockDirectiveStart'],
+                                              ],
+                      'lazyMacroCalls': [delims['lazyMacroCalls'],],
+                      'callMacro': [delims['callMacro'],],
+                      'callMacroArgs': delims['callMacroArgs'],
+                      'rawDirective': [delims['rawDirective'],],
+                      'comments': [delims['multiLineComment'],
+                                   delims['singleLineComment']],
+                      'slurp': [delims['slurpDirective_gobbleWS'],
+                                delims['slurpDirective'],
+                                ],
+                      },
+       
         'internalDelims':["<Cheetah>","</Cheetah>"],
         'internalDelimsRE': re.compile(r"<Cheetah>(.+?)</Cheetah>",
                                      re.DOTALL),
@@ -189,7 +190,6 @@ class Template(SettingsManager):
                      'errorHandler':ErrorHandlers.Stage5ErrorHandler,
                      },
                   },
-
         }
 
     def __init__(self, templateDef, *searchList, **kw):
