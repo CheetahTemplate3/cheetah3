@@ -19,6 +19,10 @@ Please initial your changes and add a date for each release
    - Cheetah.Filters.StripSqueeze: new filter to canonicalize all whitespace
      chunks to ' '.  Also removes all newlines (joining multi-line input into
      one long line), and leading/trailing whitespace from the final result. (MO)
+   - Filters can now be used standalone for debugging or for use outside
+     Cheetah.  This works transparently; details are in Filters.py docstring.
+     (MO)
+     
 
 0.9.9a6 (Nov 6, 2001) 
    - fixed bug with quotations in longer constant string chunks (TR)

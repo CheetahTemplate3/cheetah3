@@ -1,16 +1,21 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.8 2001/11/10 22:28:36 hierro Exp $
+# $Id: Filters.py,v 1.9 2001/11/10 22:51:52 hierro Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
+
+Filters may now be used standalone, for debugging or for use outside Cheetah.
+Class DummyTemplate, instance _dummyTemplateObj and class NoDefault exist only
+for this, to provide a default argument for the filter constructors (which
+would otherwise require a real template object).  
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/11/10 22:28:36 $
+Last Revision Date: $Date: 2001/11/10 22:51:52 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -38,6 +43,10 @@ class NoDefault:
 
 class DummyTemplate:
     """Fake template class to allow filters to be used standalone.
+
+    This is provides only the level of Template compatibility required by the
+    standard filters.  Namely, the get-settings interface works but there are
+    no settings.  Other aspects of Template are not implemented.
     """
     def setting(self, name, default=NoDefault):
         if default is NoDefault:
