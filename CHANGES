@@ -30,6 +30,13 @@ release
     now inherited by Template directly. (MO)
   - Tools.CGITemplate has methods to output CGI headers (=HTTP headers).
     (This was briefly in a TemplateMisc module, but no longer.) (MO)
+  - New #indent directive allows you to indent block constructs in the
+    template definition without having that indentation in the output, and
+    allows you to set the output indentation per line independent of the
+    indentation in the template definition.  This version uses Robert
+    Kuzelj's #indent syntax exactly.  In the next few days, 
+    Cheetah.Utils.Indenter will be refactored and
+    *** THE #INDENT SYNTAX WILL CHANGE! *** (MO)
 
 
 0.9.13 (May 8, 2002)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.37 2002/06/09 22:11:12 hierro Exp $
+# $Id: SyntaxAndOutput.py,v 1.38 2002/06/23 19:30:39 hierro Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.37 $
+Version: $Revision: 1.38 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/06/09 22:11:12 $
+Last Revision Date: $Date: 2002/06/23 19:30:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.37 $"[11:-2]
+__revision__ = "$Revision: 1.38 $"[11:-2]
 
 
 ##################################################
@@ -2141,6 +2141,93 @@ class CGI(OutputTest):
                     "Content-type: text/html\n\nHello, world!")
         del os.environ['QUERY_STRING']
         self._endCGI()
+
+
+
+class Indenter(OutputTest):
+    source = """
+public class X
+{
+    #for $method in $methods
+        $getMethod($method)
+        
+    #end for
+}
+//end of class
+
+#def getMethod($method)
+    #indent ++
+    public $getType($method) ${method.Name}($getParams($method.Params));
+    #indent --
+#end def
+
+#def getParams($params)
+    #indent off
+
+    #for $counter in $range($len($params))
+        #if $counter == len($params) - 1
+                       $params[$counter]#slurp
+        #else:
+                       $params[$counter], 
+        #end if
+    #end for
+    #indent on
+#end def
+
+#def getType($method)
+    #indent push
+    #indent=0
+    #if $method.Type == "VT_VOID"
+        void#slurp
+    #elif $method.Type == "VT_INT"
+        int#slurp
+    #elif $method.Type == "VT_VARIANT"
+        Object#slurp
+    #end if
+    #indent pop
+#end def
+"""
+
+    control = """
+public class X
+{
+    public void Foo(
+                       _input, 
+                       _output);
+
+
+    public int Bar(
+                       _str1, 
+                       str2, 
+                       _str3);
+
+
+    public Object Add(
+                       value1, 
+                       value);
+
+
+}
+//end of class
+
+
+
+"""
+
+    def searchList(self):    # Inside Indenter class.
+        class Method:
+            def __init__(self, _name, _type, *_params):
+                self.Name = _name
+                self.Type = _type
+                self.Params = _params
+        methods = [Method("Foo", "VT_VOID", "_input", "_output"),
+                   Method("Bar", "VT_INT", "_str1", "str2", "_str3"),
+                   Method("Add", "VT_VARIANT", "value1", "value")]
+        return [{"methods": methods}]
+
+    def test1(self):    # Inside Indenter class.
+        self.verify(self.source, self.control)
+
 
 
 

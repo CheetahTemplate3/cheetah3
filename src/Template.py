@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.96 2002/06/09 22:13:28 hierro Exp $
+# $Id: Template.py,v 1.97 2002/06/23 19:30:39 hierro Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.96 $
+Version: $Revision: 1.97 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/06/09 22:13:28 $
+Last Revision Date: $Date: 2002/06/23 19:30:39 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.96 $"[11:-2]
+__revision__ = "$Revision: 1.97 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -47,6 +47,8 @@ from DummyTransaction import DummyTransaction
 from NameMapper import NotFound, valueFromSearchList, valueForName # this is used in the generated code
 from Utils import VerifyType             # Used in Template.__init__
 from Utils.Misc import CheckKeywords     # Used in Template.__init__
+from Utils.Indenter import Indenter      # Used in Template.__init__ and for
+                                         # placeholders
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -192,6 +194,11 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         else:
             self._errorCatcher = None
         self._initErrorCatcher = self._errorCatcher
+        
+        ##################################################
+        ## Setup the indenter
+        self._indenter = Indenter()
+        self._indent = self._indenter.indent
         
         ##################################################
         ## Now, compile if we're meant to

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.38 2002/05/15 21:15:50 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.39 2002/06/23 19:30:39 hierro Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.38 $
+Version: $Revision: 1.39 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/05/15 21:15:50 $
+Last Revision Date: $Date: 2002/06/23 19:30:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.38 $"[11:-2]
+__revision__ = "$Revision: 1.39 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -36,6 +36,7 @@ import random
 from _properties import Version
 from SettingsManager import SettingsManager
 from Parser import Parser, ParseError, specialVarRE, STATIC_CACHE, REFRESH_CACHE
+from Utils.Indenter import indentize
 
 ##################################################
 ## CONSTANTS & GLOBALS 
@@ -945,6 +946,11 @@ class ModuleCompiler(Parser, GenUtils):
         source = str( source )
         # by converting to string here we allow objects such as other Templates
         # to be passed in
+
+        # Handle the #indent directive by converting it to other directives.
+        # (Over the long term we'll make it a real directive.)
+        if source.find('#indent') != -1:
+            source = indentize(source)
         
         Parser.__init__(self, source, filename=self._filePath)
         self._initializeSettings()
