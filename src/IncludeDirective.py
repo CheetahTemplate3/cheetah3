@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: IncludeDirective.py,v 1.6 2001/08/13 22:01:28 tavis_rudd Exp $
+# $Id: IncludeDirective.py,v 1.7 2001/08/15 17:49:51 tavis_rudd Exp $
 """IncludeDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/13 22:01:28 $
+Last Revision Date: $Date: 2001/08/15 17:49:51 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -56,18 +56,10 @@ class IncludeDirective(TagProcessor.TagProcessor):
         self._delimRegexs = [gobbleWS, plain]
         
     def preProcess(self, templateDef):
-
-        templateObj = self.templateObj() 
         import Template                         # import it here to avoid circ. imports
-        
-        if not hasattr(templateObj, '_rawIncludes'):
-            templateObj._rawIncludes = {}
-        if not hasattr(templateObj, '_parsedIncludes'):
-            templateObj._parsedIncludes = {}
-    
+            
         RESTART = [False,]
-        def subber(match, templateObj=templateObj, RESTART=RESTART,
-                   Template=Template, self=self):
+        def subber(match, RESTART=RESTART, Template=Template, self=self):
             args = match.group(1).strip()
     
             # do a safety/security check on this tag
@@ -87,7 +79,7 @@ class IncludeDirective(TagProcessor.TagProcessor):
                 args= ' '.join(args.split()[1:])
                 
             ## get the Cheetah code to be included
-            if args.startswith( templateObj.setting('placeholderStartToken') ):
+            if args.startswith( self.setting('placeholderStartToken') ):
                 translatedPlaceholder = self.translateRawPlaceholderString(args)
                 includeString = self.evalPlaceholderString(translatedPlaceholder)
                 
@@ -95,14 +87,14 @@ class IncludeDirective(TagProcessor.TagProcessor):
                 args = '='.join(args.split('=')[1:])
                 translatedPlaceholder = self.translateRawPlaceholderString(args)
                 fileName = self.evalPlaceholderString(translatedPlaceholder)
-                fileName = templateObj.normalizePath( fileName )
-                includeString = templateObj.getFileContents( fileName )
+                fileName = self.normalizePath( fileName )
+                includeString = self.getFileContents( fileName )
     
             ## now process finish include
             if raw:            
                 includeID = '_' + str(id(includeString)) + str(randrange(10000, 99999))
-                templateObj._rawIncludes[includeID] = includeString
-                return templateObj.setting('placeholderStartToken') + \
+                self._rawIncludes[includeID] = includeString
+                return self.setting('placeholderStartToken') + \
                        '{rawIncludes.' + includeID + '}'
             elif directInclude:
                 RESTART[0] = True
@@ -112,16 +104,16 @@ class IncludeDirective(TagProcessor.TagProcessor):
                 includeID = '_' + str(id(includeString))
                 nestedTemplate = Template.Template(
                     templateDef=includeString,
-                    overwriteSettings=templateObj.settings(),
-                    preBuiltSearchList=templateObj.searchList(),
-                    setVars = templateObj._setVars,
-                    cheetahBlocks=templateObj._cheetahBlocks,
-                    macros=templateObj._macros,
+                    overwriteSettings=self.settings(),
+                    preBuiltSearchList=self.searchList(),
+                    setVars = self._setVars,
+                    cheetahBlocks=self._cheetahBlocks,
+                    macros=self._macros,
                     )
-                templateObj._parsedIncludes[includeID] = nestedTemplate
+                self._parsedIncludes[includeID] = nestedTemplate
                 if not hasattr(nestedTemplate, 'respond'):
                     nestedTemplate.compileTemplate()
-                return templateObj.setting('placeholderStartToken') + \
+                return self.setting('placeholderStartToken') + \
                        '{parsedIncludes.' + includeID + '.respond(trans, iAmNested=True)}'
     
         for RE in self._delimRegexs:

@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SettingsManager.py,v 1.5 2001/08/14 23:15:37 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.6 2001/08/15 17:49:51 tavis_rudd Exp $
 """Provides a mixin class for managing application settings 
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2001/08/14 23:15:37 $
+Last Revision Date: $Date: 2001/08/15 17:49:51 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 
 ##################################################
@@ -114,8 +114,10 @@ class SettingsManager:
     """
 
     _settings = {}
-    _sysPathLock = Lock()   # used by the updateFromPySrcFile() method
     
+    def __init__(self):
+        self._sysPathLock = Lock()   # used by the updateFromPySrcFile() method
+        
     def initializeSettings(self):
         """A hook that allows for complex setting initialization sequences that
         involve references to 'self' or other settings.  For example:

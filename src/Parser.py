@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.10 2001/08/14 06:07:19 tavis_rudd Exp $
+# $Id: Parser.py,v 1.11 2001/08/15 17:49:51 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/14 06:07:19 $
+Last Revision Date: $Date: 2001/08/15 17:49:51 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.10 $"[11:-2]
+__version__ = "$Revision: 1.11 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -121,24 +121,36 @@ class Parser:
     
     def __init__(self, templateObj=None):
         """This method sets up some internal references to the master
-        templateObj if a referenc is supplied. Otherwise, it will assume that it
+        templateObj if a reference is supplied. Otherwise, it will assume that it
         IS the master templateObj and will setup the regex's the parser
         uses. This method must be called by subclasses."""
 
         if templateObj:
             self._templateObj = templateObj
+            
             ## setup some method mappings for convenience
             self.state = templateObj.state
             self.settings = templateObj.settings
             self.setting = templateObj.setting
             self.searchList = templateObj.searchList
-            self.evalPlaceholderString = templateObj.evalPlaceholderString
+            self.normalizePath = templateObj.normalizePath
+            self.getFileContents = templateObj.getFileContents
+            self.mergeNewTemplateData = templateObj.mergeNewTemplateData
 
+            ## setup some attribute mappings
             self._placeholderREs = templateObj._placeholderREs
             self._directiveREbits = templateObj._directiveREbits
+            self._localVarsList = templateObj._localVarsList
+            self._theFormatters = templateObj._theFormatters
+            self._macros = templateObj._macros
+            self._rawIncludes = templateObj._rawIncludes
+            self._parsedIncludes = templateObj._parsedIncludes
+            self._rawTextBlocks = templateObj._rawTextBlocks
+            self._cheetahBlocks = templateObj._cheetahBlocks
+            self._setVars = templateObj._setVars
 
         else:                           # iAmATemplateObj
-            self._templateObj = self
+            self._templateObj = None    # DON'T CREATE A REF CYCLE
             self.makePlaceholderREs()       # inherited from the Parser class
             self.makeDirectiveREbits()
 
@@ -335,10 +347,9 @@ class Parser:
     def translatePlaceholderString(self, txt, autoCall=True):
         """Translate a marked placeholder string into valid Python code."""
 
-        templateObj = self.templateObj()
-        searchList = templateObj.searchList()
+        searchList = self.searchList()
         
-        def translateName(name, templateObj=templateObj,
+        def translateName(name, self=self,
                           autoCall=autoCall):
             
             ## get rid of the 'cache-type' tokens
@@ -363,15 +374,15 @@ class Parser:
 
             ## only do autocalling on names that have no () in them
             if autoCall and name.find('(') == -1 \
-               and templateObj.setting('useAutocalling'):
+               and self.setting('useAutocalling'):
                 safeToAutoCall = True
             else:
                 safeToAutoCall = False
             
             ## deal with local vars from #set and #for directives
-            if name in templateObj._localVarsList:
+            if name in self._localVarsList:
                 return name
-            elif nameChunks[0] in templateObj._localVarsList:
+            elif nameChunks[0] in self._localVarsList:
                 translatedName = 'valueForName(' + nameChunks[0] + ',"""' + \
                            '.'.join(nameChunks[1:]) + '""", ' + \
                            str(safeToAutoCall) + ')' + remainderOfName
@@ -414,7 +425,7 @@ class Parser:
 
     def evalPlaceholderString(self, txt, globalsDict={}, localsDict={}):
         """Return the value of a placeholderstring. This doesn't work with localVars."""
-        theFormatters = self.templateObj()._theFormatters
+        theFormatters = self._theFormatters
         searchList = self.searchList()
         localsDict.update({'theFormatters':theFormatters,
                            'searchList':searchList,
@@ -428,7 +439,7 @@ class Parser:
         """Exec a placeholderString and return a tuple of the globalsDict, and
         the localsDict. This doesn't work with localVars."""
         
-        theFormatters = self.templateObj()._theFormatters
+        theFormatters = self._theFormatters
         searchList = self.searchList()
         localsDict.update({'theFormatters':theFormatters,
                            'searchList':searchList,

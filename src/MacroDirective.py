@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: MacroDirective.py,v 1.6 2001/08/13 22:01:28 tavis_rudd Exp $
+# $Id: MacroDirective.py,v 1.7 2001/08/15 17:49:51 tavis_rudd Exp $
 """MacroDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/13 22:01:28 $
+Last Revision Date: $Date: 2001/08/15 17:49:51 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -62,17 +62,12 @@ class MacroDirective(TagProcessor.TagProcessor):
 
         
     def preProcess(self, templateDef):
-        
-        templateObj = self.templateObj()
-
-        if not hasattr(templateObj, '_macros'):
-            templateObj._macros = {}
     
-        def handleMacroDefs(match, self=self, templateObj=templateObj):
+        def handleMacroDefs(match, self=self):
             """process each match of the macro definition regex"""
             macroSignature = match.group(1)
 
-            ##validateMacroDirective(templateObj, macroSignature)
+            self.validateTag(macroSignature)
             
             firstParenthesis = macroSignature.find('(')
             macroName = macroSignature[0:firstParenthesis]
@@ -85,7 +80,7 @@ class MacroDirective(TagProcessor.TagProcessor):
             macroBody = match.group(2).replace("'''","\'\'\'")
     
             def handleArgsUsedInBody(match, argNamesList=argNamesList,
-                                     templateObj=templateObj):
+                                     self=self):
                 """check each $var in the macroBody to see if it is in this macro's
                 argNamesList and needs substituting"""
 
@@ -109,7 +104,7 @@ class MacroDirective(TagProcessor.TagProcessor):
                     remainderOfName = ''
     
                 ## only do autocalling on names that have no () in them
-                if argName.find('(') == -1 and templateObj.setting('useAutocalling'):
+                if argName.find('(') == -1 and self.setting('useAutocalling'):
                     safeToAutoCall = True
                 else:
                     safeToAutoCall = False
@@ -120,15 +115,14 @@ class MacroDirective(TagProcessor.TagProcessor):
                            '.'.join(nameMapperChunks[1:]) + "', executeCallables=" + \
                            str(safeToAutoCall) + ")" + remainderOfName + ") + '''"
                 else:
-                    return templateObj.setting('placeholderStartToken') + \
+                    return self.setting('placeholderStartToken') + \
                            '{' + match.group(1) + '}'
+
     
-            processor = templateObj.placeholderProcessor
-    
-            macroBody = processor.wrapExressionsInStr(processor.markPlaceholders(macroBody),
-                                                      marker=templateObj.setting('placeholderMarker'),
-                                                      before='<argInBody>',
-                                                      after='</argInBody>')
+            macroBody = self.wrapExressionsInStr(self.markPlaceholders(macroBody),
+                                                 marker=self.setting('placeholderMarker'),
+                                                 before='<argInBody>',
+                                                 after='</argInBody>')
     
             regex = re.compile(r'<argInBody>(.*?)</argInBody>')
             macroBody = regex.sub(handleArgsUsedInBody,macroBody )
@@ -142,7 +136,7 @@ class MacroDirective(TagProcessor.TagProcessor):
                         "    return '''" + macroBody + "'''\n"
     
             exec macroCode in None, None
-            exec "templateObj._macros[macroName] = " + macroFuncName in vars()
+            exec "self._macros[macroName] = " + macroFuncName in vars()
             
             return ''
 
@@ -182,18 +176,16 @@ class CallMacroDirective(TagProcessor.TagProcessor):
         self._delimRegexs = [plain, ]
         
     def preProcess(self, templateDef):
-        templateObj = self.templateObj()
 
-        def subber(match, templateObj=templateObj,
-                   argsRE=self._argsRE):
+        def subber(match, self=self, argsRE=self._argsRE):
             
             macroName = match.group('macroName').strip()
             argString = match.group('argString')
             extendedArgString = match.group('extendedArgString')
     
             try:
-                searchList = templateObj.searchList()
-                argString = templateObj.translateRawPlaceholderString(argString)
+                searchList = self.searchList()
+                argString = self.translateRawPlaceholderString(argString)
                 
             except NameMapper.NotFound, name:
                 line = lineNumFromPos(match.string, match.start())
@@ -220,10 +212,10 @@ class CallMacroDirective(TagProcessor.TagProcessor):
                 fullArgString += argName + '=extendedArgsDict["' + argName + \
                                  '"]' + ', '
             
-            ## validateMacroDirective(templateObj, fullArgString)
+            self.validateTag(fullArgString)
                 
-            if macroName in templateObj._macros.keys():
-                return eval('templateObj._macros[macroName](' + fullArgString + ')', vars())
+            if macroName in self._macros.keys():
+                return eval('self._macros[macroName](' + fullArgString + ')', vars())
             else:
                 raise Error('The macro ' + macroName + \
                             ' was called, but it does not exist')
@@ -246,10 +238,8 @@ class LazyMacroCall(TagProcessor.TagProcessor):
         self._delimRegexs = [plain]
         
     def preProcess(self, templateDef):
-        
-        templateObj = self.templateObj()
-        
-        def handleMacroCalls(match, self=self, templateObj=templateObj):
+
+        def handleMacroCalls(match, self=self):
             """for each macro call that is found in the template, substitute it with
             the macro's output"""
 
@@ -260,7 +250,7 @@ class LazyMacroCall(TagProcessor.TagProcessor):
             macroArgstring = macroSignature[firstParenthesis+1:-1]
             macroName = macroSignature[0:firstParenthesis]
     
-            searchList = templateObj.searchList()
+            searchList = self.searchList()
             
             try:
                 macroArgstring = self.translateRawPlaceholderString(macroArgstring)
@@ -272,9 +262,9 @@ class LazyMacroCall(TagProcessor.TagProcessor):
                 
             ## validateMacroDirective(templateObj, macroArgstring)
             
-            if macroName in templateObj._macros.keys():
+            if macroName in self._macros.keys():
     
-                return eval('templateObj._macros[macroName](' + macroArgstring + ')',
+                return eval('self._macros[macroName](' + macroArgstring + ')',
                             vars())
             else:
                 raise Error('The macro ' + macroName + \

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: DisplayLogic.py,v 1.3 2001/08/13 01:58:28 tavis_rudd Exp $
+# $Id: DisplayLogic.py,v 1.4 2001/08/15 17:49:51 tavis_rudd Exp $
 """DisplayLogic Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/13 01:58:28 $
+Last Revision Date: $Date: 2001/08/15 17:49:51 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -75,8 +75,7 @@ class DisplayLogic(TagProcessor.TagProcessor):
     def translateTag(self, tag):
         """process display logic embedded in the template"""
 
-        templateObj = self.templateObj()
-        settings = templateObj._settings
+        settings = self.settings()
         state = self.state()
         indent = settings['indentationStep']
         
@@ -95,7 +94,7 @@ class DisplayLogic(TagProcessor.TagProcessor):
             tag = tag.replace('else if','elif')
             
             if tag[0:4] == 'elif':
-                tag = templateObj.translateRawPlaceholderString(tag)
+                tag = self.translateRawPlaceholderString(tag)
                 tag = tag.replace('()() ','() ') # get rid of accidental double calls
             
             outputCode = indent*(state['indentLevel']-1) + \
@@ -118,9 +117,9 @@ class DisplayLogic(TagProcessor.TagProcessor):
                 localVars, restOfForStatement = tag[3:].split(' in ')
                 localVarsList =  [localVar.strip() for localVar in
                                   localVars.split(',')]
-                templateObj._localVarsList += localVarsList 
+                self._localVarsList.extend(localVarsList)
     
-            tag = templateObj.translateRawPlaceholderString(tag)
+            tag = self.translateRawPlaceholderString(tag)
             tag = tag.replace('()() ','() ') # get rid of accidental double calls
             outputCode = indent*(state['indentLevel']-1) + \
                          tag + ":\n" + \

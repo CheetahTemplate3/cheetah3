@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.40 2001/08/14 19:29:50 tavis_rudd Exp $
+# $Id: Template.py,v 1.41 2001/08/15 17:49:51 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.40 $
+Version: $Revision: 1.41 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/14 19:29:50 $
+Last Revision Date: $Date: 2001/08/15 17:49:51 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.40 $"[11:-2]
+__version__ = "$Revision: 1.41 $"[11:-2]
 
 
 ##################################################
@@ -87,7 +87,7 @@ class Template(SettingsManager, Parser):
         'directiveStartToken':'#',
         'directiveEndToken':'/#',
         'singleLineComment':'##',
-        'multiLineComment':['#*','*#'],
+        'multiLineComment':('#*','*#'),
 
         'delayedCompile': False,  # if True, then __init__ won't compile auto-Template
         'plugins':[],
@@ -96,8 +96,8 @@ class Template(SettingsManager, Parser):
         'keepCodeGeneratorResults': False,        
 
         'includeBlockMarkers': False,   # should #block's be wrapped in a comment
-        'blockMarkerStart':['<!-- START BLOCK: ',' -->'],
-        'blockMarkerEnd':['<!-- END BLOCK: ',' -->'],
+        'blockMarkerStart':('<!-- START BLOCK: ',' -->'),
+        'blockMarkerEnd':('<!-- END BLOCK: ',' -->'),
         
         ## The rest of this stuff is mainly for internal use
         'placeholderMarker':' placeholderTag.', # the space is intentional!
@@ -150,6 +150,8 @@ class Template(SettingsManager, Parser):
         
         If the environment var CHEETAH_DEBUG is set to True the internal
         debug setting will also be set to True."""
+        
+        SettingsManager.__init__(self)
         
         ## Read in the Template Definition
         #  unravel whether the user passed in a string, filename or file object.
@@ -207,7 +209,17 @@ class Template(SettingsManager, Parser):
             if kw.has_key('searchList'):
                 tup = tuple(kw['searchList'])
                 self._searchList.extend(tup) # .extend requires a tuple.
-       
+
+        self._errorMsgStack = []
+        self._localVarsList = []   # used to track vars from #set and #for
+        self._timedRefreshCache = {} # caching timedRefresh vars
+        self._timedRefreshList = []
+        self._checkForCacheRefreshes = False
+        self._perResponseSetupCodeChunks = {}
+        self._rawTextBlocks ={}
+        self._rawIncludes = {}
+        self._parsedIncludes = {}
+        
         ## deal with other keywd args 
         # - these are for internal use by Nested Templates in #include's
         if not hasattr(self, '_macros'):
@@ -278,13 +290,14 @@ class Template(SettingsManager, Parser):
         if not self.setting('delayedCompile'):
             self.compileTemplate()
 
-    
+    #def __del__(self): #don't implement this yet!!!
+    #    del self.respond
+    #    del self.__str__
+    #    del self.__dict__
+        
     def compileTemplate(self):
         """Process and parse the template, then compile it into a function definition
         that is bound to self.__str__() and self.respond()"""
-
-        self._errorMsgStack = []
-        self._localVarsList = []   # used to track vars from #set and #for
                         
         generatedFunction = self._codeGenerator( self._templateDef )
         self.__str__ = self._bindFunctionAsMethod( generatedFunction )
@@ -328,11 +341,12 @@ class Template(SettingsManager, Parser):
         formatterDirective = FormatterDirective(self)
         
         ##store references to them as self.[fill_in_the_blank]
-        self.__dict__.update(locals())
-        del self.__dict__['self']
+        self._processors = {}
+        self._processors.update(locals())
+        del self._processors['self']
         
                
-        self.updateSettings({
+        self._codeGenSettings = {
             'preProcessors': [('rawDirective',
                                rawDirective),
                               ('comment',
@@ -394,7 +408,6 @@ class Template(SettingsManager, Parser):
             
             'generatedCodeFilters':[],
             }
-                            ) # self.updateSettings(...
         
         #end of self.setupTagProcessors()
     
@@ -428,7 +441,8 @@ class Template(SettingsManager, Parser):
         debug = settings['debug']
         results = self._codeGeneratorResults = {}
         state = self._codeGeneratorState = {}
-
+        codeGenSettings = self._codeGenSettings
+        
         state['currFormatter'] = 'initial'
         if not self._theFormatters['initial'] == str:
             state['interactiveFormatter'] = True
@@ -439,7 +453,7 @@ class Template(SettingsManager, Parser):
             ## stage 1 - preProcessing of the template string ##
             stage = 1
             if debug: results['stage1'] = []
-            for name, preProcessor in settings['preProcessors']:
+            for name, preProcessor in codeGenSettings['preProcessors']:
                 assert hasattr(preProcessor, 'preProcess'), \
                        'The Processor class ' + name + ' is not valid.'
                 templateDef = preProcessor.preProcess(templateDef)
@@ -461,7 +475,7 @@ class Template(SettingsManager, Parser):
             
             # a)
             subStage = 'a'
-            for processor in settings['coreTagProcessors'].values():
+            for processor in codeGenSettings['coreTagProcessors'].values():
                 processor.initializeTemplateObj()
                 
             # b)
@@ -540,7 +554,7 @@ class Template(SettingsManager, Parser):
             # - this is an unused hook as of Aug 2001
             stage = 4
             if debug: results['stage4'] = []
-            for filter in settings['generatedCodeFilters']:
+            for filter in codeGenSettings['generatedCodeFilters']:
                 generatedCode = filter[1](self, generatedCode)
                 if debug: results['stage4'].append( (filter[0], generatedCode) )
 
@@ -616,9 +630,8 @@ class Template(SettingsManager, Parser):
         This used for the core tags that are sensitive to state values such as
         the indentation level."""
         
-        settings = self._settings
-        tagToken, tag = tag.split(settings['tagTokenSeparator'])
-        processedTag = settings['coreTagProcessors'][tagToken].processTag(tag)
+        tagToken, tag = tag.split(self.setting('tagTokenSeparator'))
+        processedTag = self._codeGenSettings['coreTagProcessors'][tagToken].processTag(tag)
         return processedTag
         
     def _setTimedRefresh(self, ID, translatedTag, interval):
@@ -732,9 +745,9 @@ class Template(SettingsManager, Parser):
                    
         ## process the #data and #macro definition directives
         # after removing comments
-        extensionStr = self.commentDirective.preProcess(extensionStr)
-        self.dataDirective.preProcess(extensionStr)
-        self.macroDirective.preProcess(extensionStr) 
+        extensionStr = self._processors['commentDirective'].preProcess(extensionStr)
+        self._processors['dataDirective'].preProcess(extensionStr)
+        self._processors['macroDirective'].preProcess(extensionStr) 
 
 
     ## utility functions ##   

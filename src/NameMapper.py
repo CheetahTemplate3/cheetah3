@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.9 2001/08/12 20:12:34 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.10 2001/08/15 17:49:51 tavis_rudd Exp $
 
 """Utilities for accessing the members of an object via string representations
 of those members.  Template processing is its primary intended use.
@@ -58,13 +58,13 @@ Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
 License: This software is released for unlimited distribution
          under the terms of the Python license.
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/08/12 20:12:34 $
+Last Revision Date: $Date: 2001/08/15 17:49:51 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__version__ = "$Revision: 1.9 $"[11:-2]
+__version__ = "$Revision: 1.10 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -87,6 +87,7 @@ class NoDefault:
 ## FUNCTIONS ##
 
 try:
+    #0/0
     from _namemapper import NotFound, valueForKey, valueForName, valueFromSearchList
     # it is possible, with Jython for example, that _namemapper.c hasn't been compiled
 except:
