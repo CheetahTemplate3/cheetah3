@@ -9,6 +9,9 @@ Please initial your changes and add a date for each release
    - Cheetah.Utils: new package for non-Cheetah-specific modules needed by
      Cheetah (MO)
    - Cheetah.Filters: new filter WebSafe, several bugfixes (MO)
+   - more work on the Users' Guide (MO)
+   - fixed bug with adding Python's __builtins__ to the local vars list (TR)
+   - fixed bug with #echo (TR)
 
 0.9.9a6 (Nov 6, 2001) 
    - fixed bug with quotations in longer constant string chunks (TR)
