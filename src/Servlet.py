@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.26 2002/05/04 02:49:43 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.27 2002/05/05 00:21:18 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.26 $
+Version: $Revision: 1.27 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2002/05/04 02:49:43 $
+Last Revision Date: $Date: 2002/05/05 00:21:18 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.26 $"[11:-2]
+__revision__ = "$Revision: 1.27 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -28,10 +28,10 @@ except NameError:
 import os.path
 from Cheetah.Utils.CGIImportMixin import CGIImportMixin
 
-isRunningFromWebKit = False
+isWebwareInstalled = False
 try: 
     from WebKit.Servlet import Servlet as BaseServlet
-    isRunningFromWebKit = True
+    isWebwareInstalled = True
 except:
     class BaseServlet: 
         _reusable = 1
