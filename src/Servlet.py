@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.32 2002/10/01 17:52:02 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.33 2005/01/03 19:03:21 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,23 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.32 $
+Version: $Revision: 1.33 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2002/10/01 17:52:02 $
+Last Revision Date: $Date: 2005/01/03 19:03:21 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.32 $"[11:-2]
-
-##################################################
-## CONSTANTS & GLOBALS
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
-
-##################################################
-## DEPENDENCIES
+__revision__ = "$Revision: 1.33 $"[11:-2]
 
 import os.path
 
@@ -96,17 +85,10 @@ class Servlet(BaseServlet):
         #self.writeln = response.writeln
         
     def respond(self, trans=None):
-        # @@MO I don't think this method should ever be called, which
-        # is what the exception is for.  But somehow
-        # SyntaxAndOutput.EmptyTemplate in Cheetah's test suite manages
-        # to invoke it.  To verify when this superclass method is 
-        # called, uncomment the following print statement.
-        #print "*** Servlet.respond() invoked! ***"
-        return ''
-#        raise NotImplementedError("""\
-#couldn't find the template's main method.  If you are using #extends
-#without #implements, try adding '#implements respond' to your template
-#definition.""")
+        raise NotImplementedError("""\
+couldn't find the template's main method.  If you are using #extends
+without #implements, try adding '#implements respond' to your template
+definition.""")
 
     
     __str__ = respond
