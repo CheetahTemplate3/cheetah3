@@ -484,7 +484,21 @@ arguments.  Thus, the function/method must have been declared without arguments
 If the function requires arguments, you must use the \code{()}.
 
 \item Cheetah autocalls only functions and methods.  Classes and other callable
-objects are not autocalled.  
+objects are not autocalled.  The reason is that the primary purpose of a
+function/method is to call it, whereas the primary purpose of an instance is to
+look up its attributes or call its methods, not to call the instance itself.
+And calling a class may allocate large sums of memory uselessly or have other
+side effects, depending on the class.  For instance, consider
+\code{\$myInstance.fname}.
+Do we want to look up \code{fname} in the namespace of \code{myInstance} or
+in the namespace of whatever \code{myinstance} returns?  It could go either way,
+and Cheetah can't tell.  So Cheetah follows the principle of least surprise and
+doesn't autocall instances.  If you {\em do} want to call the instance, do
+{\em \$myInstance.\_\_call\_\_}.  If that's too inconvenient/ugly for you,
+rename the method to \code{.\_\_str\_\_}, and it will be invoked any time 
+\code{\$myInstance} is used as a placeholder.  Note, however, that if
+\code{\$myInstance} is in an expression rather than being a placeholder,
+\code{.\_\_str\_\_} will not be invoked.
 
 \item Autocalling can be disabled via Cheetah's 'useAutocalling' compiler
 setting.
