@@ -45,7 +45,10 @@ release
      rest of the args) for all lookups. (TR)
   - removed the #settings directive (TR)
   - added the #del directive, for using Python's del statement (TR)
-   
+  - I think I've fixed the problem with the searchList arg being discarded when a
+    template is generated from a .tmpl file that #extends another template. This
+    bug was reported by Edmund on Aug 30th 
+    (subject: "Bug? Was: Really basic searchList question") (TR)
 
 0.9.14 (July 14, 2002)
   - Precompiled template Templates/SkeletonPage.py added to CVS.  This file is
