@@ -2,6 +2,12 @@ Please initial your changes and add a date for each release
 ================================================================================
 0.9.9a6 (Nov ???, 2001) 
    - fixed bug with quotations in longer constant string chunks (TR)
+   - fixed another bug in the cheetah-compile script (TR)
+   - fixed a bug in the file-update monitoring code that was resulting in
+     infinite loops when used with Template sub-classes (TR)
+   - extended the #filter framework according to Mike's suggestions (TR)  
+   - added test modules for cheetah-compile and the file-update monitoring code (TR)
+   - extended the capabilities of cheetah-compile ... (IB)
    - updated the docs (MO)
 
 0.9.9a5 (October 31, 2001) 

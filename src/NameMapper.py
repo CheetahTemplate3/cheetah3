@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.12 2001/11/04 19:28:41 ianbicking Exp $
+# $Id: NameMapper.py,v 1.13 2001/11/06 03:51:59 tavis_rudd Exp $
 
 """This module implements Cheetah's optional NameMapper syntax.
 
@@ -146,13 +146,13 @@ Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/11/04 19:28:41 $
+Last Revision Date: $Date: 2001/11/06 03:51:59 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__version__ = "$Revision: 1.12 $"[11:-2]
+__version__ = "$Revision: 1.13 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -175,7 +175,6 @@ class NoDefault:
 ## FUNCTIONS
 
 try:
-    #0/0
     from _namemapper import NotFound, valueForKey, valueForName, valueFromSearchList
     # it is possible, with Jython for example, that _namemapper.c hasn't been compiled
     C_VERSION = True
