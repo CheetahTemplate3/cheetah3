@@ -21,10 +21,10 @@ Please initial your changes and add a date for each release
 
    - added a hundreds of new test cases (TR)
 
-   - started restructuring the SkeletonPage framework [not complete yet] (TR)
-
    - added the #breakpoint and #compiler-settings directives (TR)
 
+   - started restructuring the SkeletonPage framework [not complete yet] (TR)
+   - started restructuring the example sites [not complete yet] (TR)
 
 
 0.9.8 (October 9, 2001)
