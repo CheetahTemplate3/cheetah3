@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.16 2001/08/07 22:14:17 tavis_rudd Exp $
+# $Id: Test.py,v 1.17 2001/08/08 00:14:37 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.16 $
+Version: $Revision: 1.17 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/07 22:14:17 $
+Last Revision Date: $Date: 2001/08/08 00:14:37 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.16 $"[11:-2]
+__version__ = "$Revision: 1.17 $"[11:-2]
 
 
 ##################################################
@@ -478,10 +478,6 @@ rawTests = [
 posixCases += rawTests
 
 includeTests = [
-    ['simple #include of $emptyString - with no whitespace',
-     "#include $emptyString",
-     "",],
-
     ['simple #include of $blockToBeParsed - with no whitespace',
      "#include $blockToBeParsed",
      "1 2",],
