@@ -1,32 +1,44 @@
 #!/usr/bin/env python
-# $Id: SettingsManager.py,v 1.3 2001/08/02 06:22:14 tavis_rudd Exp $
-"""Provides a mixin class for managing settings dictionaries
+# $Id: SettingsManager.py,v 1.4 2001/08/04 05:33:06 tavis_rudd Exp $
+"""Provides a mixin class for managing application settings 
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2001/08/02 06:22:14 $
+Last Revision Date: $Date: 2001/08/04 05:33:06 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 
 ##################################################
 ## DEPENDENCIES ##
 
+import sys
 import os.path
 from copy import deepcopy, copy
-from ConfigParser import ConfigParser
+from ConfigParser import ConfigParser as ConfigParserBase
 import re
-from tokenize import Intnumber, Floatnumber, Number
-from types import StringType, IntType, FloatType, LongType, \
-     ComplexType, NoneType, UnicodeType, DictType
+from tokenize import Intnumber, \
+     Floatnumber, \
+     Number
+from types import StringType, \
+     IntType, \
+     FloatType, \
+     LongType, \
+     ComplexType, \
+     NoneType, \
+     UnicodeType, \
+     DictType
+import types
 from cStringIO import StringIO
+from threading import Lock  # used for thread lock on sys.path manipulations
+import imp                  # used by SettingsManager.updateFromPySrcFile()
 
 #intra-package imports ...
-from Utilities import mergeNestedDictionaries
+from Utilities import mergeNestedDictionaries  #@@ consider moving this to here
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
@@ -59,7 +71,7 @@ def convStringToNum(theString):
     """Convert a string representation of a Python number to the Python version"""
     if not stringIsNumber(theString):
         raise Error(theString + ' cannot be converted to a Python number')
-    return eval(theString)
+    return eval(theString, {}, {})
 
 ##################################################
 ## CLASSES ##
@@ -70,19 +82,36 @@ class Error(Exception):
 class NoDefault:
     pass
 
+class ConfigParser(ConfigParserBase):
+    """A case sensitive version of the standard Python ConfigParser."""
+    def optionxform(self, optionstr):
+        return optionstr
+
 class SettingsManager:
-    """A mixin class that provides facilities for managing settings dictionaries.
+    """A mixin class that provides facilities for managing application settings.
+    
+    SettingsManager is designed to:
+    - work well with nested settings dictionaries of any depth
+    - be able to read/write .ini style config files (or strings)
+    - be able to read settings from Python src files (or strings) so that
+      complex Python objects can be stored in the application's settings
+      dictionary.  For example, you might want to store references to various
+      classes that are used by the application and plugins to the application
+      might want to substitute one class for another.
+    - allow sections in .ini config files to be extended by settings in Python
+      src files
+    - maintain the case of setting names, unlike the ConfigParser module
+    
     """
 
     _settings = {}
+    _sysPathLock = Lock()   # used by the updateFromPySrcFile() method
     
     def initializeSettings(self):
-        
         """A hook that allows for complex setting initialization sequences that
         involve references to 'self' or other settings.  For example:
               self._settings['myCalcVal'] = self._settings['someVal'] * 15        
-        This method should be called by the class' __init__() method when needed.
-        
+        This method should be called by the class' __init__() method when needed.       
         The dummy implementation should be reimplemented by subclasses.
         """
         pass
@@ -94,43 +123,86 @@ class SettingsManager:
         else:
             self._settings = newSettings
 
-    def updateSettingsFromPythonString(self, theString, merge=True):
-        """Update the settings from a code in a text string."""
-        nameSpace = {'self':self}
-        exec theString in nameSpace
-        del nameSpace['self']
-        self.updateSettings(nameSpace,
-                            merge=nameSpace.get('mergeSettings',merge) )
+    def updateFromPySrcStr(self, theString, merge=True):
+        """Update the settings from a code in a Python src string."""
+        newSettings = self.readFromPySrcStr(theString)
+        self.updateSettings(newSettings,
+                            merge=newSettings.get('mergeSettings',merge) )
         
-    def updateSettingsFromFile(self, path, merge=True):
-        """Update the settings from Python code in text file."""
+    def updateFromPySrcFile(self, path, merge=True):
+        """Update the settings from variables in a Python source file.
+
+        This method will temporarily add the directory of src file to sys.path so
+        that import statements relative to that dir will work properly."""
+        newSettings = self.readFromPySrcFile(path)
+        self.updateSettings(newSettings,
+                            merge=newSettings.get('mergeSettings',merge) )
+
+    def readFromPySrcFile(self, path):
+        """Update the settings from variables in a Python source file.
+
+        This method will temporarily add the directory of src file to sys.path so
+        that import statements relative to that dir will work properly."""
+        
+        path = self.normalizePath(path)
+        dirName = os.path.dirname(path)
+
+        self._sysPathLock.acquire()
+        sys.path.insert(0, dirName)
+        
+        fp = open(path)
+        pySrc = fp.read()
+        newSettings = self.readFromPySrcStr(pySrc)
+        fp.close()
+        
+        if sys.path[0] == path:   # it might have modified by another thread
+            del sys.path[0]
+        self._sysPathLock.release()
+
+        return newSettings
+        
+    def readFromPySrcStr(self, theString):
+        """Return a dictionary of the settings in a Python src string."""
+        newSettings = {'self':self}
+        exec theString in {}, newSettings
+        del newSettings['self']
+        return newSettings
+
+    def updateFromConfigFile(self, path, **kw):
+        """See the docstring for updateConfigFileObj()"""
         path = self.normalizePath(path)
         fp = open(path)
-        contents = fp.read()
-        fp.close()
-        self.updateSettingsFromPythonString(contents, merge=merge)
-
-
-    def updateSettingsFromIniFile(self, path, **kw):
-        """See the docstring for updateSettingsFromIniFileObj"""
-        path = self.normalizePath(path)
-        fp = open(path)
-        self._updateSettingsFromIniFileObj(fp, **kw)
+        self.updateFromConfigFileObj(fp, **kw)
         fp.close()
 
-    def _updateSettingsFromIniFileObj(self, inFile, convert=True, merge=True):
+    def updateFromConfigFileObj(self, inFile, convert=True, merge=True):
         """Update the settings from a text file using the syntax accepted by
-        Python's standard ConfigParser module (like Windows .ini files).
+        Python's standard ConfigParser module (like Windows .ini files). NOTE:
+        this method maintains case unlike the ConfigParser module.
 
         If the keyword arg 'convert' is True then the strings in the ini file
         that represent numbers or 'True'/'False' will be converted into the
         proper Python types.
-        
-        The ini format doesn't handle nesting well and has many other
-        limitations so it is not the recommended format for config files.  In
-        most cases it is better to use standard Python syntax and the
-        SettingsManager.updateSettingsFromFile() method."""
 
+        If a config section titled 'Globals' is present the options defined
+        under it will be treated as top-level settings.
+
+        The ini format doesn't handle nesting well and has many
+        other limitations so it is not the recommended format for config files.
+        In some cases it is better to use standard Python syntax and the
+        SettingsManager.updateFromPySrcFile() method.
+
+        The caller of this method is responsible for closing the inFile file
+        object."""
+
+        newSettings = self.readFromConfigFileObj(inFile, convert=convert)
+        self.updateSettings(newSettings,
+                            merge=newSettings.get('mergeSettings',merge))
+
+    def readFromConfigFileObj(self, inFile, convert=True):
+        """Return the settings from a config file that uses the syntax accepted by
+        Python's standard ConfigParser module (like Windows .ini files).
+        """
         p = ConfigParser()
         p.readfp(inFile)
         sects = p.sections()
@@ -146,29 +218,39 @@ class SettingsManager:
                     newSettings[s][o] = p.get(s,o)
 
         ## loop through new settings -> deal with global settings, numbers,
-        ## booleans and None
+        ## booleans and None ++ also deal with 'importSettings' commands
 
         for sect, subDict in newSettings.items():
-            if convert:
-                for key, val in subDict.items():
+            for key, val in subDict.items():
+                if convert:
                     if val.lower() == 'none':
                         subDict[key] = None
                     if val.lower() == 'true':
                         subDict[key] = True
                     if val.lower() == 'false':
                         subDict[key] = False
-                        
                     if stringIsNumber(val):
                         subDict[key] = convStringToNum(val)
                         
-            if sect.lower() == 'global':
-                newSettings.update(subDict)
-                del newSettings[sect]
+                ## now deal with any 'importSettings' commands
+                if key.lower() == 'importsettings':
+                    if val.find(';') < 0:
+                        importedSettings = self.readFromPySrcFile(val)
+                    else:
+                        path = val.split(';')[0]
+                        rest = ''.join(val.split(';')[1:]).strip()
+                        parentDict = self.readFromPySrcFile(path)
+                        importedSettings = eval('parentDict["' + rest + '"]')
                         
-        ## Finally, update the settings dict
-        self.updateSettings(newSettings,
-                            merge=newSettings.get('mergeSettings',merge))
-        
+                    subDict.update(mergeNestedDictionaries(subDict,
+                                                           importedSettings))
+                        
+            if sect.lower() == 'globals':
+                newSettings.update(newSettings[sect])
+                del newSettings[sect]
+                
+        return newSettings
+    
     def normalizePath(self, path):
         """A hook for any neccessary path manipulations.
 
@@ -204,15 +286,15 @@ class SettingsManager:
         """Returns a deep copy of the settings dictionary"""
         return deepcopy(self._settings)
 
-    def _createIniFile(self, outFile=StringIO()):
+    def _createConfigFile(self, outFile=StringIO()):
         """Write all the settings that can be represented as strings to an .ini
         style config string.
 
         This method can only handle one level of nesting and will only work with
         numbers, strings, and None."""
 
-        iniSettings = {'globals':{}}
-        globals = iniSettings['globals']
+        iniSettings = {'Globals':{}}
+        globals = iniSettings['Globals']
         
         for key, theSetting in self.settings().items():
             if type(theSetting) in convertableToStrTypes:
@@ -222,30 +304,34 @@ class SettingsManager:
                 for subKey, subSetting in theSetting.items():
                     if type(subSetting) in convertableToStrTypes:
                         iniSettings[key][subKey] = subSetting
-
-        outFileWrite = outFile.write
-        for section in iniSettings.keys():
+        
+        sections = iniSettings.keys()
+        sections.sort()
+        outFileWrite = outFile.write # short-cut namebinding for efficiency
+        for section in sections:
             outFileWrite("[" + section + "]\n")
             sectDict = iniSettings[section]
-            for (key, value) in sectDict.items():
+            
+            keys = sectDict.keys()
+            keys.sort()
+            for key in keys:
                 if key == "__name__":
                     continue
-                outFileWrite("%s = %s\n" % (key, value))
+                outFileWrite("%s = %s\n" % (key, sectDict[key]))
             outFileWrite("\n")
 
         return outFile
         
-    def writeIniFile(self, path):
+    def writeConfigFile(self, path):
         """Write all the settings that can be represented as strings to an .ini
         style config file."""
         
         path = self.normalizePath(path)
         fp = open(path,'w')
-        self._createIniFile(fp)
+        self._createConfigFile(fp)
         fp.close()
         
-    def getIniString(self):
+    def getConfigString(self):
         """Return a string with the settings in .ini file format."""
         
-        return self._createIniFile().getvalue()
- 
+        return self._createConfigFile().getvalue()
