@@ -10,6 +10,7 @@ Cheetah TODO list
 
 Requirements for 1.0
 =========================================================================
+- CheetahWrapper bugs: suppress verbose output if --stdout/-p. (MO)
 - NameMapper attributes before keys, both Python and C versions.  NM should
   look for a key first, then an attribute.  But if (1) this is the first
   component after $, and (2) isinstance(OBJ, dictTypes), *ignore the
@@ -29,12 +30,13 @@ Requirements for 1.0
 Other TODO Items
 ================================================================================
 
-- Debugging tools.  See section below.
+- CheetahWrapper stuff: (MO)
+  * "cheetah compile --shbang '#!/usr/bin/python2.2'"
+  * "cheetah code [options] [FILES]"  print template-specific portion of main
+    method(s) to stdout, with line numbers.
+  * Refactor, make compile/fill/code routines callbacks using a bundle arg.
 
-- Reimplement filters so that they know the placeholder name:
-  def filter(self, val, name=None, **kw)
-  This should be the entire placeholder name as it appears in the
-  template?
+- Debugging tools.  See section below.
 
 - revisit parsed #include directives.  Are they necessary at all??
   (This is a rhetorical question.  They are necessary.  However, the
