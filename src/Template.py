@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.86 2002/03/25 20:51:49 tavis_rudd Exp $
+# $Id: Template.py,v 1.87 2002/03/26 17:51:23 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.86 $
+Version: $Revision: 1.87 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/03/25 20:51:49 $
+Last Revision Date: $Date: 2002/03/26 17:51:23 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.86 $"[11:-2]
+__revision__ = "$Revision: 1.87 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -365,7 +365,7 @@ class Template(SettingsManager, Servlet):
         if not hasattr(self, '_cheetahIncludes'):
             self._cheetahIncludes = {}
         
-        includeID = id(srcArg)
+        includeID = srcArg
         if not self._cheetahIncludes.has_key(includeID):
             if includeFrom == 'file':
                 path = self.serverSidePath(srcArg)
