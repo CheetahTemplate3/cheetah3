@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.20 2003/11/20 22:14:59 tavis_rudd Exp $
+# $Id: Filters.py,v 1.21 2003/11/25 08:17:56 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -10,12 +10,12 @@ would otherwise require a real template object).
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.20 $
+Version: $Revision: 1.21 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2003/11/20 22:14:59 $
+Last Revision Date: $Date: 2003/11/25 08:17:56 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.20 $"[11:-2]
+__revision__ = "$Revision: 1.21 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -105,7 +105,9 @@ class ReplaceNone(Filter):
         return str(val)
 #####
 class EncodeUnicode(Filter):
-    def filter(self, val, **kw):
+    def filter(self, val, encoding='utf8',
+               str=str, type=type, unicodeType=type(u''),
+               **kw):
         """Encode Unicode strings, by default in UTF-8.
 
         >>> import Cheetah.Template
@@ -116,13 +118,7 @@ class EncodeUnicode(Filter):
         ... filter='EncodeUnicode')
         >>> print t
         """
-        
-        if kw.has_key('encoding'):
-            encoding = kw['encoding']
-        else:
-            encoding = 'utf8'
-            
-        if type(val)==type(u''):
+        if type(val)==unicodeType:
             filtered = val.encode(encoding)
         elif val is None:
             filtered = ''
