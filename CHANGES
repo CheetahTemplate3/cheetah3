@@ -2,7 +2,6 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 0.9.16a1 (??? 2003)
-  - Keith Deven's exception handling patch to NameMapper.py [TR]
   - fixed a unicode bug in Compiler.py [TR]
   - added new EncodeUnicode filter that Rene Pijlman contributed (I optimized it
     slightly) and made it the default filter for all templates. [TR]
@@ -25,7 +24,41 @@ release
     placehold names like $update that match dict method names.) [MO]
   - #repeat now uses a local variable of the form __i$num which permits 
     nesting [JJ]
-
+  - implemented a modified version of Bob and JJ's patch for better parser
+    warnings about mismatched directives and #end directives [TR]
+  - lots of little cleanups and refactoring [TR]
+  - refactored the class tree for the Parser and Compiler.  They are now
+    completely separate trees and the communication between them is one-way:
+    explicit commands from the parser to the compiler.  The parser now handles
+    all parsing tasks by itself and delegates *all* code generation to the
+    compiler.  This last bit was my original intention, but things got a bit
+    mixed up over time.  Also, all SettingsManager stuff for handling
+    compiler/parser settings is now handled by ModuleCompiler.  This should make
+    it easier to grok, maintain, and extend both. [TR]
+  - improved the parsing of singe-line #if directives. [TR]
+  - removed the old webware example of the cheetah site, as it was way out of
+    date and was more confusing than helpful. [TR]
+  - added two new lookup functions to NameMapper (valueFromFrame and
+    valueFromFrameOrSearchList) and synchronized the behaviour of the C and
+    Python versions of all functions. [TR]
+  - improved the exception handling of both versions of NameMapper. NotFound
+    exceptions now include more detail about what wasn't found. [TR]
+  - made NameMapper's searchList lookup functions work with any iterable
+    type/class rather than just with lists. [TR]
+  - added and updated a variety of test cases. [TR]
+  - checked in a patch to CheetahWrapper that improves handling of the odir
+    option when the path is absolute.  I can't remember where the patch came
+    from. [TR]
+  - checked in a patch to Template.py for better include/import support under
+    Jython.  Again, I've forgotten who contributed it. [TR]
+  - updated various bits of the user guide. [TR]
+  - made the Cheetah NameMapper calls in the generated code use the new function
+    valueFromFrameOrSearchList rather than passing locals, searchList, globals,
+    and __builtins__ into valueFromSearchList.  This is faster, less bug prone
+    and simpler to read/grok. I also removed all tracking of local
+    variable names by the compiler. [TR]
+  - other misc. refactorings [TR]
+ 
 0.9.15 (Mar 25, 2003)
   - a minor tweak to the cleanup actions of one of the test cases [TR]
 
@@ -635,5 +668,5 @@ CE - Chuck Esterbrook
 MO - Mike Orr
 IB - Ian Bicking
 MH - Mike Halle
-
+JJ - Shannon 'JJ' Behrens
   
