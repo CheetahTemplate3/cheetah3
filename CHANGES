@@ -1,5 +1,9 @@
 Please initial your changes and add a date for each release
 ================================================================================
+0.9.9a6 (Nov ???, 2001) 
+   - fixed bug with quotations in longer constant string chunks (TR)
+   - updated the docs (MO)
+
 0.9.9a5 (October 31, 2001) 
    - fixed a bug I created yesterday (TR)
 
