@@ -12,7 +12,7 @@ packages = ['Cheetah',
             'Cheetah.Utils',
 	    'Cheetah.Utils.optik',
             ]
-extra_path = 'Webware'
+## used to be: extra_path = 'Webware'  # now just in site-packages top-level
 package_dir = {'Cheetah':'src'}
 
 import os
