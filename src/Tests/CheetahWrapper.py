@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.3 2002/11/10 09:08:16 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.4 2005/01/17 14:58:00 tavis_rudd Exp $
 """Tests for the 'cheetah' command.
 
 Besides unittest usage, recognizes the following command-line options:
@@ -14,12 +14,12 @@ Besides unittest usage, recognizes the following command-line options:
 Meta-Data
 ================================================================================
 Author: Mike Orr <iron@mso.oz.net>,
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2002/11/10 09:08:16 $
+Last Revision Date: $Date: 2005/01/17 14:58:00 $
 """
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.3 $"[11:-2]
+__revision__ = "$Revision: 1.4 $"[11:-2]
 
 
 ##################################################
@@ -42,6 +42,9 @@ except NameError:
 
 DELETE = True # True to clean up after ourselves, False for debugging.
 OUTPUT = False # Normally False, True for debugging.
+
+#DELETE = False # True to clean up after ourselves, False for debugging.
+#OUTPUT = True # Normally False, True for debugging.
 
 BACKUP_SUFFIX = CheetahWrapper.BACKUP_SUFFIX
 
@@ -124,7 +127,8 @@ class CFBase(unittest.TestCase):
 
     def checkCompile(self, path):
         # Raw string to prevent "\n" from being converted to a newline.
-        expected = R"write('Hello, world!\n')"
+        #expected = R"write('Hello, world!\n')"
+        expected = R"'Hello, world!\n')" # might output a u'' string
         errmsg = """\
 destination file %(path)s doesn't contain expected substring:
 %(expected)r"""
