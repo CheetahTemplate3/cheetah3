@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SetDirective.py,v 1.1 2001/08/11 01:03:16 tavis_rudd Exp $
+# $Id: SetDirective.py,v 1.2 2001/08/13 01:58:28 tavis_rudd Exp $
 """SetDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,19 +7,19 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/11 01:03:16 $
+Last Revision Date: $Date: 2001/08/13 01:58:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
 
 # intra-package imports ...
 import TagProcessor
-from Delimiters import delimiters
+
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
@@ -54,7 +54,7 @@ class SetDirective(TagProcessor.TagProcessor):
         varName = tag[0: firstEqualSign].replace(
             self.setting('placeholderStartToken'),'').strip()
         valueString = tag[firstEqualSign+1:]
-        valueString = templateObj.translatePlaceholderVars(valueString)
+        valueString = templateObj.translateRawPlaceholderString(valueString)
         # get rid of accidental double calls
         valueString = valueString.replace('()()','()')
 

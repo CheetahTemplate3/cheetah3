@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: IncludeDirective.py,v 1.4 2001/08/11 05:25:27 tavis_rudd Exp $
+# $Id: IncludeDirective.py,v 1.5 2001/08/13 01:58:28 tavis_rudd Exp $
 """IncludeDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/11 05:25:27 $
+Last Revision Date: $Date: 2001/08/13 01:58:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -87,7 +87,7 @@ class IncludeDirective(TagProcessor.TagProcessor):
                 
             ## get the Cheetah code to be included
             if args.startswith( templateObj.setting('placeholderStartToken') ):
-                translatedPlaceholder = templateObj.translatePlaceholderVars(args)
+                translatedPlaceholder = templateObj.translateRawPlaceholderString(args)
                 includeString = templateObj.placeholderProcessor.evalPlaceholderString(
                     translatedPlaceholder)
                 

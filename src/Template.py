@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.35 2001/08/12 20:12:34 tavis_rudd Exp $
+# $Id: Template.py,v 1.36 2001/08/13 01:58:28 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.35 $
+Version: $Revision: 1.36 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/12 20:12:34 $
+Last Revision Date: $Date: 2001/08/13 01:58:28 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.35 $"[11:-2]
+__version__ = "$Revision: 1.36 $"[11:-2]
 
 
 ##################################################
@@ -42,6 +42,7 @@ from DisplayLogic import DisplayLogic
 from SetDirective import SetDirective
 from CacheDirective import CacheDirective, EndCacheDirective
 from StopDirective import StopDirective
+from FormatterDirective import FormatterDirective
 
 from CommentDirective import CommentDirective
 from SlurpDirective import SlurpDirective
@@ -77,6 +78,8 @@ class RESTART:
 class Template(SettingsManager, Parser):
     """The core template engine: parses, compiles, and serves templates."""
     _settings = {
+        'formatter':str,
+        'interactiveFormatter':False,
         'useAutocalling': True,
         'delayedCompile': False,            
         'plugins':[],
@@ -254,7 +257,8 @@ class Template(SettingsManager, Parser):
         stopDirective = StopDirective(self)
         cacheDirective = CacheDirective(self)
         endCacheDirective = EndCacheDirective(self)
-
+        formatterDirective = FormatterDirective(self)
+        
         ##store references to them as self.[fill_in_the_blank]
         self.__dict__.update(locals())
         del self.__dict__['self']
@@ -305,6 +309,8 @@ class Template(SettingsManager, Parser):
                                displayLogic),
                               ('stop directives',
                                stopDirective),
+                              ('formatterDirective',
+                              formatterDirective),
                               ('placeholders',
                                placeholderProcessor),
                               ],
@@ -315,6 +321,7 @@ class Template(SettingsManager, Parser):
                                  'cacheDirective':cacheDirective,
                                  'endCacheDirective':endCacheDirective,
                                  'stopDirective':stopDirective,
+                                 'formatterDirective':formatterDirective,
                                  },
             
             'generatedCodeFilters':[('addPerResponseCode',
@@ -338,13 +345,6 @@ class Template(SettingsManager, Parser):
             ## @@ change the restart default to False once we implement run-time
             # $placeholder translation.
             self.compileTemplate()
-
-    def translatePlaceholderVars(self, string):
-        """Translate all the $placeholders in a string to the appropriate Python
-        code.  This method is used to translate $placeholders inside directives,
-        not for the Template Definition itself."""
-        
-        return self.placeholderProcessor.translateRawPlaceholderString(string)
 
     def compileTemplate(self):
         """Process and parse the template, then compile it into a function definition
@@ -396,6 +396,10 @@ class Template(SettingsManager, Parser):
         debug = settings['debug']
         results = self._codeGeneratorResults = {}
         state = self._codeGeneratorState = {}
+        self._defaultFormatter = self.setting('formatter')
+        self.settings()['theFormatters'] = {'default': self._defaultFormatter}
+        state['currFormatter'] = 'default'
+        state['interactiveFormatter'] = self.setting('interactiveFormatter')
         self._localVarsList = []   # used to track vars from #set and #for
 
         templateDef = templateDef.replace("'''",r"\'\'\'") # ''' must be escaped
@@ -457,11 +461,23 @@ class Template(SettingsManager, Parser):
             if debug: results['stage3'] = []
             indent = settings['indentationStep']
             generatedCode = \
-                          "def generatedFunction(self, trans=None, iAmNested=False):\n" \
+                          "def generatedFunction(self, trans=None, iAmNested=False," + \
+                          "format = self._defaultFormatter, " + \
+                          "searchList = self._searchList, " + \
+                          "setVars = self._setVars, " + \
+                          "checkForCacheRefreshes = self._checkForCacheRefreshes, " + \
+                          "timedRefreshCache = self._timedRefreshCache, " + \
+                          "timedRefreshList = self._timedRefreshList, " + \
+                          "timedRefresh = self._timedRefresh, " + \
+                          "):\n" \
                           + indent * 1 + "try:\n" \
                           + indent * 2 + "#setupCodeInsertMarker\n" \
-                          + indent * 2 + "searchList = self.searchList()\n" \
-                          + indent * 2 + "setVars = self._setVars\n" \
+                          + indent * 2 + "if checkForCacheRefreshes:\n"\
+                          + indent * 3 + "currTime = currentTime()\n"\
+                          + indent * 3 + "timedRefreshList.sort()\n"\
+                          + indent * 3 + "if currTime >= timedRefreshList[0][0]:\n"\
+                          + indent * 4 + "timedRefresh(currTime)\n"\
+                          + indent * 3 + "                                   \n" \
                           + indent * 2 + "outputList = []\n" \
                           + indent * 2 + "outputList.extend( ['''" + \
                                          codeFromTextVsTagsList + \
@@ -540,14 +556,14 @@ class Template(SettingsManager, Parser):
         processedTag = settings['coreTagProcessors'][tagToken].processTag(tag)
         return processedTag
         
-    def _setTimedRefresh(self, translatedTag, interval):
+    def _setTimedRefresh(self, ID, translatedTag, interval):
         """Setup a cache refresh for a $*[time]*placeholder."""
         self._checkForCacheRefreshes = True
         tagValue = self.evalPlaceholderString(translatedTag)
-        self._timedRefreshCache[translatedTag] = str(tagValue)
+        self._timedRefreshCache[ID] = str(tagValue)
         nextUpdateTime = currentTime() + interval * 60 
         self._timedRefreshList.append(
-            [nextUpdateTime, translatedTag, interval])
+            [nextUpdateTime, translatedTag, interval, ID])
 
 
     def _timedRefresh(self, currTime):
@@ -555,14 +571,15 @@ class Template(SettingsManager, Parser):
         refresh at this time, and reschedule them for their next update.
 
         the entries in the recache list are in the format [nextUpdateTime, name,
-        interval] """
+        interval, ID] """
 
         refreshList = self._timedRefreshList
         for i in range(len(refreshList)):
             if refreshList[i][0] < currTime:
                 translatedTag = refreshList[i][1]
                 interval = refreshList[i][2]
-                self._setTimedRefresh(translatedTag, interval)
+                ID = refreshList[i][3]
+                self._setTimedRefresh(ID, translatedTag, interval)
                 del refreshList[i]
                 refreshList.sort()
        

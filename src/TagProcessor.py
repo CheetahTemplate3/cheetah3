@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: TagProcessor.py,v 1.7 2001/08/11 04:57:39 tavis_rudd Exp $
+# $Id: TagProcessor.py,v 1.8 2001/08/13 01:58:28 tavis_rudd Exp $
 """Tag Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/11 04:57:39 $
+Last Revision Date: $Date: 2001/08/13 01:58:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -70,20 +70,16 @@ class TagProcessor(Parser):
 
         This must be called by subclasses"""
         templateObj = self.templateObj()
-        
-        if not self.state().has_key('indentLevel'):
-            self.state()['indentLevel'] = \
-                          self.settings()['initialIndentLevel']
-        if not hasattr(templateObj, '_localVarsList'):
-            # may have already been set by #set or #for
+
+        if not self.state().has_key('basicInitDone'):
+            self.state()['indentLevel'] = self.settings()['initialIndentLevel']
             templateObj._localVarsList = []
-            
-        if not hasattr(templateObj,'_perResponseSetupCodeChunks'):
             templateObj._perResponseSetupCodeChunks = {}
-
-        if not self.state().has_key('defaultCacheType'):
             self.state()['defaultCacheType'] = None
-
+            templateObj._timedRefreshCache = {} # caching timedRefresh vars
+            templateObj._timedRefreshList = []
+            templateObj._checkForCacheRefreshes = False
+            self.state()['basicInitDone'] = True
     
     def processTag(self, tag):
         return self.wrapTagCode( self.translateTag(tag) )

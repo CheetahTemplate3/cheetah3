@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.7 2001/08/12 20:12:34 tavis_rudd Exp $
+# $Id: Parser.py,v 1.8 2001/08/13 01:58:28 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/12 20:12:34 $
+Last Revision Date: $Date: 2001/08/13 01:58:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -319,21 +319,23 @@ class Parser:
         return txt
 
 
-    def translateRawPlaceholderString(self, txt):
+    def translateRawPlaceholderString(self, txt, autoCall=True):
         """Translate raw $placeholders in a string directly into valid Python code.
 
         This method is used for handling $placeholders in #directives
         """
-        return self.translatePlaceholderString(self.markPlaceholders(txt))
+        return self.translatePlaceholderString(self.markPlaceholders(txt),
+                                               autoCall=autoCall)
 
 
-    def translatePlaceholderString(self, txt):
+    def translatePlaceholderString(self, txt, autoCall=True):
         """Translate a marked placeholder string into valid Python code."""
 
         templateObj = self.templateObj()
         searchList = templateObj.searchList()
         
-        def translateName(name, templateObj=templateObj):
+        def translateName(name, templateObj=templateObj,
+                          autoCall=autoCall):
             
             ## get rid of the 'cache-type' tokens
             # - these are handled by the tag-processor instead
@@ -356,7 +358,8 @@ class Parser:
                 remainderOfName = ''
 
             ## only do autocalling on names that have no () in them
-            if name.find('(') == -1 and templateObj.setting('useAutocalling'):
+            if autoCall and name.find('(') == -1 \
+               and templateObj.setting('useAutocalling'):
                 safeToAutoCall = True
             else:
                 safeToAutoCall = False
@@ -407,5 +410,9 @@ class Parser:
 
     def evalPlaceholderString(self, txt):
         """Return the value of a placeholderstring. This doesn't work with localVars."""
+        try:
+            theFormatters = self.settings()['theFormatters']
+        except:
+            pass
         searchList = self.searchList()
         return eval(txt)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: MacroDirective.py,v 1.4 2001/08/12 20:12:34 tavis_rudd Exp $
+# $Id: MacroDirective.py,v 1.5 2001/08/13 01:58:28 tavis_rudd Exp $
 """MacroDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/12 20:12:34 $
+Last Revision Date: $Date: 2001/08/13 01:58:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -193,7 +193,7 @@ class CallMacroDirective(TagProcessor.TagProcessor):
     
             try:
                 searchList = templateObj.searchList()
-                argString = templateObj.translatePlaceholderVars(argString)
+                argString = templateObj.translateRawPlaceholderString(argString)
                 
             except NameMapper.NotFound, name:
                 line = lineNumFromPos(match.string, match.start())
@@ -262,7 +262,7 @@ class LazyMacroCall(TagProcessor.TagProcessor):
             searchList = templateObj.searchList()
             
             try:
-                macroArgstring = templateObj.translatePlaceholderVars(macroArgstring)
+                macroArgstring = templateObj.translateRawPlaceholderString(macroArgstring)
                 
             except NameMapper.NotFound, name:
                 line = lineNumFromPos(match.string, match.start())

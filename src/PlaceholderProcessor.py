@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.25 2001/08/12 20:12:34 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.26 2001/08/13 01:58:28 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 Meta-Data
@@ -7,18 +7,19 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.25 $
+Version: $Revision: 1.26 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/12 20:12:34 $
+Last Revision Date: $Date: 2001/08/13 01:58:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.25 $"[11:-2]
+__version__ = "$Revision: 1.26 $"[11:-2]
 
 
 ##################################################
 ## DEPENDENCIES ##
 
 import re
+from random import randrange
 
 #intra-package dependencies ...
 from TagProcessor import TagProcessor
@@ -55,37 +56,6 @@ class PlaceholderProcessor(TagProcessor):
                                                after=self.setting('internalDelims')[1])
         
         return self.unescapePlaceholders(templateDef)
-    
-    def initializeTemplateObj(self):
-        """Initialize the templateObj so that all the necessary attributes are
-        in place for the tag-processing stage"""
-
-        templateObj = self.templateObj()
-        TagProcessor.initializeTemplateObj(self)
-        
-        if not templateObj._perResponseSetupCodeChunks.has_key('placeholders'):
-            ## setup the code to be included at the beginning of each response ##
-            indent = templateObj._settings['indentationStep']
-            baseInd = indent  * \
-                   templateObj._settings['initialIndentLevel']
-
-            templateObj._perResponseSetupCodeChunks['placeholders'] = \
-                      baseInd + "if self._checkForCacheRefreshes:\n"\
-                      + baseInd + indent + "timedRefreshCache = self._timedRefreshCache\n" \
-                      + baseInd + indent + "currTime = currentTime()\n"\
-                      + baseInd + indent + "self._timedRefreshList.sort()\n"\
-                      + baseInd + indent + "if currTime >= self._timedRefreshList[0][0]:\n"\
-                      + baseInd + indent * 2 +  " self._timedRefresh(currTime)\n"\
-                      + baseInd + indent + "                                   \n" \
-                      + baseInd + "nestedTemplates = self._nestedTemplatesCache\n" \
-                      + baseInd + "components = self._componentsDict\n"
-
-            ## initialize the caches, the localVarsList, and the timedRefreshList
-            templateObj._timedRefreshCache = {} # caching timedRefresh vars
-            templateObj._nestedTemplatesCache = {} # caching references to nested templates
-            templateObj._componentsDict = {}       # you get the idea...
-            templateObj._timedRefreshList = []
-            templateObj._checkForCacheRefreshes = False
         
     def processTag(self, tag):
 
@@ -123,17 +93,22 @@ class PlaceholderProcessor(TagProcessor):
             self.setting('placeholderMarker') + tag)
 
         
-        ## deal with the caching and return the proper code to the code-generator
-        searchList = templateObj.searchList()
+        ## deal with caching 
+        currFormatter = state['currFormatter']
+        formatterTag = 'theFormatters["' + currFormatter + '"](' \
+                        + translatedTag + ')'
         if cacheType == STATIC_CACHE:
-            return str(
-                self.evalPlaceholderString(translatedTag)).replace("'''",r"\'\'\'")
+            return self.evalPlaceholderString(formatterTag)
         elif cacheType == TIMED_REFRESH_CACHE:
-            templateObj._setTimedRefresh(translatedTag, cacheRefreshInterval)
-            return self.wrapEvalTag(
-                'timedRefreshCache["""' + translatedTag + '"""]')
+            ID = str(id(translatedTag)) + '_' + str(randrange(1000, 9000))
+            templateObj._setTimedRefresh(ID, formatterTag, cacheRefreshInterval)
+            translatedTag = 'timedRefreshCache["' + ID + '"]'
+
+        ## return the proper code to the code-generator
+        if self.state()['interactiveFormatter']:
+            return self.wrapEvalTag("format(" + translatedTag + ", trans=trans)")
         else:
-            return self.wrapEvalTag("str(" + translatedTag + ")")
+            return self.wrapEvalTag("format(" + translatedTag + ")")
 
             
 
