@@ -1,12 +1,45 @@
 \section{The Template Definition Language}
 
+%% @@MO:
 % This chapter is for any information related to the TDL as a whole.
 % Since the vocabulary page already says the TDL consists of $P and #D,
 % and the details are fully explained in the next three chapters
 % ("Placeholder Tags", "Directive Tags", "Functions and Macros"), I don't
 % know what if anything needs to go in this chapter.
 
+%% @@TR: I disagree.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Placeholder tags}
+{\bf Template definitions} are text strings, or files, that have been marked up
+with Cheetah's {\bf Template Definition Language} for special processing.  This
+language is not a general purpose programming language like Python.  Rather,
+it's a mini-language that was designed to make HTML-generation, and
+code-generation in general, easy enough for non-programmers to understand and
+programmers to love.  It is purposefully limited so complex tasks are left to
+Python code, where they belong.
+
+Cheetah's Template Definition Language has 2 primary types of tags:
+
+\begin{enumerate}
+\item {\bf placeholders}: for marking areas of the template that should be
+     filled in with something. 
+     
+     Placeholders begin with a dollar sign (\code{\$varName}).
+
+\item {\bf directives}: for everything else:
+     \begin{enumerate}   % level 2
+     \item {\bf raw text} for marking verbatim blocks should not be parsed for
+          Cheetah tags.
+     \item {\bf comments} that should not appear in the output
+     \item {\bf includes} to include external text.  The text can be included
+          verbatim or with parsing for Cheetah tags.
+     \item {\bf display logic} such as {\bf conditional blocks} (if-blocks) and
+          {\bf for loops}.
+     \item {\bf blocks}, which are named sections of a template that can be
+          redefined (overridden) in a subclass or by template users.
+     \item etc.
+     \end{enumerate}  % level 2
+
+     Directives begin with a hash character (\#).
+
+The following chapters deal with these tags in detail.
 
