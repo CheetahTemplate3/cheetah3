@@ -6,6 +6,10 @@ release
     In the .filter() method, kw['rawExpr'] gives the entire placeholder name
     including subscripts and arguments, exactly as it appears in the template
     definition. (TR)
+  - Fix three bugs in "cheetah compile -R": (1) the generated class name 
+    contained the subdirectory, (2) the destination path did not contain the
+    subdirectory, (3) Cheetah failed to create the destination subdirectory
+    if missing. (MO)
 
 0.9.15a1 (Oct 6th, 2002)
   - fixed a package-relative import bug in ImportHooks.py (TR)

@@ -9,7 +9,8 @@ objects.
 DualGlob objects have the following attributes, all strings:
     src, the source path + filename.
     dst, the destination path + filename.
-    base, the base filename (without the directory or extension).
+    base, the base filename (no extension, but possibly with subdirectory).
+    basename, the base filename (without the directory or extension).
     srcDir, the directory part of 'src'.
     srcExt, the extension of part 'src'.
     dstDir, the directory part of 'dst'.
@@ -84,6 +85,7 @@ class DualGlob:
         self.src = src
         self.dst = dst
         self.base = base
+        self.basename = os.path.basename(base)
         self.srcDir, fn = os.path.split(src)
         self.srcExt = os.path.splitext(fn)[1][1:]
         self.dstDir, fn = os.path.split(dst)
@@ -121,15 +123,18 @@ class _SuperGlob:
         if not self.recurse:
             raise Error("""\
 source file '%s' is directory but recursion flag is False""" % src)
-        for file in os.listdir(orig):
-            path = os.path.join(orig, file)
+        for fil in os.listdir(orig):
+            if orig == os.curdir:
+                path = fil
+            else:
+                path = os.path.join(orig, fil)
+            print "Path is", path
             if os.path.isdir(path):
                 self._evaluateDir(path)
-            elif not file.endswith(iext):
-                continue
+            elif not fil.endswith(iext):
+                continue  # Skip this file, it has the wrong extension.
             else:
-                file = os.path.join(orig, file)
-                self.evaluate(file, False)
+                self.evaluate(path, False)
 
 
     def evaluate(self, orig, addIextIfMissing=False):
@@ -145,8 +150,6 @@ source file '%s' is directory but recursion flag is False""" % src)
         else:
             base = orig
         src = os.path.join(idir, orig)
-        #if   base == "-": # Code meaning standard input.
-        #    self.result.append(("-", "-"))
         if os.path.isdir(src):
             if recurse:
                 self._evaluateDir(src)
@@ -188,8 +191,8 @@ def dualglob(files, iext, oext, idir='', odir='', recurse=True,
     sg.verbose = verbose
     sg.debug = debug
     sg._fixExts()
-    for file in files:
-        sg.evaluate(file, addIextIfMissing)
+    for fil in files:
+        sg.evaluate(fil, addIextIfMissing)
     return sg.result
 
 

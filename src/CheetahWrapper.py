@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.8 2002/10/01 17:45:06 tavis_rudd Exp $
+# $Id: CheetahWrapper.py,v 1.9 2002/10/10 06:17:27 hierro Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -8,12 +8,12 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/10/01 17:45:06 $
+Last Revision Date: $Date: 2002/10/10 06:17:27 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.8 $"[11:-2]
+__revision__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -176,14 +176,13 @@ class CheetahWrapper:
             sys.stdout.write(output)
 
 
-    def verifyBaseIsLegalModuleName(self, base, src):
-        """Compile an single Cheetah file.  
+    def verifyBasenameIsLegalModuleName(self, base, src):
+        """Does what it says.
            
            in : base, string, the base name to check.
                 src, string, the entire source path (for error message).
         """
 
-        base = os.path.basename(base)
         if not moduleNameRx.match(base):
             raise Error(
                 "%s: base name %s contains invalid characters.  It must" \
@@ -195,12 +194,15 @@ class CheetahWrapper:
         src = pair.src
         dst = pair.dst
         base = pair.base
+        basename = pair.basename
+        dstDir = pair.dstDir
         what = self.isCompile and "Compiling" or "Filling"
         print what, src, "->", dst, # No trailing newline.
         try:
             if self.isCompile:
-                self.verifyBaseIsLegalModuleName(base, src)
-                obj = Compiler(file=src, moduleName=base, mainClassName=base)
+                self.verifyBasenameIsLegalModuleName(basename, src)
+                obj = Compiler(file=src, \
+                    moduleName=basename, mainClassName=basename)
             else:
                 obj = Template(file=src, searchList=self.searchList)
             output = str(obj)
@@ -212,6 +214,8 @@ class CheetahWrapper:
             print "(backup %s)" % bak # On same line as previous message.
         else:
             print # Print pending newline.
+        if not os.path.exists(dstDir):
+            os.makedirs(dstDir)
         f = open(dst, 'w')
         f.write(output)
         f.close()
