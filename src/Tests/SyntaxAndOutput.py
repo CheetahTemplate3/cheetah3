@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.16 2001/11/24 04:47:30 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.17 2001/12/05 18:03:59 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.16 $
+Version: $Revision: 1.17 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/24 04:47:30 $
+Last Revision Date: $Date: 2001/12/05 18:03:59 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.16 $"[11:-2]
+__version__ = "$Revision: 1.17 $"[11:-2]
 
 
 ##################################################
@@ -49,9 +49,7 @@ else:
     raise Exception, "Not sure where to find Cheetah. I do not see src/ or" + \
 	  " Cheetah/ two directories up."
 
-
 import unittest_local_copy as unittest
-
 
 ##################################################
 ## CONSTANTS & GLOBALS ##

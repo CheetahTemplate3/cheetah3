@@ -1,4 +1,4 @@
-Please initial your changes and add a date for each release
+Please initial your changes (there's a key at bottom) and add a date for each release
 ================================================================================
 0.9.9a7 (unreleased)
    - template constructor arg 'outputFilter' now 'filter', for consistency
@@ -13,6 +13,12 @@ Please initial your changes and add a date for each release
    - fixed bug with adding Python's __builtins__ to the local vars list (TR)
    - fixed bug with #echo (TR)
    - fixed bug that was preventing ${a, $b=1234} from working like ${a, b=1234} (TR)
+   - fixed some bugs in Template.varExists and Template.getVar() 
+     (TR - thanks to MH for spotting them)
+   - made it possible to use filenames like 'spam-eggs.txt' that have invalid
+     characters for module names with Template(): Template(file='spam-eggs.txt')
+     (TR/MH)
+   - refactored 'cheetah-compile' a little (TR)
    - Cheetah.Filters.Strip: new filter to strip leading/trailing whitespace
      but preserve newlines.  Suitable for #filter directive or (possible)
      future #sed directive. (MO)
@@ -23,7 +29,7 @@ Please initial your changes and add a date for each release
      Cheetah.  This works transparently; details are in Filters.py docstring.
      (MO)
    - Cheetah.Tools.MondoReport: new module for dividing a long list into
-     "pages", and for calculating statistics useful in reports.
+     "pages", and for calculating statistics useful in reports. (MO)
      
 
 0.9.9a6 (Nov 6, 2001) 
@@ -300,4 +306,14 @@ Please initial your changes and add a date for each release
 
 0.7.2
   - implemented the #longMacro directive (TR)
+
+
+================================================================================
+KEY TO INITIALS USED ABOVE:
+TR - Tavis Rudd
+CE - Chuck Esterbrook
+MO - Mike Orr
+IB - Ian Bicking
+MH - Mike Halle
+
   
