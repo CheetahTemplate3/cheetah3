@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.25 2002/03/06 22:02:14 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.26 2002/03/18 21:47:39 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.25 $
+Version: $Revision: 1.26 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/03/06 22:02:14 $
+Last Revision Date: $Date: 2002/03/18 21:47:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.25 $"[11:-2]
+__revision__ = "$Revision: 1.26 $"[11:-2]
 
 
 ##################################################
@@ -520,6 +520,11 @@ class Placeholders_Vals(OutputTest):
         The default output filter is ReplaceNone.
         """
         self.verify("$none", "")
+
+    def test7(self):
+        """True, False
+        """
+        self.verify("$True $False", "1 0")
 
 class Placeholders_Esc(OutputTest):
     convertEOLs = False
