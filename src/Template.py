@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.110 2003/03/17 00:23:40 tavis_rudd Exp $
+# $Id: Template.py,v 1.111 2003/04/07 23:00:41 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.110 $
+Version: $Revision: 1.111 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2003/03/17 00:23:40 $
+Last Revision Date: $Date: 2003/04/07 23:00:41 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.110 $"[11:-2]
+__revision__ = "$Revision: 1.111 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -375,17 +375,15 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         return new.instancemethod(function, self, self.__class__)
 
 
-    def _includeCheetahSource(self, srcArg, trans=None, includeFrom='file',
-                              raw=False, _includeID=None
-                              ):
+    def _includeCheetahSource(self, srcArg, trans=None, includeFrom='file', raw=False):
         
         """This is the method that #include directives translate into."""
 
         if not hasattr(self, '_cheetahIncludes'):
             self._cheetahIncludes = {}
 
-        if not _includeID:
-            _includeID = srcArg
+        _includeID = srcArg
+            
         if not self._cheetahIncludes.has_key(_includeID):
             if includeFrom == 'file':
                 path = self.serverSidePath(srcArg)

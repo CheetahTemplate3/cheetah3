@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.62 2002/11/28 22:09:51 tavis_rudd Exp $
+# $Id: Parser.py,v 1.63 2003/04/07 23:00:25 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.62 $
+Version: $Revision: 1.63 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/11/28 22:09:51 $
+Last Revision Date: $Date: 2003/04/07 23:00:25 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.62 $"[11:-2]
+__revision__ = "$Revision: 1.63 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1580,8 +1580,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.addWriteChunk('self._includeCheetahSource(' + expr +
                            ', trans=trans, ' +
                            'includeFrom="' + includeFrom + '", raw=' +
-                           str(raw) + ', _includeID="' +
-                           str(self.pos()) + str(time.time()) + '")')
+                           str(raw) + ')')
 
     def eatCache(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
