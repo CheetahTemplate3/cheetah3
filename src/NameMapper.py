@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.20 2002/10/05 19:36:46 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.21 2002/10/28 07:38:58 tavis_rudd Exp $
 
 """This module implements Cheetah's optional NameMapper syntax.
 
@@ -134,13 +134,13 @@ Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@damnsimple.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.20 $
+Version: $Revision: 1.21 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2002/10/05 19:36:46 $
+Last Revision Date: $Date: 2002/10/28 07:38:58 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__revision__ = "$Revision: 1.20 $"[11:-2]
+__revision__ = "$Revision: 1.21 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -171,7 +171,7 @@ try:
 except:
     C_VERSION = False
 
-    class NotFound(Exception):
+    class NotFound(LookupError):
         pass
     class NotFoundInNamespace(NotFound):
         pass
