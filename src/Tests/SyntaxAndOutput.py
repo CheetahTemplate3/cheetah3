@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.24 2002/03/06 16:54:40 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.25 2002/03/06 22:02:14 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.24 $
+Version: $Revision: 1.25 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/03/06 16:54:40 $
+Last Revision Date: $Date: 2002/03/06 22:02:14 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.24 $"[11:-2]
+__revision__ = "$Revision: 1.25 $"[11:-2]
 
 
 ##################################################
@@ -30,25 +30,9 @@ from copy import deepcopy
 import os.path
 import new
 
-# We exist in src/Tests (uninstalled) or Cheetah/Tests (installed)
-# Here we fix up sys.path to make sure we get the Cheetah we
-# belong to and not some other Cheetah.
-
-newPath = os.path.abspath(os.path.join(os.pardir, os.pardir))
-sys.path.insert(1, newPath)
-
-if os.path.exists(os.path.join(newPath, 'src')):
-    from src.NameMapper import NotFound
-    from src.Template import Template
-    from src.Parser import ParseError
-elif os.path.exists(os.path.join(newPath, 'Cheetah')):
-    from Cheetah.NameMapper import NotFound
-    from Cheetah.Template import Template
-    from Cheetah.Parser import ParseError
-else:
-    raise Exception, "Not sure where to find Cheetah. I do not see src/ or" + \
-	  " Cheetah/ two directories up."
-
+from Cheetah.NameMapper import NotFound
+from Cheetah.Template import Template
+from Cheetah.Parser import ParseError
 import unittest_local_copy as unittest
 
 ##################################################

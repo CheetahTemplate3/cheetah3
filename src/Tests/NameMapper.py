@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.4 2001/12/19 02:10:25 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.5 2002/03/06 22:01:52 tavis_rudd Exp $
 """NameMapper Tests
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2001/12/19 02:10:25 $
+Last Revision Date: $Date: 2002/03/06 22:01:52 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.4 $"[11:-2]
+__revision__ = "$Revision: 1.5 $"[11:-2]
 
 
 ##################################################
@@ -20,22 +20,9 @@ import sys
 import types
 import os
 import os.path
+
 import unittest_local_copy as unittest
-
-# We exist in src/Tests (uninstalled) or Cheetah/Tests (installed)
-# Here we fix up sys.path to make sure we get the Cheetah we
-# belong to and not some other Cheetah.
-
-newPath = os.path.abspath(os.path.join(os.pardir, os.pardir))
-sys.path.insert(1, newPath)
-
-if os.path.exists(os.path.join(newPath, 'src')):
-    from src.NameMapper import NotFound, valueForName, valueFromSearchList
-elif os.path.exists(os.path.join(newPath, 'Cheetah')):
-    from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList
-else:
-    raise Exception, "Not sure where to find Cheetah. I do not see src/ or" + \
-	  " Cheetah/ two directories up."
+from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
