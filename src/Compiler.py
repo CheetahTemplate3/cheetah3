@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.24 2002/02/27 23:21:41 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.25 2002/03/06 16:57:14 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.24 $
+Version: $Revision: 1.25 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/02/27 23:21:41 $
+Last Revision Date: $Date: 2002/03/06 16:57:14 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.24 $"[11:-2]
+__revision__ = "$Revision: 1.25 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -170,23 +170,9 @@ class GenUtils:
                               '",' + str(autoCall and chunk[1]) + ')'
                               + chunk[2])            
         else:
-            alreadyDone = False
-            for varName in  self.importedVars():
-                if chunk[0].startswith(varName):
-                    firstBit = chunk[0][:len(varName)]
-                    rest = chunk[0][len(varName)+1:] # +1 for the dot
-                    translatedName = ('VFN(' + firstBit +
-                                      ',"' + rest +
-                                      '",' + str(autoCall and chunk[1]) + ')'
-                                      + chunk[2]) 
-                    alreadyDone = True
-                    break
-
-            if not alreadyDone:
-                translatedName = ('VFS(SL,"' + chunk[0] +
-                                  '",' + str(autoCall and chunk[1]) + ')'
-                                  + chunk[2])
-
+            translatedName = ('VFS(SL,"' + chunk[0] +
+                              '",' + str(autoCall and chunk[1]) + ')'
+                              + chunk[2])
         
         while nameChunks:
             chunk = nameChunks.pop()
@@ -194,6 +180,7 @@ class GenUtils:
                               ',"' + chunk[0] +
                               '",' + str(autoCall and chunk[1]) + ')'
                               + chunk[2])
+
         return translatedName
 
     def genPlainVar(self, nameChunks):
