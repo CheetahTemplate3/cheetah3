@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.9 2001/07/12 15:12:18 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.10 2001/07/13 22:59:36 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/12 15:12:18 $
+Last Revision Date: $Date: 2001/07/13 22:59:36 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.9 $"[11:-2]
+__version__ = "$Revision: 1.10 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -48,6 +48,11 @@ EVAL_TAG_TYPE = 0
 EXEC_TAG_TYPE = 1
 EMPTY_TAG_TYPE = 2
 
+# cacheType's for $placeholders
+NO_CACHE = 0
+STATIC_CACHE = 1
+TIMED_REFRESH_CACHE = 2
+
 ##################################################
 ## CLASSES ##
 
@@ -77,17 +82,20 @@ class TagProcessor:
             templateDef = RE.sub(subber, templateDef)
 
         return templateDef
-
-    
+   
     def initializeTemplateObj(self, templateObj):
-        pass
+        if not templateObj._codeGeneratorState.has_key('indentLevel'):
+            templateObj._codeGeneratorState['indentLevel'] = \
+                          templateObj._settings['initialIndentLevel']
+        if not hasattr(templateObj, '_localVarsList'):
+            # may have already been set by #set or #for
+            templateObj._localVarsList = []
     
     def processTag(self, templateObj, tag):
         return self.wrapTagCode( templateObj, self.translateTag(templateObj, tag) )
 
     def translateTag(self, templateObj, tag):
         pass
-
 
     def wrapExecTag(self, templateObj, translatedTag):
         return "''',])\n" + translatedTag + "outputList.extend(['''"
@@ -105,10 +113,6 @@ class TagProcessor:
         elif self._tagType == EMPTY_TAG_TYPE:
             return ''
 
-
-import PlaceholderProcessor
-# PlaceholderProcessor must be imported at this stage to avoid circular refs
-
 class DisplayLogicProcessor(TagProcessor):
     """A class for processing display logic tags in Cheetah Templates."""
     
@@ -118,14 +122,6 @@ class DisplayLogicProcessor(TagProcessor):
                              delimiters['displayLogic']]
         self._token = 'displayLogic'
                     
-    def initializeTemplateObj(self, templateObj):
-        if not templateObj._codeGeneratorState.has_key('indentLevel'):
-            templateObj._codeGeneratorState['indentLevel'] = \
-                          templateObj._settings['initialIndentLevel']
-        if not hasattr(templateObj, '_localVarsList'):
-            # may have already been set by #set or #for
-            templateObj._localVarsList = []
-
     def translateTag(self, templateObj, tag):
         """process display logic embedded in the template"""
     
@@ -186,18 +182,7 @@ class SetDirectiveProcessor(TagProcessor):
     _token = 'setDirective'
     _tagType = EXEC_TAG_TYPE
     _delimRegexs = [delimiters['setDirective'],]
-    
-    def __init__(self):
-        self._placeholderProcessor = PlaceholderProcessor.PlaceholderProcessor()
                     
-    def initializeTemplateObj(self, templateObj):
-        if not templateObj._codeGeneratorState.has_key('indentLevel'):
-            templateObj._codeGeneratorState['indentLevel'] = \
-                          templateObj._settings['initialIndentLevel']
-        if not hasattr(templateObj, '_localVarsList'):
-            # may have already been set by #set or #for
-            templateObj._localVarsList = []
-
     def translateTag(self, templateObj, tag):
         """generate python code from setDirective tags, and register the vars with
         placeholderTagProcessor as local vars."""
@@ -236,10 +221,10 @@ class CacheDirectiveProcessor(TagProcessor):
         tag = tag.strip()
         if not tag:
             templateObj._codeGeneratorState['defaultCacheType'] = \
-                                       PlaceholderProcessor.STATIC_CACHE
+                                       STATIC_CACHE
         else:
             templateObj._codeGeneratorState['defaultCacheType'] = \
-                                       PlaceholderProcessor.TIMED_REFRESH_CACHE
+                                       TIMED_REFRESH_CACHE
             templateObj._codeGeneratorState['cacheRefreshInterval'] = float(tag)
 
         
@@ -517,6 +502,7 @@ def preProcessIncludeDirectives(templateObj, templateDef):
             
         elif args.startswith('"') or args.startswith("'"):
             fileName = args[1:-1]
+            fileName = templateObj.translatePath( fileName )
             includeString = templateObj.getFileContents( fileName )
 
         if raw:            
