@@ -1,0 +1,189 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Flow Control}
+\label{flowControl}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#for ... \#end for}
+\label{flowControl.for}
+
+The \code{\#for} directive iterates through a set of data.
+
+Here's how to create list of numbers separated by hyphens. This ``\#end for''
+tag shares the last line to avoid introducing a newline character after each
+hyphen.  
+\begin{verbatim}
+#for $i in range(15)
+$i - #end for
+\end{verbatim}
+
+The previous example will put an extra hyphen after last number.  Here's how to
+get around that problem, using the \code{\#set} directive, which will be dealt
+with in more detail below.
+\begin{verbatim}
+#set $sep = '' 
+#for $name in $names 
+$sep$name 
+#set $sep = ', ' 
+#end for 
+\end{verbatim}
+
+Here's how to loop through a dictionaries keys and values:
+\begin{verbatim}
+#for $key, $value in $dict
+$key - $value
+#end for
+\end{verbatim}
+
+Here's how to create a simple client listing:
+\begin{verbatim}
+<TABLE>
+#for $client in $service.clients
+<TR>
+<TD>$client.surname, $client.firstname</TD>
+<TD><A HREF="mailto:$client.email" >$client.email</A></TD>
+</TR>
+#end for
+</TABLE>
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#if ... \#else if ... \#else ... \#end if}
+\label{flowControl.if}
+
+The \code{\#if} directives and its kin are used to display a portion of text
+conditionally. \code{\#if} and \code{\#else if} should be followed by a
+True/False expression, while \code{\#else} should not.  Any Python valid
+expression is allowed.  As in Python, the expression is true unless it evaluates
+to 0, '', None, an empty list, or an empty dictionary. \code{\#elif} is accepted
+as a synonym for {\#else if}.
+
+Here are some examples:
+\begin{verbatim}
+#if $size >= 1500
+It's big
+#else if $size < 1500 and $size > 0 
+It's small
+#else
+It's not there
+#end if
+\end{verbatim}
+
+\begin{verbatim}
+#if $testItem($item)
+The item $item.name is OK.
+#end if
+\end{verbatim}
+
+Here's an example that combines an \code{\#if} tag with a \code{\#for} tag.
+\begin{verbatim}
+#if $people
+<TABLE>
+<TR>
+<TH>Name</TH>
+<TH>Address</TH>
+<TH>Phone</TH>
+</TR>
+#for $p in $people
+<TR>
+<TD>$p.name</TD>
+<TD>$p.address</TD>
+<TD>$p.phone</TD>
+</TR>
+#end for
+</TABLE>
+#else
+<P> Sorry, the search did not find any people. </P>
+#end if
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#break and \#continue}
+\label{flowControl.break}
+
+These directives are use as they are used in Python. \code{\#break} will
+prematurely exit a \code{\#for} loop, while \code{\#continue} will immediately
+jump to the next step in the \code{\#for} loop.
+
+In this example the output list will not contain ``10 - ''. 
+\begin{verbatim}
+#for $i in range(15)
+#if $i == 10
+  #continue
+#end if
+$i - #slurp
+#end for
+\end{verbatim}
+
+In this example the loop will exit if it finds a name that equals 'Joe':
+\begin{verbatim}
+#for $name in $names
+#if $name == 10
+  #break
+#end if
+$name - #slurp
+#end for
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#pass}
+\label{flowControl.break}
+
+The \code{\#pass} directive is identical to Python \code{pass} statement: it
+does nothing. It can be used when a statement is required syntactically but the
+program requires no action.
+
+In this example the output list will not contain ``10 - ''. 
+\begin{verbatim}
+#if $A and $B:
+   do something
+#elif $A:
+  #pass
+#elif $B: 
+  do something
+#else:
+  do something
+#end if
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#stop}
+\label{flowControl.stop}
+
+The \code{\#stop} directive is used to stop processing of a template at a
+certain point and return ONLY what has been processed up to that point.  When a
+\code{\#stop} is called inside an \code{\#include} it will only stop the
+processing of the included code.  Likewise, when \code{\#stop} is called inside
+a \code{\#def} or \code{\#block}, it stops only the \code{\#def} or
+\code{\#block}.
+
+\begin{verbatim}
+the beginning
+#if 1
+  inside the if block
+  #stop
+#end if
+the end
+\end{verbatim}
+
+will print 
+\begin{verbatim}
+the beginning
+  inside the if block
+\end{verbatim}
+
+instead of 
+\begin{verbatim}
+the beginning
+  inside the if block
+the end
+\end{verbatim}
+
+
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      

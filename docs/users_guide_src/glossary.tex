@@ -1,0 +1,49 @@
+\section{Glossary}
+\label{glossary}
+
+To avoid confusion when discussing different aspects of the Cheetah system, all
+Cheetah-specific terms are defined here.  If you are posting to the mailing
+list, writing cheetah code or writing cheetah examples please use these terms.
+
+\begin{description}
+
+\item{Template Definition Language (TDL)}  The markup language used for
+     Template Definitions.
+     
+\item{Template Object (TO, template)} An instance of the class
+     \code{Cheetah.Template.Template} or one of its subclasses.  In the source
+     code it is referred to as 'templateObj'.
+     
+\item{Template Definition (TD)} A string marked up in the TDL which is used to
+     created a template object.  In the source code it is referred to as
+     'templateDef'.
+     
+\item{Template Definition Extension} A string marked up in the TDL which is used
+     to extend an existing template definition. A template definition extension
+     usually contains a number of \code{\#redefine} directives that redefine blocks
+     declared in the parent template definition. In the source code it is
+     referred to as 'templateExt'.
+     
+\item{Search List} A list of Python data structures which will be searched to
+     find values for the \$placeholders in a template definition.  Each object
+     is referred to as a {\bf Namespace} and must be either a dictionary or an
+     object. In the source code it is referred to as 'searchList'.
+
+\item{Filled Template} A string which is the result of filling in the
+     changeable data in the TO with their current values.
+
+\item{Directive Tag (\#directive, \#D)}  All tags that begin with ``\#''; e.g.,
+     \code{\#if}.  
+
+\item{Placeholder Tag (\$placeholder, \$P)}  All tags that begin with ``\$''.
+     
+\item{compile} When you instantiate a template object or call its
+     \code{.compileTemplate()} method, Cheetah compiles the Template Definition
+     into Python code.
+
+\end{description}
+
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      

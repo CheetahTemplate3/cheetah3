@@ -1,0 +1,143 @@
+\section{How Cheetah Works}
+\label{howWorks}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The Template Class}
+\label{howWorks.templateClass}
+
+The heart of Cheetah is the \code{Template} class in the \code{Cheetah.Template}
+module. It serves two purposes. First, its constructor method accepts a
+\code{template definition} in a string or a file (filename or file object).
+Cheetah compiles the template definition into a Python class (the 'generated
+class'). Second, it is used as the base class for the generated classes.
+Template subclasses Webware's Template class when it is available. Thus, the
+generated classes can be used as Webware servlets.
+
+Generated template classes can either be used immediately or written to a Python
+module file for future use. In the former case, the methods and attributes of
+the generated class are dynamically bound to the instance of Template that did
+the compiling. They are available as soon as compilation is complete. In the
+latter case, Cheetah will wrap the generated class definition in some
+boilerplate code to make a complete module definition.
+
+The core method of a Cheetah generated class is \code{respond()}, as this is the
+core method of Webware servlets. When this method is called, the Cheetah code in
+the template is executed and the output is returned. For convenience, Cheetah
+makes the \code{__str__} method an alias to \code{respond()}. Thus,
+\code{``print myTemplateObj''} or \code{``print Template(sourceString)''} will
+print the output of the template.
+
+Classes generated from Cheetah templates can implement multiple methods. Cheetah
+templates can extend other templates via subclassing and reimplementation of
+methods. When one template subclasses another, the subclass template will
+default to implementing the writeBody method, unless you use the
+\code{\#implements} directive to tell Cheetah otherwise.
+
+Cheetah source files use the \code{.tmpl} extension. The cheetah-compile script
+that is packaged with Cheetah is a simple command line tool that facilitates
+batch compilation of Cheetah source files. This script will be installed in a
+system directory when Cheetah is installed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Object-Oriented Documents}
+\label{howWorks.objoriented}
+
+As Cheetah documents are actually class definitions, templates may inherit from
+one another in a natural way, using regular Python semantics. For instance,
+consider this template:
+
+\begin{verbatim}
+#def title
+This document has not defined its title
+#end def
+#def htTitle
+$title
+#end def
+<HTML><HEAD>
+<TITLE>$title</TITLE>
+</HEAD><BODY>
+<H1>$htTitle</H1>
+$body
+</BODY></HTML>
+\end{verbatim}
+
+And its subclassed document:
+\begin{verbatim}
+#from SomeModule import TheTemplateAbove
+#extends TheTemplateAbove
+#def title
+The Frog Page
+#end def
+#def htTitle
+The <IMG SRC="Frog.gif"> page
+#end def
+\end{verbatim}
+
+This is a classic use of inheritance. What we consider a "template" is simply an
+abstract superclass. Each subdocument both defines its own behavior and
+specializes the output. For instance, in this document we redefine
+\code{\$htTitle} so that we can distinguish between the plain title that appears
+in the HEAD and the potentially more complicated title that can appear in
+\code{H1}.  This allows flexibility, while allowing most documents to ignore the
+distinction (since by default \code{\$htTitle} is defined as \code{\$title}).
+
+In many other templating systems, the solution to this sort of problem is
+implemented with case statements (in whatever form they take) often placed in
+many different sections of code. This is the classic problem that arises with
+purely procedural programming languages, and Cheetah uses a classical approach
+to solve it.
+
+This is also a good way to mix Cheetah and Python code. Cheetah is not and does
+not try to be the right language for everything you want to do (in contrast to
+PHP, for instance). Instead it tries to focus on display logic and integrate
+easily with Python code.
+
+Consider the first example template: while we show another Cheetah document
+inheriting from it, a Python class could inherit from it just as easily. This
+Python class could define its programmatically-driven value for \code{\$body}
+and \code{\$title}, simply by defining body() and title() methods.
+
+Similarly, the Cheetah document can inherit from an arbitrary class. This
+technique is used when combining Cheetah with Webware for Python: the base
+template for your site inherits (indirectly) from the Webware HTTPServlet class.
+The classes are sufficiently generic that similar techniques should be possible
+for other systems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constructing Template Objects}
+\label{howWorks.constructing}
+
+The \code{Template} class' constructor accepts either a source string or a
+'file' keyword argument, but not both.
+
+Here are some examples of the various ways to create a template object:
+\begin{description}
+\item{\code{templateObj = Template("The king is a \$placeholder1.")}}
+     Pass the Template Definition as a string.
+\item{\code{templateObj = Template(file="fink.tmpl")}}
+     Read the Template Definition from a file named "fink.tmpl".  
+\item{\code{templateObj = Template(file=f)}}
+     Read the Template Definition from file-like object 'f'.
+\item{\code{templateObj = Template("The king is a \$placeholder1.", searchList=[dict, obj])}}
+     Pass the Template Definition as a string.  Also pass two Namespaces for the
+     searchList: a dictionary 'dict' and an instance 'obj'.
+\item{\code{templateObj = Template(file="fink.txt", searchList=[dict, obj])}}
+     Same, but pass a filename instead of a string.  The \code{None} is required
+     here to represent the missing Template Definition string -- this due to
+     Python's rules for positional parameters.
+\item{\code{templateObj = Template(file=f, searchList=[dict, obj])}}
+     Same with a file object.
+\end{description}
+
+The following usage examples are not valid:
+\begin{verbatim}
+templateObj = Template() 
+templateObj = Template("The king is a $placeholder1", file="fink.txt")
+templateObj = Template("The king is a $placeholder1", file=f)
+\end{verbatim}
+
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      
+

@@ -1,0 +1,267 @@
+\section{Cheetah vs. [fill in the blank]}
+\label{comparisons}
+
+This appendix compares Cheetah with various other template/emdedded scripting
+languages and internet development frameworks.  As Cheetah is similar to
+Velocity at a superficial level you may also wish to read comparisons between
+Velocity and other languages at
+\url{http://jakarta.apache.org/velocity/ymtd/ymtd.html}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{What features are unique to Cheetah}
+\label{comparisons.unique}
+
+\begin{itemize}
+\item The {\bf block framework} and everything that goes with it: \code{\#block},
+     \code{\#redefine}, \code{\#extend}
+\item Cheetah's powerful, yet simple, {\bf caching framework}. See
+     \ref{TDL.placeholders.caching} for more information.
+\item Cheetah's {\bf Unified Dotted Notation} and {\bf autocalling}. See
+     sections \ref{TDL.placeholders.unifiedDottedNotation} and
+     \ref{TDL.placeholders.autocalling} for more information.
+\item Cheetah's searchList. See section \ref{TDL.placeholders.searchList} for more
+     information.
+\item Cheetah's \code{\#raw} directive.  See section \ref{directives.raw} for more
+     information.
+\item Cheetah's \code{\#slurp} directive.  See section \ref{directives.slurp} for more
+     information.
+\item Cheetah's tight integration with {\bf Webware for Python}.  See section
+     \ref{webware} for more information.
+\item Cheetah's {\bf SkeletonPage framework}.  See section
+     \ref{webware.inheritance.skeletonPage} for more information.
+\item Cheetah's ability to mix PSP style code with Cheetah Template Definition
+     Language syntax.  See section \ref{customizing.plugins} for more
+     information.  Because of Cheetah's design and Python's flexibility it is
+     relatively easy to extend Cheetah's syntax with syntax elements from almost
+     any other template or embedded scripting language.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cheetah vs. Velocity}
+\label{comparisons.velocity}
+
+For a basic introduction to Velocity please visit
+\url{http://jakarta.apache.org/velocity}.
+
+
+Velocity is older, has a larger user-base, and has better examples and
+docs at the moment. Cheetah, however, has a number of advantages over
+Velocity:
+\begin{itemize}
+\item Cheetah is written in Python. Thus, it's easier to use and extend.
+\item Cheetah's syntax is cleaner, more flexible and is closer to Python's.
+     Here's an example
+\begin{verbatim}
+#for $i in range(15)
+$i
+#end for 
+\end{verbatim}
+     instead of 
+\begin{verbatim}
+#foreach($i in range(15))  
+$i
+#end
+\end{verbatim}
+     which means the following example is possible Cheetah, but not
+     Velocity:
+\begin{verbatim}
+#for $key, $val in $myDict
+$key, $val
+#end for 
+\end{verbatim}
+
+
+\item Cheetah has a powerful caching mechanism.  Velocity has no equivalent.
+\item It's far easier to add data/objects into the namespace where \$placeholder
+     values are extracted from in Cheetah.  Velocity calls this namespace a 'context'.
+     Contexts are dictionaries/hashtables. You can put anything you want into a
+     context, BUT you have to use the .put() method to populate the context as
+     in this example:
+
+\begin{verbatim}
+VelocityContext context1 = new VelocityContext();
+context1.put("name","Velocity");
+context1.put("project", "Jakarta");
+context1.put("duplicate", "I am in context1");
+\end{verbatim}
+     
+     Cheetah takes a different approach. Rather than require you to manually
+     populate the 'namespace' like Velocity, Cheetah will accept any existing
+     Python object or dictionary AS the 'namespace'.  Furthermore, Cheetah
+     allows you to specify a list namespaces that will be searched in sequence
+     to find a varname-to-value mapping.  This searchList can be extended at
+     run-time.
+     
+     If you add 'foo' object to the searchList and the 'foo' has an attribute
+     called 'bar' you can simply type \$bar in the template rather than \$foo.bar.
+     If the second item in the searchList is this dictionary {'spam':1234,
+       'parrot':666} then \$spam's value will be found in the dict rather than in
+     the 'foo' object at the start of the searchList.
+
+\item Cheetah has better whitespace handling around \#directive tags
+\item Cheetah has an extension to the \#macro syntax that makes it easier to call
+     macros that accept large strings as arguments: e.g. a macro that
+     pretty-prints a chunk of source code.
+\item Cheetah integrates tightly with Webware.  Velocity doesn't integrate as easily
+     with Turbine.
+\item Cheetah has a plugin that enables PSP-style coding to be freely mixed in with
+     the Cheetah syntax. Velocity doesn't.
+\item It is easy to add new \#directives to Cheetah. You can't do this easily in
+     Velocity.
+\item In Cheetah, the tokens that are used to signal the start of \$placeholders and
+     \#directives are configurable. You can set them to any character sequences,
+     not just \$ and \#.
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cheetah vs. WebMacro}
+\label{comparisons.webmacro}
+
+For a basic introduction to WebMacro please visit
+\url{http://webmacro.org}.
+
+The points discussed in section \ref{comparisons.velocity} also apply to the
+comparison between Cheetah and WebMacro.  For further differences please refer
+to \url{http://jakarta.apache.org/velocity/differences.html}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cheetah vs. Zope's DTML}
+\label{comparisons.dtml}
+
+For a basic introduction to DTML please visit
+\url{http://www.zope.org/Members/michel/ZB/DTML.dtml}.
+
+\begin{itemize}
+\item Cheetah is faster than DTML.
+\item Cheetah does not use HTML style tags, DTML does.  Thus, Cheetah tags are
+     visible in rendered HTML output if something goes wrong.
+\item DTML can only be used with ZOPE for web development, while Cheetah can be
+     used as a standalone tool for any purpose.
+\item Cheetah's documentation is more complete than DTML's.
+\item Cheetah's learning curve is shorter than DTML's.
+\item DTML has no equivalent of Cheetah's blocks, caching framework, 
+     unified dotted notation, and \code{\#raw} directive.
+\end{itemize}
+
+Here are some examples of syntax differences between DTML and Cheetah:
+\begin{verbatim}
+<ul>
+<dtml-in frogQuery>
+ <li><dtml-var animal_name></li>
+</dtml-in>
+</ul>
+\end{verbatim}
+
+\begin{verbatim}
+<ul>
+#for $animal_name in $frogQuery
+ <li>$animal_name</li>
+#end for
+</ul>
+\end{verbatim}
+
+\begin{verbatim}
+<dtml-if expr="monkeys > monkey_limit">
+  <p>There are too many monkeys!</p>
+<dtml-elif expr="monkeys < minimum_monkeys">
+  <p>There aren't enough monkeys!</p>
+<dtml-else>
+  <p>There are just enough monkeys.</p>
+</dtml-if>
+\end{verbatim}
+
+\begin{verbatim}
+#if $monkeys > $monkey_limit
+  <p>There are too many monkeys!</p>
+#else if $monkeys < $minimum_monkeys
+  <p>There aren't enough monkeys!</p>
+#else
+  <p>There are just enough monkeys.</p>
+#end if
+\end{verbatim}
+
+\begin{verbatim}
+<table>
+<dtml-in expr="objectValues('File')">
+  <dtml-if sequence-even>
+    <tr bgcolor="grey">
+  <dtml-else>
+    <tr>
+  </dtml-if>    
+  <td>
+  <a href="&dtml-absolute_url;"><dtml-var title_or_id></a>
+  </td></tr>
+</dtml-in>
+</table>
+\end{verbatim}
+
+\begin{verbatim}
+<table>
+#set $evenRow = 0
+#for $file in $objectValues('File')
+  #if $evenRow
+    <tr bgcolor="grey">
+    #set $evenRow = 0
+  #else
+    <tr>
+    #set $evenRow = 1
+  #end if
+  <td>
+  <a href="$file.absolute_url">$file.title_or_id</a>
+  </td></tr>
+#end for
+</table>
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cheetah vs. Zope Page Templates}
+\label{comparisons.zpt}
+
+For a basic introduction to Zope Page Templates please visit
+\url{http://www.zope.org/Documentation/Articles/ZPT2}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cheetah vs. PSP, PHP, ASP, JSP, Embperl, etc.}
+\label{comparisons.pspEtc}
+
+[This section is under construction.]
+
+\begin{description}
+\item[Webware's PSP Component] -- \url{http://webware.sourceforge.net/Webware/PSP/Docs/}
+\item[PHP Home Page] -- \url{http://www.php.net/}
+\item[Tomcat JSP Information] -- \url{http://jakarta.apache.org/tomcat/index.html}
+\item[ASP Information at ASP101] -- \url{http://www.asp101.com/}
+\item[Embperl] -- \url{http://perl.apache.org/embperl/}
+\end{description}
+
+
+Here's a basic Cheetah example:
+\begin{verbatim}
+<TABLE>
+#for $client in $service.clients
+<TR>
+<TD>$client.surname, $client.firstname</TD>
+<TD><A HREF="mailto:$client.email" >$client.email</A></TD>
+</TR>
+#end for
+</TABLE>
+\end{verbatim}
+
+Compare this with PSP:
+
+\begin{verbatim}
+<TABLE>
+<% for client in service.clients(): %>
+<TR>
+<TD><%=client.surname()%>, <%=client.firstname()%></TD>
+<TD><A HREF="mailto:<%=client.email()%>"><%=client.email()%></A></TD>
+</TR>
+<%end%>
+</TABLE>
+\end{verbatim}
+
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      

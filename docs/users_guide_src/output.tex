@@ -1,0 +1,179 @@
+\section{Generating, Caching and Filtering Output}
+\label{output}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Placeholders}
+\label{TDL.placeholders}
+
+Placeholders are like 'primaries' in Python (see section 5.3 of Python's
+Language Reference for more). If you don't know what a 'primary' is, think of
+them as variables. They may refer to any Python value: strings, numbers, None,
+tuples, tuple items, tuple slices, lists, list items, list slices, dictionaries,
+dictionary values, objects, and the return values of function and method calls.
+When a template is processed each placeholder will be replaced with the string
+representation of its value.  These string representations are identical to
+those returned by Python's str() function, with the exception of \code{None}.
+\code{None} is replaced with an empty string, or in other words nothing.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Caching Output}
+\label{output.caching}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Caching individual placeholders}
+\label{output.caching.placeholders}
+
+By default, the values of each \code{\$placeholder} is retrieved and
+interpolated for every request. It is possible to cache the values individual
+\code{\$placeholders}
+                         
+If you want to cache the value of a single \code{\$placeholder} during the first
+request, add an asterisk after the \$ sign.  \code{\$var} becomes \code{\$*var}.
+
+If you only need to update the cache at specific time intervals use this form:
+\code{\$*<interval>*variable} , where \code{<interval>} is the interval.  The
+time interval can be specified in seconds (5s), minutes (15m), hours (3h), days
+(2d) or weeks (1.5w). The default is minutes.
+
+\begin{verbatim}
+<HTML>
+<HEAD><TITLE>$title</TITLE></HEAD>
+<BODY>
+
+$var ${var}           ## dynamic - will be reinterpolated for each request
+$*var2 $*{var2}       ## static - will be interpolated only once at start-up
+$*5*var3 $*5*{var3}   ## timed refresh - will be updated every 5 minutes.
+
+</BODY>
+</HTML>
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Caching entire regions}
+\label{output.caching.regions}
+
+The \code{\#cache} directive is used to cache a region of content in a template.
+It accepts several keyword arguments, which are demonstrated in the examples
+below.  Cached regions can be given an 'id', which can be used to
+programmatically refresh a region with the \code{Template.refreshCache(id)}
+method.  Cached regions can also be invalidated according to a user-specified
+\code{test} conditions.
+
+\begin{verbatim}
+#cache timer='30m', ID='cache1'
+#for $cust in $customers
+$cust.name:
+$cust.street - $cust.city
+#end for
+#end cache
+\end{verbatim}
+
+\begin{verbatim}
+#cache id='sidebar', test=$isDBUpdated
+## do something
+#end cache
+
+#cache id='sidebar2', test=($isDBUpdated or $someOtherCondition)
+## do something
+#end cache
+\end{verbatim}
+
+The \code{\#cache} directive cannot be nested.
+
+We are planning to add a \code{'varyBy'} keyword argument in the future that
+will allow a separate cache instances to be created for a variety of conditions,
+such as different query string parameters or browser types. This is inspired by
+ASP.net's varyByParam and varyByBrowser output caching keywords.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#raw}
+\label{directives.raw}
+
+Any section of a Template Definition that is inside a \code{\#raw} ...
+\code{\#end raw} tag pair will be printed verbatim without any parsing of
+\$placeholders or other directives. This can be very useful for debugging, or
+writing Cheetah examples and tutorials.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#include}
+\label{directives.include}
+
+\code{\#include} directives are used to include text from outside the template
+definition.  The text can come from external files or from \code{\$placeholder}
+variables.  When working with external files Cheetah will monitor for changes to
+the included file and update as necessary.  
+
+This demonstrates its use with external files:
+\begin{verbatim}
+#include "includeFileName.txt"
+\end{verbatim}
+The content of "includeFileName.txt" will be parsed for Cheetah syntax.
+
+And this example demonstrates use with \code{\$placeholder} variables:
+\begin{verbatim}
+#include source=$myParseText
+\end{verbatim}
+The value of \code{\$myParseText} will be parsed for Cheetah syntax. This is not
+the same as simple placing the \$placeholder tag ``\code{\$myParseText}'' in
+your template definition.  In the latter case the value of \$myParseText would
+not be parsed.
+
+By default, included text will be parsed for Cheetah tags.  The argument
+``\code{raw}'' can be used to suppress the parsing.
+
+\begin{verbatim}
+#include raw "includeFileName.txt"
+#include raw source=$myParseText
+\end{verbatim}
+
+Cheetah wraps each chunk of \code{\#include} text inside a nested
+\code{Template} object.  These nested templates share the same \code{searchList}
+as the top-level template. But, unlike PHP, their Cheetah code must be
+self-contained.  For example, all \code{\#for} and \code{\#if} blocks started
+inside an \code{\#include} must be terminated in that include. \code{\#set}
+variables are only visible across includes if the \code{\#set global} keyword is
+used.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#slurp}
+\label{directives.slurp}
+
+The \code{\#slurp} directive is used for {\bf slurping up} trailing whitespace
+and extra newline characters.
+
+
+It is particularly useful in \code{\#for} loops:
+\begin{verbatim}
+#for $i in range(5)
+$i - #slurp
+#end for
+\end{verbatim}
+outputs:
+\begin{verbatim}
+01234
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ouput Filtering and \#filter}
+\label{directives.filter}
+
+Output from \code{\$placeholders} is passed through an ouput filter.  By default
+the filter just returns a string representation of the placeholder's value,
+unless it is \code{'None'}, in which case it returns an empty string. 
+
+The ouput filter can be specified via the \code{'filter'} keyword to the
+\code{Template} class' constructor or at run-time using the \code{\#filter}
+directive. The \code{Cheetah.Filters} module contains several filters.
+
+More will be written about output filtering in future versions of this guide.
+
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      
+

@@ -1,0 +1,66 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Comments}
+\label{comments}
+
+Comments are used to mark notes, explanations, and decorative text that should
+not appear in the output.  Cheetah maintains the comments in the Python module
+it generates from the Cheetah source code. There are two forms of the comment
+directive: single-line and multi-line.
+
+All text in a Template Definition that lies between 2 hash characters
+(\code{\#\#}) and the end of the line is treated as a single-line comment and
+will not show up in the output, unless the 2 hash characters are escaped with a
+backslash.
+\begin{verbatim}
+##=============================  this is a decorative comment-bar
+$var    ## this is an end-of-line comment
+##=============================
+\end{verbatim}
+
+Any text between \code{\#*} and \code{*\#} will be treated as a multi-line
+comment.
+\begin{verbatim}
+#*
+   Here is some multiline
+   comment text
+*#
+\end{verbatim}
+
+
+\subsection{Docstring Comments}
+\label{directives.comments.docstring}
+Python modules, classes, and methods can be documented with inline
+'documentation strings' (aka 'docstrings').  Docstrings, unlike comments, are
+accesible at run-time. Thus, they provide a useful hook for interactive help
+utilities.
+
+Cheetah comments can be transformed into doctrings by adding one of the
+following prefixes:
+
+\begin{verbatim}
+##doc: This text will be added to the method docstring
+#*doc: This text will be added to the method docstring *#
+
+##doc-method: so will this
+#*doc-method: so will this *#
+
+##doc-class: This text will be added to the class docstring
+#*doc-class: This text will be added to the class docstring *#
+
+##doc-module: This text will be added to the module docstring
+#*doc-module: This text will be added to the module docstring *#
+\end{verbatim}
+
+\subsection{Header Comments}
+\label{directives.comments.headers}
+Cheetah comments can also be transformed into module header comments using the
+following syntax:
+
+\begin{verbatim}
+##header: This text will be added to the module header comment
+#*header: This text will be added to the module header comment *#
+\end{verbatim}
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      

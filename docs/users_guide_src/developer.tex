@@ -1,0 +1,67 @@
+\section{Developers Information}
+\label{developer}
+
+This chapter is for people on the Cheetah development team, and for those who
+want the ``inside scoop'' on how Cheetah works.
+
+See the TODO file in the Cheetah source distribution for features we're
+working on or would like to add.  In the CVS version of Cheetah, the directory
+docs/devel contains text files detailing possible implementation strategies.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adding features to Cheetah}
+
+Whenever you add a feature to Cheetah, follow these steps:
+
+\begin{enumerate}
+     
+\item Discuss its need and design on the email list and get approval.
+     
+\item Add the feature.
+     
+\item Write regression tests for it.  Verify the test suite does not break.
+     
+\item Add an entry to the CHANGES file explaining what you did.
+     
+\item Remove the entry on the TODO list if present.
+     
+\item Update the documentation.
+     
+\item Commit it all.
+     
+\item Notify the list and ask for people to test it.
+
+\end{enumerate}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Running regression tests}
+
+Cheetah comes with a set of regression tests to verify it's working properly.
+To run the tests:
+
+\begin{enumerate}
+     
+\item \code{cd} into \code{src/Tests} in the Cheetah source distribution.
+     
+\item Run the command: \code{python Test.py}
+     
+\item It will run the test cases and then print either "OK" or an error message.
+
+\end{enumerate}
+
+The test suite tries to write the file \code{parseTest.txt} in the current
+directory if it doesn't exist.  You will get an IOError if you don't have write
+permission.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adding regression tests}
+
+The test cases are divided into several modules:
+\code{Cheetah.Tests.SyntaxAndOutput}, \code{Cheetah.Tests.NameMappper}, and
+\code{Cheetah.Tests.Template}. If you have discovered a bug please make a test
+case following the format in those modules and submit it for inclusion.
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      

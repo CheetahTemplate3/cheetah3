@@ -1,0 +1,142 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Imports, Inheritance, Declarations and Assignments}
+\label{inheritanceEtc}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#import and \#from directives}
+\label{inheritanceEtc.extend}
+
+The \code{\#import} and \code{\#from} directives is used to import Python
+modules or stuff from inside modules.  The syntax is identical to the import
+syntax in Python.  Imported modules are visible globally to all methods in the
+generated Python class.
+
+\begin{verbatim}
+#import math
+#import math as mathModule
+#from math import sin, cos
+#from math import sin as _sin
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#extends}
+\label{inheritanceEtc.extends}
+
+The \code{\#extends} directive is used to specify the base classes that the
+generated servlet class should inherit from.  It is equivalent to PSP's
+\code{``@page extends=''} directive.
+
+\begin{verbatim}
+#from Cheetah.Templates.SkeletonPage import SkeletonPage
+#extends SkeletonPage
+\end{verbatim}
+
+Multiple inheritance is allowed, provided that the first base class is a
+subclass of Cheetah.Template.Template:
+
+\begin{verbatim}
+#from Cheetah.Templates.SkeletonPage import SkeletonPage
+#from MyMixin import MyMixin
+#extends SkeletonPage, MyMixin
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#implements}
+\label{inheritanceEtc.def}
+
+The \code{\#implements} directive is used specify the name of the method that a
+template implements.  It is equivalent to PSP's \code{@page method=} directive.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#set}
+\label{inheritanceEtc.set}
+
+\code{\#set} is used for run-time creation of, and assignment to, local
+variables.  \code{\#set \$var = EXPRESSION}. The expression may be any Python
+expression. Remember to preface variable names with \$, unless it is part of an
+intermediate result in a list comprehension.
+
+Here are some examples:
+\begin{verbatim}
+#set $size = $length * 1096
+#set $buffer = $size + 1096
+#set $area = $length * $width
+#set $namesList = ['Mo','Larry','Curly']
+\end{verbatim}
+
+It is probably most useful in conjunction with the \code{\#if} directive, but
+remember that more complex logical routines should be coded in Python, not in
+Cheetah!
+\begin{verbatim}
+#if $size > 1500
+  #set $adj = 'large'
+#else
+  #set $adj = 'small'
+#end if
+\end{verbatim}
+
+\code{\#set global} is used for run-time creation of, and assignment to, global
+variables. \code{\#set global \$var = EXPRESSION}. Global variables set in this
+manner are visible to all methods of the template class and all methods of
+included templates.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#def}
+\label{inheritanceEtc.def}
+
+The \code{\#def} directive is used to define new methods of the generated Python
+class.  It is roughly analogous to Python's \code{def} statement.  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#block ... \#end block}
+\label{inheritanceEtc.block}
+
+The \code{\#block} directive allows you to delimit sections of your template
+that can be selectively reimplemented by sub-classes of the template.  It is
+very useful for selectively changing part of a template without having to
+copy-paste-and-edit the entire thing.  The output from a template definition
+that uses blocks will be identical to the output from the same template with the 
+\code{\#block and \#end block} tags removed. 
+
+\begin{verbatim}
+#block [blockName] 
+[block contents] 
+#end block [blockName]
+
+#block testBlock
+Text in the contents 
+area of the block directive
+#if $testIt
+$getFoo() 
+#end if
+#end block testBlock
+\end{verbatim}
+
+\code{\#block} directives can be nested to any depth.
+
+\begin{verbatim}
+#block outerBlock
+Outer block contents 
+
+#block innerBlock1
+inner block1 contents 
+#end block innerBlock1
+
+#block innerBlock2
+inner block2 contents 
+#end block innerBlock2
+
+#end block outerBlock
+\end{verbatim}
+
+Like methods defined with \code{\#def}, blocks are compiled into methods of the
+generated Python class and can be reimplemented in subclasses using the
+\code{\#def} directive.
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      

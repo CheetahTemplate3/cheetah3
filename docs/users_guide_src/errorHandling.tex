@@ -1,0 +1,137 @@
+\section{Error Handling}
+\label{errorHandling}
+
+There are two ways to handle run-time errors (aka exceptions) in Cheetah.  The
+first is with the Cheetah directives that mirror Python's structured exception
+handling statements. The second is with Cheetah's \code{ErrorCatcher}
+framework. These are described below.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Directives}
+\label{errorHandling.directives}
+
+Cheetah's exception handling directives are exact mirrors Python's exception
+handling statements.  See Python's documentation for details.  The following
+Cheetah code demonstrates their use:
+
+
+\begin{verbatim}
+#try
+  $mightFail()
+#except
+  It failed
+#end try
+
+#try
+  #assert $x == $y
+#except AssertionError
+  They're not the same!
+#end try
+
+#try
+  #raise ValueError
+#except ValueError
+  #pass
+#end try
+
+
+#try
+  $mightFail()
+#except ValueError
+  Hey, it raised a ValueError!
+#except NameMapper.NotFound
+  Hey, it raised a NameMapper.NotFound!
+#else
+  It didn't raise anything!
+#end try
+
+#try
+  $mightFail()
+#finally
+  $cleanup()
+#end try
+
+\end{verbatim}    
+
+The indentation in these examples was for clarity purposes only.  Remember,
+Cheetah doesn't use indentation like Python does.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{ErrorCatcher}
+\label{errorHandling.errorCatcher}
+
+\code{ErrorCatcher} is a debugging tool that catchs exceptions that occur inside
+\code{\$placeholder} tags and provides a customizable warning to the developer.
+Without it, the first exception raised in a placeholder tag would immediately
+halt execution of the template. Thus, the developer would have to resolve all
+the exceptions one-by-one. With it, the developer can be warned about all the
+exceptions at once and the rest of the template output will still work.
+
+
+The \code{Cheetah.ErrorCatchers} module defines the base class for
+ErrorCatchers:
+
+\begin{verbatim}
+class ErrorCatcher:
+    _exceptionsToCatch = (NameMapper.NotFound,)
+    
+    def __init__(self, templateObj):
+        pass
+    
+    def exceptions(self):
+        return self._exceptionsToCatch
+    
+    def warn(self, exc_val, code, rawCode, lineCol):
+        return rawCode
+\end{verbatim}    
+
+This ErrorCatcher catches \code{NameMapper.NotFound} exceptions and leaves the
+offending placeholder visible in its raw form in the template output.  If the
+following template is executed 
+\begin{verbatim}
+#set $iExist = 'Here I am!'
+Here's a good placeholder: $iExist
+Here's bad placeholder: $iDontExist
+\end{verbatim}    
+
+the output will be 
+
+\begin{verbatim}
+Here's a good placeholder: Here I am!
+Here's bad placeholder: $iDontExist
+\end{verbatim}
+
+The baseclass shown above is also accessible under the alias
+\code{Cheetah.ErrorCatchers.Echo}.  \code{Cheetah.ErrorCatchers} also provides a
+number of specialized subclasses that warn about exceptions in different ways.
+\code{Cheetah.ErrorCatchers.BigEcho} will output
+
+\begin{verbatim}
+Here's a good placeholder: Here I am!
+Here's bad placeholder: ===============&lt;$iDontExist could not be found&gt;===============
+\end{verbatim}
+
+ErrorCatcher has a significant performance impact and is turned off by default.
+It can be turned of with the \code{Template} class' \code{'errorCatcher'}
+keyword argument.  The value of this argument should either be a string
+specifying which of the classes in \code{Cheetah.ErrorCatchers} to use, or a
+class that subclasses \code{Cheetah.ErrorCatchers.ErrorCatcher}. The
+\code{\#errorCatcher} directive can also be used to change the errorCatcher part
+way through a template.
+
+
+\code{Cheetah.ErrorCatchers.ListErrors} will produce the same ouput as
+\code{Echo} while maintaining a list of the errors that can be retrieved later.
+To retrieve the list, use the \code{Template} class' \code{'errorCatcher'} method
+to retrieve the errorCatcher and then call its \code{listErrors} method.
+
+
+ErrorCatcher doesn't catch exceptions raised inside directives. 
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      
+
+
+
+

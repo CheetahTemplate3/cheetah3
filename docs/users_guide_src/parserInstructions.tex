@@ -1,0 +1,91 @@
+\section{Instructions to the Parser/Compiler}
+\label{parserInstructions}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#breakpoint}
+\label{parserInstructions.breakpoint}
+
+The \code{\#breakpoint} is a debugging tool that tells the parser to stop
+parsing at a specific point. All source code from that point on will be ignored.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#compiler-settings}
+\label{parserInstructions.settings}
+
+The \code{\#compiler-settings} directive can be used to override the Cheetah's
+standard settings which control how Cheetah parsers source code and how it
+generates Python code.  This allows makes it possible to change the behaviour of
+Cheetah's parser/compiler within for a portion of a template.
+
+Here are some examples of what you can do:
+\begin{verbatim}
+$myVar
+#compiler-settings
+cheetahVarStartToken = @
+#end compiler-settings
+@myVar
+#compiler-settings reset
+$myVar
+\end{verbatim}
+
+
+\begin{verbatim}
+## normal comment
+#compiler-settings
+commentStartToken = //
+#end compiler-settings
+
+// new style of comment
+
+#compiler-settings reset
+
+## back to normal comments
+\end{verbatim}
+
+\begin{verbatim}
+#slurp
+#compiler-settings
+directiveStartToken = %
+#end compiler-settings
+
+%slurp
+%compiler-settings reset
+
+#slurp
+\end{verbatim}
+
+Here's a partial list of the settings you can change:
+\begin{enumerate}
+\item syntax settings
+     \begin{enumerate}
+     \item cheetahVarStartToken
+     \item commentStartToken
+     \item multilineCommentStartToken
+     \item multilineCommentEndToken
+     \item directiveStartToken
+     \item directiveEndToken
+     \end{enumerate}
+\item code generation settings
+     \begin{enumerate}
+     \item commentOffset
+     \item outputRowColComments
+     \item defDocStrMsg
+
+     \item useNameMapper
+     \item useAutocalling
+     \item reprShortStrConstants
+     \item reprNewlineThreshold
+     \end{enumerate}
+\end{enumerate}
+The meaning of these settings and their default values will be documented in the future.
+
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      
+
+
+
+
