@@ -30,6 +30,13 @@ Please initial your changes (there's a key at bottom) and add a date for each re
      (MO)
    - Cheetah.Tools.MondoReport: new module for dividing a long list into
      "pages", and for calculating statistics useful in reports. (MO)
+   - refactored Cheetah.Servlet.Servlet.Awake a little (TR)
+   - fixed an output bug in the #block generated code that turned up when you
+     tried to override a block method from Python rather than Cheetah. (TR)
+   - started preparing to shift some of the 'shared' utility classes, such as
+     SettingsManager, to the Webware core.  Cheetah 1.0 will probably require
+     Webware to be installed so it can access those shared classes. (TR)
+
      
 
 0.9.9a6 (Nov 6, 2001) 
