@@ -5,14 +5,14 @@
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.21 $
+Version: $Revision: 1.22 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2002/04/15 06:22:53 $
+Last Revision Date: $Date: 2002/07/31 16:55:03 $
 """
 
-# $Id: SettingsManager.py,v 1.21 2002/04/15 06:22:53 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.22 2002/07/31 16:55:03 tavis_rudd Exp $
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.21 $"[11:-2]
+__revision__ = "$Revision: 1.22 $"[11:-2]
 
 
 ##################################################
@@ -341,9 +341,9 @@ class _SettingsCollector:
                        'False':0,
                        'SettingsContainer':SettingsContainer,
                        }
-        newSettings = {}
+        newSettings = {'self':self}
         exec theString in globalsDict, newSettings
-        #del newSettings['self']
+        del newSettings['self']
         module = new.module('temp_settings_module')
         module.__dict__.update(newSettings)
         return self.readSettingsFromModule(module)
