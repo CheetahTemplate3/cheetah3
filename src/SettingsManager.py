@@ -5,14 +5,14 @@
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.18 $
+Version: $Revision: 1.19 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2002/04/03 17:39:03 $
+Last Revision Date: $Date: 2002/04/08 04:49:42 $
 """
 
-# $Id: SettingsManager.py,v 1.18 2002/04/03 17:39:03 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.19 2002/04/08 04:49:42 tavis_rudd Exp $
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.18 $"[11:-2]
+__revision__ = "$Revision: 1.19 $"[11:-2]
 
 
 ##################################################
@@ -31,10 +31,7 @@ import tempfile
 import imp
 import time
 
-try:
-    from cStringIO import StringIO    
-except:
-    from StringIO import StringIO
+from StringIO import StringIO # not cStringIO because of unicode support
 
 import imp                 # used by SettingsManager.updateSettingsFromPySrcFile()
 
