@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.30 2002/04/22 05:20:28 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.31 2002/04/24 06:21:08 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.30 $
+Version: $Revision: 1.31 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/04/22 05:20:28 $
+Last Revision Date: $Date: 2002/04/24 06:21:08 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.30 $"[11:-2]
+__revision__ = "$Revision: 1.31 $"[11:-2]
 
 
 ##################################################
@@ -1774,6 +1774,29 @@ $os.path.exists('.')""",
                     "1")
 
 
+class CompilerDirective(OutputTest):
+    def test1(self):
+        """overriding the commentStartToken
+        """
+        self.verify("""$anInt##comment
+#compiler commentStartToken = '//'
+$anInt//comment
+""",
+                    "1\n1\n")
+
+    def test2(self):
+        """overriding and resetting the commentStartToken
+        """
+        self.verify("""$anInt##comment
+#compiler commentStartToken = '//'
+$anInt//comment
+#compiler reset
+$anInt//comment
+""",
+                    "1\n1\n1//comment\n")
+
+
+
 class CompilerSettingsDirective(OutputTest):
     
     def test1(self):
@@ -1812,7 +1835,6 @@ commentStartToken = //
 $anInt//comment
 """,
                     "1\n1\n")
-
 
 class ExtendsDirective(OutputTest):
 
