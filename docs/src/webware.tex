@@ -21,7 +21,7 @@ handled via Cheetah.
 
 In the Containment approach an instance of the Template class is contained
 inside of a Webware servlet.  The servlet must explicitly call the Template
-object's \code{.respond()}, or \code{.__str__()}, method for each request.  In
+object's \code{.respond()}, or \code{.\_\_str\_\_()}, method for each request.  In
 this case the servlet class can handle whatever per-request processing needs to
 be done before it calls Cheetah.respond().
 
@@ -76,7 +76,7 @@ usage is ``\code{cheetah-compile -R .}'', which will convert all the \code{.tmpl
 basename as \code{.tmpl servlet files} in a directory. For this reason, you
 should make changes to the \code{.tmpl} version of the template rather than the
 \code{.py} version.  Any \code{.py servlet files} that are about to be
-overwritten will are automatically backed up with the extension \code{.py_bak}.
+overwritten will are automatically backed up with the extension \code{.py\_bak}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -141,7 +141,7 @@ class hello_world(TemplateServlet):
         TemplateServlet.__init__(self, template) 
 \end{verbatim}
 
-TemplateServlet's constructor method (\code{TemplateServlet.__init__()}) adds
+TemplateServlet's constructor method (\code{TemplateServlet.\_\_init\_\_()}) adds
 the attribute dictionary of the servlet to the searchList that
 \code{\$placeholder} variables can extracted from.  Thus, attributes and methods
 of the servlet object can be interpolated into the template like this:
@@ -188,13 +188,13 @@ servlet's \code{.respond()} method and send their output via the
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Using \#include with the containment approach}
-\label{webware.includes}
+\label{webware.containment.includes}
 
-Webware's \code{current working directory} probably isn't the directory that
+Webware's ``\code{current working directory}'' probably isn't the directory that
 your servlet files are sitting in.  All relative paths need to be adjusted so
 they are relative to the servlet's directory and not Webware's \code{current
   working directory}.  Webware uses the \code{Servlet.serverSidePath()} method
-for this purpose. 
+for this purpose.
 
 The \code{TemplateServlet} class of the inheritance approach does the adjusment
 automatically for all relative paths fed to \code{\#include} directive.  When
@@ -207,7 +207,7 @@ its \code{respond()} method as \code{.serverSidePath()} only works during
 Webware's \code{awake-response-sleep} cycle.  It cannot be compiled by you
 servlet's \code{__init__()} method as \code{Servlet.serverSidePath()} doesn't
 work there.  Also note that due to a bug in Webware your servlet class must
-inherit from \code{WebKit.Page} rather than just \code{HTTPServlet} for
+inherit from \code{WebKit.Page} rather than just \code{WebKit.HTTPServlet} for
 \code{.serverSidePath()} to work.
 
 \begin{verbatim}

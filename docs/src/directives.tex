@@ -218,6 +218,9 @@ Cheetah!
 definition.  The text can come from \code{\$placeholder} variables or from
 external files.  When working with external files Cheetah will monitor for
 changes to the included file and update as necessary (NOT IMPLEMENTED YET).
+Please note that \code{\#include} directives are processed at compile-time not
+run-time.  Therefore, any \$placeholders used in them must be available at
+compile-time.
 
 This example demonstrates use with \code{\$placeholder} variables:
 
@@ -299,7 +302,9 @@ $*5*var3            ## timed refresh every 5 minutes
 \label{directives.stop}
 
 The \code{\#stop} directive is used to stop processing of a template at a
-certain point and return ONLY what has been processed up to that point.
+certain point and return ONLY what has been processed up to that point.  When a
+\code{\#stop} is called inside an \code{\#include} it will only stop the
+processing of the included code, unless it was a ``\code{direct}'' include.
 
 \begin{verbatim}
 the beginning

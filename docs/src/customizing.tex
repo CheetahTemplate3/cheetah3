@@ -1,15 +1,15 @@
 \section{Customizing and extending Cheetah}
 \label{customizing}
 
-To extend and customize Cheetah you can create a {\bf sub-class} of Template that
+To extend and customize Cheetah you can create a {\bf subclass} of Template that
 reimplements some of its methods, you can use {\bf settings}, or you can use
 {\bf plugins}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Sub-classes of the Template class}
+\subsection{Subclasses of the Template class}
 
 This is an advanced topic that is difficult to explain without full code
-examples.  It's best to learn how to do this by looking at existing sub-classes
+examples.  It's best to learn how to do this by looking at existing subclasses
 of the \code{Template} class.  The Cheetah.Servlet module and the
 Cheetah.Templates package contain examples.
 
@@ -28,7 +28,7 @@ can be quite useful.  This section explains how to use them.
 \subsubsection{Using tokens other than the dollar sign for placeholders}
 
 It is possible to use any character sequence to signal the start of a
-\$placeholder.  The \code{placeholderStartToken} setting controls this.
+\$placeholder.  The ``\code{placeholderStartToken}'' setting controls this.
 
 \begin{verbatim}
 myTemplateDef = "Here's my @@adj template."
@@ -48,8 +48,9 @@ the token, although you can have spaces mixed with other characters.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Disabling 'auto-calling'}
 
-%% @@ TR: insert a \ref{} in the next line
-Cheetah's auto-calling behaviour (see ection \ref{TDL.placeholders.autocalling}) can be 
+Cheetah's auto-calling behaviour (see section
+\ref{TDL.placeholders.autocalling}) can be disabled via the
+``\code{useAutocalling}'' setting.
 
 \begin{verbatim}
 from Cheetah.Template import Template
@@ -58,9 +59,33 @@ templateObj = Template(myTemplateDef, myNamespace,
 \end{verbatim}
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Delayed Compilation}
+
+The \code{Cheetah.Template.Template} class usually compiles its template
+definition as soon as it is initialized (e.g. \code{Template(templateDef,NS)}).
+There are some situations where you may want to delay the compilation until
+later. See section \ref{webware.containment.includes} for one such situation.
+The ``\code{delayedCompile}'' setting and the \code{.compileTemplate()} method
+are used for this purpose.
+
+\begin{verbatim}
+from Cheetah.Template import Template
+templateObj = Template(myTemplateDef, myNamespace, 
+                 settings={'delayedCompile':1,})
+...
+templateObj.compile()
+\end{verbatim}
+
+\code{Template.recompile()} is a synonym for \code{Template.compile()}.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Unknown placeholder names}
 %% handlers
+
+[{\bf THIS FEATURE IS CURRENTLY DISABLED AS WE CHANGE SOME CODE.  IT WILL BE
+  BACK LATER.}]
 
 The 'varNotFound\_handler' setting controls what happens when a \$placeholder
 is not found in the searchList.  The default setting simply places the
@@ -98,15 +123,15 @@ Cheetah's behaviour that would be awkward or too repetitive to do with {\bf
 want to build your own plugin please read the documented source code in the
 Cheetah.Plugins package.
 
-Cheetah.Template.Template() 'plugins' argument accepts a list of plugins. To use
-a plugin import its class from the module that contains it and feed Template()
-a list containing an instance of the class. Here's an example:
+Cheetah's ``\code{plugins}'' argument setting accepts a list of plugins. To use
+a plugin import its class from the module that contains it and feed
+\code{Template()} a list containing an instance of the class. Here's an example:
 
 \begin{verbatim}
 from Cheetah.Template import Template
 from Cheetah.Plugins.MyPlugin import MyPlugin
 ...
-TO = Template(templateDef, namespace, plugins=[MyPlugin(),])
+TO = Template(templateDef, namespace, settings={'plugins':[MyPlugin(),]})
 \end{verbatim}
 
 

@@ -1,14 +1,15 @@
 \section{Putting it all together}
 \label{puttingItTogether}
 
-This section explains how to use Cheetah as a stand-alone tool and gives an
+This section provides a high-level explanation of how to use Cheetah and an
 under-the-hood view of how Cheetah works.  If you are using Cheetah with Webware
 and want to get straight into it, skip ahead to section
-\ref{webware.inheritance.tmpl}.
+\ref{webware.inheritance.tmpl} and come back here later.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The Template class}
-\label{puttingItTogether.TO}
+\label{puttingItTogether.template}
+
 The \code{Template} class (\code{Cheetah.Template.Template}) is the heart of
 Cheetah.  Objects of this class parse and compile template definitions into a
 chunk of Python code.  This chunk of Python code is then bound to the template
@@ -16,22 +17,17 @@ object's \code{.__str__()} and \code{.respond()} methods, and is executed each
 time you request the filled output from the template by calling either of these
 methods.  
 
-The \code{.__str__()} method is called automatically by Python's print keyword:
-\code{print templateObj}.  
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Constructing template objects}
+\label{puttingItTogether.template.constructing}
 
 Template objects may be created manually in Python code or automatically using
 \code{.tmpl} files when Cheetah is used with Webware. See section
 \ref{webware.inheritance.tmpl} for more information on \code{.tmpl} files.  The
 section only deals with manual creation.
 
-The constructor method of the \code{Template()} class 
-
 You must pass either a Template Definition string or a 'file' keyword argument,
-but not both.  
+but not both, to the \code{Template} class' constructor.
 
 Here are some examples of the various ways to create a template object:
 \begin{description}
@@ -61,208 +57,91 @@ templateObj = Template("The king is a $placeholder1", file="fink.txt")
 templateObj = Template("The king is a $placeholder1", file=f)
 \end{verbatim}
 
-Certain other keyword arguments are also accepted, see 
-``Keyword arguments accepted by the constructor'' below.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using Template objects}
+\label{puttingItTogether.template.using}
+
+To use a template object once it has been created, simply print it using
+Python's \code{print} keyword, apply the \code{str()} function to it, or call
+its \code{.respond} method.  The result is a string with all the Placeholders
+filled in with their current values, and all the directives executed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Keyword arguments accepted by the constructor}
-
-None of these keyword arguments are necessary for normal usage of a TO.
+\subsubsection{Methods of the Template class}
+\label{puttingItTogether.template.methods}
 
 \begin{description}
+     
+\item[.compileTemplate()] -- Compile the template.  This needs to be called
+     manually if the setting ``delayedCompile'' is set to True.
+     
+\item[.recompile()] -- Synonym for \code{.compileTemplate}.
+     
+\item[.searchList()] -- Return a reference to the searchList.  It's a
+     \code{UserList} subclass, so you can use Python's standard list operations
+     on it.
+     
+\item[.addToSearchList(theNamespace)] -- Append the given Namespace to the
+     searchList.
+     
+\item[.extendTemplate(templateExt)] --
 
-\item(file) Discussed above in ``Constructing Template Objects''.
-
-\item{macros} Dictionary of macro name (string) -> macro definition (function).
-     These macros are defined before the TO is compiled.
-
-\item{cheetahBlocks} Dictionary of block name (string) -> block definition
-     (string).
-
-% Why would a programmer want to call this?
-
-\item{settings}  Dictionary of configuration settings to merge in.  This is
-     often useful to specify an alternate behavior for missing Namespace Keys:
-\begin{verbatim}
-from Cheetah import CodeGenerator
-settings = {'varNotFound_handler': CodeGenerator.varNotFound_bigWarning}
-templateObj = Template(file="fink.txt", settings=settings)       # Or:
-templateObj = Template("The king is a $placeholder1.", settings=settings)
-\end{verbatim}
-    
-
-\item{overwriteSettings}  Dictionary of configuration settings.  Any existing
-     configuration settings are erased.
-
-\item{plugins}  List of Cheetah plugins to register, in addition to those
-     specified by the configuration setting `plugins'.  Cheetah ships with two
-     plugins so far: a debugger and a PSP interface.
-
-\end{description}
+\item[.redefineTemplateBlock(blockName, blockContents)] -- Redefine a named block
+     in the template definition.  Both arguments must be strings.  You must call
+     \code{.recompile()} for the change to take effect if the template has
+     already been compiled.
+     
+\item[.killTemplateBlock(*blockNames)] Delete the named blocks from the template
+     definition.  They will no longer show up in Filled Templates. You must call
+     \code{.recompile()} for the change to take effect if the template has
+     already been compiled.
 
      
-Any positional arguments besides the first are Namespaces for the Search List.
-The constructor builds a Search List as a flat list of Namespaces,
-concatenated in the following order:
+\item[.loadMacro(), .loadMacros() and .loadMacrosFromModule()] See section
+     \ref{directives.macros}.
 
-\begin{enumerate}
+\item[.registerServerPlugin(plugin)]  Register a plugin that extends the
+     functionality of the Template.  See section \ref{customizing.plugins}.
 
-\item  All the Namespaces passed to the constructor, from left to right.
+\item[.normalizePath()] A hook to enable proper handling of server-side paths
+     with Webware.
 
-\item  The TO itself (its \code{self} attribute), 
-
-\item  The Namespaces in the keyword argument \code{searchList} if present.  
-     The argument value be a list or a tuple.
-
-\end{enumerate}
-
-Every Namespace must have Namespace Keys and Namespace Values.  This means it
-must be an object that supports attribute/value pairs or key/value pairs.  
-Instances, dictionaries, modules and classes all make suitable Namespaces.
-The Namespace Keys must be strings; the Namespace Values may be any Python
-object.
-
-If the Placeholder Name uses Dotted Notation, the Namespace Value will itself
-be used as a Namespace recursively to resolve each Identifier from left to 
-right.  Each recursive ``Namespace'' must be a valid Namespace type 
-{\em or} a Python list or list-compatible instance.  However, the top-level
-Namespace Value may {\em not} be a list, because the first Identifier in a
-Placeholder Name may not be numeric.  (If this paragraph is unclear, read it
-again after you're read the ``Placeholder Tags'' chapter.)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Using Template objects}
-
-To use a TO, simply print it, apply Python's
-\code{str()} function to it, or call its \code{.respond} method.  This is
-called ``filling'' the TO or informally,  ``filling in the template''.  The
-result is a string with all the Placeholders filled in with their current
-Placeholder Values, and all the directives executed.  The resulting string is
-called the Filled Template.
-
-\begin{verbatim}
->>> print templateObj
-<HTML>
-<HEAD><TITLE>Hello World Example</TITLE></HEAD>
-<BODY>
-Hello World!
-</BODY>
-</HTML>
-\end{verbatim}
-
-To prove that all three templateObj's produce identical results, we'll run an
-equality test on their Filled Templates.  The test will print ``1'' if the
-Filled Templates are identical, or ``0'' if they are not.
-
-\begin{verbatim}
->>> str(templateObj) == str(templateObj2) == str(templateObj3)
-1
-\end{verbatim}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Modifying Template objects}
-
-From the same TO you can produce as many Filled Templates as you
-want, each with its own set of changeable data.  To set the changeable data for
-the next Filled Template, simply modify the Namespaces in the Search List.
-
-\begin{verbatim}
->>> nameSpace['contents'] = 'Goodbye, cruel world!'
->>> print templateObj
-<HTML>
-<HEAD><TITLE>Hello World Example</TITLE></HEAD>
-<BODY>
-Goodbye, cruel world!
-</BODY>
-</HTML>
-\end{verbatim}
-
-Or for templateObj's 2 and 3:
-
-\begin{verbatim}
->>> templateObj2.contents = 'Goodbye, cruel world!'
->>> str(templateObj) == str(templateObj2) == str(templateObj3)
-1
-\end{verbatim}
-
-(templateObj3 didn't have to be modified because it's reading the same
-\code{nameSpace} dictionary we already modified.)
-
-All the Namespace Values above are strings, but they can actually be any Python
-type.  You may even change values from one type to another.  However, if you
-change a value from an autocalled type (a function or method) to a
-non-autocalled type (any other type) or vice-versa, you must recompile the
-TO by calling the \code{.compileTemplate()} method {\em before filling it}.
-Otherwise, Cheetah will autocall when it shouldn't or
-won't autocall when it should.  For the reason why, see the section
-``Autocalling'' in the chapter ``Placeholder Tags''.
-
-% Mention the exact consequences of wrongly autocalling or wrongly not
-% autocalling.
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Methods}
-
-None of these methods are necessary for normal usage of a TO.
-
-\begin{description}
-
-\item{.addToSearchList(theNamespace, restart=True)}  Append the given Namespace
-     to the Search List.  Leave the optional second argument at its default
-     value so that the template gets recompiled.  (This method is of dubious
-     value and may be removed.)
-
-\item{.defineTemplateBlock(blockName, blockContents)}  Add a named block to the
-template.  Both arguments must be strings.
-
-% What good is it to define a template block?  Does this append the block to
-% the Template Definition?  When will the block be visible in the Filled
-% Template?
-
-\item{.extendTemplate(extension)}  The docstring just says, ''@@needs
-     documenting'').  Presumably, 'extension' is a string.  Used to 
-     programmatically create nested documents?
-
-\item(.killTemplateBlock(*blockNames))  Delete the named blocks from the 
-Template Definition.  They will no longer show up in Filled Templates.
-
-% I propose we delete .killTemplateBlock.  The #if directive covers all its
-% functionality and more.  Also, .killTemplateBlock is destructive in regard to
-% future Filled Templates: there's no way to get the block back if you need it
-% again later, whereas #if will happily hide and show blocks as appropriate.
-
-\item{.loadMacro, .loadMacros and .loadMacrosFromModule}  See the chapter
-     ``Functions and Macros''.
-
-\item{.getFileContents(fileName) -> string}  Returns the contents of the named
+\item[.getFileContents(fileName)]  Returns the contents of the named
      file.  May be overridded to do, e.g., URL retrievals.
 
-\item{.registerServerPlugin(plugin)}  Register a plugin that extends the
-     functionality of the Template.  See ``plugins'' in the section on keyword
-     arguments.
-
-\item{.runAsMainProgram()}
-
-\item{.searchList()}  Return the Search List.  It's a UserList subclass, so you
-     can use Python's standard list operations on it.  If you add or delete
-     namespaces, call \code{.compileTemplate()} afterwards to recompile the template
-     {\em before trying to fill it}.
-
-\item{.compileTemplate()}  Recompile the template.  
-
-\item{.recompile()}  Synonym for \code{.compileTemplate}.
-
-\item{.translatePath()}  ``A hook to enable proper handling of server-side
-     paths with Webware.''
-     
-\item{.getUnknowns()}  Return a list of Placeholder Names which are missing in
-     the Search List.
+\item[.runAsMainProgram()]
 
 \end{description}
 
-Since the Template class inherits from the SettingsManager mixin, those methods
-are available to change configuration settings after instantiation.
+Since the Template class inherits from the \code{SettingsManager} mixin class,
+its methods are available to change configuration settings.  See section
+\ref{libraries.SettingsManager} for more about it.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Putting stuff into the searchList}
+\label{puttingItTogether.searchList}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{As attributes/methods of the Template object}
+\label{puttingItTogether.searchList.self}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using the \#data directive}
+\label{puttingItTogether.searchList.dataDirective}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Using the .addToSearchList() method}
+\label{puttingItTogether.searchList.addToSearchList}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimization}
+\label{puttingItTogether.optimization}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Debugging}
+\label{puttingItTogether.debugging}
+
+
 

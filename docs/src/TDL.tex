@@ -40,7 +40,9 @@ replaced with the values for \code{title} and \code{content}.
 
 Although these values are strings, they could be any type.  Cheetah converts all
 \$placeholder values to strings via Python's \code{str()} function each time a
-request is processed.
+request is processed.\footnote{Actually, it only does this for top-level
+  \$placeholders that are not inside a \#directive tag or inside the argument
+  set of another \$placeholder.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Rules for placeholder names}
@@ -62,7 +64,8 @@ request is processed.
      All Python quoting styles are allowed.
      
 \item All variable names inside argument sets should be prefixed with a \$.  Use
-     \$func(\$var) instead of \$func(var).
+     \$func(\$var) instead of \$func(var).  Python's builtin functions are an
+     exception to this rule.
     
 \item Trailing periods are ignored.  Cheetah will recognize that
      placeholder name in \code{\$varName.} is \code{varName} and the period will
@@ -73,7 +76,7 @@ request is processed.
      placeholder and surrounding text (\code{surrounding\$\{embeddedVar\}text}).
    
 \item Cheetah ignores all dollar signs (\code{\$}) that are not followed by a
-     letter or an underscore.  Dollar amounts (\code{\$2.50})are output
+     letter or an underscore.  Dollar amounts (\code{\$2.50}) are output
      literally as they should be.  Cheetah also ignores any placeholder escaped
      by a backslash (\code{$\backslash$\$placeholderName}).
 
@@ -101,7 +104,18 @@ dotted notation.  This is far easier for non-programmers to understand and it
 insulates you from changes in the API behind the template's \$placeholders.
 
 \$a.b.c will work with "a = \{'b':\{'c':1234\}\}" or "a = myClass(); a.b =
-anotherClass()". You can still write \$a['b']['c'] if you want to.
+anotherClass()". 
+
+\$placeholders can be written in either this syntax OR using plain old Python
+syntax.  You can still write \$a['b']['c'] if you want to. Furthermore, these
+two syntax styles can be combined.  For example, the composite placeholder
+\code{\$a.b.c['d'][5:]} contains brackets for getting dictionary-keys and
+list-slices. Cheetah will use translate everything upto the first bracket and
+leave the rest unchanged. {\bf Also note that with the current implementation
+  Cheetah will only use Unified Dotted Notation up until the first set of
+  parentheses in a \$placeholder such as
+  \code{\$a.methThatReturnsAnObj(1234).c.d}. We are currently discussing
+  changing the behaviour.}
 
 To use Uniform Dotted Notation with dictionaries, the key must be a legal
 identifier.  That is, it must start with a letter or an underscore, and contain
@@ -111,22 +125,31 @@ identifier you must use the \code{\$a['key 1234a*98']} syntax instead.
 Among Template-engines, Uniform Dotted Notation is unique to Cheetah.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Auto-calling}
+\subsubsection{Autocalling}
 \label{TDL.placeholders.autocalling}
 
-Cheetah allows 'auto-calling' of methods and functions embedded as
+Cheetah allows 'autocalling' of methods and functions embedded as
 \$placeholders in the template definition.  If this feature is enabled
 (it is by default) then \$func and \$obj.meth will translated to \$func() and
 \$obj.meth().  If the function or method require args then you still
 have to do it like in Python \$func('foo', 1234)
 
 Only functions and methods are autocalled.  Other callable types -- in
-particular classes and instances -- are never auto-called.  So if you want to
-call a class or instance or another type, you must use ``()''.
+particular classes and instances -- are never autocalled.  So if you want to
+call a class or instance or another type, you must use ``()''. {\bf Also note
+  that with the current implementation, Cheetah will only use autocalling if a)
+  it is enabled via the Cheetah settings and b) the \$placeholder contains NO
+  brackets or parentheses.  \code{\$a.b.c} would use autocalling,
+  \code{\$a.b.c['d']}, \code{\$a.b.c(15)}, and \code{\$a(16).b.c} would not.
+  \code{\$a(\$x.y.z).b.c} would use autocalling on \code{\$x.y.z} but not on
+  \code{b.c}.  We are currently discussing changing the behaviour.}
 
-Section \ref{customizing} has instructions on how turn this feature off.
+Section \ref{customizing.settings} has instructions on how turn this feature off.
 
-Auto-calling is also unique to Cheetah.
+Autocalling is unique to Cheetah.  It allows a team using Cheetah to make the
+learning curve shorter for non-programmers and also provides a bit of insulation
+between Cheetah template definitions and changes in the API of your underlying
+program code.  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{The searchList}
@@ -358,6 +381,18 @@ $clientName: $address
 #end for
 \end{verbatim}
 
-Arguments to macro definitions with the \code{\#macro} directive are an exception.  You
-should leave off the \$ for now.  This might change in the future, but it will
-be backwards compatible.
+There are several exceptions: 
+
+\begin{itemize}
+\item Variables declared and used inside \code{\#data} directives must not be
+     prefaced with \$, as the contents of this directive must be pure Python
+     code.
+
+\item If you use one of Python's builtin functions in an \code{\#if},
+     \code{\#for} or \code{\#set} directive leave off the \$.
+
+\item Arguments to macro definitions with the \code{\#macro} directive should
+     have the \$ leave off for now.  This might change in the future, but it
+     will be backwards compatible.
+
+\end{itemize}

@@ -18,6 +18,12 @@ list, writing cheetah code or writing cheetah examples please use these terms.
      created a template object.  In the source code it is referred to as
      'templateDef'.
      
+\item{Template Definition Extension} A string marked up in the TDL which is used
+     to extend an existing template definition. A template definition extension
+     usually contains a number of \code{\#redefine} directives that redefine blocks
+     declared in the parent template definition. In the source code it is
+     referred to as 'templateExt'.
+     
 \item{Search List} A list of Python data structures which will be searched to
      find values for the \$placeholders in a template definition.  Each object
      is referred to as a {\bf Namespace} and must be either a dictionary or an

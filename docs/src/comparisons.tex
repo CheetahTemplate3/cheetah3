@@ -1,10 +1,11 @@
 \section{Cheetah vs. [fill in the blank]}
 \label{comparisons}
 
-This appendix compares Cheetah with various other template languages and
-emdedded scripting frameworks.  As Cheetah is similar to Velocity at a
-superficial level you may also wish to read comparisons between Velocity and
-other languages at \url{http://jakarta.apache.org/velocity/ymtd/ymtd.html}.
+This appendix compares Cheetah with various other template/emdedded scripting
+languages and internet development frameworks.  As Cheetah is similar to
+Velocity at a superficial level you may also wish to read comparisons between
+Velocity and other languages at
+\url{http://jakarta.apache.org/velocity/ymtd/ymtd.html}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{What features are unique to Cheetah}
@@ -15,7 +16,7 @@ other languages at \url{http://jakarta.apache.org/velocity/ymtd/ymtd.html}.
      \code{\#redefine}, \code{\#extend}
 \item Cheetah's powerful, yet simple, {\bf caching framework}. See
      \ref{TDL.placeholders.caching} for more information.
-\item Cheetah's {\bf Unified Dotted Notation} and {\bf auto-calling}. See
+\item Cheetah's {\bf Unified Dotted Notation} and {\bf autocalling}. See
      sections \ref{TDL.placeholders.unifiedDottedNotation} and
      \ref{TDL.placeholders.autocalling} for more information.
 \item Cheetah's searchList. See section \ref{TDL.placeholders.searchList} for more
@@ -222,10 +223,21 @@ For a basic introduction to Zope Page Templates please visit
 \url{http://www.zope.org/Documentation/Articles/ZPT2}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Cheetah vs. PSP, PHP, ASP, JSP, etc.}
+\subsection{Cheetah vs. PSP, PHP, ASP, JSP, Embperl, etc.}
 \label{comparisons.pspEtc}
 
-Here's a basic example:
+[This section is under construction.]
+
+\begin{description}
+\item[Webware's PSP Component] -- \url{http://www.asp101.com/}
+\item[PHP Home Page] -- \url{http://www.php.net/}
+\item[Tomcat JSP Information] -- \url{http://jakarta.apache.org/tomcat/index.html}
+\item[ASP Information at ASP101] -- \url{http://www.asp101.com/}
+\item[Embperl] -- \url{http://perl.apache.org/embperl/}
+\end{description}
+
+
+Here's a basic Cheetah example:
 \begin{verbatim}
 <TABLE>
 #for $client in $service.clients
