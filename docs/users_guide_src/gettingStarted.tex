@@ -22,7 +22,7 @@ To install Cheetah to your system-wide Python library:
 
 \item Run \code{python setup.py install} at the command prompt.
 
-\item The setup program will install the program {\bf cheetah-compile} to the
+\item The setup program will install the wrapper script {\bf cheetah} to the
      "/usr/bin" or something like that.
 \end{enumerate}
 
@@ -48,8 +48,8 @@ Cheetah's installation is managed by Python's Distribution Utilities
 You can run the test suite to insure that your installation is correct by
 following these steps:
 \begin{enumerate}
-\item CD into the directory ./src/Tests   
-\item type: \code{python Test.py} 
+\item install Cheetah as explained above
+\item type: \code{cheetah test} 
 \end{enumerate}
 
 If the tests pass, start Python in interactive mode and try the example in the
@@ -149,7 +149,7 @@ as we will see in section \ref{howWorks.constructing}.
 The above is all fine for short templates, but for long templates or
 for an application that depends on many templates in a hierarchy, it's
 easier to store the templates in separate *.tmpl files and use the
-{\bf cheetah-compile} program to convert them into Python classes in
+{\bf cheetah compile} program to convert them into Python classes in
 their own modules.  This will be covered in section ??.  
 
 As an appetizer, we'll just briefly mention that you can store constant values
