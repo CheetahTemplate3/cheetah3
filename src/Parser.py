@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.15 2001/09/11 04:05:20 tavis_rudd Exp $
+# $Id: Parser.py,v 1.16 2001/09/14 17:22:26 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.15 $
+Version: $Revision: 1.16 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/09/11 04:05:20 $
+Last Revision Date: $Date: 2001/09/14 17:22:26 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.15 $"[11:-2]
+__version__ = "$Revision: 1.16 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -362,6 +362,7 @@ class Parser:
                 remainderOfName = ''
 
             ## only do autocalling on names that have no () in them
+            # @@TR: finish this off so that it works with the type of calls Chuck uses
             if autoCall and name.find('(') == -1 \
                and self.setting('useAutocalling'):
                 safeToAutoCall = True
