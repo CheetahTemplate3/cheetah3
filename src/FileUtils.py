@@ -1,21 +1,18 @@
 #!/usr/bin/env python
-# $Id: FileUtils.py,v 1.7 2002/10/01 17:52:02 tavis_rudd Exp $
+# $Id: FileUtils.py,v 1.8 2003/02/19 08:36:16 tavis_rudd Exp $
 """File utitilies for Python:
-
-This is included with Cheetah for the time-being, but I eventually plan to
-release it as a standalone package.
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/09/26
-Last Revision Date: $Date: 2002/10/01 17:52:02 $
+Last Revision Date: $Date: 2003/02/19 08:36:16 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.7 $"[11:-2]
+__revision__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -31,10 +28,8 @@ from tempfile import mktemp
 ##################################################
 ## CONSTANTS & GLOBALS
 
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
+True = (1==1)
+False = (1==0)
 
 
 ##################################################
@@ -117,13 +112,15 @@ class FileFinder:
         
         while pendingDirs:
             dir = getDir()
-            ## add sub-dirs and process this dir
+            ##  process this dir
+            processDir(dir)
+            
+            ## and add sub-dirs 
             for baseName in listdir(dir):
                 fullPath = join(dir, baseName)
                 if isdir(fullPath):
                     if filterDir(baseName, fullPath):
                         addDir( fullPath )
-                        processDir(fullPath) 
 
     def filterDir(self, baseName, fullPath):
         
@@ -139,8 +136,6 @@ class FileFinder:
     
     def files(self):
         return self._files
-
-
 
 class _GenSubberFunc:
 
@@ -171,6 +166,15 @@ class _GenSubberFunc:
 
     def advance(self, offset=1):
         self._pos += offset
+
+    def readTo(self, to, start=None):
+        if start == None:
+            start = self._pos
+        self._pos = to
+        if self.atEnd():
+            return self._src[start:]
+        else:
+            return self._src[start:to]
 
     ## match and get methods
         
@@ -315,3 +319,65 @@ class FindAndReplace:
                                    }
                                    )
         return self._subber(match)
+
+
+class SourceFileStats:
+
+    """
+    """
+    
+    _fileStats = None
+    
+    def __init__(self, files):
+        self._fileStats = stats = {}
+        for file in files:
+            stats[file] = self.getFileStats(file)
+
+    def rawStats(self):
+        return self._fileStats
+
+    def summary(self):
+        codeLines = 0
+        blankLines = 0
+        commentLines = 0
+        totalLines = 0
+        for fileStats in self.rawStats().values():
+            codeLines += fileStats['codeLines']
+            blankLines += fileStats['blankLines']
+            commentLines += fileStats['commentLines']
+            totalLines += fileStats['totalLines']
+            
+        stats = {'codeLines':codeLines,
+                 'blankLines':blankLines,
+                 'commentLines':commentLines,
+                 'totalLines':totalLines,
+                 }
+        return stats
+        
+    def printStats(self):
+        pass
+
+    def getFileStats(self, fileName):
+        codeLines = 0
+        blankLines = 0
+        commentLines = 0 
+        commentLineRe = re.compile(r'\s#.*$')
+        blankLineRe = re.compile('\s$')
+        lines = open(fileName).read().splitlines()
+        totalLines = len(lines)
+        
+        for line in lines:
+            if commentLineRe.match(line):
+                commentLines += 1
+            elif blankLineRe.match(line):
+                blankLines += 1
+            else:
+                codeLines += 1
+
+        stats = {'codeLines':codeLines,
+                 'blankLines':blankLines,
+                 'commentLines':commentLines,
+                 'totalLines':totalLines,
+                 }
+        
+        return stats
