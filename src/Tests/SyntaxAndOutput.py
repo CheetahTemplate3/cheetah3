@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.18 2001/12/07 08:30:36 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.19 2001/12/11 06:10:12 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.18 $
+Version: $Revision: 1.19 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/12/07 08:30:36 $
+Last Revision Date: $Date: 2001/12/11 06:10:12 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.18 $"[11:-2]
+__version__ = "$Revision: 1.19 $"[11:-2]
 
 
 ##################################################
@@ -1127,6 +1127,22 @@ class DefDirective(OutputTest):
             "#def testMeth: \$aFunc($anInt) \n- $testMeth -",
             "- $aFunc(1) -")
 
+    def test15(self):
+        """single line #def 1 escaped $placeholders + more WS"""
+        self.verify(
+            "#def testMeth    :  \$aFunc($anInt) \n- $testMeth -",
+            "- $aFunc(1) -")
+
+    def test16(self):
+        """multiline #def with $ on methodName"""
+        self.verify("#def $testMeth\n1234\n#end def\n$testMeth",
+                    "1234\n")
+
+    def test17(self):
+        """single line #def with $ on methodName"""
+        self.verify("#def $testMeth: 1234\n$testMeth",
+                    "1234")
+
 class BlockDirective(OutputTest):
 
     def test1(self):
@@ -1198,6 +1214,22 @@ inner
             "#block testMeth:   \$aFunc( $anInt )     ",
             "$aFunc( 1 )")
 
+    def test10(self):
+        """single line #block 1 escaped $placeholders + more WS"""
+        self.verify(
+            "#block testMeth  :   \$aFunc( $anInt )     ",
+            "$aFunc( 1 )")
+
+    def test11(self):
+        """multiline #block $ on argstring"""
+        self.verify("#block $testBlock\n1234\n#end block",
+                    "1234\n")
+
+    def test12(self):
+        """single line #block with $ on methodName """
+        self.verify(
+            "#block $testMeth: This is my block",
+            "This is my block")
 
 class IncludeDirective(OutputTest):
 
