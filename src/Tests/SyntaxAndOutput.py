@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.20 2001/12/19 02:10:25 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.21 2002/01/07 04:23:18 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.20 $
+Version: $Revision: 1.21 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/12/19 02:10:25 $
+Last Revision Date: $Date: 2002/01/07 04:23:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.20 $"[11:-2]
+__revision__ = "$Revision: 1.21 $"[11:-2]
 
 
 ##################################################
@@ -1143,6 +1143,11 @@ class DefDirective(OutputTest):
         self.verify("#def $testMeth: 1234\n$testMeth",
                     "1234")
 
+    def test18(self):
+        """single line #def with an argument"""
+        self.verify("#def $testMeth($arg=1234): $arg\n$testMeth",
+                    "1234")
+
 class BlockDirective(OutputTest):
 
     def test1(self):
@@ -1229,6 +1234,12 @@ inner
         """single line #block with $ on methodName """
         self.verify(
             "#block $testMeth: This is my block",
+            "This is my block")
+
+    def test13(self):
+        """single line #block with an arg """
+        self.verify(
+            "#block $testMeth($arg='This is my block'): $arg",
             "This is my block")
 
 class IncludeDirective(OutputTest):
