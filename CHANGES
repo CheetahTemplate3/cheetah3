@@ -1,18 +1,22 @@
 Please initial your changes and a date for each release
 ================================================================================
 0.9.7 (not released yet)
-  - reimplemented the parsing of $placeholders using the Python tokenizer module
+  - reimplemented the parsing of $placeholders using the Python tokenizer module (TR)
     - now translates into Python code instead of going through NameMapper for
       each request
     - supports arg lists and nested placeholders
     - maintained support for autocalling of functions, but this may be removed
   - reimplemented the #include and #raw directives using nested templates for
     parsed includes and  string attributes of 'Template' to store raw text
-    The support for file update monitoring of includes is still not implemented
-  - moved some stuff from __init__.py into CHANGES and TODO 
+    The support for file update monitoring of includes is still not implemented (TR)
+  - moved some stuff from __init__.py into CHANGES and TODO  (TR)
   - added a new command 'sdist_docs' to setup.py which rebuilds the docs
-    when making a source distribution
-  - changed the name of the ./Cheetah dir to ./src
+    when making a source distribution (TR)
+  - changed the name of the ./Cheetah dir to ./src (TR)
+  - fixed a bug in one of the code filters that was preventing commas from 
+    being used between $placeholders (TR)
+  - generalized the line ending regex for single-line comments (TR)
+  - corrected the spelling of 'Delimiters' throughout Cheetah (TR)
 
 0.9.6 (June 12, 2001)
   - fixed a bug in NameMapper that was preventing 'obj.__class__.__name__' from mapping (TR)
