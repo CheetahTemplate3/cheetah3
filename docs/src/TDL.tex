@@ -17,29 +17,10 @@ code-generation in general, easy enough for non-programmers to understand and
 programmers to love.  It is purposefully limited so complex tasks are left to
 Python code, where they belong.
 
-Cheetah's Template Definition Language has 2 primary types of tags:
-
-\begin{enumerate}
-\item {\bf placeholders}: for marking areas of the template that should be
-     filled in with something. 
-     
-     Placeholders begin with a dollar sign (\code{\$varName}).
-
-\item {\bf directives}: for everything else:
-     \begin{enumerate}   % level 2
-     \item {\bf raw text} for marking verbatim blocks should not be parsed for
-          Cheetah tags.
-     \item {\bf comments} that should not appear in the output
-     \item {\bf includes} to include external text.  The text can be included
-          verbatim or with parsing for Cheetah tags.
-     \item {\bf display logic} such as {\bf conditional blocks} (if-blocks) and
-          {\bf for loops}.
-     \item {\bf blocks}, which are named sections of a template that can be
-          redefined (overridden) in a subclass or by template users.
-     \item etc.
-     \end{enumerate}  % level 2
-
-     Directives begin with a hash character (\#).
-
-The following chapters deal with these tags in detail.
+Cheetah's Template Definition Language has 2 primary types of tags: {\bf
+  placeholders} and {\bf directives}. Placeholder tags begin with a dollar sign
+(\code{\$varName}) and are replaced with the value of the variable they refer to
+when the template is filled. Directives begin with a hash character (\#) and are
+used for everything else: for loops, conditional blocks, comments, includes, and
+other advanced features. The following chapters deal with these tags in detail.
 
