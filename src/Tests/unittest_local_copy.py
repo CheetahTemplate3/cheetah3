@@ -31,6 +31,10 @@ TestProgram
 
 -- Tavis Rudd (Sept 28th, 2001)
 
+- _TestTextResult.printErrorList(): print blank line after each traceback
+
+-- Mike Orr (Nov 11, 2002)
+
 ---------------------------------------------------------------------------
 Python unit testing framework, based on Erich Gamma's JUnit and Kent Beck's
 Smalltalk testing framework.
@@ -78,7 +82,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 __author__ = "Steve Purcell"
 __email__ = "stephen_purcell at yahoo dot com"
-__revision__ = "$Revision: 1.8 $"[11:-2]
+__revision__ = "$Revision: 1.9 $"[11:-2]
 
 
 ##################################################
@@ -544,6 +548,7 @@ class _TextTestResult(TestResult, StreamWrapper):
     _sep2 = '-'
     _errorSep1 = '*'
     _errorSep2 = '-'
+    _errorSep3 = ''
     
     def __init__(self,
                  stream=sys.stdout,
@@ -656,6 +661,7 @@ class _TextTestResult(TestResult, StreamWrapper):
             for line in apply(traceback.format_exception, err):
                 for l in line.split("\n")[:-1]:
                     self.writelnErr(l)
+            self.writelnErr("")
 
 class TextTestRunner:
     def __init__(self, 
@@ -901,3 +907,5 @@ main = TestProgram
 
 if __name__ == "__main__":
     main(module=None)
+
+# vim: shiftwidth=4 tabstop=4 expandtab
