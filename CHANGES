@@ -6,6 +6,7 @@ release
   - set 'monitorSrcFile' to false as it was causing problems with the
     ImportHooks ... This might be temporary as the problem needs more thought
     (TR)
+  - made 'self' visible in '#settings python' directives
 
 0.9.14 (July 14, 2002)
   - Precompiled template Templates/SkeletonPage.py added to CVS.  This file is
