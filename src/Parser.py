@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.56 2002/06/05 21:42:23 tavis_rudd Exp $
+# $Id: Parser.py,v 1.57 2002/06/30 20:08:50 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.56 $
+Version: $Revision: 1.57 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/06/05 21:42:23 $
+Last Revision Date: $Date: 2002/06/30 20:08:50 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.56 $"[11:-2]
+__revision__ = "$Revision: 1.57 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -978,6 +978,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             'break': self.eatBreak,
             'continue': self.eatContinue,
             'stop': self.eatStop,
+            'return': self.eatReturn,
 
             # little wrappers
             'repeat': self.eatRepeat,
@@ -1740,6 +1741,9 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
 
     def eatStop(self):
         self.addStop(self.eatSimpleExprDirective())
+
+    def eatReturn(self):
+        self.addReturn(self.eatSimpleExprDirective())
 
     def eatRepeat(self):
         lineClearToStartToken = self.lineClearToStartToken()
