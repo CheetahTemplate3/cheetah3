@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.34 2001/12/07 08:31:45 tavis_rudd Exp $
+# $Id: Parser.py,v 1.35 2001/12/11 06:10:49 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.34 $
+Version: $Revision: 1.35 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/12/07 08:31:45 $
+Last Revision Date: $Date: 2001/12/11 06:10:49 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.34 $"[11:-2]
+__version__ = "$Revision: 1.35 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1278,6 +1278,8 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.getDirectiveStartToken()
         self.advance(len('def'))
         self.getWhiteSpace()
+        if self.matchCheetahVarStart():
+            self.getCheetahVarStartToken()
         methodName = self.getIdentifier()
         self.getWhiteSpace()
         if self.peek() == ':':
@@ -1294,6 +1296,8 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.getDirectiveStartToken()
         self.advance(len('block'))
         self.getWhiteSpace()
+        if self.matchCheetahVarStart():
+            self.getCheetahVarStartToken()
         methodName = self.getIdentifier()
         self.getWhiteSpace()
 
