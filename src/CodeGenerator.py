@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.19 2001/08/04 00:09:25 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.20 2001/08/06 03:50:16 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.19 $
+Version: $Revision: 1.20 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/04 00:09:25 $
+Last Revision Date: $Date: 2001/08/06 03:50:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.19 $"[11:-2]
+__version__ = "$Revision: 1.20 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -246,7 +246,7 @@ def preProcessDataDirectives(templateObj, templateDef):
         exec contents in {}, newDataDict
 
         del newDataDict['self']
-        if not 'overwrite' in args:
+        if not 'nomerge' in args:
             templateObj.mergeNewTemplateData(newDataDict)
         else:
             for key, val in newDataDict.items():
@@ -470,7 +470,7 @@ def preProcessIncludeDirectives(templateObj, templateDef):
                 macros=templateObj._macros)
             templateObj._parsedIncludes[includeID] = nestedTemplate
             if not hasattr(nestedTemplate, 'respond'):
-                nestedTemplate.startServer()
+                nestedTemplate.compileTemplate()
             return templateObj.setting('placeholderStartToken') + \
                    '{parsedIncludes.' + includeID + '}'
         else:

@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.3 2001/08/04 01:01:46 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.4 2001/08/06 03:50:16 tavis_rudd Exp $
 """An abstract base class for Cheetah Servlets that can be used with Webware
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/08/04 01:01:46 $
+Last Revision Date: $Date: 2001/08/06 03:50:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -64,11 +64,11 @@ class TemplateServlet(Template, HTTPServlet):
         Template.__init__(self, template, *searchList, **kw)
         HTTPServlet.__init__(self)
         self.initializeTemplate()
-        self._started = False
+        self._isCompiled = False
         
         if not isRunningFromWebKit:
-            self._started = True
-            self.startServer()
+            self._isCompiled = True
+            self.compileTemplate()
 
 
     def initializeTemplate(self):
@@ -82,9 +82,9 @@ class TemplateServlet(Template, HTTPServlet):
         self._response    = transaction.response()
         self._request     = transaction.request()
         self._session     = None  # don't create unless needed
-        if not self._started:
-            self._started = True
-            self.startServer()
+        if not self._isCompiled:
+            self._isCompiled = True
+            self.compileTemplate()
 
     def sleep(self, transaction):
         self._session = None

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.17 2001/08/04 00:09:25 tavis_rudd Exp $
+# $Id: Template.py,v 1.18 2001/08/06 03:50:16 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.17 $
+Version: $Revision: 1.18 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/04 00:09:25 $
+Last Revision Date: $Date: 2001/08/06 03:50:16 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.17 $"[11:-2]
+__version__ = "$Revision: 1.18 $"[11:-2]
 
 
 ##################################################
@@ -202,89 +202,108 @@ class Template(SettingsManager):
         }
 
     def __init__(self, templateDef=None, *searchList, **kw):
-        """setup the namespace search list, process settings, then call
-        self._startServer() to parse/compile the template and prepare the
-        self.__str__() and self.respond() methods for serving the template.
+        
+        """Read in the template definition, setup the namespace searchList,
+        process settings, then call self._compileTemplate() to parse/compile the
+        template and prepare the self.__str__() and self.respond() methods for
+        serving the template.
 
+        The
+
+        Configuration settings should be passed in as a dictionary via the
+        'settings' keyword.
+        
         If the environment var CHEETAH_DEBUG is set to True the internal
         debug setting will also be set to True."""
         
-        self._searchList = SearchList( searchList )
-        self._searchList.append(self)
-        if kw.has_key('searchList'):
-            tup = tuple(kw['searchList'])
-            self._searchList.extend(tup) # .extend requires a tuple.
-
-        ## Unravel whether the user passed in a string, filename or file object.
+        ## Read in the Template Definition
+        #  unravel whether the user passed in a string, filename or file object.
         self._fileName = None
         self._fileMtime = None
         file = kw.get('file', None)
-        if   templateDef and file:
+        if templateDef and file:
             raise TypeError("cannot specify both Template Definition and file")
         elif (not templateDef) and (not file):
             raise("must pass Template Definition string, or 'file' keyword arg")
-        elif templateDef:
+        elif templateDef:   # it's a string templateDef
             pass
-        elif type(file) == types.StringType: # If it's a filename.
+        elif type(file) == types.StringType: # it's a filename.
             f = open(file) # Raises IOError.
             templateDef = f.read()
             f.close()
             self._fileName = file
             self._fileMtime = os.path.getmtime(file)
+            ## @@ add the code to do file modification checks and updates
+            
         elif hasattr(file, 'read'):
             templateDef = file.read()
             # Can't set filename or mtime--they're not accessible.
         else:
             raise TypeError("'file' argument must be a filename or file-like object")
 
+        self._templateDef = str( templateDef ) 
+        # by converting to string here we allow other objects such as other Templates
+        # to be passed in
+
+
+        ## Setup the searchList of namespaces in which to search for $placeholders 
+        self._searchList = SearchList( searchList )
+        self._searchList.append(self)
+        if kw.has_key('searchList'):
+            tup = tuple(kw['searchList'])
+            self._searchList.extend(tup) # .extend requires a tuple.
+
+
+        ## process the settings
+        self.initializeSettings()
+        if kw.has_key('settings'):
+            self.updateSettings(kw['settings'])
+        if kw.has_key('overwriteSettings'):
+            self._settings = kw['overwriteSettings']
+        self.placeholderProcessor.setTagStartToken(self.setting('placeholderStartToken'))
 
         ## deal with other keywd args
         if kw.has_key('macros'):
             self._macros = kw['macros']
-            
         if kw.has_key('cheetahBlocks'):
             self._cheetahBlocks = kw['cheetahBlocks']
         else:
             self._cheetahBlocks = {}
-
-        self.initializeSettings()
-        if kw.has_key('settings'):
-            self.updateSettings(kw['settings'])
-            
-        if kw.has_key('overwriteSettings'):
-            self._settings = kw['overwriteSettings']
-
         if os.environ.get('CHEETAH_DEBUG'):
             self._settings['debug'] = True
-            
         if kw.has_key('plugins'):
             self._settings['plugins'] += kw['plugins']
             for plugin in self._settings['plugins']:
-                self.registerServerPlugin(plugin)
+                self._registerServerPlugin(plugin)
 
-        self._templateDef = str( templateDef )
-
-        self.placeholderProcessor.setTagStartToken(self.setting('placeholderStartToken'))
         
         if not self._settings['delayedStart']:
-            self.startServer()
+            self.compileTemplate()
                    
     def searchList(self):
+        """Return a reference to the searchlist"""
         return self._searchList
     
     def addToSearchList(self, object, restart=True):
+        """Append an object to the end of the searchlist.""" 
         self._searchList.append(object)
+        
         if restart:
-            self.startServer()
+            ## @@ change the restart default to False once we implement run-time
+            # $placeholder translation.
+            self.compileTemplate()
 
     def translatePlaceholderVars(self, string, executeCallables=False):
+        """Translate all the $placeholders in a string to the appropriate Python
+        code.  This method is used to translate $placeholders inside directives,
+        not for the Template Definition itself."""
         
         translated = self.placeholderProcessor.translateRawPlaceholderString(
             string, searchList=self.searchList(), templateObj=self,
             executeCallables=executeCallables)
         return translated
 
-    def startServer(self):
+    def compileTemplate(self):
         """Process and parse the template, then compile it into a function definition
         that is bound to self.__str__() and self.respond()"""
         
@@ -297,11 +316,11 @@ class Template(SettingsManager):
             self._codeGeneratorResults = {}       
 
     ## make an alias
-    recompile = startServer
+    recompile = compileTemplate
     
     def _codeGenerator(self, templateDef):
         
-        """parse the template definition, generate a python code string from it,
+        """Parse the template definition, generate a python code string from it,
         then execute the code string to create a python function which can be
         bound as a method of the Template.  Returns a reference to the function.
         
@@ -429,7 +448,7 @@ class Template(SettingsManager):
             
 
     def mergeNewTemplateData(self, newDataDict):
-        """merge the newDataDict into self.__dict__. This is a recursive merge
+        """Merge the newDataDict into self.__dict__. This is a recursive merge
         that handles nested dictionaries in the same way as
         Template.updateServerSettings()"""
         
@@ -441,17 +460,21 @@ class Template(SettingsManager):
             else:
                 setattr(self,key,val)
    
-    def registerServerPlugin(self, plugin):
-        """register a plugin that extends the functionality of the Template"""
+    def _registerServerPlugin(self, plugin):
+        
+        """Register a plugin that extends the functionality of the Template.
+        This method is called automatically by __init__() method and should not
+        be called by end-users."""
+        
         plugin.bindToTemplateServer(self)
         
     def _bindFunctionAsMethod(self, function):
-        """used to dynamically bind a plain function as a method of the
+        """Used to dynamically bind a plain function as a method of the
         Template instance"""
         return new.instancemethod(function, self, self.__class__)
 
     def _tagProcessor(self, tag):
-        """an abstract tag processor that will identify the tag type from its
+        """An abstract tag processor that will identify the tag type from its
         tagToken prefix and call the appropriate processor for that type of
         tag"""
         settings = self._settings
@@ -461,6 +484,7 @@ class Template(SettingsManager):
 
     
     def _setTimedRefresh(self, translatedTag, interval):
+        """Setup a cache refresh for a $*[time]*placeholder."""
         self._checkForCacheRefreshes = True
         searchList = self.searchList()
         tagValue = eval(translatedTag)
@@ -471,7 +495,7 @@ class Template(SettingsManager):
 
 
     def _timedRefresh(self, currTime):
-        """refresh all the cached NameMapper vars that are scheduled for a
+        """Refresh all the cached NameMapper vars that are scheduled for a
         refresh at this time, and reschedule them for their next update.
 
         the entries in the recache list are in the format [nextUpdateTime, name,
@@ -487,15 +511,17 @@ class Template(SettingsManager):
                 refreshList.sort()
        
     def defineTemplateBlock(self, blockName, blockContents):
-        """  """            
+        """Define a block.  See the user's guide for info on blocks."""            
         self._cheetahBlocks[blockName]= blockContents
 
     def killTemplateBlock(self, *blockNames):
-        """ """
-        if not hasattr(self, '_blocks'):
+        """Fill a block with an empty string so it won't appear in the filled
+        template output."""
+        
+        if not hasattr(self, '_cheetahBlocks'):
             return False
         for blockName in blockNames:
-            self._blocks[blockName]= ''
+            self._cheetahBlocks[blockName]= ''
 
     def loadMacro(self, macroName, macro):
         """Load a macro into the macros dictionary, using the specified macroName"""
@@ -530,9 +556,17 @@ class Template(SettingsManager):
             self.loadMacro(macro[0], macro[1])
 
 
-    def extendTemplate(self, extension):
-        """
-        @@needs documenting
+    def extendTemplate(self, extensionStr):
+        """This method is used to extend an existing Template object with
+        #redefine's of the existing blocks.  See the Users' Guide for more
+        details on #redefine.  The 'extensionStr' argument should be a string
+        that contains #redefine directives.  It can also contain #macro
+        definitions and #data directives.
+
+        The #extend directive that is used with .tmpl files calls this method
+        automatically, feeding the contents of .tmpl file to this method as
+        'extensionStr'.
+
         #redefine and #data directives MUST NOT be nested!!
         """
         import re
@@ -545,22 +579,22 @@ class Template(SettingsManager):
             r'(?P<blockName>[A-Za-z_][A-Za-z_0-9]*?)' +
             r'(?:/#|\r\n|\n|\Z)',re.DOTALL)
                                          
-        while redefineDirectiveRE.search(extension):
-            startTagMatch = redefineDirectiveRE.search(extension)
+        while redefineDirectiveRE.search(extensionStr):
+            startTagMatch = redefineDirectiveRE.search(extensionStr)
             blockName = startTagMatch.group('blockName')
             endTagRE = re.compile(r'#end redefine[\t ]+' + blockName + r'[\t ]*(?:/#|\r\n|\n|\Z)',
                                   re.DOTALL | re.MULTILINE)
-            endTagMatch = endTagRE.search(extension)
-            blockContents = extension[startTagMatch.end() : endTagMatch.start()]
+            endTagMatch = endTagRE.search(extensionStr)
+            blockContents = extensionStr[startTagMatch.end() : endTagMatch.start()]
             self.defineTemplateBlock(blockName, blockContents)
-            extension = extension[0:startTagMatch.start()] + \
-                        extension[endTagMatch.end():]
+            extensionStr = extensionStr[0:startTagMatch.start()] + \
+                        extensionStr[endTagMatch.end():]
                    
         ## process the #data and #macro definition directives
         # after removing comments
-        extension = CodeGen.preProcessComments(self, extension)
-        CodeGen.preProcessDataDirectives(self, extension)
-        CodeGen.preProcessMacroDirectives(self, extension) 
+        extensionStr = CodeGen.preProcessComments(self, extensionStr)
+        CodeGen.preProcessDataDirectives(self, extensionStr)
+        CodeGen.preProcessMacroDirectives(self, extensionStr) 
 
 
     ## utility functions ##   
@@ -576,8 +610,13 @@ class Template(SettingsManager):
         
         return os.path.normpath(path.replace("\\",'/'))
     
-    def getFileContents(self, fileName):
-        fp = open(fileName,'r')
+    def getFileContents(self, path):
+        """A hook for getting the contents of a file.  The default
+        implementation just uses the Python open() function to load local files.
+        This method could be reimplemented to allow reading of remote files via
+        various protocols, as PHP allows with its 'URL fopen wrapper'"""
+        
+        fp = open(path,'r')
         output = fp.read()
         fp.close()
         return output
@@ -620,6 +659,7 @@ class Template(SettingsManager):
         to function as a standalone command-line program for static page
         generation and testing/debugging.
 
-        The debugging facilities are provided by a plugin to Template."""
+        The debugging facilities will be provided by a plugin to Template, at
+        some later date."""
         
         print self
