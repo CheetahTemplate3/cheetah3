@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.11 2001/07/31 05:41:32 hierro Exp $
+# $Id: CodeGenerator.py,v 1.12 2001/08/02 05:24:56 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/31 05:41:32 $
+Last Revision Date: $Date: 2001/08/02 05:24:56 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.11 $"[11:-2]
+__version__ = "$Revision: 1.12 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -84,12 +84,24 @@ class TagProcessor:
         return templateDef
    
     def initializeTemplateObj(self, templateObj):
+        """Initialize the templateObj so that all the necessary attributes are
+        in place for the tag-processing stage
+
+        This must be called by subclasses"""
+        
         if not templateObj._codeGeneratorState.has_key('indentLevel'):
             templateObj._codeGeneratorState['indentLevel'] = \
                           templateObj._settings['initialIndentLevel']
         if not hasattr(templateObj, '_localVarsList'):
             # may have already been set by #set or #for
             templateObj._localVarsList = []
+            
+        if not hasattr(templateObj,'_perResponseSetupCodeChunks'):
+            templateObj._perResponseSetupCodeChunks = {}
+
+        if not templateObj._codeGeneratorState.has_key('defaultCacheType'):
+            templateObj._codeGeneratorState['defaultCacheType'] = None
+
     
     def processTag(self, templateObj, tag):
         return self.wrapTagCode( templateObj, self.translateTag(templateObj, tag) )
@@ -212,10 +224,6 @@ class CacheDirectiveProcessor(TagProcessor):
     _tagType = EMPTY_TAG_TYPE
     _token = 'cacheDirective'
     _delimRegexs = [delimiters['cacheDirectiveStartTag'],]    
-        
-    def initializeTemplateObj(self, templateObj):
-        if not templateObj._codeGeneratorState.has_key('defaultCacheType'):
-            templateObj._codeGeneratorState['defaultCacheType'] = None
 
     def translateTag(self, templateObj, tag):
         tag = tag.strip()
