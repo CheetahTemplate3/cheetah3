@@ -1,9 +1,13 @@
-Please initial your changes (there's a key at bottom) and add a date for each release
+Please initial your changes (there's a key at bottom) and add a date for each
+release
 ================================================================================
 
 0.9.13b1 (unreleased)
   - fixed a silly buglet that resulted in StringIO being used instead of
     cStringIO (TR)
+  - Utils.Misc.CheckKeywords(): prevent misspelled keyword arguments,
+    used by Template constructor. (MO)
+
 
 0.9.12 (April 3, 2002)
    - no code changes from beta 2
