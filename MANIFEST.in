@@ -1,6 +1,4 @@
-include *.py TODO CHANGES LICENSE README examples third_party_packages docs
-recursive-include bin *
-recursive-include docs * 
-recursive-include PlateKit *.py 
-recursive-include examples *
-recursive-include third_party_packages *
+include *.py *.cfg README CHANGES COPYRIGHT TODO
+recursive-include battery_packages *
+recursive-include src *
+recursive-exclude src *.pyc *~ *.aux

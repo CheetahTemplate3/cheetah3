@@ -1,6 +1,6 @@
 Please initial your changes (there's a key at bottom) and add a date for each release
 ================================================================================
-1.0.0a1 (?, 2002)
+1.0.0a1 (Mar 06, 2002)
    - fixed bug in srcfile-mtime monitoring / update code (TR)
    - fixed the parsing of single-line #defs and #blocks so they can have
      arguments (TR)

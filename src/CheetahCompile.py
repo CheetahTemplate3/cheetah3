@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.21 2002/01/06 08:06:32 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.22 2002/03/06 17:03:48 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.21 $
+Version: $Revision: 1.22 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/01/06 08:06:32 $
+Last Revision Date: $Date: 2002/03/06 17:03:48 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.21 $"[11:-2]
+__revision__ = "$Revision: 1.22 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -24,10 +24,6 @@ import os.path
 
 from glob import glob
 import shutil
-
-#intra-package imports ...
-from _properties import Version
-from Compiler import Compiler
 
 ##################################################
 ## GLOBALS & CONTANTS
