@@ -5,12 +5,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/13 22:59:15 $
+Last Revision Date: $Date: 2001/08/11 04:57:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -153,14 +153,8 @@ class Stage1ErrorHandler(StageErrorHandler):
     def generateErrMsg(self):
         msg = '\n'
         msg += "Cheetah was executing the " + \
-               self._localvars['preProcessor'][0] + \
+               self._localvars['name'] + \
                " preProcessor when the error occurred.\n"
-        
-        if not self._localvars['preProcessor'][0] == 'parseDirectiveLoop':
-            msg += "This was the state of the template when the error " + \
-                   "occurred:\n\n"
-            msg += insertLineNums( self._localvars['templateDef'] )
-            
         msg += '-'*80
         return msg
             

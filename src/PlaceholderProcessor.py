@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.22 2001/08/10 22:44:36 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.23 2001/08/11 04:57:39 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.22 $
+Version: $Revision: 1.23 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/10 22:44:36 $
+Last Revision Date: $Date: 2001/08/11 04:57:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.22 $"[11:-2]
+__version__ = "$Revision: 1.23 $"[11:-2]
 
 
 ##################################################
@@ -54,7 +54,7 @@ class PlaceholderProcessor(TagProcessor):
 
     ## methods called by the Template Object
     
-    def preProcess(self, templateObj, templateDef):
+    def preProcess(self, templateDef):
         """Do the preProcessing stuff for stage 1 of the Template class'
         code-generator"""
         return self.wrapPlaceholders(self.markPlaceholders(templateDef))

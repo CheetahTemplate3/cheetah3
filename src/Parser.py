@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.3 2001/08/11 01:03:16 tavis_rudd Exp $
+# $Id: Parser.py,v 1.4 2001/08/11 04:57:39 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/11 01:03:16 $
+Last Revision Date: $Date: 2001/08/11 04:57:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -158,7 +158,9 @@ class Parser:
         startTokenEsc = escapeRegexChars(startToken)
         endTokenEsc = escapeRegexChars(endToken)
         endTokenEscGrp = nongroup(endTokenEsc)
+        start = escCharLookBehind + startTokenEsc
         start_gobbleWS = '(?:\A|^)' + WS + startTokenEsc
+        
         endGrp = nongroup(endTokenEsc, EOLZ)
         lazyEndGrp = nongroup(EOLZ)
 
@@ -171,12 +173,12 @@ class Parser:
         a start-tag, such as #cache, #stop, or #include."""
         
         bits = self._directiveREbits
-        plainRE = re.compile(bits['startTokenEsc']  +
+        plainRE = re.compile(bits['start']  +
                              directiveReChunk +
                              bits['endGrp'])
         gobbleRE = re.compile(bits['start_gobbleWS']  +
                              directiveReChunk +
-                             bits['lazyEndGrp'])
+                             bits['lazyEndGrp'], MULTILINE)
         return [gobbleRE, plainRE]
 
     ## data access methods  ##
@@ -366,7 +368,7 @@ class Parser:
         token = self.setting('placeholderStartToken')
         return theString.replace(token, '\\' + token)
 
-    def unescapePlaceholders(self, templateObj, theString):
+    def unescapePlaceholders(self, theString):
         """Unescape any escaped placeholders in the string.
         
         This method is called by the Template._codeGenerator() in stage 1, which

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.30 2001/08/11 01:03:16 tavis_rudd Exp $
+# $Id: Template.py,v 1.31 2001/08/11 04:57:39 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.30 $
+Version: $Revision: 1.31 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/11 01:03:16 $
+Last Revision Date: $Date: 2001/08/11 04:57:39 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.30 $"[11:-2]
+__version__ = "$Revision: 1.31 $"[11:-2]
 
 
 ##################################################
@@ -36,11 +36,22 @@ from NameMapper import valueForName     # this is used in the generated code
 from SearchList import SearchList
 import CodeGenerator as CodeGen
 
+from TagProcessor import TagProcessor
+
 from PlaceholderProcessor import PlaceholderProcessor
 from DisplayLogic import DisplayLogic
 from SetDirective import SetDirective
 from CacheDirective import CacheDirective, EndCacheDirective
 from StopDirective import StopDirective
+
+from CommentDirective import CommentDirective
+from SlurpDirective import SlurpDirective
+from RawDirective import RawDirective
+from DataDirective import DataDirective
+from IncludeDirective import IncludeDirective
+from BlockDirective import BlockDirective
+from MacroDirective import MacroDirective, \
+     LazyMacroCall, CallMacroDirective
 
 import ErrorHandlers
 from Delimiters import delimiters as delims
@@ -84,30 +95,6 @@ class Template(SettingsManager, Parser):
         
         ## The rest of this stuff is mainly for internal use
         'placeholderMarker':' placeholderTag.',
-        
-        'delimiters':{'includeDirective': [delims['includeDirective_gobbleWS'],
-                                           delims['includeDirective'],
-                                           ],
-                      'dataDirective': [delims['dataDirective_gobbleWS'],
-                                        delims['dataDirective'],
-                                        ],
-                      'macroDirective': [delims['macroDirective_gobbleWS'],
-                                         delims['macroDirective'],
-                                         ],
-                      'blockDirectiveStart': [delims['blockDirectiveStart_gobbleWS'],
-                                              delims['blockDirectiveStart'],
-                                              ],
-                      'lazyMacroCalls': [delims['lazyMacroCalls'],],
-                      'callMacro': [delims['callMacro'],],
-                      'callMacroArgs': delims['callMacroArgs'],
-                      'rawDirective': [delims['rawDirective'],],
-                      'comments': [delims['multiLineComment'],
-                                   delims['singleLineComment']],
-                      'slurp': [delims['slurpDirective_gobbleWS'],
-                                delims['slurpDirective'],
-                                ],
-                      },
-       
         'internalDelims':["<Cheetah>","</Cheetah>"],
         'tagTokenSeparator': '__@__',
         'indentationStep': ' '*4, # 4 spaces - used in the generated code
@@ -251,77 +238,74 @@ class Template(SettingsManager, Parser):
         
         placeholderProcessor =  PlaceholderProcessor(self)
         self.placeholderProcessor = placeholderProcessor
-        
+
+        commentDirective = CommentDirective(self)
+        slurpDirective = SlurpDirective(self)
+        rawDirective = RawDirective(self)
+        includeDirective = IncludeDirective(self)
+        blockDirective = BlockDirective(self)
+        dataDirective = DataDirective(self)
+        macroDirective = MacroDirective(self)
+        callMacroDirective = CallMacroDirective(self)
+        lazyMacroCall = LazyMacroCall(self)
+
         displayLogic = DisplayLogic(self)
         setDirective = SetDirective(self)        
         stopDirective = StopDirective(self)
         cacheDirective = CacheDirective(self)
         endCacheDirective = EndCacheDirective(self)
-
-        #raw
-        #comments
-        #set !
+        
         #data
-        #block
-        #macro
-        #include
-        #lazyMacroCalls
-        #explicitMacroCalls
-        #cache !
-        #slurp 3/4
         #displayLogic 3/4
-        #stop !
-        #placeholders !
         #unescape placeholders 1/2
-        
-        
+               
         self.updateSettings({
-            'preProcessors': [('rawDirectives',
-                               CodeGen.preProcessRawDirectives),
-                              ('comments',
-                               CodeGen.preProcessComments),
-                              ('setDirectives',
-                               setDirective.preProcess),
-                              ('dataDirectives',
-                               CodeGen.preProcessDataDirectives),
-                              ('blockDirectives',
-                               CodeGen.preProcessBlockDirectives),
-                              ('macroDirectives',
-                               CodeGen.preProcessMacroDirectives),
+            'preProcessors': [('rawDirective',
+                               rawDirective),
+                              ('comment',
+                               commentDirective),
+                              ('setDirective',
+                               setDirective),
+                              ('dataDirective',
+                               dataDirective),
+                              ('blockDirective',
+                               blockDirective),
+                              ('macroDirective',
+                               macroDirective),
 
                               # do includes before macro calls
-                              ('includeDirectives',
-                               CodeGen.preProcessIncludeDirectives),
+                              ('includeDirective',
+                               includeDirective),
 
-                              ('lazyMacroCalls',
-                               CodeGen.preProcessLazyMacroCalls),
-                              ('lazyMacroCalls', # get rid of this dbl-call
-                               CodeGen.preProcessLazyMacroCalls),
-                              ('explicitMacroCalls',
-                               CodeGen.preProcessExplicitMacroCalls),
+                              ('macroCall',
+                               lazyMacroCall),
+                              ('macroCall', # get rid of this dbl-call
+                               lazyMacroCall),
+                              ('CallMacro',
+                               callMacroDirective),
                               
-                              ('rawDirectives',
-                               CodeGen.preProcessRawDirectives),
+                              ('rawDirective',
+                               rawDirective),
                               ('comments',
-                               CodeGen.preProcessComments),
-                              ('setDirectives',
-                               setDirective.preProcess),
+                               commentDirective),
+                              ('setDirective',
+                               setDirective),
                               # + do includes after macro calls
-                              ('includeDirectives',
-                               CodeGen.preProcessIncludeDirectives),
+                              ('includeDirective',
+                               includeDirective),
                               
                               ('cacheDirective',
-                               cacheDirective.preProcess),
+                               cacheDirective),
                               ('endCacheDirective',
-                               endCacheDirective.preProcess),
-                              ('slurpDirectives',
-                               CodeGen.preProcessSlurpDirective),
+                               endCacheDirective),
+                              ('slurpDirective',
+                               slurpDirective),
                               ('display logic directives',
-                               displayLogic.preProcess),
+                               displayLogic),
                               ('stop directives',
-                               stopDirective.preProcess),
+                               stopDirective),
                               ('placeholders',
-                               placeholderProcessor.preProcess),
+                               placeholderProcessor),
                               ('unescapePlaceholders',
                                placeholderProcessor.unescapePlaceholders),
                               ],
@@ -424,12 +408,16 @@ class Template(SettingsManager, Parser):
             ## stage 1 - preProcessing of the template string ##
             stage = 1
             if debug: results['stage1'] = []
-            for preProcessor in settings['preProcessors']:
-                templateDef = preProcessor[1](self, templateDef)
+            for name, preProcessor in settings['preProcessors']:
+                if hasattr(preProcessor, 'preProcess'):
+                    templateDef = preProcessor.preProcess(templateDef)
+                else:
+                    templateDef = preProcessor(templateDef)
+                    
                 if isinstance(templateDef, RESTART):
                     # a parser restart might have been requested for #include's 
                     return self._codeGenerator(templateDef.data)
-                if debug: results['stage1'].append((preProcessor[0], templateDef))
+                if debug: results['stage1'].append((name, templateDef))
 
             ## stage 2 - generate the python code for each of the tokenized tags ##
             #  a) initialize this Template Obj for each processor

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SlurpDirective.py,v 1.1 2001/08/11 01:19:39 tavis_rudd Exp $
+# $Id: SlurpDirective.py,v 1.2 2001/08/11 04:57:39 tavis_rudd Exp $
 """SlurpDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/11 01:19:39 $
+Last Revision Date: $Date: 2001/08/11 04:57:39 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -38,7 +38,7 @@ class SlurpDirective(TagProcessor.TagProcessor):
         TagProcessor.TagProcessor.__init__(self,templateObj)
         self._delimRegexs = self.simpleDirectiveReList(r'slurp[\f\t ]*')
         
-    def preProcess(self, templateObj, templateDef):
+    def preProcess(self, templateDef):
         def subber(match):
             return ''
         
