@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: DummyTransaction.py,v 1.11 2002/10/01 17:52:02 tavis_rudd Exp $
+# $Id: DummyTransaction.py,v 1.12 2005/01/03 19:46:48 tavis_rudd Exp $
 
 """Provides dummy Transaction and Response classes is used by Cheetah in place
 of real Webware transactions when the Template obj is not used directly as a
@@ -8,29 +8,14 @@ Webware servlet.
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/08/30
-Last Revision Date: $Date: 2002/10/01 17:52:02 $
+Last Revision Date: $Date: 2005/01/03 19:46:48 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.11 $"[11:-2]
-
-##################################################
-## DEPENDENCIES
-
+__revision__ = "$Revision: 1.12 $"[11:-2]
 
 from StringIO import StringIO  # not cStringIO because of Unicode support, and some strange bug
-
-##################################################
-## CONSTANTS & GLOBALS
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
-
-##################################################
-## CLASSES
 
 class DummyResponse:
     

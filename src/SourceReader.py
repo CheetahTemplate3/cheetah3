@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SourceReader.py,v 1.6 2002/10/01 17:52:02 tavis_rudd Exp $
+# $Id: SourceReader.py,v 1.7 2005/01/03 19:43:21 tavis_rudd Exp $
 """SourceReader class for Cheetah's Parser and CodeGenerator
 
 Meta-Data
@@ -7,32 +7,17 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/10/01 17:52:02 $
+Last Revision Date: $Date: 2005/01/03 19:43:21 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.6 $"[11:-2]
-
-##################################################
-## DEPENDENCIES ##
+__revision__ = "$Revision: 1.7 $"[11:-2]
 
 import re
-# intra-package imports ...
-
-##################################################
-## CONSTANTS & GLOBALS ##
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
 
 EOLre = re.compile(r'[ \f\t]*(?:\r\n|\r|\n)')
 EOLZre = re.compile(r'(?:\r\n|\r|\n|\Z)')
-
-##################################################
-## CLASSES ##
 
 class Error(Exception):
     pass

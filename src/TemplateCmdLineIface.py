@@ -1,42 +1,28 @@
 #!/usr/bin/env python
-# $Id: TemplateCmdLineIface.py,v 1.11 2002/11/10 20:44:11 hierro Exp $
+# $Id: TemplateCmdLineIface.py,v 1.12 2005/01/03 19:44:54 tavis_rudd Exp $
 
 """Provides a command line interface to compiled Cheetah template modules.
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/12/06
-Last Revision Date: $Date: 2002/11/10 20:44:11 $
+Last Revision Date: $Date: 2005/01/03 19:44:54 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.11 $"[11:-2]
-
-##################################################
-## DEPENDENCIES
+__revision__ = "$Revision: 1.12 $"[11:-2]
 
 import sys
 import os
 import getopt
 import os.path
-
 try:
     from cPickle import load
 except ImportError:
     from pickle import load
 
-
-#intra-package imports ...
-from _properties import Version
-
-##################################################
-## GLOBALS & CONTANTS
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
+from Cheetah.Version import Version
 
 class Error(Exception):
     pass
