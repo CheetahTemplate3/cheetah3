@@ -78,7 +78,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 __author__ = "Steve Purcell"
 __email__ = "stephen_purcell at yahoo dot com"
-__revision__ = "$Revision: 1.7 $"[11:-2]
+__revision__ = "$Revision: 1.8 $"[11:-2]
 
 
 ##################################################
@@ -520,6 +520,7 @@ class StreamWrapper:
 
     def write(self, txt):
         self._streamOut.write(txt)
+        self._streamOut.flush()
     
     def writeln(self, *lines):
         for line in lines:
