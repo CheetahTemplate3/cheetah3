@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.49 2002/04/22 05:21:01 tavis_rudd Exp $
+# $Id: Parser.py,v 1.50 2002/04/24 06:19:41 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.49 $
+Version: $Revision: 1.50 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/04/22 05:21:01 $
+Last Revision Date: $Date: 2002/04/24 06:19:41 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.49 $"[11:-2]
+__revision__ = "$Revision: 1.50 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -992,7 +992,8 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             # intructions to the parser and compiler
             'breakpoint':self.eatBreakPoint,
             'compiler-settings':self.eatCompilerSettings,
-
+            'compiler':self.eatCompiler,
+            
             # misc
             'shBang': self.eatShbang,
             
@@ -1183,6 +1184,45 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.getWhiteSpace()
         shBang = self.readToEOL()
         self.addShBang(shBang.strip())
+        
+    def eatCompiler(self):
+        lineClearToStartToken = self.lineClearToStartToken()
+        endOfFirstLine = self.findEOL()
+        startPos = self.pos()
+        self.getDirectiveStartToken()
+        self.advance(len('compiler'))   # to end of 'compiler'
+        self.getWhiteSpace()
+               
+        settingName = self.getIdentifier()
+
+        if settingName.lower() == 'reset':
+            self.getExpression() # gobble whitespace & junk
+            self.closeDirective(lineClearToStartToken, endOfFirstLine)
+            self._initializeSettings()
+            self.configureParser()
+            return
+        
+        self.getWhiteSpace()
+        if self.peek() == '=':
+            self.advance()
+        else:
+            raise ParserError(self)
+        valueExpr = self.getExpression()
+        endPos = self.pos()
+        self.closeDirective(lineClearToStartToken, endOfFirstLine)
+
+        try:
+            self.setSetting(settingName, eval(valueExpr) )
+            self.configureParser()
+        except:
+            out = sys.stderr
+            print >> out, 'An error occurred while processing the following #compiler directive.'
+            print >> out, '-'*80
+            print >> out, self[startPos:endPos]
+            print >> out, '-'*80
+            print >> out, 'Please check the syntax of these settings.'
+            print >> out, 'A full Python exception traceback follows.'
+            raise
 
     def eatCompilerSettings(self):
         lineClearToStartToken = self.lineClearToStartToken()
