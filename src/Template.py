@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.9 2001/07/13 22:52:01 tavis_rudd Exp $
+# $Id: Template.py,v 1.10 2001/07/16 16:30:30 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.9 $
+Version: $Revision: 1.10 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/13 22:52:01 $
+Last Revision Date: $Date: 2001/07/16 16:30:30 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.9 $"[11:-2]
+__version__ = "$Revision: 1.10 $"[11:-2]
 
 
 ##################################################
@@ -264,6 +264,9 @@ class Template(SettingsManager):
         if not self._settings['keepCodeGeneratorResults']:
             self._codeGeneratorResults = {}       
 
+    ## make an alias
+    recompile = startServer
+    
     def _codeGenerator(self, templateDef):
         
         """parse the template definition, generate a python code string from it,
