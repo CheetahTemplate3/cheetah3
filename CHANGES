@@ -1,7 +1,6 @@
-Please initial your changes and a date for each release
+Please initial your changes and add a date for each release
 ================================================================================
 0.9.8 (not released yet)
-  - the docs directory (./docs/src/) is rapidly changing. (MO)
   - Added package ./src/Tools/ for contributed classes/functions/packages not
     necessary to run Cheetah.  The first such class is RecursiveNull.py by Ian
     Bicking.  Added package Cheetah.Tools to list in ./setup.py . (MO)
@@ -30,6 +29,8 @@ Please initial your changes and a date for each release
   - fixed a bug in the macro processing that prevented macros defined inside
     #includes from being visible at the top level (TR)
   - fixed a bug in the handling of the setting 'useAutocalling' (TR)
+  - fixed some bugs in the handling of macros (TR)
+  - completed the transition to nested template #includes (TR)
   - lots of changes in the docs (TR & MO)
 
  
