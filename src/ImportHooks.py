@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.17 2002/08/09 02:39:33 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.18 2002/08/09 03:07:00 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.17 $
+Version: $Revision: 1.18 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/08/09 02:39:33 $
+Last Revision Date: $Date: 2002/08/09 03:07:00 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.17 $"[11:-2]
+__revision__ = "$Revision: 1.18 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -105,9 +105,11 @@ class CheetahDirOwner(DirOwner):
                 __file__ = tmplPath
             co = compile(code+'\n', __file__, 'exec')
             
-            
             mod = newmod(name)
             mod.__file__ = co.co_filename
+            if _cacheDir:
+                mod.__orig_file__ = tmplPath # @@TR: this is used in the WebKit
+                                             # filemonitoring code
             mod.__co__ = co
             self._releaseLock()            
             return mod
