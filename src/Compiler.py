@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.41 2002/07/31 19:15:24 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.42 2002/08/21 18:49:06 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.41 $
+Version: $Revision: 1.42 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/07/31 19:15:24 $
+Last Revision Date: $Date: 2002/08/21 18:49:06 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.41 $"[11:-2]
+__revision__ = "$Revision: 1.42 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -350,9 +350,13 @@ class MethodCompiler(SettingsManager, GenUtils):
                strConst.count('\n') < self.setting('reprNewlineThreshold'):
                 self.addWriteChunk( repr(strConst).replace('\\012','\\n'))
             else:
-                self.addWriteChunk(
-                    "'''" + strConst.replace('\\','\\\\').replace("'''","'\'\'\'")
-                    + "'''" )
+                strConst = strConst.replace('\\','\\\\').replace("'''","'\'\'\'")
+                if strConst[0] == "'":
+                    strConst = '\\' + strConst
+                if strConst[-1] == "'":
+                    strConst = strConst[:-1] + '\\' + strConst[-1]
+                    
+                self.addWriteChunk("'''" + strConst + "'''" )
 
     def delLeadingWS(self):
         if self._pendingStrConstChunks:
@@ -656,7 +660,8 @@ class ClassCompiler(SettingsManager, GenUtils):
             self.addChunk('if exists(self._filePath) and ' +
                           'getmtime(self._filePath) > self._fileMtime:')
             self.indent()
-            self.addChunk('self.compile(file=self._filePath)')
+            self.addChunk('self.compile(file=self._filePath, moduleName='
+                          +className + ')')
             self.addChunk(
                 'write(getattr(self, self._mainCheetahMethod_for_' + self._className +
                 ')(trans=trans))')            
