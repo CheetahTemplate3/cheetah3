@@ -13,6 +13,12 @@ release
   - changed the exceptions in _namemapper.c from the old string exceptions
     to proper exception objects (TR)
   - first portion of Developers' Guide written (MO)
+  - implemented the extended #extends directive, which does automatic importing
+    (MO,TR)
+  - added some new testcases for the extended #extends directive (TR)
+  - lots of work on the Users' Guide (MO)
+  - implemented and tested an import hook for .tmpl files (TR):
+      import MyTemplate  # will compile and import MyTemplate.tmpl
 
 0.9.12 (April 3, 2002)
    - no code changes from beta 2
