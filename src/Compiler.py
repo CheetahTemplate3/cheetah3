@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.2 2001/07/11 21:42:11 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.3 2001/07/16 03:43:28 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/11 21:42:11 $
+Last Revision Date: $Date: 2001/07/16 03:43:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -64,7 +64,7 @@ def wrapTemplateCode(templateExt, name):
     
     if parentTemplate:
         parentServlet = parentTemplate.split('.')[-1]
-        servletCode = "templateExt = '''" + templateExt
+        servletCode = "templateExt = r'''" + templateExt
         servletCode += """'''
 from %(parentModule)s import %(parentServlet)s
 
@@ -78,7 +78,7 @@ class %(name)s(%(parentServlet)s):
         'name': name
         }
     else:
-        servletCode = "templateExt = '''" + templateExt
+        servletCode = "templateExt = r'''" + templateExt
         servletCode += """'''
 from Cheetah.Servlet import TemplateServlet
 
