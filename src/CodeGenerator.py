@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.6 2001/06/18 22:12:09 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.7 2001/07/11 21:36:51 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/18 22:12:09 $
+Last Revision Date: $Date: 2001/07/11 21:36:51 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -503,7 +503,8 @@ def preProcessIncludeDirectives(templateObj, templateDef):
         validateIncludeDirective(templateObj, args)
         includeString = match.group(1).strip()        
         raw = False
-        autoUpdate = False
+        autoUpdate = False #True
+        #@@ autoUpdate behaviour needs to be implemented
         
         if args.split()[0] == 'raw':
             raw = True
@@ -542,7 +543,7 @@ def preProcessIncludeDirectives(templateObj, templateDef):
         templateDef = RE.sub(subber, templateDef)
         
     if RESTART[0]:
-        return (Template.RESTART, templateDef)
+        return Template.RESTART(templateDef)
     else:
         return templateDef
 
@@ -618,7 +619,6 @@ def removeEmptyStrings(templateObj, generatedCode):
     tags"""
     
     generatedCode = generatedCode.replace(", '''''', ",', ')
-    generatedCode = generatedCode.replace("''', '''",'')
     generatedCode = re.sub(r"\s*outputList.extend(\['''''',\])\n", '\n',
                            generatedCode)
     return generatedCode
