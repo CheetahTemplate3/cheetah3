@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.13 2001/08/02 05:48:16 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.14 2001/08/02 06:16:17 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.13 $
+Version: $Revision: 1.14 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/02 05:48:16 $
+Last Revision Date: $Date: 2001/08/02 06:16:17 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.13 $"[11:-2]
+__version__ = "$Revision: 1.14 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -36,18 +36,14 @@ from Validators import \
 
 from Delimiters import delimiters
 from Components import Component
-import Template
+#import Template #NOTE THIS IS IMPORTED BELOW TO AVOID CIRCULAR IMPORTS
 from Utilities import lineNumFromPos
+
 ##################################################
 ## CONSTANTS & GLOBALS ##
 
 True = (1==1)
 False = (0==1)
-
-# cacheType's for $placeholders
-NO_CACHE = 0
-STATIC_CACHE = 1
-TIMED_REFRESH_CACHE = 2
 
 ##################################################
 ## CLASSES ##
@@ -412,6 +408,8 @@ def preProcessRawDirectives(templateObj, templateDef):
         templateDef = RE.sub(subber, templateDef)
     return templateDef
 
+
+import Template                         # import it here to avoid circ. imports
 def preProcessIncludeDirectives(templateObj, templateDef):
     """replace any #include statements with their substitution value.  This method
     can handle includes from file (absolute paths only at the moment) and from
