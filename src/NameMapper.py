@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.24 2002/11/14 06:07:18 hierro Exp $
+# $Id: NameMapper.py,v 1.25 2002/11/28 22:20:50 tavis_rudd Exp $
 
 """This module implements Cheetah's optional NameMapper syntax.
 
@@ -137,15 +137,15 @@ Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@damnsimple.com>,
          Chuck Esterbrook <echuck@mindspring.com>,
-     Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.24 $
+         Mike Orr <iron@mso.oz.net>
+Version: $Revision: 1.25 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2002/11/14 06:07:18 $
+Last Revision Date: $Date: 2002/11/28 22:20:50 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>" +\
          "\nMike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.24 $"[11:-2]
+__revision__ = "$Revision: 1.25 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -173,6 +173,11 @@ C_VERSION = False # Has _namemapper.c overridden functions in this module?
 
 ##################################################
 ## FUNCTIONS
+                  
+## N.B. An attempt is made at the end of this module to import C versions of
+## these functions.  If _namemapper.c has been compiled succesfully and the
+## import goes smoothly, the Python versions defined here will be replaced with
+## the C versions.
 
 class NotFound(LookupError):
     pass
