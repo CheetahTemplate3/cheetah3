@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.24 2002/03/13 03:37:48 hierro Exp $
+# $Id: CheetahCompile.py,v 1.25 2002/03/13 18:36:56 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.24 $
+Version: $Revision: 1.25 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/03/13 03:37:48 $
+Last Revision Date: $Date: 2002/03/13 18:36:56 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.24 $"[11:-2]
+__revision__ = "$Revision: 1.25 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -132,6 +132,9 @@ class CheetahCompile:
                 self._generate(fileName)
 
     def _processFile(self, fileName):
+        if self.VERBOSE:
+            print 'Compiling %s ' % (srcFile)
+        
         srcFile = fileName
         fileNameMinusExt = os.path.splitext(fileName)[0]
         className = os.path.split(fileNameMinusExt)[1]        
@@ -144,14 +147,14 @@ class CheetahCompile:
 
             if self.MAKE_BACKUPS and os.path.exists(outputModuleFilename):
                 if self.VERBOSE:
-                    print 'Backing up %s before compiling %s' % (srcFile,
-                                                                 outputModuleFilename)
+                    print 'Backing up %s before saving new version of %s' % (
+                        outputModuleFilename, srcFile )
                 
                 shutil.copyfile(outputModuleFilename,
                                 fileNameMinusExt + self.SERVLET_BACKUP_EXT)
             if self.VERBOSE:
-                print 'Compiling %s -> %s' % (srcFile,
-                                              className + self.SERVLET_EXTENSION)
+                print 'Saving compiled version of %s -> %s' % (
+                    srcFile, className + self.SERVLET_EXTENSION)
                 
             fp = open(outputModuleFilename,'w')
             fp.write(pyCode)
