@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.10 2001/11/25 03:05:47 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.11 2001/11/25 03:29:22 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/25 03:05:47 $
+Last Revision Date: $Date: 2001/11/25 03:29:22 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.10 $"[11:-2]
+__version__ = "$Revision: 1.11 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -105,23 +105,21 @@ class CheetahCompile:
                 if extension == self.CHEETAH_EXTENSION:
                     self.processFile(file)
         else:
-            baseName = os.path.splitext(fileName)[0]
-            if not re.match(r'[a-zA-Z_][a-zA-Z_0-9]*$',baseName):
-                raise Error(
-                    "The filename %s contains invalid characters.  It must" +
-                    " be named according to the same rules as Python modules."
-                    % fileName)
+            self.compileFile(fileName)
             
-            self.compileFile(baseName)
-
-            
-    def compileFile(self, fileNameMinusExt):
+    def compileFile(self, fileName):
         """Compile an single Cheetah file.  """
 
+        srcFile = fileName
+        fileNameMinusExt = os.path.splitext(fileName)[0]
+        className = os.path.split(fileNameMinusExt)[1]
+        if not re.match(r'[a-zA-Z_][a-zA-Z_0-9]*$', className):
+            raise Error(
+                "The filename %s contains invalid characters.  It must" \
+                " be named according to the same rules as Python modules."
+                % fileName)
 
         self.compiledFiles.append(fileNameMinusExt)
-        srcFile = fileNameMinusExt + self.CHEETAH_EXTENSION
-        className = os.path.split(fileNameMinusExt)[1]
         genCode = str(Compiler(file=srcFile, moduleName=className,
                                mainClassName=className))
 
