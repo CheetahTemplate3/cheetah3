@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.3 2001/07/11 22:00:48 tavis_rudd Exp $
+# $Id: Test.py,v 1.4 2001/07/12 01:44:19 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/11 22:00:48 $
+Last Revision Date: $Date: 2001/07/12 01:44:19 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 
 ##################################################
@@ -83,7 +83,7 @@ class VerifyTemplateOutput(AbstractTestCase):
 
         report = '''
 Template output mismatch
-Test: %(testName)s
+Test Name: %(testName)s
 
     Input Template =
 %(template)s%(end)s
@@ -170,7 +170,8 @@ $func $func. $func(). $func(4). $func('x'). $func("x"). $func("x"*2). $func(arg=
 $meth $meth. $meth(). $meth(5). $meth('y'). $meth("y"). $meth("y"*2). $meth(arg="y"). $meth(arg='y').
 $obj $obj.
 $obj.meth $obj.meth. $obj.meth(). $obj.meth(6).
-$obj.meth('z'). $obj.meth("z"). $obj.meth("z"*2). $obj.meth(arg="z"). $obj.meth(arg='z').""",
+$obj.meth('z'). $obj.meth("z"). $obj.meth("z"*2). $obj.meth(arg="z"). $obj.meth(arg='z').
+$func, $numTwo, ${func}, $numOne""",
 
      """
 $ $500 $. $var
@@ -182,7 +183,8 @@ Scooby Scooby. Scooby. 4. x. x. xx. x. x.
 doo doo. doo. 5. y. y. yy. y. y.
 object object.
 arff arff. arff. 6.
-z. z. zz. z. z."""
+z. z. zz. z. z.
+Scooby, 2, Scooby, 1"""
               ],
 
     ]
@@ -336,7 +338,7 @@ blockTests = [
      "this is a\ntest block\n",],
 
     ['simple #block - with whitespace - should gobble',
-     "  #block testBlock\nthis is a\ntest block\n  #end block testBlock\n",
+     "  #block testBlock\nthis is a\ntest block\n#end block testBlock  \n",
      "this is a\ntest block\n",],
 
     ['simple #block - with explicit closures',
@@ -522,6 +524,7 @@ bloggs
 posixCases += callMacroTests
 
 
+
 #extendTests = [
 #    ['simple #extend - with no whitespace',
 #     "#extend Cheetah.Templates.SkeletonPage",
@@ -531,23 +534,8 @@ posixCases += callMacroTests
 # @@ at the moment the #entend directive is only caught by Servlet.extendTemplate()
 
 
-if 1:
+if 0:
     miscBugCases = [
-	    ['bug: failure with comma right after ${foo} - jeff johnson',
-	     """#for name, last in $nameList
-<li>${name}, $last
-#end for""",
-	     """<li>john, doe
-<li>jane, smith
-"""],
-
-	    ['bug: variation on: failure with comma right after ${foo} - jeff johnson',
-	     """#for item in $list
-<li>${item.index}, $item.numOne
-#end for""",
-	     """<li>0, 1
-<li>1, 1
-"""],
 	    ]
     posixCases += miscBugCases
 
@@ -556,6 +544,11 @@ windowsCases = deepcopy(posixCases)
 for case in windowsCases:
     case[1] = case[1].replace("\n","\r\n")
     case[2] = case[2].replace("\n","\r\n")
+
+macintoshCases = deepcopy(posixCases)
+for case in macintoshCases:
+    case[1] = case[1].replace("\n","\r")
+    case[2] = case[2].replace("\n","\r")
 
 # the dataDirectiveTests must be added after the windows line ending conversion
 # as \r\n appears to be an invalid line ending for python code chunks that are
@@ -577,8 +570,8 @@ posixCases += dataDirectiveTests
 suiteData = [
     ['posixCases', posixCases],
     ['windowsCases', windowsCases],
+    ['macintoshCases', macintoshCases],
     ]
-
 
 def buildTestSuite(suiteTitle, testCasesData):
     suite = unittest.TestSuite()
