@@ -10,20 +10,15 @@ Cheetah TODO list
 
 Requirements for 1.0
 =========================================================================
-- NameMapper attributes before keys, both Python and C versions.  NM should
-  look for a key first, then an attribute.  But if (1) this is the first
-  component after $, and (2) isinstance(OBJ, dictTypes), *ignore the
-  attributes* to prevent matching methods like .update, .keys, etc.
-  "dictTypes" is a new compiler setting with the default value 
-  (types.DictType, UserDict).  (TR)
+- Modify _namemapper.c to reflect new changes in NameMapper.py: ignore
+  dictionary attributes/methods for the first chunk in a searchList
+  lookup.  (TR)
 - update User's Guide about changes to SkeletonPage (no more #settings,
   etc) (TR)
 - Decide on Cheetah's 1.0 license and update the Users' Guide. (TR)
 - Add an example in the distribution of a simplified SkeletonPage
   that used #block but does not have fancy esoteric methods like
   style stuff. (MO)
-- fix the --stdout option of CheetahWrapper so that it only prints
-  the generated python code.(TR)
 
 
 Other TODO Items
