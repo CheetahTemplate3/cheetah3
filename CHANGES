@@ -31,6 +31,8 @@ release
     This was why the Cheetah test suite was failing on Python < 2.2! (MO)
   - SettingsManager._createConfigFile(): bugfix in default argument. (MO)
   - $hasVar('varName') is an alias for $varExists('varName').  (MO)
+  - $_fileDirName and $_filePath are now None rather than missing if
+    the template definition did not come from a named file.  (MO)
 
 
 0.9.14 (July 14, 2002)
