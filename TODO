@@ -10,6 +10,12 @@ Cheetah TODO list
 
 Requirements for 1.0
 =========================================================================
+- NameMapper attributes before keys, both Python and C versions.  NM should
+  look for a key first, then an attribute.  But if (1) this is the first
+  component after $, and (2) isinstance(OBJ, dictTypes), *ignore the
+  attributes* to prevent matching methods like .update, .keys, etc.
+  "dictTypes" is a new compiler setting with the default value 
+  (types.DictType, UserDict).  (TR)
 - update User's Guide about changes to SkeletonPage (no more #settings,
   etc) (TR)
 - Decide on Cheetah's 1.0 license and update the Users' Guide. (TR)
