@@ -6,7 +6,7 @@
 \label{howWorks.templateClass}
 
 The heart of Cheetah is the \code{Template} class in the \code{Cheetah.Template}
-module. It serves two purposes. First, its constructor method accepts a
+module. It serves two purposes. First, its constructor accepts a
 \code{template definition} in a string or a file (filename or file object).
 Cheetah compiles the template definition into a Python class (the 'generated
 class'). Second, it is used as the base class for the generated classes.
@@ -23,7 +23,7 @@ boilerplate code to make a complete module definition.
 The core method of a Cheetah generated class is \code{respond()}, as this is the
 core method of Webware servlets. When this method is called, the Cheetah code in
 the template is executed and the output is returned. For convenience, Cheetah
-makes the \code{__str__} method an alias to \code{respond()}. Thus,
+makes the \code{\_\_str\_\_} method an alias to \code{respond()}. Thus,
 \code{``print myTemplateObj''} or \code{``print Template(sourceString)''} will
 print the output of the template.
 
@@ -128,6 +128,48 @@ Here are some examples of the various ways to create a template object:
 \item{\code{templateObj = Template(file=f, searchList=[dict, obj])}}
      Same with a file object.
 \end{description}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Converting .tmpl files into .py files}
+\label{howWorks.tmpl2py}
+\label{howWorks.cheetah-compile}
+
+If your application requires only a few short template definitions, you can
+just put them inline in your modules, and create Template objects like the
+examples in section \ref{gettingStarted.tutorial}.  But if your application
+has large templates or many templates, you will find it more convenient to
+put each template definition in a separate *.tmpl file, and use the
+\code{cheetah-compile} program to convert it into a *.py file; that is, a
+Python module named after the template, containing the generated class
+which is also named after the template.  
+
+\code{cheetah-compile} is a small shell script parses template definition
+files and creates equivalent Python modules.  On Unix systems, it is installed
+into a system directory like \code{/usr/local/bin}, so you can use it without
+specifying the absolute path of the script.  On Windows systems, you must
+specify the full path (\code{<cheetahRoot>/bin/cheetah-compile}). Type
+``\code{cheetah-compile}'' from the command line after installing Cheetah to
+get usage information.  The most common usage is ``\code{cheetah-compile -R}'',
+which will convert all the *.tmpl files in the current directory
+and its subdirectories.
+
+\em{ If you run \code{cheetah-compile} on a file FILENAME.tmpl, it will
+overwrite FILENAME.py if it exists in the same directory, no matter what
+FILENAME.py contains.} For this reason, you should make changes to the
+\code{.tmpl} version of the template rather than the \code{.py} version.  Any
+\code{.py servlet files} that are about to be overwritten will are
+automatically backed up with the extension \code{.py\_bak}.
+
+For the same reason, if your template requires custom Python methods or
+other Python code, don't put it in the FILENAME.py file.  Instead, put
+it in a separate base class and use the \code{#extends} directive in the
+template definition to indicate the superclass.  Or put the Python code
+in the calling routine (the routine that instantiates and uses the template
+object).
+
+%% @@MSO: Not using the term '.tmpl/.py servlet files' here because they
+%% aren't necessarily Webware servlets.
 
 % Local Variables:
 % TeX-master: "users_guide"

@@ -12,25 +12,29 @@ operating system that Python 2.0 runs on.
 \subsection{Installation}
 \label{gettingStarted.install}
 
-To install Cheetah for a single user:
-\begin{enumerate}
-\item copy the 'src' sub-directory  to a location that is in the user's
-     PYTHONPATH and rename it as 'Cheetah'.
-\end{enumerate}
-
 To install Cheetah for system-wide use:
 \begin{enumerate}
-\item on POSIX systems (AIX, Solaris, Linux, IRIX, etc.) become the 'root' user
-     and run: python setup.py install
-     
-\item On non-POSIX systems, such as Windows NT, login as an administrator and
-     type this at the command prompt:  python setup.py install
+\item Login as a user with privileges to install Python packages.  On POSIX
+     systems (AIX, Solaris, Linux, IRIX, etc.), the command is normally
+     'su root'.  On non-POSIX systems such as Windows NT, login as an 
+     administrator.
+
+\item Run \code{python setup.py install} at the command prompt.
+
+\item The setup program will install the program {\bf cheetah-compile} to the
+     "bin/" directory of your Python distribution.  If that directory is not
+     in your users' normal path, copy or symlink it to a directory that is in
+     their path.  
 \end{enumerate}
 
+%% @@MO: What about cheetah-compile on non-POSIX systems? 
 
-On POSIX systems, the system-wide installation will also install the Cheetah's
-command-line compiler program, cheetah-compile, to the "bin/" directory of your
-Python distribution.  
+We do not currently have instructions for non-privileged users installing
+Cheetah in their home directory.  It's basically a matter of copying the 'src'
+subdirectory to a location on your PYTHONPATH and renaming it as 'Cheetah'.
+However, the C module '\_namemapper.c' must be compiled, and the script
+'cheetah-compile' must be generated and placed in '~/bin'.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Testing your installation}
@@ -93,16 +97,63 @@ user input.  The remaining lines are Python output.
 Hello World!
 </BODY>
 </HTML>
->>> print templateObj  # templateObj can be printed as many times as you need
- 
+>>> print templateObj    # print it as many times as you want
+      [ ... identical output not shown ... ]
+>>> nameSpace['title'] = 'Example #2'
+>>> nameSpace['contents'] = 'Hiya Planet Earth!'
+>>> print templateObj   # Now with different plug-in values.
+      [ ... the output it the same as the first example above ... ]
 <HTML>
-<HEAD><TITLE>Hello World Example</TITLE></HEAD>
+<HEAD><TITLE>Example #2</TITLE></HEAD>
 <BODY>
-Hello World!
+Hiya Planet Earth!
 </BODY>
 </HTML>
 
 \end{verbatim}
+
+Since Cheetah is extremely flexible, you can achieve the same result this
+way:  
+
+\begin{verbatim}
+>>> templateObj2 = Template(templateDef)
+>>> templateObj2.title = 'Hello World Example!'
+>>> templateObj2.contents = 'Hello World'
+>>> print templateObj2
+      [ ... the output is the same as the first example above ... ]
+>>> templateObj2.title = 'Example #2'
+>>> templateObj2.contents = 'Hello World!'
+>>> print templateObj2
+     [ ... same as Example #2 above ... ]
+\end{verbatim}
+
+Or this way:
+
+\begin{verbatim}
+>>> class Template3(Template):
+>>>     title = 'Hello World Example!'
+>>>     contents = 'Hello World!'
+>>> templateObj3 = Template3(templateDef)
+>>> print templateObj3
+     [ ... you get the picture ... ]
+\end{verbatim}
+
+The template definition can also come from a file instead of a string,
+as we will see in section \ref{howWorks.constructing}.
+
+The above is all fine for short templates, but for long templates or
+for an application that depends on many templates in a hierarchy, it's
+easier to store the templates in separate *.tmpl files and use the
+{\bf cheetah-compile} program to convert them into Python classes in
+their own modules.  This will be covered in section ??.  
+
+As an appetizer, we'll just briefly mention that you can store constant values
+{\em inside} the template definition, and they will be converted to attributes
+in the generated class.  You can also create methods the same way.
+You can even use inheritance to arrange your templates in a hierarchy,
+with more specific templates overriding certain parts of more general
+templates (e.g., a "page" template overriding a sidebar in a "section"
+template).
 
 % Local Variables:
 % TeX-master: "users_guide"

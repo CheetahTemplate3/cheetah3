@@ -46,35 +46,15 @@ servlet file that is converted automatically, or semi-automatically, into a
   servlet files} hides alot of extraneous details and is recommended for Cheetah
 users who don't have a deep understanding of Python.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Converting .tmpl files into .py files}
-\label{webware.tmpl.converting}
+Section \ref{howWorks.tmpl2py} discussed how to convert .tmpl files to
+.py files using the \code{cheetah-compile} command.
 
-There are two ways to convert \code{.tmpl servlet files} into \code{.py servlet
-  files}.  You can let Cheetah's Webware plugin do it automatically when a
-\code{.tmpl servlet file} is requested by a browser. Or you can generate the
-\code{.py servlet files} using \code{cheetah-compile}, a small script that is
-installed with Cheetah.
-
-Cheetah's Webware plugin is being re-designed at the moment.  The redesign will
-be complete for the 0.9.9 release.  Until then use the \code{cheetah-compile}
-script.
-
-\code{cheetah-compile} parses the template definitions written in files with the
-.tmpl extension and generates a \code{.py servlet file} for each \code{.tmpl
-  servlet file}.  On Unix systems, it is installed into a system directory like
-\code{/usr/local/bin}, so you can use it without specifying the absolute path of
-the script.  On Windows systems, you need to specify the full path
-(\code{<cheetahRoot>/bin/cheetah-compile}). Type ``\code{cheetah-compile}'' from the
-command line after installing Cheetah to get usage information.  The most common
-usage is ``\code{cheetah-compile -R}'', which will convert all the \code{.tmpl
-  servlet file} in the current directory and its subdirectories.
-
-\code{cheetah-compile} overwrites \code{.py servlet files} with the same
-basename as \code{.tmpl servlet files} in a directory. For this reason, you
-should make changes to the \code{.tmpl} version of the template rather than the
-\code{.py} version.  Any \code{.py servlet files} that are about to be
-overwritten will are automatically backed up with the extension \code{.py\_bak}.
+Cheetah has a Webware plugin that automatically converts a
+\code{.tmpl servlet file} into a \code{.py servlet
+  file} when the 
+\code{.tmpl servlet file} is requested by a browser.  However, that plugin
+is currently unavailable because it's being redesigned.  Until the 0.9.9
+release of Cheetah, use \code{cheetah-compile} instead.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
