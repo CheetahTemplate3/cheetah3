@@ -4,7 +4,7 @@ DOCNAME=users_guide
 MKHOWTO=$(PYTHONSRC)/Doc/tools/mkhowto
 MAIN_TEX_FILE= users_guide.tex
 
-all: ps pdf html text
+all: ps pdf html htmlMultiPage text
 
 pdf:
 	$(MKHOWTO) --pdf $(MAIN_TEX_FILE)
@@ -18,6 +18,13 @@ html:
 	$(MKHOWTO) --html --split 1 --iconserver . $(MAIN_TEX_FILE)
 	-rm -R ../$(DOCNAME)_html
 	mv $(DOCNAME) ../$(DOCNAME)_html
+
+htmlMultiPage:
+        -rm -rf $(DOCNAME)
+        $(MKHOWTO) --html --iconserver . $(MAIN_TEX_FILE)
+        -rm -R ../$(DOCNAME)_html_multipage
+        mv $(DOCNAME) ../$(DOCNAME)_html_multipage
+
 
 text:
 	$(MKHOWTO) --text $(MAIN_TEX_FILE)
