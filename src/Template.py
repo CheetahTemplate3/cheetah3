@@ -1,21 +1,19 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.1 2001/06/13 03:50:39 tavis_rudd Exp $
+# $Id: Template.py,v 1.2 2001/06/18 17:26:01 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
 Meta-Data
 ================================================================================
-Author: Tavis Rudd <tavis@calrudd.com>,
-        with code/advice from Ian Bicking, Mike Orr, Chuck Esterbrook and others
-        It was inspired by Chuck's RNV module <echuck@mindspring.com>
+Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/13 03:50:39 $
+Last Revision Date: $Date: 2001/06/18 17:26:01 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 
 ##################################################
@@ -23,6 +21,7 @@ __version__ = "$Revision: 1.1 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import sys                        # used in the error handling code
+import re                         # used to define the internal delims regex
 import new                        # used to bind the compiled template code
 import types                      # used in the mergeNewTemplateData method
 import time                       # used in the cache refresh code
@@ -30,9 +29,11 @@ from time import time as currentTime # used in the cache refresh code
 
 # intra-package imports ...
 from SettingsManager import SettingsManager
-from NameMapper import valueForName, determineNameType
+from NameMapper import valueForName
 import NameMapper
+from SearchList import SearchList
 import CodeGenerator as CodeGen
+from PlaceholderProcessor import PlaceholderProcessor
 import ErrorHandlers
 from Delimeters import delimeters as delims
 from Utilities import \
@@ -46,29 +47,6 @@ from Utilities import \
 True = (1==1)
 False = (0==1)
 
-EVAL_TAG_TYPE = 0
-EXEC_TAG_TYPE = 1
-
-
-# text descriptions of what each stage in TemplateServer._codeGenerator() does
-stageDescriptions = {
-1:"""the raw template is filtered using
-the pre-processors specified in the TemplateServer settings.""",
-2:"""the core tags ($, #set, #if, #for,
-<%...%>, and <%=...%>, etc.) are converted to the internal tag format.""",
-3:"""the template is filtered for the 2nd
-time using the post-processors specified in the TemplateServer settings.""",
-4:"""the tags that have been translated to
-the internal format are converted into chunks of python code.""",
-5:"""the chunks of python code from stage 4
-are wrapped up in a code string of a function definition.""",
-6:"""the generated code string is filtered
-using the filters defined in the TemplateServer settings.""",
-7:"""the generated code string is executed
-to produce a function that will be bound as a method of the TemplateServer.""",
-}
-
-
 ##################################################
 ## CLASSES ##
 
@@ -81,21 +59,160 @@ class NoDefault:
 class Template(SettingsManager):
     """The core template engine: parses, compiles, and serves templates."""
 
+    placeholderProcessor =  PlaceholderProcessor()
+    displayLogicProcessor = CodeGen.DisplayLogicProcessor()
+    setDirectiveProcessor = CodeGen.SetDirectiveProcessor()        
+    cacheDirectiveProcessor = CodeGen.CacheDirectiveProcessor()
+    endCacheDirectiveProcessor = CodeGen.EndCacheDirectiveProcessor()
+
+    _settings = {
+        'delayedStart': False,            
+        'plugins':[],
+        'varNotFound_handler': CodeGen.varNotFound_echo,
+        'debug': False,
+        'keepCodeGeneratorResults': False,
+        'blockMarkerStart':['<!-- START BLOCK: ',' -->'],
+        'blockMarkerEnd':['<!-- END BLOCK: ',' -->'],
+        'includeBlockMarkers': False,
+
+
+        'delimeters':{'includeDirective': [delims['includeDirective_gobbleWS'],
+                                            delims['includeDirective'],
+                                            ],
+                         'dataDirective': [delims['dataDirective_gobbleWS'],
+                                           delims['dataDirective'],
+                                           ],
+                         'macroDirective': [delims['macroDirective'],
+                                            ],
+                         'blockDirectiveStart': [delims['blockDirectiveStart_gobbleWS'],
+                                                     delims['blockDirectiveStart'],
+                                            ],
+                         'lazyMacroCalls': [delims['lazyMacroCalls'],],
+                         'callMacro': [delims['callMacro'],],
+                         'callMacroArgs': delims['callMacroArgs'],
+                         'rawDirective': [delims['rawDirective'],],
+                         'comments': [delims['multiLineComment'],
+                                      delims['singleLineComment']],
+                         'slurp': [delims['slurpDirective_gobbleWS'],
+                                   delims['slurpDirective'],
+                                   ],
+                         },            
+        'internalDelims':["<Cheetah>","</Cheetah>"],
+        'internalDelimsRE': re.compile(r"<Cheetah>(.+?)</Cheetah>",
+                                     re.DOTALL),
+        'tagTokenSeparator': '__@__',
+        'indentationStep': ' '*4, # 4 spaces - used in the generated code
+        'initialIndentLevel': 2, 
+            
+        'preProcessors': [('rawDirectives',
+                           CodeGen.preProcessRawDirectives),
+                          ('comments',
+                           CodeGen.preProcessComments),
+                          ('setDirectives',
+                           setDirectiveProcessor.preProcess),
+                          ('dataDirectives',
+                           CodeGen.preProcessDataDirectives),
+                          ('blockDirectives',
+                           CodeGen.preProcessBlockDirectives),
+                          ('macroDirectives',
+                           CodeGen.preProcessMacroDirectives),
+                          ('lazyMacroCalls',
+                           CodeGen.preProcessLazyMacroCalls),
+                          ('explicitMacroCalls',
+                           CodeGen.preProcessExplicitMacroCalls),
+                          ('comments',
+                           CodeGen.preProcessComments),
+                          ('rawDirectives',
+                           CodeGen.preProcessRawDirectives),
+                          ('setDirectives',
+                           setDirectiveProcessor.preProcess),
+                          ('includeDirectives',
+                           CodeGen.preProcessIncludeDirectives),
+                          ('cacheDirective',
+                           cacheDirectiveProcessor.preProcess),
+                          ('endCacheDirective',
+                           endCacheDirectiveProcessor.preProcess),
+                          ('slurpDirectives',
+                           CodeGen.preProcessSlurpDirective),
+                          ('display logic directives',
+                           displayLogicProcessor.preProcess),
+                          ('placeholders',
+                           placeholderProcessor.preProcess),
+                          ('unescapePlaceholders',
+                           lambda obj, TD: TD.replace(r'\$','$') ),
+                          ],
+                 
+        'tagProcessors':{'placeholders':placeholderProcessor,
+                         'displayLogic':displayLogicProcessor,
+                         'setDirective':setDirectiveProcessor,
+                         'cacheDirective':cacheDirectiveProcessor,
+                         'endCacheDirective':endCacheDirectiveProcessor,
+                         },
+            
+                    
+        'generatedCodeFilters':[('removeEmptyStrings',
+                                 CodeGen.removeEmptyStrings),
+                                ('addPerResponseCode',
+                                 CodeGen.addPerResponseCode),
+                                ],
+                    
+        'masterErrorHandler':ErrorHandlers.CodeGeneratorErrorHandler,
+        'responseErrorHandler': ErrorHandlers.ResponseErrorHandler,
+
+        'stages':{1:{'title':'pre-processing',
+                     'description':"the raw template is filtered using\n" + \
+                     "the pre-processors specified in the TemplateServer settings.",
+                     'errorHandler':ErrorHandlers.Stage1ErrorHandler,
+                     },
+                  2:{'title':'convert-tags-to-code',
+                     'description':"the tags that have been translated to\n" + \
+                     "the internal format are converted into chunks of python code.",
+                     'errorHandler':ErrorHandlers.Stage2ErrorHandler,
+                     },
+                  3:{'title':'wrap-code-in-function-definition',
+                     'description':"the chunks of python code from stage 2\n" + \
+                     "are wrapped up in a code string of a function definition.",
+                     'errorHandler':ErrorHandlers.Stage3ErrorHandler,
+                     },
+                  4:{'title':'filter-generated-code',
+                     'description':"the generated code string is filtered\n" + \
+                     "using the filters defined in the TemplateServer settings.",
+                     'errorHandler':ErrorHandlers.Stage4ErrorHandler,
+                     },
+                  5:{'title':'execute-generated-code',
+                     'description':"the generated code string is executed" + \
+                     "to produce a function that will be bound as a method" + \
+                     "of the TemplateServer.",
+                     'errorHandler':ErrorHandlers.Stage5ErrorHandler,
+                     },
+                  },
+
+        }
+
     def __init__(self, templateDef, *searchList, **kw):
         """setup the namespace search list, process settings, then call
-        self._start() to parse/compile the template and prepare the
+        self._startCheetah() to parse/compile the template and prepare the
         self.__str__() and self.respond() methods for serving the template.
 
         If the environment var CHEETAH_DEBUG is set to True the internal
         debug setting will also be set to True."""
         
-        self._searchList = list(searchList) + [self,]
+        self._searchList = SearchList( searchList )
+        self._searchList.append(self)
         if kw.has_key('searchList'):
-            self._searchList += kw['searchList']
+            self._searchList.extend( kw['searchList'] )
+           
+        if kw.has_key('cheetahBlocks'):
+            self._cheetahBlocks = kw['cheetahBlocks']
+        else:
+            self._cheetahBlocks = {}
 
         self.initializeSettings()
         if kw.has_key('settings'):
             self.updateSettings(kw['settings'])
+            
+        if kw.has_key('overwriteSettings'):
+            self._settings = kw['overwriteSettings']
 
         if os.environ.get('CHEETAH_DEBUG'):
             self._settings['debug'] = True
@@ -105,233 +222,39 @@ class Template(SettingsManager):
             for plugin in self._settings['plugins']:
                 self.registerServerPlugin(plugin)
 
-        self._rawTemplate = str( templateDef )
+        self._templateDef = str( templateDef )
 
         if not self._settings['delayedStart']:
-            self.startServer()
-
+            self.startCheetah()
+                   
+    def searchList(self):
+        return self._searchList
     
-    def initializeSettings(self):
-        """create the default settings """
-
-        def includeDirectiveLoop(server, template):
-            """process the include Directives recursively and plus all the other
-            directives/filters that affect them or are affected by them"""
-            settings = server._settings
-            extDelimeters = settings['extDelimeters']
-            
-            regexs = extDelimeters['includeDirective']
-            regexs += extDelimeters['macroDirective']
-            regexs += extDelimeters['blockDirectiveStart']
-
-            try:
-                while filter(None, [regex.search(template) for regex in regexs]):
-                    for includeDirectiveRE in extDelimeters['includeDirective']:
-                        
-                        ## must alternate between the #parse regexes or
-                        # whitespace gobbling in  nested #parse blocks
-                        # won't be handled properly
-                    
-                        for processor in \
-                            settings['codeGenerator']['includeDirectiveLoop']:
-                            
-                            template = processor[1](server, template)
-                            
-                        template = \
-                                 CodeGen.preProcessIncludeDirectives(server,
-                                                                   template,
-                                                                   includeDirectiveRE)                    
-                ## do one more final pass
-                for processor in settings['codeGenerator']['includeDirectiveLoop']:
-                    template = processor[1](server, template)
-                    
-            except:
-                errMsg = '\n'
-                errMsg += "\nThe includeDirectiveLoop was processing " + \
-                          processor[0] + \
-                          " when the error occurred.\n"
-                errMsg += "This was the state of the template when the error " +\
-                          "occurred:\n\n"
-                errMsg += insertLineNums( template ) + '\n'
-                server._errorMsgStack.append( errMsg )
-                raise
-
-            return template
-        
-        self._settings = {
-            'delayedStart': False,            
-            
-            'plugins':[],
-            'defaultVarValue':None,
-            # default val for names, if ==None then varNotFound_handler is called
-            'varNotFound_handler': CodeGen.varNotFound_echo,
-            # only called if defaultVarValue==None and the $var can't be found
-            
-            'debug': False,
-            'keepCodeGeneratorResults': False,
-
-            'blockMarkerStart':['<!-- START BLOCK: ',' -->'],
-            'blockMarkerEnd':['<!-- END BLOCK: ',' -->'],
-            'includeBlockMarkers': False,
-
-
-            'extDelimeters':{'includeDirective': [delims['includeDirective_gobbleWS'],
-                                                delims['includeDirective'],
-                                                ],
-                             'dataDirective': [delims['dataDirective_gobbleWS'],
-                                               delims['dataDirective'],
-                                               ],
-                             'macroDirective': [delims['macroDirective'],
-                                                ],
-                             'blockDirectiveStart': [delims['blockDirectiveStart_gobbleWS'],
-                                                         delims['blockDirectiveStart'],
-                                                ],
-                             'lazyMacroCalls': [delims['lazyMacroCalls'],],
-                             'callMacro': [delims['callMacro'],],
-                             'callMacroArgs': delims['callMacroArgs'],
-                             'rawDirective': [delims['rawDirective'],],
-                             'comments': [delims['multiLineComment'],
-                                          delims['singleLineComment']],
-                             'slurp': [delims['slurpDirective_gobbleWS'],
-                                       delims['slurpDirective'],
-                                       ],
-                             },
-
-            
-            'responseErrorHandler': ErrorHandlers.ResponseErrorHandler,
-            
-            'codeGenerator':{
-                'displayLogicblockEndings':['end if','end for'],            
-                'internalDelims': delims['xml'],
-                'tagTokenSeparator': '__@__',
-                'indentationStep': ' '*4, # 4 spaces - used in the generated code
-                'initialIndentLevel': 2, 
-                
-                ## must loop over these processores to handle
-                # nested #include, #macro and #block Directives
-                'includeDirectiveLoop':[('rawDirectives',
-                                       CodeGen.preProcessRawDirectives),
-                                      ('comments',
-                                       CodeGen.preProcessComments),
-                                      ('setDirectives',
-                                       CodeGen.preProcessSetDirectives),
-                                      ('dataDirectives',
-                                       CodeGen.preProcessDataDirectives),
-                                      ('blockDirectives',
-                                       CodeGen.preProcessBlockDirectives),
-                                      ('macroDirectives',
-                                       CodeGen.preProcessMacroDirectives),
-                                      ('lazyMacroCalls',
-                                       CodeGen.preProcessLazyMacroCalls),
-                                      ('explicitMacroCalls',
-                                       CodeGen.preProcessExplicitMacroCalls),
-                                      ('comments',
-                                       CodeGen.preProcessComments),
-                                      ('rawDirectives',
-                                       CodeGen.preProcessRawDirectives),
-                                      ('setDirectives',
-                                       CodeGen.preProcessSetDirectives),
-                                      ],
-                
-                'preProcessors': [('slurpDirectives',
-                                   CodeGen.preProcessSlurpDirective),
-                                  ('includeDirectiveLoop',
-                                   includeDirectiveLoop), # see above
-                                  ('displayLogic$Escaping',
-                                   CodeGen.preProcessDisplayLogic),
-                                  ],
-                     
-                'postProcessors': [('rawDirectives',
-                                    CodeGen.postProcessRawDirectives),
-                                   ('rawIncludeDirectives',
-                                    CodeGen.postProcessRawIncludeDirectives),
-                                   ],
-                     
-                'coreTags':{'displayLogic':{'type': EXEC_TAG_TYPE,
-                                          'processor': CodeGen.displayLogicTagProcessor,
-                                          'delims': [delims['displayLogic_gobbleWS'],
-                                                     delims['displayLogic'],
-                                                     ],
-                                          },
-                          'placeholders':{'type': EVAL_TAG_TYPE,
-                                          'processor': CodeGen.placeholderTagProcessor,
-                                          'delims': [delims['${,}'],delims['$']],
-                                          ##the braced version must go first
-                                        },
-                          'setDirective':{'type': EXEC_TAG_TYPE,
-                                          'processor': CodeGen.setDirectiveTagProcessor,
-                                          'delims': [delims['setDirective'],],
-                                          },
-                          'cacheStartTag':{'type': EVAL_TAG_TYPE,
-                                           'processor': CodeGen.cacheDirectiveStartTagProcessor,
-                                           'delims': [delims['cacheDirectiveStartTag'],],
-                                           },
-                          'cacheEndTag':{'type': EVAL_TAG_TYPE,
-                                           'processor': CodeGen.cacheDirectiveEndTagProcessor,
-                                           'delims': [delims['cacheDirectiveEndTag'],],
-                                           },                            
-
-                            },
-                        
-                'generatedCodeFilters':[('removeEmptyStrings',
-                                         CodeGen.removeEmptyStrings),
-                                        ('addPerResponseCode',
-                                         CodeGen.addPerResponseCode),
-                                        ],
-                        
-                'masterErrorHandler':ErrorHandlers.CodeGeneratorErrorHandler,
-                
-                'stages':{1:{'title':'pre-processing',
-                             'description':stageDescriptions[1],
-                             'errorHandler':ErrorHandlers.Stage1ErrorHandler,
-                             },
-                          2:{'title':'translate-to-internal-tags',
-                             'description':stageDescriptions[2],
-                             'errorHandler':ErrorHandlers.Stage2ErrorHandler,
-                             },
-                          3:{'title':'post-processing',
-                             'description':stageDescriptions[3],
-                             'errorHandler':ErrorHandlers.Stage3ErrorHandler,
-                             },
-                          4:{'title':'convert-tags-to-code',
-                             'description':stageDescriptions[4],
-                             'errorHandler':ErrorHandlers.Stage4ErrorHandler,
-                             },
-                          5:{'title':'wrap-code-in-function-definition',
-                             'description':stageDescriptions[5],
-                             'errorHandler':ErrorHandlers.Stage5ErrorHandler,
-                             },
-                          6:{'title':'filter-generated-code',
-                             'description':stageDescriptions[6],
-                             'errorHandler':ErrorHandlers.Stage6ErrorHandler,
-                             },
-                          7:{'title':'execute-generated-code',
-                             'description':stageDescriptions[7],
-                             'errorHandler':ErrorHandlers.Stage7ErrorHandler,
-                             },
-                          },
-                },
-            }
-        
     def addToSearchList(self, object, restart=True):
         self._searchList.append(object)
         if restart:
-            self.startServer()
+            self.startCheetah()
 
-    def startServer(self):
+    def translatePlaceholderVars(self, string, executeCallables=False):
+        
+        translated = self.placeholderProcessor.translateRawPlaceholderString(
+            string, searchList=self.searchList(), templateObj=self,
+            executeCallables=executeCallables)
+        return translated
+    
+    def startCheetah(self):
         """Process and parse the template, then compile it into a function definition
         that is bound to self.__str__() and self.respond()"""
         
         self._errorMsgStack = []
-        generatedFunction = self._codeGenerator( self._rawTemplate )
+        generatedFunction = self._codeGenerator( self._templateDef )
         self.__str__ = self._bindFunctionAsMethod( generatedFunction )
         self.respond = self._bindFunctionAsMethod( generatedFunction )
         
         if not self._settings['keepCodeGeneratorResults']:
-            self._codeGeneratorResults = {}
-        
+            self._codeGeneratorResults = {}       
 
-    def _codeGenerator(self, template):
+    def _codeGenerator(self, templateDef):
         
         """parse the template definition, generate a python code string from it,
         then execute the code string to create a python function which can be
@@ -339,111 +262,87 @@ class Template(SettingsManager):
         
         stage 1 - the raw template is filtered using the pre-processors
         specified in the TemplateServer settings
-        
-        stage 2 - convert the coreTags to internal tags.  Core tags are: $var,
-        ${var}, #if .../#, #for .../#, #set, and the PSP tags <%...%>,
-        <%=...%>. Each internal tag will contain a token prefix to identify what
-        type of tag it was originally.  These tokens are used in stage 4 to
-        determine how the tag should be processed.
 
-        stage 3 - the template is filtered for the 2nd time using the
-        post-processors specified in the TemplateServer settings
+        stage 2 - convert the $placeholder tags, display logic directives, #set
+        directives, #cache diretives, etc. into chunks of python code
 
-        stage 4 - the tags that have been translated to the internal format are
-        converted into chunks of python code
+        stage 3 - the chunks of python code and the chunks of plain text from
+        the 2nd stage are wrapped up in a code string of a function definition
 
-        stage 5 - the chunks of python code from stage 4 are wrapped up in a
-        code string of a function definition
-
-        stage 6 - the generated code string is filtered using the filters
+        stage 4 - the generated code string is filtered using the filters
         defined in the TemplateServer settings
 
-        stage 7 - the generated code string is executed to produce a python
+        stage 5 - the generated code string is executed to produce a python
         function, that will become a method of the TemplateServer
 
         These stages are contain in a try: ... except: ... block that will
         provide helpful information for debugging if an error is caught."""
         
         settings = self._settings
-        generatorSettings = settings['codeGenerator']
-        stageSettings = generatorSettings['stages']
+        stageSettings = settings['stages']
         debug = settings['debug']
         results = self._codeGeneratorResults = {}
         state = self._codeGeneratorState = {}
-        self._localVarsList = []        # used to track vars from #set and #for
+        self._localVarsList = []   # used to track vars from #set and #for
+
+        templateDef = templateDef.replace("'''",r"\'\'\'") # ''' must be escaped
         
         try:
             ## stage 1 - preProcessing of the template string ##
             stage = 1
             if debug: results['stage1'] = []
-            for preProcessor in generatorSettings['preProcessors']:
-                template = preProcessor[1](self, template)
-                if debug: results['stage1'].append((preProcessor[0], template))
+            for preProcessor in settings['preProcessors']:
+                templateDef = preProcessor[1](self, templateDef)
+                if debug: results['stage1'].append((preProcessor[0], templateDef))
 
-                        
-            ## stage 2 - translate the coreTag delimeters to internalDelims ##
-            #  with tokens that will be recognized by the self._tagTokenProcessor
+                            
+            ## stage 2 - generate the python code for each of the tokenized tags ##
+            #  a) initialize this Template Obj for each processor
+            #  b) separate internal tags from text in the template to create
+            #     textVsTagsList 
+            #  c) send textVsTagsList through self._tagTokenProcessor to generate
+            #     the code pieces
+            #  d) merge the code pieces into a single string
             stage = 2
             if debug: results['stage2'] = []
-            template = template.replace("'''",r"\'\'\'") # ''' must be escaped
-            for token, tagSettings in generatorSettings['coreTags'].items():
-                for delimStruct in tagSettings['delims']:
-                    # this loop allows multiple delims to be used for each token
-                    template = CodeGen.swapDelims(
-                        template, delimStruct,
-                        generatorSettings['internalDelims']['start'] + token  \
-                        + generatorSettings['tagTokenSeparator'],
-                        generatorSettings['internalDelims']['end'],
-                        )
-                    if debug: results['stage2'].append( (token, template) )
-
-                    
-            ## stage 3 - postProcessing after the coreTag delim translation ##
-            stage = 3
-            if debug: results['stage3'] = []
-            for postProcessor in generatorSettings['postProcessors']:
-                template = postProcessor[1](self, template)
-                if debug: results['stage3'].append( (postProcessor[0], template) )
-
-    
-            ## stage 4 - generate the python code for each of the tokenized tags ##
-            #  a) separate internal tags from text in the template to create
-            #     textVsTagsList 
-            #  b) send textVsTagsList through self._tagTokenProcessor to generate
-            #     the code pieces
-            #  c) merge the code pieces into a single string
-            stage = 4
-            if debug: results['stage4'] = []
             
             # a)
             subStage = 'a'
-            textVsTagsList = CodeGen.separateTagsFromText(
-                template, generatorSettings['internalDelims']['placeholderRE'])
-            if debug:
-                results['stage4'].append(('textVsTagsList', textVsTagsList))
+            for processor in settings['tagProcessors'].values():
+                processor.initializeTemplateObj(self)
+                
             # b)
             subStage = 'b'
-            codePiecesFromTextVsTagsList = CodeGen.processTextVsTagsList(
-                textVsTagsList,
-                self._tagTokenProcessor)
+            textVsTagsList = CodeGen.separateTagsFromText(
+                templateDef, settings['internalDelimsRE'])
+            if debug:
+                results['stage2'].append(('textVsTagsList', textVsTagsList))
             # c)
             subStage = 'c'
+            codePiecesFromTextVsTagsList = CodeGen.processTextVsTagsList(
+                textVsTagsList,
+                self._tagProcessor)
+            
+            # d)
+            subStage = 'd'
             codeFromTextVsTagsList = "".join(codePiecesFromTextVsTagsList)
             if debug:
-                results['stage4'].append(('codeFromTextVsTagsList',
+                results['stage2'].append(('codeFromTextVsTagsList',
                                           codeFromTextVsTagsList))
 
-            ## stage 5 - wrap the code up in a function definition ##
-            stage = 5
-            if debug: results['stage5'] = []
-            indent = generatorSettings['indentationStep']
+            ## stage 3 - wrap the code up in a function definition ##
+            stage = 3
+            if debug: results['stage3'] = []
+            indent = settings['indentationStep']
             generatedCode = \
                           "def generatedFunction(self, trans=None, iAmNested=False):\n" \
                           + indent * 1 + "try:\n" \
                           + indent * 2 + "#setupCodeInsertMarker\n" \
+                          + indent * 2 + "searchList = self.searchList()\n" \
                           + indent * 2 + "outputList = []\n" \
-                          + indent * 2 + "outputList += ['''" + codeFromTextVsTagsList + \
-                          "''',]\n" \
+                          + indent * 2 + "outputList.extend( ['''" + \
+                                         codeFromTextVsTagsList + \
+                                         "''',] )\n" \
                           + indent * 2 + "output = ''.join(outputList)\n" \
                           + indent * 2 + "if trans and not iAmNested:\n" \
                           + indent * 3 + "trans.response().write(output)\n" \
@@ -452,22 +351,22 @@ class Template(SettingsManager):
                           + indent * 2 + "print self._settings['responseErrorHandler']()\n" \
                           + indent * 2 + "raise\n" \
             
-            if debug: results['stage5'].append( ('generatedCode', generatedCode) )
+            if debug: results['stage3'].append( ('generatedCode', generatedCode) )
 
             
-            ## stage 6 - final filtering of the generatedCode  ##
-            stage = 6
-            if debug: results['stage6'] = []
-            for filter in generatorSettings['generatedCodeFilters']:
+            ## stage 4 - final filtering of the generatedCode  ##
+            stage = 4
+            if debug: results['stage4'] = []
+            for filter in settings['generatedCodeFilters']:
                 generatedCode = filter[1](self, generatedCode)
-                if debug: results['stage6'].append( (filter[0], generatedCode) )
+                if debug: results['stage4'].append( (filter[0], generatedCode) )
 
-            ## stage 7 - create "generatedFunction" in this namespace ##
-            stage = 7
-            if debug: results['stage7'] = []
+            ## stage 5 - create "generatedFunction" in this namespace ##
+            stage = 5
+            if debug: results['stage5'] = []
             exec generatedCode
             if debug:
-                results['stage7'].append(('generatedFunction', generatedFunction))
+                results['stage5'].append(('generatedFunction', generatedFunction))
             
             ##
             self._generatedCode = generatedCode
@@ -477,7 +376,7 @@ class Template(SettingsManager):
         except:
             ## call masterErrorHandler, which in turn calls the ErrorHandler ##
             # for the stage in which the error occurred
-            print generatorSettings['masterErrorHandler']()
+            print settings['masterErrorHandler']()
             raise
             
 
@@ -503,88 +402,42 @@ class Template(SettingsManager):
         Template instance"""
         return new.instancemethod(function, self, self.__class__)
 
-    def _tagTokenProcessor(self, tag, wrapOutput=True):
+    def _tagProcessor(self, tag):
         """an abstract tag processor that will identify the tag type from its
         tagToken prefix and call the appropriate processor for that type of
         tag"""
         settings = self._settings
+        tagToken, tag = tag.split(settings['tagTokenSeparator'])
+        processedTag = settings['tagProcessors'][tagToken].processTag(self, tag)
+        return processedTag
 
-        tagToken, tag = tag.split(settings['codeGenerator']['tagTokenSeparator'])
-
-        for token, tagSettings in settings['codeGenerator']['coreTags'].items():
-            if tagToken == token:
-                processedTag = tagSettings['processor'](self, tag)
-
-                if not wrapOutput:
-                    return processedTag
-                elif tagSettings['type'] == EVAL_TAG_TYPE:
-                    return "''', " + processedTag + ", '''"
-                elif tagSettings['type'] == EXEC_TAG_TYPE:
-                    return "''',]\n" + processedTag + "outputList += ['''"
-
-
-    ## methods for dealing with the embedded NameMapper object references ##
-
-    def mapName(self, name, default=None, executeCallables=False):
-        """Returns a mapping for the placeholder name to its actual value
-
-        This function is similar, but not identical, to Webware's valueForName!
-        """
-
-        for namespace in self._searchList:
-            binding = valueForName(namespace, name, '<!NotFound!>')
-            if binding != '<!NotFound!>':
-                break
-
-        if binding == '<!NotFound!>':
-            if default!=None:
-                binding = defaultVarValue
-            elif self._settings['defaultVarValue']!=None:
-                binding = self._settings['defaultVarValue']
-            else:
-                raise NameMapper.NotFound(name)
-
-        if executeCallables and callable(binding):
-            binding = binding()
-        return binding
-
-
-    def _setTimedRefresh(self, placeholderName, cacheRefreshInterval):
-        nextUpdateTime = currentTime() + cacheRefreshInterval * 60 
-        self._timedRefreshList.append(
-            [placeholderName, nextUpdateTime, cacheRefreshInterval])
+    
+    def _setTimedRefresh(self, translatedTag, interval):
         self._checkForCacheRefreshes = True
+        searchList = self.searchList()
+        tagValue = eval(translatedTag)
+        self._timedRefreshCache[translatedTag] = str(tagValue)
+        nextUpdateTime = currentTime() + interval * 60 
+        self._timedRefreshList.append(
+            [nextUpdateTime, translatedTag, interval])
+
 
     def _timedRefresh(self, currTime):
         """refresh all the cached NameMapper vars that are scheduled for a
         refresh at this time, and reschedule them for their next update.
 
-        the entries in the recache list are in the format [name, interval,
-        nextRecacheTime] """
-        
-        def updateList(item, currTime=currTime):
-            if item[1] < currTime:
-                item[1] = currTime + (item[2]*60) # reschedule for next update
-                return True
-            else:
-                return False
-            
-        for name in filter(updateList, self._timedRefreshList):
-            if self._settings['debug']:
-                print repr(self), 'refreshing {' + name[0] + '} at time:', \
-                      currentTime()
-                print
-                
-            ## send it back through the tag processor to recache the value
-            CodeGen.placeholderTagProcessor(
-                self, tag=name[0], cacheType=CodeGen.TIMED_REFRESH_CACHE,
-                cacheRefreshInterval=float(name[1]))
-            
-            ## the placeholderTagProcessor will have added a new entry to the
-            # list which we don't need so ...
-            self._timedRefreshList.pop() 
+        the entries in the recache list are in the format [nextUpdateTime, name,
+        interval] """
 
-        
+        refreshList = self._timedRefreshList
+        for i in range(len(refreshList)):
+            if refreshList[i][0] < currTime:
+                translatedTag = refreshList[i][1]
+                interval = refreshList[i][2]
+                self._setTimedRefresh(translatedTag, interval)
+                del refreshList[i]
+                refreshList.sort()
+       
     def defineTemplateBlock(self, blockName, blockContents):
         """  """
         if not hasattr(self, '_blocks'):

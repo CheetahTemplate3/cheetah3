@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SettingsManager.py,v 1.1 2001/06/13 03:50:40 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.2 2001/06/18 17:26:01 tavis_rudd Exp $
 """Provides a mixin class for managing settings dictionaries
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2001/06/13 03:50:40 $
+Last Revision Date: $Date: 2001/06/18 17:26:01 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 
 ##################################################
@@ -40,9 +40,11 @@ class NoDefault:
 class SettingsManager:
     """A mixin class that provides facilities for managing settings dictionaries."""
 
+    _settings = {}
+    
     def initializeSettings(self):
         """This dummy method should be reimplemented by subclasses."""
-        self._settings = {}
+        pass
     
     def updateSettings(self, newSettings, merge=True):
         """Update the settings with a selective merge or a complete overwrite."""

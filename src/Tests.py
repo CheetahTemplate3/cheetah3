@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Tests.py,v 1.1 2001/06/13 03:50:39 tavis_rudd Exp $
+# $Id: Tests.py,v 1.2 2001/06/18 17:26:01 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/13 03:50:39 $
+Last Revision Date: $Date: 2001/06/18 17:26:01 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 
 ##################################################
@@ -130,11 +130,11 @@ posixCases = [
     ['single $var','$c','blarg'],
     ['simple $var permutations',
      """
-$ $500 $*. $. \$var
+$ $500 $. \$var
 '''
 $emptyString $numZero
-$numOne$numTwo
-$numOne and $numTwo $c. $dict.one $dict.nestedDict.1 $dict.nestedFunc
+${numOne}$numTwo
+$numOne and $numTwo $c. $dict.one $dict.nestedFunc
 $func $func. $func(). $func(4). $func('x'). $func("x"). $func("x"*2). $func(arg="x"). $func(arg='x').
 $meth $meth. $meth(). $meth(5). $meth('y'). $meth("y"). $meth("y"*2). $meth(arg="y"). $meth(arg='y').
 $obj $obj.
@@ -142,11 +142,11 @@ $obj.meth $obj.meth. $obj.meth(). $obj.meth(6).
 $obj.meth('z'). $obj.meth("z"). $obj.meth("z"*2). $obj.meth(arg="z"). $obj.meth(arg='z').""",
      
      """
-$ $500 $*. $. $var
+$ $500 $. $var
 '''
  0
 12
-1 and 2 blarg. item1 nestedItem1 Scooby
+1 and 2 blarg. item1 Scooby
 Scooby Scooby. Scooby. 4. x. x. xx. x. x.
 doo doo. doo. 5. y. y. yy. y. y.
 object object.
@@ -157,7 +157,10 @@ z. z. zz. z. z."""
     ]
 
 
-standardVarRegex = delimeters['$']['placeholderRE']
+standardVarRegex = re.compile(r"(?:(?<=\A)|(?<!\\))\$((?:\*|(?:\*[0-9\.]*\*)){0,1}" +
+                                     r"[A-Za-z_](?:[A-Za-z0-9_\.]*[A-Za-z0-9_]+)*" +
+                                     r"(?:\(.*?\))*)", re.DOTALL)
+
 def convertVars(titlePrefix, replacementString, caseData):
      caseData = deepcopy(caseData)
      caseData[0] = titlePrefix + caseData[0]
@@ -173,16 +176,15 @@ for i in range(len(posixCases)):
 
 
 
-## I have disabled nested calls like $var($anotherVar) for the time-being
-#nestedVarTests = [
-#    ['$var($var)',
-#     """$func($numOne) $meth($numOne) $obj.meth($numOne)""",
-#     '1 1 1'],
-#    ['$var($var)',
-#     """${func($numOne)} ${meth($numOne)} ${obj.meth($numOne)}""",
-#     '1 1 1'],
-#    ]
-#posixCases += nestedVarTests
+nestedVarTests = [
+    ['$var($var)',
+     """$func($numOne) $meth($numOne) $obj.meth($numOne)""",
+     '1 1 1'],
+    ['$var($var)',
+     """${func($numOne)} ${meth($numOne)} ${obj.meth($numOne)}""",
+     '1 1 1'],
+    ]
+posixCases += nestedVarTests
 
 commentTests = [
     ['simple ## comment - with whitespace - should gobble',
@@ -290,15 +292,10 @@ ifBlockTests = [
      "#if not $emptyString\n$c\n#elif $numOne\n$numOne\n#else\n$c - $c#end if\n",
      "blarg\n",],
 
-    ## These currently fail @@work on this
-    #['simple #if block using a $*emptyString',
-    # "#if $*emptyString\n$c\n#end if\n",
-    # "",],
+    ['simple #if block using a $*emptyString',
+     "#if $*emptyString\n$c\n#end if\n",
+     "",],
     
-    #['simple #if block using a ${emptyString}',
-    # "#if ${emptyString}\n$c\n#end if\n",
-    # "",],
-
     ]
 posixCases += ifBlockTests
 

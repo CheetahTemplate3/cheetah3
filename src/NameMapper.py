@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.1 2001/06/13 03:50:39 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.2 2001/06/18 17:26:01 tavis_rudd Exp $
 
 """Utilities for accessing the members of an object via string representations
 of those members.  Template processing is its primary intended use.
 
 Description
 ================================================================================
-@@ add basic desc.
 
 This module is similar to Webware's NamedValueAccess, but with the following
 basic differences:
@@ -51,17 +50,7 @@ Usage
 This module is not safe for 'from NameMapper import *'!
 
 See the example at the bottom of this file.
-The TemplateServer module implements a less trivial example.
-
-Changes
-================================================================================
-1.10- got rid of the NameMapper class.  There are now two normal functions,
-      valueForName and valueForKey, which do all the work.  This brings the core
-      down to less than 60 lines of code, and greatly simplifies the interface.
-
-TODO
-================================================================================
-- write the test cases
+The Cheetah package implements a less trivial example.
 
 Meta-Data
 ================================================================================
@@ -69,19 +58,19 @@ Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
 License: This software is released for unlimited distribution
          under the terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/06/13 03:50:39 $
+Last Revision Date: $Date: 2001/06/18 17:26:01 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
 
 import types
-from types import StringType, InstanceType, ClassType
+from types import StringType
 import re
 # it uses the string methods and list comprehensions added in recent versions of python
 
@@ -119,13 +108,7 @@ def valueForName(obj, name, default=NoDefault, exectuteCallables=False):
     firstKey = nameChunks[0]
     if len(nameChunks) > 1:
         # its a composite name like: nestedObject.item
-        binding = valueForKey(obj, firstKey, default)
-        if callable(binding) and type(binding) not in (InstanceType, ClassType):
-            # the type check allows access to the methods of instances
-            # of classes with __call__() defined
-            # and also allows obj.__class__.__name__
-            binding = binding()
-        
+        binding = valueForKey(obj, firstKey, default)        
         return valueForName(binding, nameChunks[1:], default,
                             exectuteCallables=exectuteCallables)
     else:
@@ -134,7 +117,6 @@ def valueForName(obj, name, default=NoDefault, exectuteCallables=False):
         if exectuteCallables and callable(binding):
             binding = binding()
         return binding
-
 
 
 def valueForKey(obj, key, default=NoDefault):
@@ -160,60 +142,63 @@ def valueForKey(obj, key, default=NoDefault):
         # this is a value or a reference to a callable object
         return binding              
 
-
-def determineNameType(obj, name):
-    """Return the type of a name or raise an exception if it can't be found.
-
-    This function is useful for caching in situations where a caller needs to
-    access the a NameMapper-style name repeatedly.  Using this information, the
-    name can be translated into a standard python representation by the caller
-    on the first request.  Every subsequent request will eval() the python
-    representation of the name, with is more efficient than using
-    valueForName().
-
-    Names can be of the following types:
-    - a 'callable' object.
-      In which case we just retrieve a reference of it and call it when needed
-    - a 'plain_attribute'
-    - an 'underscored_attribute'
-    - a 'mapping_key'
-    - raise NotFound
-    """
-
-    mapping = valueForName(obj,name)
-    if callable(mapping):
-        return 'callable'
-    else:
-        nameChunks = name.split('.')
-        if len(nameChunks) == 1:
-            return determineKeyType(obj, name)
-        else:
-            numChunks = len(nameChunks)
-            return determineKeyType(
-                valueForName(obj, "".join(nameChunks[0:numChunks-1])),
-                nameChunks[numChunks-1])
-        
+PLAIN_ATTRIBUTE = 0
+UNDERSCORED_ATTRIBUTE = 1
+MAPPING_KEY = 2
 
 def determineKeyType(obj, key):
+    """Determine what type of key 'key' is to 'obj': PLAIN_ATTRIBUTE,
+    UNDERSCORED_ATTRIBUTE or MAPPING_KEY.
+
+    Raises NotFound exception if the obj doesn't have the key."""
+    
     if hasattr(obj, key):
-        if callable(getattr(obj, key)):
-            return 'callable'
-        else:
-            return 'plain_attribute'
+        return PLAIN_ATTRIBUTE
     elif hasattr(obj, '_' + key):
-        if callable(getattr(obj, '_' + key)):
-            return 'callable'
-        else:
-            return 'underscored_attribute'
-    elif hasattr(obj,'has_key'):
-        try:
-            if callable(obj.get(key)):
-                return  'callable'
-            else:
-                return 'mapping_key'
-        except:
-            raise NotFound
-            
+        return UNDERSCORED_ATTRIBUTE
+    elif hasattr(obj,'has_key') and obj.has_key(key):
+        return MAPPING_KEY
+    raise NotFound
+
+def hasKey(obj, key):
+    """Determine if 'obj' has 'key' """
+    if hasattr(obj, key):
+        return True
+    elif hasattr(obj, '_' + key):
+        return True
+    elif hasattr(obj,'has_key') and obj.has_key(key):
+        return True
+    return False
+
+def hasName(obj, name):
+    """Determine if 'obj' has the 'name' """
+    try:
+        valueForName(obj, name)
+        return True
+    except NotFound:
+        return False
+
+
+def translateNameToCode(obj, name):
+    """Translate a namemapper name to Python code."""
+    if type(name)==StringType:
+        nameChunks=name.split('.')
+    else:
+        nameChunks = name
+
+    codeChunks = []
+    for name in nameChunks:
+        item = eval('obj' + ''.join(codeChunks))
+        keyType = determineKeyType(item, name)
+        if keyType == PLAIN_ATTRIBUTE:
+            code = '.' + name
+        if keyType == UNDERSCORED_ATTRIBUTE:
+            code = '._' + name
+        if keyType == MAPPING_KEY:
+            code = '["' + name + '"]'
+        codeChunks.append(code)
+        
+    return ''.join(codeChunks)
 
 
 ##################################################
@@ -221,13 +206,11 @@ def determineKeyType(obj, key):
 
 class Mixin:
     """@@ document me"""
-    def valueForName(self, name, handleArgStrings=False, localsDict=None):
-        return valueForName(self, name, handleArgStrings=handleArgStrings,
-                            localsDict=localsDict)
+    def valueForName(self, name):
+        return valueForName(self, name)
 
-    def valueForKey(self, key, handleArgStrings=False, localsDict=None):
-        return valueForKey(self, key, handleArgStrings=handleArgStrings,
-                            localsDict=localsDict)
+    def valueForKey(self, key):
+        return valueForKey(self, key)
 
 ##################################################
 ## TEST ROUTINES ##
@@ -277,7 +260,6 @@ def example():
 
     alist = ['item0','item1','item2']
 
-    print determineNameType(vars(),'B.underScoreVar')
     print valueForKey(a.dic,'subDict','NotFound')
     print valueForName(a, 'dic.item','NotFound')
     print valueForName(vars(), 'b','NotFound')

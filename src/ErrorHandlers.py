@@ -5,12 +5,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/13 03:50:39 $
+Last Revision Date: $Date: 2001/06/18 17:26:01 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -86,7 +86,7 @@ at the very end. There may be some repetition of information.
         if not self._debug:
             
             return "\nNOTE: you have Cheetah's debug setting set to " + \
-                   "False. TemplateServer will\nusually be more helpful " + \
+                   "False. Cheetah will\nusually be more helpful " + \
                    "with problems if you set debug to True."
                    
         else:
@@ -105,7 +105,7 @@ class ResponseErrorHandler(ErrorHandler):
         
     def errorDetails(self):
         msg = self.format_exc()
-        msg += "\nHere's a copy of the code that Cheetah Template generated:\n\n"
+        msg += "\nHere's a copy of the code that Cheetah generated:\n\n"
         msg += insertLineNums( self._server._generatedCode )
         
         self._server._errorMsgStack.append(msg)
@@ -121,7 +121,7 @@ class CodeGeneratorErrorHandler(ErrorHandler):
         ErrorHandler.__init__(self)
         server = self._server
         self._stage = stage = self._localvars['stage']
-        self._stageSettings = server._settings['codeGenerator']['stages'][stage]
+        self._stageSettings = server._settings['stages'][stage]
 
     def introText(self):
         fillValues = {'stage': self._stage,
@@ -138,10 +138,6 @@ Stage %(stage)s, '%(stageTitle)s', is when %(stageDescription)s""" % fillValues
         return '\n'.join( self._server._errorMsgStack )
 
 
-
-
-
-
 class StageErrorHandler(ErrorHandler):
     """ErrorHandler base class for stages of Cheetah's codeGenerator."""
     def __init__(self):
@@ -156,66 +152,38 @@ class Stage1ErrorHandler(StageErrorHandler):
 
     def generateErrMsg(self):
         msg = '\n'
-        msg += "TemplateServer was executing the " + \
+        msg += "Cheetah was executing the " + \
                self._localvars['preProcessor'][0] + \
                " preProcessor when the error occurred.\n"
         
         if not self._localvars['preProcessor'][0] == 'parseDirectiveLoop':
             msg += "This was the state of the template when the error " + \
                    "occurred:\n\n"
-            msg += insertLineNums( self._localvars['template'] )
+            msg += insertLineNums( self._localvars['templateDef'] )
             
         msg += '-'*80
         return msg
-        
-
+            
 
 class Stage2ErrorHandler(StageErrorHandler):
     """ErrorHandler for stage 2 of Cheetah's codeGenerator."""
-
-    def generateErrMsg(self):
-        msg = '\n'
-        msg += "Cheetah was processing " + self._localvars['token'] + \
-                  " tags when the error occurred.\n"
-        msg += "This was the state of the template when the error occurred:\n\n"
-        msg += insertLineNums( self._localvars['template'] )
-        msg += '-'*80
-        return msg
-
-
-class Stage3ErrorHandler(StageErrorHandler):
-    """ErrorHandler for stage 3 of Cheetah's codeGenerator."""
-
-    def generateErrMsg(self):
-        msg = '\n'
-        msg += "Cheetah was executing the " + \
-               self._localvars['postProcessor'][0] + \
-               " postProcessor when the error occurred.\n"
-        msg += "This was the state of the template when the error occurred:\n\n"
-        msg += insertLineNums( self._localvars['template'] )
-        msg += '-'*80
-        return msg
-        
-
-class Stage4ErrorHandler(StageErrorHandler):
-    """ErrorHandler for stage 4 of Cheetah's codeGenerator."""
     
     def generateErrMsg(self):        
         msg = '\n'
-        if self._localvars['subStage'] == 'a':
+        if self._localvars['subStage'] == 'b':
             msg += "Cheetah was separating tags from the normal text " + \
                       "when the error occurred.\n"
             msg += "This was the state of the template when the error occurred:\n\n"
-            msg += insertLineNums( self._localvars['template'] )
+            msg += insertLineNums( self._localvars['templateDef'] )
 
-        elif self._localvars['subStage'] == 'b':
+        elif self._localvars['subStage'] == 'c':
             msg += "Cheetah was generating code for each of the tags " + \
                       "when the error occurred.\n"
             msg += "This was the textVsTagList being processed:\n\n"
             msg += str( self._localvars['textVsTagsList'] )
             msg += '-'*80
             msg += "\nThis was the state of the template when the error occurred:\n\n"
-            msg += insertLineNums( self._localvars['template'] )
+            msg += insertLineNums( self._localvars['templateDef'] )
             
         else:
             msg += "Cheetah was joining the code from each of the tags into " + \
@@ -228,8 +196,8 @@ class Stage4ErrorHandler(StageErrorHandler):
         return msg
 
 
-class Stage5ErrorHandler(StageErrorHandler):
-    """ErrorHandler for stage 5 of Cheetah's codeGenerator."""
+class Stage3ErrorHandler(StageErrorHandler):
+    """ErrorHandler for stage 3 of Cheetah's codeGenerator."""
 
     def generateErrMsg(self):        
         msg = '\n'
@@ -241,8 +209,8 @@ class Stage5ErrorHandler(StageErrorHandler):
         return msg
 
 
-class Stage6ErrorHandler(StageErrorHandler):
-    """ErrorHandler for stage 6 of Cheetah's codeGenerator."""
+class Stage4ErrorHandler(StageErrorHandler):
+    """ErrorHandler for stage 4 of Cheetah's codeGenerator."""
 
     def generateErrMsg(self):        
         msg = '\n'
@@ -254,8 +222,8 @@ class Stage6ErrorHandler(StageErrorHandler):
         return msg
 
 
-class Stage7ErrorHandler(StageErrorHandler):
-    """ErrorHandler for stage 7 of Cheetah's codeGenerator."""
+class Stage5ErrorHandler(StageErrorHandler):
+    """ErrorHandler for stage 5 of Cheetah's codeGenerator."""
     def generateErrMsg(self):        
         generatedCode = self._localvars['generatedCode']
         msg = '\n'
