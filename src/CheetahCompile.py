@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.16 2001/12/11 04:38:32 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.17 2001/12/11 18:34:06 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.16 $
+Version: $Revision: 1.17 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/12/11 04:38:32 $
+Last Revision Date: $Date: 2001/12/11 18:34:06 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.16 $"[11:-2]
+__version__ = "$Revision: 1.17 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -64,8 +64,12 @@ class CheetahCompile:
         """The main program controller."""
         
         self._processCmdLineArgs()
-        self._buildFileList()
-        self._processFileList()
+
+        if self._args == ["-"]:          # piped input
+            print Compiler(sys.stdin.read())
+        else:
+            self._buildFileList()
+            self._processFileList()
         
     def _processCmdLineArgs(self):
         try:
@@ -193,7 +197,7 @@ Compiles Cheetah files (.tmpl) into Webware servlet modules (.py)
 
 Usage:
   %(scriptName)s [OPTIONS] FILES/DIRECTORIES
-
+  %(scriptName)s [OPTIONS] -  (accept a file on stdin)
   -R                          Recurse subdirectories
   -p                          Print generated Python code to stdout
   -w                          Write output of template to *.html
