@@ -6,6 +6,7 @@
 
 
 static PyObject *NotFound;   /* locally-raised exception */
+static PyObject *TooManyPeriods;   /* locally-raised exception */
 
 #define notFound(message) { PyErr_SetString(NotFound, message); return NULL; }
 #define MAXCHUNKS 15		/* max num of nameChunks for the arrays */
@@ -17,26 +18,33 @@ static PyObject *NotFound;   /* locally-raised exception */
 /* *************************************************************************** */
 
 
-static int getNameChunks(char *nameChunks[], char *name) 
+static int getNameChunks(char *nameChunks[], char *name, char *nameCopy) 
 {
   char c;
   char *currChunk;
   int currChunkNum = 0;
   
-  currChunk = name;
-  while ((c = *name) != '\0'){
-    if (c == '.') {
-      *name ='\0';
+  currChunk = nameCopy;
+  while ('\0' != (c = *nameCopy)){
+    if ('.' == c) {
+      if (currChunkNum >= (MAXCHUNKS-2)) { /* avoid overflowing nameChunks[] */
+	PyErr_SetString(TooManyPeriods, name); 
+	return 0;
+      }
+
+      *nameCopy ='\0';
       nameChunks[currChunkNum++] = currChunk;
-      name++;
-      currChunk = name;
+      nameCopy++;
+      currChunk = nameCopy;
     } else 
-      name++;
+      nameCopy++;
   }
-  if (name > currChunk) 
+  if (nameCopy > currChunk) {
     nameChunks[currChunkNum++] = currChunk;
+  }
   return currChunkNum;
 } /* end - getNameChunks */
+
 
 static int 
 hasKey(PyObject *obj, char *key)
@@ -193,7 +201,10 @@ namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)
   tmpPntr1 = name; tmpPntr2 = nameCopy;
   while ((*tmpPntr2++ = *tmpPntr1++));
 
-  numChunks = getNameChunks(nameChunks, nameCopy);
+  numChunks = getNameChunks(nameChunks, name, nameCopy);
+  if (PyErr_Occurred()) { 	/* there might have been TooManyPeriods */
+    return NULL;
+  }
 
   theValue = PyNamemapper_valueForName(obj, nameChunks, numChunks, executeCallables);
   free(nameCopy);
@@ -229,7 +240,11 @@ namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
   nameCopy = malloc(strlen(name) + 1);
   tmpPntr1 = name; tmpPntr2 = nameCopy;
   while ((*tmpPntr2++ = *tmpPntr1++));
-  numChunks = getNameChunks(nameChunks, nameCopy);
+
+  numChunks = getNameChunks(nameChunks, name, nameCopy);
+  if (PyErr_Occurred()) { 	/* there might have been TooManyPeriods */
+    return NULL;
+  }
 
   listLen = PyList_Size(searchList);
   for (i=0; i < listLen; i++){
@@ -268,11 +283,14 @@ void init_namemapper()
   /* add symbolic constants to the module */
   d = PyModule_GetDict(m);
   NotFound = Py_BuildValue("s", "NameMapper.NotFound");   /* export exception */
-  PyDict_SetItemString(d, "NotFound", NotFound);       /* add more if need */
+  PyDict_SetItemString(d, "NotFound", NotFound);
   
+  TooManyPeriods = Py_BuildValue("s", "NameMapper.TooManyPeriodsInName"); /* export exception */
+  PyDict_SetItemString(d, "TooManyPeriodsInName", TooManyPeriods);
+
   /* check for errors */
   if (PyErr_Occurred())
-    Py_FatalError("can't initialize module _namemapper");
+    Py_FatalError("Can't initialize module _namemapper");
 }
 
 
