@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.30 2001/11/08 06:20:25 tavis_rudd Exp $
+# $Id: Parser.py,v 1.31 2001/11/09 18:15:37 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.30 $
+Version: $Revision: 1.31 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/11/08 06:20:25 $
+Last Revision Date: $Date: 2001/11/09 18:15:37 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.30 $"[11:-2]
+__version__ = "$Revision: 1.31 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1390,7 +1390,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
 
     def eatEcho(self):
         self.getDirectiveStartToken()
-        self.advance(len('silent'))
+        self.advance(len('echo'))
         self.getWhiteSpace()
         expr = self.getExpression()
         self.closeDirective(False, self.pos())
