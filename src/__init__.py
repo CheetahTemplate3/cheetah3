@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: __init__.py,v 1.2 2001/12/19 02:10:25 tavis_rudd Exp $
+# $Id: __init__.py,v 1.3 2002/10/01 17:52:02 tavis_rudd Exp $
 
 """Cheetah is a Python-powered template engine and code-generator.
 It similar to the Jakarta project's Velocity.
@@ -47,10 +47,10 @@ Authors: The Cheetah Development Team (Tavis Rudd, Mike Orr, Chuck Esterbrook
          Ian Bicking, Tom Schwaller)
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/12/19 02:10:25 $
+Last Revision Date: $Date: 2002/10/01 17:52:02 $
 """ 
-__author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.2 $"[11:-2]
+__author__ = "Tavis Rudd <tavis@damnsimple.com>"
+__revision__ = "$Revision: 1.3 $"[11:-2]
 

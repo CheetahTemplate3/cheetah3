@@ -1,18 +1,18 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.31 2002/09/29 23:54:33 hierro Exp $
+# $Id: Servlet.py,v 1.32 2002/10/01 17:52:02 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
 ================================================================================
-Author: Tavis Rudd <tavis@calrudd.com>
+Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.31 $
+Version: $Revision: 1.32 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2002/09/29 23:54:33 $
+Last Revision Date: $Date: 2002/10/01 17:52:02 $
 """ 
-__author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.31 $"[11:-2]
+__author__ = "Tavis Rudd <tavis@damnsimple.com>"
+__revision__ = "$Revision: 1.32 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS

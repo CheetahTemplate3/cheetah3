@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SetupTools.py,v 1.4 2002/01/01 20:02:33 tavis_rudd Exp $
+# $Id: SetupTools.py,v 1.5 2002/10/01 17:52:02 tavis_rudd Exp $
 """Some tools for extending and working with distutils
 
 CREDITS: This module borrows code and ideas from M.A. Lemburg's excellent setup
@@ -7,8 +7,8 @@ tools for the mxBase package.
 
 """
 
-__author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__author__ = "Tavis Rudd <tavis@damnsimple.com>"
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 
 ##################################################

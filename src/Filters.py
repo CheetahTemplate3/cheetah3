@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.17 2002/07/01 03:19:46 hierro Exp $
+# $Id: Filters.py,v 1.18 2002/10/01 17:52:02 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -9,13 +9,13 @@ would otherwise require a real template object).
 
 Meta-Data
 ================================================================================
-Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.17 $
+Author: Tavis Rudd <tavis@damnsimple.com>
+Version: $Revision: 1.18 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/07/01 03:19:46 $
+Last Revision Date: $Date: 2002/10/01 17:52:02 $
 """
-__author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.17 $"[11:-2]
+__author__ = "Tavis Rudd <tavis@damnsimple.com>"
+__revision__ = "$Revision: 1.18 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES

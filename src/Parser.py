@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.57 2002/06/30 20:08:50 tavis_rudd Exp $
+# $Id: Parser.py,v 1.58 2002/10/01 17:52:02 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -16,13 +16,13 @@ where:
 
 Meta-Data
 ================================================================================
-Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.57 $
+Author: Tavis Rudd <tavis@damnsimple.com>
+Version: $Revision: 1.58 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/06/30 20:08:50 $
+Last Revision Date: $Date: 2002/10/01 17:52:02 $
 """
-__author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.57 $"[11:-2]
+__author__ = "Tavis Rudd <tavis@damnsimple.com>"
+__revision__ = "$Revision: 1.58 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##

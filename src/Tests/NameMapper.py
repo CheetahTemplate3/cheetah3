@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.7 2002/04/15 06:22:53 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.8 2002/10/01 17:52:03 tavis_rudd Exp $
 """NameMapper Tests
 
 Meta-Data
 ================================================================================
-Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.7 $
+Author: Tavis Rudd <tavis@damnsimple.com>,
+Version: $Revision: 1.8 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2002/04/15 06:22:53 $
+Last Revision Date: $Date: 2002/10/01 17:52:03 $
 """
-__author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.7 $"[11:-2]
+__author__ = "Tavis Rudd <tavis@damnsimple.com>"
+__revision__ = "$Revision: 1.8 $"[11:-2]
 
 
 ##################################################

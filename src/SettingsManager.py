@@ -4,15 +4,15 @@
 
 Meta-Data
 ==========
-Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.23 $
+Author: Tavis Rudd <tavis@damnsimple.com>
+Version: $Revision: 1.24 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2002/09/16 03:26:36 $
+Last Revision Date: $Date: 2002/10/01 17:52:02 $
 """
 
-# $Id: SettingsManager.py,v 1.23 2002/09/16 03:26:36 hierro Exp $
-__author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.23 $"[11:-2]
+# $Id: SettingsManager.py,v 1.24 2002/10/01 17:52:02 tavis_rudd Exp $
+__author__ = "Tavis Rudd <tavis@damnsimple.com>"
+__revision__ = "$Revision: 1.24 $"[11:-2]
 
 
 ##################################################

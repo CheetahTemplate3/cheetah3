@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: TemplateCmdLineIface.py,v 1.9 2002/09/03 01:53:23 hierro Exp $
+# $Id: TemplateCmdLineIface.py,v 1.10 2002/10/01 17:52:02 tavis_rudd Exp $
 
 """Provides a command line interface to compiled Cheetah template modules.
 
 Meta-Data
 ================================================================================
-Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.9 $
+Author: Tavis Rudd <tavis@damnsimple.com>
+Version: $Revision: 1.10 $
 Start Date: 2001/12/06
-Last Revision Date: $Date: 2002/09/03 01:53:23 $
+Last Revision Date: $Date: 2002/10/01 17:52:02 $
 """
-__author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.9 $"[11:-2]
+__author__ = "Tavis Rudd <tavis@damnsimple.com>"
+__revision__ = "$Revision: 1.10 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES

@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: _SkeletonPage.py,v 1.12 2002/08/22 16:36:58 tavis_rudd Exp $
+# $Id: _SkeletonPage.py,v 1.13 2002/10/01 17:52:02 tavis_rudd Exp $
 """A baseclass for the SkeletonPage template
 
 Meta-Data
 ==========
-Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.12 $
+Author: Tavis Rudd <tavis@damnsimple.com>,
+Version: $Revision: 1.13 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2002/08/22 16:36:58 $
+Last Revision Date: $Date: 2002/10/01 17:52:02 $
 """
-__author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.12 $"[11:-2]
+__author__ = "Tavis Rudd <tavis@damnsimple.com>"
+__revision__ = "$Revision: 1.13 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##

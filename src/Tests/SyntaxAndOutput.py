@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.42 2002/08/21 18:51:01 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.43 2002/10/01 17:52:03 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -11,13 +11,13 @@ TODO
 
 Meta-Data
 ================================================================================
-Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.42 $
+Author: Tavis Rudd <tavis@damnsimple.com>,
+Version: $Revision: 1.43 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/08/21 18:51:01 $
+Last Revision Date: $Date: 2002/10/01 17:52:03 $
 """
-__author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.42 $"[11:-2]
+__author__ = "Tavis Rudd <tavis@damnsimple.com>"
+__revision__ = "$Revision: 1.43 $"[11:-2]
 
 
 ##################################################
