@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.58 2004/12/15 22:32:27 jjinux Exp $
+# $Id: Compiler.py,v 1.59 2004/12/16 22:06:36 jjinux Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.58 $
+Version: $Revision: 1.59 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2004/12/15 22:32:27 $
+Last Revision Date: $Date: 2004/12/16 22:06:36 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.58 $"[11:-2]
+__revision__ = "$Revision: 1.59 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -108,14 +108,20 @@ class GenUtils:
         
         
     def genCheetahVar(self, nameChunks, plain=False):
-        # This is a special case for gettext's special method, _.
         if nameChunks[0][0] == "_":
-            plain = True
+            self.addGetTextVar(nameChunks)
         if self.setting('useNameMapper') and not plain:
             return self.genNameMapperVar(nameChunks)
         else:
             return self.genPlainVar(nameChunks)
-    
+
+    def addGetTextVar(self, nameChunks):
+        """Leave something for gettext to recognize--a harmless side effect."""
+        self.addChunk("if False:")
+        self.indent()
+        self.addChunk(self.genPlainVar(nameChunks[:]))
+        self.dedent()
+
     def genNameMapperVar(self, nameChunks):
         
         """Generate valid Python code for a Cheetah $var, using NameMapper
