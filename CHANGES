@@ -1,7 +1,7 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
-0.9.15a1 (Oct 5th, 2002)
+0.9.15a1 (Oct 6th, 2002)
   - fixed a package-relative import bug in ImportHooks.py (TR)
   - set 'monitorSrcFile' to false as it was causing problems with the
     ImportHooks ... This might be temporary as the problem needs more thought
