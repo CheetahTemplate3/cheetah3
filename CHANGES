@@ -1,5 +1,31 @@
 Please initial your changes and add a date for each release
 ================================================================================
+0.9.9a1 (October 9, 2001)  [many changes and bug-fixes]
+   - a complete reimplementation of Cheetah's core (the parser and compiler
+     classes) (TR + IB)
+
+   - implemented the #def, #implements, #import, and #from directives
+     + removed #redefine and #macros
+     + renamed #extend as #extends (TR + IB)
+
+   - replaced #data with #settings, see the docs (TR)
+
+   - restructured and updated the docs (TR + MO + IB)
+
+   - reimplemented the cheetah-compile script, without the -g option that Ian
+     had added (TR)
+
+   - changed the signature of Template.__init__.  See the docs. (TR)
+
+   - made #set distinguish between local and global vars.  See the docs. (TR)
+
+   - added a hundreds of new test cases (TR)
+
+   - started restructuring the SkeletonPage framework [not complete yet] (TR)
+
+   - added the #breakpoint and #compiler-settings directives (TR)
+
+
 
 0.9.8 (October 9, 2001)
    - added a few new language constructs (aka 'directives') to Cheetah (TR)

@@ -1,4 +1,4 @@
-include *.py TODO CHANGES README examples third_party_packages docs
+include *.py TODO CHANGES LICENSE README examples third_party_packages docs
 recursive-include bin *
 recursive-include docs * 
 recursive-include PlateKit *.py 

@@ -9,41 +9,22 @@ Cheetah TODO list
 Languague Specification
 ================================================================================
 
-- come to a decision on the syntax and semantics of the #block, #redefine and
-  #data directives.  There was discussion on the list of making a #define
-  directive that encapsulated all of this. See the archives for the end of Aug. 
-
-- firm up the autocalling and Unified Dotted Notation syntax rules
-
+- finish the #cache directive's varyBy keyword
 
 Implementation
 ================================================================================
-
-- make it possible to compile Cheetah directly into a Python module / class that
-  doesn't need to do any Cheetah parsing when it is initialized.  This is
-  related to Ian and Mike's ideas for #define.  One option is to generalize the
-  parsing/compiling infrastructure rework the ._codeGenerator() method so that
-  it can be used to generate code for any method of the Template object, rather
-  than just for the .respond() method.  When compiling the .respond() method any
-  other methods that need to be compiled would be added to a stack that would be
-  processed and compiled one at a time.
 
 - redesign and implement the Servlet Factory for Webware so the #extend directive
   will work with .tmpl files as well as .py files
 
 Test Suite
 ================================================================================
-- create the non-syntax related test cases
 - write script that will run the test cases with both Python 2.0 and 2.1
-- independent suite of test cases for NameMapper 
-- test cases for the PSP plugin
 - test cases for the SkeletonPage framework
 
 Documentation
 ================================================================================
 - finish up the Webware section
-- finish documenting the Formatters and ErrorChecker frameworks
-- add examples to the Examples section 
 
 Website
 ================================================================================
@@ -59,4 +40,5 @@ Packaging
 ================================================================================
 - Consider moving SettingsManager.py and NameMapper.py into the 
   third_party_packages dir and making setup_all.py the main install script
+
 
