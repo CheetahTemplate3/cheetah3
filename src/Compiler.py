@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.56 2003/11/25 08:39:07 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.57 2004/01/20 20:14:32 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.56 $
+Version: $Revision: 1.57 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2003/11/25 08:39:07 $
+Last Revision Date: $Date: 2004/01/20 20:14:32 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.56 $"[11:-2]
+__revision__ = "$Revision: 1.57 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -692,8 +692,8 @@ class ClassCompiler(SettingsManager, GenUtils):
 
         if self.__dict__.has_key(name):
             return self.__dict__[name]
-        elif self.__class__.__dict__.has_key(name):
-            return self.__class__.__dict__[name]
+        elif hasattr(self.__class__, name):
+            return getattr(self.__class__, name)
         elif self._activeMethods and hasattr(self._activeMethods[-1], name):
             return getattr(self._activeMethods[-1], name)
         else:
@@ -991,8 +991,8 @@ class ModuleCompiler(Parser, GenUtils):
         
         if self.__dict__.has_key(name):
             return self.__dict__[name]
-        elif self.__class__.__dict__.has_key(name):
-            return self.__class__.__dict__[name]
+        elif hasattr(self.__class__, name):
+            return getattr(self.__class__, name)
         elif self._activeClasses and hasattr(self._activeClasses[-1], name):
             return getattr(self._activeClasses[-1], name)
         else:
