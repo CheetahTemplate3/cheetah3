@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.13 2001/08/02 05:27:22 tavis_rudd Exp $
+# $Id: Test.py,v 1.14 2001/08/07 16:53:03 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.13 $
+Version: $Revision: 1.14 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/02 05:27:22 $
+Last Revision Date: $Date: 2001/08/07 16:53:03 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.13 $"[11:-2]
+__version__ = "$Revision: 1.14 $"[11:-2]
 
 
 ##################################################
@@ -138,6 +138,15 @@ defaultTestNameSpace = {
             },
     'dict2': {'one':'item1', 'two':'item2'},
     'blockToBeParsed':"""$numOne $numTwo""",
+    'nestedTDwithMacros':"""
+#macro test2(theTmpl)
+ test2 called from $theTmpl
+#end macro
+
+This is the inner template
+#test2('inner')
+#test1('inner')
+""",
     'aList': ['item0','item1','item2'],
     'list': [
     	{'index': 0, 'numOne': 1, 'numTwo': 2},
@@ -608,6 +617,35 @@ $testVar2
      "1234\naoeu\n",],
     ]
 posixCases += dataDirectiveTests
+
+macroPlusIncludeTests = [
+    ['#macro + #include test',
+     """
+#macro test1(theTmpl)
+ test1 called from $theTmpl
+#end macro
+
+This is the outer template
+#test2('outer')
+#test1('outer')
+
+#include $nestedTDwithMacros
+""",
+     """
+
+This is the outer template
+ test2 called from outer
+ test1 called from outer
+
+
+
+This is the inner template
+ test2 called from inner
+ test1 called from inner
+"""],
+    ]
+posixCases += macroPlusIncludeTests
+
 
 suiteData = [
     ['posixCases', posixCases],
