@@ -13,8 +13,6 @@ Requirements for 1.0
 - write a formalized grammar for Cheetah in BNF (MO)
 - update User's Guide about changes to SkeletonPage (no more #settings,
   etc) (TR)
-- allow searchList variables to override Python builtins. (TR)
-- something about globals (TR)
 - Decide on Cheetah's 1.0 license and update the Users' Guide. (TR)
 
 
