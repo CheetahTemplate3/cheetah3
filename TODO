@@ -95,12 +95,6 @@ Cheetah command revamp
      cheetah --version
      cheetah compile | c           # .tmpl -> .py
      cheetah fill | f              # .tmpl -> .html       (Not implemented yet)
-     cheetah cgi                   # .tmpl -> CGI script  (Not implemented yet)
-
-- Delay implementation of 'cheetah cgi' until spec is more precise.  (In
-  the meantime, you can use 'cheetah compile' and put 
-  	Content-type: text/html
-  and a blank line at the top of the template definition.)
 
 - Options common to 'compile', 'fill' and 'cgi':
     -i EXT                         # input file extension  (-i '' for no ext)
@@ -161,6 +155,25 @@ which I think is undesired.
 	Should it be called #wrapper, #access, #entry, etc?
 	
 
+Upload File
+========================================================================
+A mixin method in Cheetah.Utils (for Template) that handles file uploads --
+these are too complicated for .webInput().  The method should do a "safe"
+file upload; e.g., http://us3.php.net/manual/en/features.file-upload.php ,
+within the limitations of Python's cgi module.  The user has the choice of
+three destinations for the file contents: (A) copied to a local
+path you specify, (B) placed in a namespace variable like .cgiImport()
+does, or (C) returned.  (B) parallels .webInput, but (A) will certainly be
+desirable situations where we just want to save the file, not read it into
+memory.  Reject files larger than a user-specified size or not in a list of
+user-approved MIME types.  Define appropriate exceptions for typical
+file-upload errors.  Method name .webUploadFileAsString?
+	One situation to support is when  form has a text(area) field
+related to a file-upload control on the same form, and the user has the choice
+of typing into the field or uploading a text file.  We need a method that
+updates the text field's value if there is an uploaded file, but not if there
+isn't.  This may be handled by the regular method(s) or may require a separate
+method.
 
 
 Test Suite
