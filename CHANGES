@@ -2,7 +2,8 @@ Please initial your changes (there's a key at bottom) and add a date for each re
 ================================================================================
 
 0.9.12 (April 3, 2002)
-   - no changes from beta 2
+   - no code changes from beta 2
+   - a few alterations to the docs (MO)
 
 0.9.12b2 (Mar 28, 2002)
    - fixed Win32 path bug in Template._makeDummyPackageForDir() (TR)
