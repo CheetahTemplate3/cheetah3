@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SetupTools.py,v 1.5 2002/10/01 17:52:02 tavis_rudd Exp $
+# $Id: SetupTools.py,v 1.6 2002/10/05 19:52:00 tavis_rudd Exp $
 """Some tools for extending and working with distutils
 
 CREDITS: This module borrows code and ideas from M.A. Lemburg's excellent setup
@@ -8,7 +8,7 @@ tools for the mxBase package.
 """
 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 
 ##################################################
@@ -34,6 +34,7 @@ from os.path import exists, isdir, isfile, join, splitext
 import types
 import glob
 import string
+import traceback
 
 #imports from Cheetah ...
 from src.FileUtils import findFiles
@@ -177,6 +178,29 @@ class sdist_docs(sdist):
         sdist.run(self)
 
 
+class mod_install(install):
+    
+    """A modified version of the disutils install command that gets rid of the
+    old site-packages/Webware/Cheetah directory.
+    """
+
+    def removeOldCheetahLocation(self):
+        import shutil
+        oldInstallPath =  os.path.join(self.install_lib, 'Webware', 'Cheetah')
+        if os.path.exists(oldInstallPath):
+            print 'removing old cheetah installation directory', oldInstallPath
+            try:
+                shutil.rmtree(oldInstallPath)
+            except:
+                traceback.print_exc()
+                print '>>> COULD NOT REMOVE OLD CHEETAH INSTALL DIR (' + \
+                      oldInstallPath + ') YOU MUST DO IT MANUALLY.'
+        
+
+    def run (self):
+        install.run(self)
+        self.removeOldCheetahLocation()
+        
 ##################################################
 ## FUNCTIONS ##
 
@@ -209,6 +233,7 @@ def run_setup(configurations):
 
     # Add setup extensions
     cmdclasses = {
+        'install':mod_install,
         'install_data': mod_install_data,
         'contrib':contrib,
         'sdist_docs':sdist_docs,
