@@ -69,6 +69,13 @@ Please initial your changes and add a date for each release
         ... includes the value of the EXPR 
 
         where <ARGS> is 'raw' or 'direct'
+
+  - re-implemented the output mechanism to use streaming via Webware's
+    Transaction and Response objects when available and fake it with the
+    DummyTransaction DummyResponse classes when the Webware Transaction is not
+    avialable. This behaviour is roughly the same as in Webware's PSP.  Will
+    implement output buffering PHP-style later if there is any demand. (TR)
+
  
 0.9.7 (July 13, 2001)
   - reimplemented the parsing of $placeholders using the Python tokenize module (TR)
