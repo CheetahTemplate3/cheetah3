@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.10 2002/08/09 01:43:18 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.11 2002/08/09 02:10:15 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/08/09 01:43:18 $
+Last Revision Date: $Date: 2002/08/09 02:10:15 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.10 $"[11:-2]
+__revision__ = "$Revision: 1.11 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -26,6 +26,7 @@ import __builtin__
 import new
 import imp
 from threading import Lock
+import string
 
 # intra-package imports ...
 import ImportManager
@@ -46,6 +47,21 @@ CACHE_PY_FILES = False
 CACHE_DIR = None
 
 ##################################################
+## HELPER FUNCS
+
+l = ['_'] * 256
+for c in string.digits + string.letters:
+    l[ord(c)] = c
+_pathNameTransChars = string.join(l, '')
+
+def convertTmplPath(tmplPath,
+                    _pathNameTransChars=_pathNameTransChars
+                    splitdrive=os.path.splitdrive,
+                    translate=string.translate,
+                    ):
+    return translate(splitdrive(tmplPath)[1], _pathNameTransChars)
+
+##################################################
 ## CLASSES
 
 class CheetahDirOwner(DirOwner):
@@ -57,7 +73,9 @@ class CheetahDirOwner(DirOwner):
     def getmod(self, name,
                pathIsDir=os.path.isdir,
                join=os.path.join,
-               newmod=imp.new_module):
+               newmod=imp.new_module,
+               convertTmplPath=convertTmplPath,
+               ):
         
         tmplPath =  os.path.join(self.path, name + '.tmpl')
         mod = DirOwner.getmod(self, name)
@@ -71,8 +89,7 @@ class CheetahDirOwner(DirOwner):
             code = str(Compiler(file=tmplPath, moduleName=name,
                                 mainClassName=name))
             if CACHE_PY_FILES and CACHE_DIR:
-                __file__ = join(CACHE_DIR,
-                                tmplPath.replace('/','_').replace('\\','_'))
+                __file__ = join(CACHE_DIR, convertTmplPath(tmplPath))
                 try:
                     open(__file__, 'w').write(code)
                 except :
