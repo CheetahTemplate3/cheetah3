@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.21 2001/10/10 06:47:41 tavis_rudd Exp $
+# $Id: Parser.py,v 1.22 2001/10/10 06:55:44 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.21 $
+Version: $Revision: 1.22 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/10/10 06:47:41 $
+Last Revision Date: $Date: 2001/10/10 06:55:44 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.21 $"[11:-2]
+__version__ = "$Revision: 1.22 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -34,8 +34,8 @@ from types import StringType, ListType, TupleType
 
 # intra-package imports ...
 from Lexer import Lexer
-import Formatters
-import ErrorCheckers
+import Filters
+import ErrorCatchers
 ##################################################
 ## FUNCTIONS ##
 

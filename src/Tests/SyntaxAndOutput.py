@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.2 2001/10/10 06:47:41 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.3 2001/10/10 06:57:22 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -17,12 +17,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/10/10 06:47:41 $
+Last Revision Date: $Date: 2001/10/10 06:57:22 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 
 ##################################################
@@ -480,7 +480,6 @@ class Placeholders(OutputTest):
 
     def test15(self):
         """1 placeholder enclosed in {} + WS + *<float>*cache"""
-
         self.verify("$*0.5d*{ aStr   }", "blarg")
 
     def test16(self):
@@ -677,21 +676,6 @@ class Placeholders_Calls(OutputTest):
         """deeply nested argstring, () enclosure + *15*cache"""
         self.verify("$*15*(aFunc(  $arg = $aMeth( $arg = $aFunc( 1 ) ) ) )",
                     "1")
-    def test26(self):
-        """deeply nested argstring, () enclosure + !cache"""
-        self.verify("$**(aFunc(  $arg = $aMeth( $arg = $aFunc( 1 ) ) ) )",
-                    "1")
-
-    def test27(self):
-        """deeply nested argstring, () enclosure + !cache and triple quotes"""
-        self.verify("$**(aFunc(  $arg = $aMeth( $arg = $aFunc( '''1''' ) ) ) )",
-                    "1")
-
-    def test28(self):
-        """deeply nested argstring, () enclosure + !cache and triple quotes + EOLs"""
-        self.verify("$**(aFunc( \n $arg = $aMeth( \n$arg = $aFunc( '''\n1\n''' ) ) ) )",
-                    "\n1\n")
-
 
 class NameMapper(OutputTest):
     def test1(self):
@@ -808,6 +792,28 @@ class CacheDirective(OutputTest):
         r"""simple #cache + WS"""
         self.verify("  #cache  \n$anInt",
                     "1")
+
+    def test3(self):
+        r"""simple #cache ... #end cache"""
+        self.verify("""#cache id='cache1', timer=150m
+$anInt
+#end cache
+$aStr""",
+                    "1\nblarg")
+        
+    def test4(self):
+        r"""2 #cache ... #end cache blocks"""
+        self.verify("""#slurp
+#cache ID='cache1', timer=150m
+$anInt
+#end cache
+#cache id='cache2', timer=15s
+ #for $i in range(5)
+$i#slurp
+ #end for
+#end cache
+$aStr""",
+                    "1\n01234blarg")
 
 class SlurpDirective(OutputTest):
     def test1(self):
@@ -1035,25 +1041,21 @@ class DefDirective(OutputTest):
 
     def test7(self):
         """#def with *args, gobble WS"""
-        self.DEBUG=1
         self.verify("  #def testMeth($*args)   \n1234-$args\n  #end def\n$testMeth",
                     "1234-()\n")
 
     def test8(self):
         """#def with **KWs, gobble WS"""
-        self.DEBUG=1
         self.verify("  #def testMeth($**KWs)   \n1234-$KWs\n  #end def\n$testMeth",
                     "1234-{}\n")
 
     def test9(self):
         """#def with *args + **KWs, gobble WS"""
-        self.DEBUG=1
         self.verify("  #def testMeth($*args, $**KWs)   \n1234-$args-$KWs\n  #end def\n$testMeth",
                     "1234-()-{}\n")
 
     def test10(self):
         """#def with *args + **KWs, gobble WS"""
-        self.DEBUG=1
         self.verify(
             "  #def testMeth($*args, $**KWs)   \n1234-$args-$KWs.a\n  #end def\n$testMeth(1,2, a=1)",
             "1234-(1, 2)-1\n")
@@ -1269,16 +1271,6 @@ $testDict.two""",
         """simple #set with a list and *<float>*cache"""
         self.verify("   #set global $testVar = [1, 2, 3]  \n$*.5*testVar",
                     "[1, 2, 3]")
-    def test14(self):
-        """simple #set with a list and !cache
-
-        Should raise NotFound
-        """
-        def test(self=self):
-            self.verify("   #set global $testVar = [1, 2, 3]  \n$**testVar",
-                                          "[1, 2, 3]"),
-        self.failUnlessRaises(NotFound, test)
-                              
 
 
 class IfDirective(OutputTest):
@@ -1334,10 +1326,6 @@ class IfDirective(OutputTest):
     def test11(self):
         """#if block using $*5*emptyString"""
         self.verify("#if $*5*emptyString\n$aStr\n#end if\n",
-                    "")
-    def test12(self):
-        """#if block using $**emptyString"""
-        self.verify("#if $**emptyString\n$aStr\n#end if\n",
                     "")
        
 class PSP(OutputTest):
