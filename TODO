@@ -6,7 +6,15 @@ Cheetah TODO list
 
 * When a task is completed please remember to note it in the CHANGES file
 
-Languague Specification
+
+Goals for 1.0
+=========================================================================
+- Change #compiler-settings to #compiler
+- Revamp 'cheetah' command-line arguments (see below)
+- write a formalized grammar for Cheetah in BNF 
+
+
+Other TODO Items
 ================================================================================
 
 - revisit parsed #include directives.  Are they necessary at all??
@@ -16,10 +24,6 @@ Languague Specification
   something else do a parsed include ('#include parsed', '#include cheetah'?),
   so that users get parsing only if they explicitly request it.
 
-- write a formalized grammar for Cheetah in BNF 
-
-Implementation
-================================================================================
 
 - implement some better error handling for misformed #for, #if, #try directives,
   etc.  At the moment these errors are not caught until Python executes the
