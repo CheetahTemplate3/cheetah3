@@ -10,6 +10,12 @@ Please initial your changes and add a date for each release
      callable local vars from being handled properly. See Chuck's post of Sept
      10. (TR)
 
+   - fixed a pointer bug in the C version of NameMapper.valueFromSearchList()
+     that was yielding undefined values for the NotFound exception when it was
+     raised (TR)
+
+   - prefaced all internal args to Template() with underscores
+
 0.9.8a4 (September 7, 2001)
 
   - Added -g (appendGen function argument), which compiles x.tmpl to xGen.py,
