@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.52 2001/09/10 18:46:17 tavis_rudd Exp $
+# $Id: Template.py,v 1.53 2001/09/10 19:07:36 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.52 $
+Version: $Revision: 1.53 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/09/10 18:46:17 $
+Last Revision Date: $Date: 2001/09/10 19:07:36 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.52 $"[11:-2]
+__version__ = "$Revision: 1.53 $"[11:-2]
 
 
 ##################################################
@@ -558,7 +558,7 @@ class Template(SettingsManager, Parser):
                 "timedRefreshCache=self._timedRefreshCache,\n " + 
                 "timedRefreshList=self._timedRefreshList,\n " + 
                 "timedRefresh=self._timedRefresh,\n " + 
-                "includeCheetahSource=self.includeCheetahSource,\n " + 
+                "includeCheetahSource=self._includeCheetahSource,\n " + 
                 "errorChecker=self._errorChecker,\n " + 
                 "):\n" +
                 indent * 1 + "try:\n" +
@@ -686,46 +686,6 @@ class Template(SettingsManager, Parser):
     ##################################################
     ## methods that can only be used before a template has been compiled
 
-    def includeCheetahSource(self, srcArg, trans=None, includeFrom='file', raw=False):
-        includeID = id(srcArg)
-        if not self._cheetahIncludes.has_key(includeID):
-            if includeFrom == 'file':
-                path = self.normalizePath(srcArg)
-                if not raw:
-                    nestedTemplate = Template(templateDef=None,
-                                              file=path,
-                                              overwriteSettings=self.settings(),
-                                              preBuiltSearchList=self.searchList(),
-                                              setVars = self._setVars,
-                                              cheetahBlocks=self._cheetahBlocks,
-                                              macros=self._macros,
-                                              )
-                    if not hasattr(nestedTemplate, 'respond'):
-                        nestedTemplate.compileTemplate()
-                    self._cheetahIncludes[includeID] = nestedTemplate
-                else:
-                    self._cheetahIncludes[includeID] = self.getFileContents(path)
-            else:                       # from == 'str'
-                if not raw:
-                    nestedTemplate = Template(
-                        templateDef=srcArg,
-                        overwriteSettings=self.settings(),
-                        preBuiltSearchList=self.searchList(),
-                        setVars = self._setVars,
-                        cheetahBlocks=self._cheetahBlocks,
-                        macros=self._macros,
-                        )
-                    if not hasattr(nestedTemplate, 'respond'):
-                        nestedTemplate.compileTemplate()
-                    self._cheetahIncludes[includeID] = nestedTemplate
-                else:
-                    self._cheetahIncludes[includeID] = srcArg
-        ##
-
-        if not raw:
-            self._cheetahIncludes[includeID].respond(trans)
-        else:
-            trans.response().write(self._cheetahIncludes[includeID])
 
     def defineTemplateBlock(self, blockName, blockContents):
         """Define a block.  See the user's guide for info on blocks.  Only call
@@ -834,6 +794,50 @@ class Template(SettingsManager, Parser):
 
     ##################################################
     ## methods that can be called at any time
+
+    def _includeCheetahSource(self, srcArg, trans=None, includeFrom='file', raw=False):
+        
+        """This is the method that #include directives translate into."""
+        
+        includeID = id(srcArg)
+        if not self._cheetahIncludes.has_key(includeID):
+            if includeFrom == 'file':
+                path = self.normalizePath(srcArg)
+                if not raw:
+                    nestedTemplate = Template(templateDef=None,
+                                              file=path,
+                                              overwriteSettings=self.settings(),
+                                              preBuiltSearchList=self.searchList(),
+                                              setVars = self._setVars,
+                                              cheetahBlocks=self._cheetahBlocks,
+                                              macros=self._macros,
+                                              )
+                    if not hasattr(nestedTemplate, 'respond'):
+                        nestedTemplate.compileTemplate()
+                    self._cheetahIncludes[includeID] = nestedTemplate
+                else:
+                    self._cheetahIncludes[includeID] = self.getFileContents(path)
+            else:                       # from == 'str'
+                if not raw:
+                    nestedTemplate = Template(
+                        templateDef=srcArg,
+                        overwriteSettings=self.settings(),
+                        preBuiltSearchList=self.searchList(),
+                        setVars = self._setVars,
+                        cheetahBlocks=self._cheetahBlocks,
+                        macros=self._macros,
+                        )
+                    if not hasattr(nestedTemplate, 'respond'):
+                        nestedTemplate.compileTemplate()
+                    self._cheetahIncludes[includeID] = nestedTemplate
+                else:
+                    self._cheetahIncludes[includeID] = srcArg
+        ##
+
+        if not raw:
+            self._cheetahIncludes[includeID].respond(trans)
+        else:
+            trans.response().write(self._cheetahIncludes[includeID])
         
     def searchList(self):
         """Return a reference to the searchlist"""
