@@ -13,9 +13,10 @@ Please initial your changes and add a date for each release
     are None. (MO)
   - CodeGenerator new function 'varNotFound_KeyError': raises KeyError if a
     placeholder name is missing when filling the template.  Disabled by default.
-    (MO)
+    (MO)  NB - this change has been superceeded by 'errorCheckers'
   - Template.getUnknowns (new method): returns a list of Placeholder Names
-    missing in the Search List. (MO)
+    missing in the Search List. (MO) - this change has been superceeded by 
+    'errorCheckers'
   - made changes to Template.py, CodeGenerator.py, PlaceholderProcessor.py,
     and TagProcessor.py to enable customization of the placeholderStartToken so 
     it can be set to any character sequence, rather than just the default '$'.
@@ -39,6 +40,10 @@ Please initial your changes and add a date for each release
     (TR)
   - got relative path includes working with Webware and Cheetah.Servlet (TR)
   - lots of changes in the docs (TR & MO)
+  - implemented a C version of NameMapper (TR + CE)
+  - added the 'errorCheckers' framwork (TR)
+  - added the 'formatters' framework and the #formatter directive
+  - a major restructuring of the modules and internal API (TR)
 
  
 0.9.7 (July 13, 2001)
