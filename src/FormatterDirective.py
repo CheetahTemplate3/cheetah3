@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: FormatterDirective.py,v 1.4 2001/08/16 22:15:17 tavis_rudd Exp $
+# $Id: FormatterDirective.py,v 1.5 2001/08/19 22:04:13 tavis_rudd Exp $
 """FormatterDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/16 22:15:17 $
+Last Revision Date: $Date: 2001/08/19 22:04:13 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -84,6 +84,6 @@ class FormatterDirective(TagProcessor.TagProcessor):
             methodStr = ''
             
         return indent * state['indentLevel'] + \
-               'format = self._theFormatters["' + currFormatterID + '"]' + methodStr + "\n" + \
+               'format = theFormatters["' + currFormatterID + '"]' + methodStr + "\n" + \
                indent * state['indentLevel']
         

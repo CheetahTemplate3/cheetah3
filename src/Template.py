@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.46 2001/08/17 15:48:55 tavis_rudd Exp $
+# $Id: Template.py,v 1.47 2001/08/19 22:04:13 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.46 $
+Version: $Revision: 1.47 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/17 15:48:55 $
+Last Revision Date: $Date: 2001/08/19 22:04:13 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.46 $"[11:-2]
+__version__ = "$Revision: 1.47 $"[11:-2]
 
 
 ##################################################
@@ -536,18 +536,23 @@ class Template(SettingsManager, Parser):
             if debug: results['stage3'] = []
             indent = settings['indentationStep']
             generatedCode = \
-                          "def generatedFunction(self, trans=None, iAmNested=False," + \
-                          "getmtime=os.path.getmtime,\n " + \
+                          "def generatedFunction(self, trans=None, iAmNested=False,\n " + \
+                          "joinListAsStr=''.join,\n " + \
                           "filePath=self._filePath,\n " + \
                           "fileMtime=self._fileMtime,\n " + \
+                          "getmtime=os.path.getmtime,\n " + \
+                          "currentTime=currentTime,\n " + \
+                          "valueFromSearchList=valueFromSearchList,\n " + \
+                          "valueForName=valueForName,\n " + \
                           "format=self._initialFormatter,\n " + \
-                          "searchList=self._searchList, " + \
+                          "searchList=self._searchList,\n " + \
+                          "theFormatters=self._theFormatters,\n " + \
                           "setVars=self._setVars,\n " + \
-                          "checkForCacheRefreshes=self._checkForCacheRefreshes, " + \
+                          "checkForCacheRefreshes=self._checkForCacheRefreshes,\n " + \
                           "timedRefreshCache=self._timedRefreshCache,\n " + \
-                          "timedRefreshList=self._timedRefreshList, " + \
+                          "timedRefreshList=self._timedRefreshList,\n " + \
                           "timedRefresh=self._timedRefresh,\n " + \
-                          "errorChecker=self._errorChecker" + \
+                          "errorChecker=self._errorChecker,\n " + \
                           "):\n" \
                           + indent * 1 + "try:\n" \
                           + indent * 2 + "#setupCodeInsertMarker\n" \
@@ -561,10 +566,11 @@ class Template(SettingsManager, Parser):
                           + indent * 4 + "timedRefresh(currTime)\n"\
                           + indent * 3 + "                                   \n" \
                           + indent * 2 + "outputList = []\n" \
-                          + indent * 2 + "outputList.extend( ['''" + \
+                          + indent * 2 + "extendOutputList = outputList.extend\n" \
+                          + indent * 2 + "extendOutputList( ['''" + \
                                          codeFromTextVsTagsList + \
                                          "''',] )\n" \
-                          + indent * 2 + "output = ''.join(outputList)\n" \
+                          + indent * 2 + "output = joinListAsStr(outputList)\n" \
                           + indent * 2 + "if trans and not iAmNested:\n" \
                           + indent * 3 + "trans.response().write(output)\n" \
                           + indent * 2 + "return output\n" \
