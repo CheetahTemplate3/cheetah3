@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: setup.py,v 1.11 2002/03/02 20:26:17 tavis_rudd Exp $
+# $Id: setup.py,v 1.12 2002/03/06 18:05:50 tavis_rudd Exp $
 
 try:                           # see if WebwareExp's Setup procedure can be used
     from src._properties import Version, Description
@@ -10,6 +10,7 @@ try:                           # see if WebwareExp's Setup procedure can be used
                'description':Description,
                }
     from Webware.Setup import SetupManager
+    SetupManager._rebuildManifestTemplate = 0
     SetupManager(searchPath=['.'],settings=settings)
 except ImportError:
     import SetupTools

@@ -22,6 +22,12 @@ PackageToDirMap = {'%(PackageName)s':'%(PackageDir)s',
                    '%(PackageName)s.HelpDesk.Docs':'docs',
                    '%(PackageName)s.HelpDesk.Examples':'examples',
                    }
+ManifestTemplates = ['recursive-include %(PackageDir)s *',
+                     'recursive-exclude %(PackageDir)s *.pyc *~ *.aux',
+                     'include *.py *.cfg TODO CHANGES LICENSE README examples docs',
+                     'recursive-include docs * ',
+                     'recursive-exclude docs *~ *.aux',
+                     ]
 
 Scripts = ['bin/cheetah-compile',
            ]
