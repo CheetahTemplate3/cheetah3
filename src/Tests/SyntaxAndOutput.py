@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.31 2002/04/24 06:21:08 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.32 2002/04/24 21:20:27 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.31 $
+Version: $Revision: 1.32 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/04/24 06:21:08 $
+Last Revision Date: $Date: 2002/04/24 21:20:27 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.31 $"[11:-2]
+__revision__ = "$Revision: 1.32 $"[11:-2]
 
 
 ##################################################
@@ -1794,7 +1794,6 @@ $anInt//comment
 $anInt//comment
 """,
                     "1\n1\n1//comment\n")
-
 
 
 class CompilerSettingsDirective(OutputTest):
