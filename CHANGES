@@ -24,6 +24,12 @@ release
     to handle GET/POST variables from CGI scripts as well as from Webware. (MO)
   - User's Guide: new sections "Non-Webware HTML Output" and "Non-HTML
     Output". (MO)
+  - Expanded $webInput() -- renamed from $cgiImport() -- to work both with
+    Webware input and CGI scripts.  Handles GET/POST/cookie/session vars under
+    Webware, and GET/POST under CGI.  Defined in Cheetah.Utils.WebInputMixin,
+    now inherited by Template directly. (MO)
+  - Tools.CGITemplate has methods to output CGI headers (=HTTP headers).
+    (This was briefly in a TemplateMisc module, but no longer.) (MO)
 
 
 0.9.13 (May 8, 2002)
