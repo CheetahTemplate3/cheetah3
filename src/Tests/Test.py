@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.32 2002/03/07 03:54:58 tavis_rudd Exp $
+# $Id: Test.py,v 1.33 2002/03/07 04:02:06 tavis_rudd Exp $
 """Core module of Cheetah's Unit-testing framework
 
 TODO
@@ -16,12 +16,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.32 $
+Version: $Revision: 1.33 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/03/07 03:54:58 $
+Last Revision Date: $Date: 2002/03/07 04:02:06 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.32 $"[11:-2]
+__revision__ = "$Revision: 1.33 $"[11:-2]
 
 
 ##################################################
@@ -40,6 +40,8 @@ False = (0==1)
 ## CLASSES
 class RunTests:
     def __init__(self):
+        pass
+    def run(self):
         import SyntaxAndOutput
         suite = unittest.findTestCases(SyntaxAndOutput)
         
@@ -60,4 +62,4 @@ class RunTests:
 ##################################################
 ## if run from the command line
 if __name__ == '__main__':
-    RunTests()
+    Tests().run()
