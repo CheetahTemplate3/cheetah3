@@ -1,6 +1,20 @@
 \section{Introduction}
 \label{intro}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Who should read this Guide?}
+
+This Users Guide is for those wishing an overview, tutorial and reference for
+the Cheetah template system.  A basic knowledge of Python is assumed.
+This Guide also contains examples of integrating Cheetah with Webware for
+Python, a web application development framework.  Knowledge of Webware is not
+assumed, but of course you will have to learn Webware from its own 
+documentation in order to build a Webware + Cheetah site.
+
+Further resources on Python and Webware are in the appendix ``Links''.
+(Not written yet.)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{What is Cheetah?}
 \label{intro.whatIs}
@@ -240,22 +254,16 @@ articulated yet, but probably includes:
 \begin{itemize}
 
 \item  Much of the vocabulary.  We are trying to use consistent terminology in
-      this guide.
+      this Guide.
 
 \item  The constructor and methods of the Template class, the Search List, 
       and the cheetah-compile program.
 
-\item  Placeholder tags:  $placeholderName . $a.b.c.d  looks up attributes or
-      keys.  Case sensitivity.  Trailing periods are not part of the 
-      placeholder.  You can always use ${placeholderName} to make explicit 
-      where the Placeholder Name ends.  Functions and methods will probably
-      be autocalled by default; other callable types will never be autocalled
-      (provided you don't fool the TO).  The caching rules are "stable unless
-      something comes up".
-
-\item  There will be a syntax for fuction arguments in () and 
-      keys/subscripts in [].  It will be similar to the current syntax, 
-      although we may have to make some adjustments.
+\item  Placeholder tags:  \$placeholderName or \$placeholderName.  Case
+      sensitivity.  Uniform Dotted Notation (in \$a.b, 'b' can be an attribute
+      or key of 'a'.)  Trailing periods are not part of the placeholder.
+      Autocalling.  The caching rules are "stable unless something comes up".
+      Fuction arguments in (); keys/subscripts in [].
 
 \item  Directive tag syntax, /# or newline to end a directive tag, #end tags 
       to terminate multiline directives.  The existence and intent of ##,
