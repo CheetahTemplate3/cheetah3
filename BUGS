@@ -8,6 +8,8 @@ Cheetah, be sure to note its fix in the CHANGES file!
 
 Clash between searchList and locally assigned variables
 =======================================================
+@@TR 2004-12-30: I'm about to checkin some changes that will fix this.
+
 On Saturday 31 January 2004 05:29, <psyche@mensa.org.pl> wrote:
   from Cheetah.Template import Template as tmpl
   print tmpl( \
@@ -32,27 +34,29 @@ On Saturday 31 January 2004 05:29, <psyche@mensa.org.pl> wrote:
 
 Compiler forgets commas
 =======================
-Affects Cheetah 0.9.14, CVS and possibly earlier.
-- fix bug in Parser.getDefArgList() that is mucking up lists where the comma has
-  been forgotten:
+@@TR: This is not a bug.  Python and Cheetah's syntax requires commas.
 
-  > #cache timer='.5m' id='cache1'
-  > This is a cached region.  $voom
-  > #end cache
-  > 
-  > the error is:
-  > 
-  > "/local/opt/Python/lib/python2.2/site-packages/Webware/Cheetah/Compiler.py",
-  > line 102, in genCacheInfoFromArgList
-  >     val = self.genTimeInterval(val)
-  >   File
-  > "/local/opt/Python/lib/python2.2/site-packages/Webware/Cheetah/Compiler.py",
-  > line 75, in genTimeInterval
-  >     interval = float(timeString)*60
-  > ValueError: invalid literal for float(): .5m' id'cache1
-  > 
-  > 
-  > Running under pdb shows that Parser.getDefArgList() returned:
-  > "30m' id'cache1" .
-
+# Affects Cheetah 0.9.14, CVS and possibly earlier.
+# - fix bug in Parser.getDefArgList() that is mucking up lists where the comma has
+#   been forgotten:
+# 
+#   > #cache timer='.5m' id='cache1'
+#   > This is a cached region.  $voom
+#   > #end cache
+#   > 
+#   > the error is:
+#   > 
+#   > "/local/opt/Python/lib/python2.2/site-packages/Webware/Cheetah/Compiler.py",
+#   > line 102, in genCacheInfoFromArgList
+#   >     val = self.genTimeInterval(val)
+#   >   File
+#   > "/local/opt/Python/lib/python2.2/site-packages/Webware/Cheetah/Compiler.py",
+#   > line 75, in genTimeInterval
+#   >     interval = float(timeString)*60
+#   > ValueError: invalid literal for float(): .5m' id'cache1
+#   > 
+#   > 
+#   > Running under pdb shows that Parser.getDefArgList() returned:
+#   > "30m' id'cache1" .
+# 
 
