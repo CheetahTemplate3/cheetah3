@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.34 2002/04/24 21:32:19 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.35 2002/04/26 19:12:25 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.34 $
+Version: $Revision: 1.35 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/04/24 21:32:19 $
+Last Revision Date: $Date: 2002/04/26 19:12:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.34 $"[11:-2]
+__revision__ = "$Revision: 1.35 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -809,7 +809,7 @@ class ClassCompiler(SettingsManager, GenUtils):
             methodName = self._placeholderToErrorCatcherMap[rawCode]
             if not self.setting('outputRowColComments'):
                 self._methodsIndex[methodName].addMethDocString(
-                    'plus at line, col ' +lineCol)
+                    'plus at line, col ' + str(lineCol))
             return methodName
 
         self._errorCatcherCount += 1
@@ -821,7 +821,7 @@ class ClassCompiler(SettingsManager, GenUtils):
         catcherMeth.setMethodSignature('def ' + methodName +
                                      '(self, localsDict={})')
         catcherMeth.addMethDocString('Generated from ' + rawCode +
-                                   ' at line, col ' + lineCol + '.') 
+                                   ' at line, col ' + str(lineCol) + '.') 
         catcherMeth.addChunk('try:')
         catcherMeth.indent()
         catcherMeth.addChunk("return eval('''" + codeChunk + "''', globals(), localsDict)")
