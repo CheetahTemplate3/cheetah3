@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.4 2001/07/12 01:44:19 tavis_rudd Exp $
+# $Id: Test.py,v 1.5 2001/07/12 18:07:18 echuck Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/12 01:44:19 $
+Last Revision Date: $Date: 2001/07/12 18:07:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 
 ##################################################
@@ -143,6 +143,7 @@ defaultTestNameSpace = {
     	{'index': 1, 'numOne': 1, 'numTwo': 2},
 	    ],
 	'nameList': [('john', 'doe'), ('jane', 'smith')],
+	'letterList': ['a', 'b', 'c'],
     }
 
 
@@ -534,10 +535,22 @@ posixCases += callMacroTests
 # @@ at the moment the #entend directive is only caught by Servlet.extendTemplate()
 
 
-if 0:
-    miscBugCases = [
-	    ]
-    posixCases += miscBugCases
+miscBugCases = [
+    ]
+posixCases += miscBugCases
+
+
+importantExampleCases = [
+    ['simple #include raw of file - with whitespace',
+     '''#set sep = ''
+#for letter in $letterList
+${sep}${letter}#slurp
+#set sep = ', '
+#end for
+''',
+     "a, b, c",],
+    ]
+posixCases += importantExampleCases
 
 
 windowsCases = deepcopy(posixCases)
