@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SettingsManager.py,v 1.14 2001/11/25 19:54:25 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.15 2001/11/26 22:17:46 tavis_rudd Exp $
 """Provides a mixin/base class for managing application settings 
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.14 $
+Version: $Revision: 1.15 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2001/11/25 19:54:25 $
+Last Revision Date: $Date: 2001/11/26 22:17:46 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.14 $"[11:-2]
+__version__ = "$Revision: 1.15 $"[11:-2]
 
 
 ##################################################
@@ -241,6 +241,13 @@ class SettingsManager:
         self.updateSettingsFromConfigFileObj(fp, **kw)
         fp.close()
 
+    def readSettingsFromConfigFile(self, path, convert=True):
+        path = self.normalizePath(path)
+        fp = open(path)
+        settings = self.readSettingsFromConfigFileObj(fp, convert=convert)
+        fp.close()
+        return settings
+    
     def updateSettingsFromConfigFileObj(self, inFile, convert=True, merge=True):
         
         """See the docstring for .updateSettingsFromConfigFile()
