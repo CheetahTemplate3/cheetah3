@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Imports, Inheritance, Declarations and Assignments}
+\section{Import, Inheritance, Declaration and Assignment}
 \label{inheritanceEtc}
 
 
@@ -17,11 +17,13 @@ generated Python class.
 #import math as mathModule
 #from math import sin, cos
 #from math import sin as _sin
+#import random, re
+#from mx import DateTime         # ## Part of Egenix's mx package.
 \end{verbatim}
 
 After the above imports, \code{\$math}, \code{\$mathModule}, 
-\code{\$sin}, \code{\$cos} and \code{\$\_sin} may be used in 
-\code{\$placeholders} and expressions.
+\code{\$sin}, \code{\$cos} and \code{\$\_sin}, \code{\$random}, \code{\$re} 
+and \code{\$DateTime} may be used in \code{\$placeholders} and expressions.
 
 The wildcard form \code{from MODULE import *} is not supported:
 \begin{verbatim}
@@ -33,33 +35,62 @@ $sin(8)                       ## Raises NameMapper.NotFound error at fill time.
 \subsection{\#extends}
 \label{inheritanceEtc.extends}
 
-Normally, the generated template class is a subclass of
-\code{Cheetah.Template.Template}.  This gives it standard \code{Template}
-functionality as well as making it usable as a Webware servlet.  However,
-sometimes you want to inherit from a more general template (e.g., one
-containing your generic site framework), or from a pure Python class (so you
-can call its methods and attributes as placeholders.  The \code{\#extends}
-directive allows you to specify which parent class to inherit from.  It is
-equivalent to PSP's \code{``@page extends=''} directive. 
+All templates are subclasses of \code{Cheetah.Template.Template}.  This is what
+gives them template functionality and allows them to be used as Webware
+servlets.  By default they are direct subclasses, meaning \code{Template} is
+the immediate parent of the generated class.  However, it's possible for a
+template to subclass another template or a pure Python class.  This is where
+\code{\#extends} steps in: it specifies the parent class.  It's equivalent to
+PSP's \code{``@page extends=''} directive. 
 
 \begin{verbatim}
 #from Cheetah.Templates.SkeletonPage import SkeletonPage
 #extends SkeletonPage
 \end{verbatim}
 
-In the very near future, you won't need those \code{\#from ... import}
-directives because \code{\#extends} will implicitly import whatever 
-classes it needs, but for now the explicit imports are necessary.
+In the very near future, you won't need that \code{\#from ... import}
+because \code{\#extends} will implicitly import whatever 
+class it needs, but for now the explicit import is necessary.
 
-Three rules: (A) you may inherit from only one superclass (no multiple
-inheritance), (B) there may be at most one \code{\#extends} directive per
-template, and (C) the highest-level superclass in the chain must be
-\code{Cheetah.Template.Template}.  
+There can be only one \code{\#extends} directive in a template and it
+may list only one class.  In other words, templates don't do multiple
+inheritance.  This is intentional: it's too hard to initialize multiple
+base classes correctly from inside a template.  However, you can still do
+multiple inheritance in your pure Python classes.
+
+If your pure Python class overrides any of the standard \code{Template}
+methods such as \code{.\_\_init\_\_} or \code{.awake}, be sure to call
+the superclass method in your method, or things will break.  Examples of calling
+the superclass method are in section \ref{tips.callingSuperclassMethods}.
+A list of all superclass methods is in section 
+\ref{tips.allMethods}.
+
+You may make an inheritance chain as long as you wish, containing templates and
+pure Python classes, provided the top of the chain (the most general
+superclass) is \code{Template}.  If your topmost class is a template, simply
+omit the \code{\#extends} in that template and it will automatically inherit
+\code{Template}.  If your topmost class is a pure Python class, you must
+inherit from \code{Template} explicitly:
+\begin{verbatim}
+from Cheetah.Template import Template
+class MyPurePythonClass(Template):
+\end{verbatim}
+
+If you're not keen about having your Python classes inherit from
+\code{Template}, create a tiny glue class that inherits both from your
+class and from \code{Template}.
+
+Before giving any examples we'll stress that Cheetah does {\em not}
+dictate how you should structure your inheritance tree.  As long as
+\code{Template} is at the top, and overriding methods call their
+superclass methods, many structures are possible.
 
 Here's an example for a large web site that has not only a general site
-template, but also a template for this section of the site, and several pure
-Python classes too.  We'll begin with the highest-level superclass and
-end with the specific page template:
+template, but also a template for this section of the site, and then a
+specific template-servlet at the bottom.  Each template inherits from a
+pure Python class that contains methods/attributes used by the template.
+We'll begin with the highest-level superclass and end with the specific
+template-servlet:
 
 \begin{verbatim}
 1.  SiteLogic.py (pure Python class containing methods for the site)
@@ -78,90 +109,54 @@ end with the specific page template:
 	#from SectionLogic import SectionLogic
 	#extends SectionLogic
 
-5.  page1Logic.py  (pure Python class with helper code for the page)
+5.  page1Logic.py  (pure Python class with helper code for the template-servlet)
         from Section import Section
 	class indexLogic(Section):
 
-6.  page1.tmpl/py  (template for a certain page on the site)
+6.  page1.tmpl/py  (template-servlet for a certain page on the site)
         #from page1Logic import page1Logic
 	#extends page1Logic
 \end{verbatim}
 
-You may omit any files you don't need, or insert extra files as necessary, and
-of course you may name the classes anything you want.  If your highest-level
-site template (Site.tmpl/py) doesn't need a pure Python class (Site.py), it's
-even easier: just omit the \code{\#from ...  import} and \code{\#extends} lines
-in \code{Site.tmpl}, and it will automatically inherit from \code{Template}.
+A pure Python classes might also contain methods/attributes that aren't used by
+their immediate child template, but are available for any descendant
+template to use if it wishes.  For instance, the site template might have
+attributes for the name and e-mail address of the site administrator, 
+ready to use as \$placeholders in any template that wants it.
 
-Pure Python classes with \code{.\_\_init\_\_()} methods should call their
-parent's \code{.\_\_init\_\_()} method before doing anything else.  In Python
->= 2.2, it's easier:
-\begin{verbatim}
-# SiteLogic.py
-from Cheetah.Template import Template
-class SiteLogic(Template):
-	def __init__(self):
-		super(SiteLogic, self).__init__()
-		... everything else you want to do ...
-\end{verbatim}
+The presence of \code{\#extends} influences what the generated class's main
+method is named--the method you call to fill the template.  The next section,
+\code{\#implements}, explains this.
 
-In older versions of Python you must do this:
-\begin{verbatim}
-# SiteLogic.py
-from Cheetah.Template import Template
-class SiteLogic(Template):
-	def __init__(self):
-		Template.__init__(self)
-		... everything else you want to do ...
-\end{verbatim}
-
-Section ?? has a function you can use to avoid hardcoding the name of the
-superclass into your \code{.\_\_init\_\_()} method.
-
-In older versions of Cheetah (until 0.9.12), you could list multiple classes
-in the \code{\#extends} directive, thus doing multiple inheritance.  This 
-feature was removed because it caused too much confusion, user errors and
-Cheetah bugs.  However, your pure Python classes {\em may} do multiple
-inheritance, as long as they properly initialize the template superclass 
-(the one leading up toward \code{Template}) if they have an
-\code{.\_\_init\_\_()} method.
-
-For Webware servlets, it's easier to omit the \code{.\_\_init\_\_()} method
-and override \code{.awake()} instead, since Webware automatically calls
-\code{.awake()} at the beginning of the request.  But you'd have to call
-the parent's \code{.awake()} in that case.  See section ??.
-
-See the next section, \code{\#implements}, for an important issue to be aware
-of when using \code{\#extends}, namely how it affects the generated class's
-main method.
-
+% @@MO: Edmund suggests making some diagrams of inheritance chains.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#implements}
 \label{inheritanceEtc.implements}
 
-% @@MO: Fully describe the main methods.
-
 A template object has several methods, but there is always one {\bf main
 method}, the one you call to fill the template.  By default, this method is
-called \code{.respond()}.  However, you can use the \code{\#implements}
-directive to change the name of that method.  You have to do this if you're
-integrating Cheetah with an existing system, and the calling routine wants to
-call another method name rather than \code{.respond()}.
+\code{.respond()}.  However, if your template contains an \code{\#extends}
+directive, the main method's name changes to \code{.writeBody()}.  It does
+this for compatibility with Webware servlets.  You can also use the
+\code{\#implements} directive to specify the name of the method yourself.
+You may need to do this if you're integrating Cheetah into a legacy
+application, and that application wants to call a method called
+\code{.send\_output}, for instance.
 
-EXCEPTION: if your template contains an \code{\#extends} directive but no
-\code{\#implements}, the main method is \code{.writeBody()} instead of
-\code{.respond()}.  Why?  Because that helps templates that are Webware
-servlets function correctly.
+% @@MO: "Compatibility with Webware servlets" is a lame explanation.  Elaborate.
 
-So you must think about what your main method should be called and set
-\code{\#implements} accordingly if necessary.
+\begin{verbatim}
+#implements send_output
+\end{verbatim}
 
-In any case, \code{.\/\_\_str\_\_()} is always an alias for the main method, no
+In any case, \code{.\/\_\_str\_\_} is always an alias for the main method, no
 matter what the main method is called.  So you can always call \code{str(t)} to
-fill your template, or \code{print t} to fill and print it.  But of course, in
-a Webware servlet you never use the \code{print} statement directly except for
-debugging.
+fill your template, or \code{print t} to fill and print it.  
+
+% @@MO: deleted, unnecessary
+% But of course, in a Webware servlet you never use the \code{print} statement
+% directly except for debugging.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -170,7 +165,7 @@ debugging.
 
 \code{\#set} is used to create and update local variables at run time.
 \code{\#set \$var = EXPRESSION}. The expression may be any Python expression.
-Remember to preface variable names with \$, unless it is part of an
+Remember to preface variable names with \$ unless they're part of an
 intermediate result in a list comprehension.
 
 Here are some examples:
@@ -186,7 +181,7 @@ Here are some examples:
 \code{\$deeply.nested.value}, to a calculation, or to a printable version of
 a value.  The last example above converts any spaces in the 'country' value
 into HTML non-breakable-space entities, to ensure the entire value appears on
-one line in the web browser.
+one line in the browser.
 
 \code{\#set} variables are also useful in \code{\#if} expressions, but
 remember that complex logical routines should be coded in Python, not in
@@ -197,6 +192,11 @@ Cheetah!
 #else
   #set $adj = 'small'
 #end if
+\end{verbatim}
+Or Python's one-line equivalent, "A and B or C".  Remember that in this case,
+B must be a true value (not None, '', 0, [] or {}).  
+\begin{verbatim}
+$adj = $size > 1500 and 'large' or 'small'
 \end{verbatim}
 
 By default, \code{\#set} variables are not visible in method calls or include
@@ -209,23 +209,43 @@ included files.  Use this feature with care to prevent surprises.
 \subsection{\#attr}
 \label{inheritanceEtc.attr}
 
-The \code{\#attr} directive is used to declare new attributes of the generated Python
+The \code{\#attr} directive creates class attributes in the generated Python
 class.  It should be used to assign simple Python literals such as numbers or
-strings.  
+strings.  In particular, the expression must {\em not} depend on searchList
+values or \code{\#set} variables, since those are not known at compile time.
 
 \begin{verbatim}
-#attr myAttr = 1234
-#attr myAttr2 = 'a string'
+#attr title = "Rob Roy"
+#attr author = "Sir Walter Scott"
+#attr version = 123.4
 \end{verbatim}
 
+This template or any child template can output the value thus:
+\begin{verbatim}
+$title, by $author, version $version
+\end{verbatim}
+
+If you have a library of templates derived from etexts
+(\url{http://www.gutenberg.org/}), you can extract the titles and authors
+and put them in a database (assuming the templates have been compiled into
+.py template modules):
+
+\begin{verbatim}
+import glob
+
+\end{verbatim}
+
+% @@MO: Finish this example.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#def}
 \label{inheritanceEtc.def}
 
-The \code{\#def} directive is used to declare new methods of the generated Python
-class.  It is roughly analogous to Python's \code{def} statement.  Any Cheetah
-code in the body of the \code{\#def} will be processed.  
+The \code{\#def} directive is used to declare new methods in the generated
+Python class.  It is roughly analogous to Python's \code{def} statement.  
+The directive is silent, meaning it does not itself produce any output.
+However, the content of the method will be inserted into the output (and the
+directives executed) whenever the method is later called by a \$placeholder.
 
 \begin{verbatim}
 #def myMeth()
@@ -248,8 +268,8 @@ $a $b $c(123)
 $myMeth
 \end{verbatim}
 
-Methods can accept arguments, and have defaults for those arguments.  Always use the 
-\code{\$} before variable names:
+Methods can accept arguments and have defaults for those arguments, just like
+in Python.  Always use the \code{\$} before variable names:
 \begin{verbatim}
 #def myMeth($a, $b=1234)
 This is the text in my method 
@@ -267,34 +287,48 @@ This is the text in my method
 1 - 1234
 \end{verbatim}
 
-If a method already exists with the same name as the \code{\#def}, it will be replaced
-with the new definition.  If the new \code{\#def} occurs in a subclass, it overrides the
-parent's definition.  See the \code{\#extends} directive above for information about
-subclasses.  Overriding is frequently used for blocks, which will be described next.
+If a method already exists with the same name as the \code{\#def}, it will be
+replaced with the new definition.  If the new \code{\#def} occurs in a
+subclass, it overrides the parent's definition.  See the \code{\#extends}
+directive above for information about subclasses.  Overriding is frequently
+used for blocks, which will be described next.
 
 There is also a single line version of the \code{\#def} directive:
 
 \begin{verbatim}
-#attr adj = 'trivial'
+#attr $adj = 'trivial'
 #def myMeth: This is the $adj method 
 $myMeth
 \end{verbatim}
+
+Because of the difference between compile time and run time, you can place
+your \code{\#def}s anywhere in the template.  However, human readers of your
+template definition won't necessarily expect this.  To make the template
+definition easier for future maintainers to read, define your methods above
+the point you call them.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#block ... \#end block}
 \label{inheritanceEtc.block}
 
-The \code{\#block} directive allows you to mark sections of your template
-that can be selectively reimplemented by subclasses of the template.  It is
-very useful for selectively changing part of a template without having to
-copy-paste-and-edit the entire thing.  The output from a template definition
-that uses blocks will be identical to the output from the same template with
-the \code{\#block and \#end block} tags removed. 
 
-To reimplement the block, use the \code{\#def} directive.  The magical effect is that it
-goes back and changes the output text {\em at the point the original block was
-defined} rather than at the location of the reimplementation.
+The \code{\#block} directive allows you to mark a section of your template that
+can be selectively reimplemented in a subclass.  It is very useful for
+selectively changing part of a template without having to copy-paste-and-edit
+the entire thing.  The output from a template definition that uses blocks will
+be identical to the output from the same template with the \code{\#block \ldots
+\#end block} tags removed. 
+
+({\em Note:} don't be confused by the generic word `block'' in this Guide,
+which means a section of code inside {\em any} \code{\#TAG \ldots \#end TAG}
+pair.  Thus, an if-block, for-block, def-block, block-block etc.  In this
+section we are talking only of block-blocks.)
+
+To reimplement the block, use the \code{\#def} directive.  The magical effect
+is that it appears to go back and change the output text {\em at the point the
+original block was defined} rather than at the location of the
+reimplementation.
 
 \begin{verbatim}
 #block [blockName] 
@@ -309,6 +343,8 @@ $getFoo()
 #end if
 #end block testBlock
 \end{verbatim}
+
+% @@MO: The [] imply the block name is optional.  Is it?
 
 \code{\#block} directives can be nested to any depth.
 
@@ -331,17 +367,9 @@ Note that the name of the block is optional for the \code{\#end block} tag.
 
 Technically, \code{\#block} directive is equivalent to a \code{\#def} directive
 followed immediately by a \code{\#placeholder} for the same name.  In fact,
-that's what Cheetah does.  So \code{\#block} creates a method as well as
-defining a block, and you may call this method using a placeholder if you want
-its output to appear in other locations too.
+that's what Cheetah does.  Which means you can use \code{\$theBlockName}
+later in the template to output the block content again.
 
-Sometimes Cheetahites use the term "block" to refer to any multiline directive
-(e.g., \code{\#for ... \#end for}).  Thus, the terms "for-blocks", "if-blocks",
-etc.  These have nothing to do with the blocks described in this section, which
-are methods created by the \code{\#block} directive.  It's just a coincidence
-that the English language uses the same term for both things.  (Did you know 
-that "run" has over fifty meanings in the dictionary?  And "take" has
-seventy-three.  That's not counting phrases like "take off" and "run-in".)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -349,9 +377,34 @@ seventy-three.  That's not counting phrases like "take off" and "run-in".)
 \label{inheritanceEtc.settings}
 
 The \code{\#settings} directive works in tandem with Cheetah's
-\code{SettingsManager} system to provide yet another way to set values for
-\code{\#placeholders} to find.  It is best understood by reading the comments in
-\code{\#SettingsManager.py} in conjunction with this documentation.
+{\bf SettingsManager} system to provide yet another way to set values for
+\code{\#placeholders} to find, or for Python methods to read and modify their
+behaviour accordingly.  It is best understood by reading the comments in
+\code{SettingsManager.py} in conjunction with this section.  All 
+template objects inherit \code{Cheetah.SettingsManager.SettingsManager}.
+
+Settings are syntactically similar to compiler settings (the
+\code{\#compiler-settings} directive, section
+\ref{parserInstructions.compiler-settings}), but while compiler settings
+influence Cheetah's core behaviour, regular settings exist solely for the
+convenience of user code.
+
+{\em Settings are not visible to placeholders by default.}  To make settings
+visible to placeholders, put the settings object in the searchList:  
+
+\begin{verbatim}
+#silent $addToSearchList($settings)  # ## Autocalls the method.
+
+self.addToSearchList(self.settings())
+\end{verbatim}
+
+% @@MO: Is it possible to add the settings to the searchList at template
+% .__init__ time?
+
+To read a setting in a method, you don't just read self.setting\_name.  Instead
+you use the \code{.setting(name, default=NoDefault)} method to read a setting,
+\code{.setSetting(name, value)} to set it, and \code{.hasSetting(name)} to
+check whether a setting exists.  
 
 \code{SettingsManager} is a system for managing application settings.  An
 Application may subclass \code{SettingsManager.SettingsManager} and gain access
@@ -368,7 +421,7 @@ automatically converts numeric values to numbers, 'None' to None, and 'true' and
 
 What does this have to do with Cheetah templates? When you have large sets of
 hierarchically structured data that you want to make available to
-\code{\$placeholders}, the (\code{\#settings} directive can be convenient
+\$placeholders, the (\code{\#settings} directive can be convenient
 alternative to \code{\#attr} and \code{\#def}:
 
 \begin{verbatim}
@@ -422,6 +475,10 @@ SubSection2 = {
 #end settings
 $settings.SubSection1.test
 \end{verbatim}
+
+Output filters (\code{\#filter} directive, section \ref{output.filter}),
+for instance, can use settings to customize their behaviour, although none
+do at present.
 
 % Local Variables:
 % TeX-master: "users_guide"

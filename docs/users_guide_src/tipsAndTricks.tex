@@ -2,6 +2,12 @@
 \section{Miscellaneous Placeholder and Directive Tips}
 \label{tips}
 
+This chapter contains short stuff that doesn't fit anywhere else.
+
+Remember to look at the wiki periodically for the most recent tips contributed
+by users.  The mailing list also reveals tips as somebody posts a problem
+they're having and others troubleshoot it.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{ASP-style tags}
 \label{tips.ASP}
@@ -55,7 +61,7 @@ Remember that variables found earlier in the searchList override same-name
 variables located in a later searchList object.  Be careful when adding objects
 containing other variables besides the ones you want (e.g., \code{os.environ},
 CGI parameters).  The "other" variables may override variables your application
-depends on, leading to hard-to-find bugs.  Also, users can inadvertantly or
+depends on, leading to hard-to-find bugs.  Also, users can inadvertently or
 maliciously set an environmental variable or CGI parameter you didn't expect,
 screwing up your program.  To avoid all this, know what your namespaces
 contain, and place the namespaces you have the most control over first.  For
@@ -66,7 +72,82 @@ your own "safe" namespace.
 % @@ MO: If getVar() is called from Python, does errorCatcher apply?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{All Template methods}
+\subsection{Calling superclass methods, and why you have to}
+\label{tips.callingSuperclassMethods}
+
+If your template or pure Python class overrides a standard method or attribute of \code{Template}
+or one of its base classes, you should call the superclass method in your
+method to prevent various things from breaking.  The most common methods to
+override are \code{.awake} and \code{.\_\_init\_\_}.  \code{.awake} is called
+automatically by Webware early during the web transaction, so it makes a 
+convenient place to put Python initialization code your template needs.
+You'll definitely want to call the superclass \code{.awake} because it sets
+up many wonderful attributes and methods, such as those to access the CGI input
+fields.  
+
+There's nothing Cheetah-specific to calling superclass methods, but because
+it's vital, we'll recap the standard Python techniques here.
+
+In Python >= 2.2, you can simply do:
+\begin{verbatim}
+from Cheetah.Template import Template
+class MyClass(Template):
+	def awake(self, trans):
+		super(MyClass, self).awake(trans)
+		... add your own great and exciting features here ...
+\end{verbatim}
+For Python < 2.2, you have to explicitly name the superclass and call the
+method as an unbound method:
+\begin{verbatim}
+from Cheetah.Template import Template
+from Cheetah.Servlet import Servlet
+class MyClass(Template):
+	def awake(self, trans):
+		Servlet.awake(self, trans)
+		... great and exciting features written by me ...
+\end{verbatim}
+
+[ @@MO: Need to test this.  .awake is in Servlet, which is a superclass
+of Template.  Do we really need both imports?  Can we call
+Template.awake? ]
+
+To avoid hardcoding the superclass name in older Python, you can use this
+function \code{callbase()}, which emulates \code{super()} for older versions of
+Python.  It also works even \code{super()} does exist, so you don't have to
+change your servlets immediately when upgrading.  Note that the argument
+sequence is different than \code{super} uses.
+
+\begin{verbatim}
+===========================================================================
+# Place this in a module SOMEWHERE.py .  Contributed by Edmund Lian.
+class CallbaseError(AttributeError):
+    pass
+
+def callbase(obj, base, methodname='__init__', args=(), kw={},
+    raiseIfMissing=None):
+    try: method = getattr(base, methodname)
+    except AttributeError:
+        if raiseIfMissing:
+            raise CallbaseError, methodname
+        return None
+    if args is None: args = ()
+    return method(obj, *args, **kw)
+===========================================================================
+# Place this in your class that's overriding .awake (or any method).
+from SOMEWHERE import callbase
+class MyMixin:
+        def awake(self, trans):
+                args = (trans,)
+                callbase(self, MyMixin, 'awake', args)
+                ... everything else you want to do ...
+===========================================================================
+\end{verbatim}
+
+% @@MO: Edmund wants us to mention delegation too, as an alternative to
+% inheritance.  Contact elian@inbrief.net for details.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{All methods}
 \label{tips.allMethods}
 
 Here is a list of all the standard methods inherited by \code{Template} objects
@@ -76,32 +157,32 @@ by Cheetah.  Do not use these method names in mixin classes (\code{\#extends},
 section \ref{inheritanceEtc.extends}) unless you intend to override the
 standard method.  
 
-If you do override the standard method, remember to call the
-superclass method when/if appropriate.  The most common method to override is
-\code{.awake()}.  It's a convenient place to put any initialization needed 
-by your template because Webware automatically calls \code{.awake()} when it
-begins processing the request.  You'll definitely want to call the superclass
-\code{.awake()} method as your first statement, because the superclass method
-sets up many wonderful features like access to the CGI fields.  For 
-Python >= 2.2, you simply do:
-\begin{verbatim}
-class MyMixin:
-	def awake(self, trans):
-		super(MyMixin, self).awake(trans)
-		... great and exciting features written by me ...
-\end{verbatim}
-For Python < 2.2, you have to know which class \code{.awake()} is inherited
-from (it's \code{Servlet}, which \code{Template} inherits) and call that method
-directly as an unbound method:
-\begin{verbatim}
-from Cheetah.Servlet import Servlet
-class MyMixin:
-	def awake(self, trans):
-		Servlet.awake(self, trans)
-		... great and exciting features written by me ...
-\end{verbatim}
-
 [Method list not written yet.]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimizing templates}
+\label{tips.optimizing}
+
+Here are some things you can do to make your templates fill faster and user
+fewer CPU cycles.  Before you put a lot of energy into this, however, make
+sure you really need to.  In many situations, templates appear to initialize
+and fill instantaneously, so no optimization is necessary.  If you do find a
+situation where your templates are filling slowly or taking too much memory or
+too many CPU cycles, we'd like to hear about it on the mailing list.
+
+Cache \$placeholders whose values don't change frequently.  (Section
+\ref{output.caching}).
+
+Use \code{\#set} for values that are very frequently used, especially if they
+come out of an expensive operation like a deeply.nested.structure or a
+database lookup.  \code{\#set} variables are compiled into Python local
+variables, which have by far the fastest lookup time f any Python or Cheetah
+variables.
+
+% @@MO: Tavis had a section here "Moving Code into Python".  What did he
+% mean?  Is that a relic from an older version of Cheetah?
+
+
 
 
 % Local Variables:

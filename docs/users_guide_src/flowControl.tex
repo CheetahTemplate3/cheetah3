@@ -7,8 +7,8 @@
 \subsection{\#for ... \#end for}
 \label{flowControl.for}
 
-The \code{\#for} directive iterates through a sequence.  The syntax is very
-similar to Python.  Remember the \code{\$} before variables.
+The \code{\#for} directive iterates through a sequence.  The syntax is the same
+as Python,  but remember the \code{\$} before variables.
 
 Here's a simple client listing:
 \begin{verbatim}
@@ -25,7 +25,7 @@ Here's a simple client listing:
 Here's how to loop through the  keys and values of a dictionary:
 \begin{verbatim}
 <PRE>
-#for $key, $value in $dict.items()
+#for $key, $value in $dict.items() # ## Or $dict.iteritems() in Python >= 2.2.
 $key: $value
 #end for
 </PRE>
@@ -42,12 +42,10 @@ $i - #end for
 If the location of the \code{\#end for} offends your sense of indentational
 propriety, you can do this instead:
 \begin{verbatim}
-#for $i in range(15)
+#for $i in $range(15)
 $i - #slurp
 #end for
 \end{verbatim}
-
-%% @@MSO: I thought builtins require a preceding $ but it only worked without it
 
 The previous two examples will put an extra hyphen after last number.  Here's
 how to get around that problem, using the \code{\#set} directive, which will be
@@ -60,9 +58,10 @@ $sep$name
 #end for 
 \end{verbatim}
 
-(If you don't like that \code{\#set} variable, you can replace the
-\code{\#for} loop with this Python trick:
+Although to just put a separator between strings, you don't need a for loop:
+\begin{verbatim}
 \code{\#echo ', '.join(\$names)}).
+\end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#repeat ... \#end repeat}
@@ -125,7 +124,7 @@ the computer runs out of memory.
 
 The \code{\#if} directive and its kin are used to display a portion of text
 conditionally. \code{\#if} and \code{\#else if} should be followed by a
-True/False expression, while \code{\#else} should not.  Any valid Python 
+true/false expression, while \code{\#else} should not.  Any valid Python 
 expression is allowed.  As in Python, the expression is true unless it evaluates
 to 0, '', None, an empty list, or an empty dictionary.  In deference to Python,
 \code{\#elif} is accepted as a synonym for {\#else if}.
@@ -220,7 +219,7 @@ $name - #slurp
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#pass}
-\label{flowControl.break}
+\label{flowControl.pass}
 
 The \code{\#pass} directive is identical to Python \code{pass} statement: it
 does nothing. It can be used when a statement is required syntactically but the
@@ -228,20 +227,17 @@ program requires no action.
 
 In this example the output list will not contain ``10 - ''. 
 \begin{verbatim}
-#if $A and $B:
+#if $A and $B
    do something
-#elif $A:
+#elif $A
   #pass
-#elif $B: 
+#elif $B
   do something
-#else:
+#else
   do something
 #end if
 \end{verbatim}
 
-%% @@ MSO: Are the colons really allowed?  We've been telling people not to use
-%% @@ colons.  In any case, Greg Czajkowski <gregczajkowski@yahoo.com> tried to
-%% @@ use colons and got an error on the #else directive but not on the others.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#stop}
@@ -258,27 +254,39 @@ called inside a \code{\#def} or \code{\#block}, it stops only the \code{\#def}
 or \code{\#block}.
 
 \begin{verbatim}
-the beginning
+A cat
 #if 1
-  inside the if block
+  sat on a mat
   #stop
+  watching a rat
 #end if
-the end
+in a flat.
 \end{verbatim}
 
 will print 
 \begin{verbatim}
-the beginning
-  inside the if block
+A cat
+  sat on a mat
 \end{verbatim}
 
-instead of 
+And
 \begin{verbatim}
-the beginning
-  inside the if block
-the end
+A cat
+#block action
+  sat on a mat
+  #stop
+  watching a rat
+#end block
+in a flat.
 \end{verbatim}
 
+will print
+
+\begin{verbatim}
+A cat
+  sat on a mat
+in a flat.
+\end{verbatim}
 
 
 % Local Variables:

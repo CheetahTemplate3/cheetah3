@@ -44,6 +44,25 @@ Templates or PHP:
 Placeholders and directives can be escaped by putting a backslash before them.
 \code{\\\$var} and \code{\\\#if} will be output as literal text.
 
+A placeholder or directive can span multiple physical lines, following the same
+rules as Python source code: put a backslash (\code{\\}) at the end of all
+lines except the last line.  However, if there's an unclosed parenthesis,
+bracket or brace pending, you don't need the backslash.
+
+% @@MO: I don't know how to put a literal [ inside \code{} without making
+% LaTeX puke.  
+%However, if there's an unclosed \code{\\(},
+%\code{\\[} or \code{\{} pending, you don't need the backslash.
+
+\begin{verbatim}
+#if $this_is_a_very_long_line and $has_lots_of_conditions \
+    and $more_conditions:
+<h1>bla</h1>
+#elif $country in ('Argentina', 'Uruguay', 'Brazil', 'Peru', 'Colombia',
+    'Costa Rica', 'Venezuela', 'Mexico')
+<h1>hola, senorita!</h1>
+#end if
+\end{verbatim}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Language Constructs -- Summary}
 \label{language.constructs}
@@ -185,10 +204,10 @@ The use of all these directives will be covered in the next few chapters.
      method arguments, and omiting the \code{\$} reminds you of this fact.
      However, you may use \code{\$} anyway if you wish.
 
-\item The special Python name \code{None} does not require a
-     \code{\$} prefix.  (This applies only in expressions; e.g., as a method
-     argument.  The word None in regular text is treated as regular text.)
-     But you can use \code{\$None} if you want.
+\item The special Python names \code{None}, \code{True} and \code{False} in
+     expressions do not require a \code{\$} prefix (but you can use \code{\$}
+     if you want).  \code{True} and \code{False} were added to Python 2.2.1, and
+     are simulated in Cheetah for earlier versions of Python.
 
 \item EXCEPTION: You must {\em not} use the \code{\$} prefix for intermediate
      variables in a Python list comprehensions.  This is a limitation of
@@ -218,7 +237,7 @@ These are not \$placeholders but are treated as literal text:
 $@var $^var $15.50 $$
 \end{verbatim}
 
-You can use compiler settings to change the placeholder delimeters if
+You can use compiler settings to change the placeholder delimiters if
 \code{\$}, \code{\{} and \code{\}} are not suitable.  This will be documented
 in the future.  None of the examples in this Guide use this feature.
 
@@ -325,7 +344,7 @@ foo
 """
 \end{verbatim}
 
-The \code{\#slurp} directive (section \ref{directives.slurp}) also gobbles up
+The \code{\#slurp} directive (section \ref{output.slurp}) also gobbles up
 whitespace.
 
 Whitespace handling around comment directives is discussed in section
@@ -564,7 +583,7 @@ a local variable lookup followed by universal dotted notation.  But for
 {\em last} element in the searchList, any other 'attrib1' in the searchList
 will override that one.
 
-Note that you cannot override builtin variables and functions; that is, you
+{\em Note:} you cannot override builtin variables and functions; that is, you
 cannot access a searchList value of the same name.  This sometimes causes
 surprises when Python adds a new builtin to the language.  For instance, Python
 2.2 added a new builtin \code{property}.  This tripped up a user with a 

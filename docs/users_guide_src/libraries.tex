@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Template and other libraries}
+\section{Batteries included: templates and other libraries}
 \label{libraries}
 
 Cheetah comes ``batteries included'' with libraries of templates, functions,
@@ -7,15 +7,13 @@ classes and other objects you can use in your own programs.  The different
 types are listed alphabetically below, followed by a longer description of
 the SkeletonPage framework.  Some of the objects are classes for specific
 purposes (e.g., filters or error catchers), while others are standalone and
-often can be used without Cheetah.
+can be used without Cheetah.
 
 If you develop any objects which are generally useful for Cheetah sites,
-please consider posting them on the mailing list so that we can incorporate
-them into the standard library.  That way, all Cheetah users will benefit, and
-it will encourage others to contribute their objects, which might include
-something you want.
-
-%% @@MSO: If sed-filters get added to Cheetah, mention them here.
+please consider posting them on the wiki with an announcement on the mailing
+list so we can incorporate them into the standard library.  That way, all
+Cheetah users will benefit, and it will encourage others to contribute their
+objects, which might include something you want.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{ErrorCatchers}
@@ -43,35 +41,18 @@ Module \code{Filters} contains filters suitable for the \code{\#Filter}
 directive.  See section \ref{output.filter} for a description of the
 filters bundled with Cheetah.
 
-As of Cheetah 0.9.9a6, the set of filters is rapidly changing.  While this is
-mostly a case of more filters and more features, it is possible that some 
-filers may be removed in the future or be changed in backward-incompatible ways.
-If you are depending on a filter besides the default filter, and you can not
-risk it changing in the next version of Cheetah, make yourself a separate copy
-of it outside the Cheetah directory and use that.
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{SettingsManager}
 \label{libraries.SettingsManager}
 
 The \code{SettingsManager} class in the \code{Cheetah.SettingsManager} module is
 a mixin class that provides facilities for managing application settings.  
-SettingsManager is designed to:
-\begin{itemize}
-\item work well with nested settings dictionaries of any depth
-\item read/write \code{.ini style config files} (or strings)
-\item read settings from Python source files (or strings) so that
-     complex Python objects can be stored in the application's settings
-     dictionary.  For example, you might want to store references to various
-     classes that are used by the application, and plugins to the application
-     might want to substitute one class for another.
-\item allow sections in \code{.ini config files} to be extended by settings in
-     Python src files.  If a section contains a setting like
-     ``\code{importSettings=mySettings.py}'', \code{SettingsManager} will merge
-     all the settings defined in ``\code{mySettings.py}'' with the settings for
-     that section that are defined in the \code{.ini config file}.
-\item maintain the case of setting names, unlike the ConfigParser module
-\end{itemize}
+Class \code{Cheetah.SettingsManager.SettingsManager} facilitates the use of
+user-supplied configuration files to fine tune an application.  A setting is
+a key/value pair that an application or component (e.g., a filter, or your 
+own servlets) looks up and treats as a configuration value to modify its (the
+component's) behaviour.  For more information, see section
+\ref{inheritanceEtc.settings} and the class source.
 
 Cheetah uses \code{SettingsManager} to manage its configuration settings.
 \code{SettingsManager} might also be useful in your own applications. See the
@@ -79,24 +60,28 @@ source code and docstrings in the file \code{src/SettingsManager.py} for more
 information. If there is sufficient interest in \code{SettingsManager}, we will
 release it as a standalone module.
 
-Note that there are two Cheetah directives that deal with settings:
-\code{\#compiler-settings} affects the behaviour of Cheetah's parser and 
-compiler.  \code{\#settings} affects the behaviour of certain filters and
-error catchers (see \code{\#filter} and \code{\#errorCatcher}, and may also be
-used in your own template applications and and templates.
+Both the \code{\#settings} and \code{\#compiler-settings} directives use
+\code{SettingsManager}, although they maintain two separate lists of settings.
 
-By default, both kinds of settings are also visible in the searchList, so they
-may be referred to by \code{\$placeholders}.  They are at the very end of the
-searchList, so any same-name anywhere else in the searchList will override
-what the \code{\$placeholder} sees.
 
-%% @@MSO: Alternate wording:
-%% Class \code{Cheetah.SettingsManager.SettingsManager} facilitates the use of
-%% user-supplied configuration files to fine tune an application.  A setting is
-%% a key/value pair that an application or component (e.g., a filter, or your 
-%% own servlets) looks up and treats as a configuration value to modify its (the
-%% component's) behaviour.  For more information, see section
-%% \ref{inheritanceEtc.settings} and the class source.
+% @@MO: deleted, redundant.
+%SettingsManager is designed to:
+%\begin{itemize}
+%\item work well with nested settings dictionaries of any depth
+%\item read/write \code{.ini style config files} (or strings)
+%\item read settings from Python source files (or strings) so that
+%     complex Python objects can be stored in the application's settings
+%     dictionary.  For example, you might want to store references to various
+%     classes that are used by the application, and plugins to the application
+%     might want to substitute one class for another.
+%\item allow sections in \code{.ini config files} to be extended by settings in
+%     Python src files.  If a section contains a setting like
+%     ``\code{importSettings=mySettings.py}'', \code{SettingsManager} will merge
+%     all the settings defined in ``\code{mySettings.py}'' with the settings for
+%     that section that are defined in the \code{.ini config file}.
+%\item maintain the case of setting names, unlike the ConfigParser module
+%\end{itemize}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -106,7 +91,8 @@ what the \code{\$placeholder} sees.
 Package \code{Cheetah.Templates} contains stock templates that you can
 either use as is, or extend by using the \code{\#def} directive to redefine
 specific {\bf blocks}.  Currently, the only template in here is SkeletonPage,
-which is described in detail below.
+which is described in detail below in section 
+\ref{libraries.templates.skeletonPage}.  (Contributed by Tavis Rudd.)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Tools}
@@ -115,55 +101,54 @@ which is described in detail below.
 Package \code{Cheetah.Tools} contains functions and classes contributed by third
 parties.  Some are Cheetah-specific but others are generic and can be used
 standalone.  None of them are imported by any other Cheetah component; you can 
-delete the Tools/ directory and Cheetah will function normally.  
+delete the Tools/ directory and Cheetah will function fine.  
 
 Some of the items in Tools/ are experimental and have been placed there just to
 see how useful they will be, and whether they attract enough users to make 
 refining them worthwhile (the tools, not the users :).
 
-Nothing in Tools/ is guaranteed to be: (A) tested, (B) reliable, (C) immune from
-being deleted in a future Cheetah version, or (D) immune from having 
-backwards-incompatable changes made to it.  If you depend on something in Tools/
-on a production system, consider making a copy of it outside the Cheetah/
-directory so that this version won't be lost when you upgrade Cheetah.  Also,
-learn enough about Python and about the Tool so that you can maintain it and
-bugfix it if necessary.
+Nothing in Tools/ is guaranteed to be: (A) tested, (B) reliable, (C) immune
+from being deleted in a future Cheetah version, or (D) immune from
+backwards-incompatable changes.  If you depend on something in Tools/ on a
+production system, consider making a copy of it outside the Cheetah/ directory
+so that this version won't be lost when you upgrade Cheetah.  Also, learn
+enough about Python and about the Tool so that you can maintain it and bugfix
+it if necessary.
 
 If anything in Tools/ is found to be necessary to Cheetah's operation (i.e., if
 another Cheetah component starts importing it), it will be moved to the
 \code{Cheetah.Utils} package.
 
 Current Tools include:
-\begin{itemize}
-\item {\bf Cheetah.Tools.MondoReport} -- an ambitious class useful when iterating
-     over records of data (\code{\#for} loops), displaying one pageful of records
-     at a time (with previous/next links), and printing summary statistics about
-     the records or the current page.  See \code{MondoReportDoc.txt} in the same
-     directory as the module.  Some features are not implemented yet.  Contributed
-     by Mike Orr.
-\item {\bf Cheetah.Tools.RecursiveNull} -- Nothing, but in a friendly way.  Good
+\begin{description}
+\item{Cheetah.Tools.MondoReport} an ambitious class useful when
+     iterating over records of data (\code{\#for} loops), displaying one
+     pageful of records at a time (with previous/next links), and printing
+     summary statistics about the records or the current page.  See
+     \code{MondoReportDoc.txt} in the same directory as the module.  Some
+     features are not implemented yet.  \code{MondoReportTest.py} is a test
+     suite (and it shows there are currently some errors in MondoReport, hmm).
+     Contributed by Mike Orr.
+
+\item{Cheetah.Tools.RecursiveNull} Nothing, but in a friendly way.  Good
      for filling in for objects you want to hide.  If \code{\$form.f1} is a
      RecursiveNull object, then \code{\$form.f1.anything["you"].might("use")}
      will resolve to the empty string.  You can also put a \code{RecursiveNull}
      instance at the end of the searchList to convert missing values to ''
      rather than raising a \code{NotFound} error or having a (less efficient)
-     errorCatcher handle it.  Of course, maybe you prefer to get a \code{NotFound}
-     error...  Contributed by Ian Bicking.
-\item {\bf Cheetah.Tools.SiteHierarchy} -- Provides navigational links to this
+     errorCatcher handle it.  Of course, maybe you prefer to get a
+     \code{NotFound} error...  Contributed by Ian Bicking.
+
+\item{Cheetah.Tools.SiteHierarchy} Provides navigational links to this
      page's parents and children.  The constructor takes a recursive list of
-     (url,description) pairs representing a tree of hyperlinks to every page in the
-     site (or section, or application...), and also a string containing the current
-     URL.  Two methods 'menuList' and 'crumbs' return output-ready HTML showing an
-     indented menu (hierarchy tree) or crumbs list (Yahoo-style bar:
+     (url,description) pairs representing a tree of hyperlinks to every page in
+     the site (or section, or application...), and also a string containing the
+     current URL.  Two methods 'menuList' and 'crumbs' return output-ready HTML
+     showing an indented menu (hierarchy tree) or crumbs list (Yahoo-style bar:
      home > grandparent > parent > currentURL).  Contributed by Ian Bicking.
-\item{\bf Cheetah.Tools.WebwareMixin} -- Additional methods for your Template object.
-     Currently there is one method, \code{.cgiImport}.  It imports the specified CGI
-     fields, cookies or session variables into a new object on the searchList, so that
-     they can be accessed by name in \$placeholders (e.g., \code{\$myField}).  This
-     method may be renamed in the next version of Cheetah, and will likely be split 
-     into two methods to handle single vs multiple values for a field.  Contributed
-     by Mike Orr.
-\end{itemize}
+
+\item 
+\end{description}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -175,10 +160,36 @@ classes that are imported by other Cheetah components.  Many of these utils can
 be used standalone in other applications too.  
 
 Current Utils include:
-\begin{itemize}
-\item {\bf Cheetah.Utils.VerifyType} -- Functions to verify the type of a
-     user-supplied function argument.
-\end{itemize}
+\begin{description}
+\item{Cheetah.Utils.CGIImportMixin} This is inherited by \code{Template}
+     objects, and provides the method, \code{.cgiImport} method
+     (section \ref{webware.cgiImport}).
+
+\item{Cheetah.Utils.Misc} A catch-all module for small functions.
+     \begin{description}
+     \item{\code{UseOrRaise(thing, errmsg='')}}  Raise 'thing' if it's a 
+          subclass of Exception, otherwise return it.  Useful when one
+	  argument does double duty as a default value or an exception to
+	  throw.  Contribyted by Mike Orr.
+
+     \item{\code{checkKeywords(dic, legalKeywords, what='argument'}}  
+          Verifies the dictionary does not contain any keys not listed in
+	  'legalKeywords'.  If it does, raise TypeError.  Useful for
+	  checking the keyword arguments to a function.  Contributed by
+	  Mike Orr.
+     \end{description}
+
+\item{Cheetah.Utils.UploadFileMixin} Not implemented yet, but will contain
+     the \code{.uploadFile} method (or three methods) to ``safely'' copy a
+     form-uploaded file to a local file, to a searchList variable, or return
+     it.  When finished, this will be inherited by \code{Template}, allowing 
+     all templates to do this.  If you want this feature, read the docstring
+     in the source and let us know on the mailing list what you'd like this
+     method to do.  Contributed by Mike Orr.
+
+\item{Cheetah.Utils.VerifyType} Functions to verify the type of a
+     user-supplied function argument.  Contributed by Mike Orr.
+\end{description}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Cheetah.Templates.SkeletonPage}
@@ -186,7 +197,7 @@ Current Utils include:
 
 A stock template class that will be very useful for web developers is defined in
 the \code{Cheetah.Templates.SkeletonPage} module.  The \code{SkeletonPage}
-template class is generated from the following Cheetha source code:
+template class is generated from the following Cheetah source code:
 
 \begin{verbatim}
 $*docType
@@ -264,7 +275,7 @@ define in various attributes and renders them into HTML tags.
 \begin{itemize}
 \item {\bf metaTags()} -- Returns a formatted vesion of the self.\_metaTags
      dictionary, using the formatMetaTags function from
-     \code{Cheetah.Macros.HTML}.
+     \code{\_SkeletonPage.py}.
 \item {\bf stylesheetTags()} -- Returns a formatted version of the
      \code{self.\_stylesheetLibs} and \code{self.\_stylesheets} dictionaries.
      The keys in \code{self.\_stylesheets} must be listed in the order that
@@ -280,8 +291,6 @@ define in various attributes and renders them into HTML tags.
 \item {\bf bodyTag()} -- Returns an HTML body tag from the entries in the dict
      \code{self.\_bodyTagAttribs}.
 \end{itemize}
-
-%% @@MO: (item 1 above) Macros don't exist any more.  What should this say?
 
 The class also provides some convenience methods that can be used as
 \$placeholders in your template definitions:

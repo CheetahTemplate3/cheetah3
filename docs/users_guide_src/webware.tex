@@ -2,10 +2,6 @@
 \section{Using Cheetah with Webware}
 \label{webware}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Background}
-\label{webware.background}
-
 {\bf Webware for Python} is a 'Python-Powered Internet Platform' that runs
 servlets in a manner similar to Java servlets.  {\bf WebKit} is the name of
 Webware's application server.  For more details, please visit
@@ -22,6 +18,39 @@ called \code{webkit}. But to servlets they're both "WebKit, Webware's
 application server", so it's one half dozen to the other.  In this document,
 we generally use the term {\bf WebKit} to refer to the currently-running
 application server.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Installing Cheetah on a Webware system}
+\label{webware.installing}
+
+Install Cheetah after you have installed Webware, following the instructions in
+chapter \ref{gettingStarted}.
+
+The standard Cheetah test suite ('cheetah test') does not test Webware features.
+We plan to build a test suite that can run as a Webware servlet, containing
+Webware-specific tests, but that has not been built yet.  In the meantime, you
+can make a simple template containing something like "This is a very small
+template.", cheetah-compile it, put the *.py template module in a servlet
+directory, and see if Webware serves it up OK.  
+
+{\em You must not have a Webware context called "Cheetah".}  If you do, Webware
+will mistake that directory for the Cheetah module directory, and all 
+template-servlets will bomb out with a "ImportError: no module named Template".
+(This applies only to the standard Webware; WebwareExperimental does not have
+contexts.)
+
+If Webware complains that it cannot find your servlet, make sure
+'.tmpl' is listed in 'ExtensionsToIgnore' in your 'Application.config' file.
+
+% @@MO: Should explain extension cascading and how without it, standard
+% Webware pretends a file doesn't exist if it finds two or more servable files
+% that match the URL.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Containment vs Inheritance}
+\label{webware.background}
 
 Because Cheetah's core is flexible, there are many ways to integrate it with
 Webware servlets.  There are two broad strategies: the {\bf Inheritance
@@ -52,7 +81,7 @@ them for new servlets.  Existing servlets can be converted later, if at all.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{The Containment Approach}
+\subsubsection{The Containment Approach}
 \label{webware.containment}
 
 In the Containment approach, your servlet is not a template.  Instead, it 
@@ -76,20 +105,23 @@ Instead, each servlet should instantiate its own template object.  Template
 {\em classes}, however, are thread safe, since they don't change once created.
 So it's safe to store a template class in a module global variable.
 
+% @@MO: Example of containment.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{The Inheritance Approach}
+\subsubsection{The Inheritance Approach}
 \label{webware.inheritance}
 
 In the Inheritance approach, your template object doubles as as Webware 
-servlet.  {\bf cheetah compile} (section \ref{howWorks.cheetah-compile}) 
-automatically creates modules containing valid Webware servlets.  A servlet is
-a subclass of Webware's \code{WebKit.HTTPServlet} class, contained in a module
-having the same name as the servlet.  WebKit uses the request URL
-to find the module, and then instantiates the servlet/template.  The servlet
-must have a \code{.respond()} method (or \code{.respondToGet()},
-\code{.respondToPut()}, etc., but the Cheetah default is \code{.respond()}).
-Servlets created by \code{cheetah compile} meet all these requirements.
+servlet, thus these are sometimes called {\bf template-servlets}.  {\bf cheetah
+compile} (section \ref{howWorks.cheetah-compile}) automatically creates modules
+containing valid Webware servlets.  A servlet is a subclass of Webware's
+\code{WebKit.HTTPServlet} class, contained in a module with the same name as
+the servlet.  WebKit uses the request URL to find the module, and then
+instantiates the servlet/template.  The servlet must have a \code{.respond()}
+method (or \code{.respondToGet()}, \code{.respondToPut()}, etc., but the
+Cheetah default is \code{.respond()}).  Servlets created by \code{cheetah
+compile} meet all these requirements.
 
 (Cheetah has a Webware plugin that automatically converts a \code{.tmpl servlet
 file} into a \code{.py servlet file} when the \code{.tmpl servlet file} is
@@ -101,25 +133,15 @@ values), graphic design (the template definition and is display logic), and
 algorithmic logic (complex calculations and side effects) separate.  How?
 Where do you do form processing?
 
-The answer is that your template class can inherit from a class containing
-the analytical logic.  You can either use the \code{\#extends} directive in
-Cheetah to indicate the superclass(es), or write a Python \code{\#class}
-statement to do the same thing.  See the template
-\code{Cheetah.Templates.SkeletonPage.tmpl} and its logic class
+The answer is that your template class can inherit from a pure Python class
+containing the analytical logic.  You can either use the \code{\#extends}
+directive in Cheetah to indicate the superclass(es), or write a Python
+\code{class} statement to do the same thing.  See the template
+\code{Cheetah.Templates.SkeletonPage.tmpl} and its pure Python class
 \code{Cheetah.Templates.\_SkeletonPage.py} for an example of a template
 inheriting logic code.  (See sections \ref{inheritanceEtc.extends} and
-\ref{inheritanceEtc.implements} for more information about
-\code{\#extends} and \code{\#implements}.  They have to be used a certain
-right way.)
-
-If you write inherit from a mixin class containing \code{.awake()} and 
-\code{.sleep()} methods, Webware will automatically call those methods before
-and after it calls \code{.respond()} to fill the template.  So 
-\code{.awake()} is a good place to put calculations, side effects and 
-form processing that must be done before the template is filled.
-\code{.awake()} can even redirect to another servlet if you discover that this
-isn't the appropriate servlet for the situation (e.g., in case of user errors
-on a form).  
+\ref{inheritanceEtc.implements} for more information about \code{\#extends} and
+\code{\#implements}.  They have to be used a certain right way.)
 
 If \code{\#WebKit.HTTPServlet} is not available, Cheetah fakes it with a
 dummy class to satisfy the dependency.  This allows servlets to be tested on
@@ -129,6 +151,11 @@ current web transaction, since there is no web transaction.  Trying to access
 form input, for instance, will raise an exception because it depends on a
 live web request object, and in the dummy class the request object is
 \code{None}.
+
+Because Webware servlets must be valid Python modules, and cheetah-compile
+can produce only valid module names, if you're converting an existing site that
+has .html filenames with hyphens (-), extra dots (.), etc, you'll have to
+rename them (and possibly use redirects).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Site frameworks}
@@ -202,7 +229,7 @@ www/                         # Web root directory.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Doing calculations}
+\subsection{Initializing your template-servlet with Python code}
 \label{webware.calculations}
 
 If you need a place to initialize variables or do calculations for your
@@ -213,26 +240,13 @@ method.  You probably want to do that first so that you have access to the
 web transaction data \code{Servlet.awake} provides.  You don't have to worry
 about whether your parent class has its own \code{.awake} method, just call
 it anyway, and somebody up the inheritance chain will respond, or at minimum
-\code{Servlet.awake} will respond.
+\code{Servlet.awake} will respond.  Section
+\ref{tips.callingSuperclassMethods} gives examples of how to call a
+superclass method.
 
-\begin{verbatim}
-from MyParentTemplate import MyParentTemplate
-class MyMixin(MyParentTemplate):
-        def awake(self, transaction):
-                super(MyMixin, self).awake(transaction)
-                # In Python < 2.2, you have to do instead:
-                # MyParentTemplate.awake(self, transaction)
-                self.attribute1 = SomeCalculation
-                self.attribute2 = AnotherCalculation
-\end{verbatim}
-
-You can also put all your calculations in your own method, which I 
-conventionally call \code{doEverything}, and call it near the top of your
-template:
-\begin{verbatim}
-#silent $doEveryting
-\end{verbatim}
-This works well, but it does mean one ugly extra line in your template.
+As an alternative, you can put all your calculations in your own method and
+call it near the top of your template.  (\code{\#silent}, section
+\ref{output.silent}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Form processing}
@@ -298,7 +312,7 @@ submit it again.  Depending on the application, this may make the servlet
 update the same database record again, or it may generate a new record.
 \end{enumerate}
 
-% @@MO: Example of form-showing-and-processing servlet template.
+% @@MO: Example of a template that shows a form and then processes the input.
 
 \code{FunFormKit} is a third-party Webware package that makes it easier to
 produce forms and handle their logic.  It has been successfully been used with
@@ -446,7 +460,7 @@ blank/zero.  In those relatively few cases where you must distinguish between
     * $ValueError/ValueError
 (NonNumericInputError is defined in this class and is useful for
 distinguishing between bad input vs a TypeError/ValueError
-thrown for some other rason.)
+thrown for some other reason.)
 
 Here's an example using multiple values to schedule newspaper deliveries.
 'checkboxes' comes from a form with checkboxes for all the days of the week.
@@ -476,7 +490,7 @@ sources:
 In many forms, you're dealing only with strings, which is why the
 'default' argument is third and the numeric arguments are banished to
 the end.  But sometimes you want automatic number conversion, so that
-you can do numeric comparisions in your templates without having to
+you can do numeric comparisons in your templates without having to
 write a bunch of conversion/exception handling code.  Example:
 
     #silent $cgiImport(['name', 'height:int'])
@@ -504,7 +518,7 @@ the same way as for strings, except the default is 'defaultInt' or
 'defaultFloat' instead of 'default'.
 
 If a name represents an uploaded file, the entire file will be read into 
-memory.  For more sophistocated file-upload handling, leave that name out of
+memory.  For more sophisticated file-upload handling, leave that name out of
 the list and do your own handling, or wait for Cheetah.Utils.UploadFileMixin.
 
 This mixin class works only in a subclass that also inherits from 
