@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.17 2003/12/29 01:38:52 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.18 2005/01/03 19:57:24 tavis_rudd Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -9,35 +9,24 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.17 $
+Version: $Revision: 1.18 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2003/12/29 01:38:52 $
+Last Revision Date: $Date: 2005/01/03 19:57:24 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.17 $"[11:-2]
-
-##################################################
-## DEPENDENCIES
+__revision__ = "$Revision: 1.18 $"[11:-2]
 
 import getopt, glob, os, pprint, re, shutil, sys
 import cPickle as pickle
 
-from _properties import Version
-from Compiler import Compiler
-from Template import Template
+from Cheetah.Version import Version
+from Cheetah.Compiler import Compiler
+from Cheetah.Template import Template
 from Cheetah.Utils.Misc import mkdirsWithPyInitFiles
 from Cheetah.Utils.optik import OptionParser
 
-##################################################
-## GLOBALS & CONSTANTS
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
-
-optionDashesRx = re.compile(  R"^-{1,2}"  )
-moduleNameRx = re.compile(  R"^[a-zA-Z_][a-zA-Z_0-9]*$"  )
+optionDashesRE = re.compile(  R"^-{1,2}"  )
+moduleNameRE = re.compile(  R"^[a-zA-Z_][a-zA-Z_0-9]*$"  )
    
 def fprintfMessage(stream, format, *args):
     if format[-1:] == '^':
@@ -49,8 +38,6 @@ def fprintfMessage(stream, format, *args):
     else:
         message = format
     stream.write(message)
-
-die = sys.exit
 
 class Error(Exception):
     pass
@@ -92,7 +79,7 @@ def usage(usageMessage, errorMessage="", out=sys.stderr):
         out.write('\n')
         out.write("*** USAGE ERROR ***: %s\n" % errorMessage)
         exitStatus = 1
-    die(exitStatus)
+    sys.exit(exitStatus)
              
 
 WRAPPER_TOP = """\
@@ -113,7 +100,8 @@ USAGE:
   cheetah fill [options] [FILES ...]        : Fill template definitions
   cheetah help                              : Print this help message
   cheetah options                           : Print options help message
-  cheetah test                              : Run Cheetah's regression tests
+  cheetah test [options]                    : Run Cheetah's regression tests
+                                            : (same as for unittest)
   cheetah version                           : Print Cheetah version number
 
 You may abbreviate the command to the first letter; e.g., 'h' == 'help'.
@@ -127,14 +115,13 @@ OPTIONS FOR "compile" AND "fill":
   --idir DIR, --odir DIR : input/output directories (default: current dir)
   --iext EXT, --oext EXT : input/output filename extensions
     (default for compile: tmpl/py,  fill: tmpl/html)
-  -R            : recurse subdirectories looking for input files
-  --debug       : print lots of diagnostic output to standard error
-  --env         : put the environment in the searchList
-  --flat        : no destination subdirectories
-  --nobackup    : don't make backups
-  --pickle FILE : unpickle FILE and put that object in the searchList
-  --stdout, -p  : output to standard output (pipe)
-
+  -R                : recurse subdirectories looking for input files
+  --debug           : print lots of diagnostic output to standard error
+  --env             : put the environment in the searchList
+  --flat            : no destination subdirectories
+  --nobackup        : don't make backups
+  --pickle FILE     : unpickle FILE and put that object in the searchList
+  --stdout, -p      : output to standard output (pipe)
 Run "cheetah help" for the main help screen.
 """
 
@@ -143,7 +130,7 @@ Run "cheetah help" for the main help screen.
 
 class CheetahWrapper:
     MAKE_BACKUPS = True
-    BACKUP_SUFFIX = "_bak"
+    BACKUP_SUFFIX = ".bak"
 
     def __init__(self):
         self.progName = None
@@ -200,13 +187,13 @@ class CheetahWrapper:
         pao("--odir", action="store", dest="odir", default="")
         pao("--iext", action="store", dest="iext", default=".tmpl")
         pao("--oext", action="store", dest="oext", default=defaultOext)
-        pao("-R", action="store_true", dest="recurse", default=0)
-        pao("--stdout", "-p", action="store_true", dest="stdout", default=0)
-        pao("--debug", action="store_true", dest="debug", default=0)
-        pao("--env", action="store_true", dest="env", default=0)
-        pao("--pickle", action="store_true", dest="pickle", default=0)
-        pao("--flat", action="store_true", dest="flat", default=0)
-        pao("--nobackup", action="store_true", dest="nobackup", default=0)
+        pao("-R", action="store_true", dest="recurse", default=False)
+        pao("--stdout", "-p", action="store_true", dest="stdout", default=False)
+        pao("--debug", action="store_true", dest="debug", default=False)
+        pao("--env", action="store_true", dest="env", default=False)
+        pao("--pickle", action="store", dest="pickle", default="")
+        pao("--flat", action="store_true", dest="flat", default=False)
+        pao("--nobackup", action="store_true", dest="nobackup", default=False)
         self.opts, self.files = opts, files = parser.parse_args(args)
         D("""\
 cheetah compile %s
@@ -249,7 +236,7 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
             bak = None
             C("")
         if self.isCompile:
-            if not moduleNameRx.match(basename):
+            if not moduleNameRE.match(basename):
                 tup = basename, src
                 raise Error("""\
 %s: base name %s contains invalid characters.  It must
@@ -297,7 +284,7 @@ be named according to the same rules as Python modules.""" % tup)
                 W(fmt, sources, dst)
         if isError:
             what = self.isCompile and "Compilation" or "Filling"
-            die("%s aborted due to collisions" % what)
+            sys.exit("%s aborted due to collisions" % what)
                 
 
     def getBundles(self, sourceFiles):
@@ -320,7 +307,22 @@ be named according to the same rules as Python modules.""" % tup)
             if flat:
                 dst = os.path.join(odir, basename + oext)
             else:
-                dst = os.path.join(odir, base + oext)
+                dbn = basename
+                if odir and base.startswith(os.sep):
+                    odd = odir
+                    while odd != '':
+                        i = base.find(odd)
+                        if i == 0:
+                            dbn = base[len(odd):]
+                            if dbn[0] == '/':
+                                dbn = dbn[1:]
+                            break
+                        odd = os.path.dirname(odd)
+                        if odd == '/':
+                            break
+                    dst = os.path.join(odir, dbn + oext)
+                else:
+                    dst = os.path.join(odir, base + oext)
             bak = dst + self.BACKUP_SUFFIX
             b = Bundle(src=src, dst=dst, bak=bak, base=base, basename=basename)
             bundles.append(b)
@@ -433,8 +435,11 @@ you do have write permission to and re-run the tests.""")
         from Cheetah.Tests import Test
         import Cheetah.Tests.unittest_local_copy as unittest
         del sys.argv[1:] # Prevent unittest from misinterpreting options.
-        unittest.main(testSuite=Test.testSuite)
-
+        sys.argv.extend(self.testOpts)
+        #unittest.main(testSuite=Test.testSuite)
+        #unittest.main(testSuite=Test.testSuite)
+        unittest.main(module=Test)
+        
     def version(self):
         print Version
 
@@ -452,8 +457,11 @@ you do have write permission to and re-run the tests.""")
         # Step 1: Determine the command and arguments.
         try:
             self.progName = progName = os.path.basename(argv[0])
-            self.command = command = optionDashesRx.sub("", argv[1])
-            self.parseOpts(argv[2:])
+            self.command = command = optionDashesRE.sub("", argv[1])
+            if command == 'test':
+                self.testOpts = argv[2:]
+            else:
+                self.parseOpts(argv[2:])
         except IndexError:
             usage(HELP_PAGE1, "not enough command-line arguments")
 
