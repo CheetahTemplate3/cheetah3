@@ -120,40 +120,64 @@ be described next.
 \label{output.caching.regions}
 
 The \code{\#cache \ldots \#end cache} directive is used to cache a region of
-content in a template.  It accepts several keyword arguments as demonstrated in
-the examples below.  Cached regions can be given an 'id', which can be used to
-programmatically refresh a region with the \code{.refreshCache(id)}
-method.  Cached regions can also be invalidated according to a user-specified
-\code{test} conditions.
+content in a template.  The region is cached as a single unit, after 
+placeholders and directives inside the region have been evaluated.  
+Placeholders inside the region lose their identity and are not reevaluated
+until the cache item is refreshed.  As a corollary, placeholders inside a
+\code{\#cache} region cannot use the \code{\$*var} or \code{\$*<interval>*var}
+form because they cannot be cached under a different policy than the region
+they're in.
+
+Caching regions offers more flexibility than caching individual placeholders.
+You can specify the refresh interval using a placeholder or
+expression, or refresh according to other criteria rather than a certain
+time interval.
+
+\code{\#cache} without arguments caches the region statically, the same
+way as \code{\$*var}.  The region will not be automatically refreshed.
+
+To refresh the region at an interval, use the \code{timer=EXPRESSION} argument,
+equivalent to \code{\$*<interval>*}.  The expression should evaluate to a
+number or string that is a valid interval (e.g., 0.5, '3m', etc).
+
+To refresh whenever an expression is true, use \code{test=EXPRESSION}.
+The expression can be a method/function returning true or false, a boolean
+placeholder, several of these joined by \code{and} and/or \code{or}, or any
+other expression.  If the expression contains spaces, it's easier to
+read if you enclose it in \code{()}, but this is not required.
+
+To refresh whenever you say so, use \code{id=EXPRESSION}.  Your program can
+then call \code{.refreshCache(ID)} whenever it wishes.  This is useful if the
+cache depends on some external condition that changes infrequently but has just
+changed now.
+
+You can combine arguments by separating them with commas.  For instance, you can
+specify both \code{id=} and \code{interval=}, or \code{id=} and \code{test=}.
+(You can also combine interval and test although it's not very useful.)
+However, repeating an argument is not supported.  It may work, but it may not.
 
 \begin{verbatim}
-#cache timer='30m', ID='cache1'
+#cache
+This is a static cache.  It will not be refreshed.
+$a $b $c
+#end cache
+
+#cache timer='30m', id='cache1'
 #for $cust in $customers
 $cust.name:
 $cust.street - $cust.city
 #end for
 #end cache
-\end{verbatim}
 
-\begin{verbatim}
 #cache id='sidebar', test=$isDBUpdated
-## do something
+... left sidebar HTML ...
 #end cache
 
 #cache id='sidebar2', test=($isDBUpdated or $someOtherCondition)
-## do something
+... right sidebar HTML ...
 #end cache
 \end{verbatim}
 
-Note that placeholders lose their identity inside a \code{\#cache} region.
-That is, we do not cache \code{\$cust.name} and the \code{\#for} loop above
-individually.  Instead, the region is placed in the cache as plain text
-{\em after} the placeholders and directives have been evaluated.  When/if
-the cached item is invalidated, the placeholders and directives are evaluated
-again.  A corollary of this is that placeholders inside \code{\#cache}
-regions cannot use the \code{\$*var} or \code{\$*<interval>*var} form,
-because they cannot be cached under a different policy than the region 
-they're in.
 
 The \code{\#cache} directive cannot be nested.
 
@@ -165,8 +189,6 @@ ASP.net's varyByParam and varyByBrowser output caching keywords.
 % @@MO: Can we cache by Webware sessions?  What about sessions where the
 % session ID is encoded as a path prefix in the URI?  Need examples.
 
-% @@MO: Are cache parameters case sensitive?  If so, correct "id" and "ID"
-% above.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#raw}
