@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.19 2001/08/13 22:01:28 tavis_rudd Exp $
+# $Id: Test.py,v 1.20 2001/08/14 06:03:48 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.19 $
+Version: $Revision: 1.20 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/13 22:01:28 $
+Last Revision Date: $Date: 2001/08/14 06:03:48 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.19 $"[11:-2]
+__version__ = "$Revision: 1.20 $"[11:-2]
 
 
 ##################################################
@@ -40,11 +40,9 @@ sys.path.insert(1, newPath)
 if os.path.exists(os.path.join(newPath, 'src')):
     import src.NameMapper as NameMapper
     from src.Template import Template
-    from src.Delimiters import *
 elif os.path.exists(os.path.join(newPath, 'Cheetah')):
     import Cheetah.NameMapper as NameMapper
     from Cheetah.Template import Template
-    from Cheetah.Delimiters import *
 else:
     raise Exception, "Not sure where to find Cheetah. I do not see src/ or" + \
 	  " Cheetah/ two directories up."
