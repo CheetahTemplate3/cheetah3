@@ -5,14 +5,14 @@
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.24 $
+Version: $Revision: 1.25 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2002/10/01 17:52:02 $
+Last Revision Date: $Date: 2002/12/03 23:15:18 $
 """
 
-# $Id: SettingsManager.py,v 1.24 2002/10/01 17:52:02 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.25 2002/12/03 23:15:18 tavis_rudd Exp $
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.24 $"[11:-2]
+__revision__ = "$Revision: 1.25 $"[11:-2]
 
 
 ##################################################
@@ -141,7 +141,7 @@ def translateClassBasedConfigSyntax(src):
                 Products = '/home/www/Products'
     becomes:
     # WebKit.config
-    from Webware.SettingsManager import SettingsContainer
+    from Cheetah.SettingsManager import SettingsContainer
     class Applications(SettingsContainer):
         class MyApp(SettingsContainer):
             class Dirs(SettingsContainer):
@@ -165,9 +165,9 @@ def translateClassBasedConfigSyntax(src):
 
     ## prepend this to the first line to make sure that tracebacks report the right line nums
     if outputLines[0].find('class ') == -1:
-        initLine = 'from Webware.SettingsManager import SettingsContainer; True, False = 1, 0; '
+        initLine = 'from Cheetah.SettingsManager import SettingsContainer; True, False = 1, 0; '
     else:
-        initLine = 'from Webware.SettingsManager import SettingsContainer; True, False = 1, 0\n'
+        initLine = 'from Cheetah.SettingsManager import SettingsContainer; True, False = 1, 0\n'
     return initLine + '\n'.join(outputLines) + '\n'
 
 
