@@ -3,6 +3,8 @@
 ##============================================================================##
 #data
 
+_stylesheetLibs = {'LaTeX-to-HTML':'learn.css'}
+
 def usersGuideTxt():
     USERS_GUIDE_PATH = '/home/tavis/Cheetah/docs/users_guide_html/index.html'
     txt = open(USERS_GUIDE_PATH).read()
@@ -25,19 +27,16 @@ def usersGuideTxt():
 
 ##============================================================================##
 ## from SiteTemplate
-#redefine leftSideBar
-	<BR>
+#redefine mainContentsCell
+
+	<P>The Cheetah Users' Guide is available in the following formats:<BR>
+	<A HREF="Downloads/users_guide_html/"><B>Single-page HTML</B></A><BR>
+	<A HREF="Downloads/users_guide_html_multipage/"><B>Multi-page HTML in sections</B></A><BR>
 	<A HREF="Downloads/users_guide.pdf"><B>PDF</B></A><BR>
 	<A HREF="Downloads/users_guide.ps"><B>PostScript</B></A><BR>
 	<A HREF="Downloads/users_guide.txt"><B>Plain Text</B></A><BR>
-#end redefine leftSideBar
-##============================================================================##
-
-##============================================================================##
-## from SiteTemplate
-#redefine mainContentsCell
-
-$*usersGuideTxt
+	</P>
+	<P>Note: it is currently incomplete and under-construction.</P>
 
 #end redefine mainContentsCell
-##============================================================================##
+##=============================================================/home/tavis/Cheetah/docs/users_guide_html/===============##

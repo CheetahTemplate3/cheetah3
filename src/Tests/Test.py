@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.8 2001/07/13 20:31:40 tavis_rudd Exp $
+# $Id: Test.py,v 1.9 2001/07/13 23:24:09 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/13 20:31:40 $
+Last Revision Date: $Date: 2001/07/13 23:24:09 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 
 ##################################################
@@ -560,13 +560,13 @@ posixCases += miscBugCases
 
 
 importantExampleCases = [
-    ['simple #include raw of file - with whitespace',
-     '''#set sep = ''
+    ['how to make a comma-delimited list',
+     """#set sep = ''
 #for letter in $letterList
 ${sep}${letter}#slurp
 #set sep = ', '
 #end for
-''',
+""",
      "a, b, c",],
     ]
 posixCases += importantExampleCases

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.10 2001/07/13 19:58:12 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.11 2001/07/13 23:24:09 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/13 19:58:12 $
+Last Revision Date: $Date: 2001/07/13 23:24:09 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.10 $"[11:-2]
+__version__ = "$Revision: 1.11 $"[11:-2]
 
 
 ##################################################
@@ -27,6 +27,7 @@ from tokenize import tokenprog
 #intra-package dependencies ...
 import Template
 import CodeGenerator
+from CodeGenerator import NO_CACHE, STATIC_CACHE, TIMED_REFRESH_CACHE
 from Components import Component
 import NameMapper
 from Utilities import lineNumFromPos
@@ -39,10 +40,6 @@ False = (1==0)
 
 placeholderTagsRE = re.compile(r'(?:(?<=\A)|(?<!\\))\$(?=[A-Za-z_\*\{])')
 
-# cacheType's for $placeholders
-NO_CACHE = 0
-STATIC_CACHE = 1
-TIMED_REFRESH_CACHE = 2
 
 ##################################################
 ## FUNCTIONS ##
