@@ -16,16 +16,6 @@ Implementation
   the included files
 - redesign and implement the Servlet Factory for Webware so the #extend directive
   will work with .tmpl files as well as .py files
-- make sure that all the #directives that have start and end tags are
-  implemented in such a way that they won't cause 'maximum recursion' limit
-  errors if their content block is long.  Simple regexes won't cut it in these 
-  cases.
-  - #macro
-  - multiline comments
-  - #data
-  - the parsing of the core tags (the state-dependent ones) after they have been
-    translated to the internal delimiters
-
 
 Test Suite
 ================================================================================

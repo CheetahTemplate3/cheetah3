@@ -44,10 +44,25 @@ Please initial your changes and add a date for each release
   - added the 'errorCheckers' framwork (TR)
   - added the 'formatters' framework and the #formatter directive
   - a major restructuring of the modules and internal API (TR)
+  - made sure that all the #directives with start and end tags are
+    implemented in such a way that they won't cause 'maximum recursion' limit
+    errors if their content block is long.  Simple regexes didn't cut it in these 
+    cases. (TR)
+    - #macro
+    - multiline comments
+    - #data
+    - #block
+    - #raw
+    - the parsing of the core tags (the state-dependent ones) after they have been
+      translated to the internal delimiters
+
+  - made a Template.shutdown() method for cleaning up reference cycles before a 
+    template object is deleted. (TR)
+  - made the parsing and processing of #macros() more robust (TR)
 
  
 0.9.7 (July 13, 2001)
-  - reimplemented the parsing of $placeholders using the Python tokenizer module (TR)
+  - reimplemented the parsing of $placeholders using the Python tokenize module (TR)
     - now translates into Python code instead of going through NameMapper for
       each request
     - supports arg lists and nested placeholders
