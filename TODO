@@ -249,6 +249,14 @@ updates the text field's value if there is an uploaded file, but not if there
 isn't.  This may be handled by the regular method(s) or may require a separate
 method.
 
+User-defined directives
+=======================================================================
+IF we decide to support user-defined directives someday, consider Spyce's
+interface.  Spyce uses a base class which provides generic services to
+custom "active tags".
+http://spyce.sourceforge.net/doc-tag.html
+http://spyce.sourceforge.net/doc-tag_new.html
+
 
 Test Suite
 ================================================================================
