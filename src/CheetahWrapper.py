@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.16 2003/09/18 18:19:02 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.17 2003/12/29 01:38:52 hierro Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -9,12 +9,12 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.16 $
+Version: $Revision: 1.17 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2003/09/18 18:19:02 $
+Last Revision Date: $Date: 2003/12/29 01:38:52 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.16 $"[11:-2]
+__revision__ = "$Revision: 1.17 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -392,7 +392,7 @@ be named according to the same rules as Python modules.""" % tup)
         else:
             sourceFiles = self.expandSourceFiles(files, opts.recurse, True)
         sourceFiles = [os.path.normpath(x) for x in sourceFiles]
-        D("All source files found:", sourceFiles)
+        D("All source files found: %s", sourceFiles)
         bundles = self.getBundles(sourceFiles)
         D("All bundles: %s", pprint.pformat(bundles))
         if self.opts.flat:
