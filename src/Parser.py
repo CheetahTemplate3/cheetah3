@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.54 2002/05/08 22:40:34 tavis_rudd Exp $
+# $Id: Parser.py,v 1.55 2002/05/14 23:21:33 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.54 $
+Version: $Revision: 1.55 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/05/08 22:40:34 $
+Last Revision Date: $Date: 2002/05/14 23:21:33 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.54 $"[11:-2]
+__revision__ = "$Revision: 1.55 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1558,17 +1558,17 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         else:
             isGlobal = False
         
-        if not self.matchCheetahVarStart():
-            raise ParseError(self, msg='CheetahVar expected')
-        
-        cheetahVar = self.getCheetahVar(plain=True)
-        
+        if self.matchCheetahVarStart():
+            LVALUE = self.getCheetahVar(plain=True)
+        else:
+            LVALUE = self.getCheetahVarBody(plain=True)
+            
         self.getWhiteSpace()
         OP = self.getAssignmentOperator()
-        expr = self.getExpression()
+        RVALUE = self.getExpression()
         
         self.closeDirective(lineClearToStartToken, endOfFirstLine)
-        self.addSet(cheetahVar, OP, expr, isGlobal)
+        self.addSet(LVALUE, OP, RVALUE, isGlobal)
     
     def eatSlurp(self):
         if self.lineClearToStartToken():
@@ -1756,7 +1756,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.advance(len('unless'))
         expr = self.getExpression()
         self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
-        self.addIf('if not ' + expr)
+        self.addIf('if not (' + expr + ')')
 
     ## end directive eaters
 
