@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.16 2001/08/03 19:20:50 tavis_rudd Exp $
+# $Id: Template.py,v 1.17 2001/08/04 00:09:25 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.16 $
+Version: $Revision: 1.17 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/03 19:20:50 $
+Last Revision Date: $Date: 2001/08/04 00:09:25 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.16 $"[11:-2]
+__version__ = "$Revision: 1.17 $"[11:-2]
 
 
 ##################################################
@@ -27,6 +27,7 @@ import types                      # used in the mergeNewTemplateData method
 import time                       # used in the cache refresh code
 from time import time as currentTime # used in the cache refresh code
 import types                      # used in the constructor
+import os.path                    # used in Template.normalizePath()
 
 # intra-package imports ...
 from SettingsManager import SettingsManager
@@ -562,10 +563,18 @@ class Template(SettingsManager):
         CodeGen.preProcessMacroDirectives(self, extension) 
 
 
-    ## utility functions ##
-    def translatePath(self, path):
-        """A hook to enable proper handling of server-side paths with Webware """
-        return path
+    ## utility functions ##   
+    def normalizePath(self, path):
+        """A hook for any neccessary path manipulations.
+
+        For example, when this is used with Webware servlets all relative paths
+        must be converted so they are relative to the servlet's directory rather
+        than relative to the program's current working dir.
+
+        The default implementation just normalizes the path for the current
+        operating system."""
+        
+        return os.path.normpath(path.replace("\\",'/'))
     
     def getFileContents(self, fileName):
         fp = open(fileName,'r')
