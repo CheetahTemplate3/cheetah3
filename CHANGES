@@ -7,6 +7,10 @@ release
     cStringIO (TR)
   - Utils.Misc.CheckKeywords(): prevent misspelled keyword arguments,
     used by Template constructor. (MO)
+  - With an #extends listing multiple superclasses, the one that's a
+    subclass of Template must now be last instead of first; e.g., '#extends
+    MyMixIn, SiteTemplate'.  This allows one to override standard methods like
+    .awake(). (Change in Compiler.py.) (MO)
 
 
 0.9.12 (April 3, 2002)

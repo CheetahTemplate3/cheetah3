@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.28 2002/03/18 21:47:09 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.29 2002/04/08 00:19:16 hierro Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.28 $
+Version: $Revision: 1.29 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/03/18 21:47:09 $
+Last Revision Date: $Date: 2002/04/08 00:19:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.28 $"[11:-2]
+__revision__ = "$Revision: 1.29 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -697,7 +697,7 @@ class ClassCompiler(SettingsManager, GenUtils):
         __init__.setMethodSignature("def __init__(self, *args, **KWs)")
         __init__.addChunk(
             "%(mainBaseClass)s.__init__(self, *args, **KWs)" % {
-            'mainBaseClass':self._baseClasses[0],
+            'mainBaseClass':self._baseClasses[-1],
             }
             )
         for chunk in self._initMethChunks:
