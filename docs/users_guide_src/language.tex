@@ -15,7 +15,7 @@ Directive tags begin with a hash character (\#) and are used for comments,
 loops, conditional blocks, includes, and all other advanced features. Cheetah
 uses a Python-like syntax inside directive tags and understands any valid
 Python expression.  Some of the main differences from pure Python syntax are
-that variable names are prefaced with a dollar sign (\$), that colons (:) are
+that variable names are prefaced with a dollar sign (\$), colons (:) are
 not used to mark the beginning of a code block, and indentation is not
 significant.  See section \ref{language.namemapper} below for details of
 another important difference. Most of the directive tags listed below are
@@ -174,27 +174,24 @@ These tags may not be used inside other Cheetah tags.
 \item Placeholders can also be written in the form \code{\$\{placeholderName\}}
      and \code{\$(placeholderName)}.  This is useful for cases where there is no
      whitespace between the placeholder and surrounding text
-     (\code{surrounding\$\{embeddedVar\}text}).  The form with braces is called
-     the {\em long placeholder syntax}; the form without braces is called, you
-     guessed it, the {\em short placeholder syntax}.
+     (\code{surrounding\$\{embeddedVar\}text}).
 
 \item The syntax \code{\$\{placeholderName, arg1="val1"\}} passes arguments to
      the output filter (see \code{\#filter}, section \ref{output.filter}.
      The braces and comma are required in this case.  Note that you don't need
-     the \code{\$} prefix in this case since filter arguments are not regular
+     the \code{\$} prefix in this case since filter arguments are not ordinary
      method arguments, and omiting the \code{\$} reminds you of this fact.
      However, you may use \code{\$} anyway if you wish.
 
 \item The special Python name \code{None} does not require a
      \code{\$} prefix.  (This applies only in expressions; e.g., as a method
-     argument.  The word None in surrounding text is treated as regular text.)
+     argument.  The word None in regular text is treated as regular text.)
      But you can use \code{\$None} if you want.
 
-\item There is one place you {\em must} omit the \code{\$} prefix: intermediate
-     variables in Python list comprehensions.  This is a limitation of
-     Cheetah's parser, but it also makes sense.  These are temporary variables
-     local to the list comprehension,  and not any of Cheetah's business.  For
-     example:
+\item EXCEPTION: You must {\em not} use the \code{\$} prefix for intermediate
+     variables in a Python list comprehensions.  This is a limitation of
+     Cheetah's parser; it can't tell which variables in a list comprehension
+     are the intermediate variables, so you have to help it.  For example:
 \begin{verbatim}
 #set $theRange = [x ** 2 for x in $range(10)]
 \end{verbatim}
@@ -214,9 +211,9 @@ $object.method $object.method() $object.method
 $nest($nest($var))
 \end{verbatim}
 
-These are not \$placeholders:
+These are not \$placeholders but are treated as literal text:
 \begin{verbatim}
-$@var $^var $15.50
+$@var $^var $15.50 $$
 \end{verbatim}
 
 You can use compiler settings to change the placeholder delimeters if
@@ -561,8 +558,8 @@ alternate behaviour.
 
 Here's how to do certain important lookups that may not be obvious.
 Forms beginning with \code{\$} are placeholders.  Forms beginning with
-\code{self.} do the equivalent from Python, assuming you are in a method in
-the template object (or inherited by the template object).
+\code{self.} do the equivalent in Python, assuming you are in a method 
+inherited by the template object.
 
 To verify whether a variable exists in the searchList:
 \begin{verbatim}
@@ -583,7 +580,10 @@ self.getVar('theVariable', myDefault)
 This is the equivalent to \code{\$theVariable} in the template.  \code{getVar}
 returns the second argument (\code{None} or \code{myDefault} if the variable is
 missing; or, if there is no second argument, it raises raises
-\code{NameMapper.NotFound}.
+\code{NameMapper.NotFound}.  However, it usually easier to write your method
+so that all needed searchList values come in as method arguments.  That way
+the caller can just use a \$placeholder to specify the argument, which is
+less verbose than you writing a getVar call.
 
 To do a ``safe'' placeholder lookup that returns a default value if the
 variable is missing:
@@ -596,75 +596,20 @@ To get an environmental variable, put \code{os.environ} as one of the
 elements in the searchList.  Or read the envvar in Python code and set a
 placeholder variable for it.
 
-Remember that variables found earlier in the searchList override same-name variables
-located in a later searchList object.  Be careful when adding objects containing other
-variables besides the ones you want (e.g., \code{os.environ}, CGI parameters).
-The "other" variables may override variables your application depends on, leading to
-hard-to-find bugs.  Also, users can inadvertantly or maliciously set an environmental
-variable or CGI parameter you didn't expect, screwing up your program.  To
-avoid all this, know what your namespaces contain, and place the namespaces you
-have the most control over first.  For namespaces that could contain
-user-supplied "other" variables, don't put the namespace itself in the
-searchList; instead, copy the needed variables into your own "safe" namespace.
+Remember that variables found earlier in the searchList override same-name
+variables located in a later searchList object.  Be careful when adding objects
+containing other variables besides the ones you want (e.g., \code{os.environ},
+CGI parameters).  The "other" variables may override variables your application
+depends on, leading to hard-to-find bugs.  Also, users can inadvertantly or
+maliciously set an environmental variable or CGI parameter you didn't expect,
+screwing up your program.  To avoid all this, know what your namespaces
+contain, and place the namespaces you have the most control over first.  For
+namespaces that could contain user-supplied "other" variables, don't put the
+namespace itself in the searchList; instead, copy the needed variables into
+your own "safe" namespace.
 
-{\bf Tips for templates that are Webware servlets}
-
-[Note: these are currenty untested.]
-
-To look up a CGI GET or POST parameter (with POST overriding):
-\begin{verbatim}
-$request.field('myField')        ## Using autocalling only.
-$request().field('myField')      ## Using neither, boring.
-self.request().field('myField')
-\end{verbatim}
-These will fail if Webware is not available, because \code{\$request}
-(aka \code{self.request()} will be \code{None} rather than a Webware
-\code{WebKit.Request} object.  If you plan to read a lot of CGI parameters,
-you may want to put the \code{.field} method in a local variable for
-convenience:
-\begin{verbatim}
-#set $field = $request.field
-$field.myField
-$field('myField')
-\end{verbatim}
-But remember to do complicated calculations in Python, and assign the results
-to simple variables in the searchList for display.  These \code{\$request}
-forms are useful only for occasions where you just need one or two simple
-request items that going to Python for would be overkill.
-
-To get a cookie or session parameter, subsitute ``cookie'' or ``session'' for
-``field'' above.  To get a dictionary of all CGI parameters, substitute
-``fields'' (ditto for ``cookies'').  To verify a field exists,
-substitute ``hasField'' (ditto for ``hasCookie'').  
-
-Other useful request goodies:
-\begin{verbatim}
-## Defined in WebKit.Request
-$request.time              ## Time this request began in Unix ticks.
-$request.timeStamp         ## Time in human-readable format ('asctime' format).
-## Defined in WebKit.HTTPRequest
-$request.hasField.myField  ## Is a CGI parameter defined?
-$request.fields            ## Dictionary of all CGI parameters.
-$request.cookie.myCookie   ## A cookie parameter (also .hasCookie, .cookies).
-$request.value.myValue     ## A field or cookie variable (field overrides)
-                           ## (also .hasValue).
-$request.session.mySessionVar  # A session variable.
-$request.extraURLPath      ## URL path components to right of servlet, if any.
-$request.serverDictionary  ## Dict of environmental vars from web server.
-$request.remoteUser        ## Authenticated username.  HTTPRequest.py source
-                           ## suggests this is broken and always returns None.
-$request.remoteAddress  ## User's IP address (string).
-$request.remoteName     ## User's domain name, or IP address if none.
-$request.urlPath        ## URI of this servlet.
-$request.urlPathDir     ## URI of the directory containing this servlet.
-$request.serverSidePath ## Absolute path of this servlet on local filesystem.
-$request.serverURL      ## URL of this servlet, without "http://" prefix,
-                        ## extra path info or query string.
-$request.serverURLDir   ## URL of this servlet's directory, without "http://".
-$log("message")         ## Put a message in the Webware server log.  (If you
-                        ## define your own 'log' variable, it will override
-                        ## this; use $self.log("message") in that case.
-\end{verbatim}
+Webware-specific placeholder tips are in the Webware chapter (section
+\ref{webware}.
 
 % @@ MO: If getVar() is called from Python, does errorCatcher apply?
 

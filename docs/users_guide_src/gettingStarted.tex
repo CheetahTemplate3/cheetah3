@@ -42,6 +42,31 @@ Cheetah's installation is managed by Python's Distribution Utilities
   setup.py help''} for more information.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The 'cheetah' command}
+\label{gettingStarted.cheetah}
+
+Cheetah comes with a utility \code{cheetah} that provides a command-line
+interface to various housekeeping tasks.  The command's first argument is
+the name of the task.  The following tasks are currently supported:
+
+\begin{verbatim}
+cheetah --help|-h            
+          - Print this usage information
+cheetah compile|-c [compiler options]
+          - Run Cheetah's compiler ('cheetah compile --help' for more)
+cheetah test|-t [test options]
+          - Run Cheetah's test suite ('cheetah test --help' for more)
+cheetah --version|-v
+          - Print Cheetah's version number
+\end{verbatim}
+
+The test suite is described in the next section.  The compiler will be
+described in section \ref{howItWorks.cheetah-compile}.
+
+For backward compatibility, the separate \code{cheetah-compile} program
+does the same thing as \code{cheetah compile}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Testing your installation}
 \label{gettingStarted.test}
 
