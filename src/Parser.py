@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.55 2002/05/14 23:21:33 tavis_rudd Exp $
+# $Id: Parser.py,v 1.56 2002/06/05 21:42:23 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.55 $
+Version: $Revision: 1.56 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/05/14 23:21:33 $
+Last Revision Date: $Date: 2002/06/05 21:42:23 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.55 $"[11:-2]
+__revision__ = "$Revision: 1.56 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -847,12 +847,14 @@ class _LowLevelSemanticsParser(Lexer):
     
     def getExpression(self,
                       enclosed=False, 
-                      enclosures=[], # list of tuples (char, pos), where char is ({ or [ 
+                      enclosures=None, # list of tuples (char, pos), where char is ({ or [ 
                       ):
 
         """ Get a Cheetah expression that includes $CheetahVars and break at
         directive end tokens."""
 
+        if enclosures is None:
+            enclosures = []
         
         srcLen = len(self)
         exprBits = []
@@ -927,7 +929,6 @@ class _LowLevelSemanticsParser(Lexer):
                     exprBits.append(self.getWhiteSpace())
                     if not self.atEnd() and self.peek() == '(':
                         exprBits.append(self.getCallArgString())
-                        
                     
             elif self.matchCheetahVarStart():
                 token = self.getCheetahVar()
