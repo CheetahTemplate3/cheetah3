@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.26 2002/03/13 18:42:35 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.27 2002/03/13 18:54:05 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.26 $
+Version: $Revision: 1.27 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/03/13 18:42:35 $
+Last Revision Date: $Date: 2002/03/13 18:54:05 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.26 $"[11:-2]
+__revision__ = "$Revision: 1.27 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -132,7 +132,7 @@ class CheetahCompile:
                 self._generate(fileName)
 
     def _processFile(self, fileName):
-        print 'Compiling %s ' % (srcFile)
+        print 'Compiling %s ' % (fileName)
         
         srcFile = fileName
         fileNameMinusExt = os.path.splitext(fileName)[0]
