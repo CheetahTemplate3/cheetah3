@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.12 2001/12/19 08:05:32 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.13 2002/02/26 02:03:53 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2001/12/19 08:05:32 $
+Last Revision Date: $Date: 2002/02/26 02:03:53 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.12 $"[11:-2]
+__revision__ = "$Revision: 1.13 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -87,7 +87,7 @@ class Servlet(BaseServlet):
     def shutdown(self):
         pass
 
-    def serverSidePath(self, path):
+    def serverSidePath(self, path=None):
         try:
             return BaseServlet.serverSidePath(self, path)
         except:
