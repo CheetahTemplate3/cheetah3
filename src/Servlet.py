@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.4 2001/08/06 03:50:16 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.5 2001/08/10 04:51:31 tavis_rudd Exp $
 """An abstract base class for Cheetah Servlets that can be used with Webware
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/08/06 03:50:16 $
+Last Revision Date: $Date: 2001/08/10 04:51:31 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -60,7 +60,7 @@ class TemplateServlet(Template, HTTPServlet):
         """ """
         if not kw.has_key('settings'):
             kw['settings']={}
-        kw['settings']['delayedStart'] = True
+        kw['settings']['delayedCompile'] = True
         Template.__init__(self, template, *searchList, **kw)
         HTTPServlet.__init__(self)
         self.initializeTemplate()
