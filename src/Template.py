@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.103 2002/10/05 22:12:00 tavis_rudd Exp $
+# $Id: Template.py,v 1.104 2002/10/06 00:09:44 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.103 $
+Version: $Revision: 1.104 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/10/05 22:12:00 $
+Last Revision Date: $Date: 2002/10/06 00:09:44 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.103 $"[11:-2]
+__revision__ = "$Revision: 1.104 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -144,6 +144,16 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         SettingsManager.__init__(self)
         Servlet.__init__(self)
         self._compilerSettings = compilerSettings
+
+        ##################################################
+        ## Now, compile if we're meant to
+        self._cacheIndex = {}
+        self._cacheData = {}
+        self._generatedModuleCode = None
+        self._generatedClassCode = None
+        if source or file:
+            self.compile(source, file)
+
         
         ##################################################           
         ## Setup the searchList of namespaces in which to search for $placeholders
@@ -202,14 +212,6 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         self._indenter = Indenter()
         self._indent = self._indenter.indent
         
-        ##################################################
-        ## Now, compile if we're meant to
-        self._cacheIndex = {}
-        self._cacheData = {}
-        self._generatedModuleCode = None
-        self._generatedClassCode = None
-        if source or file:
-            self.compile(source, file)
 
             
     def compile(self, source=None, file=None,
