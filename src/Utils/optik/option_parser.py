@@ -1,9 +1,12 @@
 """optik.option_parser
 
 Provides the OptionParser and Values classes.
+
+Cheetah modifications:  added "Cheetah.Utils.optik." prefix to
+  all intra-Optik imports.
 """
 
-__revision__ = "$Id: option_parser.py,v 1.1 2002/08/24 17:10:06 hierro Exp $"
+__revision__ = "$Id: option_parser.py,v 1.2 2002/09/12 06:56:51 hierro Exp $"
 
 # Copyright (c) 2001 Gregory P. Ward.  All rights reserved.
 # See the README.txt distributed with Optik for licensing terms.
@@ -12,8 +15,8 @@ __revision__ = "$Id: option_parser.py,v 1.1 2002/08/24 17:10:06 hierro Exp $"
 
 import sys, os
 import types
-from optik.option import Option, NO_DEFAULT
-from optik.errors import OptionConflictError, OptionValueError, BadOptionError
+from Cheetah.Utils.optik.option import Option, NO_DEFAULT
+from Cheetah.Utils.optik.errors import OptionConflictError, OptionValueError, BadOptionError
 
 def get_prog_name ():
     return os.path.basename(sys.argv[0])

@@ -1,9 +1,12 @@
 """optik.option
 
 Defines the Option class and some standard value-checking functions.
+
+Cheetah modifications:  added "Cheetah.Utils.optik." prefix to
+  all intra-Optik imports.
 """
 
-__revision__ = "$Id: option.py,v 1.1 2002/08/24 17:10:06 hierro Exp $"
+__revision__ = "$Id: option.py,v 1.2 2002/09/12 06:56:51 hierro Exp $"
 
 # Copyright (c) 2001 Gregory P. Ward.  All rights reserved.
 # See the README.txt distributed with Optik for licensing terms.
@@ -12,7 +15,7 @@ __revision__ = "$Id: option.py,v 1.1 2002/08/24 17:10:06 hierro Exp $"
 
 import sys
 from types import TupleType, DictType
-from optik.errors import OptionError, OptionValueError
+from Cheetah.Utils.optik.errors import OptionError, OptionValueError
 
 _builtin_cvt = { "int" : (int, "integer"),
                  "long" : (long, "long integer"),
