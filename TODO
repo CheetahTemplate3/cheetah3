@@ -36,16 +36,26 @@ Implementation
 
 - implement the #cache directive's varyBy keyword
 
-- split 'cheetah compile' function into two.  'cheetah compile' converts
-  *.tmpl -> *.py and eliminates the -w switch.  Another function does 
-  whatever 'cheetah compile -w' is supposed to do (*.tmpl -> *.html somehow).
-  Audit 'cheetah compile' for bugs and unclear code.
+- Remove the -w option from 'cheetah compile'.  New command 'cheetah fill'
+  replaces the -w switch and more: it fills the template into *.html, another
+  extension or stdout.  It accepts the -R (recurse), -p (to stdout) and 
+  -v (verbose) options of 'cheetah compile', and the '-e/--env' and 
+  '-p/--pickle' options of .py template modules.  Note the conflict between
+  -p (stdout) and -p (pickle); we'll have to rename -p (stdout) to something
+  else, both in 'cheetah fill' and 'cheetah compile'.
+
+- Make template filling thread safe.  .__init__ initializes self.mutex.
+  .respond acquires lock at beginning, and unlocks at end.  Do not compile the
+  template without acquiring the lock.  Remember to unlock in a try/finally
+  clause in case there's an exception.
 
 Test Suite
 ================================================================================
 - test cases for the SkeletonPage framework
 - add cases that test the cheetah-compile script
-- add cases that test the integration with WebKit
+- add cases that test the integration with WebKit.  Since these must be called
+  from a running WebKit server, make a servlet that runs the tests and outputs
+  diagnostics to the browser.
 
 Documentation
 ================================================================================
