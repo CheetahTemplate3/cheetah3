@@ -78,6 +78,31 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
   }
 }
 
+static PyObject *
+PyNamemapper_valueFromSearchList(PyObject *searchList, 
+				 char *nameChunks[], 
+				 int numChunks, 
+				 int executeCallables)
+{
+  PyObject *nameSpace;
+  PyObject *theValue;
+  int i;
+  int listLen;
+
+  listLen = PyList_Size(searchList);
+
+  for (i=0; i < listLen; i++){
+    nameSpace = PyList_GetItem(searchList, i);
+    theValue = PyNamemapper_valueForName(nameSpace, nameChunks, 
+					 numChunks, executeCallables);
+    if (theValue) {		/* it might be NULL */
+      PyErr_Clear();		/* clear possible NotFound errors */
+      return theValue;
+    }
+  }
+  return NULL;
+}
+
 /* *************************************************************************** */
 /* Now the wrapper functions to export into the Python module */
 /* *************************************************************************** */
@@ -128,12 +153,48 @@ namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)
   return res;
 }
 
+
+static PyObject *
+namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
+{
+
+  PyObject *searchList;
+  PyObject *res;
+  const char *name;
+  int executeCallables = 0;
+
+  const char *dot = ".";
+  char *copyOfName;
+  char *nameChunks[MAXCHUNKS];
+  int numChunks = 1;
+  char *nextChunk;
+
+  static char *kwlist[] = {"searchList", "name", "executeCallables", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, keywds, "Os|i", kwlist,  &searchList, &name, 
+				   &executeCallables)) {
+    return NULL;
+  }
+
+  copyOfName = malloc(strlen(name) + 1);
+  copyOfName = strcpy(copyOfName, name);
+
+  nameChunks[0] = strtok(copyOfName, dot);
+  while ((nextChunk = strtok(NULL, dot)) != NULL) {
+    nameChunks[numChunks++] = nextChunk;
+  }
+  res = PyNamemapper_valueFromSearchList(searchList, nameChunks, numChunks, executeCallables);
+  free(copyOfName);		/* must do after nameChunks has been used */
+  return res;
+}
+
 /* *************************************************************************** */
 /* Method registration table: name-string -> function-pointer */
 
 static struct PyMethodDef namemapper_methods[] = {
   {"valueForKey", namemapper_valueForKey,  1},
   {"valueForName", (PyCFunction)namemapper_valueForName,  METH_VARARGS|METH_KEYWORDS},
+  {"valueFromSearchList", (PyCFunction)namemapper_valueFromSearchList,  METH_VARARGS|METH_KEYWORDS},
   {NULL,         NULL}
 };
 

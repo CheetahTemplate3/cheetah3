@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.6 2001/08/11 07:03:22 tavis_rudd Exp $
+# $Id: Parser.py,v 1.7 2001/08/12 20:12:34 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/11 07:03:22 $
+Last Revision Date: $Date: 2001/08/12 20:12:34 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -24,7 +24,7 @@ from tokenize import tokenprog
 
 # intra-package imports ...
 from Utilities import lineNumFromPos
-
+from NameMapper import valueFromSearchList, valueForName
 ##################################################
 ## CONSTANTS & GLOBALS ##
 
@@ -371,7 +371,7 @@ class Parser:
                 return translatedName
 
             ## Translate the NameMapper part of the Name
-            translatedName = 'searchList_getMeth("' + \
+            translatedName = 'valueFromSearchList(searchList, "' + \
                            nameMapperPartOfName + '", executeCallables=' + \
                            str(safeToAutoCall) + ')' + remainderOfName
             return translatedName
@@ -408,5 +408,4 @@ class Parser:
     def evalPlaceholderString(self, txt):
         """Return the value of a placeholderstring. This doesn't work with localVars."""
         searchList = self.searchList()
-        searchList_getMeth = searchList.get # shortcut-namebing in the eval
         return eval(txt)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.24 2001/08/11 16:57:50 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.25 2001/08/12 20:12:34 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.24 $
+Version: $Revision: 1.25 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/11 16:57:50 $
+Last Revision Date: $Date: 2001/08/12 20:12:34 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.24 $"[11:-2]
+__version__ = "$Revision: 1.25 $"[11:-2]
 
 
 ##################################################
@@ -126,7 +126,6 @@ class PlaceholderProcessor(TagProcessor):
         ## deal with the caching and return the proper code to the code-generator
         searchList = templateObj.searchList()
         if cacheType == STATIC_CACHE:
-            searchList_getMeth = searchList.get # shortcut-namebing in the eval
             return str(
                 self.evalPlaceholderString(translatedTag)).replace("'''",r"\'\'\'")
         elif cacheType == TIMED_REFRESH_CACHE:

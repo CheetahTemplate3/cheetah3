@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.8 2001/08/12 19:19:13 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.9 2001/08/12 20:12:34 tavis_rudd Exp $
 
 """Utilities for accessing the members of an object via string representations
 of those members.  Template processing is its primary intended use.
@@ -58,13 +58,13 @@ Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
 License: This software is released for unlimited distribution
          under the terms of the Python license.
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/08/12 19:19:13 $
+Last Revision Date: $Date: 2001/08/12 20:12:34 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -87,7 +87,7 @@ class NoDefault:
 ## FUNCTIONS ##
 
 try:
-    from _namemapper import NotFound, valueForKey, valueForName
+    from _namemapper import NotFound, valueForKey, valueForName, valueFromSearchList
     # it is possible, with Jython for example, that _namemapper.c hasn't been compiled
 except:
     class NotFound(Exception):
@@ -141,6 +141,23 @@ except:
         else:
             # its a single key like: nestedObject
             return binding
+
+    def valueFromSearchList(searchList, name, executeCallables=False):
+        if type(name)==StringType:
+            # then this is the first call to this function.
+            nameChunks=name.split('.')
+        else:
+            #if this function calls itself then name already is a list of nameChunks
+            nameChunks = name
+
+        for namespace in searchList:
+            try:
+                val = _valueForName(namespace, nameChunks, executeCallables=executeCallables)
+                return val
+            except NotFound:
+                pass           
+        raise NotFound(name)
+
 
 
 ##################################################

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.34 2001/08/11 16:57:50 tavis_rudd Exp $
+# $Id: Template.py,v 1.35 2001/08/12 20:12:34 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.34 $
+Version: $Revision: 1.35 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/11 16:57:50 $
+Last Revision Date: $Date: 2001/08/12 20:12:34 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.34 $"[11:-2]
+__version__ = "$Revision: 1.35 $"[11:-2]
 
 
 ##################################################
@@ -32,8 +32,7 @@ import os.path                    # used in Template.normalizePath()
 # intra-package imports ...
 from SettingsManager import SettingsManager
 from Parser import Parser, processTextVsTagsList
-from NameMapper import valueForName     # this is used in the generated code
-from SearchList import SearchList
+from NameMapper import valueFromSearchList, valueForName # this is used in the generated code
 import CodeGenerator as CodeGen
 
 from TagProcessor import TagProcessor
@@ -192,10 +191,10 @@ class Template(SettingsManager, Parser):
             
         if kw.has_key('preBuiltSearchList'):
             # happens with nested Template obj creation from #include's
-            self._searchList = kw['preBuiltSearchList']
+            self._searchList = list(kw['preBuiltSearchList'])
         else:
             # create our own searchList
-            self._searchList = SearchList( searchList )
+            self._searchList = list(searchList)
             self._searchList.insert(0, self._setVars)
             self._searchList.append(self)
             if kw.has_key('searchList'):
@@ -462,7 +461,6 @@ class Template(SettingsManager, Parser):
                           + indent * 1 + "try:\n" \
                           + indent * 2 + "#setupCodeInsertMarker\n" \
                           + indent * 2 + "searchList = self.searchList()\n" \
-                          + indent * 2 + "searchList_getMeth = searchList.get\n" \
                           + indent * 2 + "setVars = self._setVars\n" \
                           + indent * 2 + "outputList = []\n" \
                           + indent * 2 + "outputList.extend( ['''" + \
