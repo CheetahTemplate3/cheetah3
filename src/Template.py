@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.65 2001/11/08 06:25:16 hierro Exp $
+# $Id: Template.py,v 1.66 2001/11/09 10:09:19 hierro Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.65 $
+Version: $Revision: 1.66 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/08 06:25:16 $
+Last Revision Date: $Date: 2001/11/09 10:09:19 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.65 $"[11:-2]
+__version__ = "$Revision: 1.66 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -95,19 +95,31 @@ class Template(SettingsManager, Servlet):
         N = types.NoneType
         vt = VerifyType.VerifyType
         vtc = VerifyType.VerifyTypeClass
-        vt(source, 'source', [N,S], 'string or None')
-        vt(searchList, 'searchList', [L,T], 'list or tuple')
-        vt(file, 'file', [N,S,F], 'string, file open for reading, or None')
-        vt(settings, 'settings', [D], 'dictionary')
-        vtc(filter, 'filter', [S,C], 'string or class', 
-            Filters.Filter,
-            '(if class, must be subclass of Cheetah.Filters.Filter)')
-        vt(filtersLib, 'filtersLib', [S,M], 'string or module',
-            '(if module, must contain subclasses of Cheetah.Filters.Filter)')
-        vtc(errorCatcher, 'errorCatcher', [N,S,C], 'string, class or None',
-           ErrorCatchers.ErrorCatcher,
-           '(if class, must be subclass of Cheetah.ErrorCatchers.ErrorCatcher)')
-        vt(compilerSettings, 'compilerSettings', [D], 'dictionary')
+        try:
+            vt(source, 'source', [N,S], 'string or None')
+            vt(searchList, 'searchList', [L,T], 'list or tuple')
+            vt(file, 'file', [N,S,F], 'string, file open for reading, or None')
+            vt(settings, 'settings', [D], 'dictionary')
+            vtc(filter, 'filter', [S,C], 'string or class', 
+                Filters.Filter,
+                '(if class, must be subclass of Cheetah.Filters.Filter)')
+            vt(filtersLib, 'filtersLib', [S,M], 'string or module',
+                '(if module, must contain subclasses of Cheetah.Filters.Filter)')
+            vtc(errorCatcher, 'errorCatcher', [N,S,C], 'string, class or None',
+               ErrorCatchers.ErrorCatcher,
+               '(if class, must be subclass of Cheetah.ErrorCatchers.ErrorCatcher)')
+            vt(compilerSettings, 'compilerSettings', [D], 'dictionary')
+        except TypeError, reason:
+            # Re-raise the exception here so that the traceback will end in
+            # this function rather than in some utility function.
+            raise TypeError(reason)
+        if source is None and file is None:
+            raise TypeError("""\
+you must supply either a source string or the 'file' keyword argument""")
+        elif source is not None and file is not None:
+            raise TypeError("""\
+you must supply either a source string or the 
+'file' keyword argument, but not both""")
 
 
         
@@ -433,5 +445,8 @@ class Template(SettingsManager, Servlet):
                 fp.close()
                 
         return module
+
+
+T = Template   # Short and sweet for debugging at the >>> prompt.
 
 # vim: shiftwidth=4 tabstop=4 expandtab
