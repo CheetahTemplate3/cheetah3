@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: TemplateCmdLineIface.py,v 1.3 2001/12/07 04:59:49 tavis_rudd Exp $
+# $Id: TemplateCmdLineIface.py,v 1.4 2001/12/07 08:45:43 tavis_rudd Exp $
 
 """Provides a command line interface to compiled Cheetah template modules.
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/12/06
-Last Revision Date: $Date: 2001/12/07 04:59:49 $
+Last Revision Date: $Date: 2001/12/07 08:45:43 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -77,7 +77,10 @@ class CmdLineIface:
             if o in ('-e','--env'):
                 self._template.prependToSearchList(os.environ)
             if o in ('-p','--pickle'):
-                self._template.prependToSearchList( load(a) )
+                if a == '-':
+                    self._template.prependToSearchList( load( sys.stdin ) )
+                else:
+                    self._template.prependToSearchList( load(a) )
 
     def usage(self):
         return """Cheetah %(version)s template module command-line interface
@@ -94,7 +97,8 @@ Options
                              $placeholders in the template.
                              
   -p <file>, --pickle <file> Use a variables from a dictionary stored in Python
-                             pickle file to 
+                             pickle file to fill $placeholders in the template.
+                             If <file> is - stdin is used: '%(scriptName)s -p -'
 
 Description
 -----------
