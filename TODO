@@ -158,6 +158,7 @@ shell command line would have to specify the function name, either as
 or      template.py func "arg1" "arg2"
 In the latter case, the function name would always have to be specified,
 which I think is undesired.
+	Should it be called #wrapper, #access, #entry, etc?
 	
 
 
