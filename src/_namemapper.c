@@ -1,7 +1,6 @@
 /* *************************************************************************** */
 #include "Python.h"             /* Python header files */
 #include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 
