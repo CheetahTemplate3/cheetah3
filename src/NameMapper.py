@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.23 2002/11/12 07:16:47 hierro Exp $
+# $Id: NameMapper.py,v 1.24 2002/11/14 06:07:18 hierro Exp $
 
 """This module implements Cheetah's optional NameMapper syntax.
 
@@ -116,8 +116,11 @@ NAMESPACE CASCADING (d)
 Implementation details
 ================================================================================
 
-* NameMapper's search order is object attributes, then underscored attributes,
-  and finally dictionary items.
+* NameMapper's search order is object attributes, then dictionary keys.
+  However, if this is the first "chunk" (identifier) of a searchList lookup
+  -and- the searchList container is a Python dictionary (not a subclass),
+  we ignore the attributes.  That is to avoid calling dict methods like
+  .update() unintentionally.
 
 * NameMapper.NotFound is raised if a value can't be found for a name.
 
@@ -135,14 +138,14 @@ Meta-Data
 Authors: Tavis Rudd <tavis@damnsimple.com>,
          Chuck Esterbrook <echuck@mindspring.com>,
      Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.23 $
+Version: $Revision: 1.24 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2002/11/12 07:16:47 $
+Last Revision Date: $Date: 2002/11/14 06:07:18 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>" +\
          "\nMike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.23 $"[11:-2]
+__revision__ = "$Revision: 1.24 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -150,7 +153,6 @@ __revision__ = "$Revision: 1.23 $"[11:-2]
 import types
 from types import ClassType, DictType, InstanceType, StringType, TypeType
 import re
-from UserDict import UserDict
 
 # This module requires Python >= 2.0 due to its use of string methods and
 # list comprehensions.
@@ -178,26 +180,24 @@ class NotFoundInNamespace(NotFound):
     pass
     
 
-def valueForKey(obj, key, searchAttrIfKeys=True):
+def valueForKey(obj, key, searchDictMethods=True):
     """Get the value of the specified key.  The 'obj' can be a a mapping or
        any Python object that supports the __getattr__ method. The key can
        be a mapping item, or an attribute/method.
-       searchAttrIfKeys should be True for the first or only chunk, and
-       False for subsequent chunks.
+       searchDictMethods should be True normally, but False if this is the
+       first "chunk" of a searchList lookup.  It should be True for
+       non-searchList lookups.
     """
-    hasKeys = hasattr(obj, '__getitem__')
-    searchAttrs = (not hasKeys) or searchAttrIfKeys
-    if   hasKeys:
-        try:
-            return obj[key]
-        except (KeyError, TypeError):
-            # KeyError if key not found
-            # TypeError if keys are restricted to a certain type (eg. lists)
-            pass
-    if searchAttrs and hasattr(obj, key):
+    searchTheseMethods = searchDictMethods or type(obj) != DictType
+    if hasattr(obj, key) and searchTheseMethods:
         return getattr(obj, key)
-    raise NotFound, key
-            
+    try:
+        return obj[key]
+    except (KeyError, AttributeError, TypeError):
+        # KeyError if key is missing
+        # AttributeError if 'obj' is an instance without __getitem__
+        # TypeError if 'obj' is a built-in type without keys
+        raise NotFound, key
 
 
 def valueForName(obj, name, executeCallables=False):
@@ -214,20 +214,20 @@ def valueForName(obj, name, executeCallables=False):
         nameChunks = name
         
     return _valueForName(obj, nameChunks, executeCallables=executeCallables,
-        searchAttrIfKeys=True)
+        searchDictMethods=True)
 
 
 def _valueForName(obj, nameChunks, executeCallables=False, 
-    passNamespace=False, searchAttrIfKeys=True):
+    passNamespace=False, searchDictMethods=True):
     ## go get a binding for the key ##
     firstKey = nameChunks[0]
     if passNamespace:
         try:
-            binding = valueForKey(obj, firstKey, searchAttrIfKeys)
+            binding = valueForKey(obj, firstKey, searchDictMethods)
         except NotFound:
             raise NotFoundInNamespace
     else:
-        binding = valueForKey(obj, firstKey, searchAttrIfKeys)
+        binding = valueForKey(obj, firstKey, searchDictMethods)
     if executeCallables and callable(binding) and \
        type(binding) not in (InstanceType, ClassType, TypeType):
         # the type check allows access to the methods of instances
@@ -239,7 +239,7 @@ def _valueForName(obj, nameChunks, executeCallables=False,
         # it's a composite name like: nestedObject.item
         return _valueForName(binding, nameChunks[1:],
                              executeCallables=executeCallables,
-                             searchAttrIfKeys=True)
+                             searchDictMethods=True)
     else:
         # its a single key like: nestedObject
         return binding
@@ -258,7 +258,7 @@ def valueFromSearchList(searchList, name, executeCallables=False):
         try:
             val = _valueForName(namespace, nameChunks,
                                 executeCallables=executeCallables, 
-                                passNamespace=True, searchAttrIfKeys=False)
+                                passNamespace=True, searchDictMethods=False)
             return val
         except NotFoundInNamespace:
             pass           
