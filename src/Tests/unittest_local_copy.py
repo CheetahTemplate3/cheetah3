@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """ This is a hacked version of PyUnit that extends its reporting capabilities
 with optional meta data on the test cases.  It also makes it possible to
 separate the standard and error output streams in TextTestRunner.
@@ -29,12 +28,20 @@ TextTestRunner
 TestProgram
    - added -e and --explain as flags on the command line
 
--- Tavis Rudd (Sept 28th, 2001)
+-- Tavis Rudd <tavis@redonions.net> (Sept 28th, 2001)
 
 - _TestTextResult.printErrorList(): print blank line after each traceback
 
--- Mike Orr (Nov 11, 2002)
+-- Mike Orr <mso@oz.net> (Nov 11, 2002)
 
+TestCase methods copied from unittest in Python 2.3:
+  - .assertAlmostEqual(first, second, places=7, msg=None): to N decimal places.
+  - .failIfAlmostEqual(first, second, places=7, msg=None)
+
+-- Mike Orr (Jan 5, 2004)
+
+
+Below is the original docstring for unittest.
 ---------------------------------------------------------------------------
 Python unit testing framework, based on Erich Gamma's JUnit and Kent Beck's
 Smalltalk testing framework.
@@ -82,18 +89,20 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 __author__ = "Steve Purcell"
 __email__ = "stephen_purcell at yahoo dot com"
-__revision__ = "$Revision: 1.9 $"[11:-2]
+__revision__ = "$Revision: 1.10 $"[11:-2]
 
 
 ##################################################
 ## DEPENDENCIES ##
 
-import time
-import sys
-import traceback
-import string
 import os
+import re
+import string
+import sys
+import time
+import traceback
 import types
+import pprint
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -410,11 +419,39 @@ class TestCase:
         if first == second:
             raise self.failureException, (msg or '%s == %s' % (first, second))
 
+    def failUnlessAlmostEqual(self, first, second, places=7, msg=None):
+        """Fail if the two objects are unequal as determined by their
+           difference rounded to the given number of decimal places
+           (default 7) and comparing to zero.
+
+           Note that decimal places (from zero) is usually not the same
+           as significant digits (measured from the most signficant digit).
+        """
+        if round(second-first, places) != 0:
+            raise self.failureException, \
+                  (msg or '%s != %s within %s places' % (`first`, `second`, `places` ))
+
+    def failIfAlmostEqual(self, first, second, places=7, msg=None):
+        """Fail if the two objects are equal as determined by their
+           difference rounded to the given number of decimal places
+           (default 7) and comparing to zero.
+
+           Note that decimal places (from zero) is usually not the same
+           as significant digits (measured from the most signficant digit).
+        """
+        if round(second-first, places) == 0:
+            raise self.failureException, \
+                  (msg or '%s == %s within %s places' % (`first`, `second`, `places`))
+
     ## aliases
 
     assertEqual = assertEquals = failUnlessEqual
 
     assertNotEqual = assertNotEquals = failIfEqual
+
+    assertAlmostEqual = assertAlmostEquals = failUnlessAlmostEqual
+
+    assertNotAlmostEqual = assertNotAlmostEquals = failIfAlmostEqual
 
     assertRaises = failUnlessRaises
 
@@ -476,12 +513,14 @@ class TestSuite:
     in the order in which they were added, aggregating the results. When
     subclassing, do not forget to call the base class constructor.
     """
-    def __init__(self, tests=()):
+    def __init__(self, tests=(), suiteName=None):
         self._tests = []
+        self._testMap = {}
+        self.suiteName = suiteName
         self.addTests(tests)
 
     def __repr__(self):
-        return "<%s tests=%s>" % (self.__class__, self._tests)
+        return "<%s tests=%s>" % (self.__class__, pprint.pformat(self._tests))
 
     __str__ = __repr__
 
@@ -493,10 +532,21 @@ class TestSuite:
 
     def addTest(self, test):
         self._tests.append(test)
-
+        if isinstance(test, TestSuite) and test.suiteName:
+            name = test.suiteName
+        elif isinstance(test, TestCase):
+            #print test, test._testMethodName
+            name = test._testMethodName
+        else:
+            name = test.__class__.__name__
+        self._testMap[name] = test
+        
     def addTests(self, tests):
         for test in tests:
             self.addTest(test)
+
+    def getTestForName(self, name):
+        return self._testMap[name]
 
     def run(self, result):
         return self(result)
@@ -668,8 +718,7 @@ class TextTestRunner:
                  stream=sys.stdout,
                  errStream=sys.stderr,
                  verbosity=1,
-                 explain=False,
-                 ):
+                 explain=False):
 
         self._out = stream
         self._err = errStream
@@ -693,7 +742,7 @@ class TextTestRunner:
         return _TextTestResult(stream=self._out,
                                errStream=self._err,
                                verbosity=self._verbosity,
-                               explain=self._explain
+                               explain=self._explain,
                                )
 
 ##############################################################################
@@ -710,8 +759,9 @@ class TestLoader:
 
     def loadTestsFromTestCase(self, testCaseClass):
         """Return a suite of all tests cases contained in testCaseClass"""
-        return self.suiteClass(map(testCaseClass,
-                                   self.getTestCaseNames(testCaseClass)))
+        return self.suiteClass(tests=map(testCaseClass,
+                                         self.getTestCaseNames(testCaseClass)),
+                               suiteName=testCaseClass.__name__)
 
     def loadTestsFromModule(self, module):
         """Return a suite of all tests cases contained in the given module"""
@@ -747,7 +797,10 @@ class TestLoader:
                 parts = parts[1:]
         obj = module
         for part in parts:
-            obj = getattr(obj, part)
+            if isinstance(obj, TestSuite):
+                obj = obj.getTestForName(part)
+            else:
+                obj = getattr(obj, part)
 
         if type(obj) == types.ModuleType:
             return self.loadTestsFromModule(obj)
@@ -755,6 +808,10 @@ class TestLoader:
             return self.loadTestsFromTestCase(obj)
         elif type(obj) == types.UnboundMethodType:
             return obj.im_class(obj.__name__)
+        elif isinstance(obj, TestSuite):
+            return obj
+        elif isinstance(obj, TestCase):
+            return obj
         elif callable(obj):
             test = obj()
             if not isinstance(test, TestCase) and \
@@ -775,7 +832,7 @@ class TestLoader:
         return self.suiteClass(suites)
 
     def getTestCaseNames(self, testCaseClass):
-        """Return a sorted sequence of method names found within testCaseClass
+        """Return a sorted sequence of method names found within testCaseClass.
         """
         testFnNames = filter(lambda n,p=self.testMethodPrefix: n[:len(p)] == p,
                              dir(testCaseClass))
@@ -827,10 +884,12 @@ Options:
   -h, --help       Show this message
   -v, --verbose    Verbose output
   -q, --quiet      Minimal output
-
+  -e, --expain     Output extra test details if there is a failure or error
+  
 Examples:
   %(progName)s                               - run default set of tests
   %(progName)s MyTestSuite                   - run suite 'MyTestSuite'
+  %(progName)s MyTestSuite.MyTestCase        - run suite 'MyTestSuite'
   %(progName)s MyTestCase.testSomething      - run MyTestCase.testSomething
   %(progName)s MyTestCase                    - run all 'test*' test methods
                                                in MyTestCase
@@ -864,8 +923,8 @@ Examples:
     def parseArgs(self, argv):
         import getopt
         try:
-            options, args = getopt.getopt(argv[1:], 'hHvqe',
-                                          ['help','verbose','quiet','explain'])
+            options, args = getopt.getopt(argv[1:], 'hHvqer',
+                                  ['help','verbose','quiet','explain', 'raise'])
             for opt, value in options:
                 if opt in ('-h','-H','--help'):
                     self.usageExit()
@@ -896,7 +955,14 @@ Examples:
             self.testRunner = TextTestRunner(verbosity=self.verbosity,
                                              explain=self.explain)
         result = self.testRunner.run(self.test)
+        self._cleanupAfterRunningTests()
         sys.exit(not result.wasSuccessful())
+
+    def _cleanupAfterRunningTests(self):
+        """A hook method that is called immediately prior to calling
+        sys.exit(not result.wasSuccessful()) in self.runTests().
+        """
+        pass
 
 main = TestProgram
 
