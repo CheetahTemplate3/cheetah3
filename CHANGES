@@ -2,11 +2,12 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-0.9.13 (May ??, 2002)
+0.9.13 (May 8, 2002)
   - changed Cheetah.Servlet.isRunningFromWebKit to isWebwareInstalled (TR)
 
   - fixed parsing bug that would exit an expression if the directiveEndToken was a
     valid Python token and was found inside the directive.  (TR)
+
     E.g.:
     #compiler-settings
     directiveStartToken = .
