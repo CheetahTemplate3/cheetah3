@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Delimiters.py,v 1.2 2001/07/12 15:12:18 tavis_rudd Exp $
+# $Id: Delimiters.py,v 1.3 2001/07/13 22:48:14 tavis_rudd Exp $
 """A dictionary of delimeter regular expressions that are used in Cheetah
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/12 15:12:18 $
+Last Revision Date: $Date: 2001/07/13 22:48:14 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 
 ##################################################
@@ -30,21 +30,7 @@ lazyTagClosure = r'(?:\r\n|\n|\r)'
 delimiters = {
     '[%,%]':re.compile(r"\[%(.+?)%\]",re.DOTALL),
     '{,}':re.compile(r"{(.+?)}",re.DOTALL),
-
-    '<%,%>':{'start': r'<%',
-             'startEscaped': r'<\%',
-             'end': r'%>',
-             'endEscaped': r'\%>',
-             'placeholderRE': re.compile(r"<%(.+?)%>",re.DOTALL)
-             },
-
-    '<#,#>':{'start': r'<#',
-             'startEscaped': r'\<#',
-             'end': r'#>',
-             'endEscaped': r'\#>',
-             'placeholderRE': re.compile(r"<#(.*?)#>",re.DOTALL)
-             },
-
+    '<%,%>':re.compile(r"<%(.+?)%>",re.DOTALL),
 
     # the suffix _gobbleWS stands for gobble whitespace - any directive on a
     # line by itself will have all preceeding and trailing WS on that line
