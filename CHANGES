@@ -6,6 +6,10 @@ Please initial your changes and add a date for each release
      #while ... #end while
      #try ... #except ... #else ... #finally ... #end try
 
+   - fixed a bug in the handling of local vars in #for loops that was preventing
+     callable local vars from being handled properly. See Chuck's post of Sept
+     10. (TR)
+
 0.9.8a4 (September 7, 2001)
 
   - Added -g (appendGen function argument), which compiles x.tmpl to xGen.py,
