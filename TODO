@@ -26,6 +26,11 @@ Boolean argument 'all' adds local variables, builtins, etc.  Boolean argument
 'allExceptLarge' skips any element with >20 variables, printing a warning:
 "skipping, ### variables".
 
+- Reimplement filters so that they know the placeholder name:
+  def filter(self, val, name=None, **kw)
+  This should be the entire placeholder name as it appears in the
+  template?
+
 - revisit parsed #include directives.  Are they necessary at all??
   (This is a rhetorical question.  They are necessary.  However, the
   Users' Guide needs better examples about when and when not to use
