@@ -98,35 +98,6 @@ $i - #slurp
 \end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\#break and \#continue}
-\label{directives.break}
-
-These directives are use as they are used in Python. \code{\#break} will
-prematurely exit a \code{\#for} loop, while \code{\#continue} will immediately
-jump to the next step in the \code{\#for} loop.
-
-In this example the output list will not contain ``10 - ''. 
-\begin{verbatim}
-#for $i in range(15)
-#if $i == 10
-  #continue
-#end if
-$i - #slurp
-#end for
-\end{verbatim}
-
-In this example the loop will exit if it finds a name that equals 'Joe':
-\begin{verbatim}
-#for $name in $names
-#if $name == 10
-  #break
-#end if
-$name - #slurp
-#end for
-\end{verbatim}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#if ... \#else if ... \#else ... \#end if}
 \label{directives.if}
 
@@ -174,6 +145,35 @@ Here's an example that combines an \code{\#if} tag with a \code{\#for} tag.
 #else
 <P> Sorry, the search did not find any people. </P>
 #end if
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#break and \#continue}
+\label{directives.break}
+
+These directives are use as they are used in Python. \code{\#break} will
+prematurely exit a \code{\#for} loop, while \code{\#continue} will immediately
+jump to the next step in the \code{\#for} loop.
+
+In this example the output list will not contain ``10 - ''. 
+\begin{verbatim}
+#for $i in range(15)
+#if $i == 10
+  #continue
+#end if
+$i - #slurp
+#end for
+\end{verbatim}
+
+In this example the loop will exit if it finds a name that equals 'Joe':
+\begin{verbatim}
+#for $name in $names
+#if $name == 10
+  #break
+#end if
+$name - #slurp
+#end for
 \end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
