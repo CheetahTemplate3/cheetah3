@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.10 2001/10/12 02:57:21 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.11 2001/11/02 16:44:15 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2001/10/12 02:57:21 $
+Last Revision Date: $Date: 2001/11/02 16:44:15 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.10 $"[11:-2]
+__version__ = "$Revision: 1.11 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -359,9 +359,7 @@ class MethodCompiler(SettingsManager, GenUtils):
                 self.addWriteChunk( repr(strConst).replace('\\012','\\n'))
             else:
                 self.addWriteChunk(
-                    "'''" +
-                    repr(strConst).replace("\\n","\n").replace('\\012','\n')[1:-1] +
-                    "'''" )
+                    "'''" + strConst.replace('\\','\\\\').replace("'''","'\'\'\'") + "'''" )
 
     def delLeadingWS(self):
         if self._pendingStrConstChunks:
