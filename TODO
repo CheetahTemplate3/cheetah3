@@ -59,6 +59,14 @@ Implementation
   setting their variables?  This could affect performance if the threads take
   a long time to do that.
 
+- 'python setup.py uninstall'.  This may require hacking an uninstall feature
+  into distutils.
+
+- Delete whitespace before comments.  If the rest of the line consists
+  of only non-outputting directives and whitespace, delete the line from the
+  output.  The only outputting directives I see are #echo, #block and
+  #include.
+
 Test Suite
 ================================================================================
 - test cases for the SkeletonPage framework
