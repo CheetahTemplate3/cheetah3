@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.62 2005/01/03 19:40:53 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.63 2005/01/06 13:05:14 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.62 $
+Version: $Revision: 1.63 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/01/03 19:40:53 $
+Last Revision Date: $Date: 2005/01/06 13:05:14 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.62 $"[11:-2]
+__revision__ = "$Revision: 1.63 $"[11:-2]
 
 import sys
 import os
@@ -31,7 +31,7 @@ import warnings
 from Cheetah.Version import Version
 from Cheetah.SettingsManager import SettingsManager
 from Cheetah.Parser import Parser, ParseError, specialVarRE, STATIC_CACHE, REFRESH_CACHE
-from Cheetah.Utils.Indenter import indentize
+from Cheetah.Utils.Indenter import indentize # an undocumented preprocessor
 
 class Error(Exception):
     pass
@@ -196,13 +196,16 @@ class GenUtils:
 ##################################################
 ## METHOD COMPILERS
 
-class MethodCompiler(SettingsManager, GenUtils):
-    def __init__(self, methodName, classCompiler, settings={}):
-        SettingsManager.__init__(self)
-        self._settings = settings
+class MethodCompiler(GenUtils):
+    def __init__(self, methodName, classCompiler):
+        self._settingsManager = classCompiler
         self._methodName = methodName
+        self._setupState()
 
-    def setupState(self):
+    def setting(self, key):
+        return self._settingsManager.setting(key)
+
+    def _setupState(self):
         self._indent = self.setting('indentationStep')
         self._indentLev = self.setting('initialMethIndentLevel')
         self._pendingStrConstChunks = []
@@ -214,6 +217,7 @@ class MethodCompiler(SettingsManager, GenUtils):
         self._cacheRegionOpen = False
         
     def cleanupState(self):
+        """Called by the containing class compiler instance"""
         pass
 
     def methodName(self):
@@ -322,6 +326,9 @@ class MethodCompiler(SettingsManager, GenUtils):
         return theString.replace('\\' + token, token)
         
     def commitStrConst(self):
+        """Add the code for outputting the pending strConst without chopping off
+        any whitespace from it.
+        """
         if self._pendingStrConstChunks:
             strConst = self._unescapeCheetahVars(''.join(self._pendingStrConstChunks))
             strConst = self._unescapeDirectives(strConst)
@@ -339,6 +346,8 @@ class MethodCompiler(SettingsManager, GenUtils):
                 self.addWriteChunk("'''" + strConst + "'''" )
 
     def handleWSBeforeDirective(self):
+        """Truncate the pending strCont to the beginning of the current line.
+        """
         if self._pendingStrConstChunks:
             src = self._pendingStrConstChunks[-1]
             BOL = max(src.rfind('\n')+1, src.rfind('\r')+1, 0)
@@ -411,18 +420,20 @@ class MethodCompiler(SettingsManager, GenUtils):
         self.indent()
 
     def addIf(self, expr):
-        words = expr.split()
-        if 'then' in words and 'else' in words:
-            condition, rest = expr.split(' then ')
-            self.addIndentingDirective(condition)            
-            truePart, falsePart = rest.split(' else ')
-            self.addFilteredChunk(truePart)
-            self.dedent()
-            self.addIndentingDirective('else')            
-            self.addFilteredChunk(falsePart)
-            self.dedent()
-        else:
-            self.addIndentingDirective(expr)
+        """For a full #if ... #end if directive
+        """
+        self.addIndentingDirective(expr)
+
+    def addOneLineIf(self, conditionExpr, trueExpr, falseExpr):
+        """For a single-lie #if ... then .... else ... directive
+        <condition> then <trueExpr> else <falseExpr>
+        """
+        self.addIndentingDirective(conditionExpr)            
+        self.addFilteredChunk(trueExpr)
+        self.dedent()
+        self.addIndentingDirective('else')            
+        self.addFilteredChunk(falseExpr)
+        self.dedent()
 
     def addElse(self, expr):
         expr = re.sub(r'else[ \f\t]+if','elif', expr)
@@ -533,8 +544,12 @@ class MethodCompiler(SettingsManager, GenUtils):
         self.addChunk('## END CACHE REGION')
         self.addChunk('')
 
-    def setErrorCatcher(self, errorCheckerName):
-        self.addChunk('if self._errorCatchers.has_key("' + errorCheckerName + '"):')
+    def setErrorCatcher(self, errorCatcherName):
+        if self._compiler._templateObj:
+            self._compiler._templateObj._errorCatcher = \
+                   getattr(ErrorCatchers, errorCatcherName)(self._compiler._templateObj)
+
+        self.addChunk('if self._errorCatchers.has_key("' + errorCatcherName + '"):')
         self.indent()
         self.addChunk('self._errorCatcher = self._errorCatchers["' +
             theChecker + '"]')
@@ -542,8 +557,8 @@ class MethodCompiler(SettingsManager, GenUtils):
         self.addChunk('else:')
         self.indent()
         self.addChunk('self._errorCatcher = self._errorCatchers["'
-                      + errorCheckerName + '"] = ErrorCatchers.'
-                      + errorCheckerName + '(self)'
+                      + errorCatcherName + '"] = ErrorCatchers.'
+                      + errorCatcherName + '(self)'
                       )
         self.dedent()
         
@@ -569,8 +584,8 @@ class MethodCompiler(SettingsManager, GenUtils):
 
 class AutoMethodCompiler(MethodCompiler):
 
-    def setupState(self):
-        MethodCompiler.setupState(self)
+    def _setupState(self):
+        MethodCompiler._setupState(self)
         self._argStringList = [ ("self",None) ]
         self._streamingEnabled = True
         
@@ -583,9 +598,9 @@ class AutoMethodCompiler(MethodCompiler):
         self._indentLev = self.setting('initialMethIndentLevel')
         mainBodyChunks = self._methodBodyChunks
         self._methodBodyChunks = []
-        self.addAutoSetupCode()
+        self._addAutoSetupCode()
         self._methodBodyChunks.extend(mainBodyChunks)
-        self.addAutoCleanupCode()
+        self._addAutoCleanupCode()
         if self._streamingEnabled:
             for argName, defVal in  [ ('trans', 'None'),
                                       ("dummyTrans","False"),
@@ -596,7 +611,7 @@ class AutoMethodCompiler(MethodCompiler):
                                       ]:
                 self.addMethArg(argName, defVal)
         
-    def addAutoSetupCode(self):
+    def _addAutoSetupCode(self):
         if self._streamingEnabled:
             self.addChunk('if not trans:')
             self.indent()
@@ -616,7 +631,7 @@ class AutoMethodCompiler(MethodCompiler):
         self.addChunk('## START - generated method body')
         self.addChunk('')
 
-    def addAutoCleanupCode(self):
+    def _addAutoCleanupCode(self):
         self.addChunk('')
         self.addChunk("#" *40)
         self.addChunk('## END - generated method body')
@@ -654,44 +669,29 @@ class AutoMethodCompiler(MethodCompiler):
 ##################################################
 ## CLASS COMPILERS
 
-class ClassCompiler(SettingsManager, GenUtils):
-    
-    _activeMethods = None      # converted to a list at runtime
-    
+class ClassCompiler(GenUtils):
+    methodCompilerClass = AutoMethodCompiler
+    methodCompilerClassForInit = MethodCompiler
+        
     def __init__(self, className, mainMethodName='respond',
                  templateObj=None,
                  fileName=None,
-                 settings={}):
+                 settingsManager=None):
 
-        SettingsManager.__init__(self)
-        self._settings = settings
+        self._settingsManager = settingsManager
         self._fileName = fileName
         self._className = className
         self._mainMethodName = mainMethodName
         self._templateObj = templateObj
-        self.setupState()
-        methodCompiler = self.spawnMethodCompiler(mainMethodName)
+        self._setupState()
+        methodCompiler = self._spawnMethodCompiler(mainMethodName)
         methodCompiler.addMethDocString('This is the main method generated by Cheetah')
-        self.setActiveMethodCompiler(methodCompiler)
-        
+        self._setActiveMethodCompiler(methodCompiler)
         if fileName and self.setting('monitorSrcFile'):
+            self._addSourceFileMonitoring(fileName)
 
-            self.addChunkToInit('self._filePath = ' + repr(fileName))
-            self.addChunkToInit('self._fileMtime = ' + str(getmtime(fileName)) )
-            if self._templateObj:
-                setattr(self._templateObj, '_filePath', fileName)
-                setattr(self._templateObj, '_fileMtime', getmtime(fileName))
-                
-            self.addChunk('if exists(self._filePath) and ' +
-                          'getmtime(self._filePath) > self._fileMtime:')
-            self.indent()
-            self.addChunk('self.compile(file=self._filePath, moduleName='
-                          +className + ')')
-            self.addChunk(
-                'write(getattr(self, self._mainCheetahMethod_for_' + self._className +
-                ')(trans=trans))')            
-            self.addStop()
-            self.dedent()
+    def setting(self, key):
+        return self._settingsManager.setting(key)
 
     def __getattr__(self, name):
 
@@ -707,15 +707,15 @@ class ClassCompiler(SettingsManager, GenUtils):
             return self.__dict__[name]
         elif hasattr(self.__class__, name):
             return getattr(self.__class__, name)
-        elif self._activeMethods and hasattr(self._activeMethods[-1], name):
-            return getattr(self._activeMethods[-1], name)
+        elif self._activeMethodsList and hasattr(self._activeMethodsList[-1], name):
+            return getattr(self._activeMethodsList[-1], name)
         else:
             raise AttributeError, name
 
-    def setupState(self):
+    def _setupState(self):
         self._classDef = None
-        self._activeMethods = []        # stack while parsing/generating
-        self._finishedMethods = []      # store by order
+        self._activeMethodsList = []        # stack while parsing/generating
+        self._finishedMethodsList = []      # store by order
         self._methodsIndex = {}      # store by name
         self._baseClass = 'Template'
         self._classDocStringLines = []
@@ -727,21 +727,11 @@ class ClassCompiler(SettingsManager, GenUtils):
         self._errorCatcherCount = 0
         self._placeholderToErrorCatcherMap = {}
 
-    def setupInitMethod(self):
-        __init__ = self.spawnMethodCompiler('__init__', klass=MethodCompiler)
-        __init__.setupState()
-        __init__.setMethodSignature("def __init__(self, *args, **KWs)")
-        __init__.addChunk("%s.__init__(self, *args, **KWs)" % self._baseClass)
-        for chunk in self._initMethChunks:
-            __init__.addChunk(chunk)
-        __init__.cleanupState()
-        self.swallowMethodCompiler(__init__, pos=0)
-
     def cleanupState(self):
-        while self._activeMethods:
-            methCompiler = self.popActiveMethodCompiler()
-            self.swallowMethodCompiler(methCompiler)
-        self.setupInitMethod()
+        while self._activeMethodsList:
+            methCompiler = self._popActiveMethodCompiler()
+            self._swallowMethodCompiler(methCompiler)
+        self._setupInitMethod()
         if self._mainMethodName == 'respond':
             self._generatedAttribs.append('__str__ = respond')
             if self._templateObj:
@@ -749,6 +739,36 @@ class ClassCompiler(SettingsManager, GenUtils):
         self.addAttribute('_mainCheetahMethod_for_' + self._className +
                            '= ' + repr(self._mainMethodName)
                            )
+
+    def _setupInitMethod(self):
+        __init__ = self._spawnMethodCompiler('__init__',
+                                             klass=self.methodCompilerClassForInit)
+        __init__.setMethodSignature("def __init__(self, *args, **KWs)")
+        __init__.addChunk("%s.__init__(self, *args, **KWs)" % self._baseClass)
+        for chunk in self._initMethChunks:
+            __init__.addChunk(chunk)
+        __init__.cleanupState()
+        self._swallowMethodCompiler(__init__, pos=0)
+
+    def _addSourceFileMonitoring(self, fileName):
+        # the first bit is added to init
+        self.addChunkToInit('self._filePath = ' + repr(fileName))
+        self.addChunkToInit('self._fileMtime = ' + str(getmtime(fileName)) )
+        if self._templateObj:
+            setattr(self._templateObj, '_filePath', fileName)
+            setattr(self._templateObj, '_fileMtime', getmtime(fileName))
+
+        # the rest is added to the main output method of the class ('mainMethod')
+        self.addChunk('if exists(self._filePath) and ' +
+                      'getmtime(self._filePath) > self._fileMtime:')
+        self.indent()
+        self.addChunk('self.compile(file=self._filePath, moduleName='
+                      +className + ')')
+        self.addChunk(
+            'write(getattr(self, self._mainCheetahMethod_for_' + self._className +
+            ')(trans=trans))')            
+        self.addStop()
+        self.dedent()
 
     
     def setClassName(self, name):
@@ -780,30 +800,28 @@ class ClassCompiler(SettingsManager, GenUtils):
         self._mainMethodName = methodName
         
     
-    def spawnMethodCompiler(self, methodName, klass=AutoMethodCompiler):
-        methodCompiler = klass(methodName,
-                               classCompiler=self,
-                               settings=self.settings(),
-                               )
+    def _spawnMethodCompiler(self, methodName, klass=None):
+        if klass is None:
+            klass = self.methodCompilerClass
+        methodCompiler = klass(methodName, classCompiler=self)
         self._methodsIndex[methodName] = methodCompiler
-        methodCompiler.setupState()
         return methodCompiler
 
-    def setActiveMethodCompiler(self, methodCompiler):
-        self._activeMethods.append(methodCompiler)
+    def _setActiveMethodCompiler(self, methodCompiler):
+        self._activeMethodsList.append(methodCompiler)
 
-    def getActiveMethodCompiler(self):
-        return self._activeMethods[-1]
+    def _getActiveMethodCompiler(self):
+        return self._activeMethodsList[-1]
 
-    def popActiveMethodCompiler(self):
-        return self._activeMethods.pop()
+    def _popActiveMethodCompiler(self):
+        return self._activeMethodsList.pop()
 
-    def swallowMethodCompiler(self, methodCompiler, pos=None):
+    def _swallowMethodCompiler(self, methodCompiler, pos=None):
         methodCompiler.cleanupState()
         if pos==None:
-            self._finishedMethods.append( methodCompiler )
+            self._finishedMethodsList.append( methodCompiler )
         else:
-            self._finishedMethods.insert(pos, methodCompiler)
+            self._finishedMethodsList.insert(pos, methodCompiler)
 
         if self._templateObj and methodCompiler.methodName() != '__init__':
             self._templateObj._bindCompiledMethod(methodCompiler)
@@ -811,8 +829,8 @@ class ClassCompiler(SettingsManager, GenUtils):
 
 
     def startMethodDef(self, methodName, argsList, parserComment):
-        methodCompiler = self.spawnMethodCompiler(methodName, klass=AutoMethodCompiler)
-        self.setActiveMethodCompiler(methodCompiler)
+        methodCompiler = self._spawnMethodCompiler(methodName)
+        self._setActiveMethodCompiler(methodCompiler)
         
         ## deal with the method's argstring
         for argName, defVal in argsList:
@@ -820,8 +838,10 @@ class ClassCompiler(SettingsManager, GenUtils):
 
         methodCompiler.addMethDocString(parserComment)            
         
-    def finishedMethods(self):
-        return self._finishedMethods
+    def _finishedMethods(self):
+        return self._finishedMethodsList
+
+
 
     def addClassDocString(self, line):
         self._classDocStringLines.append( line.replace('%','%%')) 
@@ -865,7 +885,7 @@ class ClassCompiler(SettingsManager, GenUtils):
         methodName = '__errorCatcher' + str(self._errorCatcherCount)
         self._placeholderToErrorCatcherMap[rawCode] = methodName
         
-        catcherMeth = self.spawnMethodCompiler(methodName, klass=MethodCompiler)
+        catcherMeth = self._spawnMethodCompiler(methodName, klass=MethodCompiler)
         catcherMeth.setupState()
         catcherMeth.setMethodSignature('def ' + methodName +
                                        '(self, localsDict={})')
@@ -885,8 +905,35 @@ class ClassCompiler(SettingsManager, GenUtils):
         
         catcherMeth.cleanupState()
         
-        self.swallowMethodCompiler(catcherMeth)
+        self._swallowMethodCompiler(catcherMeth)
         return methodName
+
+    def closeDef(self):
+        self.commitStrConst()
+        methCompiler = self._popActiveMethodCompiler()
+        self._swallowMethodCompiler(methCompiler)
+
+    def closeBlock(self):
+        self.commitStrConst()
+        methCompiler = self._popActiveMethodCompiler()
+        methodName = methCompiler.methodName()
+        if self.setting('includeBlockMarkers'):
+            endMarker = self.setting('blockMarkerEnd')
+            methCompiler.addStrConst(endMarker[0] + methodName + endMarker[1])
+        self._swallowMethodCompiler(methCompiler)
+        
+        #metaData = self._blockMetaData[methodName] 
+        #rawDirective = metaData['raw']
+        #lineCol = metaData['lineCol']
+        
+        ## insert the code to call the block, caching if #cache directive is on
+        codeChunk = 'self.' + methodName + '(trans=trans)'
+        self.addChunk(codeChunk)
+        
+        #self.appendToPrevChunk(' # generated from ' + repr(rawDirective) )
+        #if self.setting('outputRowColComments'):
+        #    self.appendToPrevChunk(' at line %s, col %s' % lineCol + '.')
+
 
     ## code wrapping methods
     
@@ -932,7 +979,7 @@ class ClassCompiler(SettingsManager, GenUtils):
         return  docStr
 
     def methodDefs(self):
-        methodDefs = [str(methGen) for methGen in self.finishedMethods() ]
+        methodDefs = [str(methGen) for methGen in self._finishedMethods() ]
         return '\n\n'.join(methodDefs)
 
     def attributes(self):
@@ -951,15 +998,19 @@ class AutoClassCompiler(ClassCompiler):
         
 #class ModuleCompiler(Parser, GenUtils):
 class ModuleCompiler(SettingsManager, GenUtils):
-    
-    _activeClasses = None               # converted to a list at runtime
+
+    parserClass = Parser
+    classCompilerClass = AutoClassCompiler
     
     def __init__(self, source=None, file=None, moduleName='GenTemplate',
                  mainClassName=None,
                  mainMethodName='respond',
                  templateObj=None,
                  settings=None):
-        
+        SettingsManager.__init__(self)
+        if settings:
+            self.updateSettings(settings)
+
         self._templateObj = templateObj
         self._compiled = False
         self._moduleName = moduleName
@@ -1006,14 +1057,13 @@ class ModuleCompiler(SettingsManager, GenUtils):
         if source.find('#indent') != -1: #@@TR: undocumented hack
             source = indentize(source)
 
-        self._parser = Parser(source, filename=self._filePath, compiler=self)
-        SettingsManager.__init__(self)
-        self.setupState()
+        self._parser = self.parserClass(source, filename=self._filePath, compiler=self)
+        self._setupCompilerState()
         
     def __getattr__(self, name):
 
-        """Provide access to the methods and attributes of the ClassCompiler:
-        one-way namespace sharing
+        """Provide one-way access to the methods and attributes of the
+        ClassCompiler, and thereby the MethodCompilers as well.
 
         WARNING: Use .setMethods to assign the attributes of the ClassCompiler
         from the methods of this class!!! or you will be assigning to attributes
@@ -1023,8 +1073,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
             return self.__dict__[name]
         elif hasattr(self.__class__, name):
             return getattr(self.__class__, name)
-        elif self._activeClasses and hasattr(self._activeClasses[-1], name):
-            return getattr(self._activeClasses[-1], name)
+        elif self._activeClassesList and hasattr(self._activeClassesList[-1], name):
+            return getattr(self._activeClassesList[-1], name)
         else:
             raise AttributeError, name
 
@@ -1070,11 +1120,10 @@ class ModuleCompiler(SettingsManager, GenUtils):
             'PSPEndToken':'%>',
             }
         self.updateSettings( defaults )
-        self._parser.updateSettings( self.settings() )
         
-    def setupState(self):
-        self._activeClasses = []
-        self._finishedClasses = []      # listed by ordered 
+    def _setupCompilerState(self):
+        self._activeClassesList = []
+        self._finishedClassesList = []      # listed by ordered 
         self._finishedClassIndex = {}  # listed by name
         
         self._moduleDef = None
@@ -1124,40 +1173,43 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self._errorCatcherOn = False
         
     def compile(self):
-        classCompiler = self.spawnClassCompiler(self._mainClassName)            
-        self.addActiveClassCompiler(classCompiler)
+        classCompiler = self._spawnClassCompiler(self._mainClassName)            
+        self._addActiveClassCompiler(classCompiler)
         self._parser.parse()
-        self.swallowClassCompiler(self.popActiveClassCompiler())
+        self._swallowClassCompiler(self._popActiveClassCompiler())
         self._compiled = True
 
         
-    def spawnClassCompiler(self, className, klass=AutoClassCompiler,
+    def _spawnClassCompiler(self, className, klass=None,
                            mainMethodName='respond'):
+        if klass is None:
+            klass = self.classCompilerClass
         classCompiler = klass(className,
                               mainMethodName=self._mainMethodName,
                               templateObj=self._templateObj,
                               fileName=self._filePath,
-                              settings=self.settings(),
+                              settingsManager=self,
                               )
         return classCompiler
 
-    def addActiveClassCompiler(self, classCompiler):
-        self._activeClasses.append(classCompiler)
+    def _addActiveClassCompiler(self, classCompiler):
+        self._activeClassesList.append(classCompiler)
 
-    def getActiveClassCompiler(self):
-        return self._activeClasses[-1]
+    def _getActiveClassCompiler(self):
+        return self._activeClassesList[-1]
 
-    def popActiveClassCompiler(self):
-        return self._activeClasses.pop()
+    def _popActiveClassCompiler(self):
+        return self._activeClassesList.pop()
 
-    def swallowClassCompiler(self, classCompiler):
+    def _swallowClassCompiler(self, classCompiler):
         classCompiler.cleanupState()
-        self._finishedClasses.append( classCompiler )
+        self._finishedClassesList.append( classCompiler )
         self._finishedClassIndex[classCompiler.className()] = classCompiler
         return classCompiler
 
-    def finishedClasses(self):
-        return self._finishedClasses
+    def _finishedClasses(self):
+        return self._finishedClassesList
+
 
     def importedVarNames(self):
         return self._importedVarNames
@@ -1173,35 +1225,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
     def turnErrorCatcherOff(self):
         self._errorCatcherOn = False
-        
-    ## gen methods
-        
-    def closeDef(self):
-        self.commitStrConst()
-        methCompiler = self.popActiveMethodCompiler()
-        self.swallowMethodCompiler(methCompiler)
-
-    def closeBlock(self):
-        self.commitStrConst()
-        methCompiler = self.popActiveMethodCompiler()
-        methodName = methCompiler.methodName()
-        if self.setting('includeBlockMarkers'):
-            endMarker = self.setting('blockMarkerEnd')
-            methCompiler.addStrConst(endMarker[0] + methodName + endMarker[1])
-        self.swallowMethodCompiler(methCompiler)
-        
-        #metaData = self._blockMetaData[methodName] 
-        #rawDirective = metaData['raw']
-        #lineCol = metaData['lineCol']
-        
-        ## insert the code to call the block, caching if #cache directive is on
-        codeChunk = 'self.' + methodName + '(trans=trans)'
-        self.addChunk(codeChunk)
-        
-        #self.appendToPrevChunk(' # generated from ' + repr(rawDirective) )
-        #if self.setting('outputRowColComments'):
-        #    self.appendToPrevChunk(' at line %s, col %s' % lineCol + '.')
-
+               
         
     ## methods for adding stuff to the module and class definitions
 
@@ -1233,7 +1257,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             self.addImportStatement(importStatement)
             self.addImportedVarNames( [bareClassName,] ) 
 
-        self.getActiveClassCompiler().setBaseClass(bareClassName)
+        self._getActiveClassCompiler().setBaseClass(bareClassName)
         
         ##################################################
         ## dynamically bind to and __init__ with this new baseclass
@@ -1250,7 +1274,33 @@ class ModuleCompiler(SettingsManager, GenUtils):
             self._templateObj.__class__ = newClass
             # must initialize it so instance attributes are accessible
             newClass.__init__(self._templateObj)
-    
+
+    def setCompilerSetting(self, key, valueExpr):
+        self.setSetting(key, eval(valueExpr) )
+        self._parser.configureParser()
+
+    def setCompilerSettings(self, keywords, settingsStr):
+        KWs = keywords
+        merge = True
+        if 'nomerge' in KWs:
+            merge = False
+            
+        if 'reset' in KWs:
+            # @@TR: this is actually caught by the parser at the moment. 
+            # subject to change in the future
+            self._initializeSettings()
+            self._parser.configureParser()
+            return
+        elif 'python' in KWs:
+            settingsReader = self.updateSettingsFromPySrcStr
+            # this comes from SettingsManager
+        else:
+            # this comes from SettingsManager
+            settingsReader = self.updateSettingsFromConfigStr
+
+        settingsReader(settingsStr)
+        self._parser.configureParser()
+        
     def setShBang(self, shBang):
         self._moduleShBang = shBang
     
@@ -1285,6 +1335,14 @@ class ModuleCompiler(SettingsManager, GenUtils):
     def addGlobalCodeChunk(self, codeChunk):
         self._globalCodeChunks.append(codeChunk)
 
+
+    def addAttribute(self, attribName, expr):
+        self._getActiveClassCompiler().addAttribute(attribName + ' =' + expr)
+        if self._templateObj:
+            # @@TR: this code should be delegated to the compiler
+            val = eval(expr,{},{})
+            setattr(self._templateObj, attribName, val)
+        
     def addComment(self, comm):
         if re.match(r'#+$',comm):      # skip bar comments
             return
@@ -1415,7 +1473,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         return '\n'.join(self._moduleConstants)
 
     def classDefs(self):
-        classDefs = [str(klass) for klass in self.finishedClasses() ]
+        classDefs = [str(klass) for klass in self._finishedClasses() ]
         return '\n\n'.join(classDefs)
 
     def moduleFooter(self):
