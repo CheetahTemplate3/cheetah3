@@ -2,7 +2,9 @@ Please initial your changes (there's a key at bottom) and add a date for each re
 ================================================================================
 
 0.9.12b2 (not released yet)
-  - fixed Win32 path bug in Template._makeDummyPackageForDir() (TR)
+   - fixed Win32 path bug in Template._makeDummyPackageForDir() (TR)
+   - prettied up the format of the debug comments in the Cheetah generated
+     Python code (TR)
 
 0.9.12b1 (Mar 24, 2002)
    - $request().field(args) now works, identical to $request.field(args)
