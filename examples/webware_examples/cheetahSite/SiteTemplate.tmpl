@@ -3,6 +3,11 @@
 ##============================================================================##
 ## macros for the site
 
+
+#macro navDivider()
+#spacer(35)|#spacer(35)
+#end macro
+
 #macro Python()
 <A HREF="http://www.python.org">Python</A>
 #end macro
@@ -219,10 +224,6 @@ _stylesheetsOrder = ["H1.mainText",
     <TABLE WIDTH=100% BGCOLOR="$*navBar.bgcolor" BORDER=0 CELLPADDING=0 CELLSPACING=0>
       <TR>
 	<TD>
-#macro navDivider()
-#spacer(35)|#spacer(35)
-#end macro
-	
 	    <DIV ALIGN="center" CLASS="navBarContainer">
             <A CLASS="navBar" HREF="index.html">Home</A>#navDivider()
 	    <A CLASS="navBar" HREF="learn.html">Learn</A>#navDivider()
