@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.22 2002/04/15 06:22:53 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.23 2002/05/02 15:54:14 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.22 $
+Version: $Revision: 1.23 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2002/04/15 06:22:53 $
+Last Revision Date: $Date: 2002/05/02 15:54:14 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.22 $"[11:-2]
+__revision__ = "$Revision: 1.23 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -99,9 +99,17 @@ class Servlet(CGIImportMixin, BaseServlet):
     def shutdown(self):
         pass
 
-    def serverSidePath(self, path=None):
+    def serverSidePath(self, path=None,
+                       normpath=os.path.normpath,
+                       abspath=os.path.abspath
+                       ):
         try:
             return BaseServlet.serverSidePath(self, path)
         except:
-            return os.path.normpath(os.path.abspath(path).replace("\\",'/'))
+            if path:
+                return normpath(abspath(path.replace("\\",'/')))
+            elif hasattr(self, '_filePath') and self._filePath:
+                return normpath(abspath(self._filePath))
+            else:
+                return None
 
