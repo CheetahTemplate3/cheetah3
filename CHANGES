@@ -1,7 +1,7 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
-0.9.15a2 (unreleased)
+0.9.15a2 (Nov 4th, 2002)
   - Filters now have access to the name of the placeholder they're filtering.
     In the .filter() method, kw['rawExpr'] gives the entire placeholder name
     including subscripts and arguments, exactly as it appears in the template
