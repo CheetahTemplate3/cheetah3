@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.48 2002/10/07 18:46:45 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.49 2002/10/28 02:47:54 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.48 $
+Version: $Revision: 1.49 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/10/07 18:46:45 $
+Last Revision Date: $Date: 2002/10/28 02:47:54 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.48 $"[11:-2]
+__revision__ = "$Revision: 1.49 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -419,7 +419,18 @@ class MethodCompiler(SettingsManager, GenUtils):
         self.indent()
 
     def addIf(self, expr):
-        self.addIndentingDirective(expr)
+        words = expr.split()
+        if 'then' in words and 'else' in words:
+            condition, rest = expr.split(' then ')
+            self.addIndentingDirective(condition)            
+            truePart, falsePart = rest.split(' else ')
+            self.addFilteredChunk(truePart)
+            self.dedent()
+            self.addIndentingDirective('else')            
+            self.addFilteredChunk(falsePart)
+            self.dedent()            
+        else:
+            self.addIndentingDirective(expr)
 
     def addElse(self, expr):
         expr = re.sub(r'else[ \f\t]+if','elif', expr)
