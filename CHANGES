@@ -13,6 +13,9 @@ Please initial your changes (there's a key at bottom) and add a date for each re
      in help message. (MO)
    - CheetahCompile.py: 
      changed the order of the VERBOSE mode printouts, as per Mike's request (TR)
+   - Template.py
+     fixed the #include'd template searchList sharing problem, as reported by
+     Johannes (TR)
 
 0.9.11 (Mar 07, 2002)
    - fixed a careless bug in cheetah-compile (TR)
