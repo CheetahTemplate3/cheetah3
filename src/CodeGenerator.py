@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.21 2001/08/08 00:41:02 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.22 2001/08/08 00:45:59 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.21 $
+Version: $Revision: 1.22 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/08 00:41:02 $
+Last Revision Date: $Date: 2001/08/08 00:45:59 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.21 $"[11:-2]
+__version__ = "$Revision: 1.22 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -288,6 +288,9 @@ def preProcessMacroDirectives(templateObj, templateDef):
             if argName in argNamesList:
                 return "''' + str(" + argName + ") + '''"
 
+            ## it's a composite $placeholder so we have to deal with
+            # Unified Dotted Notation and autocalling:
+            
             firstSpecialChar = re.search(r'\(|\[', argName)
             if firstSpecialChar:         # NameMapper can't handle [] or ()
                 firstSpecialChar = firstSpecialChar.start()
@@ -298,10 +301,17 @@ def preProcessMacroDirectives(templateObj, templateDef):
                 nameMapperPartOfName = argName
                 remainderOfName = ''
 
+            ## only do autocalling on names that have no () in them
+            if argName.find('(') == -1 and templateObj.setting('useAutocalling'):
+                safeToAutoCall = True
+            else:
+                safeToAutoCall = False
+
             nameMapperChunks = nameMapperPartOfName.split('.')
             if nameMapperChunks[0] in argNamesList:
                 return "''' + str(NameMapper.valueForName(" + nameMapperChunks[0] + ", '" +\
-                       '.'.join(nameMapperChunks[1:]) + "')" + remainderOfName + ") + '''"
+                       '.'.join(nameMapperChunks[1:]) + "', executeCallables=" + \
+                       str(safeToAutoCall) + ")" + remainderOfName + ") + '''"
             else:
                 return templateObj.setting('placeholderStartToken') + \
                        '{' + match.group(1) + '}'
