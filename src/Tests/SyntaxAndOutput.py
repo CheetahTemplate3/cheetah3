@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.43 2002/10/01 17:52:03 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.44 2002/10/05 19:34:21 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -11,13 +11,13 @@ TODO
 
 Meta-Data
 ================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>,
-Version: $Revision: 1.43 $
+Author: Tavis Rudd <tavis@damnsimple.com>
+Version: $Revision: 1.44 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/10/01 17:52:03 $
+Last Revision Date: $Date: 2002/10/05 19:34:21 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.43 $"[11:-2]
+__revision__ = "$Revision: 1.44 $"[11:-2]
 
 
 ##################################################
@@ -61,6 +61,9 @@ class DummyClass:
 
     def meth2(self, arg1="a1", arg2="a2"):
         return str(arg1) + str(arg2)
+
+    def methWithPercentSignDefaultArg(self, arg1="110%"):
+        return str(arg1)
 
     def callIt(self, arg=1234):
         self._called = True
@@ -790,6 +793,15 @@ class NameMapper(OutputTest):
         If it can pass this one, it's safe to say it works!!"""
         self.verify("$( anObj.meth1[0:\n (\n(4/4*2)*2)/$anObj.meth1(2)\n ] )",
                     "do")
+
+    def test21(self):
+        """object method access with % in the default arg for the meth.
+
+        This tests a bug that Jeff Johnson found and submitted a patch to SF
+        for."""
+        
+        self.verify("$anObj.methWithPercentSignDefaultArg",
+                    "110%")
 
 
 
