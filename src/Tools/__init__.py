@@ -4,3 +4,5 @@
    these objects will remain here forever, or that they will remain
    backward-compatible.
 """
+
+# vim: shiftwidth=5 tabstop=5 expandtab
