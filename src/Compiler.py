@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.39 2002/06/23 19:30:39 hierro Exp $
+# $Id: Compiler.py,v 1.40 2002/06/30 20:08:13 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.39 $
+Version: $Revision: 1.40 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/06/23 19:30:39 $
+Last Revision Date: $Date: 2002/06/30 20:08:13 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.39 $"[11:-2]
+__revision__ = "$Revision: 1.40 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -431,7 +431,10 @@ class MethodCompiler(SettingsManager, GenUtils):
         
     def addFinally(self, expr):
         self.addReIndentingDirective(expr)
-        
+            
+    def addReturn(self, expr):
+        self.addChunk(expr)
+
     def addPSP(self, PSP):
         self.commitStrConst()
         autoIndent = False
@@ -591,16 +594,15 @@ class AutoMethodCompiler(MethodCompiler):
         self.addChunk('')
         
     def addStop(self, expr=None):
-        if 1:
-            self.addChunk('if dummyTrans:')
-            self.indent()
-            self.addChunk('return trans.response().getvalue()')
-            self.dedent()
-            self.addChunk('else:')
-            self.indent()
-            self.addChunk('return ""')
-            self.dedent()
-            
+        self.addChunk('if dummyTrans:')
+        self.indent()
+        self.addChunk('return trans.response().getvalue()')
+        self.dedent()
+        self.addChunk('else:')
+        self.indent()
+        self.addChunk('return ""')
+        self.dedent()
+
     def addMethArg(self, name, defVal=None):
         asteriskPos = max(name.rfind('*')+1, 0)
         if asteriskPos:
