@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: _SkeletonPage.py,v 1.11 2002/08/05 00:17:36 tavis_rudd Exp $
+# $Id: _SkeletonPage.py,v 1.12 2002/08/22 16:36:58 tavis_rudd Exp $
 """A baseclass for the SkeletonPage template
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2002/08/05 00:17:36 $
+Last Revision Date: $Date: 2002/08/22 16:36:58 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.11 $"[11:-2]
+__revision__ = "$Revision: 1.12 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -119,9 +119,10 @@ class _SkeletonPage(Template):
         for key, details in self._javascriptTags.items():
             if type(details) not in (types.ListType, types.TupleType):
                 details = ['',details]
-
+                
             javascriptTagsTxt += ['<script language="JavaScript', str(details[0]),
-                                      '" ><!--\n', str(details[0]), '\n//--></script>\n']
+                                  '" type="text/javascript"><!--\n',
+                                  str(details[0]), '\n//--></script>\n']
 
 
         for key, details in self._javascriptLibs.items():
@@ -129,7 +130,8 @@ class _SkeletonPage(Template):
                 details = ['',details]
 
             javascriptTagsTxt += ['<script language="JavaScript', str(details[0]),
-                                      '" src="', str(details[1]), '" />\n']
+                                  '" type="text/javascript" src="',
+                                  str(details[1]), '" />\n']
         return ''.join(javascriptTagsTxt)
     
     def bodyTag(self):
