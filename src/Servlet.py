@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.29 2002/06/30 22:05:37 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.30 2002/08/19 02:56:04 hierro Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.29 $
+Version: $Revision: 1.30 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2002/06/30 22:05:37 $
+Last Revision Date: $Date: 2002/08/19 02:56:04 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.29 $"[11:-2]
+__revision__ = "$Revision: 1.30 $"[11:-2]
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -69,7 +69,7 @@ class Servlet(BaseServlet):
         BaseServlet.__init__(self)
        
         # this default will be changed by the .awake() method
-	self.isControlledByWebKit = False 
+        self.isControlledByWebKit = False 
         
     ## methods called by Webware during the request-response
         
@@ -94,7 +94,18 @@ class Servlet(BaseServlet):
         #self.writeln = response.writeln
         
     def respond(self, trans=None):
+        # @@MO I don't think this method should ever be called, which
+        # is what the exception is for.  But somehow
+        # SyntaxAndOutput.EmptyTemplate in Cheetah's test suite manages
+        # to invoke it.  To verify when this superclass method is 
+        # called, uncomment the following print statement.
+        #print "*** Servlet.respond() invoked! ***"
         return ''
+#        raise NotImplementedError("""\
+#couldn't find the template's main method.  If you are using #extends
+#without #implements, try adding '#implements respond' to your template
+#definition.""")
+
     
     __str__ = respond
 
@@ -123,3 +134,4 @@ class Servlet(BaseServlet):
         else:
             return None
 
+# vim: shiftwidth=4 tabstop=4 expandtab
