@@ -1,6 +1,6 @@
 Please initial your changes (there's a key at bottom) and add a date for each release
 ================================================================================
-0.9.9a7 (Dec 6, 2001)
+0.9.9b1 (Dec 6, 2001)
    - template constructor arg 'outputFilter' now 'filter', for consistency
      with #filter (MO)
    - template constructor raises TypeError if bad arguments (MO)
