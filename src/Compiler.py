@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.55 2003/10/22 21:21:47 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.56 2003/11/25 08:39:07 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.55 $
+Version: $Revision: 1.56 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2003/10/22 21:21:47 $
+Last Revision Date: $Date: 2003/11/25 08:39:07 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.55 $"[11:-2]
+__revision__ = "$Revision: 1.56 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -962,8 +962,9 @@ class ModuleCompiler(Parser, GenUtils):
             self._fileDirName, self._fileBaseName = os.path.split(self._filePath)
             self._fileBaseNameRoot, self._fileBaseNameExt = \
                                     os.path.splitext(self._fileBaseName)
-            
-        source = str( source )
+
+        if not (isinstance(source, str) or isinstance(source, unicode)):
+            source = str( source )
         # by converting to string here we allow objects such as other Templates
         # to be passed in
 
