@@ -135,10 +135,34 @@ another Cheetah component starts importing it), it will be moved to the
 
 Current Tools include:
 \begin{itemize}
+\item {\bf Cheetah.Tools.MondoReport} -- an ambitious class useful when iterating
+     over records of data (\code{\#for} loops), displaying one pageful of records
+     at a time (with previous/next links), and printing summary statistics about
+     the records or the current page.  See \code{MondoReportDoc.txt} in the same
+     directory as the module.  Some features are not implemented yet.  Contributed
+     by Mike Orr.
 \item {\bf Cheetah.Tools.RecursiveNull} -- Nothing, but in a friendly way.  Good
      for filling in for objects you want to hide.  If \code{\$form.f1} is a
      RecursiveNull object, then \code{\$form.f1.anything["you"].might("use")}
-     will resolve to the empty string. Contributed by Ian Bicking.
+     will resolve to the empty string.  You can also put a \code{RecursiveNull}
+     instance at the end of the searchList to convert missing values to ''
+     rather than raising a \code{NotFound} error or having a (less efficient)
+     errorCatcher handle it.  Of course, maybe you prefer to get a \code{NotFound}
+     error...  Contributed by Ian Bicking.
+\item {\bf Cheetah.Tools.SiteHierarchy} -- Provides navigational links to this
+     page's parents and children.  The constructor takes a recursive list of
+     (url,description) pairs representing a tree of hyperlinks to every page in the
+     site (or section, or application...), and also a string containing the current
+     URL.  Two methods 'menuList' and 'crumbs' return output-ready HTML showing an
+     indented menu (hierarchy tree) or crumbs list (Yahoo-style bar:
+     home > grandparent > parent > currentURL).  Contributed by Ian Bicking.
+\item{\bf Cheetah.Tools.WebwareMixin} -- Additional methods for your Template object.
+     Currently there is one method, \code{.cgiImport}.  It imports the specified CGI
+     fields, cookies or session variables into a new object on the searchList, so that
+     they can be accessed by name in \$placeholders (e.g., \code{\$myField}).  This
+     method may be renamed in the next version of Cheetah, and will likely be split 
+     into two methods to handle single vs multiple values for a field.  Contributed
+     by Mike Orr.
 \end{itemize}
 
 
@@ -276,13 +300,6 @@ The class also provides some convenience methods that can be used as
 
 See the file \code{examples/webware\_examples/cheetahSite/SiteTemplate.tmpl}
 for an extended example of how \code{SkeletonPage} can be used.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Cheetah.Tools}
-\label{libraries.tools}
-
-As mentiond above, utility modules contributed by third parties are stored in
-the \code{Cheetah.Tools} package. It currently contains:
 
 
 
