@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.5 2001/07/12 18:07:18 echuck Exp $
+# $Id: Test.py,v 1.6 2001/07/12 19:07:05 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/12 18:07:18 $
+Last Revision Date: $Date: 2001/07/12 19:07:05 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 
 ##################################################
@@ -138,6 +138,7 @@ defaultTestNameSpace = {
             },
     'dict2': {'one':'item1', 'two':'item2'},
     'blockToBeParsed':"""$numOne $numTwo""",
+    'aList': ['item0','item1','item2'],
     'list': [
     	{'index': 0, 'numOne': 1, 'numTwo': 2},
     	{'index': 1, 'numOne': 1, 'numTwo': 2},
@@ -172,7 +173,9 @@ $meth $meth. $meth(). $meth(5). $meth('y'). $meth("y"). $meth("y"*2). $meth(arg=
 $obj $obj.
 $obj.meth $obj.meth. $obj.meth(). $obj.meth(6).
 $obj.meth('z'). $obj.meth("z"). $obj.meth("z"*2). $obj.meth(arg="z"). $obj.meth(arg='z').
-$func, $numTwo, ${func}, $numOne""",
+$func, $numTwo, ${func}, $numOne
+$func($numTwo)
+""",
 
      """
 $ $500 $. $var
@@ -185,9 +188,10 @@ doo doo. doo. 5. y. y. yy. y. y.
 object object.
 arff arff. arff. 6.
 z. z. zz. z. z.
-Scooby, 2, Scooby, 1"""
+Scooby, 2, Scooby, 1
+2
+"""
               ],
-
     ]
 
 
@@ -202,13 +206,27 @@ def convertVars(titlePrefix, replacementString, caseData):
      return caseData
 
 for i in range(len(posixCases)):
-    posixCases.append(convertVars("Braced cached ${vars} : ", r"${\1}", posixCases[i] ))
-    posixCases.append(convertVars("Dynamic $*vars : ", r"$*\1", posixCases[i] ))
-    posixCases.append(convertVars("Braced Dynamic ${*vars} : ", r"${*\1}", posixCases[i] ))
-    posixCases.append(convertVars("Dynamic Refresh $*15*vars : ", r"$*15*\1", posixCases[i] ))
-    posixCases.append(convertVars("Braced Dynamic Refresh ${*15*vars} : ", r"${*15*\1}", posixCases[i] ))
+    posixCases.append(convertVars("Braced cached ${vars} : ", r"${\1}",
+                                  posixCases[i] ))
+    posixCases.append(convertVars("Dynamic $*vars : ", r"$*\1",
+                                  posixCases[i] ))
+    posixCases.append(convertVars("Braced Dynamic ${*vars} : ", r"${*\1}",
+                                  posixCases[i] ))
+    posixCases.append(convertVars("Dynamic Refresh $*15*vars : ", r"$*15*\1",
+                                  posixCases[i] ))
+    posixCases.append(convertVars("Braced Dynamic Refresh ${*15*vars} : ",
+                                  r"${*15*\1}", posixCases[i] ))
 
+listTests = [
+    ['using a list',
+     "$aList",
+     "['item0', 'item1', 'item2']",],
+    ['slicing a list',
+     "$aList[0] $*aList[0] $*15*aList[0] $aList[0:2] $aList[-1]",
+     "item0 item0 item0 ['item0', 'item1'] item2",],
+    ]
 
+posixCases += listTests
 
 nestedVarTests = [
     ['$var($var)',
@@ -284,6 +302,9 @@ forLoopTests = [
 
     ['simple #for loop using $dict2 and a method of the local var',
      "#for $key, $val in $dict2.items\n$key - $val.upper\n#end for\n",
+     "one - ITEM1\ntwo - ITEM2\n",],
+    ['simple #for loop using $dict2 and a method of the local var',
+     "#for $key, $val in $dict2.items\n$func($key) - $val.upper\n#end for\n",
      "one - ITEM1\ntwo - ITEM2\n",],
     ]
 posixCases += forLoopTests
