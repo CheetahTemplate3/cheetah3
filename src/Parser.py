@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.32 2001/11/09 21:37:55 tavis_rudd Exp $
+# $Id: Parser.py,v 1.33 2001/12/04 09:00:38 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.32 $
+Version: $Revision: 1.33 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/11/09 21:37:55 $
+Last Revision Date: $Date: 2001/12/04 09:00:38 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.32 $"[11:-2]
+__version__ = "$Revision: 1.33 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1656,7 +1656,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         
         ## insert the code to call the block, caching if #cache directive is on
         codeChunk = 'self.' + methodName + '(trans=trans)'
-        self.addWriteChunk(codeChunk)
+        self.addChunk(codeChunk)
         
         self.appendToPrevChunk(' # generated from ' + repr(rawDirective) )
         if self.setting('outputRowColComments'):
