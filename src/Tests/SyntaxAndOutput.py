@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.29 2002/04/15 06:22:53 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.30 2002/04/22 05:20:28 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.29 $
+Version: $Revision: 1.30 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/04/15 06:22:53 $
+Last Revision Date: $Date: 2002/04/22 05:20:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.29 $"[11:-2]
+__revision__ = "$Revision: 1.30 $"[11:-2]
 
 
 ##################################################
@@ -33,6 +33,7 @@ import new
 from Cheetah.NameMapper import NotFound
 from Cheetah.Template import Template
 from Cheetah.Parser import ParseError
+from Cheetah.Compiler import Compiler
 import unittest_local_copy as unittest
 
 ##################################################
@@ -1814,10 +1815,49 @@ $anInt//comment
 
 
 class ExtendsDirective(OutputTest):
+
+    def setUp(self):
+        fp = open('SampleBaseClass.py','w')
+        fp.write(str(Compiler(source="#extends Cheetah.Templates.SkeletonPage",
+                               moduleName='SampleBaseClass',
+                               mainClassName='SampleBaseClass')))
+        fp.flush()
+        fp.close
+
+    def tearDown(self):
+        if os.path.exists('SampleBaseClass.py'):
+            os.remove('SampleBaseClass.py')
+        if os.path.exists('SampleBaseClass.pyc'):
+            os.remove('SampleBaseClass.pyc')
+
     def test1(self):
         """#extends Cheetah.Templates._SkeletonPage"""
         self.verify("""#from Cheetah.Templates._SkeletonPage import _SkeletonPage
 #extends _SkeletonPage
+#implements respond
+$spacer()
+""",
+                    '<img src="spacer.gif" width="1" height="1" alt="" />\n')
+
+    def test2(self):
+        """#extends Cheetah.Templates.SkeletonPage without #import"""
+        self.verify("""#extends Cheetah.Templates.SkeletonPage
+#implements respond
+$spacer()
+""",
+                    '<img src="spacer.gif" width="1" height="1" alt="" />\n')
+
+    def test3(self):
+        """#extends Cheetah.Templates.SkeletonPage.SkeletonPage without #import"""
+        self.verify("""#extends Cheetah.Templates.SkeletonPage.SkeletonPage
+#implements respond
+$spacer()
+""",
+                    '<img src="spacer.gif" width="1" height="1" alt="" />\n')
+
+    def test4(self):
+        """#extends SampleBaseClass without #import"""
+        self.verify("""#extends SampleBaseClass
 #implements respond
 $spacer()
 """,
@@ -1923,7 +1963,6 @@ class SilentDirective(OutputTest):
 
 class ErrorCatcherDirective(OutputTest):
     pass
-
 
 
 class VarExists(OutputTest):               # Template.varExists()
