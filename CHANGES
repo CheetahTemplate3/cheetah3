@@ -3,17 +3,15 @@ release
 ================================================================================
 
 0.9.13b1 (unreleased)
-  - fixed a silly buglet that resulted in StringIO being used instead of
-    cStringIO (TR)
-  - Backed out the above change (in DummyTransaction.py only) because it
-    caused the unittests to fail. (MO)
+  - Was going to import cStringIO instead of StringIO, but it made the 
+    DummyTransaction.py unittest fail so I undid it.  Cheetah requires Unicode
+    support, which cStringIO does not provide. (TR/MO)
   - Utils.Misc.CheckKeywords(): prevent misspelled keyword arguments,
     used by Template constructor. (MO)
-  - With an #extends listing multiple superclasses, the one that's a
-    subclass of Template must now be last instead of first; e.g., '#extends
-    MyMixIn, SiteTemplate'.  This allows one to override standard methods like
-    .awake(). (Change in Compiler.py.) (MO)
-
+  - "And the first shall be last": you must put the Template subclass last in
+    an #extends directive; e.g., '#extends MyMixIn, SiteTemplate'.  Previously,
+    one put the Template subclass first, but that prevented one from overriding
+    standard methods like .awake(). (Change in Compiler.py.) (MO)
 
 0.9.12 (April 3, 2002)
    - no code changes from beta 2
