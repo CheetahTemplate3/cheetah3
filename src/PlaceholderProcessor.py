@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.23 2001/08/11 04:57:39 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.24 2001/08/11 16:57:50 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.23 $
+Version: $Revision: 1.24 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/11 04:57:39 $
+Last Revision Date: $Date: 2001/08/11 16:57:50 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.23 $"[11:-2]
+__version__ = "$Revision: 1.24 $"[11:-2]
 
 
 ##################################################
@@ -44,21 +44,17 @@ class PlaceholderProcessor(TagProcessor):
     
     _token = 'placeholders'
 
-    def wrapPlaceholders(self, txt):
-        """Wrap all marked placeholders in a string with Cheetah's internal delims."""
-        return self.wrapExressionsInStr(txt, marker=self.setting('placeholderMarker'),
-                                        before=self.setting('internalDelims')[0] + \
-                                        self._token + self.setting('tagTokenSeparator'),
-                                        after=self.setting('internalDelims')[1])
-
-
     ## methods called by the Template Object
     
     def preProcess(self, templateDef):
-        """Do the preProcessing stuff for stage 1 of the Template class'
-        code-generator"""
-        return self.wrapPlaceholders(self.markPlaceholders(templateDef))
-
+        """Wrap all marked placeholders in a string with Cheetah's internal delims."""
+        templateDef = self.wrapExressionsInStr(self.markPlaceholders(templateDef),
+                                               marker=self.setting('placeholderMarker'),
+                                               before=self.setting('internalDelims')[0] + \
+                                               self._token + self.setting('tagTokenSeparator'),
+                                               after=self.setting('internalDelims')[1])
+        
+        return self.unescapePlaceholders(templateDef)
     
     def initializeTemplateObj(self):
         """Initialize the templateObj so that all the necessary attributes are

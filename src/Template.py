@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.33 2001/08/11 07:03:22 tavis_rudd Exp $
+# $Id: Template.py,v 1.34 2001/08/11 16:57:50 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.33 $
+Version: $Revision: 1.34 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/11 07:03:22 $
+Last Revision Date: $Date: 2001/08/11 16:57:50 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.33 $"[11:-2]
+__version__ = "$Revision: 1.34 $"[11:-2]
 
 
 ##################################################
@@ -54,7 +54,6 @@ from MacroDirective import MacroDirective, \
      LazyMacroCall, CallMacroDirective
 
 import ErrorHandlers
-from Delimiters import delimiters as delims
 from Utilities import mergeNestedDictionaries 
 
 ##################################################
@@ -78,7 +77,6 @@ class RESTART:
     
 class Template(SettingsManager, Parser):
     """The core template engine: parses, compiles, and serves templates."""
-
     _settings = {
         'useAutocalling': True,
         'delayedCompile': False,            
@@ -186,11 +184,11 @@ class Template(SettingsManager, Parser):
        
         ## Setup the searchList of namespaces in which to search for $placeholders
         # + setup a dict of #set directive vars - include it in the searchList
+        self._setVars = {}
+
         if kw.has_key('setVars'):
             # this is intended to be used internally by Nested Templates in #include's
             self._setVars = kw['setVars']
-        else:
-            self._setVars = {}
             
         if kw.has_key('preBuiltSearchList'):
             # happens with nested Template obj creation from #include's
@@ -206,9 +204,12 @@ class Template(SettingsManager, Parser):
        
         ## deal with other keywd args 
         # - these are for internal use by Nested Templates in #include's
+        if not hasattr(self, '_macros'):
+            self._macros = {}
+        
         if kw.has_key('macros'):
             self._macros = kw['macros']
-            
+
         if kw.has_key('cheetahBlocks'):
             self._cheetahBlocks = kw['cheetahBlocks']
         else:
@@ -238,9 +239,6 @@ class Template(SettingsManager, Parser):
     def setupTagProcessors(self):
         """Setup the tag processors."""
         
-        placeholderProcessor =  PlaceholderProcessor(self)
-        self.placeholderProcessor = placeholderProcessor
-
         commentDirective = CommentDirective(self)
         slurpDirective = SlurpDirective(self)
         rawDirective = RawDirective(self)
@@ -250,16 +248,18 @@ class Template(SettingsManager, Parser):
         macroDirective = MacroDirective(self)
         callMacroDirective = CallMacroDirective(self)
         lazyMacroCall = LazyMacroCall(self)
-
+        
+        placeholderProcessor =  PlaceholderProcessor(self)
         displayLogic = DisplayLogic(self)
         setDirective = SetDirective(self)        
         stopDirective = StopDirective(self)
         cacheDirective = CacheDirective(self)
         endCacheDirective = EndCacheDirective(self)
+
+        ##store references to them as self.[fill_in_the_blank]
+        self.__dict__.update(locals())
+        del self.__dict__['self']
         
-        #data
-        #displayLogic 3/4
-        #unescape placeholders 1/2
                
         self.updateSettings({
             'preProcessors': [('rawDirective',
@@ -308,8 +308,6 @@ class Template(SettingsManager, Parser):
                                stopDirective),
                               ('placeholders',
                                placeholderProcessor),
-                              ('unescapePlaceholders',
-                               placeholderProcessor.unescapePlaceholders),
                               ],
             
             'coreTagProcessors':{'placeholders':placeholderProcessor,
@@ -320,10 +318,7 @@ class Template(SettingsManager, Parser):
                                  'stopDirective':stopDirective,
                                  },
             
-            
-            'generatedCodeFilters':[('removeEmptyStrings',
-                                     CodeGen.removeEmptyStrings),
-                                    ('addPerResponseCode',
+            'generatedCodeFilters':[('addPerResponseCode',
                                      CodeGen.addPerResponseCode),
                                     ],
             }
@@ -411,10 +406,9 @@ class Template(SettingsManager, Parser):
             stage = 1
             if debug: results['stage1'] = []
             for name, preProcessor in settings['preProcessors']:
-                if hasattr(preProcessor, 'preProcess'):
-                    templateDef = preProcessor.preProcess(templateDef)
-                else:
-                    templateDef = preProcessor(templateDef)
+                assert hasattr(preProcessor, 'preProcess'), \
+                       'The Processor class ' + name + ' is not valid.'
+                templateDef = preProcessor.preProcess(templateDef)
                     
                 if isinstance(templateDef, RESTART):
                     # a parser restart might have been requested for #include's 
@@ -590,17 +584,24 @@ class Template(SettingsManager, Parser):
 
     def loadMacro(self, macroName, macro):
         """Load a macro into the macros dictionary, using the specified macroName"""
+        if not hasattr(self, '_macros'):
+            self._macros = {}
+
         self._macros[macroName] = macro
 
     def loadMacros(self, *macros):
         """Create macros from any number of functions and/or bound methods.  For
         each macro, the function/method name is used as the macro name.  """
+        if not hasattr(self, '_macros'):
+            self._macros = {}
 
         for macro in macros:
             self.loadMacro(macro.__name__, macro)
         
     def loadMacrosFromModule(self, module):
         """Load all the macros from a module into the macros dictionary"""          
+        if not hasattr(self, '_macros'):
+            self._macros = {}
 
         if hasattr(module,'_exclusionList'):
             exclusionList = module._exclusionList
@@ -629,17 +630,19 @@ class Template(SettingsManager, Parser):
 
         #redefine and #data directives MUST NOT be nested!!
         """
-        import re
-        
+        bits = self._directiveREbits
+
         redefineDirectiveRE = re.compile(
-            r'(?<!#)#redefine[\t ]+' +
+            bits['start'] + r'redefine[\f\t ]+' +
             r'(?P<blockName>[A-Za-z_][A-Za-z_0-9]*?)' +
-            r'(?:/#|\r\n|\n|\Z)',re.DOTALL)
+            bits['endGrp'],re.DOTALL)
                                          
         while redefineDirectiveRE.search(extensionStr):
             startTagMatch = redefineDirectiveRE.search(extensionStr)
             blockName = startTagMatch.group('blockName')
-            endTagRE = re.compile(r'#end redefine[\t ]+' + blockName + r'[\t ]*(?:/#|\r\n|\n|\Z)',
+            endTagRE = re.compile(bits['startTokenEsc'] +
+                                  r'end redefine[\t ]+' + blockName +
+                                  r'[\f\t ]*' + bits['endGrp'],
                                   re.DOTALL | re.MULTILINE)
             endTagMatch = endTagRE.search(extensionStr)
             blockContents = extensionStr[startTagMatch.end() : endTagMatch.start()]
@@ -649,9 +652,9 @@ class Template(SettingsManager, Parser):
                    
         ## process the #data and #macro definition directives
         # after removing comments
-        extensionStr = CodeGen.preProcessComments(self, extensionStr)
-        CodeGen.preProcessDataDirectives(self, extensionStr)
-        CodeGen.preProcessMacroDirectives(self, extensionStr) 
+        extensionStr = self.commentDirective.preProcess(extensionStr)
+        self.dataDirective.preProcess(extensionStr)
+        self.macroDirective.preProcess(extensionStr) 
 
 
     ## utility functions ##   
