@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.1 2001/06/18 17:26:01 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.2 2001/06/18 18:52:14 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/18 17:26:01 $
+Last Revision Date: $Date: 2001/06/18 18:52:14 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 
 ##################################################
@@ -294,7 +294,7 @@ class PlaceholderProcessor(CodeGenerator.TagProcessor):
                 return self.wrapEvalTag(templateObj, 'components["""' +
                                         tag + '"""](trans, templateObj=self)')
             elif isinstance(tagValue, Template.Template):
-                templateObj._nestedTemplatesCache[tag] = tagValue.__str__
+                templateObj._nestedTemplatesCache[tag] = tagValue.respond
                 return self.wrapEvalTag(templateObj, 'nestedTemplates["""' +
                                         tag + '"""](trans, iAmNested=True)')
             elif callable(tagValue):

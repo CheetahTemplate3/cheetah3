@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SkeletonPage.py,v 1.1 2001/06/13 03:50:40 tavis_rudd Exp $
+# $Id: SkeletonPage.py,v 1.2 2001/06/18 18:52:14 tavis_rudd Exp $
 """A skeleton page template for use with the Cheetah package
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/06/13 03:50:40 $
+Last Revision Date: $Date: 2001/06/18 18:52:14 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -84,10 +84,8 @@ class SkeletonPage(TemplateServlet):
     def __init__(self, template=template, *searchList, **kw):
         """ """
         self.loadMacrosFromModule(HTMLMacros)
-        self.loadMacro('imgTag', self.imgTag )
+        self.loadMacro('imgTag', self.imgTag )       
         TemplateServlet.__init__(self, template, *searchList, **kw)
-
-        
        
     ## Default values for the names embedded in the template ##
     

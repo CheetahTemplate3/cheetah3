@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.2 2001/06/18 17:26:01 tavis_rudd Exp $
+# $Id: Template.py,v 1.3 2001/06/18 18:52:14 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/18 17:26:01 $
+Last Revision Date: $Date: 2001/06/18 18:52:14 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 
 ##################################################
@@ -191,7 +191,7 @@ class Template(SettingsManager):
 
     def __init__(self, templateDef, *searchList, **kw):
         """setup the namespace search list, process settings, then call
-        self._startCheetah() to parse/compile the template and prepare the
+        self._startServer() to parse/compile the template and prepare the
         self.__str__() and self.respond() methods for serving the template.
 
         If the environment var CHEETAH_DEBUG is set to True the internal
@@ -201,7 +201,7 @@ class Template(SettingsManager):
         self._searchList.append(self)
         if kw.has_key('searchList'):
             self._searchList.extend( kw['searchList'] )
-           
+            
         if kw.has_key('cheetahBlocks'):
             self._cheetahBlocks = kw['cheetahBlocks']
         else:
@@ -225,7 +225,7 @@ class Template(SettingsManager):
         self._templateDef = str( templateDef )
 
         if not self._settings['delayedStart']:
-            self.startCheetah()
+            self.startServer()
                    
     def searchList(self):
         return self._searchList
@@ -233,7 +233,7 @@ class Template(SettingsManager):
     def addToSearchList(self, object, restart=True):
         self._searchList.append(object)
         if restart:
-            self.startCheetah()
+            self.startServer()
 
     def translatePlaceholderVars(self, string, executeCallables=False):
         
@@ -241,8 +241,8 @@ class Template(SettingsManager):
             string, searchList=self.searchList(), templateObj=self,
             executeCallables=executeCallables)
         return translated
-    
-    def startCheetah(self):
+
+    def startServer(self):
         """Process and parse the template, then compile it into a function definition
         that is bound to self.__str__() and self.respond()"""
         
@@ -439,11 +439,8 @@ class Template(SettingsManager):
                 refreshList.sort()
        
     def defineTemplateBlock(self, blockName, blockContents):
-        """  """
-        if not hasattr(self, '_blocks'):
-            self._blocks = {}
-            
-        self._blocks[blockName]= blockContents
+        """  """            
+        self._cheetahBlocks[blockName]= blockContents
 
     def killTemplateBlock(self, *blockNames):
         """ """
@@ -454,6 +451,7 @@ class Template(SettingsManager):
 
     def loadMacro(self, macroName, macro):
         """Load a macro into the macros dictionary, using the specified macroName"""
+        
         if not hasattr(self, '_macros'):
             self._macros = {}
 

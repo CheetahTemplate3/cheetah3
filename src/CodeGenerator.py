@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.3 2001/06/18 17:26:01 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.4 2001/06/18 18:52:14 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/18 17:26:01 $
+Last Revision Date: $Date: 2001/06/18 18:52:14 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -528,7 +528,10 @@ def preProcessIncludeDirectives(templateObj, templateDef):
                 overwriteSettings=templateObj.settings(),
                 searchList=templateObj.searchList(),
                 cheetahBlocks=templateObj._cheetahBlocks)
+            nestedTemplate._macros = templateObj._macros
             templateObj._parsedIncludes[includeID] = nestedTemplate
+            if not hasattr(nestedTemplate, 'respond'):
+                nestedTemplate.startServer()
             return '${parsedIncludes.' + includeID + '}'
 
     for RE in templateObj._settings['delimeters']['includeDirective']:
