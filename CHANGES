@@ -1,6 +1,9 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
+0.9.15b1 (unreleased)
+  - fixed a package-relative import bug in ImportHooks.py (TR)
+
 0.9.14 (July 14, 2002)
   - Precompiled template Templates/SkeletonPage.py added to CVS.  This file is
     needed for Cheetah's regression tests. (MO)
