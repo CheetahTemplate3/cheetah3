@@ -4,6 +4,8 @@ Please initial your changes and add a date for each release
    - added #repeat (TR implementing Chuck's suggestion)
    - added #unless (TR implementing Mike's suggestion)
    - updates to the Users' Guide (MO)
+   - fixed a small bug in the cheetah-compile script, as reported by Ian on the
+     list (TR)
 
 0.9.9a3 (October 12, 2001) 
    - more in the Users Guide (TR)
