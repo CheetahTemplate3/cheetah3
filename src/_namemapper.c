@@ -24,9 +24,9 @@ PyNamemapper_valueForKey(PyObject *obj, char *key)
   char *underscoreKey = NULL;
 
   if (PyObject_HasAttrString(obj, key)) {
-    return PyObject_GetAttrString(obj, key);
+    theValue = PyObject_GetAttrString(obj, key);
   } else if (PyMapping_Check(obj) && PyMapping_HasKeyString(obj, key)) {
-    return  PyMapping_GetItemString(obj, key);
+    theValue = PyMapping_GetItemString(obj, key);
   } else {
 
     underscoreKey = malloc(strlen(key) + 2); /* 1 for \0 and 1 for '_' */
@@ -40,9 +40,8 @@ PyNamemapper_valueForKey(PyObject *obj, char *key)
       free(underscoreKey);
       notFound(key);
     }
-    return theValue;
-    /* @@ Do I need to: Py_INCREF(theValue); */
   }
+  return theValue;
   notFound(key);		/* we shouldn't have gotten here - so raise error */
 
 
@@ -54,23 +53,69 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
 			  int executeCallables)
 {
   char *firstKey;
-  PyObject *theValue = NULL;
+  PyObject *result = NULL;
+  char *currentKey;
+  PyObject *currentVal;
+  PyObject *nextVal;
+  int i;
+
+  const char *underscore = "_";
+  char *underscoreKey = NULL;
 
   firstKey = nameChunks[0];
-  if (!(theValue = PyNamemapper_valueForKey(obj, firstKey))){
-    return NULL;
-  }
+
+  if (numChunks == 1) {		/* then we don't need to manage refs */
+    if (!(result = PyNamemapper_valueForKey(obj, firstKey))){
+      return NULL;
+    }
+    if (executeCallables && PyCallable_Check(result) && (!PyInstance_Check(result)) 
+	&& (!PyClass_Check(result)) ) {
+      result = PyObject_CallObject(result, NULL);
+    }
+    return result;
     
-  if (executeCallables && PyCallable_Check(theValue) && (!PyInstance_Check(theValue)) 
-      && (!PyClass_Check(theValue)) ) {
-    theValue = PyObject_CallObject(theValue, NULL);
-  }
-  
-  if (numChunks > 1) {
-    theValue = PyNamemapper_valueForName(theValue, nameChunks+1, 
-					 numChunks - 1, executeCallables);
-  }
-  return theValue;
+  } else if (numChunks > 1) {	/* then we need to manage refs */
+				/* and can't use valueForKey */
+
+    currentVal = obj;
+    for (i=0; i < numChunks;i++) {
+      currentKey = nameChunks[i];
+
+      if (PyObject_HasAttrString(currentVal, currentKey)) {
+    	nextVal = PyObject_GetAttrString(currentVal, currentKey);
+      } else if (PyMapping_Check(currentVal) && PyMapping_HasKeyString(currentVal, currentKey)) {
+    	nextVal = PyMapping_GetItemString(currentVal, currentKey);
+      } else {
+    
+    	underscoreKey = malloc(strlen(currentKey) + 2); /* 1 for \0 and 1 for '_' */
+    	strcpy(underscoreKey, underscore);
+    	strcat(underscoreKey, currentKey);
+    
+    	if (PyObject_HasAttrString(currentVal, underscoreKey)) {
+    	  nextVal = PyObject_GetAttrString(currentVal, underscoreKey);
+    	  free(underscoreKey);
+    	} else {
+	  if (i>0) {
+	    Py_DECREF(currentVal);
+	  }
+    	  free(underscoreKey);
+    	  notFound(currentKey);
+    	}
+      }
+      if (i>0) {
+	Py_DECREF(currentVal);
+      }
+      if (executeCallables && PyCallable_Check(nextVal) && (!PyInstance_Check(nextVal)) 
+	  && (!PyClass_Check(nextVal)) ) {
+	currentVal = PyObject_CallObject(nextVal, NULL);
+	Py_DECREF(nextVal);
+      } else {
+	currentVal = nextVal;
+      }
+    }
+    return currentVal;
+  } 
+
 }
 
 static PyObject *
