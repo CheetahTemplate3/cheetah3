@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.1 2001/06/28 19:19:17 echuck Exp $
+# $Id: Test.py,v 1.2 2001/07/09 00:52:43 echuck Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/06/28 19:19:17 $
+Last Revision Date: $Date: 2001/07/09 00:52:43 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 
 ##################################################
@@ -80,12 +80,23 @@ class VerifyTemplateOutput(AbstractTestCase):
         servlet = Template(self.template, self.nameSpace())
         output = servlet.respond()
 
-        assert output == self.expectedOutput, \
-               ('Template output mismatch\n\tTest Title: ' + self.testTitle +
-                '\n\tInput Template = %(template)s\n\tExpected Output = ' +
-                '%(expected)s---\n\tActual Output = %(actual)s---\n' ) \
-               % {'template':self.template, 'expected':self.expectedOutput,
-                  'actual':output}
+        report = '''
+Template output mismatch
+Test: %(testName)s
+
+    Input Template =
+%(template)s%(end)s
+
+    Expected Output =
+%(expected)s%(end)s
+
+    Actual Output =
+%(actual)s%(end)s'''
+
+        assert output == self.expectedOutput, report \
+               % {'testName': self.testTitle, 'template': self.template,
+                  'expected': self.expectedOutput, 'actual': output,
+                  'end': '(end)'}
 
 
 ##################################################
@@ -126,6 +137,11 @@ defaultTestNameSpace = {
             },
     'dict2': {'one':'item1', 'two':'item2'},
     'blockToBeParsed':"""$numOne $numTwo""",
+    'list': [
+    	{'index': 0, 'numOne': 1, 'numTwo': 2},
+    	{'index': 1, 'numOne': 1, 'numTwo': 2},
+	    ],
+	'nameList': [('john', 'doe'), ('jane', 'smith')],
     }
 
 
@@ -513,6 +529,27 @@ posixCases += callMacroTests
 #posixCases += extendTests
 # @@ at the moment the #entend directive is only caught by Servlet.extendTemplate()
 
+
+if 0:
+	miscBugCases = [
+		['bug: failure with comma right after ${foo} - jeff johnson',
+		'''#for name, last in $nameList
+			<li>${name}, $last
+	#end for''',
+		'''		<li>john, doe
+			<li>jane, smith
+	'''],
+
+		['bug: variation on: failure with comma right after ${foo} - jeff johnson',
+		'''#for item in $list
+			<li>${item.index}, $item.numOne
+	#end for''',
+		'''		<li>0, 1
+			<li>1, 1
+	'''],
+
+		]
+	posixCases += miscBugCases
 
 
 windowsCases = deepcopy(posixCases)
