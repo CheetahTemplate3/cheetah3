@@ -11,7 +11,6 @@ static PyObject *NotFound;   /* locally-raised exception */
     { PyErr_SetString(NotFound, message); return NULL; }
 
 #define MAXCHUNKS 25		/* max num of nameChunks for the arrays */
-#define MAXNAMELEN 200		/* max num of chars in name */
 
 /* *************************************************************************** */
 /* First the c versions of the functions */
@@ -22,7 +21,7 @@ PyNamemapper_valueForKey(PyObject *obj, char *key)
 {
   PyObject *theValue = NULL;
   const char *underscore = "_";
-  char * underscoreKey = NULL;
+  char *underscoreKey = NULL;
 
   if (PyObject_HasAttrString(obj, key)) {
     return PyObject_GetAttrString(obj, key);
@@ -101,9 +100,35 @@ PyNamemapper_valueFromSearchList(PyObject *searchList,
   return NULL;	/* the first key wasn't found in any namespace -- NotFound is raised */
 }
 
+
+
+
+static int getNameChunks(char *nameChunks[], char *name) 
+{
+  char c;
+  char *currChunk;
+  int currChunkNum = 0;
+  
+  currChunk = name;
+  while ((c = *name) != '\0'){
+    if (c == '.') {
+      *name ='\0';
+      nameChunks[currChunkNum++] = currChunk;
+      name++;
+      currChunk = name;
+    } else 
+      name++;
+  }
+  if (name > currChunk) 
+    nameChunks[currChunkNum++] = currChunk;
+  return currChunkNum;
+}
+ 
+
 /* *************************************************************************** */
 /* Now the wrapper functions to export into the Python module */
 /* *************************************************************************** */
+
 
 static PyObject *
 namemapper_valueForKey(PyObject *self, PyObject *args)
@@ -114,7 +139,7 @@ namemapper_valueForKey(PyObject *self, PyObject *args)
   if (!PyArg_ParseTuple(args, "Os", &obj, &key)) {
     return NULL;
   }
-
+  
   return PyNamemapper_valueForKey(obj, key);
 }
 
@@ -122,17 +147,18 @@ static PyObject *
 namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)
 {
 
+
   PyObject *obj;
   char *name;
   int executeCallables = 0;
 
-  PyObject *theValue;
-  char *copyOfName = NULL;
-
-  const char *dot = ".";
+  char *nameCopy = NULL;
+  char *pa = NULL;
+  char c;
   char *nameChunks[MAXCHUNKS];
-  int numChunks = 1;
-  char *nextChunk;
+  int numChunks;
+
+  PyObject *theValue;
 
   static char *kwlist[] = {"obj", "name", "executeCallables", NULL};
 
@@ -140,33 +166,36 @@ namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)
     return NULL;
   }
   
-  copyOfName = malloc(strlen(name) + 1);
-  copyOfName = strcpy(copyOfName, name);
-  nameChunks[0] = strtok(copyOfName, dot);
-  while ((nextChunk = strtok(NULL, dot)) != NULL) {
-    nameChunks[numChunks++] = nextChunk;
+  nameCopy = malloc(strlen(name) + 1);
+  pa = nameCopy;
+  while ((c = *name++)) {
+    if (!isspace(c)) {
+      *pa++ = c;
+    }
   }
+  *pa = '\0';
+  numChunks = getNameChunks(nameChunks, nameCopy);
+
   theValue = PyNamemapper_valueForName(obj, nameChunks, numChunks, executeCallables);
-  free(copyOfName);
+  free(nameCopy);
   return theValue;
 }
-
 
 static PyObject *
 namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
 {
 
   PyObject *searchList;
-  const char *name;
+  char *name;
   int executeCallables = 0;
 
-  PyObject *theValue;
-  char *copyOfName = NULL;
-
-  const char *dot = ".";
+  char *nameCopy = NULL;
+  char *pa = NULL;
+  char c;
   char *nameChunks[MAXCHUNKS];
-  int numChunks = 1;
-  char *nextChunk;
+  int numChunks;
+
+  PyObject *theValue;
 
   static char *kwlist[] = {"searchList", "name", "executeCallables", NULL};
 
@@ -175,15 +204,24 @@ namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
     return NULL;
   }
 
-  copyOfName = malloc(strlen(name) + 1);
-  copyOfName = strcpy(copyOfName, name);
-
-  nameChunks[0] = strtok(copyOfName, dot);
-  while ((nextChunk = strtok(NULL, dot)) != NULL) {
-    nameChunks[numChunks++] = nextChunk;
+  nameCopy = malloc(strlen(name) + 1);
+  pa = nameCopy;
+  while ((c = *name++)) {
+    if (!isspace(c)) {
+      *pa++ = c;
+    }
   }
+  *pa = '\0';
+  numChunks = getNameChunks(nameChunks, nameCopy);
+
   theValue = PyNamemapper_valueFromSearchList(searchList, nameChunks, numChunks, executeCallables);
-  return theValue;
+  if (theValue) {
+    free(nameCopy);
+    return theValue;
+  } else {
+    free(nameCopy);
+    notFound(name);
+  }
 }
 
 /* *************************************************************************** */

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: IncludeDirective.py,v 1.5 2001/08/13 01:58:28 tavis_rudd Exp $
+# $Id: IncludeDirective.py,v 1.6 2001/08/13 22:01:28 tavis_rudd Exp $
 """IncludeDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,17 +7,18 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/13 01:58:28 $
+Last Revision Date: $Date: 2001/08/13 22:01:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
 
 import re
+from random import randrange
 
 # intra-package imports ...
 import TagProcessor
@@ -87,18 +88,19 @@ class IncludeDirective(TagProcessor.TagProcessor):
                 
             ## get the Cheetah code to be included
             if args.startswith( templateObj.setting('placeholderStartToken') ):
-                translatedPlaceholder = templateObj.translateRawPlaceholderString(args)
-                includeString = templateObj.placeholderProcessor.evalPlaceholderString(
-                    translatedPlaceholder)
+                translatedPlaceholder = self.translateRawPlaceholderString(args)
+                includeString = self.evalPlaceholderString(translatedPlaceholder)
                 
-            elif args.startswith('"') or args.startswith("'"):
-                fileName = args[1:-1]
+            elif args.startswith('file'):
+                args = '='.join(args.split('=')[1:])
+                translatedPlaceholder = self.translateRawPlaceholderString(args)
+                fileName = self.evalPlaceholderString(translatedPlaceholder)
                 fileName = templateObj.normalizePath( fileName )
                 includeString = templateObj.getFileContents( fileName )
     
             ## now process finish include
             if raw:            
-                includeID = '_' + str(id(includeString))
+                includeID = '_' + str(id(includeString)) + str(randrange(10000, 99999))
                 templateObj._rawIncludes[includeID] = includeString
                 return templateObj.setting('placeholderStartToken') + \
                        '{rawIncludes.' + includeID + '}'

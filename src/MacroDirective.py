@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: MacroDirective.py,v 1.5 2001/08/13 01:58:28 tavis_rudd Exp $
+# $Id: MacroDirective.py,v 1.6 2001/08/13 22:01:28 tavis_rudd Exp $
 """MacroDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/13 01:58:28 $
+Last Revision Date: $Date: 2001/08/13 22:01:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -68,20 +68,20 @@ class MacroDirective(TagProcessor.TagProcessor):
         if not hasattr(templateObj, '_macros'):
             templateObj._macros = {}
     
-        def handleMacroDefs(match, templateObj=templateObj):
+        def handleMacroDefs(match, self=self, templateObj=templateObj):
             """process each match of the macro definition regex"""
             macroSignature = match.group(1)
-    
+
             ##validateMacroDirective(templateObj, macroSignature)
             
             firstParenthesis = macroSignature.find('(')
-            macroArgstring = macroSignature[firstParenthesis+1:-1]
             macroName = macroSignature[0:firstParenthesis]
-    
-            argStringChunks = [chunk.strip() for chunk in macroArgstring.split(',')]
-            argNamesList = [(chunk.split('='))[0] for chunk in argStringChunks]
-            #@@tr: not safe if the default args have commas or = in them!!!
-                    
+            macroArgstring = macroSignature[firstParenthesis:]
+
+            dummyCode = 'def dummy' + macroArgstring + ': pass'
+            globalsDict, localsDict = self.execPlaceholderString(dummyCode)
+            argNamesList = localsDict['dummy'].func_code.co_varnames
+
             macroBody = match.group(2).replace("'''","\'\'\'")
     
             def handleArgsUsedInBody(match, argNamesList=argNamesList,
@@ -138,7 +138,7 @@ class MacroDirective(TagProcessor.TagProcessor):
             else:
                 macroFuncName =  'macroFunction'
                 
-            macroCode = "def " + macroFuncName + "(" + macroArgstring + "):\n" + \
+            macroCode = "def " + macroFuncName + macroArgstring + ":\n" + \
                         "    return '''" + macroBody + "'''\n"
     
             exec macroCode in None, None
@@ -249,11 +249,12 @@ class LazyMacroCall(TagProcessor.TagProcessor):
         
         templateObj = self.templateObj()
         
-        def handleMacroCalls(match, templateObj=templateObj):
+        def handleMacroCalls(match, self=self, templateObj=templateObj):
             """for each macro call that is found in the template, substitute it with
             the macro's output"""
 
             from NameMapper import valueFromSearchList, valueForName
+            
             macroSignature = match.group(1)[1:]
             firstParenthesis = macroSignature.find('(')
             macroArgstring = macroSignature[firstParenthesis+1:-1]
@@ -262,8 +263,7 @@ class LazyMacroCall(TagProcessor.TagProcessor):
             searchList = templateObj.searchList()
             
             try:
-                macroArgstring = templateObj.translateRawPlaceholderString(macroArgstring)
-                
+                macroArgstring = self.translateRawPlaceholderString(macroArgstring)
             except NameMapper.NotFound, name:
                 line = lineNumFromPos(match.string, match.start())
                 raise Error('Undeclared variable ' + str(name) + \

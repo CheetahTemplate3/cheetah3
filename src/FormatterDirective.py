@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: FormatterDirective.py,v 1.1 2001/08/13 01:57:44 tavis_rudd Exp $
+# $Id: FormatterDirective.py,v 1.2 2001/08/13 22:01:28 tavis_rudd Exp $
 """FormatterDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/13 01:57:44 $
+Last Revision Date: $Date: 2001/08/13 22:01:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -64,7 +64,7 @@ class FormatterDirective(TagProcessor.TagProcessor):
             formatter = self.evalPlaceholderString(valueString)
             state['interactiveFormatter'] = interactive
             state['currFormatter'] = currFormatter = str(id(formatter))
-            self.settings()['theFormatters'][currFormatter] = formatter
+            self.templateObj()._theFormatters[currFormatter] = formatter
         
         indent = self.setting('indentationStep')
         if not state.has_key('indentLevel'):
@@ -72,6 +72,6 @@ class FormatterDirective(TagProcessor.TagProcessor):
                         self.setting('initialIndentLevel')
 
         return indent*(state['indentLevel']) + \
-               'format = self.setting("theFormatters")["' + currFormatter + '"]' + "\n" + \
+               'format = self._theFormatters["' + currFormatter + '"]' + "\n" + \
                indent * state['indentLevel']
         

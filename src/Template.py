@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.37 2001/08/13 04:47:30 tavis_rudd Exp $
+# $Id: Template.py,v 1.38 2001/08/13 22:01:28 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.37 $
+Version: $Revision: 1.38 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/13 04:47:30 $
+Last Revision Date: $Date: 2001/08/13 22:01:28 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.37 $"[11:-2]
+__version__ = "$Revision: 1.38 $"[11:-2]
 
 
 ##################################################
@@ -36,6 +36,8 @@ from NameMapper import valueFromSearchList, valueForName # this is used in the g
 import CodeGenerator as CodeGen
 
 from TagProcessor import TagProcessor
+
+from ErrorChecker import ErrorChecker
 
 from PlaceholderProcessor import PlaceholderProcessor
 from DisplayLogic import DisplayLogic
@@ -83,7 +85,7 @@ class Template(SettingsManager, Parser):
         'useAutocalling': True,
         'delayedCompile': False,            
         'plugins':[],
-        'varNotFound_handler': CodeGen.varNotFound_echo,
+        'errorCheckerClass': None,#ErrorChecker,#None,
         'debug': False,
         'keepCodeGeneratorResults': False,
         'blockMarkerStart':['<!-- START BLOCK: ',' -->'],
@@ -224,6 +226,8 @@ class Template(SettingsManager, Parser):
         ##  a hook for calculated settings    
         self.initializeSettings()       
 
+        ## create theFormatters dict now for storing refs to the formatter functions
+        self._theFormatters = {}
 
         ## Setup the Parser base-class and the various TagProcessors
         Parser.__init__(self) # do this before calling self.setupTagProcessors()
@@ -396,11 +400,18 @@ class Template(SettingsManager, Parser):
         debug = settings['debug']
         results = self._codeGeneratorResults = {}
         state = self._codeGeneratorState = {}
+        self._localVarsList = []   # used to track vars from #set and #for
+        
         self._defaultFormatter = self.setting('formatter')
-        self.settings()['theFormatters'] = {'default': self._defaultFormatter}
+        self._theFormatters['default'] = self._defaultFormatter
         state['currFormatter'] = 'default'
         state['interactiveFormatter'] = self.setting('interactiveFormatter')
-        self._localVarsList = []   # used to track vars from #set and #for
+        
+        if self.setting('errorCheckerClass'):
+            errorChecker = self.setting('errorCheckerClass')(self)
+            self._errorChecker = errorChecker
+        else:
+            self._errorChecker = None
         
         try:
             ## stage 1 - preProcessing of the template string ##
@@ -463,13 +474,14 @@ class Template(SettingsManager, Parser):
             indent = settings['indentationStep']
             generatedCode = \
                           "def generatedFunction(self, trans=None, iAmNested=False," + \
-                          "format = self._defaultFormatter, " + \
-                          "searchList = self._searchList, " + \
-                          "setVars = self._setVars, " + \
-                          "checkForCacheRefreshes = self._checkForCacheRefreshes, " + \
-                          "timedRefreshCache = self._timedRefreshCache, " + \
-                          "timedRefreshList = self._timedRefreshList, " + \
-                          "timedRefresh = self._timedRefresh, " + \
+                          "format=self._defaultFormatter, " + \
+                          "searchList=self._searchList, " + \
+                          "setVars=self._setVars, " + \
+                          "checkForCacheRefreshes=self._checkForCacheRefreshes, " + \
+                          "timedRefreshCache=self._timedRefreshCache, " + \
+                          "timedRefreshList=self._timedRefreshList, " + \
+                          "timedRefresh=self._timedRefresh, " + \
+                          "errorChecker=self._errorChecker" + \
                           "):\n" \
                           + indent * 1 + "try:\n" \
                           + indent * 2 + "#setupCodeInsertMarker\n" \

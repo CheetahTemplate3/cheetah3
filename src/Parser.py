@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.8 2001/08/13 01:58:28 tavis_rudd Exp $
+# $Id: Parser.py,v 1.9 2001/08/13 22:01:28 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/13 01:58:28 $
+Last Revision Date: $Date: 2001/08/13 22:01:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -75,6 +75,10 @@ def maybe(*choices): return apply(group, choices) + '?'
 
 
 #generic
+namechars = "abcdefghijklmnopqrstuvwxyz" \
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+
+
 WS = r'[ \f\t]*'                        # Whitespace
 EOL = r'\r\n|\n|\r'
 EOLZ = EOL + r'|\Z'
@@ -222,10 +226,10 @@ class Parser:
         (e.g. self.mark(txt)) into a list of plain text VS placeholders.
 
         This is the core of the placeholder parsing!
+
+        Modified from code written by Ka-Ping Yee for his itpl module.
         """
         
-        namechars = "abcdefghijklmnopqrstuvwxyz" \
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
         chunks = []
         pos = 0
 
@@ -408,11 +412,30 @@ class Parser:
         token = self.setting('placeholderStartToken')
         return theString.replace('\\' + token, token)
 
-    def evalPlaceholderString(self, txt):
+    def evalPlaceholderString(self, txt, globalsDict={}, localsDict={}):
         """Return the value of a placeholderstring. This doesn't work with localVars."""
-        try:
-            theFormatters = self.settings()['theFormatters']
-        except:
-            pass
+        theFormatters = self.templateObj()._theFormatters
         searchList = self.searchList()
-        return eval(txt)
+        localsDict.update({'theFormatters':theFormatters,
+                           'searchList':searchList,
+                           'valueFromSearchList':valueFromSearchList,
+                           'valueForName':valueForName,
+                           'True':1,
+                           'False':0})
+        return eval(txt, globalsDict, localsDict)
+    
+    def execPlaceholderString(self, code, globalsDict={}, localsDict={}):
+        """Exec a placeholderString and return a tuple of the globalsDict, and
+        the localsDict. This doesn't work with localVars."""
+        
+        theFormatters = self.templateObj()._theFormatters
+        searchList = self.searchList()
+        localsDict.update({'theFormatters':theFormatters,
+                           'searchList':searchList,
+                           'valueFromSearchList':valueFromSearchList,
+                           'valueForName':valueForName,
+                           'True':1,
+                           'False':0})
+        exec code in globalsDict, localsDict
+        return (globalsDict,localsDict)
+    

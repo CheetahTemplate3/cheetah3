@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.18 2001/08/09 17:58:05 tavis_rudd Exp $
+# $Id: Test.py,v 1.19 2001/08/13 22:01:28 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.18 $
+Version: $Revision: 1.19 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/09 17:58:05 $
+Last Revision Date: $Date: 2001/08/13 22:01:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.18 $"[11:-2]
+__version__ = "$Revision: 1.19 $"[11:-2]
 
 
 ##################################################
@@ -139,6 +139,7 @@ defaultTestNameSpace = {
     'dict2': {'one':'item1', 'two':'item2'},
     'blockToBeParsed':"""$numOne $numTwo""",
     'includeBlock2':"""$numOne $numTwo $aSetVar""",
+    'includeFileName':'parseTest.txt',
     'nestedTDwithMacros':"""
 #macro test2(theTmpl)
  test2 called from $theTmpl
@@ -494,19 +495,23 @@ includeTests = [
      "\n1 2",],
 
     ['simple #include of file - with no whitespace & single quotes',
-     "#include 'parseTest.txt'",
+     "#include file='parseTest.txt'",
      "1 2",],
 
     ['simple #include of file - with no whitespace & double quotes',
-     '#include "parseTest.txt"',
+     '#include file ="parseTest.txt"',
      "1 2",],
 
     ['simple #include of file - with extra whitespace',
-     "#include  'parseTest.txt'",
+     "#include  file = 'parseTest.txt'",
+     "1 2",],
+
+    ['simple #include of file using $includeFileName',
+     "#include  file = $includeFileName",
      "1 2",],
 
     ['complex #include of file - preceding and trailing html and \r',
-     """<HTML>\r#include "parseTest.txt"\r</html>""",
+     """<HTML>\r#include file="parseTest.txt"\r</html>""",
      """<HTML>\r1 2</html>""",
     ],
 
@@ -524,11 +529,15 @@ includeRawTests = [
      "$numOne $numTwo",],
 
     ['simple #include raw of file - with no whitespace',
-     "#include raw 'parseTest.txt'",
+     "#include raw file = 'parseTest.txt'",
      "$numOne $numTwo",],
 
     ['simple #include raw of file - with whitespace',
-     "#include raw  'parseTest.txt'",
+     "#include raw  file ='parseTest.txt'",
+     "$numOne $numTwo",],
+
+    ['simple #include raw of file - with whitespace',
+     "#include raw  file =$includeFileName",
      "$numOne $numTwo",],
 
     ]

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.26 2001/08/13 01:58:28 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.27 2001/08/13 22:01:28 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.26 $
+Version: $Revision: 1.27 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/13 01:58:28 $
+Last Revision Date: $Date: 2001/08/13 22:01:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.26 $"[11:-2]
+__version__ = "$Revision: 1.27 $"[11:-2]
 
 
 ##################################################
@@ -87,20 +87,39 @@ class PlaceholderProcessor(TagProcessor):
             del nameChunks[0]
         tag = '.'.join(nameChunks)
 
-
         ## translate the tag into Python code using self.translatePlaceholderString
         translatedTag = self.translatePlaceholderString(
             self.setting('placeholderMarker') + tag)
 
-        
-        ## deal with caching 
+        ## generate a unique ID for the tag
+        ID = str(id(translatedTag)) + '_' + str(randrange(10000, 99999))
+
+        ## setup the formatter
         currFormatter = state['currFormatter']
         formatterTag = 'theFormatters["' + currFormatter + '"](' \
                         + translatedTag + ')'
+
+        ## use the errorChecker if enabled
+        if templateObj._errorChecker:
+            originalTag = tag.replace(self.setting('placeholderMarker'),
+                                      self.setting('placeholderStartToken'))
+            if cacheType == STATIC_CACHE:
+                tagStart = '{*'
+            elif cacheType == TIMED_REFRESH_CACHE:
+                tagStart = '{*' + str(cacheRefreshInterval) + '*'
+            else:
+                tagStart = '{'
+            cacheType = None
+            originalTag = self.setting('placeholderStartToken') + \
+                          tagStart + originalTag + '}'
+            templateObj._errorChecker.set(ID, originalTag, formatterTag)
+            translatedTag = 'errorChecker.get("' + ID + '", trans=trans,localsDict=locals())'
+            
+        
+        ## deal with caching 
         if cacheType == STATIC_CACHE:
             return self.evalPlaceholderString(formatterTag)
         elif cacheType == TIMED_REFRESH_CACHE:
-            ID = str(id(translatedTag)) + '_' + str(randrange(1000, 9000))
             templateObj._setTimedRefresh(ID, formatterTag, cacheRefreshInterval)
             translatedTag = 'timedRefreshCache["' + ID + '"]'
 
@@ -109,7 +128,3 @@ class PlaceholderProcessor(TagProcessor):
             return self.wrapEvalTag("format(" + translatedTag + ", trans=trans)")
         else:
             return self.wrapEvalTag("format(" + translatedTag + ")")
-
-            
-
-
