@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.4 2001/08/14 06:04:43 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.5 2001/08/27 16:22:11 ianbicking Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/14 06:04:43 $
+Last Revision Date: $Date: 2001/08/27 16:22:11 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -42,6 +42,7 @@ False = (1==0)
 CHEETAH_EXTENSION = '.tmpl'
 SERVLET_EXTENSION = '.py'
 SERVLET_BACKUP_EXT = '.py_bak'
+GEN_EXTENSION = 'Gen'
 
 
 
@@ -56,10 +57,12 @@ extendDirectiveRE = re.compile(escCharLookBehind +
 ##################################################
 ## FUNCTIONS ##
     
-def wrapTemplateCode(templateExt, name):
+def wrapTemplateCode(templateExt, name, appendGen=False):
     """Wrap a template definition string in the boiler-plate code needed to create a
     Webware servlet."""
-    
+
+    if appendGen: gen_ext = GEN_EXTENSION
+    else: gen_ext = ''
     parentTemplate = [False,]
     def extendDirectiveProcessor(match, parentTemplate=parentTemplate):
         """process any #redefine directives that are found in the template extension""" 
@@ -75,60 +78,101 @@ def wrapTemplateCode(templateExt, name):
         servletCode += """'''
 from %(parentModule)s import %(parentServlet)s
 
-class %(name)s(%(parentServlet)s):
+class %(name)s%(gen_ext)s(%(parentServlet)s):
     def initializeTemplate(self):
         %(parentServlet)s.initializeTemplate(self)
         self.extendTemplate(templateExt)
 
 """ %  {'parentModule': parentTemplate,
         'parentServlet': parentServlet,
-        'name': name
+        'name': name,
+        'gen_ext': gen_ext,
         }
     else:
         servletCode = "templateExt = r'''" + templateExt
         servletCode += """'''
 from Cheetah.Servlet import TemplateServlet
 
-class %(name)s(TemplateServlet):
+class %(name)s%s(gen_ext)s(TemplateServlet):
     def __init__(self):
         TemplateServlet.__init__(self, template=templateExt)
 
-""" % {'name':name}
+""" % {'name': name,
+       'gen_ext': gen_ext,
+       }
 
     return servletCode
 
 
-def compileDir(dirName='.', backupServletFiles=True):
+def inheritServletCode(filenameMinusExt):
+    return '''from %(name)s%(gen_ext)s import %(name)s%(gen_ext)s
+
+class %(name)s(%(name)s%(gen_ext)s):
+    pass
+''' % {'name': os.path.basename(filenameMinusExt),
+       'gen_ext': GEN_EXTENSION,
+       }
+
+def compileDir(dirName='.', backupServletFiles=True, appendGen=False):
     """Compile all the Cheetah files in a directory."""
     
     cheetahFiles = glob(dirName + '/*' + CHEETAH_EXTENSION)
     namesMinusExt = [pathSplitext(fileName)[0] for fileName in cheetahFiles] 
-    
+
+    if appendGen:
+        gen_ext = GEN_EXTENSION
+    else:
+        gen_ext = ""
     if backupServletFiles:
         for i in range(len(namesMinusExt)):
-            if exists( namesMinusExt[i] + SERVLET_EXTENSION):
-                print 'backing up', namesMinusExt[i] + SERVLET_EXTENSION
-                os.rename(namesMinusExt[i] + SERVLET_EXTENSION,
-                          namesMinusExt[i] + SERVLET_BACKUP_EXT)
+            if exists( namesMinusExt[i] + gen_ext + SERVLET_EXTENSION):
+                print 'backing up', namesMinusExt[i] + gen_ext + \
+                      SERVLET_EXTENSION
+                os.rename(namesMinusExt[i] + gen_ext + SERVLET_EXTENSION,
+                          namesMinusExt[i] + gen_ext + SERVLET_BACKUP_EXT)
 
     for name in namesMinusExt:
-        compileFile(name)
+        compileFile(name, appendGen=appendGen)
         
-def compileFile(fileNameMinusExt):
+def compileFile(fileNameMinusExt, appendGen=False):
     """Compile an single Cheetah file.  """
     
+    if appendGen: gen_ext = GEN_EXTENSION
+    else: gen_ext = ''
+
     fp = open(fileNameMinusExt + CHEETAH_EXTENSION)
     templateExt = fp.read()
     fp.close()
     servletName = pathSplit(fileNameMinusExt)[1]
-    servletCode = wrapTemplateCode(templateExt, servletName)
-    print 'compiled ', fileNameMinusExt + CHEETAH_EXTENSION, 'to', fileNameMinusExt + SERVLET_EXTENSION
+    servletCode = wrapTemplateCode(templateExt, servletName,
+                                   appendGen=appendGen)
+    print 'compiled ', fileNameMinusExt + CHEETAH_EXTENSION, 'to', fileNameMinusExt + gen_ext + SERVLET_EXTENSION
      
-    fp = open(fileNameMinusExt + SERVLET_EXTENSION,'w')
+    fp = open(fileNameMinusExt + gen_ext + SERVLET_EXTENSION,'w')
+    fp.write("""## This module was compiled from
+##   %(name)s%(CHEETAH_EXTENSION)s
+""" % {"name": fileNameMinusExt, "CHEETAH_EXTENSION": CHEETAH_EXTENSION})
+    if appendGen:
+        fp.write("""## You should not make changes to this file.  Instead, you should make
+## changes to the file %(name)s.py, which will not be overwritten on recompile.
+""" % {"name": fileNameMinusExt})
+    else:
+        fp.write("""## If you make changes to this file they will be overwritten if you recompile
+## the .tmpl file, and the old version of the file will be in %(name)s.py_bak
+""" % {"name": fileNameMinuxExt})
+	
     fp.write(servletCode)
-    fp.close
+    fp.close()
 
-def recursiveCompile(dir='.', backupServletFiles=True):
+    if appendGen and not os.path.exists(fileNameMinusExt +
+                                        SERVLET_EXTENSION):
+        code = inheritServletCode(fileNameMinusExt)
+        fp = open(fileNameMinusExt + SERVLET_EXTENSION, "w")
+        fp.write(code)
+        fp.close()
+
+
+def recursiveCompile(dir='.', backupServletFiles=True, appendGen=False):
     """Recursively walk through a directory tree and compile Cheetah files."""
     pending = [dir]
     while pending:
@@ -140,7 +184,8 @@ def recursiveCompile(dir='.', backupServletFiles=True):
                 pending.append(path)
                 
         ## do it!
-        compileDir(dir, backupServletFiles=backupServletFiles) 
+        compileDir(dir, backupServletFiles=backupServletFiles,
+                   appendGen=appendGen) 
     
 class MainProgram:
     """A command line interface class."""
@@ -148,36 +193,45 @@ class MainProgram:
     def run(self):
         """The main program controller."""
         try:
-            opts, args = getopt.getopt( sys.argv[1:], 'd:R:', [])
+            opts, args = getopt.getopt( sys.argv[1:], 'd:R:g', [])
 
-        except getopt.GetoptError:
+        except getopt.GetoptError, v:
             # print help information and exit:
+            print v
             self.usage()
             sys.exit(2)
 
-        if not opts:
-            try:
-                fileName = args[0]
-            except:
-                self.usage()
-                sys.exit(2)
-                
-            servletName = pathSplitext(pathSplit(fileName)[1])[0]
-            fp = open(fileName)
-            templateExt = fp.read()
-            fp.close()
-            print wrapTemplateCode(templateExt, servletName)
-
+        setOpts = {}
         for o, a in opts:
             if o in ('-h',):
                 self.usage()
                 sys.exit()
             if o in ('-R',):
-                recursiveCompile(a)
-                sys.exit()
+                setOpts['recursiveCompile'] = True
             if o in ('-d',):
-                compileDir(a)
-                sys.exit()
+                setOpts['compileDir'] = True
+            if o in ('-g',):
+                setOpts['appendGen'] = True
+        if setOpts.has_key('recursiveCompile') and \
+           setOpts.has_key('compileDir'):
+            self.usage()
+            sys.exit()
+        if setOpts.has_key('recursiveCompile'):
+            recursiveCompile(a, appendGen=setOpts.has_key('appendGen'))
+            sys.exit()
+        if setOpts.has_key('compileDir'):
+            compileDir(a, appendGen=setOpts.has_key('appendGen'))
+            sys.exit()
+        if not args:
+            self.usage()
+            sys.exit(2)
+        for fileName in args:
+            servletName = pathSplitext(pathSplit(fileName)[1])[0]
+            fp = open(fileName)
+            templateExt = fp.read()
+            fp.close()
+            print wrapTemplateCode(templateExt, servletName,
+                                   appendGen=setOpts.has_key('appendGen'))
 
 
     def usage(self):
@@ -187,12 +241,15 @@ class MainProgram:
 Compiles Cheetah files (.tmpl) into Webware servlet files (.py)
 
 Usage: 
-  %(scriptName)s filename   ---> compile 'filename', output to stdout
-  %(scriptName)s -h         ---> print this help and exit
-  %(scriptName)s -d dir     ---> compile all files in dir, output to new files
-  %(scriptName)s -R dir     ---> same as -d, but operates recursively on subdirs
+  %(scriptName)s [OPTIONS] filename ---> compile 'filename', output to stdout
+  %(scriptName)s -h                 ---> print this help and exit
+  %(scriptName)s -d [OPTIONS] dir   ---> compile all files in dir, output to
+                                          new files
+  %(scriptName)s -R [OPTIONS] dir   ---> same as -d, but operates
+                                          recursively on subdirs
+  -g                                      Compile to filenameGen.py
   
-""" % {'scriptName':sys.argv[0],
+""" % {'scriptName':os.path.basename(sys.argv[0]),
        'version':version,
        'author':'Tavis Rudd',
        }
