@@ -228,6 +228,43 @@ template definition to indicate the superclass.  Or put the Python code
 in the calling routine (the routine that instantiates and uses the template
 object).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Running your template as a standalone script}
+\label{howWorks.standalone}
+
+In addition to importing your cheetah-compile'd \code{.py} file into a Python
+program or using it as a Webware servlet, you can also run it as a standalone
+program, just like any Python script.  The program will print the filled
+template on standard output.  This is useful while debugging the template.
+It's also useful as a filter in certain production situations such as shell
+scripts.  
+
+When running the template as a program, you cannot provide a searchList or
+set \code{self.} attributes in the normal way.  So you must take
+alternative measures to ensure that every placeholder has a value.
+Otherwise, you will get the usual \code{NameMapper.NotFound} exception at
+the first missing value.
+
+Fortunately, there are three ways to supply values to cheetah-compile'd
+templates running directly from the command line:
+
+\begin{description}
+\item{{\bf Default values}}  You can set default values in the template itself
+     (via the \code{\#attr} directive) or in a Python superclass.
+\item{{\bf Environment variables}} If you use the \code{-e} command-line option,
+     Cheetah will look in the environment for values.  This is the easiest way
+     to pass values from a shell script.
+\item{{\bf A pickle file}}  If you use the \code{-p PICKLE\_FILE} option, 
+     Cheetah will unpickle the file and place the resulting data structure in
+     the searchList.    See the standard Python modules \code{pickle} and
+     \code{cPickle} for more information.  (The truly masochistic who love
+     filters can even use \code{-p -} to read the pickle data from standard
+     input.)
+\end{description}
+
+You can always run \code{python FILENAME.py --help} to see all the command-line
+options your template program accepts.
+
 %% @@MSO: Not using the term '.tmpl/.py servlet files' here because they
 %% aren't necessarily Webware servlets.
 %% @@TR: but it might be best for simplicity to assume that they are.
