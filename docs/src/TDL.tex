@@ -114,8 +114,9 @@ not a String, Cheetah will call \code{str()} on it to obtain a string
 representation that can be inserted into the template.  But if the value is a
 callable object (e.g., a function or a method), Cheetah will first call it and
 then call \code{str()} on the result.  You may include or omit the () after
-callable placeholders: Cheetah will call it (without arguments) in either case.
-
+callable placeholders such as functions.  If you omit the () Cheetah will call
+them without arguments.  Functions that are used without explicit parentheses
+must either accept no arguments, or all arguments must have default values.
 
 \begin{verbatim}
 <HTML>
@@ -127,22 +128,13 @@ $aNumber                        ## type of value they map to.  They could be
 $aList                          ## any valid placeholder name.
 $aDictionary
 $aFunction
+$aFunction()
+$aFunction(myArg=1234)
 $anObject
 
 </BODY>
 </HTML>
 \end{verbatim}
-
-Note that you don't need to include () after \code{\$aFunction}.  Cheetah
-will recognize callable variables like functions and methods, call them and
-interpolate their return value in the filled template output.
-
-You cannot pass arguments to a function or method called this way.  (Actually,
-you can, but this feature may be removed soon, because it introduces too much
-complexity that is better done in Python outside the template.)  The function or
-method must either accept no arguments, or all its arguments must have default
-values.  Macro calls (see the Macros section) can accept arguments, but we
-aren't talking about macros here.
 
 Templates can be nested. It is valid to embed a placeholder name that maps to
 another \code{Template} object.  The filled output of the nested template will be
