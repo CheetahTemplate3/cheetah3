@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: _SkeletonPage.py,v 1.5 2001/12/31 19:23:01 tavis_rudd Exp $
+# $Id: _SkeletonPage.py,v 1.6 2002/02/26 02:19:16 tavis_rudd Exp $
 """A baseclass for the SkeletonPage template
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/12/31 19:23:01 $
+Last Revision Date: $Date: 2002/02/26 02:19:16 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -84,12 +84,12 @@ class _SkeletonPage(Template):
         
         stylesheetTagsTxt = ''
         for title, src in self.setting('stylesheetLibs').items():
-            stylesheetTagsTxt += '<LINK REL="stylesheet" TYPE="text/css" HREF="' + str(src) + '">\n'
+            stylesheetTagsTxt += '<link rel="stylesheet" type="text/css" href="' + str(src) + '"/>\n'
 
         if not self.setting('stylesheetsOrder'):
             return stylesheetTagsTxt
         
-        stylesheetTagsTxt += '<STYLE TYPE="text/css"><!--\n'
+        stylesheetTagsTxt += '<style type="text/css"><!--\n'
         for identifier in self.setting('stylesheetsOrder'):
             if not self.setting('stylesheets').has_key(identifier):
                 warning = '# the identifier ' + identifier + \
@@ -108,7 +108,7 @@ class _SkeletonPage(Template):
             cssCode = '\n' + identifier + ' {' +  attribCode + '}'
             stylesheetTagsTxt += cssCode
             
-        stylesheetTagsTxt += '\n//--></STYLE>\n'
+        stylesheetTagsTxt += '\n//--></style>\n'
 
         return stylesheetTagsTxt
 
@@ -125,21 +125,21 @@ class _SkeletonPage(Template):
             if type(details) not in (types.ListType, types.TupleType):
                 details = ['',details]
 
-            javascriptTagsTxt += ['<SCRIPT LANGUAGE="JavaScript', str(details[0]),
-                                      '" ><!--\n', str(details[0]), '\n//--></SCRIPT>\n']
+            javascriptTagsTxt += ['<script language="JavaScript', str(details[0]),
+                                      '" ><!--\n', str(details[0]), '\n//--></script>\n']
 
 
         for key, details in self.setting('javascriptLibs').items():
             if type(details) not in (types.ListType, types.TupleType):
                 details = ['',details]
 
-            javascriptTagsTxt += ['<SCRIPT LANGUAGE="JavaScript', str(details[0]),
-                                      '" SRC="', str(details[1]), '">\n']
+            javascriptTagsTxt += ['<script language="JavaScript', str(details[0]),
+                                      '" src="', str(details[1]), '"/>\n']
         return ''.join(javascriptTagsTxt)
     
     def bodyTag(self):
         """Create a body tag from the entries in the dict bodyTagAttribs."""
-        return self.formHTMLTag('BODY', self.setting('bodyTagAttribs'))
+        return self.formHTMLTag('body', self.setting('bodyTagAttribs'))
 
 
     def imgTag(self, src, alt='', width=None, height=None, border=0):
@@ -172,16 +172,16 @@ class _SkeletonPage(Template):
                     pass
                 
         if width and height:
-            return ''.join(['<IMG SRC="', src, '" WIDTH=', str(width), ' HEIGHT=', str(height),
-                           ' ALT="', alt, '" BORDER=', str(border), '>'])
+            return ''.join(['<img src="', src, '" width="', str(width), '" height="', str(height),
+                           '" alt="', alt, '" border="', str(border), '"/>'])
         elif width:
-            return ''.join(['<IMG SRC="', src, '" WIDTH=', str(width),
-                           ' ALT="', alt, '" BORDER=', str(border), '>'])
+            return ''.join(['<img src="', src, '" width="', str(width),
+                           '" alt="', alt, '" border="', str(border), '"/>'])
         elif height:
-            return ''.join(['<IMG SRC="', src, '" HEIGHT=', str(height),
-                           ' ALT="', alt, '" BORDER=', str(border), '>'])
+            return ''.join(['<img src="', src, '" height="', str(height),
+                           '" alt="', alt, '" border="', str(border), '"/>'])
         else:
-            return ''.join(['<IMG SRC="', src, '" ALT="', alt, '" BORDER=', str(border),'>'])
+            return ''.join(['<img src="', src, '" alt="', alt, '" border="', str(border),'"/>'])
 
 
     def currentYr(self):
@@ -193,15 +193,13 @@ class _SkeletonPage(Template):
         return time.strftime(formatString,time.localtime(time.time()))
     
     def spacer(self, width=1,height=1):
-        return '<IMG SRC="spacer.gif" WIDTH=%s HEIGHT=%s ALT="">'% (str(width), str(height))
+        return '<img src="spacer.gif" width="%s" height="%s" alt=""/>'% (str(width), str(height))
     
     def formHTMLTag(self, tagName, attributes={}):
         """returns a string containing an HTML <tag> """
-        tagTxt = ['<', tagName.upper()]
+        tagTxt = ['<', tagName.lower()]
         for name, val in attributes.items():
-            if type(val)==types.StringType:
-                val = '"' + val + '"'
-            tagTxt += [' ', name.upper(), '=', str(val)]
+            tagTxt += [' ', name.lower(), '="', str(val),'"']
         tagTxt.append('>')
         return ''.join(tagTxt)
     
@@ -210,12 +208,12 @@ class _SkeletonPage(Template):
         metaTagsTxt = []
         if metaTags.has_key('HTTP_EQUIV'):
             for http_equiv, contents in metaTags['HTTP_EQUIV'].items():
-                metaTagsTxt += ['<META HTTP_EQUIV="', str(http_equiv), '" CONTENTS="',
-                                str(contents), '">\n']
+                metaTagsTxt += ['<meta http_equiv="', str(http_equiv), '" contents="',
+                                str(contents), '"/>\n']
                 
         if metaTags.has_key('NAME'):
             for name, contents in metaTags['NAME'].items():
-                metaTagsTxt += ['<META NAME="', str(name), '" CONTENTS="', str(contents),
-                                '">\n']
+                metaTagsTxt += ['<meta name="', str(name), '" contents="', str(contents),
+                                '"/>\n']
         return ''.join(metaTagsTxt)
     
