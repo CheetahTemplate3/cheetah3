@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SetDirective.py,v 1.4 2001/09/17 22:52:15 tavis_rudd Exp $
+# $Id: SetDirective.py,v 1.5 2001/09/18 03:01:48 tavis_rudd Exp $
 """SetDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/09/17 22:52:15 $
+Last Revision Date: $Date: 2001/09/18 03:01:48 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -57,12 +57,7 @@ class SetDirective(TagProcessor.TagProcessor):
         valueString = valueString.replace('()()','()')
 
         state = self.state()
-                
         indent = self.setting('indentationStep')
-        if not state.has_key('indentLevel'):
-            state['indentLevel'] = \
-                        self.setting('initialIndentLevel')
-    
         return indent*(state['indentLevel']) + \
                'setVars["""' + varName + '"""]' +\
                "=" + valueString + "\n" + \
