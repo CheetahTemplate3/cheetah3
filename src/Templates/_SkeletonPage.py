@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: _SkeletonPage.py,v 1.6 2002/02/26 02:19:16 tavis_rudd Exp $
+# $Id: _SkeletonPage.py,v 1.7 2002/02/26 02:20:52 tavis_rudd Exp $
 """A baseclass for the SkeletonPage template
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2002/02/26 02:19:16 $
+Last Revision Date: $Date: 2002/02/26 02:20:52 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.6 $"[11:-2]
+__revision__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -84,7 +84,7 @@ class _SkeletonPage(Template):
         
         stylesheetTagsTxt = ''
         for title, src in self.setting('stylesheetLibs').items():
-            stylesheetTagsTxt += '<link rel="stylesheet" type="text/css" href="' + str(src) + '"/>\n'
+            stylesheetTagsTxt += '<link rel="stylesheet" type="text/css" href="' + str(src) + '" />\n'
 
         if not self.setting('stylesheetsOrder'):
             return stylesheetTagsTxt
@@ -134,7 +134,7 @@ class _SkeletonPage(Template):
                 details = ['',details]
 
             javascriptTagsTxt += ['<script language="JavaScript', str(details[0]),
-                                      '" src="', str(details[1]), '"/>\n']
+                                      '" src="', str(details[1]), '" />\n']
         return ''.join(javascriptTagsTxt)
     
     def bodyTag(self):
@@ -173,15 +173,15 @@ class _SkeletonPage(Template):
                 
         if width and height:
             return ''.join(['<img src="', src, '" width="', str(width), '" height="', str(height),
-                           '" alt="', alt, '" border="', str(border), '"/>'])
+                           '" alt="', alt, '" border="', str(border), '" />'])
         elif width:
             return ''.join(['<img src="', src, '" width="', str(width),
-                           '" alt="', alt, '" border="', str(border), '"/>'])
+                           '" alt="', alt, '" border="', str(border), '" />'])
         elif height:
             return ''.join(['<img src="', src, '" height="', str(height),
-                           '" alt="', alt, '" border="', str(border), '"/>'])
+                           '" alt="', alt, '" border="', str(border), '" />'])
         else:
-            return ''.join(['<img src="', src, '" alt="', alt, '" border="', str(border),'"/>'])
+            return ''.join(['<img src="', src, '" alt="', alt, '" border="', str(border),'" />'])
 
 
     def currentYr(self):
@@ -193,7 +193,7 @@ class _SkeletonPage(Template):
         return time.strftime(formatString,time.localtime(time.time()))
     
     def spacer(self, width=1,height=1):
-        return '<img src="spacer.gif" width="%s" height="%s" alt=""/>'% (str(width), str(height))
+        return '<img src="spacer.gif" width="%s" height="%s" alt="" />'% (str(width), str(height))
     
     def formHTMLTag(self, tagName, attributes={}):
         """returns a string containing an HTML <tag> """
@@ -209,11 +209,11 @@ class _SkeletonPage(Template):
         if metaTags.has_key('HTTP_EQUIV'):
             for http_equiv, contents in metaTags['HTTP_EQUIV'].items():
                 metaTagsTxt += ['<meta http_equiv="', str(http_equiv), '" contents="',
-                                str(contents), '"/>\n']
+                                str(contents), '" />\n']
                 
         if metaTags.has_key('NAME'):
             for name, contents in metaTags['NAME'].items():
                 metaTagsTxt += ['<meta name="', str(name), '" contents="', str(contents),
-                                '"/>\n']
+                                '" />\n']
         return ''.join(metaTagsTxt)
     
