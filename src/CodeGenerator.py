@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.22 2001/08/08 00:45:59 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.23 2001/08/08 02:35:31 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.22 $
+Version: $Revision: 1.23 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/08 00:45:59 $
+Last Revision Date: $Date: 2001/08/08 02:35:31 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.22 $"[11:-2]
+__version__ = "$Revision: 1.23 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -456,15 +456,15 @@ def preProcessIncludeDirectives(templateObj, templateDef):
     if not hasattr(templateObj, '_parsedIncludes'):
         templateObj._parsedIncludes = {}
 
-    RESTART = [False,]
-    def subber(match, templateObj=templateObj, RESTART=RESTART, Template=Template):
+    def subber(match, templateObj=templateObj, Template=Template):
         args = match.group(1).strip()
         # do a safety/security check on this tag
         validateIncludeDirective(templateObj, args)
         includeString = match.group(1).strip()        
         raw = False
-        autoUpdate = False #True
+
         #@@ autoUpdate behaviour needs to be implemented
+        #autoUpdate = True
         
         if args.split()[0] == 'raw':
             raw = True
@@ -485,7 +485,7 @@ def preProcessIncludeDirectives(templateObj, templateDef):
             templateObj._rawIncludes[includeID] = includeString
             return templateObj.setting('placeholderStartToken') + \
                    '{rawIncludes.' + includeID + '}'
-        elif autoUpdate:
+        else:
             includeID = '_' + str(id(includeString))
             nestedTemplate = Template.Template(
                 templateDef=includeString,
@@ -498,17 +498,11 @@ def preProcessIncludeDirectives(templateObj, templateDef):
                 nestedTemplate.compileTemplate()
             return templateObj.setting('placeholderStartToken') + \
                    '{parsedIncludes.' + includeID + '}'
-        else:
-            RESTART[0] = True
-            return includeString
 
     for RE in templateObj._settings['delimiters']['includeDirective']:
         templateDef = RE.sub(subber, templateDef)
         
-    if RESTART[0]:
-        return Template.RESTART(templateDef)
-    else:
-        return templateDef
+    return templateDef
 
 
 def preProcessBlockDirectives(templateObj, templateDef):
