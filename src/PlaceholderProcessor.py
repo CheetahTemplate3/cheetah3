@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.20 2001/08/10 18:46:22 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.21 2001/08/10 19:30:21 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.20 $
+Version: $Revision: 1.21 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/10 18:46:22 $
+Last Revision Date: $Date: 2001/08/10 19:30:21 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.20 $"[11:-2]
+__version__ = "$Revision: 1.21 $"[11:-2]
 
 
 ##################################################
@@ -25,7 +25,6 @@ from tokenize import tokenprog
 
 #intra-package dependencies ...
 from TagProcessor import TagProcessor
-from Components import Component
 import NameMapper
 from Utilities import lineNumFromPos
 #import Template                    # imported below to avoid circ. imports
