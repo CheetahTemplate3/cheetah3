@@ -23,6 +23,7 @@ Please initial your changes and a date for each release
     This is configurable by the Template setting 'placeholderStartToken' (TR)
   - fixed a small bug in PlaceholderProcessor.processTag() that prevented
     static caching (i.e. $*) of a value containing ''' style quotes
+  - added #break and #continue (TR)
 
 0.9.7 (July 13, 2001)
   - reimplemented the parsing of $placeholders using the Python tokenizer module (TR)
