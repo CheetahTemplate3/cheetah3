@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.64 2001/11/07 02:44:28 hierro Exp $
+# $Id: Template.py,v 1.65 2001/11/08 06:25:16 hierro Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.64 $
+Version: $Revision: 1.65 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/07 02:44:28 $
+Last Revision Date: $Date: 2001/11/08 06:25:16 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.64 $"[11:-2]
+__version__ = "$Revision: 1.65 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -23,6 +23,7 @@ import sys                        # used in the error handling code
 import re                         # used to define the internal delims regex
 import new                        # used to bind the compiled template code
 import types                      # used in the mergeNewTemplateData method
+                                  # and in Template.__init__()
 from types import StringType, ClassType
 import time                       # used in the cache refresh code
 from time import time as currentTime # used in the cache refresh code
@@ -43,6 +44,7 @@ import Filters                          # the output filters
 from DummyTransaction import DummyTransaction
 from NameMapper import NotFound, valueFromSearchList, valueForName # this is used in the generated code
 VFS = valueFromSearchList; VFN = valueForName
+from Utils import VerifyType      # Used in Template.__init__
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -80,6 +82,38 @@ class Template(SettingsManager, Servlet):
         
         """
         
+        ##################################################           
+        ## Verify argument types
+
+        S = types.StringType
+        L = types.ListType
+        T = types.TupleType
+        D = types.DictType
+        F = types.FileType
+        C = types.ClassType
+        M = types.ModuleType
+        N = types.NoneType
+        vt = VerifyType.VerifyType
+        vtc = VerifyType.VerifyTypeClass
+        vt(source, 'source', [N,S], 'string or None')
+        vt(searchList, 'searchList', [L,T], 'list or tuple')
+        vt(file, 'file', [N,S,F], 'string, file open for reading, or None')
+        vt(settings, 'settings', [D], 'dictionary')
+        vtc(filter, 'filter', [S,C], 'string or class', 
+            Filters.Filter,
+            '(if class, must be subclass of Cheetah.Filters.Filter)')
+        vt(filtersLib, 'filtersLib', [S,M], 'string or module',
+            '(if module, must contain subclasses of Cheetah.Filters.Filter)')
+        vtc(errorCatcher, 'errorCatcher', [N,S,C], 'string, class or None',
+           ErrorCatchers.ErrorCatcher,
+           '(if class, must be subclass of Cheetah.ErrorCatchers.ErrorCatcher)')
+        vt(compilerSettings, 'compilerSettings', [D], 'dictionary')
+
+
+        
+        ##################################################           
+        ## Do superclass initialization.
+
         SettingsManager.__init__(self)
         Servlet.__init__(self)
         self._compilerSettings = compilerSettings
@@ -399,3 +433,5 @@ class Template(SettingsManager, Servlet):
                 fp.close()
                 
         return module
+
+# vim: shiftwidth=4 tabstop=4 expandtab
