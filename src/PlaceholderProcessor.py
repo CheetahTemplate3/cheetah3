@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.29 2001/08/16 05:01:37 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.30 2001/08/16 22:15:18 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.29 $
+Version: $Revision: 1.30 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/16 05:01:37 $
+Last Revision Date: $Date: 2001/08/16 22:15:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.29 $"[11:-2]
+__version__ = "$Revision: 1.30 $"[11:-2]
 
 
 ##################################################
@@ -94,9 +94,14 @@ class PlaceholderProcessor(TagProcessor):
         ID = str(id(translatedTag)) + '_' + str(randrange(10000, 99999))
 
         ## setup the formatter
-        currFormatter = state['currFormatter']
-        formatterTag = 'theFormatters["' + currFormatter + '"](' \
-                        + translatedTag + ')'
+        currFormatterID = state['currFormatterID']
+        formatter = self._theFormatters[currFormatterID]
+        if state['interactiveFormatter']:
+            methodStr = '.format'
+            formatterAutoArgs = formatter.generateAutoArgs()
+        else:
+            methodStr = ''
+            formatterAutoArgs = ''
 
         ## use the errorChecker if enabled
         if self._errorChecker:
@@ -115,7 +120,10 @@ class PlaceholderProcessor(TagProcessor):
             translatedTag = 'errorChecker.get("' + ID + '", trans=trans,localsDict=locals())'
             
         
-        ## deal with caching 
+        ## deal with caching
+        formatterTag = 'theFormatters["' + currFormatterID + '"]' + methodStr + '(' \
+                        + translatedTag + formatterAutoArgs + ')'
+
         if cacheType == STATIC_CACHE:
             return self.evalPlaceholderString(formatterTag)
         elif cacheType == TIMED_REFRESH_CACHE:
@@ -123,7 +131,4 @@ class PlaceholderProcessor(TagProcessor):
             translatedTag = 'timedRefreshCache["' + ID + '"]'
 
         ## return the proper code to the code-generator
-        if state['interactiveFormatter']:
-            return self.wrapEvalTag("format(" + translatedTag + ", trans=trans)")
-        else:
-            return self.wrapEvalTag("format(" + translatedTag + ")")
+        return self.wrapEvalTag("format(" + translatedTag + formatterAutoArgs + ")")

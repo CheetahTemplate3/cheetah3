@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.21 2001/08/15 04:35:03 tavis_rudd Exp $
+# $Id: Test.py,v 1.22 2001/08/16 22:15:18 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.21 $
+Version: $Revision: 1.22 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/15 04:35:03 $
+Last Revision Date: $Date: 2001/08/16 22:15:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.21 $"[11:-2]
+__version__ = "$Revision: 1.22 $"[11:-2]
 
 
 ##################################################
@@ -76,8 +76,9 @@ class AbstractTestCase(unittest.TestCase):
 
 class VerifyTemplateOutput(AbstractTestCase):
     def runTest(self):
-        servlet = Template(self.template, self.nameSpace())
-        output = servlet.respond()
+        templateObj = Template(self.template, self.nameSpace())
+        output = templateObj.respond()
+        templateObj.shutdown()
 
         report = '''
 Template output mismatch
@@ -140,9 +141,7 @@ defaultTestNameSpace = {
     'includeFileName':'parseTest.txt',
     'nestedTDwithMacros':"""
 #macro test2(theTmpl)
- test2 called from $theTmpl
-#end macro
-
+ test2 called from $theTmpl#end macro
 This is the inner template
 #test2('inner')
 #test1('inner')
@@ -372,6 +371,17 @@ blockTests = [
      "  #block testBlock\nthis is a\ntest block\n#end block testBlock  \n",
      "this is a\ntest block\n",],
 
+    ['#block with nested block',
+     """#block testBlock
+this is a test block
+#block nestedB
+with a nested block
+#end block nestedB
+---
+#end block testBlock
+""",
+     "this is a test block\nwith a nested block\n---\n",],
+
     ['simple #block - with explicit closures',
      "#block testBlock/#this is a\ntest block#end block testBlock/#\n",
      "this is a\ntest block\n",],
@@ -392,34 +402,34 @@ posixCases += blockTests
 
 macroTests = [
     ['simple #macro - with no whitespace',
-     "#macro testMacro()\nthis is a\ntest block\n#end macro",
+     "#macro testMacro()\nthis is a\ntest block#end macro",
      "",],
     ['simple #macro + call - with no whitespace',
-     "#macro testMacro()\nthis is a\ntest block\n#end macro\n#testMacro()",
+     "#macro testMacro()\nthis is a\ntest block#end macro\n#testMacro()",
      "this is a\ntest block",],
 
     ['simple #macro - with whitespace - should gobble',
-     "  #macro testMacro()\nthis is a\ntest block\n#end macro  ",
+     "  #macro testMacro()\nthis is a\ntest block#end macro  ",
      "",],
 
     ['simple #macro + call - with whitespace - should gobble',
-     "  #macro testMacro()\nthis is a\ntest block\n#end macro  \n#testMacro()",
+     "  #macro testMacro()\nthis is a\ntest block#end macro  \n#testMacro()",
      "this is a\ntest block",],
 
     ['simple #macro + call - with an arg',
-     "#macro testMacro(a=1234)\nthis is a\ntest block $a\n#end macro\n#testMacro()",
+     "#macro testMacro(a=1234)\nthis is a\ntest block $a#end macro\n#testMacro()",
      "this is a\ntest block 1234",],
 
     ['simple #macro + call - with an arg, using arg in call',
-     "#macro testMacro(a=1234)\nthis is a\ntest block $a\n#end macro\n#testMacro(9876)",
+     "#macro testMacro(a=1234)\nthis is a\ntest block $a#end macro\n#testMacro(9876)",
      "this is a\ntest block 9876",],
 
     ['simple #macro + call - with two args, using one',
-     """#macro testMacro(a=1234, b='blarg')\nthis is a\ntest block $a $b\n#end macro\n#testMacro(9876)""",
+     """#macro testMacro(a=1234, b='blarg')\nthis is a\ntest block $a $b#end macro\n#testMacro(9876)""",
      "this is a\ntest block 9876 blarg",],
 
     ['simple #macro + call - with two args, using both',
-     """#macro testMacro(a=1234, b='blarg')\nthis is a\ntest block $a $b\n#end macro\n#testMacro(5,$numOne)""",
+     """#macro testMacro(a=1234, b='blarg')\nthis is a\ntest block $a $b#end macro\n#testMacro(5,$numOne)""",
      "this is a\ntest block 5 1",],
 
     ]
@@ -569,8 +579,7 @@ callMacroTests = [
     ['simple #macro + explicit #callMacro call',
      """#macro testMacro(a=1234, b='blarg',c='argC')
 this is a
-test block $a $b $c
-#end macro
+test block $a $b $c#end macro
 #callMacro testMacro(a=9876)
 #arg b
 joe
@@ -644,10 +653,14 @@ dataDirectiveTests = [
 testVar = 1234
 testVar2 = 'aoeu'
 #end data
+text between data directives
+#data
+aoeu = 'a second data directive'
+#end data
 $testVar
 $testVar2
 """,
-     "1234\naoeu\n",],
+     "text between data directives\n1234\naoeu\n",],
     ]
 posixCases += dataDirectiveTests
 
@@ -655,13 +668,11 @@ macroPlusIncludeTests = [
     ['#macro + #include test',
      """
 #macro test1(theTmpl)
- test1 called from $theTmpl
-#end macro
+ test1 called from $theTmpl#end macro
 
 This is the outer template
 #test2('outer')
 #test1('outer')
-
 #include $nestedTDwithMacros
 """,
      """
@@ -669,8 +680,6 @@ This is the outer template
 This is the outer template
  test2 called from outer
  test1 called from outer
-
-
 
 This is the inner template
  test2 called from inner

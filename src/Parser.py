@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.12 2001/08/16 05:01:37 tavis_rudd Exp $
+# $Id: Parser.py,v 1.13 2001/08/16 22:15:18 tavis_rudd Exp $
 """Parser base-class for Cheetah's TagProcessor class and for the Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/16 05:01:37 $
+Last Revision Date: $Date: 2001/08/16 22:15:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.12 $"[11:-2]
+__version__ = "$Revision: 1.13 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -313,7 +313,16 @@ class Parser:
         txt = REs['refreshTag'].sub(refreshSubber, txt)
         return txt
 
-
+    def unmarkPlaceholders(self, txt):
+        MARKER = self.setting('placeholderMarker')
+        token = self.setting('placeholderStartToken')
+        txt = re.sub(MARKER + 'CACHED\.' , token + '*', txt)
+        def refreshSubber(match, token=token):
+            return token + '*' + match.group(1).replace('_','.') + '*'
+        txt = re.sub(MARKER + r'REFRESH_(.*)\.', refreshSubber, txt)
+        txt = re.sub(MARKER, token, txt)
+        return txt
+        
     def translateRawPlaceholderString(self, txt, autoCall=True):
         """Translate raw $placeholders in a string directly into valid Python code.
 
@@ -402,11 +411,11 @@ class Parser:
         token = self.setting('placeholderStartToken')
         return theString.replace('\\' + token, token)
 
-    def evalPlaceholderString(self, txt, globalsDict={}, localsDict={}):
+    def evalPlaceholderString(self, txt, globalsDict={}, localsDict={'trans':None}):
+        #the trans in the localsDict is there for the formatters
         """Return the value of a placeholderstring. This doesn't work with localVars."""
-        theFormatters = self._theFormatters
-        searchList = self.searchList()
-        localsDict.update({'theFormatters':theFormatters,
+        
+        localsDict.update({'theFormatters':self._theFormatters,
                            'searchList':self.searchList(),
                            'valueFromSearchList':valueFromSearchList,
                            'valueForName':valueForName,
@@ -414,12 +423,11 @@ class Parser:
                            'False':0})
         return eval(txt, globalsDict, localsDict)
     
-    def execPlaceholderString(self, code, globalsDict={}, localsDict={}):
+    def execPlaceholderString(self, code, globalsDict={}, localsDict={'trans':None}):
         """Exec a placeholderString and return a tuple of the globalsDict, and
         the localsDict. This doesn't work with localVars."""
         
-        theFormatters = self._theFormatters
-        localsDict.update({'theFormatters':theFormatters,
+        localsDict.update({'theFormatters':self._theFormatters,
                            'searchList':self.searchList(),
                            'valueFromSearchList':valueFromSearchList,
                            'valueForName':valueForName,

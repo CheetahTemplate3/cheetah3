@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: TagProcessor.py,v 1.12 2001/08/16 05:01:37 tavis_rudd Exp $
+# $Id: TagProcessor.py,v 1.13 2001/08/16 22:15:18 tavis_rudd Exp $
 """Tag Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/16 05:01:37 $
+Last Revision Date: $Date: 2001/08/16 22:15:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.12 $"[11:-2]
+__version__ = "$Revision: 1.13 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -46,7 +46,7 @@ class TagProcessor(Parser):
         self._templateObj = templateObj
         
         ## setup some method mappings
-        self.state = templateObj.state
+        self.state = templateObj._state
         self.mergeNewTemplateData = templateObj.mergeNewTemplateData
         self._setTimedRefresh = templateObj._setTimedRefresh
         self.normalizePath = templateObj.normalizePath

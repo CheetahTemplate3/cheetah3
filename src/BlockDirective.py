@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: BlockDirective.py,v 1.4 2001/08/16 05:01:37 tavis_rudd Exp $
+# $Id: BlockDirective.py,v 1.5 2001/08/16 22:15:17 tavis_rudd Exp $
 """BlockDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/16 05:01:37 $
+Last Revision Date: $Date: 2001/08/16 22:15:17 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -38,55 +38,57 @@ class BlockDirective(TagProcessor.TagProcessor):
 
     def __init__(self, templateObj):
         TagProcessor.TagProcessor.__init__(self,templateObj)
-        reChunk = 'block[\t ]+(?P<blockName>[A-Za-z_][A-Za-z_0-9]*?)[\f\t ]*'
-        self._delimRegexs = self.simpleDirectiveReList(reChunk)
+        reChunk = 'block[\f\t ]+(?P<blockName>[A-Za-z_][A-Za-z_0-9]*?)[\f\t ]*'
+        self._startTagRegexs = self.simpleDirectiveReList(reChunk)
         
-    def preProcess(self, templateDef):
+        bits = self._directiveREbits
+        self._endTagTemplate = bits['start_gobbleWS'] + r'end[\f\t ]+block[\f\t ]+' + \
+                               '%(blockName)s' + \
+                               r'[\f\t ]*' + bits['lazyEndGrp'] + '|'+ \
+                               bits['start'] + r'end[\f\t ]+block[\f\t ]+' + \
+                               '%(blockName)s' + \
+                               r'[\f\t ]*' + bits['endGrp']
         
+
+    def handleBlock(self, blockName, startTagMatch, endTagRE, templateDef):
+        
+        endTagMatch = endTagRE.search(templateDef)
+        if not endTagMatch:
+            raise Error("Cheetah couldn't find the end tag for the #block titled '" +
+                        blockName + "'.")
+        
+        blockContents = templateDef[startTagMatch.end() : endTagMatch.start()]
+
+        if not self._cheetahBlocks.has_key(blockName):
+            self._cheetahBlocks[blockName] = blockContents
+
         startToken = self.setting('directiveStartToken')
         endToken = self.setting('directiveEndToken')
 
-        def handleBlock(blockName, startTagMatch, endTagRE,
-                        templateDef=templateDef, self=self,
-                        startToken=startToken, endToken=endToken):
-    
-            endTagMatch = endTagRE.search(templateDef)
-            blockContents = templateDef[startTagMatch.end() : endTagMatch.start()]
-    
-            if not self._cheetahBlocks.has_key(blockName):
-                self._cheetahBlocks[blockName] = blockContents
-    
-            if self.setting('includeBlockMarkers'):
-                markerStart = self.setting('blockMarkerStart')
-                markerEnd = self.setting('blockMarkerEnd')
-            
-                replaceString = markerStart[0] + blockName + markerStart[1] + \
-                       startToken + 'include direct ' + self.setting('placeholderStartToken') + \
-                       'cheetahBlocks.' + blockName + endToken + \
-                       markerEnd[0] + blockName + markerEnd[1]
-            else:
-                replaceString = startToken + 'include direct ' + \
-                                self.setting('placeholderStartToken') + \
-                                'cheetahBlocks.' + blockName + endToken
-    
-            return templateDef[0:startTagMatch.start()] + replaceString + \
-                       templateDef[endTagMatch.end():]
-
-   
-        ## 
-        bits = self._directiveREbits
+        if self.setting('includeBlockMarkers'):
+            markerStart = self.setting('blockMarkerStart')
+            markerEnd = self.setting('blockMarkerEnd')
         
-        for startTagRE in self._delimRegexs:
+            replaceString = markerStart[0] + blockName + markerStart[1] + \
+                   startToken + 'include direct ' + self.setting('placeholderStartToken') + \
+                   'cheetahBlocks.' + blockName + endToken + \
+                   markerEnd[0] + blockName + markerEnd[1]
+        else:
+            replaceString = startToken + 'include direct ' + \
+                            self.setting('placeholderStartToken') + \
+                            'cheetahBlocks.' + blockName + endToken
+
+        return templateDef[0:startTagMatch.start()] + replaceString + \
+                   templateDef[endTagMatch.end():]
+
+    def preProcess(self, templateDef):
+        for startTagRE in self._startTagRegexs:
             while startTagRE.search(templateDef):
                 startTagMatch = startTagRE.search(templateDef)
                 blockName = startTagMatch.group('blockName')
-                endTagRE = re.compile(bits['start_gobbleWS'] + r'end block[\t ]+' + \
-                                      blockName +
-                                      r'[\t ]*' + bits['lazyEndGrp'] + '|'+
-                                      startToken + r'end block[\t ]+' + blockName +
-                                      r'[\t ]*' + bits['endGrp'],
+                endTagRE = re.compile((self._endTagTemplate % {'blockName':blockName}),
                                       re.DOTALL | re.MULTILINE)
-                templateDef = handleBlock(blockName, startTagMatch, endTagRE,
-                                       templateDef=templateDef)
+                templateDef = self.handleBlock(blockName, startTagMatch, endTagRE,
+                                               templateDef=templateDef)
         
         return templateDef

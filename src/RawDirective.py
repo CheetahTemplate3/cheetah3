@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: RawDirective.py,v 1.3 2001/08/15 17:49:51 tavis_rudd Exp $
+# $Id: RawDirective.py,v 1.4 2001/08/16 22:15:18 tavis_rudd Exp $
 """RawDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/15 17:49:51 $
+Last Revision Date: $Date: 2001/08/16 22:15:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -41,26 +41,35 @@ class RawDirective(TagProcessor.TagProcessor):
     def __init__(self, templateObj):
         TagProcessor.TagProcessor.__init__(self,templateObj)
         
-        RE = re.compile(r'#raw[\t ]*(?:/#|\r\n|\n|\r|\Z)(.*?)' +
-                   r'(?:(?:#end raw[\t ]*(?:/#|\r\n|\n|\r))|\Z)',
-                   re.DOTALL)
-        self._delimRegexs = [RE,] #self.simpleDirectiveReList(r'slurp[\f\t ]*')
-        
-    def preProcess(self, templateDef):
+        bits = self._directiveREbits        
+        reChunk = 'raw[\f\t ]*'
+        self._startTagRegexs = self.simpleDirectiveReList(reChunk)
+        self._endTagRE = re.compile(bits['start_gobbleWS'] + r'end[\f\t ]+raw[\f\t ]*' + 
+                                    bits['lazyEndGrp'] + '|'+
+                                    bits['start'] + r'end[\f\t ]+raw[\f\t ]*' +
+                                    bits['endGrp'] + '|\Z',
+                                    re.DOTALL | re.MULTILINE)
+    def handleRawDirective(self, startTagMatch, templateDef):
         startToken = self.setting('directiveStartToken')
         endToken = self.setting('directiveEndToken')
         
-        def subber(match, self=self, startToken=startToken,
-                   endToken=endToken):
-            unparsedBlock = match.group(1)
-            blockID = '_' + str(id(unparsedBlock))
-            self._rawTextBlocks[blockID] = unparsedBlock
-            
-            return startToken + 'include raw ' + \
-                   self.setting('placeholderStartToken') \
-                   + 'rawTextBlocks.' + blockID + endToken
-                    
-        for regex in self._delimRegexs:
-            templateDef = regex.sub(subber, templateDef)
-        return templateDef
+        endTagMatch = self._endTagRE.search(templateDef)           
+        unparsedBlock = templateDef[startTagMatch.end() : endTagMatch.start()]
+
+        blockID = '_' + str(id(unparsedBlock))
+        self._rawTextBlocks[blockID] = unparsedBlock
         
+        replacementStr =  startToken + 'include raw ' + \
+                         self.setting('placeholderStartToken') \
+                         + 'rawTextBlocks.' + blockID + endToken
+        
+        return templateDef[0:startTagMatch.start()] + replacementStr + \
+               templateDef[endTagMatch.end():]
+        
+    def preProcess(self, templateDef):
+        for startTagRE in self._startTagRegexs:
+            while startTagRE.search(templateDef):
+                startTagMatch = startTagRE.search(templateDef)
+                templateDef = self.handleRawDirective(startTagMatch=startTagMatch,
+                                                  templateDef=templateDef)
+        return templateDef

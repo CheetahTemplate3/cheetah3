@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.42 2001/08/16 05:01:37 tavis_rudd Exp $
+# $Id: Template.py,v 1.43 2001/08/16 22:15:18 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.42 $
+Version: $Revision: 1.43 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/16 05:01:37 $
+Last Revision Date: $Date: 2001/08/16 22:15:18 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.42 $"[11:-2]
+__version__ = "$Revision: 1.43 $"[11:-2]
 
 
 ##################################################
@@ -30,16 +30,15 @@ import types                      # used in the constructor
 import os.path                    # used in Template.normalizePath()
 
 # intra-package imports ...
-from SettingsManager import SettingsManager
-from Parser import Parser, processTextVsTagsList
-from NameMapper import valueFromSearchList, valueForName # this is used in the generated code
-from TagProcessor import TagProcessor
-import ErrorHandlers                    # for the code-generator
+from SettingsManager import SettingsManager # baseclass for Template
+from Parser import Parser, processTextVsTagsList # baseclass for Template + util func
 from Utilities import mergeNestedDictionaries 
-
-import ErrorCheckers                    # for placeholder tags
+from NameMapper import valueFromSearchList, valueForName # this is used in the generated code
+import ErrorHandlers              # for the code-generator
+import ErrorCheckers              # for placeholder tags
 import Formatters
 
+#coreTagProcessors
 from PlaceholderProcessor import PlaceholderProcessor
 from DisplayLogic import DisplayLogic
 from SetDirective import SetDirective
@@ -47,6 +46,7 @@ from CacheDirective import CacheDirective, EndCacheDirective
 from StopDirective import StopDirective
 from FormatterDirective import FormatterDirective
 
+#preProcessing only TagProcessors
 from CommentDirective import CommentDirective
 from SlurpDirective import SlurpDirective
 from RawDirective import RawDirective
@@ -92,10 +92,9 @@ class Template(SettingsManager, Parser):
         'delayedCompile': False,  # if True, then __init__ won't compile auto-Template
         'plugins':[],
         'useAutocalling': True,
-        'debug': False,                 # doesn't affect much at this time
-        'keepCodeGeneratorResults': False,        
+        'debug': False,          
 
-        'includeBlockMarkers': False,   # should #block's be wrapped in a comment
+        'includeBlockMarkers': False,   # should output from #block's be wrapped in a comment
         'blockMarkerStart':('<!-- START BLOCK: ',' -->'),
         'blockMarkerEnd':('<!-- END BLOCK: ',' -->'),
         
@@ -179,8 +178,9 @@ class Template(SettingsManager, Parser):
         else:
             raise TypeError("'file' argument must be a filename or file-like object")
 
+
         self._templateDef = str( templateDef )
-        # by converting to string here we allow other objects such as other Templates
+        # by converting to string here we allow objects such as other Templates
         # to be passed in
 
         ## process the settings
@@ -189,6 +189,9 @@ class Template(SettingsManager, Parser):
             self._settings = kw['overwriteSettings']
         elif kw.has_key('settings'):
             self.updateSettings(kw['settings'])
+           
+        if os.environ.get('CHEETAH_DEBUG'):
+            self._settings['debug'] = True
        
         ## Setup the searchList of namespaces in which to search for $placeholders
         # + setup a dict of #set directive vars - include it in the searchList
@@ -205,7 +208,7 @@ class Template(SettingsManager, Parser):
             # create our own searchList
             self._searchList = list(searchList)
             self._searchList.insert(0, self._setVars)
-            self._searchList.append(self)
+            self._searchList.append( self )
             if kw.has_key('searchList'):
                 tup = tuple(kw['searchList'])
                 self._searchList.extend(tup) # .extend requires a tuple.
@@ -232,15 +235,12 @@ class Template(SettingsManager, Parser):
             self._cheetahBlocks = kw['cheetahBlocks']
         else:
             self._cheetahBlocks = {}
-            
-        if os.environ.get('CHEETAH_DEBUG'):
-            self._settings['debug'] = True
 
         ## hook for calculated settings before the tagProcessors have been setup 
-        self.initializeSettings()
+        self._initializeSettings()
 
         ## Setup the Parser base-class
-        Parser.__init__(self) # do this before calling self.setupTagProcessors()
+        Parser.__init__(self) # do this before calling self._setupTagProcessors()
 
         ## create theFormatters dict now for storing refs to the formatter functions
         if self.setting('formatter') and not self.setting('formatterClass'):
@@ -253,7 +253,7 @@ class Template(SettingsManager, Parser):
 
         self._theFormatters = {}
         if self.setting('formatterClass'):
-            self._initialFormatter = self.setting('formatterClass')(self).format
+            self._initialFormatter = self.setting('formatterClass')(self)
         else:
             self._initialFormatter = str
             
@@ -281,19 +281,14 @@ class Template(SettingsManager, Parser):
             self._registerCheetahPlugin(plugin)
 
         ## Setup the various TagProcessors
-        self.setupTagProcessors()
+        self._setupTagProcessors()
 
         ## hook for calculated settings after the tagProcessors have been setup 
-        self.finalizeSettings()       
+        self._finalizeSettings()       
 
         ## Now, start compile if we're meant to
         if not self.setting('delayedCompile'):
             self.compileTemplate()
-
-    #def __del__(self): #don't implement this yet!!!
-    #    del self.respond
-    #    del self.__str__
-    #    del self.__dict__
         
     def compileTemplate(self):
         """Process and parse the template, then compile it into a function definition
@@ -302,21 +297,30 @@ class Template(SettingsManager, Parser):
         generatedFunction = self._codeGenerator( self._templateDef )
         self.__str__ = self._bindFunctionAsMethod( generatedFunction )
         self.respond = self._bindFunctionAsMethod( generatedFunction )
-        
-        if not self._settings['keepCodeGeneratorResults']:
-            self._codeGeneratorResults = {}       
-        
-    def finalizeSettings(self):
+        self._cleanupProcessors()
+            
+        if not self._settings['debug']:
+            del self._codeGeneratorResults
+            del self._templateDef
+            del self._cheetahBlocks
+            del self._perResponseSetupCodeChunks
+            del self._localVarsList
+            # but don't delete self._generatedCode!
+
+    ##################################################
+    ## internal methods -- not to be called by end-users
+            
+    def _finalizeSettings(self):
         """A hook for calculated settings. This method is called by
-        self.compileTemplate() after it calls self.setupTagProcessors().
+        self.compileTemplate() after it calls self._setupTagProcessors().
         It should always be called by subclasses.
 
-        If you want to do calculated settings before self.setupTagProcessors()
-        use self.initializeSettings()."""
+        If you want to do calculated settings before self._setupTagProcessors()
+        use self._initializeSettings()."""
         
         pass
 
-    def setupTagProcessors(self):
+    def _setupTagProcessors(self):
         """Setup the tag processors."""
         
         commentDirective = CommentDirective(self)
@@ -337,11 +341,10 @@ class Template(SettingsManager, Parser):
         endCacheDirective = EndCacheDirective(self)
         formatterDirective = FormatterDirective(self)
         
-        ##store references to them as self.[fill_in_the_blank]
+        ##store references to them in a dict
         self._processors = {}
         self._processors.update(locals())
         del self._processors['self']
-        
                
         self._codeGenSettings = {
             'preProcessors': [('rawDirective',
@@ -363,11 +366,11 @@ class Template(SettingsManager, Parser):
 
                               ('macroCall',
                                lazyMacroCall),
-                              ('macroCall', # get rid of this dbl-call
-                               lazyMacroCall),
                               ('CallMacro',
                                callMacroDirective),
-                              
+                              ('macroCall', # get rid of this dbl-call
+                               lazyMacroCall),
+                             
                               ('rawDirective',
                                rawDirective),
                               ('comments',
@@ -406,7 +409,14 @@ class Template(SettingsManager, Parser):
             'generatedCodeFilters':[],
             }
         
-        #end of self.setupTagProcessors()
+        #end of self._setupTagProcessors()
+
+    def _cleanupProcessors(self):
+        """Cleanup after compiling."""
+        for key, processor in self._processors.items():
+            processor.shutdown()
+        self._processors.clear()
+
     
     def _codeGenerator(self, templateDef):
         
@@ -440,7 +450,7 @@ class Template(SettingsManager, Parser):
         state = self._codeGeneratorState = {}
         codeGenSettings = self._codeGenSettings
         
-        state['currFormatter'] = 'initial'
+        state['currFormatterID'] = 'initial'
         if not self._theFormatters['initial'] == str:
             state['interactiveFormatter'] = True
         else:
@@ -456,7 +466,7 @@ class Template(SettingsManager, Parser):
                 templateDef = preProcessor.preProcess(templateDef)
                     
                 if isinstance(templateDef, RESTART):
-                    # a parser restart might have been requested for #include's 
+                    # a parser restart might have been requested for direct #include's 
                     return self._codeGenerator(templateDef.data)
                 if debug: results['stage1'].append((name, templateDef))
 
@@ -561,77 +571,23 @@ class Template(SettingsManager, Parser):
             exec generatedCode
             if debug:
                 results['stage5'].append(('generatedFunction', generatedFunction))
-            
+
+
             ##
             self._generatedCode = generatedCode
+                
             return generatedFunction
                 
         except:
             ## call codeGenErrorHandler, which in turn calls the ErrorHandler ##
             # for the stage in which the error occurred
             print settings['codeGenErrorHandler'](self)
-            self.cleanup()
+            
+            self._cleanupProcessors()  
+            #self.shutdown() #@@ should we cleanup after an exception?
+            
             raise          
 
-
-    def shutdown(self):
-        """Cleanup after compiling."""
-        for key, processor in self._processors.items():
-            processor.shutdown()
-        self._processors.clear()
-        for key in dir(self):
-            setattr(self, key, None)
-            delattr(self, key)
-
-
-
-    def searchList(self):
-        """Return a reference to the searchlist"""
-        return self._searchList
-    
-    def addToSearchList(self, object, restart=False):
-        """Append an object to the end of the searchlist.""" 
-        self._searchList.append(object)
-        
-        if restart:
-            ## @@ change the restart default to False once we implement run-time
-            # $placeholder translation.
-            self.compileTemplate()
-
-    def state(self):
-        """Return a reference to self._codeGeneratorState. This is used by the
-        tag processors."""
-        return self._codeGeneratorState
-
-    def errorChecker(self):
-        """Return a reference to the errorChecker"""
-        return self._errorChecker
-
-    def mergeNewTemplateData(self, newDataDict):
-        """Merge the newDataDict into self.__dict__. This is a recursive merge
-        that handles nested dictionaries in the same way as
-        Template.updateServerSettings()"""
-        
-        for key, val in newDataDict.items():
-            if type(val) == types.DictType and hasattr(self,key) \
-               and type(getattr(self,key)) == types.DictType:
-                
-                setattr(self,key, mergeNestedDictionaries(getattr(self,key), val))
-            else:
-                setattr(self,key,val)
-   
-    def _registerCheetahPlugin(self, plugin):
-        
-        """Register a plugin that extends the functionality of the Template.
-        This method is called automatically by __init__() method and should not
-        be called by end-users."""
-        
-        plugin(self)
-        
-    def _bindFunctionAsMethod(self, function):
-        """Used to dynamically bind a plain function as a method of the
-        Template instance"""
-        return new.instancemethod(function, self, self.__class__)
 
     def _coreTagProcessor(self, tag):
         """An abstract tag processor that will identify the tag type from its
@@ -642,6 +598,25 @@ class Template(SettingsManager, Parser):
         tagToken, tag = tag.split(self.setting('tagTokenSeparator'))
         processedTag = self._codeGenSettings['coreTagProcessors'][tagToken].processTag(tag)
         return processedTag
+
+    def _state(self):
+        """Return a reference to self._codeGeneratorState. This is for internal
+        use by the tag processors only."""
+        
+        return self._codeGeneratorState
+   
+    def _registerCheetahPlugin(self, plugin):
+        
+        """Register a plugin that extends the functionality of the Template.
+        This method is called automatically by them __init__() method and should
+        not be called by end-users."""
+        
+        plugin(self)
+        
+    def _bindFunctionAsMethod(self, function):
+        """Used to dynamically bind a plain function as a method of the
+        Template instance"""
+        return new.instancemethod(function, self, self.__class__)
         
     def _setTimedRefresh(self, ID, translatedTag, interval):
         """Setup a cache refresh for a $*[time]*placeholder."""
@@ -669,31 +644,46 @@ class Template(SettingsManager, Parser):
                 self._setTimedRefresh(ID, translatedTag, interval)
                 del refreshList[i]
                 refreshList.sort()
-       
+
+
+    ##################################################
+    ## methods that can only be used before a template has been compiled
+                
     def defineTemplateBlock(self, blockName, blockContents):
-        """Define a block.  See the user's guide for info on blocks."""            
+        """Define a block.  See the user's guide for info on blocks.  Only call
+        this method before the template has been Compiled."""
+        
         self._cheetahBlocks[blockName]= blockContents
 
-    ## make an alias
+    # make an alias
     redefineTemplateBlock = defineTemplateBlock
     
     def killTemplateBlock(self, *blockNames):
+        
         """Fill a block with an empty string so it won't appear in the filled
-        template output."""
+        template output. Only call this method before the template has been
+        compiled."""
         
         for blockName in blockNames:
             self._cheetahBlocks[blockName]= ''
 
     def loadMacro(self, macroName, macro):
-        """Load a macro into the macros dictionary, using the specified macroName"""
+        
+        """Load a macro into the macros dictionary, using the specified
+        macroName.  Only call this method before the template has been
+        compiled."""
+        
         if not hasattr(self, '_macros'):
             self._macros = {}
 
         self._macros[macroName] = macro
 
     def loadMacros(self, *macros):
+        
         """Create macros from any number of functions and/or bound methods.  For
-        each macro, the function/method name is used as the macro name.  """
+        each macro, the function/method name is used as the macro name. Only
+        call this method before the template has been compiled."""
+        
         if not hasattr(self, '_macros'):
             self._macros = {}
 
@@ -701,7 +691,10 @@ class Template(SettingsManager, Parser):
             self.loadMacro(macro.__name__, macro)
         
     def loadMacrosFromModule(self, module):
-        """Load all the macros from a module into the macros dictionary"""          
+        
+        """Load all the macros from a module into the macros dictionary. Only
+        call this method before the template has been compiled."""
+        
         if not hasattr(self, '_macros'):
             self._macros = {}
 
@@ -732,8 +725,8 @@ class Template(SettingsManager, Parser):
 
         #redefine and #data directives MUST NOT be nested!!
 
-        This method can only be used before the templateObj has been compiled.
-        """
+        Only call this method before the template has been Compiled."""
+        
         bits = self._directiveREbits
 
         redefineDirectiveRE = re.compile(
@@ -759,6 +752,44 @@ class Template(SettingsManager, Parser):
         extensionStr = self._processors['commentDirective'].preProcess(extensionStr)
         self._processors['dataDirective'].preProcess(extensionStr)
         self._processors['macroDirective'].preProcess(extensionStr) 
+
+
+    ##################################################
+    ## methods that can be called at any time
+        
+    def searchList(self):
+        """Return a reference to the searchlist"""
+        return self._searchList
+    
+    def addToSearchList(self, object):
+        """Append an object to the end of the searchlist.""" 
+        self._searchList.append(object)
+
+    def errorChecker(self):
+        """Return a reference to the errorChecker"""
+        return self._errorChecker
+
+    def mergeNewTemplateData(self, newDataDict):
+        """Merge the newDataDict into self.__dict__. This is a recursive merge
+        that handles nested dictionaries in the same way as
+        Template.updateServerSettings()"""
+        
+        for key, val in newDataDict.items():
+            if type(val) == types.DictType and hasattr(self,key) \
+               and type(getattr(self,key)) == types.DictType:
+                
+                setattr(self,key, mergeNestedDictionaries(getattr(self,key), val))
+            else:
+                setattr(self,key,val)
+
+
+    def shutdown(self):
+        """Make sure all reference cycles have been broken this object is
+        deleted. """
+        
+        for key in dir(self):
+            setattr(self, key, None)
+            delattr(self, key)
 
 
     ## utility functions ##   

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: DataDirective.py,v 1.3 2001/08/16 05:01:37 tavis_rudd Exp $
+# $Id: DataDirective.py,v 1.4 2001/08/16 22:15:17 tavis_rudd Exp $
 """DataDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/16 05:01:37 $
+Last Revision Date: $Date: 2001/08/16 22:15:17 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -40,45 +40,48 @@ class DataDirective(TagProcessor.TagProcessor):
         TagProcessor.TagProcessor.__init__(self,templateObj)
 
         bits = self._directiveREbits
-        gobbleWS = re.compile(bits['start_gobbleWS'] + r'data[\t ]*(?P<args>.*?)' +
-                              bits['endGrp'] +
-                              r'(?P<contents>.*?)' +
-                              bits['startTokenEsc'] + r'end data[\t ]*' +
+        reChunk = 'data[\f\t ]*(?P<args>.*?)'
+        self._startTagRegexs = self.simpleDirectiveReList(reChunk)
+        self._endTagRE = re.compile(bits['start_gobbleWS'] + r'end[\f\t ]+data[\f\t ]*' + 
+                              bits['lazyEndGrp'] + '|'+
+                              bits['start'] + r'end[\f\t ]+data[\f\t ]*' +
                               bits['endGrp'],
                               re.DOTALL | re.MULTILINE)
 
-        plain = re.compile(bits['start'] + r'data[\t ]*(?P<args>.*?)' +
-                           bits['endGrp'] +
-                           r'(?P<contents>.*?)' +
-                           bits['startTokenEsc'] + r'end data[\t ]*' +
-                           bits['endGrp'],
-                           re.DOTALL | re.MULTILINE)
 
+    def handleDataDirective(self, startTagMatch, templateDef):
+        """process any #data directives that are found in the template
+        extension"""
 
-        self._delimRegexs = [gobbleWS, plain]
-            
-    def preProcess(self, templateDef):
+        endTagMatch = self._endTagRE.search(templateDef)
+        if not endTagMatch:
+            raise Error("Cheetah couldn't find an end tag for the #data directive at\n" +
+                        "position " + str(startTagMatch.start()) +
+                        " in the template definition.")
+
+        args = startTagMatch.group('args')
+        args = args.split(',')
+        contents = templateDef[startTagMatch.end() : endTagMatch.start()]
+
         templateObj = self.templateObj()
         
-        def dataDirectiveProcessor(match, self=self, templateObj=templateObj):
-            """process any #data directives that are found in the template
-            extension"""
-            
-            args = match.group('args').split(',')
-            contents = match.group('contents')
-            
-            newDataDict = {'self':templateObj} 
-            exec contents in {}, newDataDict
-            del newDataDict['self']
-            
-            if not 'nomerge' in args:
-                templateObj.mergeNewTemplateData(newDataDict)
-            else:
-                for key, val in newDataDict.items():
-                    setattr(templateObj,key,val)
-                
-            return '' # strip the directive from the extension
-    
-        for RE in self._delimRegexs:
-            templateDef = RE.sub(dataDirectiveProcessor, templateDef)
+        newDataDict = {'self':templateObj} 
+        exec contents in {}, newDataDict
+        del newDataDict['self']
+        
+        if not 'nomerge' in args:
+            templateObj.mergeNewTemplateData(newDataDict)
+        else:
+            for key, val in newDataDict.items():
+                setattr(templateObj,key,val)
+
+        return templateDef[0:startTagMatch.start()] + templateDef[endTagMatch.end():]
+        
+    def preProcess(self, templateDef):
+        for startTagRE in self._startTagRegexs:
+            while startTagRE.search(templateDef):
+                startTagMatch = startTagRE.search(templateDef)
+                templateDef = self.handleDataDirective(startTagMatch=startTagMatch,
+                                                       templateDef=templateDef)
+        
         return templateDef

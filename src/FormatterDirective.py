@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: FormatterDirective.py,v 1.3 2001/08/14 19:29:50 tavis_rudd Exp $
+# $Id: FormatterDirective.py,v 1.4 2001/08/16 22:15:17 tavis_rudd Exp $
 """FormatterDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/14 19:29:50 $
+Last Revision Date: $Date: 2001/08/16 22:15:17 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.3 $"[11:-2]
+__version__ = "$Revision: 1.4 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -61,24 +61,29 @@ class FormatterDirective(TagProcessor.TagProcessor):
 
         if not val:
             formatter = str
-            state['currFormatter'] = currFormatter = 'None'
+            state['currFormatterID'] = currFormatterID = 'None'
             state['interactiveFormatter'] = False
         elif type(val) == StringType:
             if not theFormatters.has_key(val):
                 klass = getattr(Formatters, val)
-                formatter = klass( self.templateObj() ).format
+                formatter = klass( self.templateObj() )
             else:
                 formatter = theFormatters[val]
-            state['currFormatter'] = currFormatter = val
+            state['currFormatterID'] = currFormatterID = val
             state['interactiveFormatter'] = True
         else:
-            formatter = val.format
-            state['currFormatter'] = currFormatter = str(id(formatter))
+            formatter = val
+            state['currFormatterID'] = currFormatterID = str(id(formatter))
             state['interactiveFormatter'] = True
 
-        theFormatters[currFormatter] = formatter
-        
-        return indent*(state['indentLevel']) + \
-               'format = self._theFormatters["' + currFormatter + '"]' + "\n" + \
+        theFormatters[currFormatterID] = formatter
+
+        if state['interactiveFormatter']:
+            methodStr = '.format'
+        else:
+            methodStr = ''
+            
+        return indent * state['indentLevel'] + \
+               'format = self._theFormatters["' + currFormatterID + '"]' + methodStr + "\n" + \
                indent * state['indentLevel']
         

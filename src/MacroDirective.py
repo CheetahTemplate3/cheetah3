@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: MacroDirective.py,v 1.7 2001/08/15 17:49:51 tavis_rudd Exp $
+# $Id: MacroDirective.py,v 1.8 2001/08/16 22:15:18 tavis_rudd Exp $
 """MacroDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/15 17:49:51 $
+Last Revision Date: $Date: 2001/08/16 22:15:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -41,110 +41,111 @@ class MacroDirective(TagProcessor.TagProcessor):
     def __init__(self, templateObj):
         TagProcessor.TagProcessor.__init__(self,templateObj)
 
-
         bits = self._directiveREbits
+        reChunk = 'macro[\f\t ]+(?P<macroSignature>.+?)'
+        self._startTagRegexs = self.simpleDirectiveReList(reChunk)
+        self._endTagRE = re.compile(bits['start_gobbleWS'] + r'end[\f\t ]+macro[\f\t ]*' + 
+                                    bits['lazyEndGrp'] + '|'+
+                                    bits['start'] + r'end[\f\t ]+macro[\f\t ]*' +
+                                    bits['endGrp'],
+                                    re.DOTALL | re.MULTILINE)
 
-        gobbleWS = re.compile(bits['start_gobbleWS'] + r'macro[\t ]+' +
-                              r'(.+?)' + bits['lazyEndGrp'] + '(.*?)' +
-                              bits['lazyEndGrp'] + r'[\f\t ]*' +
-                              bits['startTokenEsc'] + 'end macro[f\t ]*' +
-                              bits['lazyEndGrp'],
-                              re.DOTALL | re.MULTILINE)
+
+    def handleMacroDefs(self, startTagMatch, templateDef):
+        """process each match of the macro definition regex"""
+                                                      
+        endTagMatch = self._endTagRE.search(templateDef)
+        if not endTagMatch:
+            raise Error("Cheetah couldn't find an end tag for the #macro directive at\n" +
+                        "position " + str(startTagMatch.start()) + " in the template definition.")
         
-        plain = re.compile(bits['start'] + r'macro[\t ]+' +
-                           r'(.+?)' + bits['endGrp'] + '(.*?)' +
-                           bits['lazyEndGrp'] + r'[\f\t ]*' +
-                           bits['startTokenEsc'] + 'end macro[\t ]*' +
-                           bits['endGrp'],
-                           re.DOTALL | re.MULTILINE)
+        macroSignature = startTagMatch.group('macroSignature')            
+        macroBody = templateDef[startTagMatch.end() : endTagMatch.start()]
+        macroBody = macroBody.replace("'''","\'\'\'")
+        macroBody = macroBody.replace("'''","\'\'\'")
+        self.validateTag(macroSignature)
+        
+        firstParenthesis = macroSignature.find('(')
+        macroName = macroSignature[0:firstParenthesis]
+        macroArgstring = macroSignature[firstParenthesis:]
 
-        self._delimRegexs = [gobbleWS, plain]
+        dummyCode = 'def dummy' + macroArgstring + ': pass'
+        globalsDict, localsDict = self.execPlaceholderString(dummyCode)
+        argNamesList = localsDict['dummy'].func_code.co_varnames
+
+        macroBody = self.wrapExressionsInStr(self.markPlaceholders(macroBody),
+                                             marker=self.setting('placeholderMarker'),
+                                             before='<argInBody>',
+                                             after='</argInBody>')        
+        
+        regex = re.compile(r'<argInBody>(.*?)</argInBody>')
+        self._argNamesList = argNamesList
+        macroBody = regex.sub(self.handleArgsUsedInBody, macroBody)
+        del self._argNamesList
+        
+        if macroName not in vars().keys():
+            macroFuncName =  macroName
+        else:
+            macroFuncName =  'macroFunction'
+            
+        macroCode = "def " + macroFuncName + macroArgstring + ":\n" + \
+                    "    return '''" + macroBody + "'''\n"
+
+        exec macroCode in None, None
+        exec "self._macros[macroName] = " + macroFuncName in vars()
+
+
+        return templateDef[0:startTagMatch.start()] + templateDef[endTagMatch.end():]
+        #end handleMacroDef()
+        
+
+    def handleArgsUsedInBody(self, match):
+        """check each $var in the macroBody to see if it is in this macro's
+        argNamesList and needs substituting"""
+
+        argNamesList = self._argNamesList
+        argName = match.group(1).replace('placeholderTag.','')
+        if argName in argNamesList:
+            return "''' + str(" + argName + ") + '''"
+
+        ## it's a composite $placeholder so we have to deal with
+        # Unified Dotted Notation and autocalling:
+        
+        firstSpecialChar = re.search(r'\(|\[', argName)
+        if firstSpecialChar:         # NameMapper can't handle [] or ()
+            firstSpecialChar = firstSpecialChar.start()
+            nameMapperPartOfName, remainderOfName = \
+                                  argName[0:firstSpecialChar], argName[firstSpecialChar:]
+            remainderOfName = remainderOfName
+        else:
+            nameMapperPartOfName = argName
+            remainderOfName = ''
+
+        ## only do autocalling on names that have no () in them
+        if argName.find('(') == -1 and self.setting('useAutocalling'):
+            safeToAutoCall = True
+        else:
+            safeToAutoCall = False
+
+        nameMapperChunks = nameMapperPartOfName.split('.')
+        if nameMapperChunks[0] in argNamesList:
+            return "''' + str(NameMapper.valueForName(" + nameMapperChunks[0] + ", '" +\
+                   '.'.join(nameMapperChunks[1:]) + "', executeCallables=" + \
+                   str(safeToAutoCall) + ")" + remainderOfName + ") + '''"
+        else:
+            return self.setting('placeholderStartToken') + \
+                   '{' + match.group(1) + '}'
+        
+        #end handleArgsUsedInBody()
 
         
     def preProcess(self, templateDef):
-    
-        def handleMacroDefs(match, self=self):
-            """process each match of the macro definition regex"""
-            macroSignature = match.group(1)
-
-            self.validateTag(macroSignature)
-            
-            firstParenthesis = macroSignature.find('(')
-            macroName = macroSignature[0:firstParenthesis]
-            macroArgstring = macroSignature[firstParenthesis:]
-
-            dummyCode = 'def dummy' + macroArgstring + ': pass'
-            globalsDict, localsDict = self.execPlaceholderString(dummyCode)
-            argNamesList = localsDict['dummy'].func_code.co_varnames
-
-            macroBody = match.group(2).replace("'''","\'\'\'")
-    
-            def handleArgsUsedInBody(match, argNamesList=argNamesList,
-                                     self=self):
-                """check each $var in the macroBody to see if it is in this macro's
-                argNamesList and needs substituting"""
-
-                from NameMapper import valueFromSearchList, valueForName
-                
-                argName = match.group(1).replace('placeholderTag.','')
-                if argName in argNamesList:
-                    return "''' + str(" + argName + ") + '''"
-    
-                ## it's a composite $placeholder so we have to deal with
-                # Unified Dotted Notation and autocalling:
-                
-                firstSpecialChar = re.search(r'\(|\[', argName)
-                if firstSpecialChar:         # NameMapper can't handle [] or ()
-                    firstSpecialChar = firstSpecialChar.start()
-                    nameMapperPartOfName, remainderOfName = \
-                                          argName[0:firstSpecialChar], argName[firstSpecialChar:]
-                    remainderOfName = remainderOfName
-                else:
-                    nameMapperPartOfName = argName
-                    remainderOfName = ''
-    
-                ## only do autocalling on names that have no () in them
-                if argName.find('(') == -1 and self.setting('useAutocalling'):
-                    safeToAutoCall = True
-                else:
-                    safeToAutoCall = False
-    
-                nameMapperChunks = nameMapperPartOfName.split('.')
-                if nameMapperChunks[0] in argNamesList:
-                    return "''' + str(NameMapper.valueForName(" + nameMapperChunks[0] + ", '" +\
-                           '.'.join(nameMapperChunks[1:]) + "', executeCallables=" + \
-                           str(safeToAutoCall) + ")" + remainderOfName + ") + '''"
-                else:
-                    return self.setting('placeholderStartToken') + \
-                           '{' + match.group(1) + '}'
-
-    
-            macroBody = self.wrapExressionsInStr(self.markPlaceholders(macroBody),
-                                                 marker=self.setting('placeholderMarker'),
-                                                 before='<argInBody>',
-                                                 after='</argInBody>')
-    
-            regex = re.compile(r'<argInBody>(.*?)</argInBody>')
-            macroBody = regex.sub(handleArgsUsedInBody,macroBody )
-    
-            if macroName not in vars().keys():
-                macroFuncName =  macroName
-            else:
-                macroFuncName =  'macroFunction'
-                
-            macroCode = "def " + macroFuncName + macroArgstring + ":\n" + \
-                        "    return '''" + macroBody + "'''\n"
-    
-            exec macroCode in None, None
-            exec "self._macros[macroName] = " + macroFuncName in vars()
-            
-            return ''
-
-
+        for startTagRE in self._startTagRegexs:
+            while startTagRE.search(templateDef):
+                startTagMatch = startTagRE.search(templateDef)
+                templateDef = self.handleMacroDefs(startTagMatch=startTagMatch,
+                                                   templateDef=templateDef)
         
-        ##
-        for RE in self._delimRegexs:
-            templateDef = RE.sub(handleMacroDefs, templateDef)
         return templateDef
 
 
@@ -156,13 +157,20 @@ class CallMacroDirective(TagProcessor.TagProcessor):
     def __init__(self, templateObj):
         TagProcessor.TagProcessor.__init__(self,templateObj)
 
+
+
         bits = self._directiveREbits
-        plain =  re.compile(bits['start'] + r'callMacro[\t ]+' +
-                            r'(?P<macroName>[A-Za-z_][A-Za-z_0-9]*?)' +
-                            r'\((?P<argString>.*?)\)[\t ]*' + bits['endGrp'] +
-                            r'(?P<extendedArgString>.*?)' +
-                            bits['startTokenEsc'] + r'end callMacro[\t ]*' + bits['endGrp'],
-                            re.DOTALL | re.MULTILINE)
+        reChunk = r'callMacro[\f\t ]+' + \
+                  r'(?P<macroName>[A-Za-z_][A-Za-z_0-9]*?)' + \
+                  r'\((?P<argString>.*?)\)[\f\t ]*'
+        
+        self._startTagRegexs = self.simpleDirectiveReList(reChunk)
+        
+        self._endTagRE = re.compile(bits['start_gobbleWS'] + r'end[\f\t ]+callMacro[\f\t ]*' + 
+                                    bits['lazyEndGrp'] + '|'+
+                                    bits['start'] + r'end[\f\t ]+callMacro[\f\t ]*' +
+                                    bits['endGrp'],
+                                    re.DOTALL | re.MULTILINE)
 
         self._argsRE = re.compile(bits['start'] + r'arg[\t ]+' +
                                   r'(?P<argName>[A-Za-z_][A-Za-z_0-9]*?)' +
@@ -173,103 +181,129 @@ class CallMacroDirective(TagProcessor.TagProcessor):
                                   + bits['endGrp'],
                             re.DOTALL | re.MULTILINE)
 
-        self._delimRegexs = [plain, ]
+
+    def handleCallMacroDirective(self, startTagMatch, templateDef):
+
+        endTagMatch = self._endTagRE.search(templateDef)
+        if not endTagMatch:
+            raise Error(
+                "Cheetah couldn't find an end tag for the #callMacro directive at\n" +
+                "position " + str(startTagMatch.start()) +
+                " in the template definition.")
+
+        macroName = startTagMatch.group('macroName')
+        argString = startTagMatch.group('argString')            
+        extendedArgString = templateDef[startTagMatch.end() : endTagMatch.start()]
+
+
+        try:
+            searchList = self.searchList()
+            argString = self.translateRawPlaceholderString(argString)
+            
+        except NameMapper.NotFound, name:
+            line = lineNumFromPos(match.string, match.start())
+            raise Error('Undeclared variable ' + str(name) + 
+                        ' used in macro call #'+ macroSignature + 
+                        ' on line ' + str(line))
+
+        extendedArgsDict = {}
+        
+        def processExtendedArgs(match, extendedArgsDict=extendedArgsDict):
+            """check each $var in the macroBody to see if it is in this macro's
+            argNamesList and needs substituting"""
+            extendedArgsDict[ match.group('argName') ] = match.group('argValue')
+            return ''
+
+
+        self._argsRE.sub(processExtendedArgs, extendedArgString)
+
+        
+        fullArgString = argString
+        if fullArgString:
+            fullArgString += ', '
+        for argName in extendedArgsDict.keys():
+            fullArgString += argName + '=extendedArgsDict["' + argName + \
+                             '"]' + ', '
+        
+        self.validateTag(fullArgString)
+            
+        if macroName in self._macros.keys():
+            replacementStr = self.evalPlaceholderString(
+                'macros["' + macroName + '"](' + fullArgString + ')',
+                localsDict={'macros':self._macros,
+                            'extendedArgsDict':extendedArgsDict})
+            return templateDef[0:startTagMatch.start()] + replacementStr + \
+                   templateDef[endTagMatch.end():]
+        else:
+            raise Error('The macro ' + macroName + \
+                        ' was called, but it does not exist')
+        
+        # end handleCallMacroDirective()
         
     def preProcess(self, templateDef):
-
-        def subber(match, self=self, argsRE=self._argsRE):
-            
-            macroName = match.group('macroName').strip()
-            argString = match.group('argString')
-            extendedArgString = match.group('extendedArgString')
-    
-            try:
-                searchList = self.searchList()
-                argString = self.translateRawPlaceholderString(argString)
-                
-            except NameMapper.NotFound, name:
-                line = lineNumFromPos(match.string, match.start())
-                raise Error('Undeclared variable ' + str(name) + 
-                            ' used in macro call #'+ macroSignature + 
-                            ' on line ' + str(line))
-    
-            extendedArgsDict = {}
-            
-            def processExtendedArgs(match, extendedArgsDict=extendedArgsDict):
-                """check each $var in the macroBody to see if it is in this macro's
-                argNamesList and needs substituting"""
-                extendedArgsDict[ match.group('argName') ] = match.group('argValue')
-                return ''
-    
-
-            argsRE.sub(processExtendedArgs, extendedArgString)
-    
-            
-            fullArgString = argString
-            if fullArgString:
-                fullArgString += ', '
-            for argName in extendedArgsDict.keys():
-                fullArgString += argName + '=extendedArgsDict["' + argName + \
-                                 '"]' + ', '
-            
-            self.validateTag(fullArgString)
-                
-            if macroName in self._macros.keys():
-                return eval('self._macros[macroName](' + fullArgString + ')', vars())
-            else:
-                raise Error('The macro ' + macroName + \
-                            ' was called, but it does not exist')
-            
-        for RE in self._delimRegexs:
-            templateDef = RE.sub(subber, templateDef)
-    
+        for startTagRE in self._startTagRegexs:
+            while startTagRE.search(templateDef):
+                startTagMatch = startTagRE.search(templateDef)
+                templateDef = self.handleCallMacroDirective(startTagMatch=startTagMatch,
+                                                            templateDef=templateDef)
         return templateDef
-
-
 
 class LazyMacroCall(TagProcessor.TagProcessor):
     """Handle any calls to macros that are already defined."""
     
     def __init__(self, templateObj):
         TagProcessor.TagProcessor.__init__(self,templateObj)
-        from Parser import escCharLookBehind
-        bits = self._directiveREbits
-        plain = re.compile(escCharLookBehind + r'(#[a-zA-Z_][a-zA-Z_0-9\.]*\(.*?\))')
-        self._delimRegexs = [plain]
         
+        from Parser import escCharLookBehind
+        startToken = self.setting('directiveStartToken')
+        self._macroRE = re.compile(escCharLookBehind + startToken +
+                                   r'([a-zA-Z_][a-zA-Z_0-9\.]*)\(')
+
+
+    def handleMacroCall(self, macroCall):
+        """for each macro call that is found in the template, substitute it with
+        the macro's output"""
+
+        from NameMapper import valueFromSearchList, valueForName
+        
+        firstParenthesis = macroCall.find('(')
+        macroArgstring = macroCall[firstParenthesis+1:-1]
+        macroName = macroCall[0:firstParenthesis]
+
+        if not macroName in self._macros.keys():
+            return self.setting('directiveStartToken') + macroCall
+
+        self.validateTag(macroArgstring)
+        
+        try:
+            macroArgstring = self.translateRawPlaceholderString(macroArgstring)
+        except NameMapper.NotFound, name:
+            raise Error('Undeclared variable ' + str(name) + \
+                        ' used in macro call #'+ macroCall)
+
+
+        return self.evalPlaceholderString(
+            'macros["' + macroName + '"](' + macroArgstring + ')',
+            localsDict={'macros':self._macros})
+    
+        # end handleMacroCall()
+    
     def preProcess(self, templateDef):
+        MARKER = ' macroCall.'
+        macroRE = self._macroRE
+        while macroRE.search(templateDef):
+            tempTD = macroRE.sub(MARKER + r'\1(', templateDef)
+            tempTD = self.markPlaceholders(tempTD)
+            result = []
+            resAppend = result.append
+            for live, chunk in self.splitExprFromTxt(tempTD, MARKER):
+                if live:
+                    resAppend( self.handleMacroCall(chunk) )
+                else:
+                    resAppend(chunk)
+                    
+            templateDef = ''.join(result)
+           
+        return self.unmarkPlaceholders(templateDef)
 
-        def handleMacroCalls(match, self=self):
-            """for each macro call that is found in the template, substitute it with
-            the macro's output"""
 
-            from NameMapper import valueFromSearchList, valueForName
-            
-            macroSignature = match.group(1)[1:]
-            firstParenthesis = macroSignature.find('(')
-            macroArgstring = macroSignature[firstParenthesis+1:-1]
-            macroName = macroSignature[0:firstParenthesis]
-    
-            searchList = self.searchList()
-            
-            try:
-                macroArgstring = self.translateRawPlaceholderString(macroArgstring)
-            except NameMapper.NotFound, name:
-                line = lineNumFromPos(match.string, match.start())
-                raise Error('Undeclared variable ' + str(name) + \
-                            ' used in macro call #'+ macroSignature + ' on line ' +
-                            str(line))       
-                
-            ## validateMacroDirective(templateObj, macroArgstring)
-            
-            if macroName in self._macros.keys():
-    
-                return eval('self._macros[macroName](' + macroArgstring + ')',
-                            vars())
-            else:
-                raise Error('The macro ' + macroName + \
-                            ' was called, but it does not exist')
-    
-        for RE in self._delimRegexs:
-            templateDef = RE.sub(handleMacroCalls, templateDef)
-        return templateDef

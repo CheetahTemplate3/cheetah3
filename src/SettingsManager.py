@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: SettingsManager.py,v 1.7 2001/08/16 05:01:37 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.8 2001/08/16 22:15:18 tavis_rudd Exp $
 """Provides a mixin class for managing application settings 
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.7 $
+Version: $Revision: 1.8 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2001/08/16 05:01:37 $
+Last Revision Date: $Date: 2001/08/16 22:15:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 
 ##################################################
@@ -119,7 +119,7 @@ class SettingsManager:
     def __init__(self):
         pass
         
-    def initializeSettings(self):
+    def _initializeSettings(self):
         """A hook that allows for complex setting initialization sequences that
         involve references to 'self' or other settings.  For example:
               self._settings['myCalcVal'] = self._settings['someVal'] * 15        

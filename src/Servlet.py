@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.6 2001/08/15 02:14:25 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.7 2001/08/16 22:15:18 tavis_rudd Exp $
 """An abstract base class for Cheetah Servlets that can be used with Webware
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/08/15 02:14:25 $
+Last Revision Date: $Date: 2001/08/16 22:15:18 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -72,7 +72,7 @@ class TemplateServlet(Template, HTTPServlet):
 
     def initializeTemplate(self):
         """a hook that can be used by subclasses to do things after the
-        Template has been initialized, but before it has been started
+        Template has been initialized, but before it has been compiled
         (i.e. before the codeGeneration process starts) """
         pass
 
