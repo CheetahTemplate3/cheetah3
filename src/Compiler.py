@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.49 2002/10/28 02:47:54 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.50 2002/11/28 18:51:49 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.49 $
+Version: $Revision: 1.50 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/10/28 02:47:54 $
+Last Revision Date: $Date: 2002/11/28 18:51:49 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.49 $"[11:-2]
+__revision__ = "$Revision: 1.50 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -29,6 +29,10 @@ import os.path
 from os.path import getmtime, exists
 import re
 import types
+try:
+    _StringTypes = types.StringTypes
+except AttributeError:
+    _StringTypes = [types.StringType, types.UnicodeType]
 import time
 import random
 
@@ -945,7 +949,7 @@ class ModuleCompiler(Parser, GenUtils):
         
         if source and file:
             raise TypeError("Cannot compile from a source string AND file.")
-        elif type(file) == types.StringType: # it's a filename.
+        elif isinstance(file, _StringTypes): # it's a filename.
             f = open(file) # Raises IOError.
             source = f.read()
             f.close()

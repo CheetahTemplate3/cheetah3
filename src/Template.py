@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.107 2002/11/10 20:44:10 hierro Exp $
+# $Id: Template.py,v 1.108 2002/11/28 18:51:27 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.107 $
+Version: $Revision: 1.108 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/11/10 20:44:10 $
+Last Revision Date: $Date: 2002/11/28 18:51:27 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.107 $"[11:-2]
+__revision__ = "$Revision: 1.108 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -105,6 +105,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         checkKeywords(KWs, self._legalKWs, 'Template constructor argument')
 
         S = types.StringType
+        U = types.UnicodeType
         L = types.ListType
         T = types.TupleType
         D = types.DictType
@@ -115,9 +116,9 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         vt = VerifyType.VerifyType
         vtc = VerifyType.VerifyTypeClass
         try:
-            vt(source, 'source', [N,S], 'string or None')
+            vt(source, 'source', [N,S,U], 'string or None')
             vt(searchList, 'searchList', [L,T], 'list or tuple')
-            vt(file, 'file', [N,S,F], 'string, file open for reading, or None')
+            vt(file, 'file', [N,S,U,F], 'string, file open for reading, or None')
             vt(settings, 'settings', [D], 'dictionary')
             vtc(filter, 'filter', [S,C], 'string or class', 
                 Filters.Filter,
