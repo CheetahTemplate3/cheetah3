@@ -1,0 +1,45 @@
+\section{Language Comparisons}
+\label{comparisons}
+
+This appendix compares Cheetah with various other template languages and
+emdedded scripting frameworks.  As Cheetah is similar to Velocity at a
+superficial level you may also wish to read 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cheetah vs. Velocity}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cheetah vs. WebMacro}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cheetah vs. Zope's DTML}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cheetah vs. Zope Page Templates}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cheetah vs. PSP, PHP, ASP, JSP, etc.}
+
+\begin{verbatim}
+----------------------------------------------
+<TABLE>
+#for $client in $service.clients
+<TR>
+<TD>$client.surname, $client.firstname</TD>
+<TD><A HREF="mailto:$client.email" >$client.email</A></TD>
+</TR>
+#end for
+</TABLE>
+----------------------------------------------
+##compare this with PSP
+<TABLE>
+<% for client in service.clients(): %>
+<TR>
+<TD><%=client.surname()%>, <%=client.firstname()%></TD>
+<TD><A HREF="mailto:<%=client.email()%>"><%=client.email()%></A></TD>
+</TR>
+<%end%>
+</TABLE>
+----------------------------------------------
+\end{verbatim}
