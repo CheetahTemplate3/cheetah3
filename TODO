@@ -53,10 +53,10 @@ Implementation
   > "30m' id'cache1" .
 
 
-- Delete whitespace before comments.  If the rest of the line consists
-  of only non-outputting directives and whitespace, delete the line from the
-  output.  The only outputting directives I see are #echo, #block and
-  #include. -- MO
+- Delete whitespace before a comment on the same line.  The methods are
+  Parser.eatComment() and Parser.eatMultiLineComment().  It's already
+  working if the line contains 'STUFF#slurp   ## comment'.  Need to make
+  it work for 'STUFF    ## comment' (but retain the EOL newline).  
 
 - 'python setup.py uninstall'.  This may require hacking an uninstall feature
   into distutils.
