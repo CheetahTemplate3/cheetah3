@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.5 2002/07/30 07:10:18 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.6 2002/07/30 16:59:59 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/07/30 07:10:18 $
+Last Revision Date: $Date: 2002/07/30 16:59:59 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -25,17 +25,11 @@ import types
 import __builtin__
 import new
 import imp
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 # intra-package imports ...
 import ImportManager
 from ImportManager import DirOwner
 from Compiler import Compiler
-
-
 
 ##################################################
 ## CONSTANTS & GLOBALS
@@ -71,14 +65,6 @@ class CheetahDirOwner(DirOwner):
             mod.__file__ = co.co_filename
             mod.__co__ = co
             return mod
-                        
-            #mod = new.module(name)
-            #mod.__file__ = tmplPath
-            #mod.__name__ = name
-            #sys.modules[name] = mod
-            #exec code in mod.__dict__
-            ###print name, tmplPath, new_mod
-            #return mod
 
 ##################################################
 ## FUNCTIONS
