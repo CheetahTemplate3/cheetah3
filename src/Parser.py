@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.37 2002/01/07 04:02:50 tavis_rudd Exp $
+# $Id: Parser.py,v 1.38 2002/01/07 04:18:57 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.37 $
+Version: $Revision: 1.38 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/01/07 04:02:50 $
+Last Revision Date: $Date: 2002/01/07 04:18:57 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.37 $"[11:-2]
+__revision__ = "$Revision: 1.38 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1282,12 +1282,20 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             self.getCheetahVarStartToken()
         methodName = self.getIdentifier()
         self.getWhiteSpace()
+        if self.peek() == '(':
+            argsList = self.getDefArgList()
+            self.advance()              # past the closing ')'
+            if argsList and argsList[0][0] == 'self':
+                del argsList[0]
+        else:
+            argsList=[]
+        
         if self.peek() == ':':
             self.getc()
-            self.startSingleLineDef(methodName, startPos, endOfFirstLinePos)
+            self.startSingleLineDef(methodName, argsList, startPos, endOfFirstLinePos)
             self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
         else:
-            self.startMultiLineDef(methodName, startPos, lineClearToStartToken)
+            self.startMultiLineDef(methodName, argsList, startPos, lineClearToStartToken)
         
     def eatBlock(self):
         lineClearToStartToken = self.lineClearToStartToken()
@@ -1300,15 +1308,22 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             self.getCheetahVarStartToken()
         methodName = self.getIdentifier()
         self.getWhiteSpace()
+        if self.peek() == '(':
+            argsList = self.getDefArgList()
+            self.advance()              # past the closing ')'
+            if argsList and argsList[0][0] == 'self':
+                del argsList[0]
+        else:
+            argsList=[]
 
         singleLiner = False
         if self.peek() == ':':
             singleLiner = True
             self.getc()
-            rawDef = self.startSingleLineDef(methodName, startPos, endOfFirstLinePos)
+            rawDef = self.startSingleLineDef(methodName, argsList, startPos, endOfFirstLinePos)
             self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
         else:
-            rawDef = self.startMultiLineDef(methodName, startPos, lineClearToStartToken)
+            rawDef = self.startMultiLineDef(methodName, argsList, startPos, lineClearToStartToken)
             
         self._blockMetaData[methodName] = {'raw':rawDef,
                                            'lineCol':self.getRowCol(startPos),
@@ -1322,7 +1337,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             self.closeBlock(methodName)
             
             
-    def startSingleLineDef(self, methodName, startPos, endPos):
+    def startSingleLineDef(self, methodName, argsList, startPos, endPos):
         methodSrc = self[self.pos():endPos].strip()
         signature = self[startPos:endPos]
 
@@ -1339,6 +1354,10 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
                                         ' at line, col ' +
                                         str(self.getRowCol(startPos)) +
                                             '.')
+        ## deal with the method's argstring
+        for argName, defVal in argsList:
+            methodCompiler.addMethArg(argName, defVal)
+        
         self.parse()
         self.commitStrConst()
         methCompiler = self.getActiveMethodCompiler()
@@ -1350,15 +1369,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         return signature
 
         
-    def startMultiLineDef(self, methodName, startPos, lineClearToStartToken=False):
-        self.getWhiteSpace()
-        if self.peek() == '(':
-            argsList = self.getDefArgList()
-            self.advance()              # past the closing ')'
-            if argsList and argsList[0][0] == 'self':
-                del argsList[0]
-        else:
-            argsList=[]
+    def startMultiLineDef(self, methodName, argsList, startPos, lineClearToStartToken=False):
 
         rawDef = self[startPos:self.pos()]
         self.getExpression()            # slurp up any garbage left at the end
