@@ -9,6 +9,10 @@ release
   - made 'self' visible in '#settings python' directives (TR)
   - fixed meta tag http_equiv to be http-equiv in SkeletonPage (TR)
   - $webInput (Utils.WebInputMixin) 'source' arg can be either case. (MO)
+  - fixed code-gen bug in MethodCompiler.commitStrConst that was leading to
+    triple single quotes followed immediately by another single quote if the
+    template def contained a '$placeholder' surrounded in single quotes and
+    multiple \n newlines ... plus added new test case.(TR)
 
 0.9.14 (July 14, 2002)
   - Precompiled template Templates/SkeletonPage.py added to CVS.  This file is
