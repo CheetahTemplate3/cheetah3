@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.38 2002/05/13 20:18:41 tavis_rudd Exp $
+# $Id: Test.py,v 1.39 2002/09/12 06:48:54 hierro Exp $
 """Core module of Cheetah's Unit-testing framework
 
 TODO
@@ -14,12 +14,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.38 $
+Version: $Revision: 1.39 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/05/13 20:18:41 $
+Last Revision Date: $Date: 2002/09/12 06:48:54 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.38 $"[11:-2]
+__revision__ = "$Revision: 1.39 $"[11:-2]
 
 
 ##################################################
@@ -42,13 +42,11 @@ except NameError:
 import SyntaxAndOutput
 import NameMapper
 import Template
-import CheetahCompile
 import FileRefresh
 
 testSuite = unittest.findTestCases(SyntaxAndOutput)
 testSuite.addTest( unittest.findTestCases(NameMapper) )
 testSuite.addTest( unittest.findTestCases(Template) )
-testSuite.addTest( unittest.findTestCases(CheetahCompile) )
 testSuite.addTest( unittest.findTestCases(FileRefresh) )
 
 ##################################################
