@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: _SkeletonPage.py,v 1.4 2001/12/19 02:10:25 tavis_rudd Exp $
+# $Id: _SkeletonPage.py,v 1.5 2001/12/31 19:23:01 tavis_rudd Exp $
 """A baseclass for the SkeletonPage template
 
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/04/05
-Last Revision Date: $Date: 2001/12/19 02:10:25 $
+Last Revision Date: $Date: 2001/12/31 19:23:01 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.4 $"[11:-2]
+__revision__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -42,6 +42,9 @@ class _SkeletonPage(Template):
         ## Default values for the names embedded in the template ##
         docType = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" ' + \
                   '"http://www.w3.org/TR/html4/loose.dtd">'
+
+        #docType = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' + \
+        #'"http://www.w3.org/TR/xhtml1l/DTD/transitional.dtd">'
         
         title = ''
         siteDomainName = 'www.example.com'
