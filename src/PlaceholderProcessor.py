@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: PlaceholderProcessor.py,v 1.18 2001/08/07 05:34:00 tavis_rudd Exp $
+# $Id: PlaceholderProcessor.py,v 1.19 2001/08/08 23:38:41 tavis_rudd Exp $
 """Provides utilities for processing $placeholders in Cheetah templates
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.18 $
+Version: $Revision: 1.19 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/07 05:34:00 $
+Last Revision Date: $Date: 2001/08/08 23:38:41 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.18 $"[11:-2]
+__version__ = "$Revision: 1.19 $"[11:-2]
 
 
 ##################################################
@@ -267,13 +267,11 @@ class PlaceholderProcessor(TagProcessor):
         return self.wrapPlaceholders(self.mark(templateDef))
 
 
-    def translatePlaceholderString(self, txt, searchList, templateObj,
-                                   prefix='searchList', executeCallables=True):
+    def translatePlaceholderString(self, txt, templateObj):
         """Translate a marked placeholder string into valid Python code."""
-        
-        def translateName(name, prefix=prefix, searchList=searchList,
-                            templateObj=templateObj,
-                            executeCallables=executeCallables):
+
+        searchList = templateObj.searchList()
+        def translateName(name, searchList=searchList, templateObj=templateObj):
             
             import Template                         # import it here to avoid circ. imports
 
@@ -312,37 +310,10 @@ class PlaceholderProcessor(TagProcessor):
                            str(safeToAutoCall) + ')' + remainderOfName
                 return translatedName
 
-
             ## Translate the NameMapper part of the Name
-            try:
-                translatedName = prefix + searchList.translateName(
-                    nameMapperPartOfName, executeCallables=safeToAutoCall) + \
-                    remainderOfName
-            except NameMapper.NotFound:
-                if nameMapperPartOfName in templateObj._localVarsList:
-                    return name
-                elif templateObj and nameChunks[0] in templateObj._localVarsList:
-                    name = 'valueForName(' + nameChunks[0] + ',"""' + \
-                       '.'.join(nameChunks[1:]) + '""", executeCallables=' + \
-                       str(safeToAutoCall) + ')'
-                    return name
-                else:
-                    raise NameMapper.NotFound, name
-
-
-            ## Deal with Cheetah 'Template' and 'Component' objects
-            # but only if the tag has no ()'s in it 
-            if safeToAutoCall:
-                value = eval(translatedName)
-                if isinstance(value, Component):
-                    templateObj._componentsDict[name] = value
-                    return 'components["""' + \
-                           name + '"""](trans, templateObj=self)'
-                elif isinstance(value, Template.Template):
-                    templateObj._nestedTemplatesCache[name] = value.respond
-                    return 'nestedTemplates["""' + \
-                           name + '"""](trans, iAmNested=True)'
-
+            translatedName = 'searchList.get("' + \
+                           nameMapperPartOfName + '", executeCallables=' + \
+                           str(safeToAutoCall) + ')' + remainderOfName
             return translatedName
 
 
@@ -351,8 +322,7 @@ class PlaceholderProcessor(TagProcessor):
         for live, chunk in self.splitTxt(txt):
             if live:
                 if self._nameRE.search(chunk):
-                    chunk = self.translatePlaceholderString(chunk,
-                                                            searchList, templateObj)
+                    chunk = self.translatePlaceholderString(chunk, templateObj)
                 resultList.append( translateName(chunk) ) # using the function from above
             else:
                 resultList.append(chunk)
@@ -361,26 +331,14 @@ class PlaceholderProcessor(TagProcessor):
     
 
     def translateRawPlaceholderString(self, txt, searchList, templateObj=None,
-                                      prefix='searchList', executeCallables=True):
+                                      prefix='searchList'):
         """Translate raw $placeholders in a string directly into valid Python code.
 
         This method is used for handling $placeholders in #directives
         """
-        
-        return self.translatePlaceholderString(
-            self.mark(txt), searchList, prefix=prefix, templateObj=templateObj,
-            executeCallables=executeCallables)
 
-    def getValueAtRuntime(self, templateObj, tag):
-        searchList = templateObj.searchList()
-        try:
-            translatedTag = self.translatePlaceholderString(self._marker + tag, searchList, templateObj)
-            value = eval(translatedTag)
-            if callable(value):
-                value = value()
-            return value
-        except NameMapper.NotFound:
-            return templateObj._settings['varNotFound_handler'](templateObj, tag)
+        return self.translatePlaceholderString(
+            self.mark(txt), templateObj=templateObj)
 
         
     def processTag(self, templateObj, tag):
@@ -412,19 +370,12 @@ class PlaceholderProcessor(TagProcessor):
 
 
         ## translate the tag into Python code using self.translatePlaceholderString
-        searchList = templateObj.searchList()
-        try:
-            translatedTag = self.translatePlaceholderString(
-                self._marker + tag, searchList, templateObj)
+        translatedTag = self.translatePlaceholderString(
+            self._marker + tag, templateObj)
 
-        except NameMapper.NotFound:
-            return self.wrapEvalTag(
-                templateObj,
-                'self.placeholderProcessor.getValueAtRuntime(self, r"""' + \
-                tag + '""")')
-
-
+        
         ## deal with the caching and return the proper code to the code-generator
+        searchList = templateObj.searchList()
         if cacheType == STATIC_CACHE:
             return str(eval(translatedTag)).replace("'''",r"\'\'\'")
         elif cacheType == TIMED_REFRESH_CACHE:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Delimiters.py,v 1.8 2001/08/07 22:14:17 tavis_rudd Exp $
+# $Id: Delimiters.py,v 1.9 2001/08/08 23:38:41 tavis_rudd Exp $
 """A dictionary of delimeter regular expressions that are used in Cheetah
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/07 22:14:17 $
+Last Revision Date: $Date: 2001/08/08 23:38:41 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 
 ##################################################
@@ -100,22 +100,20 @@ delimiters = {
                                    r'#include[\t ]+(.+?)(?:/#|\r\n|\n|\r|\Z)'),
 
 
-    ## no gobbleWS for stop and restart directives!!!
-    # manage this explicitly if you need
     'rawDirective': re.compile(escCharLookBehind + r'#raw[\t ]*(?:/#|\r\n|\n|\r|\Z)(.*?)' +
                                 r'(?:(?:#end raw[\t ]*(?:/#|\r\n|\n|\r))|\Z)',
                                 re.DOTALL),
 
-    ## there is also no gobbleWS for macro defs.
-    # They must be on lines by themselves!!!
-    # @@doc this
-    'macroDirective': re.compile(r'(?:\A|^)[\t ]*#macro[\t ]+' +
+    'macroDirective_gobbleWS': re.compile(r'(?:\A|^)[\t ]*#macro[\t ]+' +
+                                 r'(.+?)(?:/#|\r\n|\n|\r)(.*?)' +
+                                 r'(?:\r\n|\n|\r)[\t ]*#end macro[\t ]*(?:\r\n|\n|\r|\Z)',
+                                 re.DOTALL | re.MULTILINE),
+    'macroDirective': re.compile(r'#macro[\t ]+' +
                                  r'(.+?)(?:/#|\r\n|\n|\r)(.*?)' +
                                  r'(?:\r\n|\n|\r)[\t ]*#end macro[\t ]*(?:\r\n|\n|\r|\Z)',
                                  re.DOTALL | re.MULTILINE),
 
     # macroCalls should NOT gobbleWS - so that's why there aren't gobbleWS versions
-
     'callMacro': re.compile(escCharLookBehind + r'#callMacro[\t ]+' +
                             r'(?P<macroName>[A-Za-z_][A-Za-z_0-9]*?)' +
                             r'\((?P<argString>.*?)\)[\t ]*(?:/#|\r\n|\n|\r)' +

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CodeGenerator.py,v 1.24 2001/08/08 06:31:29 tavis_rudd Exp $
+# $Id: CodeGenerator.py,v 1.25 2001/08/08 23:38:41 tavis_rudd Exp $
 """Utilities, processors and filters for Cheetah's codeGenerator
 
 Cheetah's codeGenerator is designed to be extensible with plugin
@@ -10,12 +10,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.24 $
+Version: $Revision: 1.25 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/08 06:31:29 $
+Last Revision Date: $Date: 2001/08/08 23:38:41 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.24 $"[11:-2]
+__version__ = "$Revision: 1.25 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -84,7 +84,7 @@ class DisplayLogicProcessor(TagProcessor.TagProcessor):
             tag = tag.replace('else if','elif')
             
             if tag[0:4] == 'elif':
-                tag = templateObj.translatePlaceholderVars(tag, executeCallables=True)
+                tag = templateObj.translatePlaceholderVars(tag)
                 tag = tag.replace('()() ','() ') # get rid of accidental double calls
             
             outputCode = indent*(templateObj._codeGeneratorState['indentLevel']-1) + \
@@ -109,7 +109,7 @@ class DisplayLogicProcessor(TagProcessor.TagProcessor):
                                   localVars.split(',')]
                 templateObj._localVarsList += localVarsList 
     
-            tag = templateObj.translatePlaceholderVars(tag, executeCallables=True)
+            tag = templateObj.translatePlaceholderVars(tag)
             tag = tag.replace('()() ','() ') # get rid of accidental double calls
             outputCode = indent*(templateObj._codeGeneratorState['indentLevel']-1) + \
                          tag + ":\n" + \
@@ -138,19 +138,19 @@ class SetDirectiveProcessor(TagProcessor.TagProcessor):
         varName = tag[0: firstEqualSign].replace(
             templateObj.setting('placeholderStartToken'),'').strip()
         valueString = tag[firstEqualSign+1:]
-        valueString = templateObj.translatePlaceholderVars(valueString,
-                                                           executeCallables=True)
+        valueString = templateObj.translatePlaceholderVars(valueString)
         # get rid of accidental double calls
         valueString = valueString.replace('()()','()')
         
-        templateObj._localVarsList.append(varName)
-    
-        indent = templateObj._settings['indentationStep']
+        #templateObj._localVarsList.append(varName)
+                
+        indent = templateObj.setting('indentationStep')
         if not templateObj._codeGeneratorState.has_key('indentLevel'):
             templateObj._codeGeneratorState['indentLevel'] = \
-                        templateObj._settings['initialIndentLevel']
+                        templateObj.setting('initialIndentLevel')
     
-        return indent*(templateObj._codeGeneratorState['indentLevel']) + varName + \
+        return indent*(templateObj._codeGeneratorState['indentLevel']) + \
+               'setVars["""' + varName + '"""]' +\
                "=" + valueString + "\n" + \
                indent * templateObj._codeGeneratorState['indentLevel']
         
@@ -384,8 +384,7 @@ def preProcessExplicitMacroCalls(templateObj, templateDef):
 
         try:
             searchList = templateObj.searchList()
-            argString = templateObj.translatePlaceholderVars(argString,
-                                                             executeCallables=True)
+            argString = templateObj.translatePlaceholderVars(argString)
             
         except NameMapper.NotFound, name:
             line = lineNumFromPos(match.string, match.start())
@@ -475,15 +474,14 @@ def preProcessIncludeDirectives(templateObj, templateDef):
             args= ' '.join(args.split()[1:])
             
         ## get the Cheetah code to be included
-        if args[0] == templateObj.setting('placeholderStartToken'):
+        if args.startswith( templateObj.setting('placeholderStartToken') ):
             searchList = templateObj.searchList()
-            translatedArgs = templateObj.translatePlaceholderVars(args)
-            includeString = eval( translatedArgs )
+            translatedPlaceholder = templateObj.translatePlaceholderVars(args)
+            includeString = eval( translatedPlaceholder )
         elif args.startswith('"') or args.startswith("'"):
             fileName = args[1:-1]
             fileName = templateObj.normalizePath( fileName )
             includeString = templateObj.getFileContents( fileName )
-
 
         ## now process finish include
         if raw:            
@@ -500,14 +498,16 @@ def preProcessIncludeDirectives(templateObj, templateDef):
             nestedTemplate = Template.Template(
                 templateDef=includeString,
                 overwriteSettings=templateObj.settings(),
-                searchList=templateObj.searchList(),
+                preBuiltSearchList=templateObj.searchList(),
+                setVars = templateObj._setVars,
                 cheetahBlocks=templateObj._cheetahBlocks,
-                macros=templateObj._macros)
+                macros=templateObj._macros,
+                )
             templateObj._parsedIncludes[includeID] = nestedTemplate
             if not hasattr(nestedTemplate, 'respond'):
                 nestedTemplate.compileTemplate()
             return templateObj.setting('placeholderStartToken') + \
-                   '{parsedIncludes.' + includeID + '}'
+                   '{parsedIncludes.' + includeID + '.respond(trans, iAmNested=True)}'
 
     for RE in templateObj._settings['delimiters']['includeDirective']:
         templateDef = RE.sub(subber, templateDef)

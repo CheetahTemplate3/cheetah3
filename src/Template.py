@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.22 2001/08/08 05:35:12 tavis_rudd Exp $
+# $Id: Template.py,v 1.23 2001/08/08 23:38:41 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.22 $
+Version: $Revision: 1.23 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/08 05:35:12 $
+Last Revision Date: $Date: 2001/08/08 23:38:41 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.22 $"[11:-2]
+__version__ = "$Revision: 1.23 $"[11:-2]
 
 
 ##################################################
@@ -94,7 +94,8 @@ class Template(SettingsManager):
                       'dataDirective': [delims['dataDirective_gobbleWS'],
                                         delims['dataDirective'],
                                         ],
-                      'macroDirective': [delims['macroDirective'],
+                      'macroDirective': [delims['macroDirective_gobbleWS'],
+                                         delims['macroDirective'],
                                          ],
                       'blockDirectiveStart': [delims['blockDirectiveStart_gobbleWS'],
                                               delims['blockDirectiveStart'],
@@ -239,6 +240,7 @@ class Template(SettingsManager):
         elif templateDef:   # it's a string templateDef
             pass
         elif type(file) == types.StringType: # it's a filename.
+            file = self.normalizePath(file)
             f = open(file) # Raises IOError.
             templateDef = f.read()
             f.close()
@@ -257,38 +259,53 @@ class Template(SettingsManager):
         # to be passed in
 
 
-        ## Setup the searchList of namespaces in which to search for $placeholders 
-        self._searchList = SearchList( searchList )
-        self._searchList.append(self)
-        if kw.has_key('searchList'):
-            tup = tuple(kw['searchList'])
-            self._searchList.extend(tup) # .extend requires a tuple.
+        ## Setup the searchList of namespaces in which to search for $placeholders
+        # + setup a dict of #set directive vars - include it in the searchList
+        if kw.has_key('setVars'):
+            # happens with nested Template obj creation from #include's
+            self._setVars = kw['setVars']
+        else:
+            self._setVars = {}
+            
+        if kw.has_key('preBuiltSearchList'):
+            # happens with nested Template obj creation from #include's
+            self._searchList = kw['preBuiltSearchList']
+        else:
+            # create our own searchList
+            self._searchList = SearchList( searchList )
+            self._searchList.insert(0, self._setVars)
+            self._searchList.append(self)
+            if kw.has_key('searchList'):
+                tup = tuple(kw['searchList'])
+                self._searchList.extend(tup) # .extend requires a tuple.
 
 
         ## process the settings
         self.initializeSettings()
-        if kw.has_key('settings'):
-            self.updateSettings(kw['settings'])
         if kw.has_key('overwriteSettings'):
             self._settings = kw['overwriteSettings']
+        elif kw.has_key('settings'):
+            self.updateSettings(kw['settings'])
         self.placeholderProcessor.setTagStartToken(self.setting('placeholderStartToken'))
 
         ## deal with other keywd args
         if kw.has_key('macros'):
             self._macros = kw['macros']
+            
         if kw.has_key('cheetahBlocks'):
             self._cheetahBlocks = kw['cheetahBlocks']
         else:
             self._cheetahBlocks = {}
+            
         if os.environ.get('CHEETAH_DEBUG'):
             self._settings['debug'] = True
         if kw.has_key('plugins'):
             self._settings['plugins'] += kw['plugins']
-            for plugin in self._settings['plugins']:
-                self._registerServerPlugin(plugin)
+        for plugin in self._settings['plugins']:
+            self._registerCheetahPlugin(plugin)
 
         
-        if not self._settings['delayedStart']:
+        if not self.setting('delayedStart'):
             self.compileTemplate()
                    
     def searchList(self):
@@ -304,14 +321,13 @@ class Template(SettingsManager):
             # $placeholder translation.
             self.compileTemplate()
 
-    def translatePlaceholderVars(self, string, executeCallables=False):
+    def translatePlaceholderVars(self, string):
         """Translate all the $placeholders in a string to the appropriate Python
         code.  This method is used to translate $placeholders inside directives,
         not for the Template Definition itself."""
         
         translated = self.placeholderProcessor.translateRawPlaceholderString(
-            string, searchList=self.searchList(), templateObj=self,
-            executeCallables=executeCallables)
+            string, searchList=self.searchList(), templateObj=self)
         return translated
 
     def compileTemplate(self):
@@ -417,6 +433,7 @@ class Template(SettingsManager):
                           + indent * 1 + "try:\n" \
                           + indent * 2 + "#setupCodeInsertMarker\n" \
                           + indent * 2 + "searchList = self.searchList()\n" \
+                          + indent * 2 + "setVars = self._setVars\n" \
                           + indent * 2 + "outputList = []\n" \
                           + indent * 2 + "outputList.extend( ['''" + \
                                          codeFromTextVsTagsList + \
@@ -471,13 +488,13 @@ class Template(SettingsManager):
             else:
                 setattr(self,key,val)
    
-    def _registerServerPlugin(self, plugin):
+    def _registerCheetahPlugin(self, plugin):
         
         """Register a plugin that extends the functionality of the Template.
         This method is called automatically by __init__() method and should not
         be called by end-users."""
         
-        plugin.bindToTemplateServer(self)
+        plugin.bindToTemplate(self)
         
     def _bindFunctionAsMethod(self, function):
         """Used to dynamically bind a plain function as a method of the
