@@ -64,6 +64,7 @@ Implementation
 - 'python setup.py uninstall'.  This may require hacking an uninstall feature
   into distutils.
 
+- 'errorCatcher None' to stop catching errors in the middle of a template.
 
 Cheetah command revamp
 ===============================================================================
