@@ -6,6 +6,14 @@ Developers: if a bug was significant and affected a released version of
 Cheetah, be sure to note its fix in the CHANGES file!
 
 
+Warm init
+=========
+If you call the Cheetah constructor with a template definition containing
+"#extends", the template instance gets initialized twice, throwing away your
+searchList and settings.  One possible solution is a "warm init" method for 
+the second time that does the other initialization and then reintroduces your
+searchList and settings.
+
 Compiler forgets commas
 =======================
 Affects Cheetah 0.9.14, CVS and possibly earlier.
