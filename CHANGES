@@ -1,7 +1,7 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
-0.9.14b1 (not released yet)
+0.9.14b1 (June 30, 2002)
   - moved the Users' Guide and the Developers' Guide into a separate CVS module,
     'CheetahDocs', so they can be distributed separately from the source distro
     (TR,MO)
