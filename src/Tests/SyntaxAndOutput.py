@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.44 2002/10/05 19:34:21 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.45 2002/10/28 08:07:04 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.44 $
+Version: $Revision: 1.45 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/10/05 19:34:21 $
+Last Revision Date: $Date: 2002/10/28 08:07:04 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.44 $"[11:-2]
+__revision__ = "$Revision: 1.45 $"[11:-2]
 
 
 ##################################################
@@ -1548,6 +1548,15 @@ class IfDirective(OutputTest):
         self.verify("#if $emptyString# $anInt#else#$anInt - $anInt#end if",
                     "1 - 1")
 
+    def test14(self):
+        """#if <condition> then <true> else <false> """
+        self.verify("#if $emptyString then 'true' else 'false'",
+                    "false")
+
+    def test15(self):
+        """#if <condition> then <true> else <false> """
+        self.verify("#if $anInt then 'true' else 'false'",
+                    "true")
 
 class UnlessDirective(OutputTest):
     
