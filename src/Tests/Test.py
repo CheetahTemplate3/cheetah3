@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.10 2001/07/30 04:14:14 hierro Exp $
+# $Id: Test.py,v 1.11 2001/07/30 04:15:28 hierro Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/07/30 04:14:14 $
+Last Revision Date: $Date: 2001/07/30 04:15:28 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.10 $"[11:-2]
+__version__ = "$Revision: 1.11 $"[11:-2]
 
 
 ##################################################
@@ -574,17 +574,6 @@ posixCases += importantExampleCases
 ### *** ADD NEW TYPES OF POSIX CASES ABOVE HERE. ***  ###
 
 ### *** BEGIN TODO: These cases don't have test suites yet. *** ###
-# Template.__init__ keyword arg 'file'.  Test should do the equivalent of:
-#   t = Template(parseTest.txt", file=1);  print t
-#   t = Template(parseTest.txt", file=0);  print t
-#   f = open("parseTest.txt");  t = Template(parseTest.txt", f);  print t
-# Template.__init__.keyword arg 'searchList' now accepts non-tuple:
-#   t = Template("parseTest.txt", (dic, c), file=1);  print t.searchList()
-#   t = Template("parseTest.txt", [dic, c], file=1);  print t.searchList()
-# Unknown placeholder handling (MSO changing for 0.9.8).
-# CodeGenerator.varNotFound_KeyError:
-#   t = Template("$missingPlaceholder");  print t
-# Template.getUnknowns: return list of Placeholder Names not in the Search List.
 ### *** END TODO. *** ###
 
 windowsCases = deepcopy(posixCases)
