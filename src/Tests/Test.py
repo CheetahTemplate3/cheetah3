@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.23 2001/08/25 17:39:50 tavis_rudd Exp $
+# $Id: Test.py,v 1.24 2001/08/31 23:12:58 tavis_rudd Exp $
 """Unit-testing framework for the Cheetah package
 
 TODO
@@ -12,12 +12,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.23 $
+Version: $Revision: 1.24 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/25 17:39:50 $
+Last Revision Date: $Date: 2001/08/31 23:12:58 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.23 $"[11:-2]
+__version__ = "$Revision: 1.24 $"[11:-2]
 
 
 ##################################################
@@ -663,30 +663,6 @@ $testVar2
      "text between data directives\n1234\naoeu\n",],
     ]
 posixCases += dataDirectiveTests
-
-macroPlusIncludeTests = [
-    ['#macro + #include test',
-     """
-#macro test1(theTmpl)
- test1 called from $theTmpl#end macro
-
-This is the outer template
-#test2('outer')
-#test1('outer')
-#include source=$nestedTDwithMacros
-""",
-     """
-
-This is the outer template
- test2 called from outer
- test1 called from outer
-
-This is the inner template
- test2 called from inner
- test1 called from inner
-"""],
-    ]
-posixCases += macroPlusIncludeTests
 
 
 suiteData = [

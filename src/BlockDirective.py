@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: BlockDirective.py,v 1.6 2001/08/25 17:39:50 tavis_rudd Exp $
+# $Id: BlockDirective.py,v 1.7 2001/08/31 23:12:58 tavis_rudd Exp $
 """BlockDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.6 $
+Version: $Revision: 1.7 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/25 17:39:50 $
+Last Revision Date: $Date: 2001/08/31 23:12:58 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -70,11 +70,11 @@ class BlockDirective(TagProcessor.TagProcessor):
             markerEnd = self.setting('blockMarkerEnd')
         
             replaceString = markerStart[0] + blockName + markerStart[1] + \
-                   startToken + 'include direct source=' + self.setting('placeholderStartToken') + \
+                   startToken + 'include source=' + self.setting('placeholderStartToken') + \
                    'cheetahBlocks.' + blockName + endToken + \
                    markerEnd[0] + blockName + markerEnd[1]
         else:
-            replaceString = startToken + 'include direct source=' + \
+            replaceString = startToken + 'include source=' + \
                             self.setting('placeholderStartToken') + \
                             'cheetahBlocks.' + blockName + endToken
 

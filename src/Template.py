@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.48 2001/08/30 20:37:57 tavis_rudd Exp $
+# $Id: Template.py,v 1.49 2001/08/31 23:12:58 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.48 $
+Version: $Revision: 1.49 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/30 20:37:57 $
+Last Revision Date: $Date: 2001/08/31 23:12:58 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.48 $"[11:-2]
+__version__ = "$Revision: 1.49 $"[11:-2]
 
 
 ##################################################
@@ -168,6 +168,10 @@ class Template(SettingsManager, Parser):
         self._rawTextBlocks ={}
         self._rawIncludes = {}
         self._parsedIncludes = {}
+
+        ## setup the include dictionaries for run-time includes
+        self._cheetahIncludes = {}
+
         
         ## deal with other keywd args 
         # - these are for internal use by Nested Templates in #include's
@@ -308,7 +312,7 @@ class Template(SettingsManager, Parser):
         if not self._settings['debug']:
             del self._codeGeneratorResults
             del self._templateDef
-            self._cheetahBlocks.clear()
+            # self._cheetahBlocks.clear() # not for the moment
             # but don't delete self._generatedCode
 
     def recompileFromFile(self, path):
@@ -420,6 +424,7 @@ class Template(SettingsManager, Parser):
                                  'cacheDirective':cacheDirective,
                                  'endCacheDirective':endCacheDirective,
                                  'stopDirective':stopDirective,
+                                 'includeDirective':includeDirective,
                                  'formatterDirective':formatterDirective,
                                  },
             
@@ -553,6 +558,7 @@ class Template(SettingsManager, Parser):
                           "timedRefreshCache=self._timedRefreshCache,\n " + \
                           "timedRefreshList=self._timedRefreshList,\n " + \
                           "timedRefresh=self._timedRefresh,\n " + \
+                          "includeCheetahSource=self.includeCheetahSource,\n " + \
                           "errorChecker=self._errorChecker,\n " + \
                           "):\n" \
                           + indent * 1 + "try:\n" \
@@ -681,7 +687,48 @@ class Template(SettingsManager, Parser):
 
     ##################################################
     ## methods that can only be used before a template has been compiled
-                
+
+    def includeCheetahSource(self, srcArg, trans=None, includeFrom='file', raw=False):
+        includeID = id(srcArg)
+        if not self._cheetahIncludes.has_key(includeID):
+            if includeFrom == 'file':
+                path = self.normalizePath(srcArg)
+                if not raw:
+                    nestedTemplate = Template(templateDef=None,
+                                              file=path,
+                                              overwriteSettings=self.settings(),
+                                              preBuiltSearchList=self.searchList(),
+                                              setVars = self._setVars,
+                                              cheetahBlocks=self._cheetahBlocks,
+                                              macros=self._macros,
+                                              )
+                    if not hasattr(nestedTemplate, 'respond'):
+                        nestedTemplate.compileTemplate()
+                    self._cheetahIncludes[includeID] = nestedTemplate
+                else:
+                    self._cheetahIncludes[includeID] = self.getFileContents(path)
+            else:                       # from == 'str'
+                if not raw:
+                    nestedTemplate = Template(
+                        templateDef=srcArg,
+                        overwriteSettings=self.settings(),
+                        preBuiltSearchList=self.searchList(),
+                        setVars = self._setVars,
+                        cheetahBlocks=self._cheetahBlocks,
+                        macros=self._macros,
+                        )
+                    if not hasattr(nestedTemplate, 'respond'):
+                        nestedTemplate.compileTemplate()
+                    self._cheetahIncludes[includeID] = nestedTemplate
+                else:
+                    self._cheetahIncludes[includeID] = srcArg
+        ##
+
+        if not raw:
+            self._cheetahIncludes[includeID].respond(trans)
+        else:
+            trans.response().write(self._cheetahIncludes[includeID])
+
     def defineTemplateBlock(self, blockName, blockContents):
         """Define a block.  See the user's guide for info on blocks.  Only call
         this method before the template has been Compiled."""
