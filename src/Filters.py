@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.4 2001/11/08 04:09:52 hierro Exp $
+# $Id: Filters.py,v 1.5 2001/11/08 07:12:11 hierro Exp $
 """Output Filters Cheetah's $placeholders
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/11/08 04:09:52 $
+Last Revision Date: $Date: 2001/11/08 07:12:11 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -22,6 +22,10 @@ __version__ = "$Revision: 1.4 $"[11:-2]
 
 True = (1==1)
 False = (0==1)
+
+# Additional entities WebSafe knows how to transform.  No need to include
+# '<', '>' or '&' since those will have been done already.
+webSafeEntities = {' ': '&nbsp;', '"': '&quot;'}
 
 ##################################################
 ## CLASSES
@@ -113,3 +117,29 @@ class Pager(Filter):
             return output
         return output
 
+
+class WebSafe(Filter):
+    """Escape HTML entities in $placeholders.
+    """
+    def filter(self, val, **kw):
+        # Do the default conversion.
+        s = Filter.filter(self, val, **kw)
+        # These substitutions are copied from cgi.escape().
+        s = s.replace("&", "&amp;") # Must be done first!
+        s = s.replace("<", "&lt;")
+        s = s.replace(">", "&gt;")
+        # Process the additional transformations if any.
+        if kw.has_key('also'):
+            also = kw['also']
+            entities = webSafeEntities   # Global variable.
+            for k in also:
+                if entities.has_key(k):
+                    v = entities[k]
+                else:
+                    v = "&#%s;" % ord(k)
+                s = s.replace(k, v)
+        # Return the puppy.
+        return s
+
+
+# vim: shiftwidth=4 tabstop=4 expandtab
