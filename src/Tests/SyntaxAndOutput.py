@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.38 2002/06/23 19:30:39 hierro Exp $
+# $Id: SyntaxAndOutput.py,v 1.39 2002/06/30 20:18:45 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.38 $
+Version: $Revision: 1.39 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/06/23 19:30:39 $
+Last Revision Date: $Date: 2002/06/30 20:18:45 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.38 $"[11:-2]
+__revision__ = "$Revision: 1.39 $"[11:-2]
 
 
 ##################################################
@@ -929,6 +929,57 @@ inside the if block
 blarg""",
         "1\nblarg")
 
+
+class ReturnDirective(OutputTest):
+    
+    def test1(self):
+        """#return'ing an int """
+        self.verify("""1
+$str($test-6)
+3
+#def test
+
+#if 1
+#return (3   *2)  \
+  + 2 
+#else
+aoeuoaeu
+#end if
+#end def
+""",
+                    "1\n2\n3\n")
+
+    def test2(self):
+        """#return'ing an string """
+        self.verify("""1
+$str($test[1])
+3
+#def test
+
+#if 1
+#return '123'
+#else
+aoeuoaeu
+#end if
+#end def
+""",
+                    "1\n2\n3\n")
+
+    def test3(self):
+        """#return'ing an string AND streaming other output via the transaction"""
+        self.verify("""1
+$str($test(trans)[1])
+3
+#def test
+1.5
+#if 1
+#return '123'
+#else
+aoeuoaeu
+#end if
+#end def
+""",
+                    "1\n1.5\n2\n3\n")
 
 class ForDirective(OutputTest):
 
