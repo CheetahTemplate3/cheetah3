@@ -11,6 +11,7 @@ packages = ['Cheetah',
             'Cheetah.Tools',
             'Cheetah.Utils',
             ]
+extra_path = 'Webware'
 package_dir = {'Cheetah':'src'}
 
 import os
@@ -30,7 +31,7 @@ else:
 ## Data Files and Scripts
 scripts = ['bin/cheetah-compile',
            ]
-data_files = ['recursive: src *.tmpl *.txt LICENSE README',
+data_files = ['recursive: src *.tmpl *.txt LICENSE README TODO CHANGES',
               ]
 
 ## GET THE DESCRIPTION AND CREATE THE README
