@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.11 2001/11/25 03:29:22 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.12 2001/12/05 06:32:38 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/25 03:29:22 $
+Last Revision Date: $Date: 2001/12/05 06:32:38 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.11 $"[11:-2]
+__version__ = "$Revision: 1.12 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -47,18 +47,21 @@ class CheetahCompile:
     SERVLET_BACKUP_EXT = '.py_bak'
     GENERATED_EXT = '.html'
     
-    def __init__(self):
+    def __init__(self, scriptName=os.path.basename(sys.argv[0]),
+                 cmdLineArgs=sys.argv[1:]):
         self.makeGenFile = False
         self.compileDirectories = False
         self.recurseDirectories = False
         self.writeGenerated = False
         self.printGenerated = False
         self.compiledFiles = []
+        self._scriptName = scriptName
+        self._cmdLineArgs = cmdLineArgs
 
     def run(self):
         """The main program controller."""
         try:
-            opts, args = getopt.getopt( sys.argv[1:], 'hpdRw', [])
+            opts, args = getopt.getopt( self._cmdLineArgs, 'hpdRw', [])
 
         except getopt.GetoptError, v:
             # print help information and exit:
@@ -165,7 +168,7 @@ Usage:
   -d                          Compile all *.tmpl files in directory
   -p                          Print generated Python code to stdout
   -w                          Write output of template to *.html
-""" % {'scriptName':os.path.basename(sys.argv[0]),
+""" % {'scriptName':self._scriptName,
        'version':version,
        'author':'Tavis Rudd',
        }
