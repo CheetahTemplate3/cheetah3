@@ -1,5 +1,8 @@
 Please initial your changes and add a date for each release
 ================================================================================
+0.9.9a7 (unreleased)
+   - Template constructor arg 'outputFilter' now 'filter' (MO)
+
 0.9.9a6 (Nov 6, 2001) 
    - fixed bug with quotations in longer constant string chunks (TR)
    - fixed another bug in the cheetah-compile script (TR)
