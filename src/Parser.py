@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.58 2002/10/01 17:52:02 tavis_rudd Exp $
+# $Id: Parser.py,v 1.59 2002/10/05 21:56:35 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.58 $
+Version: $Revision: 1.59 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/10/01 17:52:02 $
+Last Revision Date: $Date: 2002/10/05 21:56:35 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.58 $"[11:-2]
+__revision__ = "$Revision: 1.59 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -961,12 +961,12 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             'echo': self.eatEcho,
             'silent': self.eatSilent,
 
-            # declaration and assignment
+            # declaration, assignment, and deletion
             'attr':self.eatAttr,
             'def': self.eatDef,
             'block': self.eatBlock,
             'set': self.eatSet,
-            'settings':self.eatSettings,
+            'del': self.eatDel,
             
             # flow control
             'while': self.eatWhile,
@@ -1265,41 +1265,6 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             print >> out, 'A full Python exception traceback follows.'
             raise
         self.configureParser()
-    
-    def eatSettings(self):
-        lineClearToStartToken = self.lineClearToStartToken()
-        endOfFirstLine = self.findEOL()
-        self.getDirectiveStartToken()
-        self.advance(len('settings'))   # to end of 'settings'
-
-        KWs = self.getTargetVarsList()
-        self.getExpression()            # gobble any garbage
-        self.closeDirective(lineClearToStartToken, endOfFirstLine)
-
-        
-        merge = True
-        if 'nomerge' in KWs:
-            merge = False
-            
-        if 'reset' in KWs:
-            self._initializeSettings()
-            self.configureParser()
-            return
-        elif 'python' in KWs:
-            settingsType = 'python'
-        else:
-            settingsType = 'ini'
-        
-        settingsStr = self.readToThisEndDirective('settings')
-        self.addSettingsToInit(settingsStr, settingsType=settingsType)
-        
-        if self._templateObj:
-            # note that these settings won't affect the compiler/parser settings!
-            if settingsType == 'python':
-                self._templateObj.updateSettingsFromPySrcStr(settingsStr, merge=merge)
-            else:
-                self._templateObj.updateSettingsFromConfigStr(settingsStr, merge=merge)
-
 
     def eatAttr(self):
         lineClearToStartToken = self.lineClearToStartToken()
@@ -1725,6 +1690,9 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.addFinally(self.eatSimpleExprDirective())
 
     def eatPass(self):
+        self.addChunk(self.eatSimpleExprDirective())
+
+    def eatDel(self):
         self.addChunk(self.eatSimpleExprDirective())
 
     def eatAssert(self):
