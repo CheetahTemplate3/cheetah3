@@ -14,7 +14,9 @@ Please initial your changes and add a date for each release
      that was yielding undefined values for the NotFound exception when it was
      raised (TR)
 
-   - prefaced all internal args to Template() with underscores
+   - prefaced all internal args to Template() with underscores (TR)
+   - fixed the problem with parsing triple quoted strings in arg lists (TR)
+   - updated the docs (TR)
 
 0.9.8a4 (September 7, 2001)
 
