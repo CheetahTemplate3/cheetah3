@@ -30,6 +30,7 @@ release
   - Utils.WebMixin: made a string type comparision backward compatible.
     This was why the Cheetah test suite was failing on Python < 2.2! (MO)
   - SettingsManager._createConfigFile(): bugfix in default argument. (MO)
+  - $hasVar('varName') is an alias for $varExists('varName').  (MO)
 
 
 0.9.14 (July 14, 2002)

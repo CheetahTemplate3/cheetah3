@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.98 2002/07/29 22:19:58 tavis_rudd Exp $
+# $Id: Template.py,v 1.99 2002/09/16 03:44:31 hierro Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.98 $
+Version: $Revision: 1.99 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/07/29 22:19:58 $
+Last Revision Date: $Date: 2002/09/16 03:44:31 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.98 $"[11:-2]
+__revision__ = "$Revision: 1.99 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -315,7 +315,11 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             return True
         except NotFound:
             return False
+
+
+    hasVar = varExists
     
+
     def getFileContents(self, path):
         """A hook for getting the contents of a file.  The default
         implementation just uses the Python open() function to load local files.
@@ -530,3 +534,5 @@ class Template(SettingsManager, Servlet, WebInputMixin):
 
 
 T = Template   # Short and sweet for debugging at the >>> prompt.
+
+# vim: shiftwidth=4 tabstop=4 expandtab
