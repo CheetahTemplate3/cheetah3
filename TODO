@@ -36,7 +36,6 @@ Documentation
 Website
 ================================================================================
 - automate the documentation update (including regenerating the learn.html page)
-- add links to the CVS + some instructions
 - See if we can get WebKit working on Sourceforge...
 
 Examples
@@ -47,4 +46,4 @@ Packaging
 ================================================================================
 - Consider moving SettingsManager.py and NameMapper.py into the 
   third_party_packages dir and making setup_all.py the main install script
-! make 'setup.py sdist_docs' generate the update docs by executing the Makefile
+

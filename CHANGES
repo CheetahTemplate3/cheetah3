@@ -24,7 +24,8 @@ Please initial your changes and a date for each release
   - fixed a small bug in PlaceholderProcessor.processTag() that prevented
     static caching (i.e. $*) of a value containing ''' style quotes
   - added #break and #continue (TR)
-
+  - fixed the relative path problem with #include when using Cheetah with WebKit (TR)
+ 
 0.9.7 (July 13, 2001)
   - reimplemented the parsing of $placeholders using the Python tokenizer module (TR)
     - now translates into Python code instead of going through NameMapper for
