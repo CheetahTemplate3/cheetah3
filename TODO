@@ -10,7 +10,9 @@ Cheetah TODO list
 
 Requirements for 1.0
 =========================================================================
-- write a formalized grammar for Cheetah in BNF (MO)
+- Build test suite for "cheetah compile -R" and "cheetah fill -R", and
+  fix existing and anticipated bugs re paths and "/./" showing up where
+  they're not wanted. (MO)
 - update User's Guide about changes to SkeletonPage (no more #settings,
   etc) (TR)
 - Decide on Cheetah's 1.0 license and update the Users' Guide. (TR)
