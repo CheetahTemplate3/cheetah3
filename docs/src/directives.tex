@@ -5,12 +5,11 @@ there may be more details about the Directives which should be added.  Read the
 comments in the source of this chapter (docs/src/directives.tex) to see which
 points are still uncertain or what will probably be added after it's verified.}
 
-
 Directives Tags (\#D's) are used for all functionality that cannot be handled
 with simple placeholders.  All directives begin with \code{\#}, and end with
-\code{/\#}, the end of the line, or another directive on that line.  
+\code{/\#} or the end of the line.
 
-Cheetah does not use HTML/XML-style tags they are hard to 
+Cheetah does not use HTML/XML-style tags as they are hard to 
 distinguish in a file containing real HTML/XML tags.  In addition, Cheetah tags
 show up on screen when the Template Definition is viewed in a web browser,
 which aids debugging.  HTML-style tags would be invisible.
@@ -18,9 +17,6 @@ which aids debugging.  HTML-style tags would be invisible.
 Some tags have additional words after the
 command name.  (These words are called ``arguments'', but don't confuse them
 with function arguments and macro arguments, which are different things.)
-
-% I would have called them "attributes", but that term is also ambiguous and
-% harder to explain.
 
 Some Directives consist of a single tag, while others have a matching end tag
 that looks like this: \code{\#end theDirective/\#}.  The text between a tag and
@@ -52,13 +48,9 @@ block directive
 \subsection{Whitespace handling}
 %% @@ TR: This is an important topic and needs a section of its own.  We need to
 %% provide examples and refer to the #slurp directive
-If there is nothing on a line except Directive(s) and whitespace, the line is
-not included in the output.
 
-% True?
-
-Most \#D's are commands, which are described in this chapter.  Directives
-relating to macros are in the next chapter, ``Macros''.
+%If there is nothing on a line except Directive(s) and whitespace, the line is
+%not included in the output.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -278,14 +270,10 @@ parsing.
 #include raw "includeFileName.txt"
 \end{verbatim}
 
-Cheetah currently has two bugs regarding \code{\#include}.  It is not working
-with relative paths when used in conjunction with Webware.  (Webware has some
-specific rules regarding what the current directory and the Python path must be
-when it is running.)  Second, Cheetah will not notice if an included file is
-updated after the TO has been created; it will continue to use the old version.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#raw}
+
 Any section of a Template Definition that is inside a \code{\#raw} ...
 \code{\#end raw} tag pair will be printed verbatim without any parsing of
 \$placeholders or other directives.  This can be very useful for debugging, or
@@ -295,7 +283,9 @@ writing Cheetah examples and tutorials.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\#redefine ... \#end redefine}
 
-See \code{\#block}.
+%% @@TR: this definitely needs explanation by itself
+
+%See \code{\#block}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -303,14 +293,12 @@ See \code{\#block}.
 
 \code{\#set} allows you to assign a value for a placeholder from inside the
 Template Definition.  One use for this is to assign a short alias to what would
-otherwise be a long Placeholder Name.  (Note that the \code{\#set} value will
-not automatically change if the original value changes.)
+otherwise be a long Placeholder Name. 
 
 The syntax is: \code{\#set \$lvaluePlaceholder = EXPRESSION}
 
-The \code{\$lvaluePlaceholder} is stored in a special namespace that is searched
-before the Search List.  The expression may be any Python expression, but you
-must use Placeholder Tags instead of variable names within it.
+The expression may be any Python expression. but you must use Placeholder Tags
+instead of variable names within it.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -320,8 +308,4 @@ must use Placeholder Tags instead of variable names within it.
 character from the current line so that they will not appear in the output.
 Instead, the following line will be joined onto this one.
 
-% Does it really eat all the trailing whitespace, or only the newline?
-
-\code{\#slurp} is useful when you want something on a separate line in the
-source for readability, but don't want it on a separate line in the output.
 
