@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.3 2002/03/06 22:01:16 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.4 2002/04/15 06:12:19 tavis_rudd Exp $
 """Tests of the cheetah-compile tool.
 
 THIS TEST MODULE IS JUST A SHELL AT THE MOMENT. Feel like filling it in??
@@ -7,12 +7,12 @@ THIS TEST MODULE IS JUST A SHELL AT THE MOMENT. Feel like filling it in??
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.3 $
+Version: $Revision: 1.4 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2002/03/06 22:01:16 $
+Last Revision Date: $Date: 2002/04/15 06:12:19 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.3 $"[11:-2]
+__revision__ = "$Revision: 1.4 $"[11:-2]
 
 
 ##################################################
@@ -29,9 +29,11 @@ from Cheetah.CheetahCompile import CheetahCompile
 ##################################################
 ## CONSTANTS & GLOBALS ##
 
-True = (1==1)
-False = (0==1)
-
+try:
+    True = (1==1)
+    False = (0==1)
+except:
+    pass
 
 ##################################################
 ## TEST DATA FOR USE IN THE TEMPLATES ##

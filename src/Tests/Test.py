@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.35 2002/03/07 04:39:55 tavis_rudd Exp $
+# $Id: Test.py,v 1.36 2002/04/15 06:12:19 tavis_rudd Exp $
 """Core module of Cheetah's Unit-testing framework
 
 TODO
@@ -14,12 +14,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>,
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.35 $
+Version: $Revision: 1.36 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/03/07 04:39:55 $
+Last Revision Date: $Date: 2002/04/15 06:12:19 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.35 $"[11:-2]
+__revision__ = "$Revision: 1.36 $"[11:-2]
 
 
 ##################################################
@@ -31,8 +31,11 @@ import unittest_local_copy as unittest
 ##################################################
 ## CONSTANTS & GLOBALS
 
-True = (1==1)
-False = (0==1)
+try:
+    True = (1==1)
+    False = (0==1)
+except:
+    pass
 
 ##################################################
 ## TESTS

@@ -78,7 +78,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 __author__ = "Steve Purcell"
 __email__ = "stephen_purcell at yahoo dot com"
-__revision__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 
 ##################################################
@@ -94,8 +94,11 @@ import types
 ##################################################
 ## CONSTANTS & GLOBALS
 
-True = (1==1)
-False = (0==1)
+try:
+    True = (1==1)
+    False = (0==1)
+except:
+    pass
 
 ##############################################################################
 # Test framework core
