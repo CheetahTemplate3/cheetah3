@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.112 2003/11/25 08:18:15 tavis_rudd Exp $
+# $Id: Template.py,v 1.113 2004/01/15 00:05:00 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.112 $
+Version: $Revision: 1.113 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2003/11/25 08:18:15 $
+Last Revision Date: $Date: 2004/01/15 00:05:00 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.112 $"[11:-2]
+__revision__ = "$Revision: 1.113 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -24,6 +24,10 @@ import re                         # used to define the internal delims regex
 import new                        # used to bind the compiled template code
 import types                      # used in the mergeNewTemplateData method
                                   # and in Template.__init__()
+try:
+    from types import StringTypes
+except ImportError:
+    StringTypes = (types.StringType,types.UnicodeType)
 from types import StringType, ClassType
 import time                       # used in the cache refresh code
 from time import time as currentTime # used in the cache refresh code
@@ -180,7 +184,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         ## setup the ouput filters
         self._filtersLib = filtersLib
         self._filters = {}
-        if type(filter) == StringType:
+        if type(filter) in StringTypes:
             filterName = filter
             klass = getattr(self._filtersLib, filterName)
         else:
@@ -194,7 +198,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         ## setup the errorChecker
         self._errorCatchers = {}
         if errorCatcher:
-            if type(errorCatcher) == StringType:
+            if type(errorCatcher) in StringTypes:
                 errorCatcherClass = getattr(ErrorCatchers, errorCatcher)
             elif type(errorCatcher) == ClassType:
                 errorCatcherClass = errorCatcher
@@ -221,7 +225,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         
         from Compiler import Compiler
         
-        if file and type(file) == StringType and not moduleName and \
+        if file and type(file) in StringTypes and not moduleName and \
            re.match(r'[a-zA-Z_][a-zA-Z_0-9]*$', file):
             moduleName = os.path.splitext(os.path.split(file)[1])[0]
         elif not moduleName:
@@ -230,7 +234,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         self._fileMtime = None
         self._fileDirName = None
         self._fileBaseName = None
-        if file and type(file) == StringType:
+        if file and type(file) in StringTypes:
             file = self.serverSidePath(file)
             self._fileMtime = os.path.getmtime(file)
             self._fileDirName, self._fileBaseName = os.path.split(file)
