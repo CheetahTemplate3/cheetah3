@@ -15,7 +15,9 @@ Requirements for 1.0
   lookup.  (TR)
 - update User's Guide about changes to SkeletonPage (no more #settings,
   etc) (TR)
-- Decide on Cheetah's 1.0 license and update the Users' Guide. (TR)
+- Decide on Cheetah's 1.0 license and update the Users' Guide.  Cheetah
+  will remain open source, and derived works (open or closed source) will be
+  allowed.  The issue is how to make the second part more explicit. (TR)
 - Add an example in the distribution of a simplified SkeletonPage
   that used #block but does not have fancy esoteric methods like
   style stuff. (MO)
@@ -26,9 +28,9 @@ Other TODO Items
 
 - CheetahWrapper stuff: (MO)
   * "cheetah compile --shbang '#!/usr/bin/python2.2'"
-  * "cheetah code [options] [FILES]"  print template-specific portion of main
-    method(s) to stdout, with line numbers.  May want a Template method to do
-    this too.
+  * "cheetah preview [options] [FILES]"  print template-specific portion of main
+    method(s) to stdout, with line numbers based on the .py template module.  
+    Make a Template method to do the same thing, a la .generatedModuleCode().
   * Refactor, make compile/fill/code routines callbacks using a bundle arg.
 
 - Debugging tools.  See section below.
