@@ -1,18 +1,19 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.5 2002/09/02 21:46:46 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.6 2002/09/04 08:06:40 hierro Exp $
 """Cheetah command-line interface.
 
-BUGS: -p option not implemented.
+2002-09-03 MSO: Total rewrite.
+2002-09-04 MSO: Bugfix, compile command was using wrong output ext.
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/09/02 21:46:46 $
+Last Revision Date: $Date: 2002/09/04 08:06:40 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -138,7 +139,8 @@ class CheetahWrapper:
 
 
     def parseOpts(self, args):
-        defaultOext = (self.command == 'c') and ".py" or ".html"
+        self.isCompile = isCompile = self.command[0] == 'c'
+        defaultOext = isCompile and ".py" or ".html"
         parser = MyOptionParser()
         pao = parser.add_option
         pao("--idir", action="store", dest="idir", default="")
@@ -151,7 +153,6 @@ class CheetahWrapper:
         pao("--env", action="store_true", dest="env", default=0)
         pao("--pickle", action="store_true", dest="pickle", default=0)
         self.opts, self.files = opts, files = parser.parse_args(args)
-        self.isCompile = self.command[0] == 'c'
         if opts.debug:
             print >>sys.stderr, "cheetah compile", args
             print >>sys.stderr, "Options are"
