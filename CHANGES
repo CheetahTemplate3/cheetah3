@@ -1,7 +1,14 @@
 Please initial your changes and add a date for each release
 ================================================================================
 0.9.9a7 (unreleased)
-   - Template constructor arg 'outputFilter' now 'filter' (MO)
+   - template constructor arg 'outputFilter' now 'filter', for consistency
+     with #filter (MO)
+   - template constructor raises TypeError if bad arguments (MO)
+   - Cheetah.Utils.VerifyType new module containing functions for verifying the
+     type of an argument (MO)
+   - Cheetah.Utils: new package for non-Cheetah-specific modules needed by
+     Cheetah (MO)
+   - Cheetah.Filters: new filter WebSafe, several bugfixes (MO)
 
 0.9.9a6 (Nov 6, 2001) 
    - fixed bug with quotations in longer constant string chunks (TR)
