@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.5 2001/08/03 19:20:50 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.6 2001/08/11 18:05:12 tavis_rudd Exp $
 
 """Utilities for accessing the members of an object via string representations
 of those members.  Template processing is its primary intended use.
@@ -58,13 +58,13 @@ Authors: Tavis Rudd <tavis@calrudd.com>,
          Chuck Esterbrook <echuck@mindspring.com>
 License: This software is released for unlimited distribution
          under the terms of the Python license.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2001/08/03 19:20:50 $
+Last Revision Date: $Date: 2001/08/11 18:05:12 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__version__ = "$Revision: 1.5 $"[11:-2]
+__version__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -93,7 +93,7 @@ class NoDefault:
 ##################################################
 ## FUNCTIONS ##
 
-def valueForName(obj, name, default=NoDefault, executeCallables=False):
+def valueForName(obj, name, executeCallables=False):
     """Get the value for the specified name.  This function can be called
     recursively.  """
 
@@ -101,14 +101,14 @@ def valueForName(obj, name, default=NoDefault, executeCallables=False):
         # then this is the first call to this function.
         nameChunks=name.split('.')
     else:
-        #if this function calls itself then name already be a list of nameChunks
+        #if this function calls itself then name already is a list of nameChunks
         nameChunks = name
 
     ## go get a binding for the key ##
     firstKey = nameChunks[0]
     if len(nameChunks) > 1:
         # its a composite name like: nestedObject.item
-        binding = valueForKey(obj, firstKey, default)
+        binding = valueForKey(obj, firstKey)
         if executeCallables and callable(binding) and \
            type(binding) not in (InstanceType, ClassType):
             # the type check allows access to the methods of instances
@@ -116,40 +116,31 @@ def valueForName(obj, name, default=NoDefault, executeCallables=False):
             # and also allows obj.__class__.__name__
             binding = binding()
         
-        return valueForName(binding, nameChunks[1:], default,
+        return valueForName(binding, nameChunks[1:],
                             executeCallables=executeCallables)
     else:
         # its a single key like: nestedObject
-        binding =  valueForKey(obj, firstKey, default)
+        binding =  valueForKey(obj, firstKey)
         if executeCallables and callable(binding):
             binding = binding()
         return binding
 
 
-def valueForKey(obj, key, default=NoDefault):
+def valueForKey(obj, key):
 
     """Get the value of the specified key.  The 'obj' can be a a mapping or any
     Python object that supports the __getattr__ method. The key can be a mapping
     item, an attribute or an underscored attribute."""
 
     if hasattr(obj, key):
-        binding = getattr(obj, key)
-    elif hasattr(obj, '_' + key):
-        binding = getattr(obj, '_' + key)
-    else:
-        try:
-            if key in digits:
-                binding = obj[int(key)]
-            else:
-                binding = obj.get(key, default)
-        except:
-            binding = default
-
-    if binding==NoDefault:
-        raise NotFound, key
-    else:
-        # this is a value or a reference to a callable object
-        return binding
+        return getattr(obj, key)
+    try:
+        return obj[key]
+    except:
+        if hasattr(obj, '_' + key):
+            return getattr(obj, '_' + key)
+        else:
+            raise NotFound, key
 
 PLAIN_ATTRIBUTE = 0
 UNDERSCORED_ATTRIBUTE = 1
