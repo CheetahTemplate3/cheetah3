@@ -22,6 +22,8 @@ Please initial your changes and add a date for each release
    - Filters can now be used standalone for debugging or for use outside
      Cheetah.  This works transparently; details are in Filters.py docstring.
      (MO)
+   - Cheetah.Tools.MondoReport: new module for dividing a long list into
+     "pages", and for calculating statistics useful in reports.
      
 
 0.9.9a6 (Nov 6, 2001) 
