@@ -1,0 +1,54 @@
+This is not in legal TeX syntax yet, so don't try to compile it!
+
+Here's an analysis of NameMapper.py.
+
+	valueForKey(obj, key):
+Search 'obj' for 'key'.  Tries to return (1) a same-name attribute, (2)
+a same-name dictionary key, or (3) an attribute that is "'_' + key".
+If fail, raise NameMapper.NotFound.
+
+	valueForName(obj, name):
+Wrapper for _valueForName.  Splits 'name' into 'nameChunks' at dots.
+'executeCallables' is, I assume, whether to do autocalling.
+
+	_valueForName(obj, nameChunks, executeCallables):
+'passNamespace' is false initially, since valueForName doesn't specify it.
+Take the first identifier in nameChunks.  If 'passNamespace', do
+valueForKey on it (if fail, raise NameMapper.NotFoundInNamespace).
+If not 'passNamespace', same but if fail, allow NameMapper.NotFound to
+propagate.  Why the difference in exceptions?
+
+Assuming the first identifier was successfully found, if the value meets
+autocallable criteria, call it.  
+
+If there are further components in nameChunks, recurse using the found
+value as 'obj', and "nameChunks minus the first identifier" as
+'nameChunks' (so that the next identifier will be first each recursion).
+The result is a name lookup of a.b.c.d.e, looking recursively in 'obj' only.
+No searchList is involved.
+
+	valueFromSearchList(searchList, name, executeCallables):
+name -> nameChunks.  Call _valueForName using each element in searchList
+in turn as the searchable 'obj'.  'passNamespace' is always True, which
+causes the called function (_valueForName) to raise
+NameMapper.NotFoundInNamespace instead of NameMapper.NotFound if fail.
+Why?  Especially since this function (valueFromSearchList) converts
+NameMapper.NotFoundInNamespace to NameMapper.NotFound anyway, so the net 
+effect is the same.
+
+	hasKey(obj, key):
+Boolean whether 'obj' has 'key', searching the attributes, subscripts
+and underlined attributes.  There is one discrepency from 
+valueForKey(): the underlined attribute is searched second rather than
+third.
+
+	hasName(obj, key):
+Boolean whether 'obj' has 'name', based on valueForName.  
+
+What's the difference between a 'key' and a 'name'?
+
+Class 'Mixin' wraps valueForName and valueForKey into methods. 
+Presumably, this is inherited by Template and thus defines the public
+entry points for this module.  Meaning that if I want to have a 
+boolean "placeholder value exists" method in Template, I'll have to
+wrap hasKey or hasName.  But which one?  And why do both functions exist?
