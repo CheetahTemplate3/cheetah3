@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.40 2002/07/01 03:00:02 hierro Exp $
+# $Id: SyntaxAndOutput.py,v 1.41 2002/07/01 03:19:46 hierro Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.40 $
+Version: $Revision: 1.41 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/07/01 03:00:02 $
+Last Revision Date: $Date: 2002/07/01 03:19:46 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.40 $"[11:-2]
+__revision__ = "$Revision: 1.41 $"[11:-2]
 
 
 ##################################################
@@ -2196,8 +2196,7 @@ class CGI(OutputTest):
 
 
 class Indenter(OutputTest):
-    source1 = """
-#indent chars "    "
+    source = """
 public class X
 {
     #for $method in $methods
@@ -2228,7 +2227,7 @@ public class X
 
 #def getType($method)
     #indent push
-    #indent = 0
+    #indent=0
     #if $method.Type == "VT_VOID"
         void#slurp
     #elif $method.Type == "VT_INT"
@@ -2240,7 +2239,7 @@ public class X
 #end def
 """
 
-    control1 = """
+    control = """
 public class X
 {
     public void Foo(
@@ -2266,57 +2265,6 @@ public class X
 
 """
 
-    source2 = """\
-#indent strip
-#repeat 3
-    For he's a jolly good fellow...
-#end repeat
-Which nobody can deny.
-"""
-    control2 = """\
-For he's a jolly good fellow...
-For he's a jolly good fellow...
-For he's a jolly good fellow...
-Which nobody can deny.
-"""
-
-    source3 = """\
-#indent chars "\t"
-#indent ++
-The quotation is: $multilineQuote
-
-    Again, the quotation is:
-    $multilineQuote
-"""
-
-    control3 = """\
-\tThe quotation is: Ha! whaur ye gaun, ye crowlin ferlie?
-Your impudence protects you sairly;
-I canna say but ye strunt rarely,
-Owre gauze and lace;
-
-\tAgain, the quotation is:
-Ha! whaur ye gaun, ye crowlin ferlie?
-Your impudence protects you sairly;
-I canna say but ye strunt rarely,
-Owre gauze and lace;
-"""
-
-    source4 = "#filter Indent\n" + source3
-
-    control4 = """\
-\tThe quotation is: Ha! whaur ye gaun, ye crowlin ferlie?
-\tYour impudence protects you sairly;
-\tI canna say but ye strunt rarely,
-\tOwre gauze and lace;
-
-\tAgain, the quotation is:
-\tHa! whaur ye gaun, ye crowlin ferlie?
-\tYour impudence protects you sairly;
-\tI canna say but ye strunt rarely,
-\tOwre gauze and lace;
-"""
-
     def searchList(self):    # Inside Indenter class.
         class Method:
             def __init__(self, _name, _type, *_params):
@@ -2326,40 +2274,10 @@ Owre gauze and lace;
         methods = [Method("Foo", "VT_VOID", "_input", "_output"),
                    Method("Bar", "VT_INT", "_str1", "str2", "_str3"),
                    Method("Add", "VT_VARIANT", "value1", "value")]
-        multilineQuote = """\
-Ha! whaur ye gaun, ye crowlin ferlie?
-Your impudence protects you sairly;
-I canna say but ye strunt rarely,
-Owre gauze and lace;
-"""
-        return [{
-            "methods": methods,
-            'multilineQuote': multilineQuote,
-            'multilineQuoteWithLeadingNewline': '\n' + multilineQuote
-        }]
-
-
+        return [{"methods": methods}]
 
     def test1(self):    # Inside Indenter class.
-        """Robert Kuzely's indented Java output test.
-        """
-        self.verify(self.source1, self.control1)
-
-
-    def test2(self):
-        """Strip leading whitespace but don't add indentation.
-        """
-        self.verify(self.source2, self.control2)
-
-    def test3(self):
-        """Print a multiline placeholder with indentation.
-        """
-        self.verify(self.source3, self.control3)
-
-    def test4(self):
-        """Print a multiline placeholder with indentation.
-        """
-        self.verify(self.source4, self.control4)
+        self.verify(self.source, self.control)
 
 
 

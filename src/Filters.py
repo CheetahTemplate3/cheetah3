@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.16 2002/07/01 03:00:02 hierro Exp $
+# $Id: Filters.py,v 1.17 2002/07/01 03:19:46 hierro Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -10,12 +10,12 @@ would otherwise require a real template object).
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.16 $
+Version: $Revision: 1.17 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/07/01 03:00:02 $
+Last Revision Date: $Date: 2002/07/01 03:19:46 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.16 $"[11:-2]
+__revision__ = "$Revision: 1.17 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -71,7 +71,6 @@ class Filter:
     def __init__(self, templateObj=_dummyTemplateObj):
         """Setup a ref to the templateObj.  Subclasses should call this method.
         """
-        self.template = templateObj
         self.setting = templateObj.setting
         self.settings = templateObj.settings
 
@@ -225,26 +224,6 @@ class StripSqueeze(Filter):
         s = Filter.filter(self, val, **kw)
         s = val.split()
         return " ".join(s)
-
-#####
-class Indent(Filter):
-    """
-    """
-    def filter(self, val, **kw):
-        s = Filter.filter(self, val, **kw)
-        sio = StringIO()
-        lines = s.splitlines(True)
-        if not lines: # Prevent IndexError.
-            return ""
-        firstLine = lines.pop(0)
-        sio.write(firstLine)
-        indentStr = self.template._indenter.indent()
-        for lin in lines:
-            lin = lin.lstrip()
-            sio.write(indentStr)
-            sio.write(lin)
-        return sio.getvalue()
-        
     
 ##################################################
 ## MAIN ROUTINE -- testing

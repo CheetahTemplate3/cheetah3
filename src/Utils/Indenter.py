@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Indenter.py,v 1.2 2002/07/01 03:00:02 hierro Exp $
+# $Id: Indenter.py,v 1.3 2002/07/01 03:19:46 hierro Exp $
 """Indentation maker.
 
 This version is based directly on code by Robert Kuzelj
@@ -14,26 +14,18 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/11/07
-Last Revision Date: $Date: 2002/07/01 03:00:02 $
+Last Revision Date: $Date: 2002/07/01 03:19:46 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.2 $"[11:-2]
+__revision__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
 
 import re
 import sys
-
-##################################################
-## CONSTANTS & GLOBALS ##
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
 
 ##################################################
 ## PRIVATE FUNCTIONS
@@ -46,27 +38,6 @@ except NameError:
 
 def indentize(source):
     return IndentProcessor().process(source)
-
-def parse(source):
-    d = R"#indent[ \t]+([\w+-]+)[ \t]+(.*?)(#|$)"
-    d = R"#indent[ \t]+([\w+-]+)[ \t]*(.*?)"
-    INDENT_DIRECTIVE = re.compile(d)
-    for lin in source.splitlines(True):
-        print lin,
-        pos = 0
-        while 1:
-            m = INDENT_DIRECTIVE.search(lin, pos)
-            if m is None:
-                break
-            print m.groups()
-            pos = m.end()
-
-def test():
-    from Cheetah.Tests.SyntaxAndOutput import Indenter as I
-    for source in (I.source1, I.source2, I.source3, I.source4):
-        print "===TEST==="
-        parse(source)
-    
 
 
 
@@ -115,9 +86,8 @@ class IndentProcessor:
                     level = int(args[1:])
                     line = "#silent $self._indenter.setLevel(%(level)d)" % {"level":level}
                 elif args.startswith('chars'):
-                    #self.indentChars = eval(args.split('=')[1])
-                    indentChars = self.indentChars = eval(args[5:])
-                    line = "#silent $self._indenter.setChars(%(indentChars)s)" % {"indentChars": `indentChars`}
+                    self.indentChars = eval(args.split('=')[1])
+                    line = "#silent $self._indenter.setChars(%(level)d)" % {"level":level}
                 elif args.startswith(self.PUSH):
                     line = "#silent $self._indenter.push()"
                 elif args.startswith(self.POP):
@@ -143,7 +113,7 @@ class Indenter:
     def __init__(self):
         self.On = 1
         self.Level = 0
-        self.Chars = "\t" #" "*4
+        self.Chars = " "*4
         self.LevelStack = []
     def on(self):
         self.On = 1
@@ -180,5 +150,3 @@ class Indenter:
         else:
             return " " * _default
 
-
-# vim: shiftwidth=4 tabstop=4 expandtab
