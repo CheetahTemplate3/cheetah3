@@ -1,2 +1,5 @@
 PLEASE NOTE THAT THIS EXAMPLE SITE NEEDS UPDATING.  IT HASN'T BEEN TOUCHED IN
 AGES.
+
+Also, you'll need to add '.tmpl' to WebKit's 'ExtensionsToIgnore' setting in
+Application.config before testing this example.
