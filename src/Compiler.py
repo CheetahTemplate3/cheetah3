@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.18 2001/11/06 22:50:31 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.19 2001/11/07 16:51:04 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.18 $
+Version: $Revision: 1.19 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2001/11/06 22:50:31 $
+Last Revision Date: $Date: 2001/11/07 16:51:04 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.18 $"[11:-2]
+__version__ = "$Revision: 1.19 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -542,7 +542,7 @@ class AutoMethodCompiler(MethodCompiler):
                            'SL',
                            'globalSetVars',
                            'write',
-                           'format',
+                           'filter',
                            'currentTime',
                            ]
         self._argStringList = [ ("self",None) ]
