@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: CheetahCompile.py,v 1.4 2001/11/01 02:29:04 tavis_rudd Exp $
+# $Id: CheetahCompile.py,v 1.5 2001/11/04 20:12:11 tavis_rudd Exp $
 """A command line compiler for turning Cheetah files (.tmpl) into Webware
 servlet files (.py).
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/01 02:29:04 $
+Last Revision Date: $Date: 2001/11/04 20:12:11 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -81,7 +81,8 @@ class CheetahCompile:
                 sys.exit()
             if o in ('-p',):
                 for fileName in args:
-                    print Template(file=fileName).generatedModuleCode()
+                    className = os.path.split( os.path.splitext(fileName)[0] )[1]
+                    print Compiler(file=fileName, moduleName=className, mainClassName=className)
                 sys.exit()
                     
         for fileName in args:
@@ -108,7 +109,7 @@ class CheetahCompile:
     
         srcFile = fileNameMinusExt + self.CHEETAH_EXTENSION
         className = os.path.split(fileNameMinusExt)[1]
-        genCode = str(Compiler(file=srcFile, moduleName=className))
+        genCode = str(Compiler(file=srcFile, moduleName=className, mainClassName=className))
     
         fp = open(fileNameMinusExt + self.SERVLET_EXTENSION,'w')
         fp.write(genCode)
