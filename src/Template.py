@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.79 2001/12/19 02:10:25 tavis_rudd Exp $
+# $Id: Template.py,v 1.80 2001/12/22 00:52:58 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.79 $
+Version: $Revision: 1.80 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/12/19 02:10:25 $
+Last Revision Date: $Date: 2001/12/22 00:52:58 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.79 $"[11:-2]
+__revision__ = "$Revision: 1.80 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -386,28 +386,53 @@ class Template(SettingsManager, Servlet):
             str(randrange(10000, 99999)) +
             '.py')
 
-    def _makeDummyPackageForDir(self, dirName):
-        packageName = 'Cheetah.Temp.' + dirName.replace('\\', '/').replace('/', '_')
-        baseDirName, finalDirName = os.path.split(dirName)
-        self._importModuleFromDirectory(
-            packageName, finalDirName, baseDirName,
-            isPackageDir=1,forceReload=1)
-        return packageName
 
     def _importAsDummyModule(self, contents):
+
+        """Used by the Compiler to do correct importing from Cheetah templates
+        when the template is compiled via the Template class' interface rather
+        than via 'cheetah-compile'.
+        """
+        
         tmpFilename = self._genTmpFilename()
         fp = open(tmpFilename,'w')
         fp.write(contents)
         fp.close()
         if self._filePath:
-            packageName = self._makeDummyPackageForDir(self._fileDirName)
+            moduleDir = self._fileDirName
         else:
-            packageName = self._makeDummyPackageForDir(os.getcwd())
+            moduleDir = os.getcwd()
+            
+        packageName = self._makeDummyPackageForDir(moduleDir)
         mod = self._impModFromDummyPackage(packageName, tmpFilename)            
         os.remove(tmpFilename)
         if os.path.exists( tmpFilename + 'c'):
             os.remove(tmpFilename + 'c')
+            
         return mod
+
+    def _makeDummyPackageForDir(self, dirName):
+
+        """Returns a Python Package that thinks it came from 'dirName'.
+        """
+        
+        packageName = 'Cheetah.Temp.' + dirName.replace('\\', '/').replace('/', '_')
+        baseDirName, finalDirName = os.path.split(dirName)
+        
+        initModulePath = os.path.join(dirName, '__init__.py')
+        initModuleExists = False
+        if os.path.exists(initModulePath):
+            initModuleExists = True            
+        
+        self._importModuleFromDirectory(
+            packageName, finalDirName, baseDirName,
+            isPackageDir=1,forceReload=1)
+            
+        if not initModuleExists and os.path.exists(initModulePath):
+            os.remove(initModulePath)
+            if os.path.exists(initModulePath + 'c'):
+                os.remove(initModulePath + 'c')
+        return packageName
         
     def _impModFromDummyPackage(self, packageName, pathToImport):
         moduleFileName = os.path.basename(pathToImport)
