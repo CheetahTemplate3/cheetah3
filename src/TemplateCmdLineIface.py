@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: TemplateCmdLineIface.py,v 1.1 2001/12/07 04:56:20 tavis_rudd Exp $
+# $Id: TemplateCmdLineIface.py,v 1.2 2001/12/07 04:59:11 tavis_rudd Exp $
 
 """Provides a command line interface to compiled Cheetah template modules.
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/12/06
-Last Revision Date: $Date: 2001/12/07 04:56:20 $
+Last Revision Date: $Date: 2001/12/07 04:59:11 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -61,7 +61,7 @@ class CmdLineIface:
             self._opts, self._args = getopt.getopt(
                 self._cmdLineArgs, 'hep:', ['help',
                                             'env',
-                                            'pickle',
+                                            'pickle=',
                                             ])
 
         except getopt.GetoptError, v:
