@@ -180,13 +180,17 @@ These tags may not be used inside other Cheetah tags.
 
 \item The syntax \code{\$\{placeholderName, arg1="val1"\}} passes arguments to
      the output filter (see \code{\#filter}, section \ref{output.filter}.
-     The braces and comma are required in this case.  Note that filter arguments
-     don't need a \code{\$} on the left side of the equal sign.
+     The braces and comma are required in this case.  Note that you don't need
+     the \code{\$} prefix in this case since filter arguments are not regular
+     method arguments, and omiting the \code{\$} reminds you of this fact.
+     However, you may use \code{\$} anyway if you wish.
 
 \item The special Python name \code{None} does not require a
-     \code{\$} prefix.
+     \code{\$} prefix.  (This applies only in expressions; e.g., as a method
+     argument.  The word None in surrounding text is treated as regular text.)
+     But you can use \code{\$None} if you want.
 
-\item There is one other place you omit the \code{\$} prefix: intermediate
+\item There is one place you {\em must} omit the \code{\$} prefix: intermediate
      variables in Python list comprehensions.  This is a limitation of
      Cheetah's parser, but it also makes sense.  These are temporary variables
      local to the list comprehension,  and not any of Cheetah's business.  For
@@ -194,6 +198,9 @@ These tags may not be used inside other Cheetah tags.
 \begin{verbatim}
 #set $theRange = [x ** 2 for x in $range(10)]
 \end{verbatim}
+     \code{\$theRange} is a regular \code{\#set} variable.  \code{\$range} is a
+     Python built-in function.  But \code{x} is a scratch variable internal to
+     the list comprehension: if you type \code{\$x}, Cheetah will miscompile it.
 \item Cheetah ignores all dollar signs (\code{\$}) that are not followed by a
      letter or an underscore.  Cheetah also ignores any placeholder escaped by a
      backslash (\code{$\backslash$\$placeholderName}).
@@ -641,10 +648,9 @@ $request.serverSidePath ## Absolute path of this servlet on local filesystem.
 $request.serverURL      ## URL of this servlet, without "http://" prefix,
                         ## extra path info or query string.
 $request.serverURLDir   ## URL of this servlet's directory, without "http://".
-$log("message")         ## Put a message in the Webware server log.  (Watch out:
-                        ## '#attr log', '#def log' or '#block log' will clobber
-                        ## this method, probably confusing Webware!)
-                        ## Other Webware methods easily clobberable: 'sleep'.
+$log("message")         ## Put a message in the Webware server log.  (If you
+                        ## define your own 'log' variable, it will override
+                        ## this; use $self.log("message") in that case.
 \end{verbatim}
 
 % @@ MO: If getVar() is called from Python, does errorCatcher apply?
