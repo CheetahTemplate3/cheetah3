@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.44 2002/03/18 21:28:12 tavis_rudd Exp $
+# $Id: Parser.py,v 1.45 2002/03/26 02:05:09 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.44 $
+Version: $Revision: 1.45 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/03/18 21:28:12 $
+Last Revision Date: $Date: 2002/03/26 02:05:09 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.44 $"[11:-2]
+__revision__ = "$Revision: 1.45 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1121,7 +1121,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.addFilteredChunk( codeChunk + restOfEnclosure )
         self.appendToPrevChunk(' # generated from ' + repr(rawPlaceholder) )
         if self.setting('outputRowColComments'):
-            self.appendToPrevChunk(' at line, col '+ str(lineCol) + '.')
+            self.appendToPrevChunk(' at line %s, col %s' % lineCol + '.')
         if cacheInfo:
             self.endCacheRegion()
 
@@ -1357,9 +1357,8 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         methodCompiler = self.spawnMethodCompiler(methodName, klass=AutoMethodCompiler)
         self.setActiveMethodCompiler(methodCompiler)
         methodCompiler.addMethDocString('Generated from ' + signature +
-                                        ' at line, col ' +
-                                        str(self.getRowCol(startPos)) +
-                                            '.')
+                                        ' at line %s, col %s' % self.getRowCol(startPos)
+                                        + '.')
         ## deal with the method's argstring
         for argName, defVal in argsList:
             methodCompiler.addMethArg(argName, defVal)
@@ -1393,9 +1392,8 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
             methodCompiler.addMethArg(argName, defVal)
 
         methodCompiler.addMethDocString('Generated from ' + signature +
-                                        ' at line, col ' +
-                                        str(self.getRowCol(startPos)) +
-                                        '.')            
+                                        ' at line %s, col %s' % self.getRowCol(startPos)
+                                        + '.')            
         return methodName, rawDef
 
     def eatImport(self):
@@ -1729,7 +1727,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         
         self.appendToPrevChunk(' # generated from ' + repr(rawDirective) )
         if self.setting('outputRowColComments'):
-            self.appendToPrevChunk(' at line, col '+ str(lineCol) + '.')
+            self.appendToPrevChunk(' at line %s, col %s' % lineCol + '.')
 
     def eatEndCache(self, lineClearToStartToken=False):
         endOfFirstLinePos = self.findEOL()
