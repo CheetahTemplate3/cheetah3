@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.10 2001/11/08 06:56:37 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.11 2001/11/08 07:12:25 hierro Exp $
 """Syntax and Output tests.
 
 TODO
@@ -13,12 +13,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>,
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/11/08 06:56:37 $
+Last Revision Date: $Date: 2001/11/08 07:12:25 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.10 $"[11:-2]
+__version__ = "$Revision: 1.11 $"[11:-2]
 
 
 ##################################################
@@ -107,6 +107,8 @@ defaultTestNameSpace = {
     'numOne':1,
     'numTwo':2,
     'zero':0,
+    'tenDigits': 1234567890,
+    'webSafeTest': 'abc <=> &',
     
     'blockToBeParsed':"""$numOne $numTwo""",
     'includeBlock2':"""$numOne $numTwo $aSetVar""",
@@ -1772,6 +1774,31 @@ class FilterDirective(OutputTest):
         """
         self.verify("#filter ReplaceNone  \n$none",
                     "")
+
+    def test3(self):
+        """#filter MaxLen -- maxlen of 5
+        """
+        self.verify("#filter MaxLen  \n${tenDigits, maxlen=5}",
+                    "12345")
+
+    def test4(self):
+        """#filter MaxLen -- no maxlen
+        """
+        self.verify("#filter MaxLen  \n${tenDigits}",
+                    "1234567890")
+
+    def test5(self):
+        """#filter WebSafe -- basic usage
+        """
+        self.verify("#filter WebSafe  \n$webSafeTest",
+                    "abc &lt;=&gt; &amp;")
+
+    def test6(self):
+        """#filter WebSafe -- also space
+        """
+        self.verify("#filter WebSafe  \n${webSafeTest, also=' '}",
+                    "abc&nbsp;&lt;=&gt;&nbsp;&amp;")
+
 
 class ErrorCatcherDirective(OutputTest):
     pass
