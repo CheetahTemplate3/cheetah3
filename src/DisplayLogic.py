@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: DisplayLogic.py,v 1.4 2001/08/15 17:49:51 tavis_rudd Exp $
+# $Id: DisplayLogic.py,v 1.5 2001/08/30 02:48:57 tavis_rudd Exp $
 """DisplayLogic Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/15 17:49:51 $
+Last Revision Date: $Date: 2001/08/30 02:48:57 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.4 $"[11:-2]
+__version__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -43,32 +43,34 @@ class DisplayLogic(TagProcessor.TagProcessor):
         TagProcessor.TagProcessor.__init__(self, templateObj)
 
         bits = self._directiveREbits
-        anythingBut = r'[^(?:' + bits['endTokenEsc'] + r')]+?' # anything but the endToken
-        gobbleWS = re.compile(bits['start_gobbleWS'] + r'(' +
-                              r'if[\f\t ]+' + anythingBut + '|' +
-                              r'else[\f\t ]*?|' +
-                              r'else[\f\t ]if[\t ]+' + anythingBut + '|' +
-                              r'elif[\f\t ]+' + anythingBut + '|' +
-                              r'for[\f\t ]+' + anythingBut + '|' +
-                              r'continue|' +
-                              r'break|' +
-                              r'end[\f\t ]+if|' +
-                              r'end[\f\t ]+for|' +
-                              r')[\f\t ]*' + bits['lazyEndGrp'],
-                              re.MULTILINE
-                              )
+
+        reTemplate = (r'%(startGrp)s(' +
+                      r'if[\f\t ]+%(content)s|' +
+                      r'else[\f\t ]*?|' +
+                      r'else[\f\t ]if[\t ]+%(content)s|' +
+                      r'elif[\f\t ]+%(content)s|' +
+                      r'for[\f\t ]+%(content)s|' +
+                      r'continue|' +
+                      r'break|' +
+                      r'end[\f\t ]+if|' +
+                      r'end[\f\t ]+for|' +
+                      r')[\f\t ]*%(endGrp)s')
+            
+        plain = re.compile(
+            reTemplate %
+            {'startGrp':bits['start'],
+             'content': r'.+?', # anything 
+             'endGrp': bits['endGrp'],
+             },
+            re.MULTILINE)
         
-        plain =  re.compile(bits['start'] + r'(' +
-                            r'if[\f\t ]+.+?|' +
-                            r'else[\f\t ]*?|' +
-                            r'else[\f\t ]if[\f\t ]+.+?|' +
-                            r'elif[\f\t ]+.+?|' +
-                            r'for[\f\t ].+?|' +
-                            r'end[\f\t ]+if|' +
-                            r'end[\f\t ]+for|' +
-                            r')[\f\t ]*' + bits['endGrp'],
-                            re.MULTILINE
-                            )
+        gobbleWS = re.compile(
+            reTemplate %
+            {'startGrp':bits['start_gobbleWS'],
+             'content': r'[^(?:' + bits['endTokenEsc'] + r')]+?', # anything but the endToken
+             'endGrp': bits['lazyEndGrp'],
+             },
+            re.MULTILINE)
 
         self._delimRegexs = [gobbleWS, plain]
                     
