@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: DummyTransaction.py,v 1.1 2001/08/30 19:36:21 tavis_rudd Exp $
+# $Id: DummyTransaction.py,v 1.2 2001/08/30 19:39:48 tavis_rudd Exp $
 
 """Provides dummy Transaction and Response classes is used by Cheetah in place
 of real Webware transactions when the Template obj is not used directly as a
@@ -8,12 +8,12 @@ Webware servlet.
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.1 $
+Version: $Revision: 1.2 $
 Start Date: 2001/08/30
-Last Revision Date: $Date: 2001/08/30 19:36:21 $
+Last Revision Date: $Date: 2001/08/30 19:39:48 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.2 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -66,5 +66,5 @@ class DummyTransaction:
 
     def reponse(self):
         """Return a ref to the dummy reponse object."""
-       self._response
+        return self._response
        
