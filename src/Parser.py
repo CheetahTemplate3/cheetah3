@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.43 2002/03/06 16:42:21 tavis_rudd Exp $
+# $Id: Parser.py,v 1.44 2002/03/18 21:28:12 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.43 $
+Version: $Revision: 1.44 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/03/06 16:42:21 $
+Last Revision Date: $Date: 2002/03/18 21:28:12 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.43 $"[11:-2]
+__revision__ = "$Revision: 1.44 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1409,7 +1409,7 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         ## this doesn't work with from math import *, etc.
         importVarNames = impStatement[impStatement.find('import') + len('import'):].split(',')
         importVarNames = [var.split()[-1] for var in importVarNames]
-        self.addImportedVars(importVarNames)
+        self.addGlobalVars(importVarNames)
 
         if self._templateObj:
             import Template as TemplateMod
