@@ -15,6 +15,8 @@ release
   - Abort with a helpful error message if user runs 'cheetah test' in a
     directory without write permission.  (Kludge in CheetahWrapper.py; we
     should probably move the temp files under the system tmp directory.) [MO]
+  - Fix printf format bug in "cheetah c --debug", found by Terry MacDonald. [MO]
+    
 
 0.9.15 (Mar 25, 2003)
   - a minor tweak to the cleanup actions of one of the test cases [TR]
