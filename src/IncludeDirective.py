@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: IncludeDirective.py,v 1.8 2001/08/16 22:15:17 tavis_rudd Exp $
+# $Id: IncludeDirective.py,v 1.9 2001/08/16 23:24:52 tavis_rudd Exp $
 """IncludeDirective Processor class Cheetah's codeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.8 $
+Version: $Revision: 1.9 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/08/16 22:15:17 $
+Last Revision Date: $Date: 2001/08/16 23:24:52 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -57,36 +57,50 @@ class IncludeDirective(TagProcessor.TagProcessor):
 
         
     def handleInclude(self, match):
+        """
+
+        #include <ARGS> <EXPR> 
+        ... includes the value of the EXPR 
+        
+        #include <ARGS> file = <EXPR> 
+        ... uses the value of EXPR as the path of the file to  include.
+
+        where <ARGS> is 'raw' or 'direct
+        """
+        
         import Template
-        args = match.group(1).strip()
+        EXPR = match.group(1).strip()
 
         # do a safety/security check on this tag
-        self.validateTag(args)
+        self.validateTag(EXPR)
         
         includeString = match.group(1).strip()
         
         raw = False
         directInclude = False
-
+        includeFromFile = False
+        
         ## deal with any extra args to the #include directive
-        if args.split()[0] == 'raw':
+        if EXPR.split()[0] == 'raw':
             raw = True
-            args= ' '.join(args.split()[1:])
-        elif args.split()[0] == 'direct':
+            EXPR= ' '.join(EXPR.split()[1:])
+        elif EXPR.split()[0] == 'direct':
             directInclude = True
-            args= ' '.join(args.split()[1:])
+            EXPR= ' '.join(EXPR.split()[1:])
             
-        ## get the Cheetah code to be included
-        if args.startswith( self.setting('placeholderStartToken') ):
-            translatedPlaceholder = self.translateRawPlaceholderString(args)
-            includeString = self.evalPlaceholderString(translatedPlaceholder)
-            
-        elif args.startswith('file'):
-            args = '='.join(args.split('=')[1:])
-            translatedPlaceholder = self.translateRawPlaceholderString(args)
+        ## get the path of the Cheetah code to be included or the code itself
+        if EXPR.startswith('file'):
+            includeFromFile = True
+            EXPR = '='.join(EXPR.split('=')[1:])
+            translatedPlaceholder = self.translateRawPlaceholderString(EXPR)
             fileName = self.evalPlaceholderString(translatedPlaceholder)
             fileName = self.normalizePath( fileName )
-            includeString = self.getFileContents( fileName )
+            if directInclude or raw:
+                includeString = self.getFileContents( fileName )
+        else:                           # include the value of the 
+            translatedPlaceholder = self.translateRawPlaceholderString(EXPR)
+            includeString = self.evalPlaceholderString(translatedPlaceholder)
+            
 
         ## now process finish include
         if raw:            
@@ -97,8 +111,18 @@ class IncludeDirective(TagProcessor.TagProcessor):
         elif directInclude:
             self.RESTART = True
             return includeString
+        elif includeFromFile:
+            includeID = '_' + str(id(fileName))
+            nestedTemplate = Template.Template(
+                templateDef=None,
+                file=fileName,
+                overwriteSettings=self.settings(),
+                preBuiltSearchList=self.searchList(),
+                setVars = self._setVars,
+                cheetahBlocks=self._cheetahBlocks,
+                macros=self._macros,
+                )
         else:
-            #@@ autoUpdate behaviour needs to be implemented
             includeID = '_' + str(id(includeString))
             nestedTemplate = Template.Template(
                 templateDef=includeString,
@@ -108,11 +132,12 @@ class IncludeDirective(TagProcessor.TagProcessor):
                 cheetahBlocks=self._cheetahBlocks,
                 macros=self._macros,
                 )
-            self._parsedIncludes[includeID] = nestedTemplate
-            if not hasattr(nestedTemplate, 'respond'):
-                nestedTemplate.compileTemplate()
-            return self.setting('placeholderStartToken') + \
-                   '{parsedIncludes.' + includeID + '.respond(trans, iAmNested=True)}'
+            
+        self._parsedIncludes[includeID] = nestedTemplate
+        if not hasattr(nestedTemplate, 'respond'):
+            nestedTemplate.compileTemplate()
+        return self.setting('placeholderStartToken') + \
+               '{parsedIncludes.' + includeID + '.respond(trans, iAmNested=True)}'
     
     def preProcess(self, templateDef):
         import Template                         # import it here to avoid circ. imports
