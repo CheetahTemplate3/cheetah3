@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.64 2003/10/22 21:21:47 tavis_rudd Exp $
+# $Id: Parser.py,v 1.65 2004/04/07 01:30:12 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.64 $
+Version: $Revision: 1.65 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2003/10/22 21:21:47 $
+Last Revision Date: $Date: 2004/04/07 01:30:12 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.64 $"[11:-2]
+__revision__ = "$Revision: 1.65 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1726,7 +1726,10 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         self.advance(len('repeat'))
         expr = self.getExpression()
         self.closeDirective(isLineClearToStartToken, endOfFirstLinePos)
-        self.addFor('for i in range(' + expr + ')')
+
+        #the _repeatCount stuff here allows nesting of #repeat directives
+        self._repeatCount = getattr(self, "_repeatCount", -1) + 1
+        self.addFor('for __i%s in range(%s)' % (self._repeatCount,expr))
 
     def eatUnless(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
