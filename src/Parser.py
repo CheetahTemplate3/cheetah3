@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.33 2001/12/04 09:00:38 tavis_rudd Exp $
+# $Id: Parser.py,v 1.34 2001/12/07 08:31:45 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -17,12 +17,12 @@ where:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.33 $
+Version: $Revision: 1.34 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2001/12/04 09:00:38 $
+Last Revision Date: $Date: 2001/12/07 08:31:45 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.33 $"[11:-2]
+__version__ = "$Revision: 1.34 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
@@ -1277,7 +1277,15 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         startPos = self.pos()
         self.getDirectiveStartToken()
         self.advance(len('def'))
-        methodName, rawDef = self.startDef(startPos, lineClearToStartToken)
+        self.getWhiteSpace()
+        methodName = self.getIdentifier()
+        self.getWhiteSpace()
+        if self.peek() == ':':
+            self.getc()
+            self.startSingleLineDef(methodName, startPos, endOfFirstLinePos)
+            self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        else:
+            self.startMultiLineDef(methodName, startPos, lineClearToStartToken)
         
     def eatBlock(self):
         lineClearToStartToken = self.lineClearToStartToken()
@@ -1285,21 +1293,60 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         startPos = self.pos()
         self.getDirectiveStartToken()
         self.advance(len('block'))
+        self.getWhiteSpace()
+        methodName = self.getIdentifier()
+        self.getWhiteSpace()
 
-        methodName, rawDef = self.startDef(startPos, lineClearToStartToken)
+        singleLiner = False
+        if self.peek() == ':':
+            singleLiner = True
+            self.getc()
+            rawDef = self.startSingleLineDef(methodName, startPos, endOfFirstLinePos)
+            self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
+        else:
+            rawDef = self.startMultiLineDef(methodName, startPos, lineClearToStartToken)
+            
         self._blockMetaData[methodName] = {'raw':rawDef,
                                            'lineCol':self.getRowCol(startPos),
                                            }
-
+        
         if self.setting('includeBlockMarkers'):
             startMarker = self.setting('blockMarkerStart')
             self.addStrConst(startMarker[0] + methodName + startMarker[1])
+
+        if singleLiner:
+            self.closeBlock(methodName)
             
+            
+    def startSingleLineDef(self, methodName, startPos, endPos):
+        methodSrc = self[self.pos():endPos].strip()
+        signature = self[startPos:endPos]
+
+        origBP = self.breakPoint()
+        origSrc = self._src
+        self._src = methodSrc
+        self.setPos(0)
+        self.setBreakPoint(len(methodSrc))
         
-    def startDef(self, startPos, lineClearToStartToken=False):
-        ## get some info on the method
-        self.getWhiteSpace()
-        methodName = self.getIdentifier()
+        from Compiler import AutoMethodCompiler
+        methodCompiler = self.spawnMethodCompiler(methodName, klass=AutoMethodCompiler)
+        self.setActiveMethodCompiler(methodCompiler)
+        methodCompiler.addMethDocString('Generated from ' + signature +
+                                        ' at line, col ' +
+                                        str(self.getRowCol(startPos)) +
+                                            '.')
+        self.parse()
+        self.commitStrConst()
+        methCompiler = self.getActiveMethodCompiler()
+        self.swallowMethodCompiler(methCompiler)
+        
+        self._src = origSrc
+        self.setBreakPoint(origBP)
+        self.setPos(endPos)
+        return signature
+
+        
+    def startMultiLineDef(self, methodName, startPos, lineClearToStartToken=False):
         self.getWhiteSpace()
         if self.peek() == '(':
             argsList = self.getDefArgList()
@@ -1641,15 +1688,17 @@ class _HighLevelSemanticsParser(_LowLevelSemanticsParser):
         endOfFirstLinePos = self.findEOL()
         self.getExpression()
         self.closeDirective(lineClearToStartToken, endOfFirstLinePos)
-        
         methCompiler = self.getActiveMethodCompiler()
         methodName = methCompiler.methodName()
         if self.setting('includeBlockMarkers'):
             endMarker = self.setting('blockMarkerEnd')
             methCompiler.addStrConst(endMarker[0] + methodName + endMarker[1])
-        self.commitStrConst()
+        if hasattr(self, 'commitStrConst'):
+            self.commitStrConst()
         self.swallowMethodCompiler(methCompiler)
+        self.closeBlock(methodName)
 
+    def closeBlock(self, methodName):
         metaData = self._blockMetaData[methodName] 
         rawDirective = metaData['raw']
         lineCol = metaData['lineCol']
