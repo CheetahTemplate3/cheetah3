@@ -31,6 +31,13 @@ Please initial your changes and add a date for each release
   - fixed a bug in the handling of the setting 'useAutocalling' (TR)
   - fixed some bugs in the handling of macros (TR)
   - completed the transition to nested template #includes (TR)
+  - added direct #includes (TR)
+  - completed the transition to run-time evaluation (TR)
+  - renamed the .startServer() method of Template to .compile() (TR)
+  - renamed the 'delayedStart' setting as 'delayedCompile' (TR)
+  - added .redefineTemplateBlock as an alias to Template.defineTemplateBlock
+    (TR)
+  - got relative path includes working with Webware and Cheetah.Servlet (TR)
   - lots of changes in the docs (TR & MO)
 
  

@@ -8,7 +8,7 @@ Cheetah TODO list
 
 Languague Specification
 ================================================================================
-- firm up the list of features/syntax that are not subject to change
+- firm up the autocalling and Unified Dotted Notation syntax rules
 
 Implementation
 ================================================================================
@@ -20,6 +20,12 @@ Implementation
   implemented in such a way that they won't cause 'maximum recursion' limit
   errors if their content block is long.  Simple regexes won't cut it in these 
   cases.
+  - #macro
+  - multiline comments
+  - #data
+  - the parsing of the core tags (the state-dependent ones) after they have been
+    translated to the internal delimiters
+
 
 Test Suite
 ================================================================================
