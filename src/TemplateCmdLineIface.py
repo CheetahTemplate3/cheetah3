@@ -1,17 +1,17 @@
 #!/usr/bin/env python
-# $Id: TemplateCmdLineIface.py,v 1.2 2001/12/07 04:59:11 tavis_rudd Exp $
+# $Id: TemplateCmdLineIface.py,v 1.3 2001/12/07 04:59:49 tavis_rudd Exp $
 
 """Provides a command line interface to compiled Cheetah template modules.
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.2 $
+Version: $Revision: 1.3 $
 Start Date: 2001/12/06
-Last Revision Date: $Date: 2001/12/07 04:59:11 $
+Last Revision Date: $Date: 2001/12/07 04:59:49 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.2 $"[11:-2]
+__version__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -67,7 +67,7 @@ class CmdLineIface:
         except getopt.GetoptError, v:
             # print help information and exit:
             print v
-            self.usage()
+            print self.usage()
             sys.exit(2)
         
         for o, a in self._opts:
@@ -80,8 +80,7 @@ class CmdLineIface:
                 self._template.prependToSearchList( load(a) )
 
     def usage(self):
-        print \
-"""Cheetah %(version)s template module command-line interface
+        return """Cheetah %(version)s template module command-line interface
 
 Usage
 -----
