@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.13 2002/04/15 06:12:38 tavis_rudd Exp $
+# $Id: Filters.py,v 1.14 2002/04/15 06:22:53 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -10,12 +10,12 @@ would otherwise require a real template object).
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.13 $
+Version: $Revision: 1.14 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2002/04/15 06:12:38 $
+Last Revision Date: $Date: 2002/04/15 06:22:53 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.13 $"[11:-2]
+__revision__ = "$Revision: 1.14 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -28,10 +28,9 @@ from StringIO import StringIO # not cStringIO because of unicode support
 ## CONSTANTS & GLOBALS
 
 try:
-    True = (1==1)
-    False = (0==1)
-except:
-    pass
+    True,False
+except NameError:
+    True, False = (1==1),(1==0)
 
 # Additional entities WebSafe knows how to transform.  No need to include
 # '<', '>' or '&' since those will have been done already.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.89 2002/04/15 06:08:15 tavis_rudd Exp $
+# $Id: Template.py,v 1.90 2002/04/15 06:22:53 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.89 $
+Version: $Revision: 1.90 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2002/04/15 06:08:15 $
+Last Revision Date: $Date: 2002/04/15 06:22:53 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.89 $"[11:-2]
+__revision__ = "$Revision: 1.90 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -50,10 +50,9 @@ from Utils.Misc import CheckKeywords     # Used in Template.__init__
 ## CONSTANTS & GLOBALS
 
 try:
-    True = (1==1)
-    False = (0==1)
-except:
-    pass
+    True,False
+except NameError:
+    True, False = (1==1),(1==0)
 
 VFS = valueFromSearchList
 VFN = valueForName
