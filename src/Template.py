@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.14 2001/08/02 05:32:10 tavis_rudd Exp $
+# $Id: Template.py,v 1.15 2001/08/02 06:17:11 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@calrudd.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.14 $
+Version: $Revision: 1.15 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2001/08/02 05:32:10 $
+Last Revision Date: $Date: 2001/08/02 06:17:11 $
 """ 
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__version__ = "$Revision: 1.14 $"[11:-2]
+__version__ = "$Revision: 1.15 $"[11:-2]
 
 
 ##################################################
@@ -35,6 +35,7 @@ import NameMapper
 from SearchList import SearchList
 import CodeGenerator as CodeGen
 from PlaceholderProcessor import PlaceholderProcessor
+from CacheDirectiveProcessor import CacheDirectiveProcessor, EndCacheDirectiveProcessor
 import ErrorHandlers
 from Delimiters import delimiters as delims
 from Utilities import \
@@ -67,8 +68,8 @@ class Template(SettingsManager):
     placeholderProcessor =  PlaceholderProcessor()
     displayLogicProcessor = CodeGen.DisplayLogicProcessor()
     setDirectiveProcessor = CodeGen.SetDirectiveProcessor()        
-    cacheDirectiveProcessor = CodeGen.CacheDirectiveProcessor()
-    endCacheDirectiveProcessor = CodeGen.EndCacheDirectiveProcessor()
+    cacheDirectiveProcessor = CacheDirectiveProcessor()
+    endCacheDirectiveProcessor = EndCacheDirectiveProcessor()
 
     _settings = {
         'useAutocalling': True,
