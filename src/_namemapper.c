@@ -52,25 +52,12 @@ static int getNameChunks(char *nameChunks[], char *name, char *nameCopy)
 static int 
 hasKey(PyObject *obj, char *key)
 {
-  const char *underscore = "_";
-  char *underscoreKey = NULL;
-
   if (PyObject_HasAttrString(obj, key)) {
     return TRUE;
   } else if (PyMapping_Check(obj) && PyMapping_HasKeyString(obj, key)) {
     return TRUE;
   } else {
-    underscoreKey = malloc(strlen(key) + 2); /* 1 for \0 and 1 for '_' */
-    strcpy(underscoreKey, underscore);
-    strcat(underscoreKey, key);
-
-    if (PyObject_HasAttrString(obj, underscoreKey)) {
-      free(underscoreKey);
-      return TRUE;
-    } else {
-      free(underscoreKey);
       return FALSE;
-    }
   }
 } /* end - hasKey */
 
@@ -79,26 +66,13 @@ static PyObject *
 PyNamemapper_valueForKey(PyObject *obj, char *key)
 {
   PyObject *theValue = NULL;
-  const char *underscore = "_";
-  char *underscoreKey = NULL;
 
   if (PyObject_HasAttrString(obj, key)) {
     theValue = PyObject_GetAttrString(obj, key);
   } else if (PyMapping_Check(obj) && PyMapping_HasKeyString(obj, key)) {
     theValue = PyMapping_GetItemString(obj, key);
   } else {
-
-    underscoreKey = malloc(strlen(key) + 2); /* 1 for \0 and 1 for '_' */
-    strcpy(underscoreKey, underscore);
-    strcat(underscoreKey, key);
-
-    if (PyObject_HasAttrString(obj, underscoreKey)) {
-      theValue = PyObject_GetAttrString(obj, underscoreKey);
-      free(underscoreKey);
-    } else {
-      free(underscoreKey);
       notFound(key);
-    }
   }
   return theValue;
 } /* end - PyNamemapper_valueForKey */
@@ -112,8 +86,6 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
   char *currentKey;
   PyObject *currentVal = NULL;
   PyObject *nextVal = NULL;
-  const char *underscore = "_";
-  char *underscoreKey = NULL;
 
   currentVal = obj;
   for (i=0; i < numChunks;i++) {
@@ -124,21 +96,10 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
     } else if (PyMapping_Check(currentVal) && PyMapping_HasKeyString(currentVal, currentKey)) {
       nextVal = PyMapping_GetItemString(currentVal, currentKey);
     } else {
-      
-      underscoreKey = malloc(strlen(currentKey) + 2); /* 1 for \0 and 1 for '_' */
-      strcpy(underscoreKey, underscore);
-      strcat(underscoreKey, currentKey);
-      
-      if (PyObject_HasAttrString(currentVal, underscoreKey)) {
-	nextVal = PyObject_GetAttrString(currentVal, underscoreKey);
-	free(underscoreKey);
-      } else {
-	if (i>0) {
-	  Py_DECREF(currentVal);
-	}
-	free(underscoreKey);
-	notFound(currentKey);
+      if (i>0) {
+	Py_DECREF(currentVal);
       }
+      notFound(currentKey);
     }
     if (i>0) {
       Py_DECREF(currentVal);

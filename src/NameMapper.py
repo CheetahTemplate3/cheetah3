@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.19 2002/10/01 17:52:02 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.20 2002/10/05 19:36:46 tavis_rudd Exp $
 
 """This module implements Cheetah's optional NameMapper syntax.
 
@@ -110,18 +110,6 @@ NameMapper makes it possible to access the attributes of a servlet in Cheetah
 without needing to include 'self' in the variable names.  See the NAMESPACE
 CASCADING section below for details.
 
-
-UNDERSCORED ATTRIBUTES (d)
---------------------------
-
-If a 'name' in cheetah doesn't correspond to a valid object attribute name in
-Python, but there is an attribute in the form '_<name>' NameMapper will return
-the underscored attribute.
-
-Thus, it removes the need to change all placeholders like $clients.list to
-$clients._list when the 'list' attribute of 'clients' is changed to underscored
-attribute, and vice-versa.
-
 NAMESPACE CASCADING (d)
 --------------------
 
@@ -146,13 +134,13 @@ Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@damnsimple.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.19 $
+Version: $Revision: 1.20 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2002/10/01 17:52:02 $
+Last Revision Date: $Date: 2002/10/05 19:36:46 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__revision__ = "$Revision: 1.19 $"[11:-2]
+__revision__ = "$Revision: 1.20 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -192,17 +180,14 @@ except:
     
         """Get the value of the specified key.  The 'obj' can be a a mapping or any
         Python object that supports the __getattr__ method. The key can be a mapping
-        item, an attribute or an underscored attribute."""
+        item, or an attribute."""
     
         if hasattr(obj, key):
             return getattr(obj, key)
         try:
             return obj[key]
-        except:
-            if hasattr(obj, '_' + key):
-                return getattr(obj, '_' + key)
-            else:
-                raise NotFound, key
+        except KeyError:
+            raise NotFound, key
 
 
     def valueForName(obj, name, executeCallables=False):
@@ -268,8 +253,6 @@ def hasKey(obj, key):
     """Determine if 'obj' has 'key' """
     if hasattr(obj, key):
         return True
-    elif hasattr(obj, '_' + key):
-        return True
     elif hasattr(obj,'has_key') and obj.has_key(key):
         return True
     else:
@@ -311,10 +294,6 @@ def example():
 
     class B(A):
         classBvar = 'classBvar val'
-        _underScoreVar = '_underScoreVar val'
-
-        def _underScoreMethod(self):
-            return '_underScoreMethod output'
 
     a = A()
     a.one = 'valueForOne'
@@ -339,7 +318,6 @@ def example():
     print valueForName(vars(), 'b')
     print valueForName(__builtins__, 'dir')()
     print valueForName(vars(), 'a.classVar')
-    print valueForName(vars(), 'B.underScoreVar')
     print valueForName(vars(), 'a.dic.func', executeCallables=True)
     print valueForName(vars(), 'a.method2.item1', executeCallables=True)
 
