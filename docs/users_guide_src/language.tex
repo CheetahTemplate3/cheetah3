@@ -613,7 +613,6 @@ searchList; instead, copy the needed variables into your own "safe" namespace.
 
 To look up a CGI GET or POST parameter (with POST overriding):
 \begin{verbatim}
-$request.field.myField           ## Uniform Dotted Notation and autocalling.
 $request.field('myField')        ## Using autocalling only.
 $request().field('myField')      ## Using neither, boring.
 self.request().field('myField')
