@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.15 2003/02/06 05:36:13 hierro Exp $
+# $Id: CheetahWrapper.py,v 1.16 2003/09/18 18:19:02 hierro Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -9,12 +9,12 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.15 $
+Version: $Revision: 1.16 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2003/02/06 05:36:13 $
+Last Revision Date: $Date: 2003/09/18 18:19:02 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.15 $"[11:-2]
+__revision__ = "$Revision: 1.16 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -417,6 +417,19 @@ be named according to the same rules as Python modules.""" % tup)
         usage(HELP_PAGE2, "", sys.stdout)
 
     def test(self):
+        # @@MO: Ugly kludge.
+        TEST_WRITE_FILENAME = 'cheetah_test_file_creation_ability.tmp'
+        try:
+            f = open(TEST_WRITE_FILENAME, 'w')
+        except:
+            sys.exit("""\
+Cannot run the tests because you don't have write permission in the current
+directory.  The tests need to create temporary files.  Change to a directory
+you do have write permission to and re-run the tests.""")
+        else:
+            f.close()
+            os.remove(TEST_WRITE_FILENAME)
+        # @@MO: End ugly kludge.
         from Cheetah.Tests import Test
         import Cheetah.Tests.unittest_local_copy as unittest
         del sys.argv[1:] # Prevent unittest from misinterpreting options.

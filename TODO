@@ -15,6 +15,10 @@ Requirements for 1.0
   and 'False' instead of '1' and '0' when used as placeholders).  The same
   thing happens with $True and $False.  Do we need a set of parallel tests
   for Python >= 2.3?  
+- There's a kludge in CheetahWrapper.py to abort with a helpful error message
+  if the user runs 'cheetah test' but doesn't have write permission in the
+  current directory.  The tests should instead put their temporary files
+  under the system tmp directory.
 - Simplify NameMapper.py while maintaining new behavior (ignore dictionary
   attributes/methods when searching for match of first chunk in searchList
   lookup).  Modify _namemapper.c to conform.  Make valueForKey error
