@@ -2,6 +2,8 @@
 """Nothing, but in a friendly way.  Good for filling in for objects you want to
 hide.  If $form.f1 is a RecursiveNull object, then
 $form.f1.anything["you"].might("use") will resolve to the empty string.
+
+This module was contributed by Ian Bicking.
 """
 
 class RecursiveNull:
