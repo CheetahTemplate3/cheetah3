@@ -39,6 +39,9 @@ release
     *** THE #INDENT SYNTAX WILL CHANGE! *** (MO)
   - added the #return directive as requested by Robert Kulezj (TR)
   - added some test cases for the #return directive (TR)
+  - removed buggy import statement that had been left in Servlet.py after the
+    CGIInputMixin changes (TR)
+
 
 0.9.13 (May 8, 2002)
   - changed Cheetah.Servlet.isRunningFromWebKit to isWebwareInstalled (TR)
