@@ -230,7 +230,7 @@ This example demonstrates use with \code{\$placeholder} variables:
 
 And this demonstrates its use with external files:
 \begin{verbatim}
-#include "includeFileName.txt"
+#include file="includeFileName.txt"
 \end{verbatim}
 
 By default, included text will be parsed for Cheetah tags.  The argument
@@ -239,7 +239,7 @@ parsing.
 
 \begin{verbatim}
 #include raw $myParseText
-#include raw "includeFileName.txt"
+#include raw file = "includeFileName.txt"
 \end{verbatim}
 
 By default, Cheetah wraps each chunk of \code{\#include} text inside a nested
@@ -260,7 +260,7 @@ to the include src file.
 
 \begin{verbatim}
 #include direct $myParseText
-#include direct "includeFileName.txt"
+#include direct file = "includeFileName.txt"
 \end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
