@@ -1,21 +1,17 @@
 Cheetah TODO list
 -----------------
 
-
 * If you are working on a task please put your initials at the end of the
   description
 
-* When a task is completed please change its - to an ! and move it to the bottom
-  of the list.
+* When a task is completed please remember to note it in the CHANGES file
 
 Languague Specification
 ================================================================================
 - firm up the list of features/syntax that are not subject to change
-- firm up the NamedValueAccess syntax (along with new test cases)
 
 Implementation
 ================================================================================
-- design and implement the new parser we've been discussing
 - reimplement the #include directive so it monitors for changes to 
   the included files
 - redesign and implement the Servlet Factory for Webware so the #extend directive
@@ -34,10 +30,7 @@ Test Suite
 
 Documentation
 ================================================================================
-- add the list of what's stable and what's not to the 'How Mature is Cheetah'
-  section
 - finish all the empty sections
-- flesh out the 'Quick Tutorial' in the 'Getting Started' section
 - add the glossary
 - add an 'Information for Developers' Section
 - add examples to the Examples section
