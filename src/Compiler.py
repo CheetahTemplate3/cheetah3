@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.40 2002/06/30 20:08:13 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.41 2002/07/31 19:15:24 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -12,12 +12,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@calrudd.com>
-Version: $Revision: 1.40 $
+Version: $Revision: 1.41 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2002/06/30 20:08:13 $
+Last Revision Date: $Date: 2002/07/31 19:15:24 $
 """
 __author__ = "Tavis Rudd <tavis@calrudd.com>"
-__revision__ = "$Revision: 1.40 $"[11:-2]
+__revision__ = "$Revision: 1.41 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -62,6 +62,7 @@ class GenUtils:
 
 
     def genTimeInterval(self, timeString):
+        ##@@ TR: need to add some error handling here
         if timeString[-1] == 's':
             interval = float(timeString[:-1])
         elif timeString[-1] == 'm':
@@ -326,7 +327,7 @@ class MethodCompiler(SettingsManager, GenUtils):
         self._methodBodyChunks[-1] = self._methodBodyChunks[-1] + appendage
 
     def addWriteChunk(self, chunk):
-        self.addChunk('write(' + chunk + ")")
+        self.addChunk('write(' + chunk + ')')
 
     def addFilteredChunk(self, chunk):
         self.addWriteChunk('filter(' + chunk + ')')
@@ -919,7 +920,7 @@ class ModuleCompiler(Parser, GenUtils):
         if not mainClassName:
             self._mainClassName = moduleName
         else:
-            self._mainClassName =mainClassName
+            self._mainClassName = mainClassName
         self._mainMethodName = mainMethodName
 
         
@@ -986,7 +987,7 @@ class ModuleCompiler(Parser, GenUtils):
             'indentationStep': ' '*4, 
             'initialMethIndentLevel': 2,
 
-            'monitorSrcFile':True,
+            'monitorSrcFile':False,
             
             ## controlling the handling of Cheetah $vars
             'useNameMapper': True,      # Unified dotted notation and the searchList
@@ -1272,8 +1273,6 @@ class ModuleCompiler(Parser, GenUtils):
         
     def moduleConstants(self):
         return '\n'.join(self._moduleConstants)
-
-
 
     def classDefs(self):
         classDefs = [str(klass) for klass in self.finishedClasses() ]
