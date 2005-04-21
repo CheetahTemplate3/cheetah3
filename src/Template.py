@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.115 2005/02/28 23:45:23 tavis_rudd Exp $
+# $Id: Template.py,v 1.116 2005/04/21 02:00:05 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.115 $
+Version: $Revision: 1.116 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/02/28 23:45:23 $
+Last Revision Date: $Date: 2005/04/21 02:00:05 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.115 $"[11:-2]
+__revision__ = "$Revision: 1.116 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import sys                        # used in the error handling code
@@ -21,6 +21,7 @@ import re                         # used to define the internal delims regex
 import new                        # used to bind the compiled template code
 import types                      # used in the mergeNewTemplateData method
                                   # and in Template.__init__()
+import string
 try:
     from types import StringTypes
 except ImportError:
@@ -327,7 +328,6 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         CmdLineIface(templateObj=self).run()
         
 
-
     ##################################################
     ## internal methods -- not to be called by end-users
     ## @@TR 2005-01-01:  note that I plan to get rid of all of this in a future
@@ -417,146 +417,24 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         'cheetah compile'."""
        
         return (
-            os.path.split(mktemp())[0] + '/__CheetahTemp_' +
             ''.join(map(lambda x: '%02d' % x, time.localtime(time.time())[:6])) + 
             str(randrange(10000, 99999)) +
             '.py')
-
 
     def _importAsDummyModule(self, contents):
 
         """Used by the Compiler to do correct importing from Cheetah templates
         when the template is compiled via the Template class' interface rather
         than via 'cheetah compile'.
-
-        @@TR 2005-01-01: I really want to get away from this approach!
         """
         tmpFilename = self._genTmpFilename()
-        fp = open(tmpFilename,'w')
-        fp.write(contents)
-        fp.close()
-        if self._filePath:
-            moduleDir = self._fileDirName
-        else:
-            moduleDir = gettempdir()
-            
-        packageName = self._makeDummyPackageForDir(moduleDir)
-        mod = self._impModFromDummyPackage(packageName, tmpFilename)            
-        os.remove(tmpFilename)
-        if os.path.exists( tmpFilename + 'c'):
-            os.remove(tmpFilename + 'c')
-        if os.path.exists( tmpFilename + 'o'):
-            os.remove(tmpFilename + 'o')
-            
+        name = tmpFilename.replace('.py','')
+        co = compile(contents+'\n', tmpFilename, 'exec')
+        mod = new.module(name)
+        #mod.__file__ = co.co_filename
+        #mod.__co__ = co
+        exec co in mod.__dict__
         return mod
-
-    def _makeDummyPackageForDir(self, dirName):
-
-        """Returns a Python Package that thinks it came from 'dirName'.
-        """
-        packageName = 'Cheetah.Temp.' + dirName.replace('\\', '/').replace('/', '_').replace(':','_')
-        baseDirName, finalDirName = os.path.split(dirName)
-        
-        initModulePath = os.path.join(dirName, '__init__.py')
-        initModuleExists = False
-        if os.path.exists(initModulePath):
-            initModuleExists = True            
-        
-        self._importModuleFromDirectory(
-            packageName, finalDirName, baseDirName,
-            isPackageDir=1,forceReload=1)
-            
-        if not initModuleExists and os.path.exists(initModulePath):
-            os.remove(initModulePath)
-            if os.path.exists(initModulePath + 'c'):
-                os.remove(initModulePath + 'c')
-        return packageName
-        
-    def _impModFromDummyPackage(self, packageName, pathToImport):
-        
-        """Imports a python .py module as if it were part of the package given
-        by 'packageName'.  The package doesn't need to exist.
-        """
-        
-        moduleFileName = os.path.basename(pathToImport)
-        moduleDir = os.path.dirname(pathToImport)
-        moduleName, ext = os.path.splitext(moduleFileName)
-        fullModName = packageName + '.' + moduleName
-        return self._importModuleFromDirectory(fullModName, moduleName,
-                                           moduleDir, forceReload=1)
-
-    def _importModuleFromDirectory(self, fullModuleName, moduleName,
-                                   directory, isPackageDir=0, forceReload=0):
-        
-        """ Imports the given module from the given directory.  fullModuleName
-        should be the full dotted name that will be given to the module within
-        Python (including the packages, etc.).  moduleName should be the name of
-        the module in the filesystem, which may be different from the name given
-        in fullModuleName.  Returns the module object.  If forceReload is true
-        then this reloads the module even if it has already been imported.
-        
-        If isPackageDir is true, then this function creates an empty __init__.py
-        if that file doesn't already exist.  """
-                
-        if not forceReload:
-            module = sys.modules.get(fullModuleName, None)
-            if module is not None:
-                return module
-        fp = None
-        try:
-            if isPackageDir:
-                # Check if __init__.py is in the directory -- if not, make an empty one.
-                packageDir = os.path.join(directory, moduleName)
-                initPy = os.path.join(packageDir, '__init__.py')
-                if not os.path.exists(initPy):
-                    file = open(initPy, 'w')
-                    file.write('#')
-                    file.close()
-            if os.name != 'java':
-                fp, pathname, stuff = imp.find_module(moduleName, [directory])
-                module = imp.load_module(fullModuleName, fp, pathname, stuff)
-            else:
-                module = self._jython_importModuleFromDirectory(fullModuleName, moduleName,
-                                                                directory)
-        finally:
-            if fp is not None:
-                fp.close()
-                
-        return module
-
-    def _jython_importModuleFromDirectory(self, fullModuleName, moduleName,
-                                          directory):
-        fp = None
-        try:
-            try:
-                fp, pathname, stuff = imp.find_module(moduleName, [directory])
-                module = sys.modules.get(fullModuleName, None)
-                if module is not None:
-                    code = "del " + fullModuleName
-                    self._importCode(code, "_jython_importModuleFromDirectory_hlp")
-
-                (suffix, mode, type) = stuff
-                if type == imp.PY_SOURCE:
-                    module = self._importCode(fp, fullModuleName, 1)
-
-                return module
-
-            except:
-                module = imp.new_module(fullModuleName)
-                sys.modules[fullModuleName] = module
-                return module
-        finally:
-            if fp is not None:
-                fp.close()
-
-
-    def _importCode(self, code, name, add_to_sys_modules=0):
-        module = imp.new_module(name)
-        if add_to_sys_modules:
-            sys.modules[name] = module
-        exec code in module.__dict__
-
-        return module
 
 T = Template   # Short and sweet for debugging at the >>> prompt.
 
