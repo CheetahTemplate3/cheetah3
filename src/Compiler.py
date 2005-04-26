@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.64 2005/01/17 18:14:21 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.65 2005/04/26 20:48:33 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.64 $
+Version: $Revision: 1.65 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/01/17 18:14:21 $
+Last Revision Date: $Date: 2005/04/26 20:48:33 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.64 $"[11:-2]
+__revision__ = "$Revision: 1.65 $"[11:-2]
 
 import sys
 import os
@@ -32,6 +32,7 @@ from Cheetah.Version import Version
 from Cheetah.SettingsManager import SettingsManager
 from Cheetah.Parser import Parser, ParseError, specialVarRE, STATIC_CACHE, REFRESH_CACHE
 from Cheetah.Utils.Indenter import indentize # an undocumented preprocessor
+from Cheetah import ErrorCatchers
 
 class Error(Exception):
     pass
@@ -197,8 +198,9 @@ class GenUtils:
 ## METHOD COMPILERS
 
 class MethodCompiler(GenUtils):
-    def __init__(self, methodName, classCompiler):
+    def __init__(self, methodName, classCompiler, templateObj=None):
         self._settingsManager = classCompiler
+        self._templateObj = templateObj
         self._methodName = methodName
         self._setupState()
 
@@ -545,14 +547,14 @@ class MethodCompiler(GenUtils):
         self.addChunk('')
 
     def setErrorCatcher(self, errorCatcherName):
-        if self._compiler._templateObj:
-            self._compiler._templateObj._errorCatcher = \
-                   getattr(ErrorCatchers, errorCatcherName)(self._compiler._templateObj)
+        if self._templateObj:
+            self._templateObj._errorCatcher = \
+                   getattr(ErrorCatchers, errorCatcherName)(self._templateObj)
 
         self.addChunk('if self._errorCatchers.has_key("' + errorCatcherName + '"):')
         self.indent()
         self.addChunk('self._errorCatcher = self._errorCatchers["' +
-            theChecker + '"]')
+            errorCatcherName + '"]')
         self.dedent()
         self.addChunk('else:')
         self.indent()
@@ -803,7 +805,7 @@ class ClassCompiler(GenUtils):
     def _spawnMethodCompiler(self, methodName, klass=None):
         if klass is None:
             klass = self.methodCompilerClass
-        methodCompiler = klass(methodName, classCompiler=self)
+        methodCompiler = klass(methodName, classCompiler=self, templateObj=self._templateObj)
         self._methodsIndex[methodName] = methodCompiler
         return methodCompiler
 
@@ -886,7 +888,6 @@ class ClassCompiler(GenUtils):
         self._placeholderToErrorCatcherMap[rawCode] = methodName
         
         catcherMeth = self._spawnMethodCompiler(methodName, klass=MethodCompiler)
-        catcherMeth.setupState()
         catcherMeth.setMethodSignature('def ' + methodName +
                                        '(self, localsDict={})')
                                         # is this use of localsDict right?

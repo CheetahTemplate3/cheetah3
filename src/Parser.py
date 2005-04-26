@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.69 2005/01/11 15:46:51 tavis_rudd Exp $
+# $Id: Parser.py,v 1.70 2005/04/26 20:49:01 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.69 $
+Version: $Revision: 1.70 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/01/11 15:46:51 $
+Last Revision Date: $Date: 2005/04/26 20:49:01 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.69 $"[11:-2]
+__revision__ = "$Revision: 1.70 $"[11:-2]
 
 import os
 import sys
@@ -1627,10 +1627,10 @@ class _HighLevelParser(_LowLevelParser):
         self.getDirectiveStartToken()
         self.advance(len('errorCatcher'))
         self.getWhiteSpace()
-        self.turnErrorCatcherOn()
+        self._compiler.turnErrorCatcherOn()
         errorCatcherName = self.getIdentifier()
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
-        self.setErrorCatcher(errorCatcherName)
+        self._compiler.setErrorCatcher(errorCatcherName)
         
     def eatWhile(self):
         self._compiler.addWhile(self.eatSimpleExprDirective())
