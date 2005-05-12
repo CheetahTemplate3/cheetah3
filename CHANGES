@@ -1,6 +1,13 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
+0.9.17-rc1 (May 12, 2005)
+  - removed the use of temp files for handling imports with dynamic
+    compilation. This removes a whole slew of issues, including a temp file
+    security issue reported on the email list by Brian Bird. [TR]
+  - fixed bug with handling of the searchList with dynamic inheritance, as
+    reported by  Brian Bird. [TR]
+
 0.9.16 (Mar 27, 2005)
   - this is just 0.9.16b1 repackaged [TR]
 
