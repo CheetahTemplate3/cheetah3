@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.66 2005/05/12 21:05:57 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.67 2005/05/14 00:31:43 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.66 $
+Version: $Revision: 1.67 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/05/12 21:05:57 $
+Last Revision Date: $Date: 2005/05/14 00:31:43 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.66 $"[11:-2]
+__revision__ = "$Revision: 1.67 $"[11:-2]
 
 import sys
 import os
@@ -1274,7 +1274,9 @@ class ModuleCompiler(SettingsManager, GenUtils):
             newClass.__bases__ = __bases__
             self._templateObj.__class__ = newClass
             # must initialize it so instance attributes are accessible
-            newClass.__init__(self._templateObj, _preBuiltSearchList=self._templateObj._searchList)
+            newClass.__init__(self._templateObj,
+                              _globalSetVars=self._templateObj._globalSetVars,
+                              _preBuiltSearchList=self._templateObj._searchList)
 
     def setCompilerSetting(self, key, valueExpr):
         self.setSetting(key, eval(valueExpr) )
