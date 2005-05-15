@@ -1,5 +1,5 @@
 include *.py *.cfg TODO CHANGES LICENSE README examples docs bin
-recursive-include src *
+recursive-include src *.py *.tmpl *.txt
 recursive-include bin *
 recursive-include docs * 
 recursive-include examples *
