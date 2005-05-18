@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.55 2005/02/28 23:50:38 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.56 2005/05/18 07:26:03 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.55 $
+Version: $Revision: 1.56 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/02/28 23:50:38 $
+Last Revision Date: $Date: 2005/05/18 07:26:03 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.55 $"[11:-2]
+__revision__ = "$Revision: 1.56 $"[11:-2]
 
 
 ##################################################
@@ -2016,6 +2016,14 @@ $spacer()
 """,
                     '<img src="spacer.gif" width="1" height="1" alt="" />\n')
 
+    def test4(self):
+        """#extends with globals and searchList test"""
+        self.verify("""#extends Cheetah.Templates.SkeletonPage
+#set global g="Hello"
+#implements respond
+$g $numOne
+""",
+                    'Hello 1\n')
 
 class ImportantExampleCases(OutputTest):
     def test1(self):
