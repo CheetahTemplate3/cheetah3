@@ -10,13 +10,6 @@ Cheetah TODO list
 
 Requirements for 1.0
 =========================================================================
-- Remove the use of temp files with dynamically compiled templates. 
-  When compiling a template on the fly, Cheetah writes mymodule.py and then
-  imports it; however, it imports /tmp/mymodule.py instead if it exists.  This is
-  wrong and a potential security hole.  Anyway, it's possible to create a module
-  entirely in memory (see 'new' module) without writing a temporary file, and
-  that makes more sense.
-
 - "cheetah test" problem: subcommands fail mysteriously on Windows.  Rewrite
   to avoid using subcommands.  Instead, set sys.argv and call the appropriate
   main() for each test.

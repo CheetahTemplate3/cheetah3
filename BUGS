@@ -5,33 +5,6 @@ See the file CHANGES for a list of bugs that have been resolved.
 Developers: if a bug was significant and affected a released version of
 Cheetah, be sure to note its fix in the CHANGES file!
 
-
-Clash between searchList and locally assigned variables
-=======================================================
-@@TR 2004-12-30: I'm about to checkin some changes that will fix this.
-
-On Saturday 31 January 2004 05:29, <psyche@mensa.org.pl> wrote:
-  from Cheetah.Template import Template as tmpl
-  print tmpl( \
-  '''
-  #if False
-   #for $a in [1]:
-   #end for
-  #end if
-  
-  $a
-  ''', searchList=[{'a': 3}])
-
-  throws exception:
-  
-  Traceback (most recent call last):
-    File "P:\python\cheetah\bug.py", line 16, in ?
-      print t
-    File "<string>", line 36, in respond
-  UnboundLocalError: local variable 'a' referenced before assignment
-  
-  ...it shouldn't, right?
-
 Compiler forgets commas
 =======================
 @@TR: This is not a bug.  Python and Cheetah's syntax requires commas.
