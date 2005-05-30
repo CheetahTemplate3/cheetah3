@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.56 2005/05/18 07:26:03 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.57 2005/05/30 23:26:59 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.56 $
+Version: $Revision: 1.57 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/05/18 07:26:03 $
+Last Revision Date: $Date: 2005/05/30 23:26:59 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.56 $"[11:-2]
+__revision__ = "$Revision: 1.57 $"[11:-2]
 
 
 ##################################################
@@ -1351,6 +1351,18 @@ inner
         self.verify(
             "#block $testMeth($arg='This is my block'): $arg",
             "This is my block")
+
+    def test14(self):
+        """single line #block with None for content"""
+        self.verify(
+            """#block $testMeth: $None\ntest $testMeth-""",
+            "test -")
+
+    def test15(self):
+        """single line #block with nothing for content"""
+        self.verify(
+            """#block $testMeth: \ntest $testMeth-""",
+            "test -")
 
 class IncludeDirective(OutputTest):
 
