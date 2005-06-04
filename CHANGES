@@ -5,7 +5,7 @@ release
   - this is just 0.9.17rc1 repackaged [TR]
 
 0.9.17-rc1 (May 12, 2005)
-  This is simple bug fix release resolves some issues introduced by
+  This simple bug fix release resolves some issues introduced by
   under-the-hood changes in release 0.9.16a1.
 
   - removed the use of temp files for handling imports with dynamic
