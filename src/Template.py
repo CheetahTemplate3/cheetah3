@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.116 2005/04/21 02:00:05 tavis_rudd Exp $
+# $Id: Template.py,v 1.117 2005/07/09 22:26:59 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.116 $
+Version: $Revision: 1.117 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/04/21 02:00:05 $
+Last Revision Date: $Date: 2005/07/09 22:26:59 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.116 $"[11:-2]
+__revision__ = "$Revision: 1.117 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import sys                        # used in the error handling code
@@ -51,6 +51,7 @@ from Cheetah.Utils import VerifyType             # Used in Template.__init__
 from Cheetah.Utils.Misc import checkKeywords     # Used in Template.__init__
 from Cheetah.Utils.Indenter import Indenter      # Used in Template.__init__ and for
                                                  # placeholders
+from Cheetah.CacheRegion import CacheRegion
 
 # function name aliase in used dynamically loaded templates
 VFS = valueFromSearchList
@@ -157,8 +158,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
 
         ##################################################
         ## Now, compile if we're meant to
-        self._cacheIndex = {}
-        self._cacheData = {}
+        self._cacheRegions = {}
         self._generatedModuleCode = None
         self._generatedClassCode = None
         if source is not None or file is not None:
@@ -260,15 +260,23 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         """Return a reference to the current errorCatcher"""
         return self._errorCatcher
 
-    def refreshCache(self, cacheKey=None):
+    def refreshCache(self, cacheRegionKey=None, cacheKey=None):
         
         """Refresh a cache item."""
         
-        if not cacheKey:
-            self._cacheData.clear()
+        if not cacheRegionKey:
+            # clear all template's cache regions
+            self._cacheRegions.clear()
         else:
-            del self._cacheData[ self._cacheIndex[cacheKey] ]
-            
+            region = self._cacheRegions.get(cacheRegionKey)
+            if not cacheKey:
+                # clear the desired region and all its cache
+                region.clear()
+            else:
+                # clear one specific cache of a specific region
+                cache = region.getCache(cacheKey)
+                if cache:
+                    cache.clear()
 
     def shutdown(self):
         """Break reference cycles before discarding a servlet."""

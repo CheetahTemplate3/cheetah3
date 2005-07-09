@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.67 2005/05/14 00:31:43 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.68 2005/07/09 22:26:59 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.67 $
+Version: $Revision: 1.68 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/05/14 00:31:43 $
+Last Revision Date: $Date: 2005/07/09 22:26:59 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.67 $"[11:-2]
+__revision__ = "$Revision: 1.68 $"[11:-2]
 
 import sys
 import os
@@ -479,55 +479,53 @@ class MethodCompiler(GenUtils):
             
         if autoIndent:
             self.indent()
-
     
-    def cacheID(self):
-        return self._cacheID
-
     def nextCacheID(self):
-        self._cacheID = str(random.randrange(100, 999)) \
-                        + str(random.randrange(10000, 99999))
-        return self._cacheID
-
+        return str(random.randrange(100, 999)) \
+               + str(random.randrange(10000, 99999))
+        
     def startCacheRegion(self, cacheInfo, lineCol):
         ID = self.nextCacheID()
         interval = cacheInfo.get('interval',None)
         test = cacheInfo.get('test',None)
+        
+        customID = cacheInfo.get('id',None)
+        if customID:
+            ID = repr(customID)
+        varyBy = cacheInfo.get('varyBy',ID)
+
         self._cacheRegionOpen = True    # attrib of current methodCompiler
         
         self.addChunk('## START CACHE REGION: at line, col ' + str(lineCol) + ' in the source.')
-        self.addChunk('RECACHE = True')
+        self.addChunk('RECACHE = False')
+
+        self.addChunk('region = self._cacheRegions.get(' + ID + ')')
         
-        self.addChunk('if not self._cacheData.has_key(' + repr(ID) + '):')
+        self.addChunk('if not region:')
         self.indent()
-        if cacheInfo.has_key('id'):
-            self.addChunk("self._cacheIndex['" +
-                          cacheInfo['id'] +
-                          "'] = '" + ID +"'")
-        if not (interval or test):
-            self.addChunk('pass')
+        self.addChunk("region = CacheRegion()")
+        self.addChunk("self._cacheRegions[" + ID + "] = region")
+        self.addChunk('RECACHE = True')
+        self.dedent()
+        
+        self.addChunk('cache = region.getCache('+varyBy+')')
+
         if interval:
-            setRefreshTime = ('self.__cache' + ID +
-                              '__refreshTime = currentTime() + ' + str(interval))
-            self.addChunk(setRefreshTime)
-            self.dedent()
-            self.addChunk('elif currentTime() > self.__cache' + ID
-                               + '__refreshTime:')
-            self.indent()
-            self.addChunk(setRefreshTime)
             self.addMethDocString('This cache will be refreshed every ' +
-                                       str(interval) + ' seconds.')
-        if test:
+                                  str(interval) + ' seconds.')
+            self.addChunk('if (not cache.getRefreshTime())' +
+                          ' or (currentTime() > cache.getRefreshTime()):')
+            self.indent()
+            self.addChunk("cache.setRefreshTime(currentTime() +" + str(interval) + ")")
+            self.addChunk('RECACHE = True')
             self.dedent()
-            self.addChunk('elif ' + test + ':')
+            
+        if test:
+            self.addChunk('if ' + test + ':')
             self.indent()
             self.addChunk('RECACHE = True')
+            self.dedent()
             
-        self.dedent()
-        self.addChunk('else:')
-        self.indent()
-        self.addChunk('RECACHE = False')
-        self.dedent()
         self.addChunk('if RECACHE:')
         self.indent()
         self.addChunk('orig_trans = trans')
@@ -538,11 +536,11 @@ class MethodCompiler(GenUtils):
         self._cacheRegionOpen = False
         self.addChunk('trans = orig_trans')
         self.addChunk('write = trans.response().write')
-        self.addChunk('self._cacheData[' + repr(self.cacheID())
-                      + '] = cacheCollector.response().getvalue()')
+        self.addChunk('cache.setData(cacheCollector.response().getvalue())')
         self.addChunk('del cacheCollector')
-        self.dedent()
-        self.addWriteChunk( 'self._cacheData[' + repr(self.cacheID()) + ']' )
+        
+        self.dedent()        
+        self.addWriteChunk('cache.getData()')
         self.addChunk('## END CACHE REGION')
         self.addChunk('')
 
@@ -1145,6 +1143,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "from Cheetah.Template import Template",
             "from Cheetah.DummyTransaction import DummyTransaction",
             "from Cheetah.NameMapper import NotFound, valueForName, valueFromFrameOrSearchList",
+            "from Cheetah.CacheRegion import CacheRegion",
             "import Cheetah.Filters as Filters",
             "import Cheetah.ErrorCatchers as ErrorCatchers",
             ]        
@@ -1159,6 +1158,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
                                   'NotFound',
                                   'Filters',
                                   'ErrorCatchers',
+                                  'CacheRegion',
                                   ]
         
         self._moduleConstants = [
