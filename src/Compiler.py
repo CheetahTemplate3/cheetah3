@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.68 2005/07/09 22:26:59 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.69 2005/07/10 20:32:06 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.68 $
+Version: $Revision: 1.69 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/07/09 22:26:59 $
+Last Revision Date: $Date: 2005/07/10 20:32:06 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.68 $"[11:-2]
+__revision__ = "$Revision: 1.69 $"[11:-2]
 
 import sys
 import os
@@ -526,7 +526,7 @@ class MethodCompiler(GenUtils):
             self.addChunk('RECACHE = True')
             self.dedent()
             
-        self.addChunk('if RECACHE:')
+        self.addChunk('if RECACHE or not cache.getData():')
         self.indent()
         self.addChunk('orig_trans = trans')
         self.addChunk('trans = cacheCollector = DummyTransaction()')
