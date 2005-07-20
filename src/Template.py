@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.117 2005/07/09 22:26:59 tavis_rudd Exp $
+# $Id: Template.py,v 1.118 2005/07/20 17:44:28 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the Python license.
-Version: $Revision: 1.117 $
+Version: $Revision: 1.118 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/07/09 22:26:59 $
+Last Revision Date: $Date: 2005/07/20 17:44:28 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.117 $"[11:-2]
+__revision__ = "$Revision: 1.118 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import sys                        # used in the error handling code
@@ -268,7 +268,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             # clear all template's cache regions
             self._cacheRegions.clear()
         else:
-            region = self._cacheRegions.get(cacheRegionKey)
+            region = self._cacheRegions.get(cacheRegionKey, CacheRegion())
             if not cacheKey:
                 # clear the desired region and all its cache
                 region.clear()
