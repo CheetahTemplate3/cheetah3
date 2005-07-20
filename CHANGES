@@ -1,6 +1,9 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
+0.9.18rc1 (unreleased)
+  - applied Philippe Normand's patch for extended cache support [TR]
+
 0.9.17 (May 30, 2005)
   - this is just 0.9.17rc1 repackaged [TR]
 
