@@ -1,8 +1,10 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
-0.9.18rc1 (unreleased)
+0.9.18rc1 (Aug 15, 2005)
   - applied Philippe Normand's patch for extended cache support [TR]
+  - added filter RawOrEncodedUnicode to fix a unicode issue that was discussed
+    on the email list on Aug. 9th 2005 [TR]
 
 0.9.17 (May 30, 2005)
   - this is just 0.9.17rc1 repackaged [TR]
