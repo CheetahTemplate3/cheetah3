@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.23 2005/01/03 18:08:15 tavis_rudd Exp $
+# $Id: Filters.py,v 1.24 2005/08/16 05:14:12 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -10,12 +10,12 @@ would otherwise require a real template object).
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.23 $
+Version: $Revision: 1.24 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/01/03 18:08:15 $
+Last Revision Date: $Date: 2005/08/16 05:14:12 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.23 $"[11:-2]
+__revision__ = "$Revision: 1.24 $"[11:-2]
 
 from StringIO import StringIO # not cStringIO because of unicode support
 
@@ -92,7 +92,8 @@ class ReplaceNone(Filter):
         return str(val)
 #####
 class EncodeUnicode(Filter):
-    def filter(self, val, encoding='utf8',
+    def filter(self, val,
+               encoding='utf8',
                str=str, type=type, unicodeType=type(u''),
                **kw):
         """Encode Unicode strings, by default in UTF-8.
@@ -112,6 +113,26 @@ class EncodeUnicode(Filter):
         else:
             filtered = str(val)
         return filtered
+
+class RawOrEncodedUnicode(Filter):
+    def filter(self, val,
+               #encoding='utf8',
+               encoding=None,
+               str=str, type=type, unicodeType=type(u''),
+               **kw):
+        """Pass Unicode strings through unmolested, unless an encoding is specified.
+        """
+        if type(val)==unicodeType:
+            if encoding:
+                filtered = val.encode(encoding)
+            else:
+                filtered = val
+        elif val is None:
+            filtered = ''
+        else:
+            filtered = str(val)
+        return filtered
+
 #####
 class MaxLen(Filter):
     def filter(self, val, **kw):
