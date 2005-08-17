@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SetupTools.py,v 1.6 2002/10/05 19:52:00 tavis_rudd Exp $
+# $Id: SetupTools.py,v 1.7 2005/08/17 18:45:21 tavis_rudd Exp $
 """Some tools for extending and working with distutils
 
 CREDITS: This module borrows code and ideas from M.A. Lemburg's excellent setup
@@ -8,23 +8,22 @@ tools for the mxBase package.
 """
 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__version__ = "$Revision: 1.6 $"[11:-2]
-
-
-##################################################
-## GLOBALS AND CONSTANTS ##
-
-True = (1==1) 
-False = (1==0) 
+__version__ = "$Revision: 1.7 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES ##
 
 from distutils.core import setup
+## this bit is experimental:
+#try:
+#    # use http://peak.telecommunity.com/DevCenter/setuptools if it's installed
+#    # requires Py >=2.3
+#    from setuptools import setup
+#except ImportError:   
+#    from distutils.core import setup
+
 from distutils.core import Command
-from distutils.command.install import install
 from distutils.command.install_data import install_data
-from distutils.command.sdist import sdist
 
 import os
 from os import listdir
@@ -102,104 +101,6 @@ class mod_install_data(install_data):
                 else:
                     outfile = dstPath
                 self.outfiles.append(outfile)
-
-
-class contrib(Command):
-    """a setup command that will process the contributed packages.
-
-    USAGE: setup.py contrib install
-           or
-           setup.py contrib sdist
-           etc.
-    """
-    description = ""
- 
-    # List of option tuples: long name, short name (None if no short
-    # name), and help string.
-    user_options = [ ('cmd=', None,
-                      "The command to run on each of the contrib packages"),
-                     ('contrib_dir=', None,
-                      "The directory which contains all of the contrib packages"),
-                     ('contrib_packages=', None,
-                      "A whitespace separated list of contrib package subdirs"),
-                     
-                     ]
-     
-    def initialize_options (self):
-        self.cmd = 'install'
- 
-    def finalize_options (self):
-        pass
-    
-    def run(self):
-        cwd = os.getcwd()
-        for p in self.contrib_packages.split():
-            d = os.path.join(cwd, self.contrib_dir, p)
-            os.chdir(d)
-            print "Working on", d, "(", os.getcwd(), ")"
-            try:
-                os.system(sys.executable+' setup.py '+ self.cmd)
-            except:
-                print "An error occurred while installing the contributed packages."
-                #os.chdir(cwd)
-                raise
-
-
-class sdist_docs(sdist):
-    
-    """A setup command that will rebuild Users Guide at the same time as
-    creating a source distribution.
-
-    It relies on the main tex-file being called users_guide.tex and the tex file
-    being in a form that Python's mkhowto script accepts."""
-    
-    def run(self):
-        try:
-            from main_package.Version import version
-            
-            currentDir = os.getcwd()
-            os.chdir(os.path.join(currentDir,'docs','src'))
-            fp = open('users_guide.tex','r')
-            originalTexCode = fp.read()
-            fp.close()
-            
-            newTexCode = re.sub(r'(?<=\\release\{)[0-9\.a-zA-Z]*',str(version), originalTexCode)
-            
-            fp = open('users_guide.tex','w')
-            fp.write(newTexCode)
-            fp.close()
-            
-            os.system('make -f Makefile')
-            os.chdir(currentDir)
-        except:
-            print "The sdist_docs command couldn't rebuild the Users Guide"
-            os.chdir(currentDir)
-            
-        sdist.run(self)
-
-
-class mod_install(install):
-    
-    """A modified version of the disutils install command that gets rid of the
-    old site-packages/Webware/Cheetah directory.
-    """
-
-    def removeOldCheetahLocation(self):
-        import shutil
-        oldInstallPath =  os.path.join(self.install_lib, 'Webware', 'Cheetah')
-        if os.path.exists(oldInstallPath):
-            print 'removing old cheetah installation directory', oldInstallPath
-            try:
-                shutil.rmtree(oldInstallPath)
-            except:
-                traceback.print_exc()
-                print '>>> COULD NOT REMOVE OLD CHEETAH INSTALL DIR (' + \
-                      oldInstallPath + ') YOU MUST DO IT MANUALLY.'
-        
-
-    def run (self):
-        install.run(self)
-        self.removeOldCheetahLocation()
         
 ##################################################
 ## FUNCTIONS ##
@@ -233,10 +134,7 @@ def run_setup(configurations):
 
     # Add setup extensions
     cmdclasses = {
-        'install':mod_install,
         'install_data': mod_install_data,
-        'contrib':contrib,
-        'sdist_docs':sdist_docs,
         }
 
     kws['cmdclass'] = cmdclasses
