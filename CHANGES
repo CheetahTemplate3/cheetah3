@@ -1,6 +1,12 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
+0.9.19rc1 (???, 2005 - not released)
+  - added the compiler option "useStackFrames" for optionally turning off the
+    default lookup method which doesn't work with psyco because it uses stack
+    frame introspection.  When useStackFrames=False, an alternative psyco
+    friendly lookup method is used. [TR]
+
 0.9.18 (Aug 22, 2005)
   - version bump from 0.9.18rc1 [TR]
 
