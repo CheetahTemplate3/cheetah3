@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.69 2005/07/10 20:32:06 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.70 2005/10/05 00:23:41 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.69 $
+Version: $Revision: 1.70 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/07/10 20:32:06 $
+Last Revision Date: $Date: 2005/10/05 00:23:41 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.69 $"[11:-2]
+__revision__ = "$Revision: 1.70 $"[11:-2]
 
 import sys
 import os
@@ -162,6 +162,7 @@ class GenUtils:
         where:
           VFN = NameMapper.valueForName
           VFFSL = NameMapper.valueFromFrameOrSearchList
+          VFSL = NameMapper.valueFromSearchList # optionally used instead of VFFSL
           SL = self.searchList()
           useAC = self.setting('useAutocalling') # True in this example
           
@@ -176,16 +177,30 @@ class GenUtils:
              
           B` = VFN(A`, name=B[0], executeCallables=(useAC and B[1]))B[2]
           A` = VFFSL(SL, name=A[0], executeCallables=(useAC and A[1]))A[2]
-          
+
+
+        Note, if the compiler setting useStackFrames=False (default is true)
+        then
+          A` = VFSL([locals()]+SL+[globals(), __builtin__], name=A[0], executeCallables=(useAC and A[1]))A[2]
+        This option allows Cheetah to be used with Psyco, which doesn't support
+        stack frame introspection.
         """
 
         defaultUseAC = self.setting('useAutocalling')
         nameChunks.reverse()
         name, useAC, remainder = nameChunks.pop()
-        pythonCode = ('VFFSL(SL,'
-                      '"'+ name + '",'
-                      + repr(defaultUseAC and useAC) + ')'
-                      + remainder)
+
+        if self.setting('useStackFrames'):
+            pythonCode = ('VFFSL(SL,'
+                          '"'+ name + '",'
+                          + repr(defaultUseAC and useAC) + ')'
+                          + remainder)
+        else:
+            pythonCode = ('VFSL([locals()]+SL+[globals(), __builtin__],'
+                          '"'+ name + '",'
+                          + repr(defaultUseAC and useAC) + ')'
+                          + remainder)
+            
         while nameChunks:
             name, useAC, remainder = nameChunks.pop()
             pythonCode = ('VFN(' + pythonCode +
@@ -1088,6 +1103,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
             ## controlling the handling of Cheetah $vars
             'useNameMapper': True,      # Unified dotted notation and the searchList
             'useAutocalling': True, # detect and call callable()'s
+            'useStackFrames': False, # use NameMapper.valueFromFrameOrSearchList
+                                    # rather than NameMapper.valueFromSearchList
             'useErrorCatcher':False,
             
             ## controlling the aesthetic appearance of the generated code
@@ -1167,6 +1184,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "except NameError:",
             "    True, False = (1==1), (1==0)",
             "VFFSL=valueFromFrameOrSearchList",
+            "VFSL=valueFromSearchList",
             "VFN=valueForName",
             "currentTime=time.time",
             ]
