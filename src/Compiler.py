@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.70 2005/10/05 00:23:41 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.71 2005/10/07 08:00:23 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.70 $
+Version: $Revision: 1.71 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/10/05 00:23:41 $
+Last Revision Date: $Date: 2005/10/07 08:00:23 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.70 $"[11:-2]
+__revision__ = "$Revision: 1.71 $"[11:-2]
 
 import sys
 import os
@@ -1159,7 +1159,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "import __builtin__",
             "from Cheetah.Template import Template",
             "from Cheetah.DummyTransaction import DummyTransaction",
-            "from Cheetah.NameMapper import NotFound, valueForName, valueFromFrameOrSearchList",
+            "from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, valueFromFrameOrSearchList",
             "from Cheetah.CacheRegion import CacheRegion",
             "import Cheetah.Filters as Filters",
             "import Cheetah.ErrorCatchers as ErrorCatchers",
