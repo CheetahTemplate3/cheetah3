@@ -7,9 +7,9 @@ Cheetah TODO list
   in the CHANGES file if the bug is considered significant enough and it
   affected a released version of Cheetah.
 
+TODO Items (many are just ideas. This is not an official roadmap!)
+================================================================================
 
-Requirements for 1.0
-=========================================================================
 - "cheetah test" problem: subcommands fail mysteriously on Windows.  Rewrite
   to avoid using subcommands.  Instead, set sys.argv and call the appropriate
   main() for each test.
@@ -22,16 +22,9 @@ Requirements for 1.0
   current directory.  The tests should instead put their temporary files
   under the system tmp directory.
 
-- Decide on Cheetah's 1.0 license and update the Users' Guide.  Cheetah
-  will remain open source, and derived works (open or closed source) will be
-  allowed.  The issue is how to make the second part more explicit. (TR)
-
 - Reset the current filter to the default (or to the constructor's filter
   if specified) at the beginning of each fill.  Currently, filter changes
   leak from one fill to the next.
-
-Other TODO Items
-================================================================================
 
 - CheetahWrapper stuff: (MO)
   * "cheetah compile --shbang '#!/usr/bin/python2.2'"
@@ -132,24 +125,6 @@ the subelements of collections.  I.e, if the first searchList element
 is a dictionary, show its keys/values, but do not expand any 
 subvalues if they are dictionaries too, unless the display tool happens
 to default to that.
-
-
-Rewrite the caching framework
-=============================
-- add #cache varyBy= (tied to Tavis' proposed caching framework for Webware)
-
-- #cache test= with a one-variable test produces invalid Python (an empty
-  if-block).  Example in Cheetah Developers' Guide, section
-  "#cache with test: expression and method conditions".
-
-- #cache id= seems to be ignoring the ID and generating a random numeric
-  ID instead.  Is it working?  Do cache IDs have to be numeric?
-
-- Other ideas in Tavis' head.
-
-- Have an option to refresh the cache whenever an external
-  file is updated.  This would allow a data structure to be kept in
-  sync whenever its text configuration file is changed.
 
 #entry $func($arg1, $arg2="default", $**kw)
 ===============================================================================
@@ -319,7 +294,7 @@ Examples
 - Pickled templates?
 
 
-CheetahX: pie-in-the-sky
+CheetahX: pie-in-the-sky (notes from Mike Orr)
 ========================================================================
 These ideas are being considered for Cheetah 2.0.
 
@@ -357,8 +332,6 @@ These ideas are being considered for Cheetah 2.0.
   lookups, you can call another method and pass the value directly.
   For caching, I guess you pass in the cache time (or a special constant)
   as a separate argument, and let the INFRASTRUCTURE maintain the cache.
-
-- Tavis wants to rewrite the cache infrastructure and fully implement it.
 
 - The Template class needs to be split up into stuff nececssary to fill
   a template (the INFRASTRUCTURE), and stuff necessary to comple a template
