@@ -1,18 +1,18 @@
 #!/usr/bin/env python
-# $Id: SourceReader.py,v 1.9 2005/01/17 19:12:52 tavis_rudd Exp $
+# $Id: SourceReader.py,v 1.10 2005/11/02 22:26:07 tavis_rudd Exp $
 """SourceReader class for Cheetah's Parser and CodeGenerator
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
-         terms of the Python license.
-Version: $Revision: 1.9 $
+         terms of the MIT license.  See the LICENSE file.
+Version: $Revision: 1.10 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/01/17 19:12:52 $
+Last Revision Date: $Date: 2005/11/02 22:26:07 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.9 $"[11:-2]
+__revision__ = "$Revision: 1.10 $"[11:-2]
 
 import re
 import sys

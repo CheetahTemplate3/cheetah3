@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportManager.py,v 1.2 2005/01/03 20:03:32 tavis_rudd Exp $
+# $Id: ImportManager.py,v 1.3 2005/11/02 22:26:07 tavis_rudd Exp $
 
 """Provides an emulator/replacement for Python's standard import system.
 
@@ -19,13 +19,13 @@ Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>  based on Gordon McMillan's iu.py
 License: This software is released for unlimited distribution under the
-         terms of the Python license.
-Version: $Revision: 1.2 $
+         terms of the MIT license.  See the LICENSE file.
+Version: $Revision: 1.3 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/01/03 20:03:32 $
+Last Revision Date: $Date: 2005/11/02 22:26:07 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.2 $"[11:-2]
+__revision__ = "$Revision: 1.3 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES

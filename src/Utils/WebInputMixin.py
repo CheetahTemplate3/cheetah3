@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: WebInputMixin.py,v 1.8 2005/01/03 18:12:20 tavis_rudd Exp $
+# $Id: WebInputMixin.py,v 1.9 2005/11/02 22:26:08 tavis_rudd Exp $
 """Mixin for Cheetah.Servlet for importing web transaction variables in bulk.
 
 This works for GET/POST fields both in Webware servlets and in CGI scripts, 
@@ -164,13 +164,13 @@ Meta-Data
 ================================================================================
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
-         terms of the Python license.
-Version: $Revision: 1.8 $
+         terms of the MIT license.  See the LICENSE file.
+Version: $Revision: 1.9 $
 Start Date: 2002/03/17
-Last Revision Date: $Date: 2005/01/03 18:12:20 $
+Last Revision Date: $Date: 2005/11/02 22:26:08 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.8 $"[11:-2]
+__revision__ = "$Revision: 1.9 $"[11:-2]
 
 import cgi     # Used by WebInputMixin.cgiImport() if this is a CGI script.
 import pprint

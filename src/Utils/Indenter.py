@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Indenter.py,v 1.4 2005/01/03 18:12:20 tavis_rudd Exp $
+# $Id: Indenter.py,v 1.5 2005/11/02 22:26:08 tavis_rudd Exp $
 """Indentation maker.
 @@TR: this code is unsupported and largely undocumented ...
 
@@ -14,13 +14,13 @@ Meta-Data
 ================================================================================
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
-         terms of the Python license.
-Version: $Revision: 1.4 $
+         terms of the MIT license.  See the LICENSE file.
+Version: $Revision: 1.5 $
 Start Date: 2001/11/07
-Last Revision Date: $Date: 2005/01/03 18:12:20 $
+Last Revision Date: $Date: 2005/11/02 22:26:08 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.4 $"[11:-2]
+__revision__ = "$Revision: 1.5 $"[11:-2]
 
 import re
 import sys

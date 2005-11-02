@@ -1,18 +1,18 @@
 #!/usr/bin/env python
-# $Id: Misc.py,v 1.7 2005/01/03 18:12:20 tavis_rudd Exp $
+# $Id: Misc.py,v 1.8 2005/11/02 22:26:08 tavis_rudd Exp $
 """Miscellaneous functions/objects used by Cheetah but also useful standalone.
 
 Meta-Data
 ================================================================================
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
-         terms of the Python license.
-Version: $Revision: 1.7 $
+         terms of the MIT license.  See the LICENSE file.
+Version: $Revision: 1.8 $
 Start Date: 2001/11/07
-Last Revision Date: $Date: 2005/01/03 18:12:20 $
+Last Revision Date: $Date: 2005/11/02 22:26:08 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.7 $"[11:-2]
+__revision__ = "$Revision: 1.8 $"[11:-2]
 
 import os          # Used in mkdirsWithPyInitFile.
 import types       # Used in useOrRaise.

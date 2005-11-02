@@ -1,18 +1,18 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.33 2005/01/03 19:03:21 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.34 2005/11/02 22:26:07 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
-         terms of the Python license.
-Version: $Revision: 1.33 $
+         terms of the MIT license.  See the LICENSE file.
+Version: $Revision: 1.34 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2005/01/03 19:03:21 $
+Last Revision Date: $Date: 2005/11/02 22:26:07 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.33 $"[11:-2]
+__revision__ = "$Revision: 1.34 $"[11:-2]
 
 import os.path
 

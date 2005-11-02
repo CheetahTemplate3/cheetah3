@@ -1,18 +1,18 @@
 #!/usr/bin/env python
-# $Id: FileUtils.py,v 1.11 2005/03/29 00:44:25 tavis_rudd Exp $
+# $Id: FileUtils.py,v 1.12 2005/11/02 22:26:07 tavis_rudd Exp $
 """File utitilies for Python:
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
-         terms of the Python license.
-Version: $Revision: 1.11 $
+         terms of the MIT license.  See the LICENSE file.
+Version: $Revision: 1.12 $
 Start Date: 2001/09/26
-Last Revision Date: $Date: 2005/03/29 00:44:25 $
+Last Revision Date: $Date: 2005/11/02 22:26:07 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.11 $"[11:-2]
+__revision__ = "$Revision: 1.12 $"[11:-2]
 
 
 from glob import glob

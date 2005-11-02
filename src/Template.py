@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.119 2005/10/05 00:23:41 tavis_rudd Exp $
+# $Id: Template.py,v 1.120 2005/11/02 22:26:07 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -7,13 +7,13 @@ Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
-         terms of the Python license.
-Version: $Revision: 1.119 $
+         terms of the MIT license.  See the LICENSE file.
+Version: $Revision: 1.120 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/10/05 00:23:41 $
+Last Revision Date: $Date: 2005/11/02 22:26:07 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.119 $"[11:-2]
+__revision__ = "$Revision: 1.120 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import sys                        # used in the error handling code
