@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.24 2005/08/16 05:14:12 tavis_rudd Exp $
+# $Id: Filters.py,v 1.25 2005/11/03 00:14:06 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -10,12 +10,12 @@ would otherwise require a real template object).
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.24 $
+Version: $Revision: 1.25 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/08/16 05:14:12 $
+Last Revision Date: $Date: 2005/11/03 00:14:06 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.24 $"[11:-2]
+__revision__ = "$Revision: 1.25 $"[11:-2]
 
 from StringIO import StringIO # not cStringIO because of unicode support
 
@@ -137,7 +137,10 @@ class RawOrEncodedUnicode(Filter):
 class MaxLen(Filter):
     def filter(self, val, **kw):
         """Replace None with '' and cut off at maxlen."""
-        output = Filter.filter(self, val, **kw)
+        
+        if val is None:
+            return ''
+        output = val
         if kw.has_key('maxlen') and len(output) > kw['maxlen']:
             return output[:kw['maxlen']]
         return output
@@ -164,7 +167,9 @@ class Pager(Filter):
     
     def filter(self, val, **kw):
         """Replace None with '' and cut off at maxlen."""
-        output = Filter.filter(self, val, **kw)
+        if val is None:
+            return ''
+        output = val
         if kw.has_key('trans') and kw['trans']:
             ID = kw['ID']
             marker = kw.get('marker', '<split>')
@@ -196,7 +201,9 @@ class WebSafe(Filter):
     """
     def filter(self, val, **kw):
         # Do the default conversion.
-        s = Filter.filter(self, val, **kw)
+        if val is None:
+            return ''
+        s = val
         # These substitutions are copied from cgi.escape().
         s = s.replace("&", "&amp;") # Must be done first!
         s = s.replace("<", "&lt;")
@@ -232,7 +239,9 @@ class Strip(Filter):
     with the proposed #sed directive (which has not been ratified yet.)
     """
     def filter(self, val, **kw):
-        s = Filter.filter(self, val, **kw)
+        if val is None:
+            return ''
+        s = val
         result = StringIO()
         start = 0   # The current line will be s[start:end].
         while 1: # Loop through each line.
@@ -256,7 +265,8 @@ class StripSqueeze(Filter):
     input is joined into one ling line with NO trailing newline.
     """
     def filter(self, val, **kw):
-        s = Filter.filter(self, val, **kw)
+        if val is None:
+            return ''
         s = val.split()
         return " ".join(s)
     
