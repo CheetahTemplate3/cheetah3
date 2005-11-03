@@ -1,6 +1,7 @@
 Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
+
 1.0rc1 (Nov 2, 2005 - not released)
 
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
@@ -9,6 +10,9 @@ release
     default lookup method which doesn't work with psyco because it uses stack
     frame introspection.  When useStackFrames=False, an alternative psyco
     friendly lookup method is used. [TR]
+
+  - fixed treatment of None in several filters, bug reported by Daniele Varrazzo
+    [TR]
 
 0.9.18 (Aug 22, 2005)
   - version bump from 0.9.18rc1 [TR]
