@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.71 2005/10/07 08:00:23 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.72 2005/11/12 01:16:12 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.71 $
+Version: $Revision: 1.72 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/10/07 08:00:23 $
+Last Revision Date: $Date: 2005/11/12 01:16:12 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.71 $"[11:-2]
+__revision__ = "$Revision: 1.72 $"[11:-2]
 
 import sys
 import os
@@ -405,7 +405,7 @@ class MethodCompiler(GenUtils):
 
     def addInclude(self, sourceExpr, includeFrom, isRaw):
         # @@TR: consider soft-coding this
-        self.addWriteChunk('self._includeCheetahSource(' + sourceExpr +
+        self.addChunk('self._includeCheetahSource(' + sourceExpr +
                            ', trans=trans, ' +
                            'includeFrom="' + includeFrom + '", raw=' +
                            repr(isRaw) + ')')
