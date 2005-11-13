@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.72 2005/11/12 01:16:12 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.73 2005/11/13 01:25:34 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.72 $
+Version: $Revision: 1.73 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/11/12 01:16:12 $
+Last Revision Date: $Date: 2005/11/13 01:25:34 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.72 $"[11:-2]
+__revision__ = "$Revision: 1.73 $"[11:-2]
 
 import sys
 import os
@@ -312,11 +312,27 @@ class MethodCompiler(GenUtils):
     def addWriteChunk(self, chunk):
         self.addChunk('write(' + chunk + ')')
 
-    def addFilteredChunk(self, chunk, rawExpr=None):
+    def addFilteredChunk(self, chunk, filterArgs=None, rawExpr=None):
         """
         """
-        self.addWriteChunk('filter(' + chunk + ', rawExpr=' + repr(rawExpr) +')')
+        if filterArgs is None:
+            filterArgs = ''
+        if self.setting('includeRawExprInFilterArgs') and rawExpr:
+            filterArgs += ', rawExpr=%s'%repr(rawExpr)
 
+        if self.setting('alwaysFilterNone'):
+            self.addChunk("__v = %s"%chunk)
+            if self.setting('useFilters'):
+                self.addChunk("if __v is not None: write(filter(__v%s))"%filterArgs)
+            else:
+                self.addChunk("if __v is not None: write(str(__v))")
+        else:
+            
+            if self.setting('useFilters'):
+                self.addChunk("write(filter(%s%s))"%(chunk,filterArgs))
+            else:
+                self.addChunk("write(str(%s))"%chunk)
+            
     # @@TR: consider merging the next two methods into one
     def addStrConst(self, strConst):
         self._appendToPrevStrConst(strConst)
@@ -617,13 +633,13 @@ class AutoMethodCompiler(MethodCompiler):
         self._methodBodyChunks.extend(mainBodyChunks)
         self._addAutoCleanupCode()
         if self._streamingEnabled:
-            for argName, defVal in  [ ('trans', 'None'),
-                                      ("dummyTrans","False"),
-                                      ("VFFSL","valueFromFrameOrSearchList"), 
-                                      ("VFN","valueForName"),
-                                      ("getmtime","getmtime"),
-                                      ("currentTime","time.time"),
-                                      ]:
+            argList = [ ('trans', 'None'),
+                        #("dummyTrans","False"),
+                        ]
+            if self.setting('useNameMapper'):
+                argList.extend([("VFFSL","valueFromFrameOrSearchList"), 
+                                ("VFN","valueForName")])
+            for argName, defVal in  argList:
                 self.addMethArg(argName, defVal)
         
     def _addAutoSetupCode(self):
@@ -633,13 +649,17 @@ class AutoMethodCompiler(MethodCompiler):
             self.addChunk('trans = DummyTransaction()')
             self.addChunk('dummyTrans = True')
             self.dedent()
+            self.addChunk('else: dummyTrans = False')
+
         else:
             self.addChunk('trans = DummyTransaction()')
             self.addChunk('dummyTrans = True')
         self.addChunk('write = trans.response().write')
-        self.addChunk('SL = self._searchList')
-        self.addChunk('filter = self._currentFilter')
-        self.addChunk('globalSetVars = self._globalSetVars')
+        if self.setting('useNameMapper'):
+            self.addChunk('SL = self._searchList')
+            self.addChunk('globalSetVars = self._globalSetVars')
+        if self.setting('useFilters'):
+            self.addChunk('filter = self._currentFilter')
         self.addChunk('')
 
         self.addChunk("#" *40)
@@ -655,14 +675,7 @@ class AutoMethodCompiler(MethodCompiler):
         self.addChunk('')
         
     def addStop(self, expr=None):
-        self.addChunk('if dummyTrans:')
-        self.indent()
-        self.addChunk('return trans.response().getvalue()')
-        self.dedent()
-        self.addChunk('else:')
-        self.indent()
-        self.addChunk('return ""')
-        self.dedent()
+        self.addChunk('return dummyTrans and trans.response().getvalue() or ""')
 
     def addMethArg(self, name, defVal=None):
         asteriskPos = max(name.rfind('*')+1, 0)
@@ -1102,10 +1115,18 @@ class ModuleCompiler(SettingsManager, GenUtils):
             
             ## controlling the handling of Cheetah $vars
             'useNameMapper': True,      # Unified dotted notation and the searchList
-            'useAutocalling': True, # detect and call callable()'s
-            'useStackFrames': False, # use NameMapper.valueFromFrameOrSearchList
+            'useAutocalling': True, # detect and call callable()'s, requires NameMapper
+            'useStackFrames': True, # use NameMapper.valueFromFrameOrSearchList
                                     # rather than NameMapper.valueFromSearchList
             'useErrorCatcher':False,
+
+            # the next three are new in 1.0rc2
+            'alwaysFilterNone':True, # filter out None, before the filter is called
+            'useFilters':True, # use str instead if =False
+            'includeRawExprInFilterArgs':True,
+
+
+
             
             ## controlling the aesthetic appearance of the generated code
             'commentOffset': 1,
