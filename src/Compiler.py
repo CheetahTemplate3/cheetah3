@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.75 2005/11/13 02:50:53 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.76 2005/11/13 04:37:51 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.75 $
+Version: $Revision: 1.76 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/11/13 02:50:53 $
+Last Revision Date: $Date: 2005/11/13 04:37:51 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.75 $"[11:-2]
+__revision__ = "$Revision: 1.76 $"[11:-2]
 
 import sys
 import os
@@ -649,7 +649,8 @@ class AutoMethodCompiler(MethodCompiler):
             self.addChunk('if not trans:')
             self.indent()
             self.addChunk('trans = DummyTransaction()')
-            self.addChunk('self.transaction = trans') #             
+            if self.setting('autoAssignDummyTransactionToSelf'):
+                self.addChunk('self.transaction = trans')            
             self.addChunk('dummyTrans = True')
             self.dedent()
             self.addChunk('else: dummyTrans = False')
@@ -1134,10 +1135,11 @@ class ModuleCompiler(SettingsManager, GenUtils):
                                     # rather than NameMapper.valueFromSearchList
             'useErrorCatcher':False,
 
-            # the next three are new in 1.0rc2
+            # the next four are new in 1.0rc2
             'alwaysFilterNone':True, # filter out None, before the filter is called
             'useFilters':True, # use str instead if =False
             'includeRawExprInFilterArgs':True,
+            'autoAssignDummyTransactionToSelf':False,
 
 
 
