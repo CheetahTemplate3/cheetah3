@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.74 2005/11/13 02:13:21 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.75 2005/11/13 02:50:53 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.74 $
+Version: $Revision: 1.75 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/11/13 02:13:21 $
+Last Revision Date: $Date: 2005/11/13 02:50:53 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.74 $"[11:-2]
+__revision__ = "$Revision: 1.75 $"[11:-2]
 
 import sys
 import os
@@ -33,10 +33,10 @@ from Cheetah.SettingsManager import SettingsManager
 from Cheetah.Parser import Parser, ParseError, specialVarRE, STATIC_CACHE, REFRESH_CACHE
 from Cheetah.Utils.Indenter import indentize # an undocumented preprocessor
 from Cheetah import ErrorCatchers
+from Cheetah import NameMapper
 
 class Error(Exception):
     pass
-
 
 class GenUtils:
 
@@ -1040,6 +1040,17 @@ class ModuleCompiler(SettingsManager, GenUtils):
         SettingsManager.__init__(self)
         if settings:
             self.updateSettings(settings)
+        # disable useStackFrames if the C version of NameMapper isn't compiled
+        # it's painfully slow in the Python version and bites Windows users all
+        # the time:
+        if not NameMapper.C_VERSION:
+            warnings.warn(
+                "\nYou don't have the C version of NameMapper installed! "
+                "I'm disabling Cheetah's useStackFrames option as it is "
+                 "painfully slow with the Python version of NameMapper. "
+                "You should get a copy of Cheetah with the compiled C version of NameMapper."
+                )
+            self.setSetting('useStackFrames', False)                    
 
         self._templateObj = templateObj
         self._compiled = False
