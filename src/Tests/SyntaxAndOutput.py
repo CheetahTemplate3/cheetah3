@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.57 2005/05/30 23:26:59 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.58 2005/11/13 01:46:11 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.57 $
+Version: $Revision: 1.58 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/05/30 23:26:59 $
+Last Revision Date: $Date: 2005/11/13 01:46:11 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.57 $"[11:-2]
+__revision__ = "$Revision: 1.58 $"[11:-2]
 
 
 ##################################################
@@ -160,13 +160,18 @@ Template output mismatch: %(notes)s
         templateObj = self.template
         output = templateObj.respond()
         #print self.genClassCode() #@@ DEBUG
-        templateObj.shutdown()
-
-        assert output == expectedOutput, self.report \
-               % {'notes': notes,
-                  'template': self._input,
-                  'expected': expectedOutput, 'actual': output,
-                  'end': '(end)'}
+        try:
+            try:
+                assert output == expectedOutput, self.report \
+                       % {'notes': notes,
+                          'template': self._input,
+                          'expected': expectedOutput, 'actual': output,
+                          'end': '(end)'}
+            except:
+                #print templateObj.generatedClassCode()
+                raise
+        finally:
+            templateObj.shutdown()
         
     def genClassCode(self):
         if hasattr(self, 'template'):
@@ -997,7 +1002,6 @@ class ReturnDirective(OutputTest):
 $str($test-6)
 3
 #def test
-
 #if 1
 #return (3   *2)  \
   + 2 
@@ -1014,7 +1018,6 @@ aoeuoaeu
 $str($test[1])
 3
 #def test
-
 #if 1
 #return '123'
 #else
