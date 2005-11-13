@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.73 2005/11/13 01:25:34 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.74 2005/11/13 02:13:21 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.73 $
+Version: $Revision: 1.74 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/11/13 01:25:34 $
+Last Revision Date: $Date: 2005/11/13 02:13:21 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.73 $"[11:-2]
+__revision__ = "$Revision: 1.74 $"[11:-2]
 
 import sys
 import os
@@ -644,9 +644,12 @@ class AutoMethodCompiler(MethodCompiler):
         
     def _addAutoSetupCode(self):
         if self._streamingEnabled:
+            self.addChunk('if not trans: trans = self.transaction'
+                          ' # is None unless self.awake() was called')
             self.addChunk('if not trans:')
             self.indent()
             self.addChunk('trans = DummyTransaction()')
+            self.addChunk('self.transaction = trans') #             
             self.addChunk('dummyTrans = True')
             self.dedent()
             self.addChunk('else: dummyTrans = False')
