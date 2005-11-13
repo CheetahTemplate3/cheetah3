@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.34 2005/11/02 22:26:07 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.35 2005/11/13 01:13:38 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,18 +7,22 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.34 $
+Version: $Revision: 1.35 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2005/11/02 22:26:07 $
+Last Revision Date: $Date: 2005/11/13 01:13:38 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.34 $"[11:-2]
+__revision__ = "$Revision: 1.35 $"[11:-2]
 
+import sys
 import os.path
 
 isWebwareInstalled = False
-try: 
-    from WebKit.Servlet import Servlet as BaseServlet
+try:
+    if 'ds.sys.appserver' in sys.modules.keys():
+        from ds.sys.appserver.Servlet import Servlet as BaseServlet
+    else:
+        from WebKit.Servlet import Servlet as BaseServlet
     isWebwareInstalled = True
 except:
     class BaseServlet: 
