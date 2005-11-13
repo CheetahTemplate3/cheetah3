@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.70 2005/04/26 20:49:01 tavis_rudd Exp $
+# $Id: Parser.py,v 1.71 2005/11/13 02:23:34 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.70 $
+Version: $Revision: 1.71 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/04/26 20:49:01 $
+Last Revision Date: $Date: 2005/11/13 02:23:34 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.70 $"[11:-2]
+__revision__ = "$Revision: 1.71 $"[11:-2]
 
 import os
 import sys
@@ -1119,10 +1119,10 @@ class _HighLevelParser(_LowLevelParser):
             enclosures = []
         nameChunks = self.getCheetahVarNameChunks()
         if enclosures:
-            restOfEnclosure = self.getCallArgString(enclosures=enclosures,
+            filterArgs = self.getCallArgString(enclosures=enclosures,
                                                     )[1:-1]
         else:
-            restOfEnclosure = ''
+            filterArgs = None
 
         rawPlaceholder = self[startPos: self.pos()]
         lineCol = self.getRowCol(startPos)
@@ -1141,7 +1141,7 @@ class _HighLevelParser(_LowLevelParser):
                                                   )
             codeChunk = 'self.' + methodName + '(localsDict=locals())'
 
-        self._compiler.addFilteredChunk( codeChunk + restOfEnclosure, rawPlaceholder)
+        self._compiler.addFilteredChunk( codeChunk, filterArgs, rawPlaceholder)
         if self.setting('outputRowColComments'):
             self._compiler.appendToPrevChunk(' # from line %s, col %s' % lineCol + '.')
         if cacheInfo:
