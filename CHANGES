@@ -2,7 +2,28 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-1.0rc1 (Nov 2, 2005 - not released)
+1.0rc2 (Nov 19, 2005)
+
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+
+  See my email to the cheetahtemplate-discuss list on Sat. Nov. 12th for more
+  details on these changes:
+
+  - faster list-based buffering in DummyTrans, rather than StringIO (my 
+    benchmarks showed it to be significantly faster.  collections.deque wasn't 
+    any faster than a simple list.) [TR]
+  - new CompilerSettings to tweak generated code: [TR]
+    * alwaysFilterNone: filter out None immediately, before the filter is called
+    * useFilters: allows you to turn them off completely and default to str()
+    * includeRawExprInFilterArgs: allows you to disable this behaviour
+    * autoAssignDummyTransactionToSelf: off by default 
+  - and automatic $trans finding without having to pass it as an arg to methods 
+    based Jonathan Mark's suggestion.  If the template's self.transaction
+    attribute has been set, each method of the template will use it when
+    called. [TR]
+
+
+1.0rc1 (Nov 2, 2005)
 
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
 
