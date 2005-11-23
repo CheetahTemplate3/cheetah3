@@ -21,7 +21,7 @@ release
     based Jonathan Mark's suggestion.  If the template's self.transaction
     attribute has been set, each method of the template will use it when
     called. [TR]
-
+  - applied Chris Murphy's patch to fix a bug in the #shBang directive. [TR]
 
 1.0rc1 (Nov 2, 2005)
 
