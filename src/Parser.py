@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.71 2005/11/13 02:23:34 tavis_rudd Exp $
+# $Id: Parser.py,v 1.72 2005/11/23 07:35:35 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.71 $
+Version: $Revision: 1.72 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/11/13 02:23:34 $
+Last Revision Date: $Date: 2005/11/23 07:35:35 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.71 $"[11:-2]
+__revision__ = "$Revision: 1.72 $"[11:-2]
 
 import os
 import sys
@@ -1252,7 +1252,7 @@ class _HighLevelParser(_LowLevelParser):
         self.advance(len('shBang'))
         self.getWhiteSpace()
         shBang = self.readToEOL()
-        self.setShBang(shBang.strip())
+        self._compiler.setShBang(shBang.strip())
 
     def eatEncoding(self):
         self.getDirectiveStartToken()
