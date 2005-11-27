@@ -2,6 +2,17 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+1.0rc3 (Nov 27, 2005)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+
+  - added useSearchList compiler setting [TR]
+    This defaults to True, but if false, the compiler assumes the first
+    portion of a $variable (before the first dot) is a global, builtin, or local
+    var that doesn't need looking up in the searchlist.  NameMapper's unified
+    dotted notation will still be used on the rest of the lookup (provide the
+    setting useNameMapper==True):
+      $aLocalDictVar.aKey.somethingElse
+
 1.0rc2 (Nov 19, 2005)
 
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
