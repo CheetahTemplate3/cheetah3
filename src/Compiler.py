@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.76 2005/11/13 04:37:51 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.77 2005/11/27 03:37:22 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.76 $
+Version: $Revision: 1.77 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/11/13 04:37:51 $
+Last Revision Date: $Date: 2005/11/27 03:37:22 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.76 $"[11:-2]
+__revision__ = "$Revision: 1.77 $"[11:-2]
 
 import sys
 import os
@@ -187,10 +187,25 @@ class GenUtils:
         """
 
         defaultUseAC = self.setting('useAutocalling')
+        useSearchList = self.setting('useSearchList')
+
         nameChunks.reverse()
         name, useAC, remainder = nameChunks.pop()
 
-        if self.setting('useStackFrames'):
+        if not useSearchList:
+            firstDotIdx = name.find('.')
+            if firstDotIdx != -1 and firstDotIdx < len(name):
+                beforeFirstDot, afterDot = name[:firstDotIdx], name[firstDotIdx+1:]
+                pythonCode = ('VFN(' + beforeFirstDot +
+                              ',"' + afterDot +
+                              '",' + repr(defaultUseAC and useAC) + ')'
+                              + remainder)
+                #print 'DEBUG1: ', pythonCode, name, remainder
+            else:
+                pythonCode = name+remainder
+                #print 'DEBUG2: ', pythonCode, name, remainder
+
+        elif self.setting('useStackFrames'):
             pythonCode = ('VFFSL(SL,'
                           '"'+ name + '",'
                           + repr(defaultUseAC and useAC) + ')'
@@ -1130,6 +1145,11 @@ class ModuleCompiler(SettingsManager, GenUtils):
             
             ## controlling the handling of Cheetah $vars
             'useNameMapper': True,      # Unified dotted notation and the searchList
+            'useSearchList': True, # if false, assume the first
+                                   # portion of the $variable (before the first dot) is a global,
+                                   # builtin, or local var that doesn't need
+                                   # looking up in the searchlist BUT use
+                                   # namemapper on the rest of the lookup
             'useAutocalling': True, # detect and call callable()'s, requires NameMapper
             'useStackFrames': True, # use NameMapper.valueFromFrameOrSearchList
                                     # rather than NameMapper.valueFromSearchList
