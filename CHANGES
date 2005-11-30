@@ -2,7 +2,7 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-1.0rc3 (Nov 27, 2005)
+1.0rc3 (Nov 30, 2005)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
 
   - added useSearchList compiler setting [TR]
