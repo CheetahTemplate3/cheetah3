@@ -1,0 +1,7 @@
+#!/bin/sh
+release=$1
+echo curl -T dist/Cheetah-${release}.tar.gz.asc ftp://anonymous@upload.sourceforge.net/incoming/
+curl -T  dist/Cheetah-${release}.tar.gz.asc ftp://anonymous@upload.sourceforge.net/incoming/
+
+echo curl -T  dist/Cheetah-${release}.tar.gz ftp://anonymous@upload.sourceforge.net/incoming/
+curl -T  dist/Cheetah-${release}.tar.gz ftp://anonymous@upload.sourceforge.net/incoming/

@@ -1,0 +1,3 @@
+#!/bin/sh
+release=$1
+gpg --armor --detach-sign  dist/Cheetah-${release}.tar.gz
