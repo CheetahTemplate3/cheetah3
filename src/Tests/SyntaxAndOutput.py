@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.58 2005/11/13 01:46:11 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.59 2005/12/12 21:01:26 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.58 $
+Version: $Revision: 1.59 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/11/13 01:46:11 $
+Last Revision Date: $Date: 2005/12/12 21:01:26 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.58 $"[11:-2]
+__revision__ = "$Revision: 1.59 $"[11:-2]
 
 
 ##################################################
@@ -298,27 +298,6 @@ class NonTokens(OutputTest):
         """1 dollar sign followed by hash"""
         self.verify("\n$#\n",
                     "\n$#\n")
-
-    def test7(self):
-        """$( """
-        self.verify("$( ",
-                    "$( ")
-
-    def test8(self):
-        """${ """
-        self.verify("${ ",
-                    "${ ")
-        
-    def test9(self):
-        """$*( """
-        self.verify("$*( ",
-                    "$*( ")
-
-    def test10(self):
-        """$*{ """
-        self.verify("$*{ ",
-                    "$*{ ")
-
 
 class Comments_SingleLine(OutputTest):
     def test1(self):
