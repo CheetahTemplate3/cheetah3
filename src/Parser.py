@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.73 2005/12/12 22:44:15 tavis_rudd Exp $
+# $Id: Parser.py,v 1.74 2005/12/12 23:56:34 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.73 $
+Version: $Revision: 1.74 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/12/12 22:44:15 $
+Last Revision Date: $Date: 2005/12/12 23:56:34 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.73 $"[11:-2]
+__revision__ = "$Revision: 1.74 $"[11:-2]
 
 import os
 import sys
@@ -81,10 +81,10 @@ delimeters = ('(',')','{','}','[',']',
               ',','.',':',';','=','`') + augAssignOps
 
 
-keywords = ('and',       'del',       'for',       'is',        'raise',    
-            'assert',    'elif',      'from',      'lambda',    'return',   
-            'break',     'else',      'global',    'not',       'try',      
-            'class',     'except',    'if',        'or',        'while',    
+keywords = ('and',       'del',       'for',       'is',        'raise',
+            'assert',    'elif',      'from',      'lambda',    'return',
+            'break',     'else',      'global',    'not',       'try',   
+            'class',     'except',    'if',        'or',        'while',
             'continue',  'exec',      'import',    'pass',
             'def',       'finally',   'in',        'print',
             )
@@ -1088,7 +1088,7 @@ class _HighLevelParser(_LowLevelParser):
             elif self.matchVariablePlaceholderStart():
                 self.eatPlaceholder()
             elif self.matchExpressionPlaceholderStart():
-                self.eatPlaceholder(isExpressionPlaceholder=True)                
+                self.eatPlaceholder()
             elif self.matchDirective():
                 self.eatDirective()
             elif self.matchPSPStartToken():
@@ -1143,7 +1143,7 @@ class _HighLevelParser(_LowLevelParser):
         # don't gobble
         self._compiler.addComment(comm)
 
-    def eatPlaceholder(self, isExpressionPlaceholder=False):
+    def eatPlaceholder(self):
         startPos = self.pos()
         lineCol = self.getRowCol(startPos)
         startToken = self.getCheetahVarStartToken()
@@ -1156,14 +1156,26 @@ class _HighLevelParser(_LowLevelParser):
             self.getWhiteSpace()
         else:
             enclosures = []
-
-        if not isExpressionPlaceholder:
+            
+        if self.matchIdentifier(): 
             nameChunks = self.getCheetahVarNameChunks()
-            filterArgs = (enclosures
-                          and self.getCallArgString(enclosures=enclosures)[1:-1]
-                          or None)
+            restOfExpr = None
+            filterArgs = None
+            if enclosures:
+                self.getWhiteSpace()
+                if self.setting('useFilterArgsInPlaceholders') and self.peek()==',':
+                    filterArgs = self.getCallArgString(enclosures=enclosures)[1:-1]
+                else:
+                    if self.peek()==closurePairsRev[enclosureOpenChar]:
+                        self.getc()
+                    else:
+                        restOfExpr = self.getExpression(enclosed=True, enclosures=enclosures)
+                        if restOfExpr[-1] == closurePairsRev[enclosureOpenChar]:
+                            restOfExpr = restOfExpr[:-1]
+
             self._compiler.addVariablePlaceholder(
                 varNameChunks=nameChunks,
+                restOfExpr=restOfExpr,
                 filterArgs=filterArgs,
                 rawPlaceholder=self[startPos: self.pos()],
                 cacheTokenParts=cacheTokenParts,
@@ -1171,11 +1183,11 @@ class _HighLevelParser(_LowLevelParser):
             return
 
         else:
-            codeChunk = self.getExpression(enclosed=True, enclosures=enclosures)
-            if codeChunk[-1] == closurePairsRev[enclosureOpenChar]:
-                codeChunk = codeChunk[:-1]
+            expr = self.getExpression(enclosed=True, enclosures=enclosures)
+            if expr[-1] == closurePairsRev[enclosureOpenChar]:
+                expr = expr[:-1]
             self._compiler.addExpressionPlaceholder(
-                codeChunk,
+                expr,
                 rawPlaceholder=self[startPos: self.pos()],
                 cacheTokenParts=cacheTokenParts,
                 lineCol=lineCol)

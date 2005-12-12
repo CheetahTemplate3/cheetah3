@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.78 2005/12/12 22:44:43 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.79 2005/12/12 23:56:47 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.78 $
+Version: $Revision: 1.79 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/12 22:44:43 $
+Last Revision Date: $Date: 2005/12/12 23:56:47 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.78 $"[11:-2]
+__revision__ = "$Revision: 1.79 $"[11:-2]
 
 import sys
 import os
@@ -434,22 +434,26 @@ class MethodCompiler(GenUtils):
         offSet = self.setting('commentOffset')
         self.addChunk('#' + ' '*offSet + comm)
 
-    def addVariablePlaceholder(self, varNameChunks, filterArgs, rawPlaceholder, cacheTokenParts, lineCol):
-        codeChunk  = self.genCheetahVar(varNameChunks)
-        self._addPlaceholder(codeChunk,
+    def addVariablePlaceholder(self, varNameChunks,
+                               restOfExpr,
+                               filterArgs, rawPlaceholder, cacheTokenParts, lineCol):
+        expr  = self.genCheetahVar(varNameChunks)
+        if restOfExpr:
+            expr = expr + ' ' + restOfExpr
+        self._addPlaceholder(expr,
                              filterArgs=filterArgs,
                              rawPlaceholder=rawPlaceholder,
                              cacheTokenParts=cacheTokenParts,
                              lineCol=lineCol)        
 
-    def addExpressionPlaceholder(self, codeChunk, rawPlaceholder, cacheTokenParts, lineCol):
-        self._addPlaceholder(codeChunk,
+    def addExpressionPlaceholder(self, expr, rawPlaceholder, cacheTokenParts, lineCol):
+        self._addPlaceholder(expr,
                              filterArgs=None,
                              rawPlaceholder=rawPlaceholder,
                              cacheTokenParts=cacheTokenParts,
                              lineCol=lineCol)        
 
-    def _addPlaceholder(self, codeChunk, filterArgs, rawPlaceholder, cacheTokenParts, lineCol):
+    def _addPlaceholder(self, expr, filterArgs, rawPlaceholder, cacheTokenParts, lineCol):
         cacheInfo = self.genCacheInfo(cacheTokenParts) 
         if cacheInfo:
             cacheInfo['ID'] = repr(rawPlaceholder)[1:-1]
@@ -457,9 +461,9 @@ class MethodCompiler(GenUtils):
 
         if self.isErrorCatcherOn():
             methodName = self._classCompiler.addErrorCatcherCall(
-                codeChunk, rawCode=rawPlaceholder, lineCol=lineCol)
-            codeChunk = 'self.' + methodName + '(localsDict=locals())' 
-        self.addFilteredChunk(codeChunk, filterArgs, rawPlaceholder)      
+                expr, rawCode=rawPlaceholder, lineCol=lineCol)
+            expr = 'self.' + methodName + '(localsDict=locals())' 
+        self.addFilteredChunk(expr, filterArgs, rawPlaceholder)      
         if self.setting('outputRowColComments'):
             self.appendToPrevChunk(' # from line %s, col %s' % lineCol + '.')
         if cacheInfo:
@@ -1245,6 +1249,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             # the next four are new in 1.0rc2
             'alwaysFilterNone':True, # filter out None, before the filter is called
             'useFilters':True, # use str instead if =False
+            'useFilterArgsInPlaceholders':True,
             'includeRawExprInFilterArgs':True,
             'autoAssignDummyTransactionToSelf':False,
 
