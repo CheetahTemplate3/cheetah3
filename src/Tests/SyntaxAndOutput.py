@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.59 2005/12/12 21:01:26 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.60 2005/12/12 23:57:30 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.59 $
+Version: $Revision: 1.60 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/12 21:01:26 $
+Last Revision Date: $Date: 2005/12/12 23:57:30 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.59 $"[11:-2]
+__revision__ = "$Revision: 1.60 $"[11:-2]
 
 
 ##################################################
@@ -137,7 +137,7 @@ Template output mismatch: %(notes)s
     convertEOLs = True
     DEBUGLEV = 0
     _searchList = [defaultTestNameSpace]
-    
+
     def searchList(self):
         return self._searchList
 
@@ -145,12 +145,16 @@ Template output mismatch: %(notes)s
         self._gen(input)
         self._verify(output)
 
+    def _getCompilerSettings(self):
+        return {}
 
     def _gen(self, input):
         self._input = input
-        self.template = templateObj = Template(input,
-                                               searchList=self.searchList()
-                                               )
+        self.template = templateObj = Template(
+            input,
+            searchList=self.searchList(),
+            compilerSettings=self._getCompilerSettings(),
+            )
         if self.DEBUGLEV == 1:
             print self.genClassCode()
         elif self.DEBUGLEV == 2:
@@ -2031,6 +2035,8 @@ $sep$letter#slurp
                     "a, b, c")
 
 class FilterDirective(OutputTest):
+    def _getCompilerSettings(self):
+        return dict(useFilterArgsInPlaceholders=True)
     
     def test1(self):
         """#filter ReplaceNone
@@ -2333,6 +2339,8 @@ public class X
 
 
 """
+    def _getCompilerSettings(self):
+        return dict(useFilterArgsInPlaceholders=True)
 
     def searchList(self):    # Inside Indenter class.
         class Method:
