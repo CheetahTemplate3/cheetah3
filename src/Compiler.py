@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.77 2005/11/27 03:37:22 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.78 2005/12/12 22:44:43 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.77 $
+Version: $Revision: 1.78 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/11/27 03:37:22 $
+Last Revision Date: $Date: 2005/12/12 22:44:43 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.77 $"[11:-2]
+__revision__ = "$Revision: 1.78 $"[11:-2]
 
 import sys
 import os
@@ -63,7 +63,7 @@ class GenUtils:
 
         return interval
         
-    def genCacheInfo(self, cacheToken):
+    def _X_genCacheInfo(self, cacheToken):
         
         """Decipher a placeholder cachetoken
         """
@@ -75,6 +75,19 @@ class GenUtils:
             cacheInfo['type'] = REFRESH_CACHE
             cacheInfo['interval'] = self.genTimeInterval(subGrpDict['interval'])
         elif subGrpDict['STATIC_CACHE']:
+            cacheInfo['type'] = STATIC_CACHE
+        return cacheInfo                # is empty if no cache
+
+    def genCacheInfo(self, cacheTokenParts):
+        
+        """Decipher a placeholder cachetoken
+        """
+        
+        cacheInfo = {}
+        if cacheTokenParts['REFRESH_CACHE']:
+            cacheInfo['type'] = REFRESH_CACHE
+            cacheInfo['interval'] = self.genTimeInterval(cacheTokenParts['interval'])
+        elif cacheTokenParts['STATIC_CACHE']:
             cacheInfo['type'] = STATIC_CACHE
         return cacheInfo                # is empty if no cache
 
@@ -230,6 +243,7 @@ class GenUtils:
 class MethodCompiler(GenUtils):
     def __init__(self, methodName, classCompiler, templateObj=None):
         self._settingsManager = classCompiler
+        self._classCompiler = classCompiler
         self._templateObj = templateObj
         self._methodName = methodName
         self._setupState()
@@ -247,6 +261,7 @@ class MethodCompiler(GenUtils):
         self._methodBodyChunks = []
 
         self._cacheRegionOpen = False
+        self._errorCatcherOn = False
         
     def cleanupState(self):
         """Called by the containing class compiler instance"""
@@ -347,13 +362,8 @@ class MethodCompiler(GenUtils):
                 self.addChunk("write(filter(%s%s))"%(chunk,filterArgs))
             else:
                 self.addChunk("write(str(%s))"%chunk)
-            
-    # @@TR: consider merging the next two methods into one
-    def addStrConst(self, strConst):
-        self._appendToPrevStrConst(strConst)
 
-    def addRawText(self, text):
-        self.addStrConst(text)
+
 
     def _appendToPrevStrConst(self, strConst):
         if self._pendingStrConstChunks:
@@ -401,14 +411,65 @@ class MethodCompiler(GenUtils):
             BOL = max(src.rfind('\n')+1, src.rfind('\r')+1, 0)
             if BOL < len(src):
                 self._pendingStrConstChunks[-1] = src[:BOL]
+
+
+
+    def isErrorCatcherOn(self):
+        return self._errorCatcherOn
+    
+    def turnErrorCatcherOn(self):
+        self._errorCatcherOn = True
+
+    def turnErrorCatcherOff(self):
+        self._errorCatcherOn = False
+            
+    # @@TR: consider merging the next two methods into one
+    def addStrConst(self, strConst):
+        self._appendToPrevStrConst(strConst)
+
+    def addRawText(self, text):
+        self.addStrConst(text)
         
     def addMethComment(self, comm):
         offSet = self.setting('commentOffset')
         self.addChunk('#' + ' '*offSet + comm)
 
+    def addVariablePlaceholder(self, varNameChunks, filterArgs, rawPlaceholder, cacheTokenParts, lineCol):
+        codeChunk  = self.genCheetahVar(varNameChunks)
+        self._addPlaceholder(codeChunk,
+                             filterArgs=filterArgs,
+                             rawPlaceholder=rawPlaceholder,
+                             cacheTokenParts=cacheTokenParts,
+                             lineCol=lineCol)        
+
+    def addExpressionPlaceholder(self, codeChunk, rawPlaceholder, cacheTokenParts, lineCol):
+        self._addPlaceholder(codeChunk,
+                             filterArgs=None,
+                             rawPlaceholder=rawPlaceholder,
+                             cacheTokenParts=cacheTokenParts,
+                             lineCol=lineCol)        
+
+    def _addPlaceholder(self, codeChunk, filterArgs, rawPlaceholder, cacheTokenParts, lineCol):
+        cacheInfo = self.genCacheInfo(cacheTokenParts) 
+        if cacheInfo:
+            cacheInfo['ID'] = repr(rawPlaceholder)[1:-1]
+            self.startCacheRegion(cacheInfo, lineCol)
+
+        if self.isErrorCatcherOn():
+            methodName = self._classCompiler.addErrorCatcherCall(
+                codeChunk, rawCode=rawPlaceholder, lineCol=lineCol)
+            codeChunk = 'self.' + methodName + '(localsDict=locals())' 
+        self.addFilteredChunk(codeChunk, filterArgs, rawPlaceholder)      
+        if self.setting('outputRowColComments'):
+            self.appendToPrevChunk(' # from line %s, col %s' % lineCol + '.')
+        if cacheInfo:
+            self.endCacheRegion()
 
     def addSilent(self, expr):
         self.addChunk( expr )
+
+    def addEcho(self, expr, rawExpr=None):
+        self.addFilteredChunk(expr, rawExpr=rawExpr)
         
     def addSet(self, LVALUE, OP, RVALUE, isGlobal=True):
         ## we need to split the LVALUE to deal with globalSetVars
@@ -446,6 +507,10 @@ class MethodCompiler(GenUtils):
         
     def addFor(self, expr):
         self.addIndentingDirective(expr)
+
+    #def closeFor(self)
+    #    self._compiler.commitStrConst()
+    #    self._compiler.dedent()
 
     def addRepeat(self, expr):
         #the _repeatCount stuff here allows nesting of #repeat directives        
@@ -500,6 +565,24 @@ class MethodCompiler(GenUtils):
         self.addReIndentingDirective(expr)
             
     def addReturn(self, expr):
+        self.addChunk(expr)
+
+    def addPass(self, expr):
+        self.addChunk(expr)
+
+    def addDel(self, expr):
+        self.addChunk(expr)
+
+    def addAssert(self, expr):
+        self.addChunk(expr)
+
+    def addRaise(self, expr):
+        self.addChunk(expr)
+
+    def addBreak(self, expr):
+        self.addChunk(expr)
+
+    def addContinue(self, expr):
         self.addChunk(expr)
 
     def addPSP(self, PSP):
@@ -591,6 +674,7 @@ class MethodCompiler(GenUtils):
         self.addChunk('')
 
     def setErrorCatcher(self, errorCatcherName):
+        self.turnErrorCatcherOn()        
         if self._templateObj:
             self._templateObj._errorCatcher = \
                    getattr(ErrorCatchers, errorCatcherName)(self._templateObj)
@@ -627,6 +711,9 @@ class MethodCompiler(GenUtils):
                 self.addChunk('filter = self._currentFilter = \\\n\t\t\tself._filters[filterName] = '
                               + 'getattr(self._filtersLib, filterName)(self).filter')
                 self.dedent()
+                
+    def closeFilterBlock(self):
+        self.addChunk('filter = self._initialFilter')        
 
 class AutoMethodCompiler(MethodCompiler):
 
@@ -1245,8 +1332,6 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "VFN=valueForName",
             "currentTime=time.time",
             ]
-
-        self._errorCatcherOn = False
         
     def compile(self):
         classCompiler = self._spawnClassCompiler(self._mainClassName)            
@@ -1291,17 +1376,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         return self._importedVarNames
     
     def addImportedVarNames(self, varNames):
-        self._importedVarNames.extend(varNames)
-
-    def isErrorCatcherOn(self):
-        return self._errorCatcherOn
-    
-    def turnErrorCatcherOn(self):
-        self._errorCatcherOn = True
-
-    def turnErrorCatcherOff(self):
-        self._errorCatcherOn = False
-               
+        self._importedVarNames.extend(varNames)               
         
     ## methods for adding stuff to the module and class definitions
 
