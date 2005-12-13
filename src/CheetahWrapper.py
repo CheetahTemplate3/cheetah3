@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.18 2005/01/03 19:57:24 tavis_rudd Exp $
+# $Id: CheetahWrapper.py,v 1.19 2005/12/13 04:07:07 tavis_rudd Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -9,18 +9,17 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.18 $
+Version: $Revision: 1.19 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/01/03 19:57:24 $
+Last Revision Date: $Date: 2005/12/13 04:07:07 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.18 $"[11:-2]
+__revision__ = "$Revision: 1.19 $"[11:-2]
 
 import getopt, glob, os, pprint, re, shutil, sys
 import cPickle as pickle
 
 from Cheetah.Version import Version
-from Cheetah.Compiler import Compiler
 from Cheetah.Template import Template
 from Cheetah.Utils.Misc import mkdirsWithPyInitFiles
 from Cheetah.Utils.optik import OptionParser
@@ -131,6 +130,7 @@ Run "cheetah help" for the main help screen.
 class CheetahWrapper:
     MAKE_BACKUPS = True
     BACKUP_SUFFIX = ".bak"
+    _templateClass = None
 
     def __init__(self):
         self.progName = None
@@ -211,17 +211,46 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
         opts.verbose = not opts.stdout
 
 
-    def compileOrFillStdin(self):
-            if self.isCompile:
-                output = Compiler(file=sys.stdin)
-            else:
-                output = Template(file=sys.stdin)
-            output = str(output)
-            sys.stdout.write(output)
+    def _getTemplateClass(self):
+        C, D, W = self.chatter, self.debug, self.warn
+        if self._templateClass:
+            return self._templateClass
+        
+        modname = os.environ.get('CHEETAH_TEMPLATE_CLASS')
+        if not modname:
+            return Template
+        p = modname.rfind('.')
+        assert ':' in modname, 'The environment var CHEETAH_TEMPLATE_CLASS is invalid'
+        modname, classname = modname.split(':')
 
+        C('using environ[CHEETAH_TEMPLATE_CLASS]=%s:%s'%(modname, classname))
+        
+        if p >= 0:
+            mod = getattr(__import__(modname[:p], {}, {}, [modname[p+1:]]), modname[p+1:])
+        else:
+            mod = __import__(modname, {}, {}, [])
+
+        klass = getattr(mod, classname, None)
+        if klass:
+            self._templateClass = klass
+            return klass
+        else:
+            W('**Template class specified in env[CHEETAH_TEMPLATE_CLASS] not found')
+            W('**Falling back on Cheetah.Template:Template')            
+            return Template
+
+    def compileOrFillStdin(self):
+        TemplateClass = self._getTemplateClass()
+        if self.isCompile:
+            pysrc = TemplateClass.compile(file=sys.stdin, returnAClass=False)
+            output = pysrc
+        else:
+            output = str(TemplateClass(file=sys.stdin))
+        sys.stdout.write(output)
 
     def compileOrFillBundle(self, b):
         C, D, W = self.chatter, self.debug, self.warn
+        TemplateClass = self._getTemplateClass()
         src = b.src
         dst = b.dst
         base = b.base
@@ -241,11 +270,12 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
                 raise Error("""\
 %s: base name %s contains invalid characters.  It must
 be named according to the same rules as Python modules.""" % tup)
-            obj = Compiler(file=src, \
-                moduleName=basename, mainClassName=basename)
+            pysrc = TemplateClass.compile(file=src, returnAClass=False,
+                                     moduleName=basename, className=basename)
+            output = pysrc
         else:
-            obj = Template(file=src, searchList=self.searchList)
-        output = str(obj)
+            output = str(TemplateClass(file=src, searchList=self.searchList))
+            
         if bak:
             shutil.copyfile(dst, bak)
         if dstDir and not os.path.exists(dstDir):
@@ -364,8 +394,8 @@ be named according to the same rules as Python modules.""" % tup)
                     raise Error("source file '%s' is a directory" % path)
             elif os.path.isfile(path):
                 ret.append(path)
-            elif addIextIfMissing and not path.endswith(iext) and \
-                os.path.isfile(pathWithExt):
+            elif (addIextIfMissing and not path.endswith(iext) and 
+                  os.path.isfile(pathWithExt)):
                 ret.append(pathWithExt)
                 # Do not recurse directories discovered by iext appending.
             elif os.path.exists(path):
