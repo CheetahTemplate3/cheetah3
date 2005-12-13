@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.81 2005/12/13 01:20:50 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.82 2005/12/13 04:11:30 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.81 $
+Version: $Revision: 1.82 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/13 01:20:50 $
+Last Revision Date: $Date: 2005/12/13 04:11:30 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.81 $"[11:-2]
+__revision__ = "$Revision: 1.82 $"[11:-2]
 
 import sys
 import os
@@ -102,6 +102,9 @@ class GenUtils:
         
         This is a harmless side effect necessary to make gettext work when it
         is scanning compiled templates for strings marked for translation.
+
+        @@TR: another marginally more efficient approach would be to put the
+        output in a dummy method that is never called.
         """
         # @@TR: this should be in the compiler not here
         self.addChunk("if False:")
@@ -246,7 +249,7 @@ class MethodCompiler(GenUtils):
         self._methodBodyChunks = []
 
         self._cacheRegionOpen = False
-        self._errorCatcherOn = False
+        self._isErrorCatcherOn = False
         
     def cleanupState(self):
         """Called by the containing class compiler instance"""
@@ -338,13 +341,13 @@ class MethodCompiler(GenUtils):
         if self.setting('alwaysFilterNone'):
             self.addChunk("__v = %s"%chunk)
             if self.setting('useFilters'):
-                self.addChunk("if __v is not None: write(filter(__v%s))"%filterArgs)
+                self.addChunk("if __v is not None: write(__filter(__v%s))"%filterArgs)
             else:
                 self.addChunk("if __v is not None: write(str(__v))")
         else:
             
             if self.setting('useFilters'):
-                self.addChunk("write(filter(%s%s))"%(chunk,filterArgs))
+                self.addChunk("write(__filter(%s%s))"%(chunk,filterArgs))
             else:
                 self.addChunk("write(str(%s))"%chunk)
 
@@ -402,13 +405,13 @@ class MethodCompiler(GenUtils):
 
 
     def isErrorCatcherOn(self):
-        return self._errorCatcherOn
+        return self._isErrorCatcherOn
     
     def turnErrorCatcherOn(self):
-        self._errorCatcherOn = True
+        self._isErrorCatcherOn = True
 
     def turnErrorCatcherOff(self):
-        self._errorCatcherOn = False
+        self._isErrorCatcherOn = False
             
     # @@TR: consider merging the next two methods into one
     def addStrConst(self, strConst):
@@ -481,7 +484,7 @@ class MethodCompiler(GenUtils):
             secondary = ''
 
         if isGlobal:
-            LVALUE = 'globalSetVars["' + primary + '"]' + secondary            
+            LVALUE = 'self._CHEETAH_globalSetVars["' + primary + '"]' + secondary            
         else:
             pass
         self.addChunk( LVALUE + ' ' + OP + ' ' + RVALUE.strip() )
@@ -582,7 +585,7 @@ class MethodCompiler(GenUtils):
         if PSP[0] == '=':
             PSP = PSP[1:]
             if PSP:
-                self.addWriteChunk('filter(' + PSP + ')')
+                self.addWriteChunk('__filter(' + PSP + ')')
             return
                     
         elif PSP.lower() == 'end':
@@ -619,12 +622,12 @@ class MethodCompiler(GenUtils):
         self.addChunk('## START CACHE REGION: at line, col ' + str(lineCol) + ' in the source.')
         self.addChunk('RECACHE = False')
 
-        self.addChunk('region = self._cacheRegions.get(' + ID + ')')
+        self.addChunk('region = self._CHEETAH_cacheRegions.get(' + ID + ')')
         
         self.addChunk('if not region:')
         self.indent()
         self.addChunk("region = CacheRegion()")
-        self.addChunk("self._cacheRegions[" + ID + "] = region")
+        self.addChunk("self._CHEETAH_cacheRegions[" + ID + "] = region")
         self.addChunk('RECACHE = True')
         self.dedent()
         
@@ -667,17 +670,17 @@ class MethodCompiler(GenUtils):
     def setErrorCatcher(self, errorCatcherName):
         self.turnErrorCatcherOn()        
         if self._templateObj:
-            self._templateObj._errorCatcher = \
+            self._templateObj._CHEETAH_errorCatcher = \
                    getattr(ErrorCatchers, errorCatcherName)(self._templateObj)
 
-        self.addChunk('if self._errorCatchers.has_key("' + errorCatcherName + '"):')
+        self.addChunk('if self._CHEETAH_errorCatchers.has_key("' + errorCatcherName + '"):')
         self.indent()
-        self.addChunk('self._errorCatcher = self._errorCatchers["' +
+        self.addChunk('self._CHEETAH_errorCatcher = self._CHEETAH_errorCatchers["' +
             errorCatcherName + '"]')
         self.dedent()
         self.addChunk('else:')
         self.indent()
-        self.addChunk('self._errorCatcher = self._errorCatchers["'
+        self.addChunk('self._CHEETAH_errorCatcher = self._CHEETAH_errorCatchers["'
                       + errorCatcherName + '"] = ErrorCatchers.'
                       + errorCatcherName + '(self)'
                       )
@@ -685,26 +688,26 @@ class MethodCompiler(GenUtils):
         
     def setFilter(self, theFilter, isKlass):
         if isKlass:
-            self.addChunk('filter = self._currentFilter = ' + theFilter.strip() +
+            self.addChunk('__filter = self._CHEETAH_currentFilter = ' + theFilter.strip() +
                           '(self).filter')
         else:
             if theFilter.lower() == 'none':
-                self.addChunk('filter = self._initialFilter')
+                self.addChunk('__filter = self._CHEETAH_initialFilter')
             else:
                 # is string representing the name of a builtin filter
                 self.addChunk('filterName = ' + repr(theFilter))
-                self.addChunk('if self._filters.has_key("' + theFilter + '"):')
+                self.addChunk('if self._CHEETAH_filters.has_key("' + theFilter + '"):')
                 self.indent()
-                self.addChunk('filter = self._currentFilter = self._filters[filterName]')
+                self.addChunk('__filter = self._CHEETAH_currentFilter = self._CHEETAH_filters[filterName]')
                 self.dedent()
                 self.addChunk('else:')
                 self.indent()
-                self.addChunk('filter = self._currentFilter = \\\n\t\t\tself._filters[filterName] = '
-                              + 'getattr(self._filtersLib, filterName)(self).filter')
+                self.addChunk('__filter = self._CHEETAH_currentFilter = \\\n\t\t\tself._CHEETAH_filters[filterName] = '
+                              + 'getattr(self._CHEETAH_filtersLib, filterName)(self).filter')
                 self.dedent()
                 
     def closeFilterBlock(self):
-        self.addChunk('filter = self._initialFilter')        
+        self.addChunk('__filter = self._CHEETAH_initialFilter')        
 
 class AutoMethodCompiler(MethodCompiler):
 
@@ -727,7 +730,7 @@ class AutoMethodCompiler(MethodCompiler):
         self._addAutoCleanupCode()
         if self._streamingEnabled:
             argList = [ ('trans', 'None'),
-                        #("dummyTrans","False"),
+                        #("__dummyTrans","False"),
                         ]
             if self.setting('useNameMapper'):
                 argList.extend([("VFFSL","valueFromFrameOrSearchList"), 
@@ -744,19 +747,18 @@ class AutoMethodCompiler(MethodCompiler):
             self.addChunk('trans = DummyTransaction()')
             if self.setting('autoAssignDummyTransactionToSelf'):
                 self.addChunk('self.transaction = trans')            
-            self.addChunk('dummyTrans = True')
+            self.addChunk('__dummyTrans = True')
             self.dedent()
-            self.addChunk('else: dummyTrans = False')
+            self.addChunk('else: __dummyTrans = False')
 
         else:
             self.addChunk('trans = DummyTransaction()')
-            self.addChunk('dummyTrans = True')
+            self.addChunk('__dummyTrans = True')
         self.addChunk('write = trans.response().write')
         if self.setting('useNameMapper'):
-            self.addChunk('SL = self._searchList')
-            self.addChunk('globalSetVars = self._globalSetVars')
+            self.addChunk('SL = self._CHEETAH_searchList')
         if self.setting('useFilters'):
-            self.addChunk('filter = self._currentFilter')
+            self.addChunk('__filter = self._CHEETAH_currentFilter')
         self.addChunk('')
 
         self.addChunk("#" *40)
@@ -772,7 +774,7 @@ class AutoMethodCompiler(MethodCompiler):
         self.addChunk('')
         
     def addStop(self, expr=None):
-        self.addChunk('return dummyTrans and trans.response().getvalue() or ""')
+        self.addChunk('return __dummyTrans and trans.response().getvalue() or ""')
 
     def addMethArg(self, name, defVal=None):
         asteriskPos = max(name.rfind('*')+1, 0)
@@ -1021,9 +1023,9 @@ class ClassCompiler(GenUtils):
         catcherMeth.addChunk("return eval('''" + codeChunk +
                              "''', globals(), localsDict)")
         catcherMeth.dedent()
-        catcherMeth.addChunk('except self._errorCatcher.exceptions(), e:')
+        catcherMeth.addChunk('except self._CHEETAH_errorCatcher.exceptions(), e:')
         catcherMeth.indent()        
-        catcherMeth.addChunk("return self._errorCatcher.warn(exc_val=e, code= " +
+        catcherMeth.addChunk("return self._CHEETAH_errorCatcher.warn(exc_val=e, code= " +
                              repr(codeChunk) + " , rawCode= " +
                              repr(rawCode) + " , lineCol=" + str(lineCol) +")")
         
@@ -1417,8 +1419,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
             self._templateObj.__class__ = newClass
             # must initialize it so instance attributes are accessible
             newClass.__init__(self._templateObj,
-                              _globalSetVars=self._templateObj._globalSetVars,
-                              _preBuiltSearchList=self._templateObj._searchList)
+                              _globalSetVars=self._templateObj._CHEETAH_globalSetVars,
+                              _preBuiltSearchList=self._templateObj._CHEETAH_searchList)
 
     def setCompilerSetting(self, key, valueExpr):
         self.setSetting(key, eval(valueExpr) )
@@ -1476,7 +1478,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
             # @@TR 2005-01-15: testing this approach to support
             # 'from foo import *'
-            self._templateObj._searchList.append(mod)
+            self._templateObj._CHEETAH_searchList.append(mod)
 
             # @@TR: old buggy approach is still needed for now
             for varName in importVarNames: 
@@ -1637,7 +1639,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
 ##################################################
 ## if run from command line:
 if __name__ == '__main__':
-    %(className)s().runAsMainProgram()
+    from Cheetah.TemplateCmdLineIface import CmdLineIface
+    CmdLineIface(templateObj=%(className)s()).run()
 """ % {'className':self._mainClassName}
 
 
