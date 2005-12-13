@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.83 2005/12/13 05:21:23 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.84 2005/12/13 05:28:55 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.83 $
+Version: $Revision: 1.84 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/13 05:21:23 $
+Last Revision Date: $Date: 2005/12/13 05:28:55 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.83 $"[11:-2]
+__revision__ = "$Revision: 1.84 $"[11:-2]
 
 import sys
 import os
@@ -860,7 +860,6 @@ class ClassCompiler(GenUtils):
         # printed after methods in the gen class def:
         self._generatedAttribs = ['_CHEETAH_instanceInitialized = False']
         self._initMethChunks = [_initMethod_defaults]
-        self._alias__str__ = True      # should we set the __str__ alias
         
         self._blockMetaData = {}
         self._errorCatcherCount = 0
@@ -872,7 +871,8 @@ class ClassCompiler(GenUtils):
             self._swallowMethodCompiler(methCompiler)
         self._setupInitMethod()
         if self._mainMethodName == 'respond':
-            self._generatedAttribs.append('__str__ = respond')
+            if self.setting('setup__str__method'):
+                self._generatedAttribs.append('def __str__(self): return self.respond()')
             if self._templateObj:
                 self._templateObj.__str__ = self._templateObj.respond
         self.addAttribute('_mainCheetahMethod_for_' + self._className +
@@ -1277,7 +1277,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             ## @@TR: The following really belong in the parser, but I've put them
             ## here for the time being to facilitate separating the parser and
             ## compiler:
-            
+            'setup__str__method': True, 
             'cheetahVarStartToken':'$',
             'commentStartToken':'##',
             'multiLineCommentStartToken':'#*',
