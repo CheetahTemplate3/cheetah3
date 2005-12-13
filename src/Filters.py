@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.26 2005/11/03 00:18:02 tavis_rudd Exp $
+# $Id: Filters.py,v 1.27 2005/12/13 04:50:57 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -10,12 +10,12 @@ would otherwise require a real template object).
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.26 $
+Version: $Revision: 1.27 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/11/03 00:18:02 $
+Last Revision Date: $Date: 2005/12/13 04:50:57 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.26 $"[11:-2]
+__revision__ = "$Revision: 1.27 $"[11:-2]
 
 from StringIO import StringIO # not cStringIO because of unicode support
 
@@ -58,8 +58,15 @@ class Filter:
     def __init__(self, templateObj=_dummyTemplateObj):
         """Setup a ref to the templateObj.  Subclasses should call this method.
         """
-        self.setting = templateObj.setting
-        self.settings = templateObj.settings
+        if hasattr(templateObj, 'setting'):
+            self.setting = templateObj.setting
+        else:
+            self.setting = lambda k: None
+
+        if hasattr(templateObj, 'settings'):
+            self.settings = templateObj.settings
+        else:
+            self.settings = lambda: {}
 
     def generateAutoArgs(self):
         
