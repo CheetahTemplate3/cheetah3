@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.79 2005/12/12 23:56:47 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.80 2005/12/13 01:19:37 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.79 $
+Version: $Revision: 1.80 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/12 23:56:47 $
+Last Revision Date: $Date: 2005/12/13 01:19:37 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.79 $"[11:-2]
+__revision__ = "$Revision: 1.80 $"[11:-2]
 
 import sys
 import os
@@ -391,6 +391,8 @@ class MethodCompiler(GenUtils):
             strConst = self._unescapeCheetahVars(''.join(self._pendingStrConstChunks))
             strConst = self._unescapeDirectives(strConst)
             self._pendingStrConstChunks = []
+            if not strConst:
+                return
             if self.setting('reprShortStrConstants') and \
                strConst.count('\n') < self.setting('reprNewlineThreshold'):
                 self.addWriteChunk( repr(strConst).replace('\\012','\\n'))
