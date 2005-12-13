@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.122 2005/12/13 05:21:44 tavis_rudd Exp $
+# $Id: Template.py,v 1.123 2005/12/13 05:27:33 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.122 $
+Version: $Revision: 1.123 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/13 05:21:44 $
+Last Revision Date: $Date: 2005/12/13 05:27:33 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.122 $"[11:-2]
+__revision__ = "$Revision: 1.123 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import os.path
@@ -182,6 +182,10 @@ class Template(SettingsManager, Servlet, WebInputMixin):
                                    '_mainCheetahMethod_for_'+otherClass.__name__)
             mainMeth = getattr(otherClass, mainMethName)
             setattr(otherClass, '__str__', mainMeth)
+            def __str__(self): return mainMeth()
+            __str__ = instancemethod(__str__, None, otherClass)
+            setattr(otherClass, '__str__', __str__)            
+            #setattr(otherClass, '__str__', mainMeth)
             
     assignRequiredMethodsToClass = classmethod(assignRequiredMethodsToClass)
 
