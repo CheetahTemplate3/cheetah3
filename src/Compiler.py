@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.85 2005/12/13 06:03:53 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.86 2005/12/13 06:17:26 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.85 $
+Version: $Revision: 1.86 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/13 06:03:53 $
+Last Revision Date: $Date: 2005/12/13 06:17:26 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.85 $"[11:-2]
+__revision__ = "$Revision: 1.86 $"[11:-2]
 
 import sys
 import os
@@ -1167,6 +1167,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             self._mainClassName = moduleName
         else:
             self._mainClassName = mainClassName
+        self._mainMethodNameArg = mainMethodName
         if mainMethodName:
             self.setSetting('mainMethodName', mainMethodName)
         
@@ -1388,8 +1389,10 @@ class ModuleCompiler(SettingsManager, GenUtils):
     ## methods for adding stuff to the module and class definitions
 
     def setBaseClass(self, baseClassName):
-        # change the default mainMethodName from the default 'respond' 
-        self.setMainMethodName(self.setting('mainMethodNameForSubclasses'))
+        if self._mainMethodNameArg:
+            self.setMainMethodName(self._mainMethodNameArg)
+        else:
+            self.setMainMethodName(self.setting('mainMethodNameForSubclasses'))
        
         ##################################################
         ## If the #extends directive contains a classname or modulename that isn't
