@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.80 2005/12/13 01:19:37 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.81 2005/12/13 01:20:50 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.80 $
+Version: $Revision: 1.81 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/13 01:19:37 $
+Last Revision Date: $Date: 2005/12/13 01:20:50 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.80 $"[11:-2]
+__revision__ = "$Revision: 1.81 $"[11:-2]
 
 import sys
 import os
@@ -62,21 +62,6 @@ class GenUtils:
             interval = float(timeString)*60
 
         return interval
-        
-    def _X_genCacheInfo(self, cacheToken):
-        
-        """Decipher a placeholder cachetoken
-        """
-        
-        match = self._parser.cacheTokenRE.match(cacheToken)
-        subGrpDict = match.groupdict()
-        cacheInfo = {}
-        if subGrpDict['REFRESH_CACHE']:
-            cacheInfo['type'] = REFRESH_CACHE
-            cacheInfo['interval'] = self.genTimeInterval(subGrpDict['interval'])
-        elif subGrpDict['STATIC_CACHE']:
-            cacheInfo['type'] = STATIC_CACHE
-        return cacheInfo                # is empty if no cache
 
     def genCacheInfo(self, cacheTokenParts):
         
