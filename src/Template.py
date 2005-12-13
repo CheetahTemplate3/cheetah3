@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.125 2005/12/13 21:26:57 tavis_rudd Exp $
+# $Id: Template.py,v 1.126 2005/12/13 21:28:52 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.125 $
+Version: $Revision: 1.126 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/13 21:26:57 $
+Last Revision Date: $Date: 2005/12/13 21:28:52 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.125 $"[11:-2]
+__revision__ = "$Revision: 1.126 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import os.path
@@ -68,9 +68,6 @@ try:
 except ImportError:
     class Unspecified:
         pass
-
-class NoDefault:
-    pass
 
 class Error(Exception):
     pass
@@ -417,7 +414,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             
     ## utility functions ##   
 
-    def getVar(self, varName, default=NoDefault, autoCall=True):        
+    def getVar(self, varName, default=Unspecified, autoCall=True):        
         """Get a variable from the searchList.  If the variable can't be found
         in the searchList, it returns the default value if one was given, or
         raises NameMapper.NotFound."""
@@ -425,7 +422,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         try:
             return VFSL(self.searchList(), varName.replace('$',''), autoCall)
         except NotFound:
-            if default != NoDefault:
+            if default is not Unspecified:
                 return default
             else:
                 raise
