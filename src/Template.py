@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.121 2005/12/13 04:11:01 tavis_rudd Exp $
+# $Id: Template.py,v 1.122 2005/12/13 05:21:44 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,18 +8,19 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.121 $
+Version: $Revision: 1.122 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/13 04:11:01 $
+Last Revision Date: $Date: 2005/12/13 05:21:44 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.121 $"[11:-2]
+__revision__ = "$Revision: 1.122 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import os.path
 import sys                        # used in the error handling code
 import re                         # used to define the internal delims regex
 import new                        # used to bind the compiled template code
+from new import instancemethod
 import types                      # used in the mergeNewTemplateData method
                                   # and in Template.__init__()
 import string
@@ -156,6 +157,36 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             return generatedModuleCode
     compile = classmethod(compile)
 
+
+    def assignRequiredMethodsToClass(klass, otherClass):
+        for methodname in ('_initCheetahAttributes',
+                           'searchList',
+                           'errorCatcher',
+                           'refreshCache',
+                           'getVar',
+                           'varExists',
+                           'getFileContents',
+                           'runAsMainProgram',
+                           '_includeCheetahSource',
+                           '_genTmpFilename',
+                           '_importAsDummyModule',
+                           ):
+            if not hasattr(otherClass, methodname):
+                method = getattr(Template, methodname)
+                newMethod = instancemethod(method.im_func, None, otherClass)
+                #print methodname, method
+                setattr(otherClass, methodname, newMethod)
+
+        if not hasattr(otherClass, '__str__') or otherClass.__str__ is object.__str__:
+            mainMethName = getattr(otherClass,
+                                   '_mainCheetahMethod_for_'+otherClass.__name__)
+            mainMeth = getattr(otherClass, mainMethName)
+            setattr(otherClass, '__str__', mainMeth)
+            
+    assignRequiredMethodsToClass = classmethod(assignRequiredMethodsToClass)
+
+
+
     def __init__(self, source=None, searchList=Unspecified, file=None,
                  filter='EncodeUnicode', # which filter from Cheetah.Filters
                  filtersLib=Filters,
@@ -291,6 +322,9 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             self._CHEETAH_errorCatcher = None
         self._CHEETAH_initErrorCatcher = self._CHEETAH_errorCatcher        
 
+        if not hasattr(self, 'transaction'):
+            self.transaction = None
+        self._CHEETAH_instanceInitialized = True
             
     def _compile(self, source=None, file=None, moduleName=None, mainMethodName=None):
         
@@ -532,6 +566,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         #mod.__co__ = co
         exec co in mod.__dict__
         return mod
+
 
 T = Template   # Short and sweet for debugging at the >>> prompt.
 

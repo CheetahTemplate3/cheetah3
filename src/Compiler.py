@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.82 2005/12/13 04:11:30 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.83 2005/12/13 05:21:23 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.82 $
+Version: $Revision: 1.83 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/13 04:11:30 $
+Last Revision Date: $Date: 2005/12/13 05:21:23 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.82 $"[11:-2]
+__revision__ = "$Revision: 1.83 $"[11:-2]
 
 import sys
 import os
@@ -740,7 +740,7 @@ class AutoMethodCompiler(MethodCompiler):
         
     def _addAutoSetupCode(self):
         if self._streamingEnabled:
-            self.addChunk('if not trans: trans = self.transaction'
+            self.addChunk('if not trans and not callable(self.transaction): trans = self.transaction'
                           ' # is None unless self.awake() was called')
             self.addChunk('if not trans:')
             self.indent()
@@ -796,6 +796,17 @@ class AutoMethodCompiler(MethodCompiler):
 ##################################################
 ## CLASS COMPILERS
 
+_initMethod_defaults = """\
+if not self._CHEETAH_instanceInitialized:
+    if not hasattr(self, '_initCheetahAttributes'):
+        Template.assignRequiredMethodsToClass(self.__class__)
+    cheetahKWArgs = {}
+    allowedKWs = 'searchList filter filtersLib errorCatcher'.split()
+    for k,v in KWs.items():
+        if k in allowedKWs: cheetahKWArgs[k] = v
+    self._initCheetahAttributes(**cheetahKWArgs)
+""".replace('\n','\n'+' '*8)
+
 class ClassCompiler(GenUtils):
     methodCompilerClass = AutoMethodCompiler
     methodCompilerClassForInit = MethodCompiler
@@ -846,8 +857,9 @@ class ClassCompiler(GenUtils):
         self._methodsIndex = {}      # store by name
         self._baseClass = 'Template'
         self._classDocStringLines = []
-        self._generatedAttribs = []      # printed after methods in the gen class def
-        self._initMethChunks = []
+        # printed after methods in the gen class def:
+        self._generatedAttribs = ['_CHEETAH_instanceInitialized = False']
+        self._initMethChunks = [_initMethod_defaults]
         self._alias__str__ = True      # should we set the __str__ alias
         
         self._blockMetaData = {}
@@ -1130,7 +1142,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
     
     def __init__(self, source=None, file=None, moduleName='GenTemplate',
                  mainClassName=None,
-                 mainMethodName='respond',
+                 mainMethodName=None,
                  templateObj=None,
                  settings=None):
         SettingsManager.__init__(self)
@@ -1155,8 +1167,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
             self._mainClassName = moduleName
         else:
             self._mainClassName = mainClassName
-        self._mainMethodName = mainMethodName
-
+        if mainMethodName:
+            self.setSetting('mainMethodName', mainMethodName)
         
         self._filePath = None
         self._fileMtime = None
@@ -1218,7 +1230,9 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
     def _initializeSettings(self):
         defaults = {
-            'indentationStep': ' '*4, 
+            'mainMethodName':'respond',
+            'mainMethodNameForSubclasses':'writeBody',
+            'indentationStep': ' '*4,
             'initialMethIndentLevel': 2,
 
             'monitorSrcFile':False,
@@ -1240,8 +1254,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
             'useFilters':True, # use str instead if =False
             'useFilterArgsInPlaceholders':True,
             'includeRawExprInFilterArgs':True,
+            #'lookForTransactionAttr':False,
             'autoAssignDummyTransactionToSelf':False,
-
 
 
             
@@ -1335,12 +1349,11 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self._compiled = True
 
         
-    def _spawnClassCompiler(self, className, klass=None,
-                           mainMethodName='respond'):
+    def _spawnClassCompiler(self, className, klass=None):
         if klass is None:
             klass = self.classCompilerClass
         classCompiler = klass(className,
-                              mainMethodName=self._mainMethodName,
+                              mainMethodName=self.setting('mainMethodName'),
                               templateObj=self._templateObj,
                               fileName=self._filePath,
                               settingsManager=self,
@@ -1376,7 +1389,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
     def setBaseClass(self, baseClassName):
         # change the default mainMethodName from the default 'respond' 
-        self.setMainMethodName('writeBody') # @@TR: needs some thought
+        self.setMainMethodName(self.setting('mainMethodNameForSubclasses'))
        
         ##################################################
         ## If the #extends directive contains a classname or modulename that isn't
@@ -1395,7 +1408,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             # or a previously imported classname
             modName = bareClassName = baseClassName 
             
-        if modName not in self.importedVarNames():
+        if bareClassName!='object' and modName not in self.importedVarNames():
             if len(chunks) > 1 and bareClassName != chunks[:-1][-1]:
                 modName = '.'.join(chunks)
             importStatement = "from %s import %s" % (modName, bareClassName)
