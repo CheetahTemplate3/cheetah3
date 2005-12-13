@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.74 2005/12/12 23:56:34 tavis_rudd Exp $
+# $Id: Parser.py,v 1.75 2005/12/13 21:11:35 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.74 $
+Version: $Revision: 1.75 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/12/12 23:56:34 $
+Last Revision Date: $Date: 2005/12/13 21:11:35 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.74 $"[11:-2]
+__revision__ = "$Revision: 1.75 $"[11:-2]
 
 import os
 import sys
@@ -279,7 +279,8 @@ class _LowLevelParser(SourceReader):
             self.matchVariablePlaceholderStart,
             self.matchExpressionPlaceholderStart,
             self.matchDirective,
-            self.matchPSPStartToken
+            self.matchPSPStartToken,
+            self.matchEOLSlurpToken,
             ]
 
     ## regex setup ##
@@ -332,6 +333,12 @@ class _LowLevelParser(SourceReader):
             #r'\[[ \t\f]*'
             r'(?:\{|\(|\[)[ \t\f]*'
             + r'(?=[^\)\}\]])'
+            )
+
+        self.EOLSlurpRE = re.compile(
+            escapeRegexChars(self.setting('EOLSlurpToken'))
+            + r'[ \t\f]*'
+            + r'(?:'+EOL+')'
             )
 
 
@@ -403,6 +410,15 @@ class _LowLevelParser(SourceReader):
                 if matcher():
                     return True
         return False
+
+    def matchEOLSlurpToken(self):
+        return self.EOLSlurpRE.match(self.src(), self.pos())
+
+    def getEOLSlurpToken(self):
+        match = self.matchEOLSlurpToken()
+        if not match:
+            raise ParseError(self, msg='Invalid EOL slurp token')
+        return self.readTo(match.end())
 
     def matchCommentStartToken(self):
         return self.commentStartTokenRE.match(self.src(), self.pos())
@@ -1093,6 +1109,8 @@ class _HighLevelParser(_LowLevelParser):
                 self.eatDirective()
             elif self.matchPSPStartToken():
                 self.eatPSP()
+            elif self.matchEOLSlurpToken():
+                self.eatEOLSlurpToken()
             else:
                 self.eatStrConstant()
         self.assertEmptyIndentStack()
@@ -1566,6 +1584,12 @@ class _HighLevelParser(_LowLevelParser):
             self._compiler.handleWSBeforeDirective()
         self._compiler.commitStrConst()
         self.readToEOL(gobble=True)
+
+    def eatEOLSlurpToken(self):
+        if self.isLineClearToStartToken():
+            self._compiler.handleWSBeforeDirective()
+        self._compiler.commitStrConst()
+        self.readToEOL(gobble=True)        
 
     def eatRaw(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
