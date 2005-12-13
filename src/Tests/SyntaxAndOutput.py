@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.60 2005/12/12 23:57:30 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.61 2005/12/13 21:21:49 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.60 $
+Version: $Revision: 1.61 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/12 23:57:30 $
+Last Revision Date: $Date: 2005/12/13 21:21:49 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.60 $"[11:-2]
+__revision__ = "$Revision: 1.61 $"[11:-2]
 
 
 ##################################################
@@ -36,7 +36,7 @@ from Cheetah.NameMapper import NotFound
 from Cheetah.NameMapper import C_VERSION as NameMapper_C_VERSION
 from Cheetah.Template import Template
 from Cheetah.Parser import ParseError
-from Cheetah.Compiler import Compiler
+from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
 import unittest_local_copy as unittest
 
 ##################################################
@@ -298,11 +298,20 @@ class NonTokens(OutputTest):
         """1 dollar sign"""
         self.verify("$",
                     "$")
-    def test6(self):
+    def _X_test6(self):
         """1 dollar sign followed by hash"""
         self.verify("\n$#\n",
                     "\n$#\n")
 
+    def test6(self):
+        """1 dollar sign followed by EOL Slurp Token"""
+        if DEFAULT_COMPILER_SETTINGS['EOLSlurpToken']:
+            self.verify("\n$%s\n"%DEFAULT_COMPILER_SETTINGS['EOLSlurpToken'],
+                        "\n$")
+        else:
+            self.verify("\n$#\n",
+                        "\n$#\n")
+            
 class Comments_SingleLine(OutputTest):
     def test1(self):
         """## followed by WS"""
@@ -899,6 +908,40 @@ class SlurpDirective(OutputTest):
         self.verify(" 1234 #slurp garbage   \n",
                     " 1234 ")
 
+
+
+class EOLSlurpToken(OutputTest):
+    _EOLSlurpToken = DEFAULT_COMPILER_SETTINGS['EOLSlurpToken']
+    def test1(self):
+        r"""#slurp with 1 \n """
+        self.verify("%s\n"%self._EOLSlurpToken,
+                    "")
+
+    def test2(self):
+        r"""#slurp with 1 \n, leading whitespace
+        Should gobble"""
+        self.verify("       %s\n"%self._EOLSlurpToken,
+                    "")
+    def test3(self):
+        r"""#slurp with 1 \n, leading content
+        Shouldn't gobble"""
+        self.verify(" 1234 %s\n"%self._EOLSlurpToken,
+                    " 1234 ")
+        
+    def test4(self):
+        r"""#slurp with WS then \n, leading content
+        Shouldn't gobble"""
+        self.verify(" 1234 %s    \n"%self._EOLSlurpToken,
+                    " 1234 ")
+
+    def test5(self):
+        r"""#slurp with garbage chars then \n, leading content
+        Should NOT eat the garbage"""
+        self.verify(" 1234 %s garbage   \n"%self._EOLSlurpToken,
+                    " 1234 %s garbage   \n"%self._EOLSlurpToken)
+
+if not DEFAULT_COMPILER_SETTINGS['EOLSlurpToken']:
+    del EOLSlurpToken
 
 class RawDirective(OutputTest):
     def test1(self):
