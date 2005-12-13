@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.124 2005/12/13 05:42:16 tavis_rudd Exp $
+# $Id: Template.py,v 1.125 2005/12/13 21:26:57 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.124 $
+Version: $Revision: 1.125 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/13 05:42:16 $
+Last Revision Date: $Date: 2005/12/13 21:26:57 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.124 $"[11:-2]
+__revision__ = "$Revision: 1.125 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import os.path
@@ -86,7 +86,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
     servlets and also knows how to compile a template."""
 
 
-    _defaultMainMethodName = 'respond'
+    _defaultMainMethodName = None
     _compilerSettings = None
     _compilerClass = Compiler
 
@@ -100,7 +100,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
     
     def compile(klass, source=None, file=None, returnAClass=True,
                 compilerSettings=None, compilerClass=None,
-                moduleName=None, className=None, mainMethodName='respond'):
+                moduleName=None, className=None, mainMethodName=None):
         """Compiles cheetah source code and returns a python class.  You then
         create template instances using that class.
 
@@ -179,10 +179,11 @@ class Template(SettingsManager, Servlet, WebInputMixin):
 
         if not hasattr(otherClass, '__str__') or otherClass.__str__ is object.__str__:
             mainMethName = getattr(otherClass,
-                                   '_mainCheetahMethod_for_'+otherClass.__name__)
-            def __str__(self): return getattr(self, mainMethName)()
-            __str__ = instancemethod(__str__, None, otherClass)
-            setattr(otherClass, '__str__', __str__)            
+                                   '_mainCheetahMethod_for_'+otherClass.__name__, None)
+            if mainMethName:
+                def __str__(self): return getattr(self, mainMethName)()
+                __str__ = instancemethod(__str__, None, otherClass)
+                setattr(otherClass, '__str__', __str__)            
             
     assignRequiredMethodsToClass = classmethod(assignRequiredMethodsToClass)
 
