@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.86 2005/12/13 06:17:26 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.87 2005/12/13 06:31:16 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.86 $
+Version: $Revision: 1.87 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/13 06:17:26 $
+Last Revision Date: $Date: 2005/12/13 06:31:16 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.86 $"[11:-2]
+__revision__ = "$Revision: 1.87 $"[11:-2]
 
 import sys
 import os
@@ -796,11 +796,12 @@ class AutoMethodCompiler(MethodCompiler):
 ##################################################
 ## CLASS COMPILERS
 
-_initMethod_defaults = """\
+_initMethod_setupArbitraryClass = """\
 if not self._CHEETAH_instanceInitialized:
     if not hasattr(self, '_initCheetahAttributes'):
         templateClass = getattr(self, '_CHEETAH_templateClass', Template)
-        templateClass.assignRequiredMethodsToClass(self.__class__)
+        #templateClass.assignRequiredMethodsToClass(self.__class__)
+        templateClass.assignRequiredMethodsToClass(%(className)s)
     cheetahKWArgs = {}
     allowedKWs = 'searchList filter filtersLib errorCatcher'.split()
     for k,v in KWs.items():
@@ -859,7 +860,7 @@ class ClassCompiler(GenUtils):
         self._classDocStringLines = []
         # printed after methods in the gen class def:
         self._generatedAttribs = ['_CHEETAH_instanceInitialized = False']
-        self._initMethChunks = [_initMethod_defaults]
+        self._initMethChunks = []
         
         self._blockMetaData = {}
         self._errorCatcherCount = 0
@@ -884,6 +885,7 @@ class ClassCompiler(GenUtils):
                                              klass=self.methodCompilerClassForInit)
         __init__.setMethodSignature("def __init__(self, *args, **KWs)")
         __init__.addChunk("%s.__init__(self, *args, **KWs)" % self._baseClass)
+        __init__.addChunk(_initMethod_setupArbitraryClass%dict(className=self._className))
         for chunk in self._initMethChunks:
             __init__.addChunk(chunk)
         __init__.cleanupState()
