@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.84 2005/12/13 05:28:55 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.85 2005/12/13 06:03:53 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.84 $
+Version: $Revision: 1.85 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/13 05:28:55 $
+Last Revision Date: $Date: 2005/12/13 06:03:53 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.84 $"[11:-2]
+__revision__ = "$Revision: 1.85 $"[11:-2]
 
 import sys
 import os
@@ -799,7 +799,8 @@ class AutoMethodCompiler(MethodCompiler):
 _initMethod_defaults = """\
 if not self._CHEETAH_instanceInitialized:
     if not hasattr(self, '_initCheetahAttributes'):
-        Template.assignRequiredMethodsToClass(self.__class__)
+        templateClass = getattr(self, '_CHEETAH_templateClass', Template)
+        templateClass.assignRequiredMethodsToClass(self.__class__)
     cheetahKWArgs = {}
     allowedKWs = 'searchList filter filtersLib errorCatcher'.split()
     for k,v in KWs.items():
@@ -832,7 +833,6 @@ class ClassCompiler(GenUtils):
         return self._settingsManager.setting(key)
 
     def __getattr__(self, name):
-
         """Provide access to the methods and attributes of the MethodCompiler
         at the top of the activeMethods stack: one-way namespace sharing
 
