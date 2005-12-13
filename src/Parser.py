@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.75 2005/12/13 21:11:35 tavis_rudd Exp $
+# $Id: Parser.py,v 1.76 2005/12/13 21:14:03 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.75 $
+Version: $Revision: 1.76 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/12/13 21:11:35 $
+Last Revision Date: $Date: 2005/12/13 21:14:03 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.75 $"[11:-2]
+__revision__ = "$Revision: 1.76 $"[11:-2]
 
 import os
 import sys
@@ -335,11 +335,14 @@ class _LowLevelParser(SourceReader):
             + r'(?=[^\)\}\]])'
             )
 
-        self.EOLSlurpRE = re.compile(
-            escapeRegexChars(self.setting('EOLSlurpToken'))
-            + r'[ \t\f]*'
-            + r'(?:'+EOL+')'
-            )
+        if self.setting('EOLSlurpToken'):
+            self.EOLSlurpRE = re.compile(
+                escapeRegexChars(self.setting('EOLSlurpToken'))
+                + r'[ \t\f]*'
+                + r'(?:'+EOL+')'
+                )
+        else:
+            self.EOLSlurpRE = None
 
 
     def _makeCommentREs(self):
@@ -412,7 +415,8 @@ class _LowLevelParser(SourceReader):
         return False
 
     def matchEOLSlurpToken(self):
-        return self.EOLSlurpRE.match(self.src(), self.pos())
+        if self.EOLSlurpRE:
+            return self.EOLSlurpRE.match(self.src(), self.pos())
 
     def getEOLSlurpToken(self):
         match = self.matchEOLSlurpToken()
