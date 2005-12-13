@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-# $Id: Indenter.py,v 1.5 2005/11/02 22:26:08 tavis_rudd Exp $
+# $Id: Indenter.py,v 1.6 2005/12/13 05:29:31 tavis_rudd Exp $
 """Indentation maker.
 @@TR: this code is unsupported and largely undocumented ...
 
 This version is based directly on code by Robert Kuzelj
 <robert_kuzelj@yahoo.com> and uses his directive syntax.  Some classes and
 attributes have been renamed.  Indentation is output via
-$self._indenter.indent() to prevent '_indenter' being looked up on the
+$self._CHEETAH_indenter.indent() to prevent '_indenter' being looked up on the
 searchList and another one being found.  The directive syntax will
 soon be changed somewhat.
 
@@ -15,12 +15,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/11/07
-Last Revision Date: $Date: 2005/11/02 22:26:08 $
+Last Revision Date: $Date: 2005/12/13 05:29:31 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 import re
 import sys
@@ -58,23 +58,23 @@ class IndentProcessor:
                 #is indention directive
                 args = match.group(self.ARGS).strip()
                 if args == self.ON:
-                    line = "#silent $self._indenter.on()"
+                    line = "#silent $self._CHEETAH_indenter.on()"
                 elif args == self.OFF:
-                    line = "#silent $self._indenter.off()"
+                    line = "#silent $self._CHEETAH_indenter.off()"
                 elif args == self.INC:
-                    line = "#silent $self._indenter.inc()"
+                    line = "#silent $self._CHEETAH_indenter.inc()"
                 elif args == self.DEC:
-                    line = "#silent $self._indenter.dec()"
+                    line = "#silent $self._CHEETAH_indenter.dec()"
                 elif args.startswith(self.SET):
                     level = int(args[1:])
-                    line = "#silent $self._indenter.setLevel(%(level)d)" % {"level":level}
+                    line = "#silent $self._CHEETAH_indenter.setLevel(%(level)d)" % {"level":level}
                 elif args.startswith('chars'):
                     self.indentChars = eval(args.split('=')[1])
-                    line = "#silent $self._indenter.setChars(%(level)d)" % {"level":level}
+                    line = "#silent $self._CHEETAH_indenter.setChars(%(level)d)" % {"level":level}
                 elif args.startswith(self.PUSH):
-                    line = "#silent $self._indenter.push()"
+                    line = "#silent $self._CHEETAH_indenter.push()"
                 elif args.startswith(self.POP):
-                    line = "#silent $self._indenter.pop()"
+                    line = "#silent $self._CHEETAH_indenter.pop()"
             else:
                 match = self.DIRECTIVE.match(line)
                 if not match:
@@ -82,9 +82,9 @@ class IndentProcessor:
                     match = self.WHITESPACES.match(line)
                     if match:
                         size = len(match.group("ws").expandtabs(4))
-                        line = ("${self._indenter.indent(%(size)d)}" % {"size":size}) + line.lstrip()
+                        line = ("${self._CHEETAH_indenter.indent(%(size)d)}" % {"size":size}) + line.lstrip()
                     else:
-                        line = "${self._indenter.indent(0)}" + line
+                        line = "${self._CHEETAH_indenter.indent(0)}" + line
             result.append(line)
 
         return self.LINE_SEP.join(result)
