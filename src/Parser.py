@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.77 2005/12/14 02:01:43 tavis_rudd Exp $
+# $Id: Parser.py,v 1.78 2005/12/14 02:09:02 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.77 $
+Version: $Revision: 1.78 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/12/14 02:01:43 $
+Last Revision Date: $Date: 2005/12/14 02:09:02 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.77 $"[11:-2]
+__revision__ = "$Revision: 1.78 $"[11:-2]
 
 import os
 import sys
@@ -1104,6 +1104,15 @@ class _HighLevelParser(_LowLevelParser):
             callback(parser=self, expr=expr,  exprType=exprType,
                      rawExpr=rawExpr, startPos=startPos)
 
+    def _filterDisabledDirectives(self, directiveKey):
+        directiveKey = directiveKey.lower()
+        if (directiveKey in self.setting('disabledDirectives')
+            or (self.setting('enabledDirectives')
+                and directiveKey not in self.setting('enabledDirectives'))):
+            for callback in self.setting('disabledDirectiveHooks'):
+                callback(parser=self, directiveKey=directiveKey)
+            raise ForbiddenExpr(self, msg='This directive is disabled')
+        
     ## main parse loop
 
     def parse(self):
@@ -1238,9 +1247,8 @@ class _HighLevelParser(_LowLevelParser):
             callback(parser=self)
         
     def eatPSP(self):
-        # filtered 
-        if not self.setting('isPSPEnabled'):
-            raise ParseError(self, msg='PSP tags are disabled')
+        # filtered
+        self._filterDisabledDirectives(directiveKey='psp')
         self.getPSPStartToken()
         endToken = self.setting('PSPEndToken')
         startPos = self.pos()            
@@ -1259,12 +1267,7 @@ class _HighLevelParser(_LowLevelParser):
 
     def eatDirective(self):
         directiveKey = self.matchDirective()
-        if (directiveKey in self.setting('disabledDirectives')
-            or (self.setting('enabledDirectives')
-                and directiveKey not in self.setting('enabledDirectives'))):
-            for callback in self.setting('disabledDirectiveHooks'):
-                callback(parser=self, directiveKey=directiveKey)
-            raise ParseError(self, msg='This directive is disabled')
+        self._filterDisabledDirectives(directiveKey)
 
         for callback in self.setting('preparseDirectiveHooks'):
             callback(parser=self, directiveKey=directiveKey)
