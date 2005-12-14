@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.89 2005/12/13 21:21:26 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.90 2005/12/14 02:02:03 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.89 $
+Version: $Revision: 1.90 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/13 21:21:26 $
+Last Revision Date: $Date: 2005/12/14 02:02:03 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.89 $"[11:-2]
+__revision__ = "$Revision: 1.90 $"[11:-2]
 
 import sys
 import os
@@ -1194,10 +1194,22 @@ DEFAULT_COMPILER_SETTINGS = {
     'multiLineCommentEndToken':'*#',
     'directiveStartToken':'#',
     'directiveEndToken':'#',
+    'isPSPEnabled':True, 
     'PSPStartToken':'<%',
     'PSPEndToken':'%>',
     'EOLSlurpToken':'#',
     'gettextTokens': ["_", "N_", "ngettext"],
+
+    # input filtering/restriction
+    'disabledDirectives':[], # list of directive keys, without the start token
+    'enabledDirectives':[], # list of directive keys, without the start token
+    'disabledDirectiveHooks':[], # callable(parser, directiveKey)
+    'preparseDirectiveHooks':[], # callable(parser, directiveKey)
+    'postparseDirectiveHooks':[], # callable(parser, directiveKey)
+    'preparsePlaceholderHooks':[], # callable(parser)
+    'postparsePlaceholderHooks':[], # callable(parser)
+    'expressionFilterHooks':[], # callable(parser, expr, exprType, rawExpr=None)
+    # exprType is the name of the directive, 'psp', or 'placeholder'
     }
 
 #class ModuleCompiler(Parser, GenUtils):
