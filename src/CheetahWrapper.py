@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.20 2005/12/21 01:06:03 tavis_rudd Exp $
+# $Id: CheetahWrapper.py,v 1.21 2005/12/21 01:12:45 tavis_rudd Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -9,12 +9,12 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.20 $
+Version: $Revision: 1.21 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/21 01:06:03 $
+Last Revision Date: $Date: 2005/12/21 01:12:45 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.20 $"[11:-2]
+__revision__ = "$Revision: 1.21 $"[11:-2]
 
 import getopt, glob, os, pprint, re, shutil, sys
 import cPickle as pickle
@@ -452,6 +452,8 @@ be named according to the same rules as Python modules.""" % tup)
         self.compileOrFill()
 
     def fill(self):
+        from Cheetah.ImportHooks import install
+        install()        
         self.compileOrFill()
 
     def help(self):
