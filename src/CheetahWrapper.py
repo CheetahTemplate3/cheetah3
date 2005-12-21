@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.19 2005/12/13 04:07:07 tavis_rudd Exp $
+# $Id: CheetahWrapper.py,v 1.20 2005/12/21 01:06:03 tavis_rudd Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -9,12 +9,12 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.19 $
+Version: $Revision: 1.20 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/13 04:07:07 $
+Last Revision Date: $Date: 2005/12/21 01:06:03 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.19 $"[11:-2]
+__revision__ = "$Revision: 1.20 $"[11:-2]
 
 import getopt, glob, os, pprint, re, shutil, sys
 import cPickle as pickle
@@ -200,6 +200,18 @@ cheetah compile %s
 Options are
 %s
 Files are %s""", args, pprint.pformat(vars(opts)), files)
+
+        #cleanup trailing path separators
+        seps = [sep for sep in [os.sep, os.altsep] if sep]
+        for attr in ['idir', 'odir']:
+            for sep in seps:
+                path = getattr(self, attr, None)
+                if path and path.endswith(sep):
+                    path = path[:-len(sep)]
+                    setattr(self, attr, path)
+                    break
+
+
         self._fixExts()
         if opts.env:
             self.searchList.append(os.environ)
