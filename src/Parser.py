@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.78 2005/12/14 02:09:02 tavis_rudd Exp $
+# $Id: Parser.py,v 1.79 2005/12/28 08:00:31 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.78 $
+Version: $Revision: 1.79 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/12/14 02:09:02 $
+Last Revision Date: $Date: 2005/12/28 08:00:31 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.78 $"[11:-2]
+__revision__ = "$Revision: 1.79 $"[11:-2]
 
 import os
 import sys
@@ -176,7 +176,7 @@ class ParseError(ValueError):
         nextLines.reverse()
         
         ## print the main message
-        report += "\n\n%s at line %i, column %i%s\n\n" % (self.msg, row, col, f)
+        report += "\n\n%s. Line %i, column %i%s\n\n" % (self.msg, row, col, f)
         report += 'Line|Line contents\n'
         report += '----|-------------------------------------------------------------\n'
         while prevLines:
@@ -194,7 +194,9 @@ class ParseError(ValueError):
             
         return report
 
-class ForbiddenExpr(ParseError): pass
+class ForbiddenSyntax(ParseError): pass
+class ForbiddenExpression(ForbiddenSyntax): pass
+class ForbiddenDirective(ForbiddenSyntax): pass
 
 class CheetahVariable:
     def __init__(self, nameChunks, useNameMapper=True, cacheToken=None,
@@ -1111,12 +1113,12 @@ class _HighLevelParser(_LowLevelParser):
                 and directiveKey not in self.setting('enabledDirectives'))):
             for callback in self.setting('disabledDirectiveHooks'):
                 callback(parser=self, directiveKey=directiveKey)
-            raise ForbiddenExpr(self, msg='This directive is disabled')
+            raise ForbiddenDirective(self, msg='This %r directive is disabled'%directiveKey)
         
     ## main parse loop
 
-    def parse(self):
-        while not self.atEnd():
+    def parse(self, endPos=None, assertEmptyStack=True):
+        while not self.atEnd() and not (endPos and self.pos()==endPos):
             #print self.peek(), self.pos() #DEBUG
             if self.matchCommentStartToken():
                 self.eatComment()
@@ -1134,7 +1136,8 @@ class _HighLevelParser(_LowLevelParser):
                 self.eatEOLSlurpToken()
             else:
                 self.eatStrConstant()
-        self.assertEmptyIndentStack()
+        if assertEmptyStack:
+            self.assertEmptyIndentStack()
                 
     ## eat methods    
                 
@@ -1205,7 +1208,7 @@ class _HighLevelParser(_LowLevelParser):
             restOfExpr = None
             filterArgs = None
             if enclosures:
-                self.getWhiteSpace()
+                WS = self.getWhiteSpace()
                 if self.setting('useFilterArgsInPlaceholders') and self.peek()==',':
                     filterArgs = self.getCallArgString(enclosures=enclosures)[1:-1]
                 else:
@@ -1219,7 +1222,7 @@ class _HighLevelParser(_LowLevelParser):
             rawPlaceholder = self[startPos: self.pos()]
             exprToFilter = self._compiler.genPlainVar(nameChunks[:])
             if restOfExpr:
-                exprToFilter = exprToFilter + ' ' + restOfExpr
+                exprToFilter = exprToFilter + WS + restOfExpr
             self._applyExpressionFilters(exprToFilter,'placeholder',
                                          rawExpr=rawPlaceholder, startPos=startPos)
             self._compiler.addVariablePlaceholder(
@@ -1511,7 +1514,10 @@ class _HighLevelParser(_LowLevelParser):
 
         if self.peek() == ':':
             self.getc()
-            rawSignature = self._eatSingleLineDef(methodName, argsList, startPos, endOfFirstLinePos)
+            rawSignature = self._eatSingleLineDef(methodName,
+                                                  argsList=argsList,
+                                                  startPos=startPos,
+                                                  endPos=endOfFirstLinePos)
             if directiveKey == 'def':
                 #@@TR: must come before _eatRestOfDirectiveTag ... for some reason
                 self._compiler.closeDef()
@@ -1539,18 +1545,34 @@ class _HighLevelParser(_LowLevelParser):
         self._src = methodSrc
         self.setPos(0)
         self.setBreakPoint(len(methodSrc))
-
         parserComment = ('Generated from ' + fullSignature + 
                          ' at line %s, col %s' % self.getRowCol(startPos)
                          + '.')
         self._compiler.startMethodDef(methodName, argsList, parserComment)
-
-        self.parse()
+        self.parse(assertEmptyStack=False)
         self.getWhiteSpace()
         self._src = origSrc
         self.setBreakPoint(origBP) 
         self.setPos(endPos)
         
+        return fullSignature # used by the #block code
+
+    def _X_eatSingleLineDef(self, methodName, argsList, startPos, endPos):
+        ## @@TR: this is an experimental version of the method
+        # filtered in calling method        
+        origPos = self.pos()
+        methodSrc = self[self.pos():endPos].strip()
+        fullSignature = self[startPos:endPos]
+        origBP = self.breakPoint()
+        self.setBreakPoint(endPos-1)
+        parserComment = ('Generated from ' + fullSignature + 
+                         ' at line %s, col %s' % self.getRowCol(startPos)
+                         + '.')
+        self._compiler.startMethodDef(methodName, argsList, parserComment)
+        #self.getWhiteSpace()
+        self.parse(assertEmptyStack=False, endPos=endPos)
+        #print self.pos()
+        self.setBreakPoint(origBP) 
         return fullSignature # used by the #block code
         
     def _eatMultiLineDef(self, methodName, argsList, startPos, isLineClearToStartToken=False):
