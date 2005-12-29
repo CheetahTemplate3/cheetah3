@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.91 2005/12/14 02:08:55 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.92 2005/12/29 00:39:26 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.91 $
+Version: $Revision: 1.92 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/14 02:08:55 $
+Last Revision Date: $Date: 2005/12/29 00:39:26 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.91 $"[11:-2]
+__revision__ = "$Revision: 1.92 $"[11:-2]
 
 import sys
 import os
@@ -1156,8 +1156,8 @@ DEFAULT_COMPILER_SETTINGS = {
     'useStackFrames': True, # use NameMapper.valueFromFrameOrSearchList
     # rather than NameMapper.valueFromSearchList
     'useErrorCatcher':False,
-    
-    # the next four are new in 1.0rc2
+
+    'autoImportForExtendDirective':True,
     'alwaysFilterNone':True, # filter out None, before the filter is called
     'useFilters':True, # use str instead if =False
     'useFilterArgsInPlaceholders':True,
@@ -1198,7 +1198,8 @@ DEFAULT_COMPILER_SETTINGS = {
     'PSPEndToken':'%>',
     'EOLSlurpToken':'#',
     'gettextTokens': ["_", "N_", "ngettext"],
-
+    'allowExpressionsInExtendsDirective': False,
+    
     # input filtering/restriction
     # use lower case keys here!!
     'disabledDirectives':[], # list of directive keys, without the start token
@@ -1209,8 +1210,8 @@ DEFAULT_COMPILER_SETTINGS = {
     'postparseDirectiveHooks':[], # callable(parser, directiveKey)
     'preparsePlaceholderHooks':[], # callable(parser)
     'postparsePlaceholderHooks':[], # callable(parser)
-    'expressionFilterHooks':[], # callable(parser, expr, exprType, rawExpr=None)
-    # exprType is the name of the directive, 'psp', or 'placeholder'
+    'expressionFilterHooks':[], # callable(parser, expr, exprType, rawExpr=None, startPos=None)
+    # exprType is the name of the directive, 'psp', or 'placeholder'. all lowercase
     }
 
 #class ModuleCompiler(Parser, GenUtils):
@@ -1424,22 +1425,44 @@ class ModuleCompiler(SettingsManager, GenUtils):
         #    module name.  This might break if people do something really fancy 
         #    with their dots and namespaces.
 
-        chunks = baseClassName.split('.')
-        if len(chunks) > 1:
-            modName, bareClassName = '.'.join(chunks[:-1]), chunks[-1]
+        if (not self.setting('autoImportForExtendDirective')
+            or baseClassName=='object' or baseClassName in self.importedVarNames()):
+            self._getActiveClassCompiler().setBaseClass(baseClassName)
+            # no need to import
         else:
-            # baseClassName is either unimported modName
-            # or a previously imported classname
-            modName = bareClassName = baseClassName 
-            
-        if bareClassName!='object' and modName not in self.importedVarNames():
-            if len(chunks) > 1 and bareClassName != chunks[:-1][-1]:
-                modName = '.'.join(chunks)
-            importStatement = "from %s import %s" % (modName, bareClassName)
-            self.addImportStatement(importStatement)
-            self.addImportedVarNames( [bareClassName,] ) 
+            chunks = baseClassName.split('.')
+            if len(chunks)==1:
+                self._getActiveClassCompiler().setBaseClass(baseClassName)
+                if baseClassName not in self.importedVarNames():
+                    modName = baseClassName
+                    # we assume the class name to be the module name
+                    # and that it's not a builtin:
+                    importStatement = "from %s import %s" % (modName, baseClassName)
+                    self.addImportStatement(importStatement)
+                    self.addImportedVarNames( [baseClassName,] ) 
+            else:
+                needToAddImport = True
+                modName = chunks[0]
+                #print chunks, ':', self.importedVarNames()
+                for chunk in chunks[1:-1]:
+                    if modName in self.importedVarNames():
+                        needToAddImport = False
+                        finalBaseClassName = baseClassName.replace(modName+'.', '')
+                        self._getActiveClassCompiler().setBaseClass(finalBaseClassName)
+                        break
+                    else:
+                        modName += '.'+chunk                        
+                if needToAddImport:
+                    modName, finalClassName = '.'.join(chunks[:-1]), chunks[-1]                
+                    #if finalClassName != chunks[:-1][-1]:
+                    if finalClassName != chunks[-2]:
+                        # we assume the class name to be the module name
+                        modName = '.'.join(chunks)
+                    self._getActiveClassCompiler().setBaseClass(finalClassName)                        
+                    importStatement = "from %s import %s" % (modName, finalClassName)
+                    self.addImportStatement(importStatement)
+                    self.addImportedVarNames( [finalClassName,] ) 
 
-        self._getActiveClassCompiler().setBaseClass(bareClassName)
         
         ##################################################
         ## dynamically bind to and __init__ with this new baseclass

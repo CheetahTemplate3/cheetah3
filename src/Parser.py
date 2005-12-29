@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.79 2005/12/28 08:00:31 tavis_rudd Exp $
+# $Id: Parser.py,v 1.80 2005/12/29 00:39:16 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.79 $
+Version: $Revision: 1.80 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/12/28 08:00:31 $
+Last Revision Date: $Date: 2005/12/29 00:39:16 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.79 $"[11:-2]
+__revision__ = "$Revision: 1.80 $"[11:-2]
 
 import os
 import sys
@@ -1616,7 +1616,11 @@ class _HighLevelParser(_LowLevelParser):
         self.advance(len('extends'))
         self.getWhiteSpace()
         startPos = self.pos()
-        baseName = self.getDottedName()
+        if self.setting('allowExpressionsInExtendsDirective'):
+            baseName = self.getExpression()
+        else:
+            baseName = self.getDottedName()
+                       
         self._applyExpressionFilters(baseName, 'extends', startPos=startPos)
         self._compiler.setBaseClass(baseName) # in compiler
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
