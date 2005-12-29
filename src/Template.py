@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.126 2005/12/13 21:28:52 tavis_rudd Exp $
+# $Id: Template.py,v 1.127 2005/12/29 00:50:27 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.126 $
+Version: $Revision: 1.127 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/13 21:28:52 $
+Last Revision Date: $Date: 2005/12/29 00:50:27 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.126 $"[11:-2]
+__revision__ = "$Revision: 1.127 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import os.path
@@ -95,9 +95,18 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         return klass._compilerSettings
     _getCompilerSettings = classmethod(_getCompilerSettings)
     
-    def compile(klass, source=None, file=None, returnAClass=True,
-                compilerSettings=None, compilerClass=None,
-                moduleName=None, className=None, mainMethodName=None):
+    def compile(klass, source=None, file=None,
+                returnAClass=True,
+                compilerSettings=None,
+                compilerClass=None,
+                moduleName=None,
+                className=None,
+                mainMethodName=None,
+                
+                moduleGlobals=None,
+                # a dict of vars that will be added to the global namespace of
+                # the module the generated code is executed in.
+                ):
         """Compiles cheetah source code and returns a python class.  You then
         create template instances using that class.
 
@@ -147,6 +156,9 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             dummyModName = _genDummyModuleFilename(moduleName)
             co = compile(generatedModuleCode+'\n', dummyModName+'.py', 'exec')
             mod = new.module(dummyModName)
+            if moduleGlobals:
+                for k, v in moduleGlobals.items():
+                    setattr(mod, k, v)
             exec co in mod.__dict__
             sys.modules[dummyModName] = mod
             return getattr(mod, className)
