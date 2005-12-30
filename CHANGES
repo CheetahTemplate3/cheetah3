@@ -2,6 +2,53 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0b2 (Dec 30, 2005)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+
+  Core Changes: 
+
+    - In previous versions of Cheetah tracebacks from exceptions that were raised
+      inside dynamically compiled Cheetah templates were opaque because
+      Python didn't have access to a python source file to use in the traceback:
+
+        File "/usr/local/unsnarl/lib/python/us/ui/views/WikiPageRenderer.py", line 192, in getTextiledContent
+          content = str(template(searchList=searchList))
+        File "cheetah_DynamicallyCompiledCheetahTemplate_2005123013020776922.py", line 202, in __str__
+        File "cheetah_DynamicallyCompiledCheetahTemplate_2005123013020776922.py", line 187, in respond
+        File "cheetah_DynamicallyCompiledCheetahTemplate_2005123013020788104.py", line 139, in writeBody
+       ZeroDivisionError: integer division or modulo by zero
+
+      It is now possible to keep the generated source code from the python
+      classes returned by Template.compile() in a cache dir.  Having these files
+      around allows Python to include the actual source lines in tracebacks and
+      makes them much easier to understand:
+
+       File "/usr/local/unsnarl/lib/python/us/ui/views/WikiPageRenderer.py", line 192, in getTextiledContent
+         content = str(template(searchList=searchList))
+       File "/tmp/tmp9OVLwe/cheetah_2005123012172480269.py", line 202, in __str__
+         def __str__(self): return self.respond()
+       File "/tmp/tmp9OVLwe/cheetah_2005123012172480269.py", line 187, in respond
+         self.writeBody(trans=trans)
+       File "/tmp/tmp9OVLwe/cheetah_2005123012172449990.py", line 139, in writeBody
+         __v = 0/0 # $(0/0)
+      ZeroDivisionError: integer division or modulo by zero
+
+      This is turned off by default. To turn it on, do this:
+
+        class NiceTracebackTemplate(Template):
+            _keepGeneratedPythonModulesForTracebacks = True
+            _cacheDirForGeneratedPythonModules = 'xxxx' # change to a dirname
+        
+        templateClass = NiceTracebackTemplate.compile(src)
+
+      This only works with the new Template.compile(src) usage style!
+
+      Note, Cheetah generated modules that are compiled on the command line have
+      never been affected by this issue. [TR]
+
+    - added an extra comment per $placeholder to generated python code so it is
+      easier to grok. [TR]
+
 2.0b1 (Dec 29, 2005)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
 
