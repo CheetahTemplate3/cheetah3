@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.127 2005/12/29 00:50:27 tavis_rudd Exp $
+# $Id: Template.py,v 1.128 2005/12/30 20:26:41 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.127 $
+Version: $Revision: 1.128 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/29 00:50:27 $
+Last Revision Date: $Date: 2005/12/30 20:26:41 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.127 $"[11:-2]
+__revision__ = "$Revision: 1.128 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import os.path
@@ -49,6 +49,8 @@ from Cheetah.Compiler import Compiler
 from Cheetah import ErrorCatchers              # for placeholder tags
 from Cheetah import Filters                          # the output filters
 from Cheetah.DummyTransaction import DummyTransaction
+from threading import Lock
+from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
 # this is used in the generated code:
 from Cheetah.NameMapper import NotFound, valueFromSearchList, valueForName 
 from Cheetah.NameMapper import valueFromFrameOrSearchList # this is used in the generated code
@@ -72,11 +74,22 @@ except ImportError:
 class Error(Exception):
     pass
 
-def _genDummyModuleFilename(baseModuleName):   
-    return ('cheetah_'+baseModuleName
-            +'_'
-            +''.join(map(lambda x: '%02d' % x, time.localtime(time.time())[:6]))
-            + str(randrange(10000, 99999)))
+
+_cheetahModuleNames = []
+_uniqueModuleNameLock = Lock() # used to prevent collisions in sys.modules
+def _genUniqueModuleName(baseModuleName):
+    _uniqueModuleNameLock.acquire()
+    if baseModuleName not in sys.modules and baseModuleName not in _cheetahModuleNames:
+        finalName = baseModuleName
+    else:
+        finalName = ('cheetah_'+baseModuleName
+                     +'_'
+                     +''.join(map(lambda x: '%02d' % x, time.localtime(time.time())[:6]))
+                     + str(randrange(10000, 99999)))
+
+    _cheetahModuleNames.append(finalName) # prevent collisions
+    _uniqueModuleNameLock.release()
+    return finalName
     
 class Template(SettingsManager, Servlet, WebInputMixin):    
     """The core template engine.  It serves as a base class for Template
@@ -94,6 +107,12 @@ class Template(SettingsManager, Servlet, WebInputMixin):
     def _getCompilerSettings(klass, source=None, file=None):
         return klass._compilerSettings
     _getCompilerSettings = classmethod(_getCompilerSettings)
+
+
+
+    _keepGeneratedPythonModulesForTracebacks = False
+    _cacheDirForGeneratedPythonModules = None # change to a dirname
+    _compileLock = Lock() # used to prevent race conditions while writing file
     
     def compile(klass, source=None, file=None,
                 returnAClass=True,
@@ -128,13 +147,14 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             # Re-raise the exception here so that the traceback will end in
             # this function rather than in some utility function.
             raise TypeError(reason)
-        
+
+        __orig_file__ = None
         if not moduleName:
-            if (file and type(file) in StringTypes
-                and re.match(r'[a-zA-Z_][a-zA-Z_0-9]*$', file)):
-                moduleName = os.path.splitext(os.path.split(file)[1])[0]
+            if file and type(file) in StringTypes:
+                moduleName = convertTmplPathToModuleName(file)
+                __orig_file__ = file
             else:
-                moduleName = 'DynamicallyCompiled'
+                moduleName = 'DynamicallyCompiledCheetahTemplate'
 
         if not compilerSettings:
             compilerSettings = klass._getCompilerSettings(source, file) or {}
@@ -153,15 +173,43 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         compiler.compile()
         generatedModuleCode = str(compiler)
         if returnAClass:
-            dummyModName = _genDummyModuleFilename(moduleName)
-            co = compile(generatedModuleCode+'\n', dummyModName+'.py', 'exec')
-            mod = new.module(dummyModName)
+            uniqueModuleName = _genUniqueModuleName(moduleName)
+            __file__ = uniqueModuleName+'.py' # relative file path with no dir part
+
+            if klass._keepGeneratedPythonModulesForTracebacks:
+                if not os.path.exists(klass._cacheDirForGeneratedPythonModules):
+                    raise Exception('%s does not exist'%
+                                    klass._cacheDirForGeneratedPythonModules)
+
+                __file__ = os.path.join(klass._cacheDirForGeneratedPythonModules,
+                                        __file__)
+                try:
+                    # @@TR: might want to assert that it doesn't already exist
+                    klass._compileLock.acquire()
+                    try:
+                        open(__file__, 'w').write(generatedModuleCode)
+                        # @@TR: should probably restrict the perms, etc.
+                    except OSError:
+                        # @@ TR: should this optionally raise?
+                        traceback.print_exc(file=sys.stderr)
+                finally:
+                    klass._compileLock.release()
+
+            co = compile(generatedModuleCode, __file__, 'exec')
+            mod = new.module(uniqueModuleName)
+            mod.__file__ = __file__
+            if __orig_file__ and os.path.exists(__orig_file__):
+                # this is used in the WebKit filemonitoring code
+                mod.__orig_file__ = __orig_file__
+
             if moduleGlobals:
                 for k, v in moduleGlobals.items():
                     setattr(mod, k, v)
             exec co in mod.__dict__
-            sys.modules[dummyModName] = mod
-            return getattr(mod, className)
+
+            sys.modules[uniqueModuleName] = mod
+            templateClass = getattr(mod, className)
+            return templateClass
         else:
             return generatedModuleCode
     compile = classmethod(compile)
