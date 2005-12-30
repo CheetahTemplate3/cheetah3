@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.94 2005/12/30 19:19:40 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.95 2005/12/30 20:23:15 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.94 $
+Version: $Revision: 1.95 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/30 19:19:40 $
+Last Revision Date: $Date: 2005/12/30 20:23:15 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.94 $"[11:-2]
+__revision__ = "$Revision: 1.95 $"[11:-2]
 
 import sys
 import os
@@ -339,7 +339,11 @@ class MethodCompiler(GenUtils):
             filterArgs += ', rawExpr=%s'%repr(rawExpr)
 
         if self.setting('alwaysFilterNone'):
-            self.addChunk("__v = %s"%chunk)
+            if rawExpr and rawExpr.find('\n')==-1 and rawExpr.find('\r')==-1:
+                self.addChunk("__v = %s # <- %s"%(chunk, rawExpr))
+            else:
+                self.addChunk("__v = %s"%chunk)
+                
             if self.setting('useFilters'):
                 self.addChunk("if __v is not None: write(__filter(__v%s))"%filterArgs)
             else:
