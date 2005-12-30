@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.93 2005/12/30 19:18:44 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.94 2005/12/30 19:19:40 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.93 $
+Version: $Revision: 1.94 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/30 19:18:44 $
+Last Revision Date: $Date: 2005/12/30 19:19:40 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.93 $"[11:-2]
+__revision__ = "$Revision: 1.94 $"[11:-2]
 
 import sys
 import os
@@ -1692,7 +1692,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
     def moduleFooter(self):
         return """
-# CHEETAH was developed by Tavis Rudd, Mike Orr, Ian Bicking and Chuck Esterbrook;
+# CHEETAH was developed by Tavis Rudd and Mike Orr
 # with code, advice and input from many other volunteers.
 # For more information visit http://www.CheetahTemplate.org
 
