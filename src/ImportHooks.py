@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.21 2005/12/05 21:16:49 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.22 2005/12/30 19:07:21 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.21 $
+Version: $Revision: 1.22 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/05 21:16:49 $
+Last Revision Date: $Date: 2005/12/30 19:07:21 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.21 $"[11:-2]
+__revision__ = "$Revision: 1.22 $"[11:-2]
 
 import sys
 import os.path
@@ -28,23 +28,12 @@ import traceback
 from Cheetah import ImportManager
 from Cheetah.ImportManager import DirOwner
 from Cheetah.Compiler import Compiler
+from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
 
 _installed = False
 
 ##################################################
 ## HELPER FUNCS
-
-l = ['_'] * 256
-for c in string.digits + string.letters:
-    l[ord(c)] = c
-_pathNameTransChars = string.join(l, '')
-
-def convertTmplPath(tmplPath,
-                    _pathNameTransChars=_pathNameTransChars,
-                    splitdrive=os.path.splitdrive,
-                    translate=string.translate,
-                    ):
-    return translate(splitdrive(tmplPath)[1], _pathNameTransChars)
 
 _cacheDir = []
 def setCacheDir(cacheDir):
@@ -64,7 +53,7 @@ class CheetahDirOwner(DirOwner):
                pathIsDir=os.path.isdir,
                join=os.path.join,
                newmod=imp.new_module,
-               convertTmplPath=convertTmplPath,
+               convertTmplPath=convertTmplPathToModuleName,
                ):
         
         tmplPath =  os.path.join(self.path, name + '.tmpl')
