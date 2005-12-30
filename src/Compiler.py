@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.92 2005/12/29 00:39:26 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.93 2005/12/30 19:18:44 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.92 $
+Version: $Revision: 1.93 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/29 00:39:26 $
+Last Revision Date: $Date: 2005/12/30 19:18:44 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.92 $"[11:-2]
+__revision__ = "$Revision: 1.93 $"[11:-2]
 
 import sys
 import os
@@ -1701,6 +1701,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
 if __name__ == '__main__':
     from Cheetah.TemplateCmdLineIface import CmdLineIface
     CmdLineIface(templateObj=%(className)s()).run()
+
 """ % {'className':self._mainClassName}
 
 
