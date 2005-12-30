@@ -91,6 +91,9 @@ release
       which the baseclasses for the templates are dynamically compiled at run
       time and are not available via simple imports. [TR]
 
+    - added compiler setting autoImportForExtendDirective=True, so this existing
+      default behaviour can be turned off when needed. [TR]
+
     - fixed a bug in the parsing of single-line #def's and #block's when they
       are enclosed within #if ... #end if. Reported by Marcin Gajda [TR]
 
