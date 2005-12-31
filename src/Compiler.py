@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.96 2005/12/31 01:47:47 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.97 2005/12/31 02:33:30 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.96 $
+Version: $Revision: 1.97 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/31 01:47:47 $
+Last Revision Date: $Date: 2005/12/31 02:33:30 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.96 $"[11:-2]
+__revision__ = "$Revision: 1.97 $"[11:-2]
 
 import sys
 import os
@@ -676,13 +676,31 @@ class MethodCompiler(GenUtils):
         assert not self._callRegionOpen
         self._callRegionOpen = True    # attrib of current methodCompiler
         self._currentCallSignature = (callSignature, lineCol)
+        self._currentCallUsesKeywordArgs = False
         self.addChunk('## START CALL REGION: '+callSignature
                       +' at line, col ' + str(lineCol) + ' in the source.')
         self.addChunk('__orig_trans = trans')
         self.addChunk('trans = __callCollector = DummyTransaction()')
         self.addChunk('write = __callCollector.response().write')
 
-
+    def setCallArg(self, argName, lineCol):
+        assert self._callRegionOpen
+        if self._currentCallUsesKeywordArgs:
+            self._endCallArg()
+        else:
+            self._currentCallUsesKeywordArgs = True
+            self.addChunk('__callKws = {}')
+            self.addChunk('__currentCallArgname = %r'%argName)
+        self._currentCallArgname = argName
+        
+    def _endCallArg(self):
+        self.addChunk(
+            '__callKws[%r] = __callCollector.response().getvalue()'%
+            self._currentCallArgname)
+        self.addChunk('del __callCollector')
+        self.addChunk('trans = __callCollector = DummyTransaction()')
+        self.addChunk('write = __callCollector.response().write')
+    
     def endCallRegion(self):
         assert self._callRegionOpen
         callSignature, lineCol = self._currentCallSignature
@@ -690,10 +708,15 @@ class MethodCompiler(GenUtils):
         self._currentCallSignature = None
         self.addChunk('trans = __orig_trans')
         self.addChunk('write = trans.response().write')
-        self.addChunk('__callArgVal = __callCollector.response().getvalue()')
-        self.addChunk('del __callCollector')
-        self.addFilteredChunk('%s(__callArgVal)'%callSignature)
-        self.addChunk('del __callArgVal')
+        if not self._currentCallUsesKeywordArgs:
+            self.addChunk('__callArgVal = __callCollector.response().getvalue()')
+            self.addChunk('del __callCollector')
+            self.addFilteredChunk('%s(__callArgVal)'%callSignature)
+            self.addChunk('del __callArgVal')
+        else:
+            self._endCallArg()
+            self.addFilteredChunk('%s(**__callKws)'%callSignature)
+            self.addChunk('del __callKws')
         self.addChunk('## END CALL REGION: '+callSignature
                       +' at line, col ' + str(lineCol) + ' in the source.')        
         self.addChunk('')

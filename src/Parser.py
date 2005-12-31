@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.83 2005/12/31 01:53:57 tavis_rudd Exp $
+# $Id: Parser.py,v 1.84 2005/12/31 02:33:07 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.83 $
+Version: $Revision: 1.84 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/12/31 01:53:57 $
+Last Revision Date: $Date: 2005/12/31 02:33:07 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.83 $"[11:-2]
+__revision__ = "$Revision: 1.84 $"[11:-2]
 
 import os
 import sys
@@ -1032,6 +1032,7 @@ class _HighLevelParser(_LowLevelParser):
             'include': self.eatInclude,
             'cache': self.eatCache,
             'call': self.eatCall,
+            'arg': self.eatCallArg,
             'filter': self.eatFilter,
             'echo': self.eatEcho,
             'silent': self.eatSilent,
@@ -1775,6 +1776,24 @@ class _HighLevelParser(_LowLevelParser):
         self._applyExpressionFilters(callSignature, 'call', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)        
         self._compiler.startCallRegion(callSignature, lineCol)
+
+    def eatCallArg(self):
+        isLineClearToStartToken = self.isLineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        lineCol = self.getRowCol()
+        self.getDirectiveStartToken()
+
+        self.advance(len('arg'))
+        startPos = self.pos()
+        self.getWhiteSpace()
+        argName = self.getIdentifier()
+        self.getWhiteSpace()
+        self._applyExpressionFilters(argName, 'arg', startPos=startPos)
+        self._compiler.setCallArg(argName, lineCol)
+        if self.peek() == ':':
+            self.getc()
+        else:        
+            self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
 
     def eatFilter(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
