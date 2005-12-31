@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.62 2005/12/31 02:42:42 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.63 2005/12/31 02:45:37 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.62 $
+Version: $Revision: 1.63 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/31 02:42:42 $
+Last Revision Date: $Date: 2005/12/31 02:45:37 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.62 $"[11:-2]
+__revision__ = "$Revision: 1.63 $"[11:-2]
 
 
 ##################################################
@@ -913,6 +913,18 @@ $arg1.upper() - $arg2.lower()#slurp
 $(1234+1) foo#slurp
 #arg arg2
 UPPER#slurp
+#end call''',
+        "1235 FOO - upper")
+
+    def test5(self):
+        r"""#call with single-line keyword #args """
+        self.verify('''\
+#def meth(arg1, arg2)
+$arg1.upper() - $arg2.lower()#slurp
+#end def
+#call self.meth
+#arg arg1:$(1234+1) foo#slurp
+#arg arg2:UPPER#slurp
 #end call''',
         "1235 FOO - upper")
 
