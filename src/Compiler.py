@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.95 2005/12/30 20:23:15 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.96 2005/12/31 01:47:47 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.95 $
+Version: $Revision: 1.96 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/30 20:23:15 $
+Last Revision Date: $Date: 2005/12/31 01:47:47 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.95 $"[11:-2]
+__revision__ = "$Revision: 1.96 $"[11:-2]
 
 import sys
 import os
@@ -249,6 +249,7 @@ class MethodCompiler(GenUtils):
         self._methodBodyChunks = []
 
         self._cacheRegionOpen = False
+        self._callRegionOpen = False
         self._isErrorCatcherOn = False
         
     def cleanupState(self):
@@ -671,6 +672,32 @@ class MethodCompiler(GenUtils):
         self.addChunk('## END CACHE REGION')
         self.addChunk('')
 
+    def startCallRegion(self, callSignature, lineCol):
+        assert not self._callRegionOpen
+        self._callRegionOpen = True    # attrib of current methodCompiler
+        self._currentCallSignature = (callSignature, lineCol)
+        self.addChunk('## START CALL REGION: '+callSignature
+                      +' at line, col ' + str(lineCol) + ' in the source.')
+        self.addChunk('__orig_trans = trans')
+        self.addChunk('trans = __callCollector = DummyTransaction()')
+        self.addChunk('write = __callCollector.response().write')
+
+
+    def endCallRegion(self):
+        assert self._callRegionOpen
+        callSignature, lineCol = self._currentCallSignature
+        self._callRegionOpen = False    # attrib of current methodCompiler
+        self._currentCallSignature = None
+        self.addChunk('trans = __orig_trans')
+        self.addChunk('write = trans.response().write')
+        self.addChunk('__callArgVal = __callCollector.response().getvalue()')
+        self.addChunk('del __callCollector')
+        self.addFilteredChunk('%s(__callArgVal)'%callSignature)
+        self.addChunk('del __callArgVal')
+        self.addChunk('## END CALL REGION: '+callSignature
+                      +' at line, col ' + str(lineCol) + ' in the source.')        
+        self.addChunk('')
+    
     def setErrorCatcher(self, errorCatcherName):
         self.turnErrorCatcherOn()        
         if self._templateObj:

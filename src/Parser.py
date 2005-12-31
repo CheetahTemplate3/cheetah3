@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.80 2005/12/29 00:39:16 tavis_rudd Exp $
+# $Id: Parser.py,v 1.81 2005/12/31 01:48:06 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.80 $
+Version: $Revision: 1.81 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/12/29 00:39:16 $
+Last Revision Date: $Date: 2005/12/31 01:48:06 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.80 $"[11:-2]
+__revision__ = "$Revision: 1.81 $"[11:-2]
 
 import os
 import sys
@@ -1031,6 +1031,7 @@ class _HighLevelParser(_LowLevelParser):
             'raw': self.eatRaw,
             'include': self.eatInclude,
             'cache': self.eatCache,
+            'call': self.eatCall,
             'filter': self.eatFilter,
             'echo': self.eatEcho,
             'silent': self.eatSilent,
@@ -1084,6 +1085,7 @@ class _HighLevelParser(_LowLevelParser):
             'block': self.eatEndBlock,
             
             'cache': self.eatEndCache,
+            'call': self.eatEndCall,
             'filter': self.eatEndFilter,
             'errorCatcher':self.eatEndErrorCatcher,
             
@@ -1912,6 +1914,19 @@ class _HighLevelParser(_LowLevelParser):
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self.pushToIndentStack("unless")
         self._compiler.addUnless(expr)
+
+
+    def eatCall(self):
+        isLineClearToStartToken = self.isLineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        lineCol = self.getRowCol()
+        self.getDirectiveStartToken()
+        self.advance(len('call'))
+        startPos = self.pos()
+        callSignature = self.getExpression()
+        self._applyExpressionFilters(callSignature, 'call', startPos=startPos)
+        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)        
+        self._compiler.startCallRegion(callSignature, lineCol)
         
     ## end directive eaters
 
@@ -1935,6 +1950,12 @@ class _HighLevelParser(_LowLevelParser):
         self.getExpression()
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self._compiler.endCacheRegion()
+
+    def eatEndCall(self, isLineClearToStartToken=False):
+        endOfFirstLinePos = self.findEOL()
+        self.getExpression()
+        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
+        self._compiler.endCallRegion()
 
     def eatEndFilter(self, isLineClearToStartToken=False):
         endOfFirstLinePos = self.findEOL()
