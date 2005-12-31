@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.81 2005/12/31 01:48:06 tavis_rudd Exp $
+# $Id: Parser.py,v 1.82 2005/12/31 01:51:31 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.81 $
+Version: $Revision: 1.82 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/12/31 01:48:06 $
+Last Revision Date: $Date: 2005/12/31 01:51:31 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.81 $"[11:-2]
+__revision__ = "$Revision: 1.82 $"[11:-2]
 
 import os
 import sys
@@ -1759,6 +1759,17 @@ class _HighLevelParser(_LowLevelParser):
         cacheInfo = self._compiler.genCacheInfoFromArgList(argList)
         self._compiler.startCacheRegion(cacheInfo, lineCol)
 
+    def eatCall(self):
+        isLineClearToStartToken = self.isLineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        lineCol = self.getRowCol()
+        self.getDirectiveStartToken()
+        self.advance(len('call'))
+        startPos = self.pos()
+        callSignature = self.getExpression()
+        self._applyExpressionFilters(callSignature, 'call', startPos=startPos)
+        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)        
+        self._compiler.startCallRegion(callSignature, lineCol)
 
     def eatFilter(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
@@ -1915,18 +1926,6 @@ class _HighLevelParser(_LowLevelParser):
         self.pushToIndentStack("unless")
         self._compiler.addUnless(expr)
 
-
-    def eatCall(self):
-        isLineClearToStartToken = self.isLineClearToStartToken()
-        endOfFirstLinePos = self.findEOL()
-        lineCol = self.getRowCol()
-        self.getDirectiveStartToken()
-        self.advance(len('call'))
-        startPos = self.pos()
-        callSignature = self.getExpression()
-        self._applyExpressionFilters(callSignature, 'call', startPos=startPos)
-        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)        
-        self._compiler.startCallRegion(callSignature, lineCol)
         
     ## end directive eaters
 
