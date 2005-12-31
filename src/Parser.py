@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.82 2005/12/31 01:51:31 tavis_rudd Exp $
+# $Id: Parser.py,v 1.83 2005/12/31 01:53:57 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.82 $
+Version: $Revision: 1.83 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/12/31 01:51:31 $
+Last Revision Date: $Date: 2005/12/31 01:53:57 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.82 $"[11:-2]
+__revision__ = "$Revision: 1.83 $"[11:-2]
 
 import os
 import sys
@@ -1766,7 +1766,12 @@ class _HighLevelParser(_LowLevelParser):
         self.getDirectiveStartToken()
         self.advance(len('call'))
         startPos = self.pos()
+        
+        useAutocallingOrig = self.setting('useAutocalling')
+        self.setSetting('useAutocalling', False)
         callSignature = self.getExpression()
+        self.setSetting('useAutocalling', useAutocallingOrig)
+        
         self._applyExpressionFilters(callSignature, 'call', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)        
         self._compiler.startCallRegion(callSignature, lineCol)
