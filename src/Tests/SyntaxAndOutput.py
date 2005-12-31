@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.61 2005/12/13 21:21:49 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.62 2005/12/31 02:42:42 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.61 $
+Version: $Revision: 1.62 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/13 21:21:49 $
+Last Revision Date: $Date: 2005/12/31 02:42:42 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.61 $"[11:-2]
+__revision__ = "$Revision: 1.62 $"[11:-2]
 
 
 ##################################################
@@ -877,6 +877,44 @@ $i#slurp
 #end cache
 $aStr""",
                     "1\n01234blarg")
+
+
+class CallDirective(OutputTest):
+    
+    def test1(self):
+        r"""simple #call """
+        self.verify("#call int\n$anInt#end call",
+                    "1")
+
+    def test2(self):
+        r"""simple #call + WS"""
+        self.verify("#call int\n$anInt  #end call",
+                    "1")
+
+    def test3(self):
+        r"""a longer #call"""
+        self.verify('''\
+#def meth(arg)
+$arg.upper()#slurp
+#end def
+#call $meth
+$(1234+1) foo#slurp
+#end call''',
+        "1235 FOO")
+
+    def test4(self):
+        r"""#call with keyword #args"""
+        self.verify('''\
+#def meth(arg1, arg2)
+$arg1.upper() - $arg2.lower()#slurp
+#end def
+#call self.meth
+#arg arg1
+$(1234+1) foo#slurp
+#arg arg2
+UPPER#slurp
+#end call''',
+        "1235 FOO - upper")
 
 class SlurpDirective(OutputTest):
     def test1(self):
