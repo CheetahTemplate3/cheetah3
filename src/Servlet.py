@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.35 2005/11/13 01:13:38 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.36 2006/01/01 23:41:46 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.35 $
+Version: $Revision: 1.36 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2005/11/13 01:13:38 $
+Last Revision Date: $Date: 2006/01/01 23:41:46 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.35 $"[11:-2]
+__revision__ = "$Revision: 1.36 $"[11:-2]
 
 import sys
 import os.path
@@ -73,7 +73,7 @@ class Servlet(BaseServlet):
         self.isControlledByWebKit = True
         
         self.transaction = transaction        
-        self.application = transaction.application
+        #self.application = transaction.application
         self.response = response = transaction.response
         self.request = transaction.request
 
