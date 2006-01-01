@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SetupTools.py,v 1.7 2005/08/17 18:45:21 tavis_rudd Exp $
+# $Id: SetupTools.py,v 1.8 2006/01/01 23:40:54 tavis_rudd Exp $
 """Some tools for extending and working with distutils
 
 CREDITS: This module borrows code and ideas from M.A. Lemburg's excellent setup
@@ -8,32 +8,28 @@ tools for the mxBase package.
 """
 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__version__ = "$Revision: 1.7 $"[11:-2]
-
-##################################################
-## DEPENDENCIES ##
-
-from distutils.core import setup
-## this bit is experimental:
-#try:
-#    # use http://peak.telecommunity.com/DevCenter/setuptools if it's installed
-#    # requires Py >=2.3
-#    from setuptools import setup
-#except ImportError:   
-#    from distutils.core import setup
-
-from distutils.core import Command
-from distutils.command.install_data import install_data
+__version__ = "$Revision: 1.8 $"[11:-2]
 
 import os
 from os import listdir
 import os.path
 from os.path import exists, isdir, isfile, join, splitext
-
 import types
 import glob
 import string
 import traceback
+
+from distutils.core import setup
+if 'CHEETAH_USE_SETUPTOOLS' in os.environ:
+    try:
+        # use http://peak.telecommunity.com/DevCenter/setuptools if it's installed
+        # requires Py >=2.3
+        from setuptools import setup
+    except ImportError:   
+        from distutils.core import setup
+
+from distutils.core import Command
+from distutils.command.install_data import install_data
 
 #imports from Cheetah ...
 from src.FileUtils import findFiles
@@ -42,7 +38,6 @@ from src.FileUtils import findFiles
 ## CLASSES ##
    
 class mod_install_data(install_data):
-    
     """A modified version of the disutils install_data command that allows data
     files to be included directly in the installed Python package tree.
     """
@@ -106,7 +101,6 @@ class mod_install_data(install_data):
 ## FUNCTIONS ##
 
 def run_setup(configurations):
-
     """ Run distutils setup.
 
         The parameters passed to setup() are extracted from the list of modules,
