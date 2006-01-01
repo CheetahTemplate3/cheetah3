@@ -12,7 +12,23 @@ packages = ['Cheetah',
             'Cheetah.Utils',
 	    'Cheetah.Utils.optik',
             ]
-## used to be: extra_path = 'Webware'  # now just in site-packages top-level
+classifiers = [line.strip() for line in '''\
+  Development Status :: 4 - Beta
+  #Development Status :: 5 - Production/Stable
+  Intended Audience :: Developers
+  Intended Audience :: System Administrators
+  License :: OSI Approved :: MIT License
+  Operating System :: OS Independent
+  Programming Language :: Python
+  Topic :: Internet :: WWW/HTTP
+  Topic :: Internet :: WWW/HTTP :: Dynamic Content
+  Topic :: Internet :: WWW/HTTP :: Site Management
+  Topic :: Software Development :: Code Generators
+  Topic :: Software Development :: Libraries :: Python Modules
+  Topic :: Software Development :: User Interfaces
+  Topic :: Text Processing'''.splitlines() if not line.strip().startswith('#')]
+del line
+
 package_dir = {'Cheetah':'src'}
 
 import os
