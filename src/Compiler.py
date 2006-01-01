@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.97 2005/12/31 02:33:30 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.98 2006/01/01 23:39:02 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.97 $
+Version: $Revision: 1.98 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/12/31 02:33:30 $
+Last Revision Date: $Date: 2006/01/01 23:39:02 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.97 $"[11:-2]
+__revision__ = "$Revision: 1.98 $"[11:-2]
 
 import sys
 import os
@@ -775,6 +775,8 @@ class AutoMethodCompiler(MethodCompiler):
         self.commitStrConst()
         if self._cacheRegionOpen:
             self.endCacheRegion()
+        if self._callRegionOpen:
+            self.endCallRegion()
             
         self._indentLev = self.setting('initialMethIndentLevel')
         mainBodyChunks = self._methodBodyChunks
