@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.85 2006/01/01 22:56:12 tavis_rudd Exp $
+# $Id: Parser.py,v 1.86 2006/01/03 23:24:05 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.85 $
+Version: $Revision: 1.86 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/01 22:56:12 $
+Last Revision Date: $Date: 2006/01/03 23:24:05 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.85 $"[11:-2]
+__revision__ = "$Revision: 1.86 $"[11:-2]
 
 import os
 import sys
@@ -51,6 +51,7 @@ def maybe(*choices): return apply(group, choices) + '?'
 NO_CACHE = 0
 STATIC_CACHE = 1
 REFRESH_CACHE = 2
+COMPILE_TIME_CACHE = 3
 
 ##################################################
 ## Tokens for the parser ##
@@ -306,8 +307,10 @@ class _LowLevelParser(SourceReader):
         cacheToken = (r'(?:' +
                       r'(?P<REFRESH_CACHE>\*' + interval + '\*)'+
                       '|' +
-                      r'(?P<STATIC_CACHE>\*)' +
+                      r'(?P<COMPILE_TIME_CACHE>\*\*)' +
                       '|' +
+                      r'(?P<STATIC_CACHE>\*)' +
+                      '|' +                      
                       r'(?P<NO_CACHE>)' +
                       ')')
         self.cacheTokenRE = re.compile(cacheToken)
@@ -1041,6 +1044,9 @@ class _HighLevelParser(_LowLevelParser):
             'attr':self.eatAttr,
             'def': self.eatDef,
             'block': self.eatBlock,
+
+            'closure': self.eatClosure,
+
             'set': self.eatSet,
             'del': self.eatDel,
             
@@ -1084,6 +1090,7 @@ class _HighLevelParser(_LowLevelParser):
         self._directiveEndEaters = {
             'def': self.eatEndDef,
             'block': self.eatEndBlock,
+            'closure': self.eatEndClosure,
             
             'cache': self.eatEndCache,
             'call': self.eatEndCall,
@@ -1099,10 +1106,10 @@ class _HighLevelParser(_LowLevelParser):
             'unless': self.eatEndUnless,
             
             }
-        self._indentingDirectives = ['def','block',
-                                    'if','for','while',
-                                    'try',
-                                    'repeat','unless']
+        self._indentingDirectives = ['def','block','closure',                                     
+                                     'if','for','while',
+                                     'try',
+                                     'repeat','unless']
 
     def _applyExpressionFilters(self, expr, exprType, rawExpr=None, startPos=None):
         for callback in self.setting('expressionFilterHooks'):
@@ -1486,10 +1493,23 @@ class _HighLevelParser(_LowLevelParser):
     def eatDef(self):
         # filtered         
         self._eatDefOrBlock('def')
+
+    def eatBlock(self):
+        # filtered
+        startPos = self.pos()
+        methodName, rawSignature = self._eatDefOrBlock('block')
+        self._compiler._blockMetaData[methodName] = {
+            'raw':rawSignature,
+            'lineCol':self.getRowCol(startPos),
+            }
+
+    def eatClosure(self):
+        # filtered         
+        self._eatDefOrBlock('closure')
         
     def _eatDefOrBlock(self, directiveKey):
         # filtered 
-        assert directiveKey in ('def','block')
+        assert directiveKey in ('def','block','closure')
         isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         startPos = self.pos()
@@ -1515,30 +1535,55 @@ class _HighLevelParser(_LowLevelParser):
 
         self._applyExpressionFilters(self[startPos:self.pos()], 'def', startPos=startPos)
 
-        if self.peek() == ':':
+        if self.peek() == ':': # single-line version
             self.getc()
-            rawSignature = self._eatSingleLineDef(methodName,
-                                                  argsList=argsList,
-                                                  startPos=startPos,
-                                                  endPos=endOfFirstLinePos)
+            rawSignature = self[startPos:endOfFirstLinePos]
+            self._eatSingleLineDef(directiveKey=directiveKey,
+                                   methodName=methodName,
+                                   argsList=argsList,
+                                   startPos=startPos,
+                                   endPos=endOfFirstLinePos)
             if directiveKey == 'def':
                 #@@TR: must come before _eatRestOfDirectiveTag ... for some reason
                 self._compiler.closeDef()
-            else:
+            elif directiveKey == 'block':
                 includeBlockMarkers()
                 self._compiler.closeBlock()
+            elif directiveKey == 'closure':
+                self._compiler.dedent()
                 
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         else:
             self.pushToIndentStack(directiveKey)
-            rawSignature = self._eatMultiLineDef(methodName,
-                                                 argsList, startPos, isLineClearToStartToken)
+            rawSignature = self[startPos:self.pos()]
+            self._eatMultiLineDef(directiveKey=directiveKey,
+                                  methodName=methodName,
+                                  argsList=argsList,
+                                  startPos=startPos,
+                                  isLineClearToStartToken=isLineClearToStartToken)
             if directiveKey == 'block':
                 includeBlockMarkers()
 
         return methodName, rawSignature
+
+    def _eatMultiLineDef(self, directiveKey, methodName, argsList, startPos,
+                         isLineClearToStartToken=False):
+        # filtered in calling method
+        self.getExpression()            # slurp up any garbage left at the end
+        signature = self[startPos:self.pos()]
+        endOfFirstLinePos = self.findEOL()
+        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
+        parserComment = ('Generated from ' + signature + 
+                         ' at line %s, col %s' % self.getRowCol(startPos)
+                         + '.')
+        if directiveKey in ('def','block'):
+            self._compiler.startMethodDef(methodName, argsList, parserComment)
+        else: #closure
+            self._compiler.addClosure(methodName, argsList, parserComment)
+
+        return methodName
             
-    def _eatSingleLineDef(self, methodName, argsList, startPos, endPos):
+    def _eatSingleLineDef(self, directiveKey, methodName, argsList, startPos, endPos):
         # filtered in calling method        
         origPos = self.pos()
         methodSrc = self[self.pos():endPos].strip()
@@ -1551,14 +1596,17 @@ class _HighLevelParser(_LowLevelParser):
         parserComment = ('Generated from ' + fullSignature + 
                          ' at line %s, col %s' % self.getRowCol(startPos)
                          + '.')
-        self._compiler.startMethodDef(methodName, argsList, parserComment)
+
+        if directiveKey in ('def','block'):
+            self._compiler.startMethodDef(methodName, argsList, parserComment)
+        else: #closure
+            self._compiler.addClosure(methodName, argsList, parserComment)
+
         self.parse(assertEmptyStack=False)
         self.getWhiteSpace()
         self._src = origSrc
         self.setBreakPoint(origBP) 
         self.setPos(endPos)
-        
-        return fullSignature # used by the #block code
 
     def _X_eatSingleLineDef(self, methodName, argsList, startPos, endPos):
         ## @@TR: this is an experimental version of the method
@@ -1576,29 +1624,7 @@ class _HighLevelParser(_LowLevelParser):
         self.parse(assertEmptyStack=False, endPos=endPos)
         #print self.pos()
         self.setBreakPoint(origBP) 
-        return fullSignature # used by the #block code
-        
-    def _eatMultiLineDef(self, methodName, argsList, startPos, isLineClearToStartToken=False):
-        # filtered in calling method
-        rawDef = self[startPos:self.pos()]
-        self.getExpression()            # slurp up any garbage left at the end
-        signature = self[startPos:self.pos()]
-        endOfFirstLinePos = self.findEOL()
-        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
-        parserComment = ('Generated from ' + signature + 
-                         ' at line %s, col %s' % self.getRowCol(startPos)
-                         + '.')
-        self._compiler.startMethodDef(methodName, argsList, parserComment)
-        return methodName, rawDef
-
-    def eatBlock(self):
-        # filtered
-        startPos = self.pos()
-        methodName, rawSignature = self._eatDefOrBlock('block')
-        self._compiler._blockMetaData[methodName] = {
-            'raw':rawSignature,
-            'lineCol':self.getRowCol(startPos),
-            }
+        return fullSignature # used by the #block code        
             
     def eatImport(self):
         # filtered
@@ -1770,12 +1796,19 @@ class _HighLevelParser(_LowLevelParser):
         
         useAutocallingOrig = self.setting('useAutocalling')
         self.setSetting('useAutocalling', False)
-        callSignature = self.getExpression()
+        self.getWhiteSpace()
+        if self.matchCheetahVarStart():
+            functionName = self.getCheetahVar()
+        else:
+            functionName = self.getCheetahVar(plain=True, skipStartToken=True)
+        self.getWhiteSpace()
+        args = self.getExpression().strip()
+        
         self.setSetting('useAutocalling', useAutocallingOrig)
         
-        self._applyExpressionFilters(callSignature, 'call', startPos=startPos)
+        self._applyExpressionFilters(self[startPos:self.pos()], 'call', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)        
-        self._compiler.startCallRegion(callSignature, lineCol)
+        self._compiler.startCallRegion(functionName, args, lineCol)
 
     def eatCallArg(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
@@ -1967,6 +2000,8 @@ class _HighLevelParser(_LowLevelParser):
         self.popFromIndentStack("block")
         self._compiler.closeBlock()
 
+    def eatEndClosure(self, isLineClearToStartToken=False):
+        self.eatDedentDirective('closure', isLineClearToStartToken)
 
     def eatEndCache(self, isLineClearToStartToken=False):
         endOfFirstLinePos = self.findEOL()
