@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.63 2005/12/31 02:45:37 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.64 2006/01/03 23:06:12 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.63 $
+Version: $Revision: 1.64 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/31 02:45:37 $
+Last Revision Date: $Date: 2006/01/03 23:06:12 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.63 $"[11:-2]
+__revision__ = "$Revision: 1.64 $"[11:-2]
 
 
 ##################################################
@@ -39,6 +39,7 @@ from Cheetah.Parser import ParseError
 from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
 import unittest_local_copy as unittest
 
+class Unspecified: pass 
 ##################################################
 ## CONSTANTS & GLOBALS ##
 
@@ -123,7 +124,7 @@ defaultTestNameSpace = {
 
 class OutputTest(unittest.TestCase):
     report = '''
-Template output mismatch: %(notes)s 
+Template output mismatch: 
 
     Input Template =
 %(template)s%(end)s
@@ -135,47 +136,71 @@ Template output mismatch: %(notes)s
 %(actual)s%(end)s'''
 
     convertEOLs = True
+    _EOLreplacement = None
+    _debugEOLReplacement = False
+
     DEBUGLEV = 0
     _searchList = [defaultTestNameSpace]
+
+    _useNewStyleCompilation = True
+    #_useNewStyleCompilation = False
 
     def searchList(self):
         return self._searchList
 
-    def verify(self, input, output):
-        self._gen(input)
-        self._verify(output)
+    def verify(self, input, expectedOutput,
+               outputEncoding=None,
+               convertEOLs=Unspecified):
+        if self._EOLreplacement:
+            if convertEOLs is Unspecified:
+                convertEOLs = self.convertEOLs
+            if convertEOLs:
+                input = input.replace('\n', self._EOLreplacement)
+                expectedOutput = expectedOutput.replace('\n', self._EOLreplacement)
 
-    def _getCompilerSettings(self):
-        return {}
-
-    def _gen(self, input):
         self._input = input
-        self.template = templateObj = Template(
-            input,
-            searchList=self.searchList(),
-            compilerSettings=self._getCompilerSettings(),
-            )
-        if self.DEBUGLEV == 1:
-            print self.genClassCode()
-        elif self.DEBUGLEV == 2:
-            print self.genModuleCode()
-        
-    def _verify(self, expectedOutput, notes=''):
-        templateObj = self.template
-        output = templateObj.respond()
-        #print self.genClassCode() #@@ DEBUG
+        if self._useNewStyleCompilation:
+            templateClass = Template.compile(source=input,compilerSettings=self._getCompilerSettings())
+            moduleCode = Template.compile(source=input, returnAClass=False,
+                                     compilerSettings=self._getCompilerSettings())
+            self.template = templateObj = templateClass(searchList=self.searchList())
+        else:
+            self.template = templateObj = Template(
+                input,
+                searchList=self.searchList(),
+                compilerSettings=self._getCompilerSettings(),
+                )
+            moduleCode = templateObj._generatedModuleCode
+        if self.DEBUGLEV >= 1:
+            print moduleCode
         try:
             try:
-                assert output == expectedOutput, self.report \
-                       % {'notes': notes,
-                          'template': self._input,
-                          'expected': expectedOutput, 'actual': output,
-                          'end': '(end)'}
+                output = templateObj.respond() # rather than __str__, because of unicode
+                if outputEncoding:
+                    output = output.decode(outputEncoding)
+                assert output==expectedOutput, self._outputMismatchReport(output, expectedOutput)
             except:
-                #print templateObj.generatedClassCode()
+                #print moduleCode
                 raise
         finally:
             templateObj.shutdown()
+
+    def _getCompilerSettings(self):
+        return {}
+            
+    def _outputMismatchReport(self, output, expectedOutput):
+        if self._debugEOLReplacement and self._EOLreplacement:
+            EOLrepl = self._EOLreplacement
+            marker = '*EOL*'
+            return self.report % {'template': self._input.replace(EOLrepl,marker),
+                                  'expected': expectedOutput.replace(EOLrepl,marker),
+                                  'actual': output.replace(EOLrepl,marker),
+                                  'end': '(end)'}
+        else:
+            return self.report % {'template': self._input,
+                                  'expected': expectedOutput,
+                                  'actual': output,
+                                  'end': '(end)'}
         
     def genClassCode(self):
         if hasattr(self, 'template'):
@@ -566,7 +591,34 @@ class UnicodeStrings(OutputTest):
         """unicode data in body
         """
         self.verify(u"aoeu12345\u1234", u"aoeu12345\u1234")
-        
+        #self.verify(u"#encoding utf8#aoeu12345\u1234", u"aoeu12345\u1234")
+
+class EncodingDirective(OutputTest):
+    def test1(self):
+        """basic #encoding """
+        self.verify("#encoding utf-8\n1234",
+                    "1234")
+
+    def test2(self):
+        """basic #encoding """
+        self.verify("#encoding ascii\n1234",
+                    "1234")
+
+    def test3(self):
+        """basic #encoding """
+        self.verify("#encoding utf-8\n\xe1\x88\xb4",
+                    u'\u1234', outputEncoding='utf8')
+
+    def test4(self):
+        """basic #encoding """
+        self.verify("#encoding ascii\n\xe1\x88\xb4",
+                    "\xe1\x88\xb4")
+
+    def test5(self):
+        """basic #encoding """
+        self.verify("#encoding latin-1\nAndr\202",
+                    u'Andr\202', outputEncoding='latin-1')
+
 class Placeholders_Esc(OutputTest):
     convertEOLs = False
     def test1(self):
@@ -609,17 +661,17 @@ class Placeholders_Calls(OutputTest):
     def test3(self):
         r"""func placeholder - with (\n\n)"""
         self.verify("$aFunc(\n\n)",
-                    "Scooby")
+                    "Scooby", convertEOLs=False)
 
     def test4(self):
         r"""func placeholder - with (\n\n) and $() enclosure"""
         self.verify("$(aFunc(\n\n))",
-                    "Scooby")
+                    "Scooby", convertEOLs=False)
 
     def test5(self):
         r"""func placeholder - with (\n\n) and ${} enclosure"""
         self.verify("${aFunc(\n\n)}",
-                    "Scooby")
+                    "Scooby", convertEOLs=False)
         
     def test6(self):
         """func placeholder - with (int)"""
@@ -629,7 +681,7 @@ class Placeholders_Calls(OutputTest):
     def test7(self):
         r"""func placeholder - with (\nint\n)"""
         self.verify("$aFunc(\n1234\n)",
-                    "1234")
+                    "1234", convertEOLs=False)
     def test8(self):
         """func placeholder - with (string)"""
         self.verify("$aFunc('aoeu')",
@@ -672,7 +724,7 @@ class Placeholders_Calls(OutputTest):
     def test16(self):
         r"""func placeholder - with (int\n*\nfloat)"""
         self.verify("$aFunc(2\n*\n2.0)",
-                    "4.0")
+                    "4.0", convertEOLs=False)
 
     def test17(self):
         """func placeholder - with ($arg=float)"""
@@ -927,6 +979,43 @@ $arg1.upper() - $arg2.lower()#slurp
 #arg arg2:UPPER#slurp
 #end call''',
         "1235 FOO - upper")
+        
+    def test6(self):
+        """#call with python kwargs and cheetah output for the 1s positional
+        arg"""
+        
+        self.verify('''\
+#def meth(arg1, arg2)
+$arg1.upper() - $arg2.lower()#slurp
+#end def
+#call self.meth arg2="UPPER"
+$(1234+1) foo#slurp
+#end call''',
+        "1235 FOO - upper")
+
+    def test7(self):
+        """#call with python kwargs and #args"""
+        self.verify('''\
+#def meth(arg1, arg2, arg3)
+$arg1.upper() - $arg2.lower() - $arg3#slurp
+#end def
+#call self.meth arg2="UPPER", arg3=999
+#arg arg1:$(1234+1) foo#slurp
+#end call''',
+        "1235 FOO - upper - 999")
+        
+    def test8(self):
+        r"""#call with python kwargs and #args, and using a function to get the
+        function that will be called"""
+        self.verify('''\
+#def meth(arg1, arg2, arg3)
+$arg1.upper() - $arg2.lower() - $arg3#slurp
+#end def
+#call getattr(self, "meth") arg2="UPPER", arg3=999
+#arg arg1:$(1234+1) foo#slurp
+#end call''',
+        "1235 FOO - upper - 999")
+
 
 class SlurpDirective(OutputTest):
     def test1(self):
@@ -1228,14 +1317,6 @@ class AttrDirective(OutputTest):
         Shouldn't gobble"""
         self.verify("  --   #attr $test = 'blarg'   \n$test",
                     "  --   \nblarg")
-
-
-class EncodingDirective(OutputTest):
-
-    def test1(self):
-        """basic #encoding """
-        self.verify("#encoding utf-8\n1234",
-                    "1234")
 
 
 class DefDirective(OutputTest):
@@ -2128,6 +2209,8 @@ $sep$letter#slurp
                     "a, b, c")
 
 class FilterDirective(OutputTest):
+    convertEOLs=False
+
     def _getCompilerSettings(self):
         return dict(useFilterArgsInPlaceholders=True)
     
@@ -2294,6 +2377,8 @@ class MiscComplexSyntax(OutputTest):
 class CGI(OutputTest):
     """CGI scripts with(out) the CGI environment and with(out) GET variables.
     """
+    convertEOLs=False
+    
     def _beginCGI(self):  
         os.environ['REQUEST_METHOD'] = "GET"
     def _endCGI(self):  
@@ -2364,6 +2449,8 @@ class CGI(OutputTest):
 
 
 class Indenter(OutputTest):
+    convertEOLs=False
+    
     source = """
 public class X
 {
@@ -2450,31 +2537,21 @@ public class X
         self.verify(self.source, self.control)
 
 
-
-
 ##################################################
 ## CREATE CONVERTED EOL VERSIONS OF THE TEST CASES 
-        
-class EOL_converter:
-    """A mixin"""
-    _EOL = '\n'
-    def verify(self, input, output):
-        self._verify(input.replace('\n',self._EOL), output.replace('\n',self._EOL) )
-
-class WIN32_EOL(EOL_converter):  _EOL = '\r\n'
-class MAC_EOL(EOL_converter):  _EOL = '\r'
-
 for klass in [var for var in globals().values()
               if type(var) == types.ClassType and issubclass(var, unittest.TestCase)]:
         
     if hasattr(klass,'convertEOLs') and klass.convertEOLs:
         name = klass.__name__
-        name1 = name + '_Win32EOL'
-        name2 = name + '_MacEOL'
-        exec name1 + ' = new.classobj("' + name1 + '", (klass, WIN32_EOL),{})'
-        exec name2 + ' = new.classobj("' + name2 + '", (klass, MAC_EOL),{})'
-        del klass, name, name1, name2
-    
+        win32Src = r"""class %(name)s_Win32EOL(%(name)s): _EOLreplacement = '\r\n'"""%locals()
+        macSrc = r"""class %(name)s_MacEOL(%(name)s): _EOLreplacement = '\r'"""%locals()
+        #print win32Src
+        #print macSrc
+        exec win32Src+'\n'
+        exec macSrc+'\n'
+        del name
+    del klass
 
 ##################################################
 ## if run from the command line ##
