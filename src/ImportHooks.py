@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.22 2005/12/30 19:07:21 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.23 2006/01/03 19:33:08 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.22 $
+Version: $Revision: 1.23 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/30 19:07:21 $
+Last Revision Date: $Date: 2006/01/03 19:33:08 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.22 $"[11:-2]
+__revision__ = "$Revision: 1.23 $"[11:-2]
 
 import sys
 import os.path
@@ -64,29 +64,43 @@ class CheetahDirOwner(DirOwner):
             return None
         else:
             self._acquireLock()
-            ## @@ consider adding an ImportError raiser here
-            code = str(Compiler(file=tmplPath, moduleName=name,
-                                mainClassName=name))
-            if _cacheDir:
-                __file__ = join(_cacheDir[0], convertTmplPath(tmplPath)) + '.py'
+            try:
                 try:
-                    open(__file__, 'w').write(code)
-                except OSError:
-                    ## @@ TR: need to add some error code here
-                    traceback.print_exc(file=sys.stderr)
-                    __file__ = tmplPath
-            else:
+                    return self._compile(name, tmplPath)
+                except:
+                    # @@TR: log the error
+                    exc_txt = traceback.format_exc()
+                    exc_txt ='  '+('  \n'.join(exc_txt.splitlines()))
+                    raise ImportError(
+                        'Error while compiling Cheetah module'
+                        ' %(name)s, original traceback follows:\n%(exc_txt)s'%locals())
+            finally:
+                self._releaseLock()          
+
+    def _compile(self, name, tmplPath):
+        ## @@ consider adding an ImportError raiser here
+        code = str(Compiler(file=tmplPath, moduleName=name,
+                            mainClassName=name))
+        if _cacheDir:
+            __file__ = join(_cacheDir[0], convertTmplPath(tmplPath)) + '.py'
+            try:
+                open(__file__, 'w').write(code)
+            except OSError:
+                ## @@ TR: need to add some error code here
+                traceback.print_exc(file=sys.stderr)
                 __file__ = tmplPath
-            co = compile(code+'\n', __file__, 'exec')
-            
-            mod = newmod(name)
-            mod.__file__ = co.co_filename
-            if _cacheDir:
-                mod.__orig_file__ = tmplPath # @@TR: this is used in the WebKit
-                                             # filemonitoring code
-            mod.__co__ = co
-            self._releaseLock()            
-            return mod
+        else:
+            __file__ = tmplPath
+        co = compile(code+'\n', __file__, 'exec')
+
+        mod = newmod(name)
+        mod.__file__ = co.co_filename
+        if _cacheDir:
+            mod.__orig_file__ = tmplPath # @@TR: this is used in the WebKit
+                                         # filemonitoring code
+        mod.__co__ = co
+        return mod
+        
 
 ##################################################
 ## FUNCTIONS
