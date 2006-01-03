@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.23 2006/01/03 19:33:08 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.24 2006/01/03 19:55:57 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.23 $
+Version: $Revision: 1.24 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/03 19:33:08 $
+Last Revision Date: $Date: 2006/01/03 19:55:57 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.23 $"[11:-2]
+__revision__ = "$Revision: 1.24 $"[11:-2]
 
 import sys
 import os.path
@@ -49,13 +49,7 @@ class CheetahDirOwner(DirOwner):
     _releaseLock = _lock.release
     
 
-    def getmod(self, name,
-               pathIsDir=os.path.isdir,
-               join=os.path.join,
-               newmod=imp.new_module,
-               convertTmplPath=convertTmplPathToModuleName,
-               ):
-        
+    def getmod(self, name):        
         tmplPath =  os.path.join(self.path, name + '.tmpl')
         mod = DirOwner.getmod(self, name)
         if mod:
@@ -82,7 +76,8 @@ class CheetahDirOwner(DirOwner):
         code = str(Compiler(file=tmplPath, moduleName=name,
                             mainClassName=name))
         if _cacheDir:
-            __file__ = join(_cacheDir[0], convertTmplPath(tmplPath)) + '.py'
+            __file__ = os.path.join(_cacheDir[0],
+                                    convertTmplPathToModuleName(tmplPath)) + '.py'
             try:
                 open(__file__, 'w').write(code)
             except OSError:
@@ -93,7 +88,7 @@ class CheetahDirOwner(DirOwner):
             __file__ = tmplPath
         co = compile(code+'\n', __file__, 'exec')
 
-        mod = newmod(name)
+        mod = imp.new_module(name)
         mod.__file__ = co.co_filename
         if _cacheDir:
             mod.__orig_file__ = tmplPath # @@TR: this is used in the WebKit
