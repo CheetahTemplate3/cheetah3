@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.128 2005/12/30 20:26:41 tavis_rudd Exp $
+# $Id: Template.py,v 1.129 2006/01/03 23:19:30 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.128 $
+Version: $Revision: 1.129 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/30 20:26:41 $
+Last Revision Date: $Date: 2006/01/03 23:19:30 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.128 $"[11:-2]
+__revision__ = "$Revision: 1.129 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import os.path
@@ -125,6 +125,8 @@ class Template(SettingsManager, Servlet, WebInputMixin):
                 moduleGlobals=None,
                 # a dict of vars that will be added to the global namespace of
                 # the module the generated code is executed in.
+
+                keepRefToGeneratedModuleCode=False,
                 ):
         """Compiles cheetah source code and returns a python class.  You then
         create template instances using that class.
@@ -165,13 +167,15 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         mainMethodName = mainMethodName or klass._defaultMainMethodName
         
         compiler = compilerClass(source, file,
-                            moduleName=moduleName,
-                            mainClassName=className,
-                            mainMethodName=mainMethodName,
-                            settings=(compilerSettings or {}),
-                            )
+                                 moduleName=moduleName,
+                                 mainClassName=className,
+                                 mainMethodName=mainMethodName,
+                                 settings=(compilerSettings or {}),                                 
+                                 )
         compiler.compile()
-        generatedModuleCode = str(compiler)
+        #encoding = compiler.getModuleEncoding()
+        generatedModuleCode = compiler.getModuleCode()
+        
         if returnAClass:
             uniqueModuleName = _genUniqueModuleName(moduleName)
             __file__ = uniqueModuleName+'.py' # relative file path with no dir part
@@ -183,9 +187,9 @@ class Template(SettingsManager, Servlet, WebInputMixin):
 
                 __file__ = os.path.join(klass._cacheDirForGeneratedPythonModules,
                                         __file__)
+                klass._compileLock.acquire()
                 try:
                     # @@TR: might want to assert that it doesn't already exist
-                    klass._compileLock.acquire()
                     try:
                         open(__file__, 'w').write(generatedModuleCode)
                         # @@TR: should probably restrict the perms, etc.
@@ -209,6 +213,8 @@ class Template(SettingsManager, Servlet, WebInputMixin):
 
             sys.modules[uniqueModuleName] = mod
             templateClass = getattr(mod, className)
+            if keepRefToGeneratedModuleCode:
+                templateClass._generatedModuleCode = generatedModuleCode
             return templateClass
         else:
             return generatedModuleCode
@@ -419,7 +425,8 @@ class Template(SettingsManager, Servlet, WebInputMixin):
                                  settings=compilerSettings,
                                  )
         compiler.compile()
-        self._generatedModuleCode = str(compiler)
+        encoding = compiler.getModuleEncoding()
+        self._generatedModuleCode = compiler.getModuleCode()
         self._generatedClassCode = str(compiler._finishedClassIndex[moduleName])
 
         compiler._templateObj = None
