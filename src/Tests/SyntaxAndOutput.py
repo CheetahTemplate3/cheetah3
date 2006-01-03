@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.64 2006/01/03 23:06:12 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.65 2006/01/03 23:19:09 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.64 $
+Version: $Revision: 1.65 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/03 23:06:12 $
+Last Revision Date: $Date: 2006/01/03 23:19:09 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.64 $"[11:-2]
+__revision__ = "$Revision: 1.65 $"[11:-2]
 
 
 ##################################################
@@ -160,9 +160,11 @@ Template output mismatch:
 
         self._input = input
         if self._useNewStyleCompilation:
-            templateClass = Template.compile(source=input,compilerSettings=self._getCompilerSettings())
-            moduleCode = Template.compile(source=input, returnAClass=False,
-                                     compilerSettings=self._getCompilerSettings())
+            templateClass = Template.compile(
+                source=input,
+                compilerSettings=self._getCompilerSettings(),
+                keepRefToGeneratedModuleCode=True)
+            moduleCode = templateClass._generatedModuleCode
             self.template = templateObj = templateClass(searchList=self.searchList())
         else:
             self.template = templateObj = Template(
