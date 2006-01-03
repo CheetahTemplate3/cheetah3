@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.98 2006/01/01 23:39:02 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.99 2006/01/03 23:23:19 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.98 $
+Version: $Revision: 1.99 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/01 23:39:02 $
+Last Revision Date: $Date: 2006/01/03 23:23:19 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.98 $"[11:-2]
+__revision__ = "$Revision: 1.99 $"[11:-2]
 
 import sys
 import os
@@ -30,10 +30,17 @@ import warnings
 
 from Cheetah.Version import Version
 from Cheetah.SettingsManager import SettingsManager
-from Cheetah.Parser import Parser, ParseError, specialVarRE, STATIC_CACHE, REFRESH_CACHE
+from Cheetah.Parser import (
+    Parser, ParseError, specialVarRE, STATIC_CACHE, REFRESH_CACHE, COMPILE_TIME_CACHE)
 from Cheetah.Utils.Indenter import indentize # an undocumented preprocessor
 from Cheetah import ErrorCatchers
 from Cheetah import NameMapper
+
+from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, valueFromFrameOrSearchList
+VFFSL=valueFromFrameOrSearchList
+VFSL=valueFromSearchList
+VFN=valueForName
+currentTime=time.time
 
 class Error(Exception):
     pass
@@ -64,7 +71,6 @@ class GenUtils:
         return interval
 
     def genCacheInfo(self, cacheTokenParts):
-        
         """Decipher a placeholder cachetoken
         """
         
@@ -74,6 +80,8 @@ class GenUtils:
             cacheInfo['interval'] = self.genTimeInterval(cacheTokenParts['interval'])
         elif cacheTokenParts['STATIC_CACHE']:
             cacheInfo['type'] = STATIC_CACHE
+        elif cacheTokenParts['COMPILE_TIME_CACHE']:
+            cacheInfo['type'] = COMPILE_TIME_CACHE
         return cacheInfo                # is empty if no cache
 
     def genCacheInfoFromArgList(self, argList):
@@ -341,18 +349,18 @@ class MethodCompiler(GenUtils):
 
         if self.setting('alwaysFilterNone'):
             if rawExpr and rawExpr.find('\n')==-1 and rawExpr.find('\r')==-1:
-                self.addChunk("__v = %s # <- %s"%(chunk, rawExpr))
+                self.addChunk("_v = %s # <- %s"%(chunk, rawExpr))
             else:
-                self.addChunk("__v = %s"%chunk)
+                self.addChunk("_v = %s"%chunk)
                 
             if self.setting('useFilters'):
-                self.addChunk("if __v is not None: write(__filter(__v%s))"%filterArgs)
+                self.addChunk("if _v is not None: write(_filter(_v%s))"%filterArgs)
             else:
-                self.addChunk("if __v is not None: write(str(__v))")
+                self.addChunk("if _v is not None: write(str(_v))")
         else:
             
             if self.setting('useFilters'):
-                self.addChunk("write(__filter(%s%s))"%(chunk,filterArgs))
+                self.addChunk("write(_filter(%s%s))"%(chunk,filterArgs))
             else:
                 self.addChunk("write(str(%s))"%chunk)
 
@@ -449,7 +457,17 @@ class MethodCompiler(GenUtils):
                              lineCol=lineCol)        
 
     def _addPlaceholder(self, expr, filterArgs, rawPlaceholder, cacheTokenParts, lineCol):
-        cacheInfo = self.genCacheInfo(cacheTokenParts) 
+        cacheInfo = self.genCacheInfo(cacheTokenParts)
+
+        if cacheInfo and cacheInfo['type']==COMPILE_TIME_CACHE:
+            # @@TR: partially completed
+            SL = [{'test':999, 'author':'tavis'}]
+            val = eval(expr)
+            self.addStrConst(str(val))
+            return
+            expr = repr(val)
+            cacheInfo = None
+            
         if cacheInfo:
             cacheInfo['ID'] = repr(rawPlaceholder)[1:-1]
             self.startCacheRegion(cacheInfo, lineCol)
@@ -554,6 +572,17 @@ class MethodCompiler(GenUtils):
     def addUnless(self, expr):
         self.addIf('if not (' + expr + ')')
 
+    def addClosure(self, functionName, argsList, parserComment):
+        argStringChunks = []
+        for arg in argsList:
+            chunk = arg[0]
+            if not arg[1] == None:
+                chunk += '=' + arg[1]
+            argStringChunks.append(chunk)
+        signature = "def " + functionName + "(" + ','.join(argStringChunks) + "):"
+        self.addIndentingDirective(signature)
+        self.addChunk('#'+parserComment)
+
     def addTry(self, expr):
         self.addIndentingDirective(expr)
         
@@ -590,7 +619,7 @@ class MethodCompiler(GenUtils):
         if PSP[0] == '=':
             PSP = PSP[1:]
             if PSP:
-                self.addWriteChunk('__filter(' + PSP + ')')
+                self.addWriteChunk('_filter(' + PSP + ')')
             return
                     
         elif PSP.lower() == 'end':
@@ -672,12 +701,12 @@ class MethodCompiler(GenUtils):
         self.addChunk('## END CACHE REGION')
         self.addChunk('')
 
-    def startCallRegion(self, callSignature, lineCol):
+    def startCallRegion(self, functionName, args, lineCol):
         assert not self._callRegionOpen
         self._callRegionOpen = True    # attrib of current methodCompiler
-        self._currentCallSignature = (callSignature, lineCol)
+        self._currentCallSignature = (functionName, args, lineCol)
         self._currentCallUsesKeywordArgs = False
-        self.addChunk('## START CALL REGION: '+callSignature
+        self.addChunk('## START CALL REGION: '+functionName
                       +' at line, col ' + str(lineCol) + ' in the source.')
         self.addChunk('__orig_trans = trans')
         self.addChunk('trans = __callCollector = DummyTransaction()')
@@ -703,7 +732,7 @@ class MethodCompiler(GenUtils):
     
     def endCallRegion(self):
         assert self._callRegionOpen
-        callSignature, lineCol = self._currentCallSignature
+        functionName, initialKwArgs, lineCol = self._currentCallSignature
         self._callRegionOpen = False    # attrib of current methodCompiler
         self._currentCallSignature = None
         self.addChunk('trans = __orig_trans')
@@ -711,13 +740,17 @@ class MethodCompiler(GenUtils):
         if not self._currentCallUsesKeywordArgs:
             self.addChunk('__callArgVal = __callCollector.response().getvalue()')
             self.addChunk('del __callCollector')
-            self.addFilteredChunk('%s(__callArgVal)'%callSignature)
+            if initialKwArgs:
+                initialKwArgs = ', '+initialKwArgs           
+            self.addFilteredChunk('%(functionName)s(__callArgVal%(initialKwArgs)s)'%locals())
             self.addChunk('del __callArgVal')
         else:
+            if initialKwArgs:
+                initialKwArgs = initialKwArgs+', '
             self._endCallArg()
-            self.addFilteredChunk('%s(**__callKws)'%callSignature)
+            self.addFilteredChunk('%(functionName)s(%(initialKwArgs)s**__callKws)'%locals())
             self.addChunk('del __callKws')
-        self.addChunk('## END CALL REGION: '+callSignature
+        self.addChunk('## END CALL REGION: '+functionName
                       +' at line, col ' + str(lineCol) + ' in the source.')        
         self.addChunk('')
     
@@ -742,26 +775,26 @@ class MethodCompiler(GenUtils):
         
     def setFilter(self, theFilter, isKlass):
         if isKlass:
-            self.addChunk('__filter = self._CHEETAH_currentFilter = ' + theFilter.strip() +
+            self.addChunk('_filter = self._CHEETAH_currentFilter = ' + theFilter.strip() +
                           '(self).filter')
         else:
             if theFilter.lower() == 'none':
-                self.addChunk('__filter = self._CHEETAH_initialFilter')
+                self.addChunk('_filter = self._CHEETAH_initialFilter')
             else:
                 # is string representing the name of a builtin filter
                 self.addChunk('filterName = ' + repr(theFilter))
                 self.addChunk('if self._CHEETAH_filters.has_key("' + theFilter + '"):')
                 self.indent()
-                self.addChunk('__filter = self._CHEETAH_currentFilter = self._CHEETAH_filters[filterName]')
+                self.addChunk('_filter = self._CHEETAH_currentFilter = self._CHEETAH_filters[filterName]')
                 self.dedent()
                 self.addChunk('else:')
                 self.indent()
-                self.addChunk('__filter = self._CHEETAH_currentFilter = \\\n\t\t\tself._CHEETAH_filters[filterName] = '
+                self.addChunk('_filter = self._CHEETAH_currentFilter = \\\n\t\t\tself._CHEETAH_filters[filterName] = '
                               + 'getattr(self._CHEETAH_filtersLib, filterName)(self).filter')
                 self.dedent()
                 
     def closeFilterBlock(self):
-        self.addChunk('__filter = self._CHEETAH_initialFilter')        
+        self.addChunk('_filter = self._CHEETAH_initialFilter')        
 
 class AutoMethodCompiler(MethodCompiler):
 
@@ -786,7 +819,7 @@ class AutoMethodCompiler(MethodCompiler):
         self._addAutoCleanupCode()
         if self._streamingEnabled:
             argList = [ ('trans', 'None'),
-                        #("__dummyTrans","False"),
+                        #("_dummyTrans","False"),
                         ]
             if self.setting('useNameMapper'):
                 argList.extend([("VFFSL","valueFromFrameOrSearchList"), 
@@ -803,13 +836,13 @@ class AutoMethodCompiler(MethodCompiler):
             self.addChunk('trans = DummyTransaction()')
             if self.setting('autoAssignDummyTransactionToSelf'):
                 self.addChunk('self.transaction = trans')            
-            self.addChunk('__dummyTrans = True')
+            self.addChunk('_dummyTrans = True')
             self.dedent()
-            self.addChunk('else: __dummyTrans = False')
+            self.addChunk('else: _dummyTrans = False')
 
         else:
             self.addChunk('trans = DummyTransaction()')
-            self.addChunk('__dummyTrans = True')
+            self.addChunk('_dummyTrans = True')
         self.addChunk('write = trans.response().write')
         if self.setting('useNameMapper'):
             argNames = [arg[0] for arg in self._argStringList]
@@ -821,7 +854,7 @@ class AutoMethodCompiler(MethodCompiler):
             else:
                 self.addChunk('SL = self._CHEETAH_searchList')                
         if self.setting('useFilters'):
-            self.addChunk('__filter = self._CHEETAH_currentFilter')
+            self.addChunk('_filter = self._CHEETAH_currentFilter')
         self.addChunk('')
 
         self.addChunk("#" *40)
@@ -837,7 +870,7 @@ class AutoMethodCompiler(MethodCompiler):
         self.addChunk('')
         
     def addStop(self, expr=None):
-        self.addChunk('return __dummyTrans and trans.response().getvalue() or ""')
+        self.addChunk('return _dummyTrans and trans.response().getvalue() or ""')
 
     def addMethArg(self, name, defVal=None):
         asteriskPos = max(name.rfind('*')+1, 0)
@@ -1375,7 +1408,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
         
         self._moduleDef = None
         self._moduleShBang = '#!/usr/bin/env python'
-        self._moduleEncoding = ''
+        self._moduleEncoding = 'ascii'
+        self._moduleEncodingStr = ''
         self._moduleHeaderLines = []
         self._moduleDocStringLines = []
         self._specialVars = {}
@@ -1568,7 +1602,11 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self._moduleShBang = shBang
     
     def setModuleEncoding(self, encoding):
-        self._moduleEncoding = '# -*- coding: %s -*-' %encoding
+        self._moduleEncoding = encoding
+        self._moduleEncodingStr = '# -*- coding: %s -*-' %encoding
+
+    def getModuleEncoding(self):
+        return self._moduleEncoding
 
     def addModuleHeader(self, line):
         self._moduleHeaderLines.append(line)
@@ -1644,7 +1682,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
     ## methods for module code wrapping
     
-    def moduleDef(self):
+    def getModuleCode(self):
         if not self._compiled:
             self.compile()
         if self._moduleDef:
@@ -1652,7 +1690,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         else:
             return self.wrapModuleDef()
         
-    __str__ = moduleDef
+    __str__ = getModuleCode
 
 
     def wrapModuleDef(self):
@@ -1707,7 +1745,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
     
     def moduleHeader(self):
         header = self._moduleShBang + '\n'
-        header += self._moduleEncoding + '\n'
+        header += self._moduleEncodingStr + '\n'
         if self._moduleHeaderLines:
             offSet = self.setting('commentOffset')
         
