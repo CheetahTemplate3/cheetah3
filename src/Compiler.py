@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.103 2006/01/04 01:42:24 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.104 2006/01/04 18:31:49 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.103 $
+Version: $Revision: 1.104 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/04 01:42:24 $
+Last Revision Date: $Date: 2006/01/04 18:31:49 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.103 $"[11:-2]
+__revision__ = "$Revision: 1.104 $"[11:-2]
 
 import sys
 import os
@@ -437,26 +437,7 @@ class MethodCompiler(GenUtils):
         offSet = self.setting('commentOffset')
         self.addChunk('#' + ' '*offSet + comm)
 
-    def addVariablePlaceholder(self, varNameChunks,
-                               restOfExpr,
-                               filterArgs, rawPlaceholder, cacheTokenParts, lineCol):
-        expr  = self.genCheetahVar(varNameChunks)
-        if restOfExpr:
-            expr = expr + ' ' + restOfExpr
-        self._addPlaceholder(expr,
-                             filterArgs=filterArgs,
-                             rawPlaceholder=rawPlaceholder,
-                             cacheTokenParts=cacheTokenParts,
-                             lineCol=lineCol)        
-
-    def addExpressionPlaceholder(self, expr, rawPlaceholder, cacheTokenParts, lineCol):
-        self._addPlaceholder(expr,
-                             filterArgs=None,
-                             rawPlaceholder=rawPlaceholder,
-                             cacheTokenParts=cacheTokenParts,
-                             lineCol=lineCol)        
-
-    def _addPlaceholder(self, expr, filterArgs, rawPlaceholder, cacheTokenParts, lineCol):
+    def addPlaceholder(self, expr, filterArgs, rawPlaceholder, cacheTokenParts, lineCol):
         cacheInfo = self.genCacheInfo(cacheTokenParts)
 
         if cacheInfo and cacheInfo['type']==COMPILE_TIME_CACHE:
@@ -1252,7 +1233,6 @@ DEFAULT_COMPILER_SETTINGS = {
     'autoImportForExtendDirective':True,
     'alwaysFilterNone':True, # filter out None, before the filter is called
     'useFilters':True, # use str instead if =False
-    'useFilterArgsInPlaceholders':True,
     'includeRawExprInFilterArgs':True,
     
     #'lookForTransactionAttr':False,
@@ -1293,6 +1273,7 @@ DEFAULT_COMPILER_SETTINGS = {
     'allowExpressionsInExtendsDirective': False,
     'allowEmptySingleLineMethods': False,
     'allowNestedDefScopes': True,
+    'allowPlaceholderFilterArgs': True,
     
     # input filtering/restriction
     # use lower case keys here!!

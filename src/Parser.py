@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.90 2006/01/04 09:36:31 tavis_rudd Exp $
+# $Id: Parser.py,v 1.91 2006/01/04 18:31:32 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.90 $
+Version: $Revision: 1.91 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/04 09:36:31 $
+Last Revision Date: $Date: 2006/01/04 18:31:32 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.90 $"[11:-2]
+__revision__ = "$Revision: 1.91 $"[11:-2]
 
 import os
 import sys
@@ -1030,8 +1030,8 @@ class _LowLevelParser(SourceReader):
                     if strConst:
                         outputExprs.append(repr(strConst))
                         strConst = ''
-                    placeholder = self.getCheetahVar()
-                    outputExprs.append('str('+placeholder+')')
+                    placeholderExpr = self.getPlaceholder()#self.getCheetahVar()
+                    outputExprs.append('str('+placeholderExpr+')')
                 else:
                     strConst += self.getc()
             self.setPos(endPos)
@@ -1041,6 +1041,67 @@ class _LowLevelParser(SourceReader):
             #    print 'DEBUG***'
             token = "''.join(["+','.join(outputExprs)+"])"
         return token
+
+    def getPlaceholder(self, allowCacheTokens=False, plain=False, returnEverything=False):
+        # filtered 
+        for callback in self.setting('preparsePlaceholderHooks'):
+            callback(parser=self)
+
+        startPos = self.pos()
+        lineCol = self.getRowCol(startPos)
+        startToken = self.getCheetahVarStartToken()
+        if allowCacheTokens:
+            cacheToken = self.getCacheToken()
+            cacheTokenParts = self.cacheTokenRE.match(cacheToken).groupdict()        
+        else:
+            cacheTokenParts = {}
+
+        if self.peek() in '({[':         
+            pos = self.pos()
+            enclosureOpenChar = self.getc()
+            enclosures = [ (enclosureOpenChar, pos) ]
+            self.getWhiteSpace()
+        else:
+            enclosures = []
+
+        filterArgs = None
+        if self.matchIdentifier(): 
+            nameChunks = self.getCheetahVarNameChunks()
+            expr = self._compiler.genCheetahVar(nameChunks[:], plain=plain)
+            restOfExpr = None
+            if enclosures:
+                WS = self.getWhiteSpace()
+                expr += WS
+                if self.setting('allowPlaceholderFilterArgs') and self.peek()==',':
+                    filterArgs = self.getCallArgString(enclosures=enclosures)[1:-1]
+                else:
+                    if self.peek()==closurePairsRev[enclosureOpenChar]:
+                        self.getc()
+                    else:
+                        restOfExpr = self.getExpression(enclosed=True, enclosures=enclosures)
+                        if restOfExpr[-1] == closurePairsRev[enclosureOpenChar]:
+                            restOfExpr = restOfExpr[:-1]
+                        expr += restOfExpr
+            rawPlaceholder = self[startPos: self.pos()]
+            exprToFilter = self._compiler.genPlainVar(nameChunks[:])
+            if restOfExpr:
+                exprToFilter = exprToFilter + WS + restOfExpr
+        else:
+            expr = self.getExpression(enclosed=True, enclosures=enclosures)
+            if expr[-1] == closurePairsRev[enclosureOpenChar]:
+                expr = expr[:-1]
+            rawPlaceholder=self[startPos: self.pos()]
+            exprToFilter = expr
+            
+        self._applyExpressionFilters(expr,'placeholder',rawExpr=rawPlaceholder,startPos=startPos)
+        for callback in self.setting('postparsePlaceholderHooks'):
+            callback(parser=self)
+
+        if returnEverything:
+            return expr, rawPlaceholder, lineCol, cacheTokenParts, filterArgs
+        else:
+            return expr
+        
 
 class _HighLevelParser(_LowLevelParser):
     """This class is a StateMachine for parsing Cheetah source and
@@ -1238,68 +1299,16 @@ class _HighLevelParser(_LowLevelParser):
         self._compiler.addComment(comm)
 
     def eatPlaceholder(self):
-        # filtered 
-        for callback in self.setting('preparsePlaceholderHooks'):
-            callback(parser=self)
-
-        startPos = self.pos()
-        lineCol = self.getRowCol(startPos)
-        startToken = self.getCheetahVarStartToken()
-        cacheToken = self.getCacheToken()
-        cacheTokenParts = self.cacheTokenRE.match(cacheToken).groupdict()        
-        if self.peek() in '({[':            
-            pos = self.pos()
-            enclosureOpenChar = self.getc()
-            enclosures = [ (enclosureOpenChar, pos) ]
-            self.getWhiteSpace()
-        else:
-            enclosures = []
-            
-        if self.matchIdentifier(): 
-            nameChunks = self.getCheetahVarNameChunks()
-            restOfExpr = None
-            filterArgs = None
-            if enclosures:
-                WS = self.getWhiteSpace()
-                if self.setting('useFilterArgsInPlaceholders') and self.peek()==',':
-                    filterArgs = self.getCallArgString(enclosures=enclosures)[1:-1]
-                else:
-                    if self.peek()==closurePairsRev[enclosureOpenChar]:
-                        self.getc()
-                    else:
-                        restOfExpr = self.getExpression(enclosed=True, enclosures=enclosures)
-                        if restOfExpr[-1] == closurePairsRev[enclosureOpenChar]:
-                            restOfExpr = restOfExpr[:-1]
-
-            rawPlaceholder = self[startPos: self.pos()]
-            exprToFilter = self._compiler.genPlainVar(nameChunks[:])
-            if restOfExpr:
-                exprToFilter = exprToFilter + WS + restOfExpr
-            self._applyExpressionFilters(exprToFilter,'placeholder',
-                                         rawExpr=rawPlaceholder, startPos=startPos)
-            self._compiler.addVariablePlaceholder(
-                varNameChunks=nameChunks,
-                restOfExpr=restOfExpr,
-                filterArgs=filterArgs,
-                rawPlaceholder=rawPlaceholder,
-                cacheTokenParts=cacheTokenParts,
-                lineCol=lineCol)
-        else:
-            expr = self.getExpression(enclosed=True, enclosures=enclosures)
-            if expr[-1] == closurePairsRev[enclosureOpenChar]:
-                expr = expr[:-1]
-
-            rawPlaceholder=self[startPos: self.pos()]
-            self._applyExpressionFilters(expr, 'placeholder',
-                                         rawExpr=rawPlaceholder, startPos=startPos)
-            self._compiler.addExpressionPlaceholder(
-                expr,
-                rawPlaceholder=rawPlaceholder,
-                cacheTokenParts=cacheTokenParts,
-                lineCol=lineCol)
-            
-        for callback in self.setting('postparsePlaceholderHooks'):
-            callback(parser=self)
+        (expr, rawPlaceholder,
+         lineCol, cacheTokenParts,
+         filterArgs) = self.getPlaceholder(allowCacheTokens=True, returnEverything=True)
+        self._compiler.addPlaceholder(
+            expr,
+            filterArgs=filterArgs,
+            rawPlaceholder=rawPlaceholder,
+            cacheTokenParts=cacheTokenParts,
+            lineCol=lineCol)
+        return
         
     def eatPSP(self):
         # filtered
