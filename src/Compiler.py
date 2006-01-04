@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.102 2006/01/04 01:19:16 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.103 2006/01/04 01:42:24 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.102 $
+Version: $Revision: 1.103 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/04 01:19:16 $
+Last Revision Date: $Date: 2006/01/04 01:42:24 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.102 $"[11:-2]
+__revision__ = "$Revision: 1.103 $"[11:-2]
 
 import sys
 import os
@@ -470,7 +470,7 @@ class MethodCompiler(GenUtils):
             
         if cacheInfo:
             cacheInfo['ID'] = repr(rawPlaceholder)[1:-1]
-            self.startCacheRegion(cacheInfo, lineCol)
+            self.startCacheRegion(cacheInfo, lineCol, rawPlaceholder=rawPlaceholder)
 
         if self.isErrorCatcherOn():
             methodName = self._classCompiler.addErrorCatcherCall(
@@ -641,7 +641,7 @@ class MethodCompiler(GenUtils):
         return str(random.randrange(100, 999)) \
                + str(random.randrange(10000, 99999))
         
-    def startCacheRegion(self, cacheInfo, lineCol):
+    def startCacheRegion(self, cacheInfo, lineCol, rawPlaceholder=None):
         ID = self.nextCacheID()
         interval = cacheInfo.get('interval',None)
         test = cacheInfo.get('test',None)
@@ -668,8 +668,11 @@ class MethodCompiler(GenUtils):
         self.addChunk('cache = region.getCache('+varyBy+')')
 
         if interval:
-            self.addMethDocString('This cache will be refreshed every ' +
-                                  str(interval) + ' seconds.')
+            self.addMethDocString(
+                'Contains a cache region which will be refreshed every ' +
+                str(interval) + ' seconds.'
+                +(rawPlaceholder and ' %s'%rawPlaceholder or ''))
+                
             self.addChunk('if (not cache.getRefreshTime())' +
                           ' or (currentTime() > cache.getRefreshTime()):')
             self.indent()
