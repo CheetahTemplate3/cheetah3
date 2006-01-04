@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SourceReader.py,v 1.10 2005/11/02 22:26:07 tavis_rudd Exp $
+# $Id: SourceReader.py,v 1.11 2006/01/04 07:44:43 tavis_rudd Exp $
 """SourceReader class for Cheetah's Parser and CodeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2005/11/02 22:26:07 $
+Last Revision Date: $Date: 2006/01/04 07:44:43 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.10 $"[11:-2]
+__revision__ = "$Revision: 1.11 $"[11:-2]
 
 import re
 import sys
@@ -223,13 +223,13 @@ class SourceReader:
             return self._src[start:to]
 
         
-    def readToEOL(self, gobble=True):
+    def readToEOL(self, start=None, gobble=True):
         EOLmatch = EOLZre.search(self.src(), self.pos())
         if gobble:
             pos = EOLmatch.end()
         else:
             pos = EOLmatch.start()
-        return self.readTo(pos)
+        return self.readTo(to=pos, start=start)
     
 
     def find(self, it, pos=None):
@@ -243,6 +243,12 @@ class SourceReader:
         else:
             return False
         
+    def matches(self, strOrRE):
+        if isinstance(strOrRE, (str, unicode)):
+            self.startswith(strOrRE, pos=self.pos())
+        else: # assume an re object
+            return strOrRE.match(self.src(), self.pos())
+            
     def rfind(self, it, pos):
         if pos == None:
             pos = self._pos
