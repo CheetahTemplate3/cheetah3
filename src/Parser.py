@@ -1,22 +1,22 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.89 2006/01/04 01:19:07 tavis_rudd Exp $
+# $Id: Parser.py,v 1.90 2006/01/04 09:36:31 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
   ParseError( Exception )
-  _LowLevelParser( Cheetah.SourceReader.SourceReader )
+  _LowLevelParser( Cheetah.SourceReader.SourceReader ), basically a lexer
   _HighLevelParser( _LowLevelParser )
   Parser === _HighLevelParser (an alias)
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.89 $
+Version: $Revision: 1.90 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/04 01:19:07 $
+Last Revision Date: $Date: 2006/01/04 09:36:31 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.89 $"[11:-2]
+__revision__ = "$Revision: 1.90 $"[11:-2]
 
 import os
 import sys
@@ -130,11 +130,10 @@ EOL = r'\r\n|\n|\r'
 EOLZ = EOL + r'|\Z'
 escCharLookBehind = nongroup(r'(?<=\A)',r'(?<!\\)')
 nameCharLookAhead = r'(?=[A-Za-z_])'
-
-
-specialVarRE=re.compile(r'([a-zA-z_]+)@') # for matching specialVar comments
+identRE=re.compile(r'[a-zA-Z_][a-zA-Z_0-9]*')
 EOLre=re.compile(r'(?:\r\n|\r|\n)')
 
+specialVarRE=re.compile(r'([a-zA-z_]+)@') # for matching specialVar comments
 # e.g. ##author@ Tavis Rudd
 
 ##################################################
@@ -307,7 +306,8 @@ class _LowLevelParser(SourceReader):
         cacheToken = (r'(?:' +
                       r'(?P<REFRESH_CACHE>\*' + interval + '\*)'+
                       '|' +
-                      r'(?P<COMPILE_TIME_CACHE>\*\*)' +
+                      r'(?P<COMPILE_TIME_CACHE>\*\*)' +# @@TR: hack that might
+                                        # be removed
                       '|' +
                       r'(?P<STATIC_CACHE>\*)' +
                       '|' +                      
@@ -514,8 +514,7 @@ class _LowLevelParser(SourceReader):
 
         return ''.join(nameChunks)
 
-    def matchIdentifier(self,
-                     identRE=re.compile(r'[a-zA-Z_][a-zA-Z_0-9]*')):
+    def matchIdentifier(self):
         return identRE.match(self.src(), self.pos())
     
     def getIdentifier(self):
@@ -810,10 +809,12 @@ class _LowLevelParser(SourceReader):
                 else:
                     addBit( codeFor1stToken + WS)
             else:
+                beforeTokenPos = self.pos()
                 token = self.getPyToken()
                 if token in ('{','(','['):
                     self.rev()
                     token = self.getExpression(enclosed=True)
+                token = self.transformToken(token, beforeTokenPos)
                 addBit(token)
 
         return ''.join(argStringBits)
@@ -879,10 +880,12 @@ class _LowLevelParser(SourceReader):
                 if self.matchCheetahVarStart():
                     token = self.getCheetahVar()
                 else:
+                    beforeTokenPos = self.pos()
                     token = self.getPyToken()
                     if token in ('{','(','['):
                         self.rev()
                         token = self.getExpression(enclosed=True)
+                    token = self.transformToken(token, beforeTokenPos)
                 argList.addToDefVal(token)
             elif c == '*' and not onDefVal:
                 varName = self.getc()
@@ -902,10 +905,13 @@ class _LowLevelParser(SourceReader):
     def getExpressionParts(self,
                            enclosed=False, 
                            enclosures=None, # list of tuples (char, pos), where char is ({ or [ 
+                           pyTokensToBreakAt=None
                            ):
 
         """ Get a Cheetah expression that includes $CheetahVars and break at
-        directive end tokens."""
+        directive end tokens, the end of an enclosure, or at a specified
+        pyToken.
+        """
 
         if enclosures is None:
             enclosures = []
@@ -925,15 +931,12 @@ class _LowLevelParser(SourceReader):
                     break
 
             c = self.peek()
-            
             if c in "{([":
                 exprBits.append(c)
                 enclosures.append( (c, self.pos()) )
-                self.advance()
-                
+                self.advance()                
             elif enclosed and not enclosures:
-                break
-                
+                break                
             elif c in "])}":
                 if not enclosures:
                     raise ParseError(self)
@@ -954,11 +957,9 @@ class _LowLevelParser(SourceReader):
                 self.advance()
                                 
             elif c in " \f\t":
-                exprBits.append(self.getWhiteSpace())
-            
+                exprBits.append(self.getWhiteSpace())            
             elif self.matchDirectiveEndToken() and not enclosures:
-                break
-            
+                break            
             elif c == "\\" and self.pos()+1 < srcLen:
                 eolMatch = EOLre.match(self.src(), self.pos()+1)
                 if not eolMatch:
@@ -969,36 +970,77 @@ class _LowLevelParser(SourceReader):
                 if enclosures:
                     self.advance()                    
                 else:
-                    break
-                
-            elif self.matchIdentifier():
-                token = self.getIdentifier()
-                exprBits.append(token)
-                if token == 'for':
-                    targetVars = self.getTargetVarsList()
-                    exprBits.append(' ' + ', '.join(targetVars) + ' ')
-                else:
-                    exprBits.append(self.getWhiteSpace())
-                    if not self.atEnd() and self.peek() == '(':
-                        exprBits.append(self.getCallArgString())
-                    
+                    break                    
             elif self.matchCheetahVarStart():
                 token = self.getCheetahVar()
                 exprBits.append(token)
-            else:
+            else:                
+                beforeTokenPos = self.pos()
                 token = self.getPyToken()
+                if pyTokensToBreakAt and token in pyTokensToBreakAt:
+                    self.setPos(beforeTokenPos)
+                    break
+
+                token = self.transformToken(token, beforeTokenPos)
+                        
                 exprBits.append(token)                    
-                                        
+                if identRE.match(token):
+                    if token == 'for':
+                        # @@TR: this needs expanding to handle more complex targetVarLists
+                        targetVars = self.getTargetVarsList()
+                        exprBits.append(' ' + ', '.join(targetVars) + ' ')
+                    else:
+                        exprBits.append(self.getWhiteSpace())
+                        if not self.atEnd() and self.peek() == '(':
+                            exprBits.append(self.getCallArgString())                    
+        ##
         return exprBits
 
     def getExpression(self,
                       enclosed=False, 
                       enclosures=None, # list of tuples (char, pos), where # char is ({ or [
+                      pyTokensToBreakAt=None
                       ):
         """Returns the output of self.getExpressionParts() as a concatenated
         string rather than as a list.
         """
-        return ''.join(self.getExpressionParts(enclosed=enclosed, enclosures=enclosures))
+        return ''.join(self.getExpressionParts(enclosed=enclosed, enclosures=enclosures,
+                                               pyTokensToBreakAt=pyTokensToBreakAt))
+
+
+    def transformToken(self, token, beforeTokenPos):
+        if token=='c' and not self.atEnd() and self.peek() in '\'"':
+            nextToken = self.getPyToken()
+            token = nextToken.upper()
+            theStr = eval(token)
+            endPos = self.pos()
+            if not theStr:
+                return
+            
+            if token.startswith(single3) or token.startswith(double3):
+                startPosIdx = 3
+            else:
+                startPosIdx = 1
+            #print 'CHEETAH STRING', nextToken, theStr, startPosIdx
+            self.setPos(beforeTokenPos+startPosIdx+1)
+            outputExprs = []
+            strConst = ''
+            while self.pos() < (endPos-startPosIdx):
+                if self.matchCheetahVarStart():
+                    if strConst:
+                        outputExprs.append(repr(strConst))
+                        strConst = ''
+                    placeholder = self.getCheetahVar()
+                    outputExprs.append('str('+placeholder+')')
+                else:
+                    strConst += self.getc()
+            self.setPos(endPos)
+            if strConst:
+                outputExprs.append(repr(strConst))
+            #if not self.atEnd() and self.matches('.join('):
+            #    print 'DEBUG***'
+            token = "''.join(["+','.join(outputExprs)+"])"
+        return token
 
 class _HighLevelParser(_LowLevelParser):
     """This class is a StateMachine for parsing Cheetah source and
@@ -1901,12 +1943,16 @@ class _HighLevelParser(_LowLevelParser):
         endOfFirstLine = self.findEOL()
         self.getDirectiveStartToken()
         startPos = self.pos()
-        expressionParts = self.getExpressionParts()
+        expressionParts = self.getExpressionParts(pyTokensToBreakAt=[':'])
+        if not self.atEnd() and self.peek()==':':
+            pass
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
+
         expr = ''.join(expressionParts).strip()
         self._applyExpressionFilters(expr, 'if', startPos=startPos)
-        oneLiner = ('then' in expressionParts and 'else' in expressionParts)
-        if oneLiner:
+
+        isTerniaryExpr = ('then' in expressionParts and 'else' in expressionParts)
+        if isTerniaryExpr:
             conditionExpr = []
             trueExpr = []
             falseExpr = []
