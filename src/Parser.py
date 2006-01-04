@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.86 2006/01/03 23:24:05 tavis_rudd Exp $
+# $Id: Parser.py,v 1.87 2006/01/04 00:13:37 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.86 $
+Version: $Revision: 1.87 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/03 23:24:05 $
+Last Revision Date: $Date: 2006/01/04 00:13:37 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.86 $"[11:-2]
+__revision__ = "$Revision: 1.87 $"[11:-2]
 
 import os
 import sys
@@ -1579,6 +1579,8 @@ class _HighLevelParser(_LowLevelParser):
         if directiveKey in ('def','block'):
             self._compiler.startMethodDef(methodName, argsList, parserComment)
         else: #closure
+            self._useSearchList_orig = self.setting('useSearchList')
+            self.setSetting('useSearchList', False)
             self._compiler.addClosure(methodName, argsList, parserComment)
 
         return methodName
@@ -1600,9 +1602,16 @@ class _HighLevelParser(_LowLevelParser):
         if directiveKey in ('def','block'):
             self._compiler.startMethodDef(methodName, argsList, parserComment)
         else: #closure
-            self._compiler.addClosure(methodName, argsList, parserComment)
+            # @@TR: temporary hack of useSearchList
+            useSearchList_orig = self.setting('useSearchList')
+            self.setSetting('useSearchList', False)
+            
+            self._compiler.addClosure(methodName, argsList, parserComment)            
 
         self.parse(assertEmptyStack=False)
+        if directiveKey=='closure': # @@TR: temporary hack of useSearchList
+            self.setSetting('useSearchList', useSearchList_orig)
+            
         self.getWhiteSpace()
         self._src = origSrc
         self.setBreakPoint(origBP) 
@@ -2002,6 +2011,8 @@ class _HighLevelParser(_LowLevelParser):
 
     def eatEndClosure(self, isLineClearToStartToken=False):
         self.eatDedentDirective('closure', isLineClearToStartToken)
+        # @@TR: temporary hack of useSearchList
+        self.setSetting('useSearchList', self._useSearchList_orig)        
 
     def eatEndCache(self, isLineClearToStartToken=False):
         endOfFirstLinePos = self.findEOL()
