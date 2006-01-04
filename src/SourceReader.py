@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SourceReader.py,v 1.11 2006/01/04 07:44:43 tavis_rudd Exp $
+# $Id: SourceReader.py,v 1.12 2006/01/04 09:31:56 tavis_rudd Exp $
 """SourceReader class for Cheetah's Parser and CodeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/04 07:44:43 $
+Last Revision Date: $Date: 2006/01/04 09:31:56 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.11 $"[11:-2]
+__revision__ = "$Revision: 1.12 $"[11:-2]
 
 import re
 import sys
@@ -245,7 +245,7 @@ class SourceReader:
         
     def matches(self, strOrRE):
         if isinstance(strOrRE, (str, unicode)):
-            self.startswith(strOrRE, pos=self.pos())
+            return self.startswith(strOrRE, pos=self.pos())
         else: # assume an re object
             return strOrRE.match(self.src(), self.pos())
             
