@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.99 2006/01/03 23:23:19 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.100 2006/01/04 00:44:34 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.99 $
+Version: $Revision: 1.100 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/03 23:23:19 $
+Last Revision Date: $Date: 2006/01/04 00:44:34 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.99 $"[11:-2]
+__revision__ = "$Revision: 1.100 $"[11:-2]
 
 import sys
 import os
@@ -319,7 +319,7 @@ class MethodCompiler(GenUtils):
         ind = self._indent*2
         
         docStr = (ind + '"""\n' + ind +
-                  ('\n' + ind).join(self._docStringLines) +
+                  ('\n' + ind).join(ln.replace('"""',"'''") for ln in self._docStringLines) +
                   '\n' + ind + '"""\n')
         return  docStr
 
@@ -1288,6 +1288,7 @@ DEFAULT_COMPILER_SETTINGS = {
     'EOLSlurpToken':'#',
     'gettextTokens': ["_", "N_", "ngettext"],
     'allowExpressionsInExtendsDirective': False,
+    'allowEmptySingleLineMethods': False,
     
     # input filtering/restriction
     # use lower case keys here!!
