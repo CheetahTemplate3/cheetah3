@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.87 2006/01/04 00:13:37 tavis_rudd Exp $
+# $Id: Parser.py,v 1.88 2006/01/04 01:17:51 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.87 $
+Version: $Revision: 1.88 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/04 00:13:37 $
+Last Revision Date: $Date: 2006/01/04 01:17:51 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.87 $"[11:-2]
+__revision__ = "$Revision: 1.88 $"[11:-2]
 
 import os
 import sys
@@ -1535,7 +1535,12 @@ class _HighLevelParser(_LowLevelParser):
 
         self._applyExpressionFilters(self[startPos:self.pos()], 'def', startPos=startPos)
 
-        if self.peek() == ':': # single-line version
+        if (self.peek()==':'
+            and (self.setting('allowEmptySingleLineMethods')
+                 or self[self.pos()+1:self.findEOL()].strip())):
+            # single-line version
+            isNestedDef = (self.setting('allowNestedFunctions')
+                           and [name for name in self._indentStack if name=='def'])
             self.getc()
             rawSignature = self[startPos:endOfFirstLinePos]
             self._eatSingleLineDef(directiveKey=directiveKey,
@@ -1543,17 +1548,19 @@ class _HighLevelParser(_LowLevelParser):
                                    argsList=argsList,
                                    startPos=startPos,
                                    endPos=endOfFirstLinePos)
-            if directiveKey == 'def':
+            if directiveKey == 'def' and not isNestedDef:
                 #@@TR: must come before _eatRestOfDirectiveTag ... for some reason
                 self._compiler.closeDef()
             elif directiveKey == 'block':
                 includeBlockMarkers()
                 self._compiler.closeBlock()
-            elif directiveKey == 'closure':
+            elif directiveKey == 'closure' or isNestedDef:
                 self._compiler.dedent()
                 
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         else:
+            if self.peek()==':':
+                self.getc()            
             self.pushToIndentStack(directiveKey)
             rawSignature = self[startPos:self.pos()]
             self._eatMultiLineDef(directiveKey=directiveKey,
@@ -1576,7 +1583,10 @@ class _HighLevelParser(_LowLevelParser):
         parserComment = ('Generated from ' + signature + 
                          ' at line %s, col %s' % self.getRowCol(startPos)
                          + '.')
-        if directiveKey in ('def','block'):
+
+        isNestedDef = (self.setting('allowNestedFunctions')
+                       and len([name for name in self._indentStack if name=='def'])>1)
+        if directiveKey=='block' or (directiveKey=='def' and not isNestedDef):
             self._compiler.startMethodDef(methodName, argsList, parserComment)
         else: #closure
             self._useSearchList_orig = self.setting('useSearchList')
@@ -1598,8 +1608,9 @@ class _HighLevelParser(_LowLevelParser):
         parserComment = ('Generated from ' + fullSignature + 
                          ' at line %s, col %s' % self.getRowCol(startPos)
                          + '.')
-
-        if directiveKey in ('def','block'):
+        isNestedDef = (self.setting('allowNestedFunctions')
+                       and [name for name in self._indentStack if name=='def'])
+        if directiveKey=='block' or (directiveKey=='def' and not isNestedDef):
             self._compiler.startMethodDef(methodName, argsList, parserComment)
         else: #closure
             # @@TR: temporary hack of useSearchList
@@ -1609,7 +1620,7 @@ class _HighLevelParser(_LowLevelParser):
             self._compiler.addClosure(methodName, argsList, parserComment)            
 
         self.parse(assertEmptyStack=False)
-        if directiveKey=='closure': # @@TR: temporary hack of useSearchList
+        if directiveKey=='closure' or isNestedDef: # @@TR: temporary hack of useSearchList
             self.setSetting('useSearchList', useSearchList_orig)
             
         self.getWhiteSpace()
@@ -1999,8 +2010,18 @@ class _HighLevelParser(_LowLevelParser):
         endOfFirstLinePos = self.findEOL()
         self.getExpression()
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
+
+
         self.popFromIndentStack("def")
-        self._compiler.closeDef()
+        isNestedDef = (self.setting('allowNestedFunctions')
+                       and [name for name in self._indentStack if name=='def'])
+        if not isNestedDef:
+            self._compiler.closeDef()
+        else:
+            # @@TR: temporary hack of useSearchList
+            self.setSetting('useSearchList', self._useSearchList_orig)                    
+            self._compiler.commitStrConst()
+            self._compiler.dedent()
         
     def eatEndBlock(self, isLineClearToStartToken=False):
         endOfFirstLinePos = self.findEOL()
