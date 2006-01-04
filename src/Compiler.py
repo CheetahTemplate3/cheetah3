@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.101 2006/01/04 01:17:40 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.102 2006/01/04 01:19:16 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.101 $
+Version: $Revision: 1.102 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/04 01:17:40 $
+Last Revision Date: $Date: 2006/01/04 01:19:16 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.101 $"[11:-2]
+__revision__ = "$Revision: 1.102 $"[11:-2]
 
 import sys
 import os
@@ -1289,7 +1289,7 @@ DEFAULT_COMPILER_SETTINGS = {
     'gettextTokens': ["_", "N_", "ngettext"],
     'allowExpressionsInExtendsDirective': False,
     'allowEmptySingleLineMethods': False,
-    'allowNestedFunctions': True,
+    'allowNestedDefScopes': True,
     
     # input filtering/restriction
     # use lower case keys here!!
