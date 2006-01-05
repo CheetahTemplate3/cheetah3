@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.100 2006/01/05 22:30:42 tavis_rudd Exp $
+# $Id: Parser.py,v 1.101 2006/01/05 23:58:34 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.100 $
+Version: $Revision: 1.101 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/05 22:30:42 $
+Last Revision Date: $Date: 2006/01/05 23:58:34 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.100 $"[11:-2]
+__revision__ = "$Revision: 1.101 $"[11:-2]
 
 import os
 import sys
@@ -1713,7 +1713,7 @@ class _HighLevelParser(_LowLevelParser):
         self._src = methodSrc
         self.setPos(0)
         self.setBreakPoint(len(methodSrc))
-        parserComment = ('Generated from ' + fullSignature + 
+        parserComment = ('## Generated from ' + fullSignature + 
                          ' at line %s, col %s' % self.getRowCol(startPos)
                          + '.')
         isNestedDef = (self.setting('allowNestedDefScopes')
@@ -1744,7 +1744,7 @@ class _HighLevelParser(_LowLevelParser):
         fullSignature = self[startPos:endPos]
         origBP = self.breakPoint()
         self.setBreakPoint(endPos-1)
-        parserComment = ('Generated from ' + fullSignature + 
+        parserComment = ('## Generated from ' + fullSignature + 
                          ' at line %s, col %s' % self.getRowCol(startPos)
                          + '.')
         self._compiler.startMethodDef(methodName, argsList, parserComment)
