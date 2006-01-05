@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.94 2006/01/05 08:22:51 tavis_rudd Exp $
+# $Id: Parser.py,v 1.95 2006/01/05 19:13:24 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.94 $
+Version: $Revision: 1.95 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/05 08:22:51 $
+Last Revision Date: $Date: 2006/01/05 19:13:24 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.94 $"[11:-2]
+__revision__ = "$Revision: 1.95 $"[11:-2]
 
 import os
 import sys
@@ -987,8 +987,15 @@ class _LowLevelParser(SourceReader):
                 if identRE.match(token):
                     if token == 'for':
                         # @@TR: this needs expanding to handle more complex targetVarLists
-                        targetVars = self.getTargetVarsList()
-                        exprBits.append(' ' + ', '.join(targetVars) + ' ')
+                        useNameMapper_orig = self.setting('useNameMapper')
+                        self.setSetting('useNameMapper', False)
+                        expr = self.getExpression(pyTokensToBreakAt=['in']) 
+                        #print 'DEBUG', expr
+                        exprBits.append(expr)
+                        self.setSetting('useNameMapper', useNameMapper_orig)
+                        #targetVars = self.getTargetVarsList()
+                        #print 'DEBUG', targetVars
+                        #exprBits.append(' ' + ', '.join(targetVars) + ' ')
                     else:
                         exprBits.append(self.getWhiteSpace())
                         if not self.atEnd() and self.peek() == '(':
@@ -1786,9 +1793,11 @@ class _HighLevelParser(_LowLevelParser):
             self.getWhiteSpace()
             style = SET_MODULE
 
+        # @@TR: this needs expanding to handle (i,j) = list style assignments
         startsWithDollar = self.matchCheetahVarStart()
         startPos = self.pos()
         LVALUE = self.getCheetahVar(plain=True, skipStartToken=(not startsWithDollar))
+
         self.getWhiteSpace()
         OP = self.getAssignmentOperator()
         RVALUE = self.getExpression()        
