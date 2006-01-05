@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.72 2006/01/05 19:40:22 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.73 2006/01/05 22:44:12 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.72 $
+Version: $Revision: 1.73 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/05 19:40:22 $
+Last Revision Date: $Date: 2006/01/05 22:44:12 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.72 $"[11:-2]
+__revision__ = "$Revision: 1.73 $"[11:-2]
 
 
 ##################################################
@@ -1750,13 +1750,24 @@ $testDict.two""",
                     "bar")
 
     def test18(self):
-        """#set with (i,j)=list style assignment"""
-        self.verify("""#set (i,j) = [1,2]\n$i$j""",
+        """#set with i,j=list style assignment"""
+        self.verify("""#set i,j = [1,2]\n$i$j""",
+                    "12")
+        self.verify("""#set $i,$j = [1,2]\n$i$j""",
                     "12")
 
     def test19(self):
+        """#set with (i,j)=list style assignment"""
+        self.verify("""#set (i,j) = [1,2]\n$i$j""",
+                    "12")
+        self.verify("""#set ($i,$j) = [1,2]\n$i$j""",
+                    "12")
+
+    def test20(self):
         """#set with i, (j,k)=list style assignment"""
         self.verify("""#set i, (j,k) = [1,(2,3)]\n$i$j$k""",
+                    "123")
+        self.verify("""#set $i, ($j,$k) = [1,(2,3)]\n$i$j$k""",
                     "123")
 
 
