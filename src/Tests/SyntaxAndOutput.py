@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.70 2006/01/05 08:22:20 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.71 2006/01/05 19:12:15 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.70 $
+Version: $Revision: 1.71 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/05 08:22:20 $
+Last Revision Date: $Date: 2006/01/05 19:12:15 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.70 $"[11:-2]
+__revision__ = "$Revision: 1.71 $"[11:-2]
 
 
 ##################################################
@@ -1288,6 +1288,20 @@ class ForDirective(OutputTest):
         self.verify("#for $i, $j in [('aa','bb'),('cc','dd')]\n$i.upper,$j.upper\n#end for",
                     "AA,BB\nCC,DD\n")
 
+    def test11(self):
+        """#for loop over list, using ($i,$j) style target list"""
+        self.verify("#for ($i, $j) in [('aa','bb'),('cc','dd')]\n$i.upper,$j.upper\n#end for",
+                    "AA,BB\nCC,DD\n")
+
+    def test12(self):
+        """#for loop over list, using (i,j) style target list"""
+        self.verify("#for (i, j) in [('aa','bb'),('cc','dd')]\n$i.upper,$j.upper\n#end for",
+                    "AA,BB\nCC,DD\n")
+
+    def test13(self):
+        """#for loop over list, using i, (j,k) style target list"""
+        self.verify("#for i, (j, k) in enumerate([('aa','bb'),('cc','dd')])\n$j.upper,$k.upper\n#end for",
+                    "AA,BB\nCC,DD\n")
 
 class RepeatDirective(OutputTest):
 
