@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.73 2006/01/05 22:44:12 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.74 2006/01/05 22:45:24 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.73 $
+Version: $Revision: 1.74 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/05 22:44:12 $
+Last Revision Date: $Date: 2006/01/05 22:45:24 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.73 $"[11:-2]
+__revision__ = "$Revision: 1.74 $"[11:-2]
 
 
 ##################################################
@@ -1285,22 +1285,23 @@ class ForDirective(OutputTest):
 
     def test10(self):
         """#for loop over list, using methods of the items"""
+        self.verify("#for i, j in [('aa','bb'),('cc','dd')]\n$i.upper,$j.upper\n#end for",
+                    "AA,BB\nCC,DD\n")
         self.verify("#for $i, $j in [('aa','bb'),('cc','dd')]\n$i.upper,$j.upper\n#end for",
                     "AA,BB\nCC,DD\n")
 
     def test11(self):
         """#for loop over list, using ($i,$j) style target list"""
+        self.verify("#for (i, j) in [('aa','bb'),('cc','dd')]\n$i.upper,$j.upper\n#end for",
+                    "AA,BB\nCC,DD\n")
         self.verify("#for ($i, $j) in [('aa','bb'),('cc','dd')]\n$i.upper,$j.upper\n#end for",
                     "AA,BB\nCC,DD\n")
 
     def test12(self):
-        """#for loop over list, using (i,j) style target list"""
-        self.verify("#for (i, j) in [('aa','bb'),('cc','dd')]\n$i.upper,$j.upper\n#end for",
-                    "AA,BB\nCC,DD\n")
-
-    def test13(self):
         """#for loop over list, using i, (j,k) style target list"""
         self.verify("#for i, (j, k) in enumerate([('aa','bb'),('cc','dd')])\n$j.upper,$k.upper\n#end for",
+                    "AA,BB\nCC,DD\n")
+        self.verify("#for $i, ($j, $k) in enumerate([('aa','bb'),('cc','dd')])\n$j.upper,$k.upper\n#end for",
                     "AA,BB\nCC,DD\n")
 
 class RepeatDirective(OutputTest):
