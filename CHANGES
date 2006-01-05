@@ -38,7 +38,7 @@ release
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]
     - added #yield statement
-   - added ability to create nested scopes/functions via nested #def statements
+    - added ability to create nested scopes/functions via nested #def statements
     - added new #call directive and related #arg directive, per Ian Bicking's
       suggestion.        
     - added new expression syntax c"text $placeholder text"
