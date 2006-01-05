@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.129 2006/01/03 23:19:30 tavis_rudd Exp $
+# $Id: Template.py,v 1.130 2006/01/05 06:46:42 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.129 $
+Version: $Revision: 1.130 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/03 23:19:30 $
+Last Revision Date: $Date: 2006/01/05 06:46:42 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.129 $"[11:-2]
+__revision__ = "$Revision: 1.130 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import os.path
@@ -71,9 +71,8 @@ except ImportError:
     class Unspecified:
         pass
 
-class Error(Exception):
-    pass
-
+class Error(Exception):  pass
+class PreprocessError(Error): pass
 
 _cheetahModuleNames = []
 _uniqueModuleNameLock = Lock() # used to prevent collisions in sys.modules
@@ -127,6 +126,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
                 # the module the generated code is executed in.
 
                 keepRefToGeneratedModuleCode=False,
+                preprocessors=None,
                 ):
         """Compiles cheetah source code and returns a python class.  You then
         create template instances using that class.
@@ -149,6 +149,19 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             # Re-raise the exception here so that the traceback will end in
             # this function rather than in some utility function.
             raise TypeError(reason)
+
+        if preprocessors:
+            if not source: # @@TR: this needs improving
+                if isinstance(file, (str, unicode)): # it's a filename.
+                    f = open(file) # Raises IOError.
+                    source = f.read()
+                    f.close()
+                elif hasattr(file, 'read'):
+                    source = file.read()  # Can't set filename or mtime--they're not accessible.
+                file = None
+            origSrc = source
+            source = klass._preprocessSource(source, preprocessors)
+            
 
         __orig_file__ = None
         if not moduleName:
@@ -198,8 +211,11 @@ class Template(SettingsManager, Servlet, WebInputMixin):
                         traceback.print_exc(file=sys.stderr)
                 finally:
                     klass._compileLock.release()
-
-            co = compile(generatedModuleCode, __file__, 'exec')
+            try:
+                co = compile(generatedModuleCode, __file__, 'exec')
+            except:
+                print generatedModuleCode
+                raise
             mod = new.module(uniqueModuleName)
             mod.__file__ = __file__
             if __orig_file__ and os.path.exists(__orig_file__):
@@ -219,6 +235,99 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         else:
             return generatedModuleCode
     compile = classmethod(compile)
+
+    def _preprocessSource(klass, source, preprocessors):
+        """Iterates through the .compile() classmethod's preprocessors argument
+        and pipes the source code through each each preprocessors.
+        """
+        if not isinstance(preprocessors, (list, tuple)):
+            preprocessors = [preprocessors]
+        for preprocessor in preprocessors:
+            preprocessor = klass._normalizePreprocessor(preprocessor)
+            source = preprocessor.preprocess(source)
+        return source
+    _preprocessSource = classmethod(_preprocessSource)
+
+    def _normalizePreprocessor(klass, input):
+        """Used to convert the items in the .compile() classmethod's
+        preprocessors argument into real source preprocessors.  This permits the
+        use of several shortcut forms for defining preprocessors.
+        """
+        if hasattr(input, 'preprocess'):
+            return input
+        elif callable(input):
+            class Preprocessor:
+                def preprocess(self, src):
+                    return input(src)
+            return Preprocessor()
+
+        ##
+        class Options(object): pass
+        options = Options()
+        options.searchList = []
+        options.keepRefToGeneratedModuleCode = True
+        
+        def normalizeSearchList(searchList):
+            if not isinstance(searchList, (list, tuple)):
+                searchList = [searchList]
+            return searchList            
+        
+        if isinstance(input, str):
+            options.prefix = input            
+        elif isinstance(input, (list, tuple)):
+            prefix, searchList = input
+            options.prefix = prefix
+            options.searchList = normalizeSearchList(searchList)
+        elif isinstance(input, dict):
+            options.prefix = input.get('prefix')
+            options.searchList = normalizeSearchList(
+                input.get('searchList',
+                          input.get('namespaces', [])))            
+            for k, v in input.items():
+                setattr(options, k, v)
+        else: #it's an options object
+            options = input
+
+        if not hasattr(options, 'outputTransformer'):            
+            options.outputTransformer = str
+
+        if not hasattr(options, 'compiler'):
+            def createPreprocessCompiler(prefix, compilerSettings=None):
+                class PreprocessorCompiler(klass):
+                    _compilerSettings = dict(
+                        cheetahVarStartToken='$'+prefix,
+                        directiveStartToken='#'+prefix,
+                        commentStartToken='##'+prefix,
+                        multiLineCommentStartToken='#*'+prefix,
+                        )
+                    if compilerSettings:
+                        _compilerSettings.update(compilerSettings)
+                return PreprocessorCompiler
+
+            compilerSettings = getattr(options, 'compilerSettings', None)
+            if not compilerSettings and not options.prefix:
+                raise TypeError(
+                    'Preprocessor requires either a "prefix" or a "compilerSettings" arg.'
+                    ' Neither was provided.')
+            options.compiler = createPreprocessCompiler(
+                prefix=options.prefix,
+                compilerSettings=compilerSettings,
+                )
+
+        class Preprocessor:
+            def preprocess(self, source):
+                moduleGlobals = getattr(options, 'moduleGlobals', None)
+                templClass = options.compiler.compile(
+                    source,
+                    keepRefToGeneratedModuleCode=options.keepRefToGeneratedModuleCode,
+                    moduleGlobals=moduleGlobals,
+                    )
+                instance = templClass(searchList=options.searchList)
+                source = options.outputTransformer(instance)
+                return source
+        return Preprocessor()
+    _normalizePreprocessor = classmethod(_normalizePreprocessor)        
+
 
 
     def assignRequiredMethodsToClass(klass, otherClass):
@@ -251,6 +360,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
     assignRequiredMethodsToClass = classmethod(assignRequiredMethodsToClass)
 
 
+    ## end classmethods ##
 
     def __init__(self, source=None, searchList=Unspecified, file=None,
                  filter='EncodeUnicode', # which filter from Cheetah.Filters
@@ -624,15 +734,18 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         when the template is compiled via the Template class' interface rather
         than via 'cheetah compile'.
         """
-        tmpFilename = self._genTmpFilename()
-        name = tmpFilename.replace('.py','')
-        co = compile(contents+'\n', tmpFilename, 'exec')
-        mod = new.module(name)
-        #mod.__file__ = co.co_filename
-        #mod.__co__ = co
+        mod = self._getDummyModuleForDynamicCompileHack()
+        co = compile(contents+'\n', mod.__file__, 'exec')
         exec co in mod.__dict__
         return mod
 
+    def _getDummyModuleForDynamicCompileHack(self):
+        if not hasattr(self, '_dummyModule'):
+            tmpFilename = self._genTmpFilename()
+            name = tmpFilename.replace('.py','')            
+            self._dummyModule = new.module(name)
+            self._dummyModule.__file__ = tmpFilename
+        return self._dummyModule
 
 T = Template   # Short and sweet for debugging at the >>> prompt.
 
