@@ -2,6 +2,38 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0b4 (Jan 6, 2006)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+  Core Changes: [TR]
+    - fixed up parsing of target lists in for loops
+      #for ($i, $j) in [('aa','bb'),('cc','dd')]
+        $i.upper,$j.upper
+      #end for"
+      #for (i, j) in [('aa','bb'),('cc','dd')]
+        $i.upper,$j.upper
+      #end for"
+      #for i,(j, k) in enumerate([('aa','bb'),('cc','dd')])
+        $j.upper,$k.upper
+      #end for"
+
+    - improved handling of target lists in #set directive
+      #set i,j = [1,2] ... #set $i,$j = [1,2]
+      #set (i,j) = [1,2] ... #set ($i,$j) = [1,2]
+      #set i, (j,k) = [1,(2,3)] ... #set $i, ($j,$k) = [1,(2,3)]
+
+    - made it possible for the expressionFilter hooks to modify the code chunks
+      they are fed. Also documented the hooks in a docstring.  Thus the hooks
+      can be used as preprocessors for expressions, 'restricted execution', or
+      even enforcement of style guidelines.
+
+    - removed cheetah junk from docstrings and placed it all in comments or
+      __moduleVars__. Per JJ's suggestion.
+  
+  Unit Tests [TR]
+    - extended tests for #for directive
+    - expanded tests for #set directive
+
+
 2.0b3 (Jan 5, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]
