@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.104 2006/01/04 18:31:49 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.105 2006/01/05 01:28:05 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.104 $
+Version: $Revision: 1.105 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/04 18:31:49 $
+Last Revision Date: $Date: 2006/01/05 01:28:05 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.104 $"[11:-2]
+__revision__ = "$Revision: 1.105 $"[11:-2]
 
 import sys
 import os
@@ -31,7 +31,7 @@ import warnings
 from Cheetah.Version import Version
 from Cheetah.SettingsManager import SettingsManager
 from Cheetah.Parser import (
-    Parser, ParseError, specialVarRE, STATIC_CACHE, REFRESH_CACHE, COMPILE_TIME_CACHE)
+    Parser, ParseError, specialVarRE, STATIC_CACHE, REFRESH_CACHE)
 from Cheetah.Utils.Indenter import indentize # an undocumented preprocessor
 from Cheetah import ErrorCatchers
 from Cheetah import NameMapper
@@ -80,8 +80,6 @@ class GenUtils:
             cacheInfo['interval'] = self.genTimeInterval(cacheTokenParts['interval'])
         elif cacheTokenParts['STATIC_CACHE']:
             cacheInfo['type'] = STATIC_CACHE
-        elif cacheTokenParts['COMPILE_TIME_CACHE']:
-            cacheInfo['type'] = COMPILE_TIME_CACHE
         return cacheInfo                # is empty if no cache
 
     def genCacheInfoFromArgList(self, argList):
@@ -439,16 +437,6 @@ class MethodCompiler(GenUtils):
 
     def addPlaceholder(self, expr, filterArgs, rawPlaceholder, cacheTokenParts, lineCol):
         cacheInfo = self.genCacheInfo(cacheTokenParts)
-
-        if cacheInfo and cacheInfo['type']==COMPILE_TIME_CACHE:
-            # @@TR: partially completed
-            SL = [{'test':999, 'author':'tavis'}]
-            val = eval(expr)
-            self.addStrConst(str(val))
-            return
-            expr = repr(val)
-            cacheInfo = None
-            
         if cacheInfo:
             cacheInfo['ID'] = repr(rawPlaceholder)[1:-1]
             self.startCacheRegion(cacheInfo, lineCol, rawPlaceholder=rawPlaceholder)
@@ -786,7 +774,14 @@ class AutoMethodCompiler(MethodCompiler):
         MethodCompiler._setupState(self)
         self._argStringList = [ ("self",None) ]
         self._streamingEnabled = True
-        
+
+    def _useKWsDictArgForPassingTrans(self):
+        alreadyHasTransArg = [argname for argname,defval in self._argStringList
+                              if argname=='trans']
+        return (self.methodName()!='respond'
+                and not alreadyHasTransArg
+                and self.setting('useKWsDictArgForPassingTrans'))
+    
     def cleanupState(self):
         MethodCompiler.cleanupState(self)
         self.commitStrConst()
@@ -795,26 +790,47 @@ class AutoMethodCompiler(MethodCompiler):
         if self._callRegionOpen:
             self.endCallRegion()
             
+        if self._streamingEnabled:
+            kwargsName = None
+            positionalArgsListName = None
+            for argname,defval in self._argStringList:
+                if argname.strip().startswith('**'):
+                    kwargsName = argname.strip().replace('**','')
+                    break
+                elif argname.strip().startswith('*'):
+                    positionalArgsListName = argname.strip().replace('*','')
+                    
+            if not kwargsName and self._useKWsDictArgForPassingTrans():
+                kwargsName = 'KWS'
+                self.addMethArg('**KWS', None)
+            self._kwargsName = kwargsName
+
+            if not self._useKWsDictArgForPassingTrans():
+                if not kwargsName and not positionalArgsListName:
+                    self.addMethArg('trans', 'None')       
+                else:
+                    self._streamingEnabled = False
+            #if self._streamingEnabled and self.setting('useNameMapper'):
+            #    argList.extend([("VFFSL","valueFromFrameOrSearchList"), 
+            #                    ("VFN","valueForName")])                
+                
         self._indentLev = self.setting('initialMethIndentLevel')
         mainBodyChunks = self._methodBodyChunks
         self._methodBodyChunks = []
         self._addAutoSetupCode()
         self._methodBodyChunks.extend(mainBodyChunks)
         self._addAutoCleanupCode()
-        if self._streamingEnabled:
-            argList = [ ('trans', 'None'),
-                        #("_dummyTrans","False"),
-                        ]
-            if self.setting('useNameMapper'):
-                argList.extend([("VFFSL","valueFromFrameOrSearchList"), 
-                                ("VFN","valueForName")])
-            for argName, defVal in  argList:
-                self.addMethArg(argName, defVal)
         
     def _addAutoSetupCode(self):
         if self._streamingEnabled:
-            self.addChunk('if not trans and not callable(self.transaction): trans = self.transaction'
+            if self._useKWsDictArgForPassingTrans() and self._kwargsName:
+                self.addChunk('trans = %s.get("trans")'%self._kwargsName)            
+            self.addChunk('if not trans and not callable(self.transaction):')
+            self.indent()
+            self.addChunk('trans = self.transaction'
                           ' # is None unless self.awake() was called')
+            self.dedent()
+
             self.addChunk('if not trans:')
             self.indent()
             self.addChunk('trans = DummyTransaction()')
@@ -858,8 +874,8 @@ class AutoMethodCompiler(MethodCompiler):
 
     def addMethArg(self, name, defVal=None):
         asteriskPos = max(name.rfind('*')+1, 0)
-        if asteriskPos:
-            self._streamingEnabled = False
+        #if asteriskPos:
+        #    self._streamingEnabled = False
         self._argStringList.append( (name,defVal) )
         
     def methodSignature(self):
@@ -869,8 +885,9 @@ class AutoMethodCompiler(MethodCompiler):
             if not arg[1] == None:
                 chunk += '=' + arg[1]
             argStringChunks.append(chunk)
+        argString = (',\n' + self._indent*3).join(argStringChunks)
         return (self._indent + "def " + self.methodName() + "(" +
-                (',\n' + self._indent*3).join(argStringChunks) + "):\n\n")
+                 argString + "):\n\n")
 
 
 ##################################################
@@ -1237,6 +1254,7 @@ DEFAULT_COMPILER_SETTINGS = {
     
     #'lookForTransactionAttr':False,
     'autoAssignDummyTransactionToSelf':False,
+    'useKWsDictArgForPassingTrans':True,
     
     ## controlling the aesthetic appearance / behaviour of generated code
     'commentOffset': 1,
