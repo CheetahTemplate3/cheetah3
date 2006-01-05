@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.109 2006/01/05 21:31:02 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.110 2006/01/05 22:30:28 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.109 $
+Version: $Revision: 1.110 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/05 21:31:02 $
+Last Revision Date: $Date: 2006/01/05 22:30:28 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.109 $"[11:-2]
+__revision__ = "$Revision: 1.110 $"[11:-2]
 
 import sys
 import os
@@ -237,12 +237,15 @@ class GenUtils:
 ## METHOD COMPILERS
 
 class MethodCompiler(GenUtils):
-    def __init__(self, methodName, classCompiler, templateObj=None):
+    def __init__(self, methodName, classCompiler,
+                 initialMethodComment=None,
+                 templateObj=None):
         self._settingsManager = classCompiler
         self._classCompiler = classCompiler
         self._moduleCompiler = classCompiler._moduleCompiler
         self._templateObj = templateObj
         self._methodName = methodName
+        self._initialMethodComment = initialMethodComment
         self._setupState()
 
     def setting(self, key):
@@ -321,8 +324,10 @@ class MethodCompiler(GenUtils):
         return ''.join( self._methodBodyChunks )
 
     def docString(self):
-        ind = self._indent*2
+        if not self._docStringLines:
+            return ''
         
+        ind = self._indent*2        
         docStr = (ind + '"""\n' + ind +
                   ('\n' + ind).join(ln.replace('"""',"'''") for ln in self._docStringLines) +
                   '\n' + ind + '"""\n')
@@ -674,10 +679,10 @@ class MethodCompiler(GenUtils):
         self.addChunk('cache = region.getCache('+varyBy+')')
 
         if interval:
-            self.addMethDocString(
-                'Contains a cache region which will be refreshed every ' +
-                str(interval) + ' seconds.'
-                +(rawPlaceholder and ' %s'%rawPlaceholder or ''))
+            #self.addMethDocString(
+            #    'Contains a cache region which will be refreshed every ' +
+            #    str(interval) + ' seconds.'
+            #    +(rawPlaceholder and ' %s'%rawPlaceholder or ''))
                 
             self.addChunk('if (not cache.getRefreshTime())' +
                           ' or (currentTime() > cache.getRefreshTime()):')
@@ -859,6 +864,9 @@ class AutoMethodCompiler(MethodCompiler):
         self._addAutoCleanupCode()
         
     def _addAutoSetupCode(self):
+        if self._initialMethodComment:
+            self.addChunk(self._initialMethodComment)
+            
         if self._streamingEnabled:
             if self._useKWsDictArgForPassingTrans() and self._kwargsName:
                 self.addChunk('trans = %s.get("trans")'%self._kwargsName)            
@@ -924,7 +932,7 @@ class AutoMethodCompiler(MethodCompiler):
             if not arg[1] == None:
                 chunk += '=' + arg[1]
             argStringChunks.append(chunk)
-        argString = (',\n' + self._indent*3).join(argStringChunks)
+        argString = (', ').join(argStringChunks)
         return (self._indent + "def " + self.methodName() + "(" +
                  argString + "):\n\n")
 
@@ -962,9 +970,9 @@ class ClassCompiler(GenUtils):
         self._mainMethodName = mainMethodName
         self._templateObj = templateObj
         self._setupState()
-        methodCompiler = self._spawnMethodCompiler(mainMethodName)
-        methodCompiler.addMethDocString(
-            'CHEETAH: This is the main method generated for this template')
+        methodCompiler = self._spawnMethodCompiler(
+            mainMethodName,
+            initialMethodComment='## CHEETAH: main method generated for this template')
         self._setActiveMethodCompiler(methodCompiler)
         if fileName and self.setting('monitorSrcFile'):
             self._addSourceFileMonitoring(fileName)
@@ -1080,10 +1088,13 @@ class ClassCompiler(GenUtils):
         self._mainMethodName = methodName
         
     
-    def _spawnMethodCompiler(self, methodName, klass=None):
+    def _spawnMethodCompiler(self, methodName, klass=None, 
+                             initialMethodComment=None):
         if klass is None:
             klass = self.methodCompilerClass
-        methodCompiler = klass(methodName, classCompiler=self, templateObj=self._templateObj)
+        methodCompiler = klass(methodName, classCompiler=self,
+                               initialMethodComment=initialMethodComment,
+                               templateObj=self._templateObj)
         self._methodsIndex[methodName] = methodCompiler
         return methodCompiler
 
@@ -1109,19 +1120,14 @@ class ClassCompiler(GenUtils):
 
 
     def startMethodDef(self, methodName, argsList, parserComment):
-        methodCompiler = self._spawnMethodCompiler(methodName)
-        self._setActiveMethodCompiler(methodCompiler)
-        
-        ## deal with the method's argstring
+        methodCompiler = self._spawnMethodCompiler(
+            methodName, initialMethodComment=parserComment)
+        self._setActiveMethodCompiler(methodCompiler)        
         for argName, defVal in argsList:
             methodCompiler.addMethArg(argName, defVal)
-
-        methodCompiler.addMethDocString(parserComment)            
         
     def _finishedMethods(self):
         return self._finishedMethodsList
-
-
 
     def addClassDocString(self, line):
         self._classDocStringLines.append( line.replace('%','%%')) 
@@ -1165,12 +1171,15 @@ class ClassCompiler(GenUtils):
         methodName = '__errorCatcher' + str(self._errorCatcherCount)
         self._placeholderToErrorCatcherMap[rawCode] = methodName
         
-        catcherMeth = self._spawnMethodCompiler(methodName, klass=MethodCompiler)
+        catcherMeth = self._spawnMethodCompiler(
+            methodName,
+            klass=MethodCompiler,
+            initialMethodComment=('## CHEETAH: Generated from ' + rawCode +
+                                  ' at line, col ' + str(lineCol) + '.')
+            )        
         catcherMeth.setMethodSignature('def ' + methodName +
                                        '(self, localsDict={})')
                                         # is this use of localsDict right?
-        catcherMeth.addMethDocString('CHEETAH: Generated from ' + rawCode +
-                                   ' at line, col ' + str(lineCol) + '.') 
         catcherMeth.addChunk('try:')
         catcherMeth.indent()
         catcherMeth.addChunk("return eval('''" + codeChunk +
@@ -1225,8 +1234,6 @@ class ClassCompiler(GenUtils):
     __str__ = classDef
     
     def wrapClassDef(self):
-        self.addClassDocString('')
-        self.addClassDocString(self.setting('defDocStrMsg'))
         ind = self.setting('indentationStep')
         classDefChunks = (
             self.classSignature(),
@@ -1250,6 +1257,8 @@ class ClassCompiler(GenUtils):
         return "class %s(%s):" % (self.className(), self._baseClass)
         
     def classDocstring(self):
+        if not self._classDocStringLines:
+            return ''
         ind = self.setting('indentationStep')
         docStr = ('%(ind)s"""\n%(ind)s' +
                   '\n%(ind)s'.join(self._classDocStringLines) +
@@ -1768,17 +1777,13 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
 
     def wrapModuleDef(self):
-        self.addModuleDocString('')
-        self.addModuleDocString(self.setting('defDocStrMsg'))
-        self.addModuleDocString(' CHEETAH VERSION: ' + Version)
+        self.addSpecialVar('CHEETAH_docstring', self.setting('defDocStrMsg'))
         self.addSpecialVar('CHEETAH_version', Version)
-        self.addModuleDocString(' CHEETAH: Generation time: ' + self.timestamp())
         self.addSpecialVar('CHEETAH_genTime', self.timestamp())
         if self._filePath:
+            timestamp = self.timestamp(self._fileMtime)
             self.addSpecialVar('CHEETAH_src', self._filePath)
-            self.addModuleDocString('   Source file: ' + self._filePath)
-            self.addModuleDocString('   Source file last modified: ' +
-                                    self.timestamp(self._fileMtime))
+            self.addSpecialVar('CHEETAH_srcLastModified', timestamp)
             
         moduleDef = """%(header)s
 %(docstring)s
@@ -1830,6 +1835,9 @@ class ModuleCompiler(SettingsManager, GenUtils):
         return header
 
     def moduleDocstring(self):
+        if not self._moduleDocStringLines:
+            return ''
+        
         docStr = ('"""' +
                   '\n'.join(self._moduleDocStringLines) +
                   '\n"""\n'
