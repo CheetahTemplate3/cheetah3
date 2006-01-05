@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.98 2006/01/05 21:28:08 tavis_rudd Exp $
+# $Id: Parser.py,v 1.99 2006/01/05 21:53:28 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.98 $
+Version: $Revision: 1.99 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/05 21:28:08 $
+Last Revision Date: $Date: 2006/01/05 21:53:28 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.98 $"[11:-2]
+__revision__ = "$Revision: 1.99 $"[11:-2]
 
 import os
 import sys
@@ -1235,6 +1235,37 @@ class _HighLevelParser(_LowLevelParser):
                                      'repeat','unless']
 
     def _applyExpressionFilters(self, expr, exprType, rawExpr=None, startPos=None):
+        """Pipes cheetah expressions through a set of optional filter hooks.
+
+        The filters are functions which may modify the expressions or raise
+        a ForbiddenExpression exception if the expression is not allowed.  They
+        are defined in the compiler setting 'expressionFilterHooks'.
+
+        Some intended use cases:
+
+         - to implement 'restricted execution' safeguards in cases where you
+           can't trust the author of the template.
+
+         - to enforce style guidelines  
+           
+        filter call signature:  (parser, expr, exprType, rawExpr=None, startPos=None)
+         - parser is the Cheetah parser  
+         - expr is the expression to filter.  In some cases the parser will have
+           already modified it from the original source code form.  For example,
+           placeholders will have been translated into namemapper calls.  If you
+           need to work with the original source, see rawExpr.        
+         - exprType is the name of the directive, 'psp', or 'placeholder'. All
+           lowercase.  @@TR: These will eventually be replaced with a set of
+           constants.
+         - rawExpr is the original source string that Cheetah parsed.  This
+           might be None in some cases.
+         - startPos is the character position in the source string/file
+           where the parser started parsing the current expression.
+
+        @@TR: I realize this use of the term 'expression' is a bit wonky as many
+         of the 'expressions' are actually statements, but I haven't thought of
+         a better name yet.  Suggestions?
+        """
         for callback in self.setting('expressionFilterHooks'):
             expr = callback(parser=self, expr=expr,  exprType=exprType,
                             rawExpr=rawExpr, startPos=startPos)
