@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.96 2006/01/05 19:41:01 tavis_rudd Exp $
+# $Id: Parser.py,v 1.97 2006/01/05 20:47:44 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.96 $
+Version: $Revision: 1.97 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/05 19:41:01 $
+Last Revision Date: $Date: 2006/01/05 20:47:44 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.96 $"[11:-2]
+__revision__ = "$Revision: 1.97 $"[11:-2]
 
 import os
 import sys
@@ -1808,19 +1808,21 @@ class _HighLevelParser(_LowLevelParser):
         # @@TR: this needs expanding to handle (i,j) = list style assignments
         startsWithDollar = self.matchCheetahVarStart()
         startPos = self.pos()
-        #LVALUE = self.getCheetahVar(plain=True, skipStartToken=(not startsWithDollar))
-        LVALUE = self.getExpression(pyTokensToBreakAt=assignmentOps, useNameMapper=False)        
-        LVALUE = LVALUE.strip()
-        
-        self.getWhiteSpace()
+        LVALUE = self.getExpression(pyTokensToBreakAt=assignmentOps, useNameMapper=False).strip()
         OP = self.getAssignmentOperator()
         RVALUE = self.getExpression()        
-        self._applyExpressionFilters(
-            self[startPos+(startsWithDollar and 1 or 0):self.pos()],
-            'set', startPos=startPos)
+        expr = LVALUE + ' ' + OP + ' ' + RVALUE.strip()
+        
+        self._applyExpressionFilters((startsWithDollar and '$' or '')+expr,
+                                     'set', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
 
-        self._compiler.addSet(LVALUE, OP, RVALUE, style)
+        class Components: pass # used for 'set global'
+        exprComponents = Components()
+        exprComponents.LVALUE = LVALUE
+        exprComponents.OP = OP
+        exprComponents.RVALUE = RVALUE
+        self._compiler.addSet(expr, exprComponents, style)
     
     def eatSlurp(self):
         if self.isLineClearToStartToken():
