@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.95 2006/01/05 19:13:24 tavis_rudd Exp $
+# $Id: Parser.py,v 1.96 2006/01/05 19:41:01 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.95 $
+Version: $Revision: 1.96 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/05 19:13:24 $
+Last Revision Date: $Date: 2006/01/05 19:41:01 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.95 $"[11:-2]
+__revision__ = "$Revision: 1.96 $"[11:-2]
 
 import os
 import sys
@@ -30,6 +30,8 @@ import inspect
 from Cheetah.SourceReader import SourceReader
 from Cheetah import Filters
 from Cheetah import ErrorCatchers
+
+class Unspecified: pass
 
 # re tools
 def escapeRegexChars(txt,
@@ -905,13 +907,18 @@ class _LowLevelParser(SourceReader):
     def getExpressionParts(self,
                            enclosed=False, 
                            enclosures=None, # list of tuples (char, pos), where char is ({ or [ 
-                           pyTokensToBreakAt=None
+                           pyTokensToBreakAt=None,
+                           useNameMapper=Unspecified,
                            ):
 
         """ Get a Cheetah expression that includes $CheetahVars and break at
         directive end tokens, the end of an enclosure, or at a specified
         pyToken.
         """
+
+        if useNameMapper is not Unspecified:
+            useNameMapper_orig = self.setting('useNameMapper')
+            self.setSetting('useNameMapper', useNameMapper)
 
         if enclosures is None:
             enclosures = []
@@ -1001,18 +1008,23 @@ class _LowLevelParser(SourceReader):
                         if not self.atEnd() and self.peek() == '(':
                             exprBits.append(self.getCallArgString())                    
         ##
+        if useNameMapper is not Unspecified:                            
+            self.setSetting('useNameMapper', useNameMapper_orig) # @@TR: see comment above
         return exprBits
 
     def getExpression(self,
                       enclosed=False, 
                       enclosures=None, # list of tuples (char, pos), where # char is ({ or [
-                      pyTokensToBreakAt=None
+                      pyTokensToBreakAt=None,
+                      useNameMapper=Unspecified,
                       ):
         """Returns the output of self.getExpressionParts() as a concatenated
         string rather than as a list.
         """
-        return ''.join(self.getExpressionParts(enclosed=enclosed, enclosures=enclosures,
-                                               pyTokensToBreakAt=pyTokensToBreakAt))
+        return ''.join(self.getExpressionParts(
+            enclosed=enclosed, enclosures=enclosures,
+            pyTokensToBreakAt=pyTokensToBreakAt,
+            useNameMapper=useNameMapper))
 
 
     def transformToken(self, token, beforeTokenPos):
@@ -1796,8 +1808,10 @@ class _HighLevelParser(_LowLevelParser):
         # @@TR: this needs expanding to handle (i,j) = list style assignments
         startsWithDollar = self.matchCheetahVarStart()
         startPos = self.pos()
-        LVALUE = self.getCheetahVar(plain=True, skipStartToken=(not startsWithDollar))
-
+        #LVALUE = self.getCheetahVar(plain=True, skipStartToken=(not startsWithDollar))
+        LVALUE = self.getExpression(pyTokensToBreakAt=assignmentOps, useNameMapper=False)        
+        LVALUE = LVALUE.strip()
+        
         self.getWhiteSpace()
         OP = self.getAssignmentOperator()
         RVALUE = self.getExpression()        
