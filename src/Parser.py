@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.93 2006/01/05 06:45:51 tavis_rudd Exp $
+# $Id: Parser.py,v 1.94 2006/01/05 08:22:51 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.93 $
+Version: $Revision: 1.94 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/05 06:45:51 $
+Last Revision Date: $Date: 2006/01/05 08:22:51 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.93 $"[11:-2]
+__revision__ = "$Revision: 1.94 $"[11:-2]
 
 import os
 import sys
@@ -1164,6 +1164,7 @@ class _HighLevelParser(_LowLevelParser):
             'continue': self.eatContinue,
             'stop': self.eatStop,
             'return': self.eatReturn,
+            'yield': self.eatYield,
 
             # little wrappers
             'repeat': self.eatRepeat,
@@ -2033,6 +2034,10 @@ class _HighLevelParser(_LowLevelParser):
     def eatReturn(self):
         # filtered 
         self._compiler.addReturn(self.eatSimpleExprDirective())
+
+    def eatYield(self):
+        # filtered 
+        self._compiler.addYield(self.eatSimpleExprDirective())
 
     def eatRepeat(self):
         # filtered 

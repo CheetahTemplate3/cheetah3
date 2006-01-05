@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.106 2006/01/05 06:45:31 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.107 2006/01/05 08:20:40 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.106 $
+Version: $Revision: 1.107 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/05 06:45:31 $
+Last Revision Date: $Date: 2006/01/05 08:20:40 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.106 $"[11:-2]
+__revision__ = "$Revision: 1.107 $"[11:-2]
 
 import sys
 import os
@@ -260,6 +260,10 @@ class MethodCompiler(GenUtils):
         self._cacheRegionOpen = False
         self._callRegionOpen = False
         self._isErrorCatcherOn = False
+
+        self._hasReturnStatement = False
+        self._isGenerator = False
+        
         
     def cleanupState(self):
         """Called by the containing class compiler instance"""
@@ -572,7 +576,28 @@ class MethodCompiler(GenUtils):
         self.addReIndentingDirective(expr)
             
     def addReturn(self, expr):
+        assert not self._isGenerator
         self.addChunk(expr)
+        self._hasReturnStatement = True
+
+    def addYield(self, expr):
+        assert not self._hasReturnStatement
+        self._isGenerator = True
+        if expr.replace('yield','').strip():
+            self.addChunk(expr)
+        else:
+            self.addChunk('if _dummyTrans:')
+            self.indent()
+            self.addChunk('yield trans.response().getvalue()')
+            self.addChunk('trans = DummyTransaction()')
+            self.addChunk('write = trans.response().write')
+            self.dedent()
+            self.addChunk('else:')
+            self.indent()
+            self.addChunk(
+                'raise TypeError("This method cannot be called with a trans arg")')
+            self.dedent()
+            
 
     def addPass(self, expr):
         self.addChunk(expr)
@@ -876,7 +901,9 @@ class AutoMethodCompiler(MethodCompiler):
         self.addChunk("#" *40)
         self.addChunk('## END - generated method body')
         self.addChunk('')
-        self.addStop()
+
+        if not self._isGenerator:
+            self.addStop()
         self.addChunk('')
         
     def addStop(self, expr=None):

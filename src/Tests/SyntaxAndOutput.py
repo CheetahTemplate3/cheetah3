@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.68 2006/01/05 06:46:05 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.69 2006/01/05 08:20:16 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.68 $
+Version: $Revision: 1.69 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/05 06:46:05 $
+Last Revision Date: $Date: 2006/01/05 08:20:16 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.68 $"[11:-2]
+__revision__ = "$Revision: 1.69 $"[11:-2]
 
 
 ##################################################
@@ -182,7 +182,7 @@ Template output mismatch:
                     output = output.decode(outputEncoding)
                 assert output==expectedOutput, self._outputMismatchReport(output, expectedOutput)
             except:
-                #print >>sys.stderr, moduleCode
+                print >>sys.stderr, moduleCode
                 raise
         finally:
             templateObj.shutdown()
@@ -1210,6 +1210,31 @@ aoeuoaeu
 """,
                     "1\n1.5\n2\n3\n")
 
+
+class YieldDirective(OutputTest):
+    convertEOLs = False
+    def test1(self):
+        """simple #yield """
+        
+        src1 = """#for i in range(10)\n#yield i\n#end for"""
+        src2 = """#for i in range(10)\n$i#slurp\n#yield\n#end for"""
+        src3 = ("#def iterator\n"
+               "#for i in range(10)\n#yield i\n#end for\n"
+               "#end def\n"
+               "#for i in $iterator\n$i#end for"
+               )
+
+
+        for src in (src1,src2,src3):
+            klass = Template.compile(src, keepRefToGeneratedModuleCode=True)
+            print klass._generatedModuleCode
+            iter = klass().respond()
+            output = [str(i) for i in iter]
+            assert ''.join(output)=='0123456789'
+            #print ''.join(output)
+
+        # @@TR: need to expand this to cover error conditions etc.
+        
 class ForDirective(OutputTest):
 
     def test1(self):
