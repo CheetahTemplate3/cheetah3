@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.97 2006/01/05 20:47:44 tavis_rudd Exp $
+# $Id: Parser.py,v 1.98 2006/01/05 21:28:08 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.97 $
+Version: $Revision: 1.98 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/05 20:47:44 $
+Last Revision Date: $Date: 2006/01/05 21:28:08 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.97 $"[11:-2]
+__revision__ = "$Revision: 1.98 $"[11:-2]
 
 import os
 import sys
@@ -1112,7 +1112,7 @@ class _LowLevelParser(SourceReader):
             rawPlaceholder=self[startPos: self.pos()]
             exprToFilter = expr
             
-        self._applyExpressionFilters(expr,'placeholder',rawExpr=rawPlaceholder,startPos=startPos)
+        expr = self._applyExpressionFilters(expr,'placeholder',rawExpr=rawPlaceholder,startPos=startPos)
         for callback in self.setting('postparsePlaceholderHooks'):
             callback(parser=self)
 
@@ -1236,8 +1236,9 @@ class _HighLevelParser(_LowLevelParser):
 
     def _applyExpressionFilters(self, expr, exprType, rawExpr=None, startPos=None):
         for callback in self.setting('expressionFilterHooks'):
-            callback(parser=self, expr=expr,  exprType=exprType,
-                     rawExpr=rawExpr, startPos=startPos)
+            expr = callback(parser=self, expr=expr,  exprType=exprType,
+                            rawExpr=rawExpr, startPos=startPos)
+        return expr
 
     def _filterDisabledDirectives(self, directiveKey):
         directiveKey = directiveKey.lower()
@@ -1342,7 +1343,7 @@ class _HighLevelParser(_LowLevelParser):
                     break
             self.advance()
         pspString = self.readTo(self.pos(), start=startPos).strip()
-        self._applyExpressionFilters(pspString, 'psp', startPos=startPos)
+        pspString = self._applyExpressionFilters(pspString, 'psp', startPos=startPos)
         self._compiler.addPSP(pspString)
         self.getPSPEndToken()
 
@@ -1433,7 +1434,7 @@ class _HighLevelParser(_LowLevelParser):
         startPos = self.pos()
         expr = self.getExpression().strip()
         directiveKey = expr.split()[0]
-        self._applyExpressionFilters(expr, directiveKey, startPos=startPos)
+        expr = self._applyExpressionFilters(expr, directiveKey, startPos=startPos)
         if directiveKey in self._indentingDirectives:
             self.pushToIndentStack(directiveKey)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
@@ -1451,7 +1452,7 @@ class _HighLevelParser(_LowLevelParser):
         self.getWhiteSpace()
         startPos = self.pos()
         shBang = self.readToEOL()
-        self._applyExpressionFilters(shBang, 'shbang', startPos=startPos)
+        shBang = self._applyExpressionFilters(shBang, 'shbang', startPos=startPos)
         self._compiler.setShBang(shBang.strip())
 
     def eatEncoding(self):
@@ -1461,7 +1462,7 @@ class _HighLevelParser(_LowLevelParser):
         self.getWhiteSpace()
         startPos = self.pos()
         encoding = self.readToEOL()
-        self._applyExpressionFilters(encoding, 'encoding', startPos=startPos)               
+        encoding = self._applyExpressionFilters(encoding, 'encoding', startPos=startPos)               
         self._compiler.setModuleEncoding(encoding.strip())
         
     def eatCompiler(self):
@@ -1491,6 +1492,9 @@ class _HighLevelParser(_LowLevelParser):
         valueExpr = self.getExpression()
         endPos = self.pos()
 
+        # @@TR: it's unlikely that anyone apply filters would have left this
+        # directive enabled:
+        # @@TR: fix up filtering, regardless
         self._applyExpressionFilters('%s=%r'%(settingName, valueExpr),
                                      'compiler', startPos=startPos)
         
@@ -1529,7 +1533,8 @@ class _HighLevelParser(_LowLevelParser):
             return 
         startPos = self.pos()
         settingsStr = self._eatToThisEndDirective('compiler-settings')            
-        self._applyExpressionFilters(settingsStr, 'compilerSettings', startPos=startPos)
+        settingsStr = self._applyExpressionFilters(settingsStr, 'compilerSettings', 
+                                                   startPos=startPos)
         try:
             self._compiler.setCompilerSettings(keywords=keywords, settingsStr=settingsStr)
         except:
@@ -1557,7 +1562,7 @@ class _HighLevelParser(_LowLevelParser):
         self.getWhiteSpace()
         self.getAssignmentOperator()
         expr = self.getExpression()
-        self._applyExpressionFilters(expr, 'attr', startPos=startPos)
+        expr = self._applyExpressionFilters(expr, 'attr', startPos=startPos)
         self._compiler.addAttribute(attribName, expr)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
 
@@ -1604,6 +1609,7 @@ class _HighLevelParser(_LowLevelParser):
                 startMarker = self.setting('blockMarkerStart')
                 self._compiler.addStrConst(startMarker[0] + methodName + startMarker[1])
 
+        # @@TR: fix up filtering
         self._applyExpressionFilters(self[startPos:self.pos()], 'def', startPos=startPos)
 
         if (self.peek()==':'
@@ -1724,7 +1730,7 @@ class _HighLevelParser(_LowLevelParser):
         self.getDirectiveStartToken()
         startPos = self.pos()
         impStatement = self.getExpression()
-        self._applyExpressionFilters(impStatement, 'import', startPos=startPos)
+        impStatement = self._applyExpressionFilters(impStatement, 'import', startPos=startPos)
         self._compiler.addImportStatement(impStatement)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
     
@@ -1741,7 +1747,7 @@ class _HighLevelParser(_LowLevelParser):
         else:
             baseName = self.getDottedName()
                        
-        self._applyExpressionFilters(baseName, 'extends', startPos=startPos)
+        baseName = self._applyExpressionFilters(baseName, 'extends', startPos=startPos)
         self._compiler.setBaseClass(baseName) # in compiler
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
             
@@ -1754,7 +1760,7 @@ class _HighLevelParser(_LowLevelParser):
         self.getWhiteSpace()
         startPos = self.pos()
         methodName = self.getIdentifier()
-        self._applyExpressionFilters(methodName, 'implements', startPos=startPos)
+        methodName = self._applyExpressionFilters(methodName, 'implements', startPos=startPos)
         self._compiler.setMainMethodName(methodName)
         self.getExpression()  # throw away and unwanted crap that got added in
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
@@ -1768,7 +1774,7 @@ class _HighLevelParser(_LowLevelParser):
         self.getWhiteSpace()
         startPos = self.pos()
         expr = self.getExpression()
-        self._applyExpressionFilters(expr, 'silent', startPos=startPos)        
+        expr = self._applyExpressionFilters(expr, 'silent', startPos=startPos)        
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self._compiler.addSilent(expr)
 
@@ -1781,7 +1787,7 @@ class _HighLevelParser(_LowLevelParser):
         self.getWhiteSpace()
         startPos = self.pos()
         expr = self.getExpression()
-        self._applyExpressionFilters(expr, 'echo', startPos=startPos)        
+        exp = self._applyExpressionFilters(expr, 'echo', startPos=startPos)        
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self._compiler.addEcho(expr, rawExpr=expr)
 
@@ -1813,8 +1819,7 @@ class _HighLevelParser(_LowLevelParser):
         RVALUE = self.getExpression()        
         expr = LVALUE + ' ' + OP + ' ' + RVALUE.strip()
         
-        self._applyExpressionFilters((startsWithDollar and '$' or '')+expr,
-                                     'set', startPos=startPos)
+        expr = self._applyExpressionFilters(expr, 'set', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
 
         class Components: pass # used for 'set global'
@@ -1869,7 +1874,7 @@ class _HighLevelParser(_LowLevelParser):
             self.advance()
         startPos = self.pos()
         sourceExpr = self.getExpression()
-        self._applyExpressionFilters(sourceExpr, 'include', startPos=startPos)        
+        sourceExpr = self._applyExpressionFilters(sourceExpr, 'include', startPos=startPos)        
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self._compiler.addInclude(sourceExpr, includeFrom, isRaw)
 
@@ -1881,7 +1886,7 @@ class _HighLevelParser(_LowLevelParser):
         self.advance(len('cache'))
         startPos = self.pos()
         argList = self.getDefArgList(useNameMapper=True)
-        self._applyExpressionFilters(argList, 'cache', startPos=startPos)
+        argList = self._applyExpressionFilters(argList, 'cache', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         cacheInfo = self._compiler.genCacheInfoFromArgList(argList)
         self._compiler.startCacheRegion(cacheInfo, lineCol)
@@ -1905,7 +1910,8 @@ class _HighLevelParser(_LowLevelParser):
         args = self.getExpression().strip()
         
         self.setSetting('useAutocalling', useAutocallingOrig)
-        
+
+        # @@TR: fix up filtering
         self._applyExpressionFilters(self[startPos:self.pos()], 'call', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)        
         self._compiler.startCallRegion(functionName, args, lineCol)
@@ -1921,7 +1927,7 @@ class _HighLevelParser(_LowLevelParser):
         self.getWhiteSpace()
         argName = self.getIdentifier()
         self.getWhiteSpace()
-        self._applyExpressionFilters(argName, 'arg', startPos=startPos)
+        argName = self._applyExpressionFilters(argName, 'arg', startPos=startPos)
         self._compiler.setCallArg(argName, lineCol)
         if self.peek() == ':':
             self.getc()
@@ -1943,7 +1949,7 @@ class _HighLevelParser(_LowLevelParser):
             isKlass = False
             theFilter = self.getIdentifier()
             self.getWhiteSpace()
-        self._applyExpressionFilters(theFilter, 'filter', startPos=startPos)
+        theFilter = self._applyExpressionFilters(theFilter, 'filter', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self._compiler.setFilter(theFilter, isKlass)
         
@@ -1955,7 +1961,8 @@ class _HighLevelParser(_LowLevelParser):
         self.getWhiteSpace()
         startPos = self.pos()
         errorCatcherName = self.getIdentifier()
-        self._applyExpressionFilters(errorCatcherName, 'errorcatcher', startPos=startPos)
+        errorCatcherName = self._applyExpressionFilters(
+            errorCatcherName, 'errorcatcher', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)        
         self._compiler.setErrorCatcher(errorCatcherName)
         
@@ -1970,7 +1977,7 @@ class _HighLevelParser(_LowLevelParser):
         self.getDirectiveStartToken()
         startPos = self.pos()
         expr = self.getExpression()
-        self._applyExpressionFilters(expr, 'for', startPos=startPos)        
+        expr = self._applyExpressionFilters(expr, 'for', startPos=startPos)        
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self.pushToIndentStack("for")
         self._compiler.addFor(expr)
@@ -1987,7 +1994,7 @@ class _HighLevelParser(_LowLevelParser):
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
 
         expr = ''.join(expressionParts).strip()
-        self._applyExpressionFilters(expr, 'if', startPos=startPos)
+        expr = self._applyExpressionFilters(expr, 'if', startPos=startPos)
 
         isTerniaryExpr = ('then' in expressionParts and 'else' in expressionParts)
         if isTerniaryExpr:
@@ -2072,7 +2079,7 @@ class _HighLevelParser(_LowLevelParser):
         self.advance(len('repeat'))
         startPos = self.pos()
         expr = self.getExpression()
-        self._applyExpressionFilters(expr, 'repeat', startPos=startPos)
+        expr = self._applyExpressionFilters(expr, 'repeat', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self.pushToIndentStack("repeat")
         self._compiler.addRepeat(expr)
@@ -2086,7 +2093,7 @@ class _HighLevelParser(_LowLevelParser):
         self.advance(len('unless'))
         startPos = self.pos()
         expr = self.getExpression()
-        self._applyExpressionFilters(expr, 'unless', startPos=startPos)
+        expr = self._applyExpressionFilters(expr, 'unless', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self.pushToIndentStack("unless")
         self._compiler.addUnless(expr)
