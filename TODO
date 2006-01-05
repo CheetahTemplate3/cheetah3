@@ -35,16 +35,6 @@ TODO Items (many are just ideas. This is not an official roadmap!)
   * If an input file ends in a dot, intelligently add the input extension if
     not found.
 
-- ##null: throw this comment away, do not place it in the compiled template
-  module in any manner.  Useful for obsolete text, unfinished text, or notes
-  to yourself.  Do for single- and multi-line comments.
-
-- Split out the code needed to run the generated
-  python into a base class of Template, and derive the compiled Python class
-  from that?  This would allow precompiled templates to be loaded much more
-  quickly. @@TR: I've done some of the refactoring neccessary to support this as
-  part of the 0.9.16 release.
-
 - A further 'nice to have' optimisation would be to be able to specify at
   compile time that you are not using filters, Webware transactions etc, and not
   generate code that uses them.  This would remove the need to import
@@ -69,12 +59,6 @@ TODO Items (many are just ideas. This is not an official roadmap!)
 - create a better error message for invalid syntax when a $var inside a 
   directive is enclosed in ${} or $(). E.g.:
      #include raw source=${x}
-   
-- Delete whitespace before a comment on the same line.  The methods are
-  Parser.eatComment() and Parser.eatMultiLineComment().  It's already
-  working if the line contains 'STUFF#slurp   ## comment'.  Need to make
-  it work for 'STUFF    ## comment' (but retain the EOL newline).  
-  @@TR: is this really needed?  It seems a bit 'magic' to me.
 
 - 'errorCatcher None' to stop catching errors in the middle of a template.
 
@@ -293,47 +277,3 @@ Examples
   a database.
 - Pickled templates?
 
-
-CheetahX: pie-in-the-sky (notes from Mike Orr)
-========================================================================
-These ideas are being considered for Cheetah 2.0.
-
-- There are five distinct objects in Cheetah which should have a clearer
-  separation.
-
-  1. TEMPLATE DEFINITION:  a string.
-  2. TEMPLATE METHOD:  the method that implements the desired template
-       (which may be the Main Method or a #def/#block method).  This is
-       inside the generated class, which is inside the generated module.
-  3. DATA:  the searchList, local variables, current filter, etc.   Everything
-       that changes at runtime.
-  4. INFRASTRUCTURE:  the internal code used by Cheetah to fill and maintain the
-       template.
-  5. SERVICES:  convenience methods from the infrastructure exposed to user.
-
-  Cheetah combines 2-5 into a single Template subclass.  CheetahX proposes to
-  keep these distinct, with defined containment and interfaces between them.
-
-- The TEMPLATE METHOD might instantiate an INFRASTRUCTURE object for each
-  fill.  The constructor arguments would be everything necessary to access
-  the DATA.  Perhaps the TEMPLATE METHOD can pass its own code block, making
-  its own locals/globals accessible directly.  This would be a bit 
-  unorthodox, but less so than the current practice of switching the
-  template instance's class on the fly.
-
-- For SERVICES, add a custom object to the searchList that knows how to
-  access the protected INFRASTRUCTURE data.
-
-- Push more work into INFRASTRUCTURE, to insulate the TEMPLATE METHOD from
-  implementation changes.  For instance, replace every placeholder lookup
-  with a simple INFRASTRUCTURE method call, and let the infrastructure
-  do all the processing.  (It can use the code block mentioned above to
-  access the searchList and current filter.)  For local variable
-  lookups, you can call another method and pass the value directly.
-  For caching, I guess you pass in the cache time (or a special constant)
-  as a separate argument, and let the INFRASTRUCTURE maintain the cache.
-
-- The Template class needs to be split up into stuff nececssary to fill
-  a template (the INFRASTRUCTURE), and stuff necessary to comple a template
-  (which is not necessary for using precompiled templates, and slows down
-  Cheetah's import time).
