@@ -38,7 +38,7 @@ release
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]
     - added #yield statement
-    - added ability to create nested scopes/functions via nested #def statements
+   - added ability to create nested scopes/functions via nested #def statements
     - added new #call directive and related #arg directive, per Ian Bicking's
       suggestion.        
     - added new expression syntax c"text $placeholder text"
@@ -85,7 +85,7 @@ release
     - improved error message for unclosed directives, per Mike Orr's suggestion.  
     - added optional support for passing the trans arg to methods via **KWS rather
       than trans=None.  See the discussion on the mailing list Jan 4th (JJ's post) for
-      details.  The purpose is to avoid an positional argument clash that
+      details.  The purpose is to avoid a positional argument clash that
       apparently is very confusing for beginners.
 
         Note that any existing client code that passing the trans arg in
