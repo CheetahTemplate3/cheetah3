@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.91 2006/01/04 18:31:32 tavis_rudd Exp $
+# $Id: Parser.py,v 1.92 2006/01/05 01:26:49 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.91 $
+Version: $Revision: 1.92 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/04 18:31:32 $
+Last Revision Date: $Date: 2006/01/05 01:26:49 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.91 $"[11:-2]
+__revision__ = "$Revision: 1.92 $"[11:-2]
 
 import os
 import sys
@@ -51,7 +51,6 @@ def maybe(*choices): return apply(group, choices) + '?'
 NO_CACHE = 0
 STATIC_CACHE = 1
 REFRESH_CACHE = 2
-COMPILE_TIME_CACHE = 3
 
 ##################################################
 ## Tokens for the parser ##
@@ -305,9 +304,6 @@ class _LowLevelParser(SourceReader):
     
         cacheToken = (r'(?:' +
                       r'(?P<REFRESH_CACHE>\*' + interval + '\*)'+
-                      '|' +
-                      r'(?P<COMPILE_TIME_CACHE>\*\*)' +# @@TR: hack that might
-                                        # be removed
                       '|' +
                       r'(?P<STATIC_CACHE>\*)' +
                       '|' +                      
