@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.66 2006/01/04 18:33:23 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.67 2006/01/05 01:26:22 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.66 $
+Version: $Revision: 1.67 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/04 18:33:23 $
+Last Revision Date: $Date: 2006/01/05 01:26:22 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.66 $"[11:-2]
+__revision__ = "$Revision: 1.67 $"[11:-2]
 
 
 ##################################################
@@ -182,7 +182,7 @@ Template output mismatch:
                     output = output.decode(outputEncoding)
                 assert output==expectedOutput, self._outputMismatchReport(output, expectedOutput)
             except:
-                #print moduleCode
+                #print >>sys.stderr, moduleCode
                 raise
         finally:
             templateObj.shutdown()
@@ -1197,7 +1197,7 @@ aoeuoaeu
     def test3(self):
         """#return'ing an string AND streaming other output via the transaction"""
         self.verify("""1
-$str($test(trans)[1])
+$str($test(trans=trans)[1])
 3
 #def test
 1.5
