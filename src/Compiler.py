@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.105 2006/01/05 01:28:05 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.106 2006/01/05 06:45:31 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.105 $
+Version: $Revision: 1.106 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/05 01:28:05 $
+Last Revision Date: $Date: 2006/01/05 06:45:31 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.105 $"[11:-2]
+__revision__ = "$Revision: 1.106 $"[11:-2]
 
 import sys
 import os
@@ -31,7 +31,9 @@ import warnings
 from Cheetah.Version import Version
 from Cheetah.SettingsManager import SettingsManager
 from Cheetah.Parser import (
-    Parser, ParseError, specialVarRE, STATIC_CACHE, REFRESH_CACHE)
+    Parser, ParseError, specialVarRE,
+    STATIC_CACHE, REFRESH_CACHE,
+    SET_LOCAL, SET_GLOBAL,SET_MODULE)
 from Cheetah.Utils.Indenter import indentize # an undocumented preprocessor
 from Cheetah import ErrorCatchers
 from Cheetah import NameMapper
@@ -238,6 +240,7 @@ class MethodCompiler(GenUtils):
     def __init__(self, methodName, classCompiler, templateObj=None):
         self._settingsManager = classCompiler
         self._classCompiler = classCompiler
+        self._moduleCompiler = classCompiler._moduleCompiler
         self._templateObj = templateObj
         self._methodName = methodName
         self._setupState()
@@ -457,7 +460,7 @@ class MethodCompiler(GenUtils):
     def addEcho(self, expr, rawExpr=None):
         self.addFilteredChunk(expr, rawExpr=rawExpr)
         
-    def addSet(self, LVALUE, OP, RVALUE, isGlobal=True):
+    def addSet(self, LVALUE, OP, RVALUE, setStyle):
         ## we need to split the LVALUE to deal with globalSetVars
         splitPos1 = LVALUE.find('.')
         splitPos2 = LVALUE.find('[')
@@ -475,11 +478,18 @@ class MethodCompiler(GenUtils):
             primary = LVALUE
             secondary = ''
 
-        if isGlobal:
+        if setStyle is SET_GLOBAL:
             LVALUE = 'self._CHEETAH_globalSetVars["' + primary + '"]' + secondary            
         else:
             pass
-        self.addChunk( LVALUE + ' ' + OP + ' ' + RVALUE.strip() )
+        expr = LVALUE + ' ' + OP + ' ' + RVALUE.strip()
+        if setStyle is SET_MODULE:
+            #self._moduleCompiler.addModuleHeader(expr)
+            self._moduleCompiler.addModuleGlobal(expr)
+            #self._moduleCompiler.addSpecialVar(
+            #    LVALUE, RVALUE.strip(), includeUnderscores=False)
+        else:
+            self.addChunk(expr)
 
     def addInclude(self, sourceExpr, includeFrom, isRaw):
         # @@TR: consider soft-coding this
@@ -911,6 +921,7 @@ class ClassCompiler(GenUtils):
     methodCompilerClassForInit = MethodCompiler
         
     def __init__(self, className, mainMethodName='respond',
+                 moduleCompiler=None,
                  templateObj=None,
                  fileName=None,
                  settingsManager=None):
@@ -918,6 +929,7 @@ class ClassCompiler(GenUtils):
         self._settingsManager = settingsManager
         self._fileName = fileName
         self._className = className
+        self._moduleCompiler = moduleCompiler
         self._mainMethodName = mainMethodName
         self._templateObj = templateObj
         self._setupState()
@@ -1470,6 +1482,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         if klass is None:
             klass = self.classCompilerClass
         classCompiler = klass(className,
+                              moduleCompiler=self,
                               mainMethodName=self.setting('mainMethodName'),
                               templateObj=self._templateObj,
                               fileName=self._filePath,
@@ -1613,13 +1626,42 @@ class ModuleCompiler(SettingsManager, GenUtils):
         return self._moduleEncoding
 
     def addModuleHeader(self, line):
+        """Adds a header comment to the top of the generated module.
+        """
         self._moduleHeaderLines.append(line)
         
     def addModuleDocString(self, line):        
+        """Adds a line to the generated module docstring.
+        """
         self._moduleDocStringLines.append(line)
 
-    def addSpecialVar(self, basename, contents):
-        self._specialVars['__' + basename + '__'] = contents.strip()
+    def addModuleGlobal(self, line):
+        """Adds a line of global module code.  It is inserted after the import
+        statements and Cheetah default module constants.
+        """
+        self._moduleConstants.append(line)
+        if self._templateObj:
+            mod = self._execInDummyModule(line)
+
+    def addSpecialVar(self, basename, contents, includeUnderscores=True):
+        """Adds module __specialConstant__ to the module globals.
+        """
+        name = includeUnderscores and '__'+basename+'__' or basename
+        self._specialVars[name] = contents.strip()
+
+    def _getDummyModuleForDynamicCompileHack(self):
+        mod = self._templateObj._getDummyModuleForDynamicCompileHack()
+        if mod not in self._templateObj._CHEETAH_searchList:
+            # @@TR 2005-01-15: testing this approach to support
+            # 'from foo import *'
+            self._templateObj._CHEETAH_searchList.append(mod)
+        return mod
+
+    def _execInDummyModule(self, code):
+        mod = self._getDummyModuleForDynamicCompileHack()        
+        co = compile(code+'\n', mod.__file__, 'exec')
+        exec co in mod.__dict__
+        return mod
 
     def addImportStatement(self, impStatement):
         self._importStatements.append(impStatement)
@@ -1631,22 +1673,13 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self.addImportedVarNames(importVarNames) #used by #extend for auto-imports
         
         if self._templateObj:
-            import Template as TemplateMod
-            mod = self._templateObj._importAsDummyModule(impStatement)
-
-            # @@TR 2005-01-15: testing this approach to support
-            # 'from foo import *'
-            self._templateObj._CHEETAH_searchList.append(mod)
-
+            mod = self._execInDummyModule(impStatement)
             # @@TR: old buggy approach is still needed for now
+            import Template as TemplateMod
             for varName in importVarNames: 
                 if varName == '*': continue
                 val = getattr(mod, varName.split('.')[0])
                 setattr(TemplateMod, varName, val)
-
-    def addGlobalCodeChunk(self, codeChunk):
-        self._globalCodeChunks.append(codeChunk)
-
 
     def addAttribute(self, attribName, expr):
         self._getActiveClassCompiler().addAttribute(attribName + ' =' + expr)
@@ -1661,6 +1694,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
         
         specialVarMatch = specialVarRE.match(comm)
         if specialVarMatch:
+            # @@TR: this is a bit hackish and is being replaced with
+            # #set module varName = ...
             return self.addSpecialVar(specialVarMatch.group(1),
                                       comm[specialVarMatch.end():])
         elif comm.startswith('doc:'):
@@ -1712,17 +1747,15 @@ class ModuleCompiler(SettingsManager, GenUtils):
             
         moduleDef = """%(header)s
 %(docstring)s
-%(specialVars)s
 
 ##################################################
 ## DEPENDENCIES
-
 %(imports)s
 
 ##################################################
 ## MODULE CONSTANTS
-
 %(constants)s
+%(specialVars)s
 
 ##################################################
 ## CLASSES

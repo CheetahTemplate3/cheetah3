@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.92 2006/01/05 01:26:49 tavis_rudd Exp $
+# $Id: Parser.py,v 1.93 2006/01/05 06:45:51 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.92 $
+Version: $Revision: 1.93 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/05 01:26:49 $
+Last Revision Date: $Date: 2006/01/05 06:45:51 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.92 $"[11:-2]
+__revision__ = "$Revision: 1.93 $"[11:-2]
 
 import os
 import sys
@@ -51,6 +51,10 @@ def maybe(*choices): return apply(group, choices) + '?'
 NO_CACHE = 0
 STATIC_CACHE = 1
 REFRESH_CACHE = 2
+
+SET_LOCAL = 0
+SET_GLOBAL = 1
+SET_MODULE = 2
 
 ##################################################
 ## Tokens for the parser ##
@@ -1768,16 +1772,18 @@ class _HighLevelParser(_LowLevelParser):
         self.getDirectiveStartToken()
         self.advance(3)
         self.getWhiteSpace()
+        style = SET_LOCAL
         if self.startswith('local'):
             self.getIdentifier()
             self.getWhiteSpace()
-            isGlobal = False
         elif self.startswith('global'):
             self.getIdentifier()
             self.getWhiteSpace()
-            isGlobal = True
-        else:
-            isGlobal = False
+            style = SET_GLOBAL
+        elif self.startswith('module'):
+            self.getIdentifier()
+            self.getWhiteSpace()
+            style = SET_MODULE
 
         startsWithDollar = self.matchCheetahVarStart()
         startPos = self.pos()
@@ -1789,7 +1795,8 @@ class _HighLevelParser(_LowLevelParser):
             self[startPos+(startsWithDollar and 1 or 0):self.pos()],
             'set', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
-        self._compiler.addSet(LVALUE, OP, RVALUE, isGlobal)
+
+        self._compiler.addSet(LVALUE, OP, RVALUE, style)
     
     def eatSlurp(self):
         if self.isLineClearToStartToken():
