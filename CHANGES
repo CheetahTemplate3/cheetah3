@@ -2,11 +2,91 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0b3 (Jan 5, 2005)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+  Core Changes: [TR]
+    - added #yield statement
+    - added ability to create nested scopes/functions via nested #def statements
+    - added new #call directive and related #arg directive, per Ian Bicking's
+      suggestion.        
+    - added new expression syntax c"text $placeholder text"
+        
+        for those basic function calling cases where you just need to pass in a
+        small bit of cheetah output as an argument:
+        
+        c'a string with $placeholders', 
+        c'''a string with $placeholders''', 
+        c"a string with $placeholders", 
+        c"""a string with $placeholders"""
+        
+        - They can't contain #directives, but accept any valid $placeholder syntax 
+        except caching placeholders. Caching placeholders don't make any sense in 
+        this context.
+        - They can be used *any* place where a python expression is expected.
+        - They can be nested to any depth.
+        
+        $func(c'<li>$var1-$var2</li>')
+        $func(c'<li>$var1-$var2</li>', doSomething=True)
+        $func(content=c'<li>$var1-$var2</li>', doSomething=True)
+        $func(lambda x,y: c'<li>$x-$y</li>')
+        $func(callback=lambda x,y: c'<li>$x-$y</li>')
+        $func(lambda x,y: c'<li>$x-$y-$varInSearchList</li>')
+        $func(c'<li>$var1-$var2-$(var3*10)-$(94.3*58)</li>')
+        $func(c'<li>$var1-$var2-$func2(c"a nested expr $var99")</li>')
+        #if $cond then c'<li>$var1-$var2</li>' else c'<p>$var1-$var2</p>'
+        #def foo(arg1=c'$var1<span class="foo">$var2</span>'):  blah $arg1 blah
+        $foo(c'$var1<i>$var2</i>')
+
+    - added preprocessor hooks to Template.compile()
+      can be used for partial completion or 'compile-time-caching'
+      ... more details and examples coming.  It's very useful, but takes a bit
+      of explaining.
+    - added '#set module varName = expr' for adding module globals. JJ's suggestion
+    - improved generated docstring notes about cached vars
+    - fixed silly bug related to """ in docstring comments and statements like
+      this '#def foo: $str("""foo""")'.  Reported by JJ.
+    - changed the handling of single-line defs so that 
+      '#def xxx:<just whitespace>\n' will be treated as a multi-line #def.  
+      The same applies to #block.  There's a compiler setting to turn this off
+      if you really need empty single-line #def:'s.
+      JJ reported that this was causing great confusion with beginners.
+    - improved error message for unclosed directives, per Mike Orr's suggestion.  
+    - added optional support for passing the trans arg to methods via **KWS rather
+      than trans=None.  See the discussion on the mailing list Jan 4th (JJ's post) for
+      details.  The purpose is to avoid an positional argument clash that
+      apparently is very confusing for beginners.
+
+        Note that any existing client code that passing the trans arg in
+        positionally rather than as a keyword will break as a result.  WebKit
+        does this with the .respond method so I've kept the old style there.
+        You can also turn this new behaviour off by either manually including
+        the trans arg in your method signature (see the example below) or by
+        using the compiler setting 'useKWsDictArgForPassingTrans'=False.
+        
+        #def manualOverride(arg1, trans=None)
+          foo $arg1
+        #end def
+
+  ImportHooks: 
+    - made the ImportHook more robust against compilation errors during import [TR]
+
+  Install scripts: [TR]
+    - added optional support for pje's setuptools 
+    - added cheeseshop classifiers 
+    - removed out of date install instructions in __init__.py
+
+  Servlet Base Class For Webkit: [TR]
+    - disabled assignment of self.application (was a webware hack)   
+
+  Unit Tests: [TR]
+    - unit tests for most of the new syntax elements
+    - tidied up some old tests
+    - misc refactoring
+
 2.0b2 (Dec 30, 2005)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
 
   Core Changes: 
-
     - In previous versions of Cheetah tracebacks from exceptions that were raised
       inside dynamically compiled Cheetah templates were opaque because
       Python didn't have access to a python source file to use in the traceback:
