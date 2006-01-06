@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.75 2006/01/06 00:13:29 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.76 2006/01/06 00:36:44 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.75 $
+Version: $Revision: 1.76 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/06 00:13:29 $
+Last Revision Date: $Date: 2006/01/06 00:36:44 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.75 $"[11:-2]
+__revision__ = "$Revision: 1.76 $"[11:-2]
 
 
 ##################################################
@@ -1023,7 +1023,7 @@ $arg1.upper() - $arg2.lower() - $arg3#slurp
         "1235 FOO - upper - 999")
         
     def test8(self):
-        r"""#call with python kwargs and #args, and using a function to get the
+        """#call with python kwargs and #args, and using a function to get the
         function that will be called"""
         self.verify('''\
 #def meth(arg1, arg2, arg3)
@@ -1033,6 +1033,21 @@ $arg1.upper() - $arg2.lower() - $arg3#slurp
 #arg arg1:$(1234+1) foo#slurp
 #end call''',
         "1235 FOO - upper - 999")
+
+
+    def test9(self):
+        """nested #call directives"""
+        self.verify('''\
+#def meth(arg1)
+$arg1#slurp
+#end def
+#call self.meth
+1#slurp
+#call self.meth
+2#slurp
+#end call
+#end call''',
+        "12")
 
 
 class SlurpDirective(OutputTest):
