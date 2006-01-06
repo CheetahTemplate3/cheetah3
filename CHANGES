@@ -5,7 +5,8 @@ release
 2.0b4 (Jan 6, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]
-    - fixed up parsing of target lists in for loops
+    - fixed up parsing of target lists in for loops. This was previously limited 
+      to fairly simple target lists.
       #for ($i, $j) in [('aa','bb'),('cc','dd')]
         $i.upper,$j.upper
       #end for"
@@ -16,7 +17,8 @@ release
         $j.upper,$k.upper
       #end for"
 
-    - improved handling of target lists in #set directive
+    - improved handling of target lists in #set directive. This was previously 
+      limited to fairly simple target lists.
       #set i,j = [1,2] ... #set $i,$j = [1,2]
       #set (i,j) = [1,2] ... #set ($i,$j) = [1,2]
       #set i, (j,k) = [1,(2,3)] ... #set $i, ($j,$k) = [1,(2,3)]
