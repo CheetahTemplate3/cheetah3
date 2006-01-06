@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.102 2006/01/06 01:00:50 tavis_rudd Exp $
+# $Id: Parser.py,v 1.103 2006/01/06 01:11:55 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.102 $
+Version: $Revision: 1.103 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/06 01:00:50 $
+Last Revision Date: $Date: 2006/01/06 01:11:55 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.102 $"[11:-2]
+__revision__ = "$Revision: 1.103 $"[11:-2]
 
 import os
 import sys
@@ -1045,7 +1045,7 @@ class _LowLevelParser(SourceReader):
             outputExprs = []
             strConst = ''
             while self.pos() < (endPos-startPosIdx):
-                if self.matchExpressionPlaceholderStart():
+                if self.matchCheetahVarStart() or self.matchExpressionPlaceholderStart():
                     if strConst:
                         outputExprs.append(repr(strConst))
                         strConst = ''
