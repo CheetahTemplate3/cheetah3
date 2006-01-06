@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.111 2006/01/06 00:10:37 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.112 2006/01/06 00:37:49 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.111 $
+Version: $Revision: 1.112 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/06 00:10:37 $
+Last Revision Date: $Date: 2006/01/06 00:37:49 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.111 $"[11:-2]
+__revision__ = "$Revision: 1.112 $"[11:-2]
 
 import sys
 import os
@@ -262,7 +262,6 @@ class MethodCompiler(GenUtils):
 
         self._cacheRegionOpen = False
         self._cacheRegionsStack = []
-        self._callRegionOpen = False
         self._callRegionsStack = []
 
         self._isErrorCatcherOn = False
@@ -707,13 +706,13 @@ class MethodCompiler(GenUtils):
             
         self.addChunk('if _RECACHE%(ID)s or not _cache%(ID)s.getData():'%locals())
         self.indent()
-        self.addChunk('orig_trans%(ID)s = trans'%locals())
+        self.addChunk('_orig_trans%(ID)s = trans'%locals())
         self.addChunk('trans = _cacheCollector%(ID)s = DummyTransaction()'%locals())
         self.addChunk('write = _cacheCollector%(ID)s.response().write'%locals())
         
     def endCacheRegion(self):
         ID = self._cacheRegionsStack.pop()
-        self.addChunk('trans = orig_trans%(ID)s'%locals())
+        self.addChunk('trans = _orig_trans%(ID)s'%locals())
         self.addChunk('write = trans.response().write')
         self.addChunk(
             '_cache%(ID)s.setData(_cacheCollector%(ID)s.response().getvalue())'%locals())
@@ -729,58 +728,65 @@ class MethodCompiler(GenUtils):
         return self.nextCacheID()
 
     def startCallRegion(self, functionName, args, lineCol):
-        assert not self._callRegionOpen
-        self._callRegionOpen = True    # attrib of current methodCompiler
-        self._currentCallSignature = (functionName, args, lineCol)
-        self._currentCallUsesKeywordArgs = False
+        class CallDetails: pass
+        callDetails = CallDetails()
+        callDetails.ID = ID = self.nextCallRegionID()
+        callDetails.functionName = functionName
+        callDetails.args = args
+        callDetails.lineCol = lineCol
+        callDetails.usesKeywordArgs = False
+        self._callRegionsStack.append((ID, callDetails)) # attrib of current methodCompiler
+
         self.addChunk('## START CALL REGION: '+functionName
                       +' at line, col ' + str(lineCol) + ' in the source.')
-        self.addChunk('__orig_trans = trans')
-        self.addChunk('trans = __callCollector = DummyTransaction()')
-        self.addChunk('write = __callCollector.response().write')
+        self.addChunk('_orig_trans%(ID)s = trans'%locals())
+        self.addChunk('trans = _callCollector%(ID)s = DummyTransaction()'%locals())
+        self.addChunk('write = _callCollector%(ID)s.response().write'%locals())
 
     def setCallArg(self, argName, lineCol):
-        assert self._callRegionOpen
-        if self._currentCallUsesKeywordArgs:
+        ID, callDetails = self._callRegionsStack[-1]
+        if callDetails.usesKeywordArgs:
             self._endCallArg()
         else:
-            self._currentCallUsesKeywordArgs = True
-            self.addChunk('__callKws = {}')
-            self.addChunk('__currentCallArgname = %r'%argName)
-        self._currentCallArgname = argName
+            callDetails.usesKeywordArgs = True
+            self.addChunk('_callKws%(ID)s = {}'%locals())
+            self.addChunk('_currentCallArgname%(ID)s = %(argName)r'%locals())
+        callDetails.currentArgname = argName
         
     def _endCallArg(self):
-        self.addChunk(
-            '__callKws[%r] = __callCollector.response().getvalue()'%
-            self._currentCallArgname)
-        self.addChunk('del __callCollector')
-        self.addChunk('trans = __callCollector = DummyTransaction()')
-        self.addChunk('write = __callCollector.response().write')
+        ID, callDetails = self._callRegionsStack[-1]
+        currCallArg = callDetails.currentArgname
+        self.addChunk(('_callKws%(ID)s[%(currCallArg)r] ='
+                       ' _callCollector%(ID)s.response().getvalue()')%locals())
+        self.addChunk('del _callCollector%(ID)s'%locals())
+        self.addChunk('trans = _callCollector%(ID)s = DummyTransaction()'%locals())
+        self.addChunk('write = _callCollector%(ID)s.response().write'%locals())
     
     def endCallRegion(self):
-        assert self._callRegionOpen
-        functionName, initialKwArgs, lineCol = self._currentCallSignature
-        self._callRegionOpen = False    # attrib of current methodCompiler
-        self._currentCallSignature = None
-        self.addChunk('trans = __orig_trans')
+        ID, callDetails = self._callRegionsStack[-1]
+        functionName, initialKwArgs, lineCol = (callDetails.functionName,
+                                                callDetails.args,
+                                                callDetails.lineCol)
+        self.addChunk('trans = _orig_trans%(ID)s'%locals())
         self.addChunk('write = trans.response().write')
-        if not self._currentCallUsesKeywordArgs:
-            self.addChunk('__callArgVal = __callCollector.response().getvalue()')
-            self.addChunk('del __callCollector')
+        if not callDetails.usesKeywordArgs:
+            self.addChunk('_callArgVal%(ID)s = _callCollector%(ID)s.response().getvalue()'%locals())
+            self.addChunk('del _callCollector%(ID)s'%locals())
             if initialKwArgs:
                 initialKwArgs = ', '+initialKwArgs           
-            self.addFilteredChunk('%(functionName)s(__callArgVal%(initialKwArgs)s)'%locals())
-            self.addChunk('del __callArgVal')
+            self.addFilteredChunk('%(functionName)s(_callArgVal%(ID)s%(initialKwArgs)s)'%locals())
+            self.addChunk('del _callArgVal%(ID)s'%locals())
         else:
             if initialKwArgs:
                 initialKwArgs = initialKwArgs+', '
             self._endCallArg()
-            self.addFilteredChunk('%(functionName)s(%(initialKwArgs)s**__callKws)'%locals())
-            self.addChunk('del __callKws')
+            self.addFilteredChunk('%(functionName)s(%(initialKwArgs)s**_callKws%(ID)s)'%locals())
+            self.addChunk('del _callKws%(ID)s'%locals())
         self.addChunk('## END CALL REGION: '+functionName
                       +' at line, col ' + str(lineCol) + ' in the source.')        
         self.addChunk('')
-    
+        self._callRegionsStack.pop() # attrib of current methodCompiler
+
     def setErrorCatcher(self, errorCatcherName):
         self.turnErrorCatcherOn()        
         if self._templateObj:
@@ -842,7 +848,7 @@ class AutoMethodCompiler(MethodCompiler):
         self.commitStrConst()
         if self._cacheRegionsStack:
             self.endCacheRegion()
-        if self._callRegionOpen:
+        if self._callRegionsStack:
             self.endCallRegion()
             
         if self._streamingEnabled:
