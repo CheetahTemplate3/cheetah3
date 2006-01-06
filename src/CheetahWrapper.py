@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.21 2005/12/21 01:12:45 tavis_rudd Exp $
+# $Id: CheetahWrapper.py,v 1.22 2006/01/06 23:52:12 tavis_rudd Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -9,12 +9,12 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.21 $
+Version: $Revision: 1.22 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/12/21 01:12:45 $
+Last Revision Date: $Date: 2006/01/06 23:52:12 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.21 $"[11:-2]
+__revision__ = "$Revision: 1.22 $"[11:-2]
 
 import getopt, glob, os, pprint, re, shutil, sys
 import cPickle as pickle
@@ -283,10 +283,11 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
 %s: base name %s contains invalid characters.  It must
 be named according to the same rules as Python modules.""" % tup)
             pysrc = TemplateClass.compile(file=src, returnAClass=False,
-                                     moduleName=basename, className=basename)
+                                          moduleName=basename, className=basename)
             output = pysrc
         else:
-            output = str(TemplateClass(file=src, searchList=self.searchList))
+            #output = str(TemplateClass(file=src, searchList=self.searchList))
+            output = str(TemplateClass.compile(file=src)(searchList=self.searchList))
             
         if bak:
             shutil.copyfile(dst, bak)
