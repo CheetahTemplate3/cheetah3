@@ -29,9 +29,14 @@ release
     - removed cheetah junk from docstrings and placed it all in comments or
       __moduleVars__. Per JJ's suggestion.
   
+    - made it possible to nest #cache directives to any level
+    - made it possible to nest #call directives to any level
+
   Unit Tests [TR]
     - extended tests for #for directive
     - expanded tests for #set directive
+    - expanded tests for #call directive
+    - expanded tests for #cache directive
 
 
 2.0b3 (Jan 5, 2006)
