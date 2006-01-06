@@ -37,7 +37,8 @@ release
     - expanded tests for #set directive
     - expanded tests for #call directive
     - expanded tests for #cache directive
-
+    - added basic tests for the new $placeholder string expressions:
+      c'text $placeholder text'
 
 2.0b3 (Jan 5, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
