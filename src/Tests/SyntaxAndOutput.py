@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.78 2006/01/06 01:02:10 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.79 2006/01/06 01:19:36 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.78 $
+Version: $Revision: 1.79 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/06 01:02:10 $
+Last Revision Date: $Date: 2006/01/06 01:19:36 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.78 $"[11:-2]
+__revision__ = "$Revision: 1.79 $"[11:-2]
 
 
 ##################################################
@@ -582,6 +582,42 @@ class Placeholders_Vals(OutputTest):
         """$_
         """
         self.verify("$_('foo')", "Translated: foo")
+
+class PlaceholderStrings(OutputTest):
+    def test1(self):
+        """some c'text $placeholder text' strings"""
+        self.verify("$str(c'$aStr')", "blarg")
+
+    def test2(self):
+        """some c'text $placeholder text' strings"""
+        self.verify("$str(c'$aStr.upper')", "BLARG")
+
+    def test3(self):
+        """some c'text $placeholder text' strings"""
+        self.verify("$str(c'$(aStr.upper.replace(c\"A$str()\",\"\"))')", "BLRG")
+
+    def test4(self):
+        """some c'text $placeholder text' strings"""
+        self.verify("#echo $str(c'$(aStr.upper)')", "BLARG")
+
+    def test5(self):
+        """some c'text $placeholder text' strings"""
+        self.verify("#if 1 then $str(c'$(aStr.upper)') else 0", "BLARG")
+
+    def test6(self):
+        """some c'text $placeholder text' strings"""
+        self.verify("#if 1\n$str(c'$(aStr.upper)')#slurp\n#else\n0#end if", "BLARG")
+
+    def test7(self):
+        """some c'text $placeholder text' strings"""
+        self.verify("#def foo(arg=c'$(\"BLARG\")')\n"
+                    "$arg#slurp\n"
+                    "#end def\n"
+                    "$foo()$foo(c'$anInt')#slurp",
+                    
+                    "BLARG1")
+
+
 
 class UnicodeStrings(OutputTest):
     def test1(self):
