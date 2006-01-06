@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.130 2006/01/05 06:46:42 tavis_rudd Exp $
+# $Id: Template.py,v 1.131 2006/01/06 22:06:15 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.130 $
+Version: $Revision: 1.131 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/05 06:46:42 $
+Last Revision Date: $Date: 2006/01/06 22:06:15 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.130 $"[11:-2]
+__revision__ = "$Revision: 1.131 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import os.path
@@ -37,19 +37,21 @@ from random import randrange
 from tempfile import gettempdir, mktemp
 import imp
 import traceback
-
+from threading import Lock
 import __builtin__ # sometimes used by dynamically compiled templates
+import pprint
+import cgi   # Used by .webInput() if the template is a CGI script.
 
 # Base classes for Template
 from Cheetah.SettingsManager import SettingsManager  
 from Cheetah.Servlet import Servlet                 
-from Cheetah.Utils.WebInputMixin import WebInputMixin
+from Cheetah.Utils.WebInputMixin import _Converter, _lookup, NonNumericInputError
+
 # More intra-package imports ...
 from Cheetah.Compiler import Compiler
 from Cheetah import ErrorCatchers              # for placeholder tags
-from Cheetah import Filters                          # the output filters
+from Cheetah import Filters                    # the output filters
 from Cheetah.DummyTransaction import DummyTransaction
-from threading import Lock
 from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
 # this is used in the generated code:
 from Cheetah.NameMapper import NotFound, valueFromSearchList, valueForName 
@@ -60,22 +62,27 @@ from Cheetah.Utils.Indenter import Indenter      # Used in Template.__init__ and
                                                  # placeholders
 from Cheetah.CacheRegion import CacheRegion
 
+try:
+    from ds.sys.Unspecified import Unspecified
+except ImportError:
+    class Unspecified: pass
+
+class Error(Exception):  pass
+class PreprocessError(Error): pass
+
+
 # function name aliase in used dynamically loaded templates
 VFSL = valueFromSearchList
 VFFSL = valueFromFrameOrSearchList
 VFN = valueForName
 
-try:
-    from ds.sys.Unspecified import Unspecified
-except ImportError:
-    class Unspecified:
-        pass
+# Cache of a cgi.FieldStorage() instance, maintained by .webInput().
+# This is only relavent to templates used as CGI scripts.
+_formUsedByWebInput = None
 
-class Error(Exception):  pass
-class PreprocessError(Error): pass
 
-_cheetahModuleNames = []
-_uniqueModuleNameLock = Lock() # used to prevent collisions in sys.modules
+_cheetahModuleNames = [] # used by _genUniqueModuleName
+_uniqueModuleNameLock = Lock() # _genUniqueModuleName(): prevent collisions in sys.modules
 def _genUniqueModuleName(baseModuleName):
     _uniqueModuleNameLock.acquire()
     if baseModuleName not in sys.modules and baseModuleName not in _cheetahModuleNames:
@@ -90,14 +97,93 @@ def _genUniqueModuleName(baseModuleName):
     _uniqueModuleNameLock.release()
     return finalName
     
-class Template(SettingsManager, Servlet, WebInputMixin):    
-    """The core template engine.  It serves as a base class for Template
-    servlets and also knows how to compile a template."""
+class Template(Servlet):            
+    """This provides a) methods used at runtime by templates and b) the
+    .compile() classmethod for compiling Cheetah source code into template
+    classes.
 
+    This documentation assumes you already know Python and the basics of object
+    oriented programming.  If you don't know Python, see the sections of the
+    Cheetah Users' Guide for non-programmers.  It also assumes you have read
+    about Cheetah's syntax in the Users' Guide.
 
+    The following explains how to use this Cheetah within Python programs or via
+    the interpreter. If you statically compile your templates on the command
+    line using the 'cheetah' script, this is not relevant to you. Statically
+    compiled Cheetah template modules/classes (e.g. myTemplate.py:
+    MyTemplateClasss) are just like any other Python module or class. Also note,
+    most Python web frameworks (Webware, Aquarium, mod_python, Turbogears,
+    CherryPy, Quixote, etc.) provide plugins that Cheetah compilation for you.
+
+    General usage:
+       # a) create the class
+         MyTmplClass = Template.compile(src) # or Template.compile(file=file)
+       # b) create an instance
+         tmplInstance = MyTmplClass() # or MyTmplClass(searchList=[namespace1, ...])
+       # c) use the instance
+         output = str(tmplInstance) # or tmplInstance.aMethodYouDefined(...args...)
+         
+    The old usage style skipped step (a) and did some black magic in step (b) to
+    compile the methods Cheetah generates from the src directly into the
+    instance:    
+       tmplInstance = Template(src) # or Template(src, searchList=[namespace1, ...])
+       output = str(tmplInstance)
+       output = tmplInstance.someMethodYouDefined(...args...)
+
+    The old style still works fine, but it:
+      - provides no reference to MyTmplClass and, thus, no way to create subclasses 
+      - provides no way to use a compiled template with different searchLists
+      - requires that your templates subclass the Template class, directly or
+        via intermediate subclasses. The Template.compile() usage pattern allows
+        your templates to subclass any arbitrary baseclass, including new-style
+        classes.
+
+    If you need to subclass a dynamically compiled Cheetah class, do something like this:
+        from Cheetah.Template import Template
+        import Cheetah
+        src = '''
+          #extends object
+          #set name = 'template'
+          This is a $name
+          $meth1
+          #def meth1
+           this is meth1 in My1stTemplateClass
+          #end def
+          '''
+        My1stTemplateClass = Template.compile(src)
+        print My1stTemplateClass, My1stTemplateClass()
+        Cheetah.My1stTemplateClass = My1stTemplateClass
+
+        My2ndTemplateClass = Template.compile('''
+          #from Cheetah import My1stTemplateClass
+          #extends My1stTemplateClass
+          #implements meth1
+            this is meth1 redefined in My2ndTemplateClass
+          ''')
+        print My2ndTemplateClass, My2ndTemplateClass()              
+    """
+
+    #_requiredCheetahMethodNames is used by .assignRequiredMethodsToClass()
+    _requiredCheetahMethodNames = ('_initCheetahAttributes',
+                                   'searchList',
+                                   'errorCatcher',
+                                   'refreshCache',
+                                   'getVar',
+                                   'varExists',
+                                   'getFileContents',
+                                   'runAsMainProgram',
+                                   '_includeCheetahSource',
+                                   '_genTmpFilename',
+                                   '_importAsDummyModule',
+                                   )
+
+    # the following are used by .compile()
     _defaultMainMethodName = None
     _compilerSettings = None
     _compilerClass = Compiler
+    _keepGeneratedPythonModulesForTracebacks = False
+    _cacheDirForGeneratedPythonModules = None # change to a dirname
+    _compileLock = Lock() # used to prevent race conditions
 
     def _getCompilerClass(klass, source=None, file=None):
         return klass._compilerClass
@@ -106,12 +192,6 @@ class Template(SettingsManager, Servlet, WebInputMixin):
     def _getCompilerSettings(klass, source=None, file=None):
         return klass._compilerSettings
     _getCompilerSettings = classmethod(_getCompilerSettings)
-
-
-
-    _keepGeneratedPythonModulesForTracebacks = False
-    _cacheDirForGeneratedPythonModules = None # change to a dirname
-    _compileLock = Lock() # used to prevent race conditions while writing file
     
     def compile(klass, source=None, file=None,
                 returnAClass=True,
@@ -128,7 +208,8 @@ class Template(SettingsManager, Servlet, WebInputMixin):
                 keepRefToGeneratedModuleCode=False,
                 preprocessors=None,
                 ):
-        """Compiles cheetah source code and returns a python class.  You then
+        """
+        Compiles Cheetah source code and returns a python class.  You then
         create template instances using that class.
 
         If you want to get the generated python source code instead, pass the
@@ -238,7 +319,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
 
     def _preprocessSource(klass, source, preprocessors):
         """Iterates through the .compile() classmethod's preprocessors argument
-        and pipes the source code through each each preprocessors.
+        and pipes the source code through each each preprocessor.
         """
         if not isinstance(preprocessors, (list, tuple)):
             preprocessors = [preprocessors]
@@ -328,37 +409,31 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         return Preprocessor()
     _normalizePreprocessor = classmethod(_normalizePreprocessor)        
 
+    def _assignRequiredMethodsToClass(klass, concreteTemplateClass):
+        """If concreteTemplateClass is not a subclass of Cheetah.Template, add
+        the required cheetah methods to it.
 
-
-    def assignRequiredMethodsToClass(klass, otherClass):
-        for methodname in ('_initCheetahAttributes',
-                           'searchList',
-                           'errorCatcher',
-                           'refreshCache',
-                           'getVar',
-                           'varExists',
-                           'getFileContents',
-                           'runAsMainProgram',
-                           '_includeCheetahSource',
-                           '_genTmpFilename',
-                           '_importAsDummyModule',
-                           ):
-            if not hasattr(otherClass, methodname):
+        This is called from the __init__ method of each compiled template.  If
+        concreteTemplateClass is not a subclass of Cheetah.Template but already
+        has method with the same name as one of the required cheetah methods,
+        this will skip that method.  
+        """
+        for methodname in klass._requiredCheetahMethodNames:
+            if not hasattr(concreteTemplateClass, methodname):
                 method = getattr(Template, methodname)
-                newMethod = instancemethod(method.im_func, None, otherClass)
+                newMethod = instancemethod(method.im_func, None, concreteTemplateClass)
                 #print methodname, method
-                setattr(otherClass, methodname, newMethod)
+                setattr(concreteTemplateClass, methodname, newMethod)
 
-        if not hasattr(otherClass, '__str__') or otherClass.__str__ is object.__str__:
-            mainMethName = getattr(otherClass,
-                                   '_mainCheetahMethod_for_'+otherClass.__name__, None)
+        if not hasattr(concreteTemplateClass, '__str__') or concreteTemplateClass.__str__ is object.__str__:
+            mainMethName = getattr(concreteTemplateClass,
+                                   '_mainCheetahMethod_for_'+concreteTemplateClass.__name__, None)
             if mainMethName:
                 def __str__(self): return getattr(self, mainMethName)()
-                __str__ = instancemethod(__str__, None, otherClass)
-                setattr(otherClass, '__str__', __str__)            
+                __str__ = instancemethod(__str__, None, concreteTemplateClass)
+                setattr(concreteTemplateClass, '__str__', __str__)            
             
-    assignRequiredMethodsToClass = classmethod(assignRequiredMethodsToClass)
-
+    _assignRequiredMethodsToClass = classmethod(_assignRequiredMethodsToClass)
 
     ## end classmethods ##
 
@@ -379,7 +454,8 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         the 'compilerSettings' keyword.
 
         This method can also be called without arguments in cases where it is
-        called as a baseclass from a pre-compiled Template servlet."""
+        called as a baseclass from a pre-compiled Template servlet.
+        """
         
         ##################################################           
         ## Verify argument keywords and types
@@ -421,8 +497,6 @@ class Template(SettingsManager, Servlet, WebInputMixin):
                     
         ##################################################           
         ## Do superclass initialization.
-
-        SettingsManager.__init__(self)
         Servlet.__init__(self)
 
         ##################################################           
@@ -448,6 +522,112 @@ class Template(SettingsManager, Servlet, WebInputMixin):
             
             self._compile(source, file)
 
+    def generatedModuleCode(self):
+        """Return the module code the compiler generated, or None if no
+        compilation took place.
+        """
+        
+        return self._generatedModuleCode
+    
+    def generatedClassCode(self):        
+        """Return the class code the compiler generated, or None if no
+        compilation took place.
+        """
+
+        return self._generatedClassCode
+    
+    def searchList(self):
+        """Return a reference to the searchlist
+        """
+        return self._CHEETAH_searchList
+
+    def errorCatcher(self):
+        """Return a reference to the current errorCatcher
+        """
+        return self._CHEETAH_errorCatcher
+
+    def refreshCache(self, cacheRegionKey=None, cacheKey=None):        
+        """Refresh a cache item.
+        """
+        
+        if not cacheRegionKey:
+            # clear all template's cache regions
+            self._CHEETAH_cacheRegions.clear()
+        else:
+            region = self._CHEETAH_cacheRegions.get(cacheRegionKey, CacheRegion())
+            if not cacheKey:
+                # clear the desired region and all its cache
+                region.clear()
+            else:
+                # clear one specific cache of a specific region
+                cache = region.getCache(cacheKey)
+                if cache:
+                    cache.clear()
+
+    def shutdown(self):
+        """Break reference cycles before discarding a servlet.
+        """
+        try:
+            Servlet.shutdown(self)
+        except:
+            pass
+        self._CHEETAH_searchList = None
+        self.__dict__ = {}
+            
+    ## utility functions ##   
+
+    def getVar(self, varName, default=Unspecified, autoCall=True):        
+        """Get a variable from the searchList.  If the variable can't be found
+        in the searchList, it returns the default value if one was given, or
+        raises NameMapper.NotFound.
+        """
+        
+        try:
+            return VFSL(self.searchList(), varName.replace('$',''), autoCall)
+        except NotFound:
+            if default is not Unspecified:
+                return default
+            else:
+                raise
+    
+    def varExists(self, varName, autoCall=True):
+        """Test if a variable name exists in the searchList.
+        """
+        try:
+            VFSL(self.searchList(), varName.replace('$',''), autoCall)
+            return True
+        except NotFound:
+            return False
+
+
+    hasVar = varExists
+    
+
+    def getFileContents(self, path):
+        """A hook for getting the contents of a file.  The default
+        implementation just uses the Python open() function to load local files.
+        This method could be reimplemented to allow reading of remote files via
+        various protocols, as PHP allows with its 'URL fopen wrapper'
+        """
+        
+        fp = open(path,'r')
+        output = fp.read()
+        fp.close()
+        return output
+    
+    def runAsMainProgram(self):        
+        """Allows the Template to function as a standalone command-line program
+        for static page generation.
+
+        Type 'python yourtemplate.py --help to see what it's capabable of.
+        """
+
+        from TemplateCmdLineIface import CmdLineIface
+        CmdLineIface(templateObj=self).run()
+        
+    ##################################################
+    ## internal methods -- not to be called by end-users
+
     def _initCheetahAttributes(self,
                                searchList=Unspecified,
                                filter='EncodeUnicode', # which filter from Cheetah.Filters
@@ -455,7 +635,11 @@ class Template(SettingsManager, Servlet, WebInputMixin):
                                errorCatcher=None,
                                _globalSetVars=Unspecified,
                                _preBuiltSearchList=Unspecified):
+        """Sets up the instance attributes that cheetah templates use at
+        run-time.
 
+        This is automatically called by the __init__ method of compiled templates.
+        """
         self._CHEETAH_globalSetVars = {}
         if _globalSetVars is not Unspecified:
             # this is intended to be used internally by Nested Templates in #include's
@@ -502,7 +686,6 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         self._CHEETAH_instanceInitialized = True
             
     def _compile(self, source=None, file=None, moduleName=None, mainMethodName=None):
-        
         """Compile the template. This method is automatically called by __init__
         when __init__ is fed a file or source string.
 
@@ -543,111 +726,12 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         compiler.__dict__ = {}
         del compiler
 
-    def generatedModuleCode(self):
-        """Return the module code the compiler generated, or None if no
-        compilation took place."""
-        
-        return self._generatedModuleCode
-    
-    def generatedClassCode(self):        
-        """Return the class code the compiler generated, or None if no
-        compilation took place."""
-
-        return self._generatedClassCode
-    
-    def searchList(self):
-        """Return a reference to the searchlist"""
-        return self._CHEETAH_searchList
-
-    def errorCatcher(self):
-        """Return a reference to the current errorCatcher"""
-        return self._CHEETAH_errorCatcher
-
-    def refreshCache(self, cacheRegionKey=None, cacheKey=None):        
-        """Refresh a cache item."""
-        
-        if not cacheRegionKey:
-            # clear all template's cache regions
-            self._CHEETAH_cacheRegions.clear()
-        else:
-            region = self._CHEETAH_cacheRegions.get(cacheRegionKey, CacheRegion())
-            if not cacheKey:
-                # clear the desired region and all its cache
-                region.clear()
-            else:
-                # clear one specific cache of a specific region
-                cache = region.getCache(cacheKey)
-                if cache:
-                    cache.clear()
-
-    def shutdown(self):
-        """Break reference cycles before discarding a servlet."""
-        try:
-            Servlet.shutdown(self)
-        except:
-            pass
-        self._CHEETAH_searchList = None
-        self.__dict__ = {}
-            
-    ## utility functions ##   
-
-    def getVar(self, varName, default=Unspecified, autoCall=True):        
-        """Get a variable from the searchList.  If the variable can't be found
-        in the searchList, it returns the default value if one was given, or
-        raises NameMapper.NotFound."""
-        
-        try:
-            return VFSL(self.searchList(), varName.replace('$',''), autoCall)
-        except NotFound:
-            if default is not Unspecified:
-                return default
-            else:
-                raise
-    
-    def varExists(self, varName, autoCall=True):
-        """Test if a variable name exists in the searchList."""
-        try:
-            VFSL(self.searchList(), varName.replace('$',''), autoCall)
-            return True
-        except NotFound:
-            return False
-
-
-    hasVar = varExists
-    
-
-    def getFileContents(self, path):
-        """A hook for getting the contents of a file.  The default
-        implementation just uses the Python open() function to load local files.
-        This method could be reimplemented to allow reading of remote files via
-        various protocols, as PHP allows with its 'URL fopen wrapper'"""
-        
-        fp = open(path,'r')
-        output = fp.read()
-        fp.close()
-        return output
-
-    
-    def runAsMainProgram(self):        
-        """Allows enable the Template to function as a standalone command-line
-        program for static page generation.
-
-        Type 'python yourtemplate.py --help to see what it's capabable of.
-        """
-
-        from TemplateCmdLineIface import CmdLineIface
-        CmdLineIface(templateObj=self).run()
-        
-
-    ##################################################
-    ## internal methods -- not to be called by end-users
-    ## @@TR 2005-01-01:  note that I plan to get rid of all of this in a future
-    ## release     
-    
-    
     def _bindCompiledMethod(self, methodCompiler):        
         """Called by the Compiler class, to add new methods at runtime as the
-        compilation process proceeds."""
+        compilation process proceeds.
+
+        This is not used if the template is compiled via Template.compile(src)
+        """
         
         genCode = str(methodCompiler).strip() + '\n'
         methodName  = methodCompiler.methodName()
@@ -659,8 +743,7 @@ class Template(SettingsManager, Servlet, WebInputMixin):
                   'following code but Python found a syntax error in it:'
             print >> err
             print >> err,  genCode
-            raise
-            
+            raise            
 
         genMeth = self._bindFunctionAsMethod(locals()[methodName])
 
@@ -672,12 +755,18 @@ class Template(SettingsManager, Servlet, WebInputMixin):
           
     def _bindFunctionAsMethod(self, function):
         """Used to dynamically bind a plain function as a method of the
-        Template instance."""
+        Template instance.
+
+        This is not used if the template is compiled via Template.compile(src)
+        """
         return new.instancemethod(function, self, self.__class__)
 
 
     def _includeCheetahSource(self, srcArg, trans=None, includeFrom='file', raw=False):        
-        """This is the method that #include directives translate into."""
+        """This is the method that #include directives translate into.
+
+        It is called at runtime by template instances.
+        """
 
         if not hasattr(self, '_CHEETAH_cheetahIncludes'):
             self._CHEETAH_cheetahIncludes = {}
@@ -693,8 +782,6 @@ class Template(SettingsManager, Servlet, WebInputMixin):
                                               _preBuiltSearchList=self.searchList(),
                                               _globalSetVars = self._CHEETAH_globalSetVars,
                                               )
-                    if not hasattr(nestedTemplate, 'respond'):
-                        nestedTemplate.compileTemplate()
                     self._CHEETAH_cheetahIncludes[_includeID] = nestedTemplate
                 else:
                     self._CHEETAH_cheetahIncludes[_includeID] = self.getFileContents(path)
@@ -705,8 +792,6 @@ class Template(SettingsManager, Servlet, WebInputMixin):
                         _preBuiltSearchList=self.searchList(),
                         _globalSetVars = self._CHEETAH_globalSetVars,
                         )
-                    if not hasattr(nestedTemplate, 'respond'):
-                        nestedTemplate.compileTemplate()
                     self._CHEETAH_cheetahIncludes[_includeID] = nestedTemplate
                 else:
                     self._CHEETAH_cheetahIncludes[_includeID] = srcArg
@@ -722,7 +807,8 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         """Generate a temporary file name.  This is used internally by the
         Compiler to do correct importing from Cheetah templates when the
         template is compiled via the Template class' interface rather than via
-        'cheetah compile'."""
+        'cheetah compile'.
+        """
        
         return (
             ''.join(map(lambda x: '%02d' % x, time.localtime(time.time())[:6])) + 
@@ -733,6 +819,8 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         """Used by the Compiler to do correct importing from Cheetah templates
         when the template is compiled via the Template class' interface rather
         than via 'cheetah compile'.
+
+        This is not used if the template is compiled via Template.compile(src)        
         """
         mod = self._getDummyModuleForDynamicCompileHack()
         co = compile(contents+'\n', mod.__file__, 'exec')
@@ -740,12 +828,251 @@ class Template(SettingsManager, Servlet, WebInputMixin):
         return mod
 
     def _getDummyModuleForDynamicCompileHack(self):
+        """Sets up a dummy module which is used for handling imports in
+        templates that dynamically compiled via Template(src).
+
+        This is not used if the template is compiled via Template.compile(src)
+        The dummy module is cached so it can be reused.
+        """
         if not hasattr(self, '_dummyModule'):
             tmpFilename = self._genTmpFilename()
             name = tmpFilename.replace('.py','')            
             self._dummyModule = new.module(name)
             self._dummyModule.__file__ = tmpFilename
         return self._dummyModule
+
+    ## functions for using templates as CGI scripts
+    def webInput(self, names, namesMulti=(), default='', src='f',
+        defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00, debug=False):
+        """Method for importing web transaction variables in bulk.
+
+        This works for GET/POST fields both in Webware servlets and in CGI
+        scripts, and for cookies and session variables in Webware servlets.  If
+        you try to read a cookie or session variable in a CGI script, you'll get
+        a RuntimeError.  'In a CGI script' here means 'not running as a Webware
+        servlet'.  If the CGI environment is not properly set up, Cheetah will
+        act like there's no input.
+
+        The public method provided is:
+
+          def webInput(self, names, namesMulti=(), default='', src='f',
+            defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00, debug=False):
+
+        This method places the specified GET/POST fields, cookies or session
+        variables into a dictionary, which is both returned and put at the
+        beginning of the searchList.  It handles:
+            
+            * single vs multiple values
+            * conversion to integer or float for specified names
+            * default values/exceptions for missing or bad values
+            * printing a snapshot of all values retrieved for debugging        
+
+        All the 'default*' and 'bad*' arguments have 'use or raise' behavior,
+        meaning that if they're a subclass of Exception, they're raised.  If
+        they're anything else, that value is substituted for the missing/bad
+        value.
+
+
+        The simplest usage is:
+
+            #silent $webInput(['choice'])
+            $choice
+
+            dic = self.webInput(['choice'])
+            write(dic['choice'])
+
+        Both these examples retrieves the GET/POST field 'choice' and print it.
+        If you leave off the'#silent', all the values would be printed too.  But
+        a better way to preview the values is
+
+            #silent $webInput(['name'], $debug=1)
+
+        because this pretty-prints all the values inside HTML <PRE> tags.
+
+        ** KLUDGE: 'debug' is supposed to insert into the template output, but it
+        wasn't working so I changed it to a'print' statement.  So the debugging
+        output will appear wherever standard output is pointed, whether at the
+        terminal, in a Webware log file, or whatever. ***
+
+        Since we didn't specify any coversions, the value is a string.  It's a
+        'single' value because we specified it in 'names' rather than
+        'namesMulti'. Single values work like this:
+        
+            * If one value is found, take it.
+            * If several values are found, choose one arbitrarily and ignore the rest.
+            * If no values are found, use or raise the appropriate 'default*' value.
+
+        Multi values work like this:
+            * If one value is found, put it in a list.
+            * If several values are found, leave them in a list.
+            * If no values are found, use the empty list ([]).  The 'default*' 
+              arguments are *not* consulted in this case.
+
+        Example: assume 'days' came from a set of checkboxes or a multiple combo
+        box on a form, and the user  chose'Monday', 'Tuesday' and 'Thursday'.
+
+            #silent $webInput([], ['days'])
+            The days you chose are: #slurp
+            #for $day in $days
+            $day #slurp
+            #end for
+
+            dic = self.webInput([], ['days'])
+            write('The days you chose are: ')
+            for day in dic['days']:
+                write(day + ' ')
+
+        Both these examples print:  'The days you chose are: Monday Tuesday Thursday'.
+
+        By default, missing strings are replaced by '' and missing/bad numbers
+        by zero.  (A'bad number' means the converter raised an exception for
+        it, usually because of non-numeric characters in the value.)  This
+        mimics Perl/PHP behavior, and simplifies coding for many applications
+        where missing/bad values *should* be blank/zero.  In those relatively
+        few cases where you must distinguish between empty-string/zero on the
+        one hand and missing/bad on the other, change the appropriate
+        'default*' and 'bad*' arguments to something like: 
+
+            * None
+            * another constant value
+            * $NonNumericInputError/self.NonNumericInputError
+            * $ValueError/ValueError
+            
+        (NonNumericInputError is defined in this class and is useful for
+        distinguishing between bad input vs a TypeError/ValueError thrown for
+        some other rason.)
+
+        Here's an example using multiple values to schedule newspaper
+        deliveries.  'checkboxes' comes from a form with checkboxes for all the
+        days of the week.  The days the user previously chose are preselected.
+        The user checks/unchecks boxes as desired and presses Submit.  The value
+        of 'checkboxes' is a list of checkboxes that were checked when Submit
+        was pressed.  Our task now is to turn on the days the user checked, turn
+        off the days he unchecked, and leave on or off the days he didn't
+        change.
+
+            dic = self.webInput([], ['dayCheckboxes'])
+            wantedDays = dic['dayCheckboxes'] # The days the user checked.
+            for day, on in self.getAllValues():
+                if   not on and wantedDays.has_key(day):
+                    self.TurnOn(day)
+                    # ... Set a flag or insert a database record ...
+                elif on and not wantedDays.has_key(day):
+                    self.TurnOff(day)
+                    # ... Unset a flag or delete a database record ...
+
+        'source' allows you to look up the variables from a number of different
+        sources:
+            'f'   fields (CGI GET/POST parameters)
+            'c'   cookies
+            's'   session variables
+            'v'   'values', meaning fields or cookies
+
+        In many forms, you're dealing only with strings, which is why the
+        'default' argument is third and the numeric arguments are banished to
+        the end.  But sometimes you want automatic number conversion, so that
+        you can do numeric comparisions in your templates without having to
+        write a bunch of conversion/exception handling code.  Example:
+
+            #silent $webInput(['name', 'height:int'])
+            $name is $height cm tall.
+            #if $height >= 300
+            Wow, you're tall!
+            #else
+            Pshaw, you're short.
+            #end if
+
+            dic = self.webInput(['name', 'height:int'])
+            name = dic[name]
+            height = dic[height]
+            write('%s is %s cm tall.' % (name, height))
+            if height > 300:
+                write('Wow, you're tall!')
+            else:
+                write('Pshaw, you're short.')
+
+        To convert a value to a number, suffix ':int' or ':float' to the name.
+        The method will search first for a 'height:int' variable and then for a
+        'height' variable.  (It will be called 'height' in the final
+        dictionary.)  If a numeric conversion fails, use or raise 'badInt' or
+        'badFloat'.  Missing values work the same way as for strings, except the
+        default is 'defaultInt' or 'defaultFloat' instead of 'default'.
+
+        If a name represents an uploaded file, the entire file will be read into
+        memory.  For more sophistocated file-upload handling, leave that name
+        out of the list and do your own handling, or wait for
+        Cheetah.Utils.UploadFileMixin.
+
+        This only in a subclass that also inherits from Webware's Servlet or
+        HTTPServlet.  Otherwise you'll get an AttributeError on 'self.request'.
+
+        EXCEPTIONS: ValueError if 'source' is not one of the stated characters.
+        TypeError if a conversion suffix is not ':int' or ':float'.
+
+        FUTURE EXPANSION: a future version of this method may allow source
+        cascading; e.g., 'vs' would look first in 'values' and then in session
+        variables.
+
+        Meta-Data
+        ================================================================================
+        Author: Mike Orr <iron@mso.oz.net>
+        License: This software is released for unlimited distribution under the
+                 terms of the MIT license.  See the LICENSE file.
+        Version: $Revision: 1.131 $
+        Start Date: 2002/03/17
+        Last Revision Date: $Date: 2006/01/06 22:06:15 $
+        """ 
+        src = src.lower()
+        isCgi = not self.isControlledByWebKit
+        if   isCgi and src in ('f', 'v'):
+            global _formUsedByWebInput
+            if _formUsedByWebInput is None:
+                _formUsedByWebInput = cgi.FieldStorage()
+            source, func = 'field',   _formUsedByWebInput.getvalue
+        elif isCgi and src == 'c':
+            raise RuntimeError("can't get cookies from a CGI script")
+        elif isCgi and src == 's':
+            raise RuntimeError("can't get session variables from a CGI script")
+        elif isCgi and src == 'v':
+            source, func = 'value',   self.request().value
+        elif isCgi and src == 's':
+            source, func = 'session', self.request().session().value
+        elif src == 'f':
+            source, func = 'field',   self.request().field
+        elif src == 'c':
+            source, func = 'cookie',  self.request().cookie
+        elif src == 'v':
+            source, func = 'value',   self.request().value
+        elif src == 's':
+            source, func = 'session', self.request().session().value
+        else:
+            raise TypeError("arg 'src' invalid")
+        sources = source + 's'
+        converters = {
+            ''     : _Converter('string', None, default,      default ),
+            'int'  : _Converter('int',     int, defaultInt,   badInt  ),
+            'float': _Converter('float', float, defaultFloat, badFloat),  }
+        #pprint.pprint(locals());  return {}
+        dic = {} # Destination.
+        for name in names:
+            k, v = _lookup(name, func, False, converters)
+            dic[k] = v
+        for name in namesMulti:
+            k, v = _lookup(name, func, True, converters)
+            dic[k] = v
+        # At this point, 'dic' contains all the keys/values we want to keep.
+        # We could split the method into a superclass
+        # method for Webware/WebwareExperimental and a subclass for Cheetah.
+        # The superclass would merely 'return dic'.  The subclass would
+        # 'dic = super(ThisClass, self).webInput(names, namesMulti, ...)'
+        # and then the code below.
+        if debug:
+           print "<PRE>\n" + pprint.pformat(dic) + "\n</PRE>\n\n"
+        self.searchList().insert(0, dic)
+        return dic
+
+#Template.webInput = new.instancemethod(WebInputMixin.webInput, None, Template)
+Template.NonNumericInputError = NonNumericInputError
 
 T = Template   # Short and sweet for debugging at the >>> prompt.
 
