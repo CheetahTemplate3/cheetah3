@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.76 2006/01/06 00:36:44 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.77 2006/01/06 00:54:25 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.76 $
+Version: $Revision: 1.77 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/06 00:36:44 $
+Last Revision Date: $Date: 2006/01/06 00:54:25 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.76 $"[11:-2]
+__revision__ = "$Revision: 1.77 $"[11:-2]
 
 
 ##################################################
@@ -182,7 +182,7 @@ Template output mismatch:
                     output = output.decode(outputEncoding)
                 assert output==expectedOutput, self._outputMismatchReport(output, expectedOutput)
             except:
-                #print >>sys.stderr, moduleCode
+                print >>sys.stderr, moduleCode
                 raise
         finally:
             templateObj.shutdown()
@@ -1034,20 +1034,30 @@ $arg1.upper() - $arg2.lower() - $arg3#slurp
 #end call''',
         "1235 FOO - upper - 999")
 
-
     def test9(self):
         """nested #call directives"""
         self.verify('''\
 #def meth(arg1)
 $arg1#slurp
 #end def
+#def meth2(x,y)
+$x$y#slurp
+#end def
+##
 #call self.meth
 1#slurp
 #call self.meth
 2#slurp
-#end call
-#end call''',
-        "12")
+#call self.meth
+3#slurp
+#end call 3
+#call self.meth2 y=5
+#arg x
+4#slurp
+#end call 4
+#end call 2
+#end call 1''',
+        "12345")
 
 
 class SlurpDirective(OutputTest):
