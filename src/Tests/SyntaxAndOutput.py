@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.74 2006/01/05 22:45:24 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.75 2006/01/06 00:13:29 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.74 $
+Version: $Revision: 1.75 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/05 22:45:24 $
+Last Revision Date: $Date: 2006/01/06 00:13:29 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.74 $"[11:-2]
+__revision__ = "$Revision: 1.75 $"[11:-2]
 
 
 ##################################################
@@ -931,6 +931,22 @@ $i#slurp
 #end cache
 $aStr""",
                     "1\n01234blarg")
+
+
+    def test5(self):
+        r"""nested #cache blocks"""
+        self.verify("""#slurp
+#cache ID='cache1', timer=150m
+$anInt
+#cache id='cache2', timer=15s
+ #for $i in range(5)
+$i#slurp
+ #end for
+$*(6)#slurp
+#end cache
+#end cache
+$aStr""",
+                    "1\n012346blarg")
 
 
 class CallDirective(OutputTest):
