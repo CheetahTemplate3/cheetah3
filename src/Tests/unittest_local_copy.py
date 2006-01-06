@@ -89,7 +89,7 @@ SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 __author__ = "Steve Purcell"
 __email__ = "stephen_purcell at yahoo dot com"
-__revision__ = "$Revision: 1.10 $"[11:-2]
+__revision__ = "$Revision: 1.11 $"[11:-2]
 
 
 ##################################################
@@ -817,7 +817,7 @@ class TestLoader:
             if not isinstance(test, TestCase) and \
                not isinstance(test, TestSuite):
                 raise ValueError, \
-                      "calling %s returned %s, not a test" % obj,test
+                      "calling %s returned %s, not a test" %(obj,test)
             return test
         else:
             raise ValueError, "don't know how to make test from: %s" % obj
