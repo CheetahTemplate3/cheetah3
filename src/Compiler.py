@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.110 2006/01/05 22:30:28 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.111 2006/01/06 00:10:37 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.110 $
+Version: $Revision: 1.111 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/05 22:30:28 $
+Last Revision Date: $Date: 2006/01/06 00:10:37 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.110 $"[11:-2]
+__revision__ = "$Revision: 1.111 $"[11:-2]
 
 import sys
 import os
@@ -261,7 +261,10 @@ class MethodCompiler(GenUtils):
         self._methodBodyChunks = []
 
         self._cacheRegionOpen = False
+        self._cacheRegionsStack = []
         self._callRegionOpen = False
+        self._callRegionsStack = []
+
         self._isErrorCatcherOn = False
 
         self._hasReturnStatement = False
@@ -649,8 +652,8 @@ class MethodCompiler(GenUtils):
             self.indent()
     
     def nextCacheID(self):
-        return str(random.randrange(100, 999)) \
-               + str(random.randrange(10000, 99999))
+        return ('_'+str(random.randrange(100, 999)) 
+                + str(random.randrange(10000, 99999)))
         
     def startCacheRegion(self, cacheInfo, lineCol, rawPlaceholder=None):
         ID = self.nextCacheID()
@@ -659,24 +662,28 @@ class MethodCompiler(GenUtils):
         
         customID = cacheInfo.get('id',None)
         if customID:
-            ID = repr(customID)
-        varyBy = cacheInfo.get('varyBy',ID)
-
-        self._cacheRegionOpen = True    # attrib of current methodCompiler
+            ID = customID
+        varyBy = cacheInfo.get('varyBy',repr(ID))
         
-        self.addChunk('## START CACHE REGION: at line, col ' + str(lineCol) + ' in the source.')
-        self.addChunk('RECACHE = False')
-
-        self.addChunk('region = self._CHEETAH_cacheRegions.get(' + ID + ')')
+        self._cacheRegionsStack.append(ID) # attrib of current methodCompiler
         
-        self.addChunk('if not region:')
+        self.addChunk('## START CACHE REGION: '+ID+
+                      '. line, col ' + str(lineCol) + ' in the source.')
+        self.addChunk('_RECACHE%(ID)s = False'%locals())
+
+        self.addChunk('_cacheRegion%(ID)s = self._CHEETAH_cacheRegions.get('%locals()
+                      + repr(ID) + ')')
+        
+        self.addChunk('if not _cacheRegion%(ID)s:'%locals())
         self.indent()
-        self.addChunk("region = CacheRegion()")
-        self.addChunk("self._CHEETAH_cacheRegions[" + ID + "] = region")
-        self.addChunk('RECACHE = True')
+        self.addChunk("_cacheRegion%(ID)s = CacheRegion()"%locals())
+        self.addChunk("self._CHEETAH_cacheRegions[" + repr(ID)
+                      + "] = _cacheRegion%(ID)s"%locals())
+        self.addChunk('_RECACHE%(ID)s = True'%locals())
         self.dedent()
         
-        self.addChunk('cache = region.getCache('+varyBy+')')
+        self.addChunk('_cache%(ID)s = _cacheRegion%(ID)s.getCache('%locals()
+                      +varyBy+')')
 
         if interval:
             #self.addMethDocString(
@@ -684,36 +691,42 @@ class MethodCompiler(GenUtils):
             #    str(interval) + ' seconds.'
             #    +(rawPlaceholder and ' %s'%rawPlaceholder or ''))
                 
-            self.addChunk('if (not cache.getRefreshTime())' +
-                          ' or (currentTime() > cache.getRefreshTime()):')
+            self.addChunk(('if (not _cache%(ID)s.getRefreshTime())'%locals())
+                          +' or (currentTime() > cache.getRefreshTime()):')
             self.indent()
-            self.addChunk("cache.setRefreshTime(currentTime() +" + str(interval) + ")")
-            self.addChunk('RECACHE = True')
+            self.addChunk(("_cache%(ID)s.setRefreshTime(currentTime() +"%locals())
+                          + str(interval) + ")")
+            self.addChunk('_RECACHE%(ID)s = True'%locals())
             self.dedent()
             
         if test:
             self.addChunk('if ' + test + ':')
             self.indent()
-            self.addChunk('RECACHE = True')
+            self.addChunk('_RECACHE%(ID)s = True'%locals())
             self.dedent()
             
-        self.addChunk('if RECACHE or not cache.getData():')
+        self.addChunk('if _RECACHE%(ID)s or not _cache%(ID)s.getData():'%locals())
         self.indent()
-        self.addChunk('orig_trans = trans')
-        self.addChunk('trans = cacheCollector = DummyTransaction()')
-        self.addChunk('write = cacheCollector.response().write')
+        self.addChunk('orig_trans%(ID)s = trans'%locals())
+        self.addChunk('trans = _cacheCollector%(ID)s = DummyTransaction()'%locals())
+        self.addChunk('write = _cacheCollector%(ID)s.response().write'%locals())
         
     def endCacheRegion(self):
-        self._cacheRegionOpen = False
-        self.addChunk('trans = orig_trans')
+        ID = self._cacheRegionsStack.pop()
+        self.addChunk('trans = orig_trans%(ID)s'%locals())
         self.addChunk('write = trans.response().write')
-        self.addChunk('cache.setData(cacheCollector.response().getvalue())')
-        self.addChunk('del cacheCollector')
+        self.addChunk(
+            '_cache%(ID)s.setData(_cacheCollector%(ID)s.response().getvalue())'%locals())
+        self.addChunk('del _cacheCollector%(ID)s'%locals())
         
         self.dedent()        
-        self.addWriteChunk('cache.getData()')
-        self.addChunk('## END CACHE REGION')
+        self.addWriteChunk('_cache%(ID)s.getData()'%locals())
+        self.addChunk('## END CACHE REGION: '+ID)
         self.addChunk('')
+
+
+    def nextCallRegionID(self):
+        return self.nextCacheID()
 
     def startCallRegion(self, functionName, args, lineCol):
         assert not self._callRegionOpen
@@ -827,7 +840,7 @@ class AutoMethodCompiler(MethodCompiler):
     def cleanupState(self):
         MethodCompiler.cleanupState(self)
         self.commitStrConst()
-        if self._cacheRegionOpen:
+        if self._cacheRegionsStack:
             self.endCacheRegion()
         if self._callRegionOpen:
             self.endCallRegion()
