@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.113 2006/01/06 00:54:50 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.114 2006/01/06 21:51:42 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.113 $
+Version: $Revision: 1.114 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/06 00:54:50 $
+Last Revision Date: $Date: 2006/01/06 21:51:42 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.113 $"[11:-2]
+__revision__ = "$Revision: 1.114 $"[11:-2]
 
 import sys
 import os
@@ -967,8 +967,7 @@ _initMethod_setupArbitraryClass = """\
 if not self._CHEETAH_instanceInitialized:
     if not hasattr(self, '_initCheetahAttributes'):
         templateClass = getattr(self, '_CHEETAH_templateClass', Template)
-        #templateClass.assignRequiredMethodsToClass(self.__class__)
-        templateClass.assignRequiredMethodsToClass(%(className)s)
+        templateClass._assignRequiredMethodsToClass(%(className)s)
     cheetahKWArgs = {}
     allowedKWs = 'searchList filter filtersLib errorCatcher'.split()
     for k,v in KWs.items():
