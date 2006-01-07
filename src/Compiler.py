@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.115 2006/01/07 07:12:41 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.116 2006/01/07 22:42:42 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.115 $
+Version: $Revision: 1.116 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/07 07:12:41 $
+Last Revision Date: $Date: 2006/01/07 22:42:42 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.115 $"[11:-2]
+__revision__ = "$Revision: 1.116 $"[11:-2]
 
 import sys
 import os
@@ -238,12 +238,10 @@ class GenUtils:
 
 class MethodCompiler(GenUtils):
     def __init__(self, methodName, classCompiler,
-                 initialMethodComment=None,
-                 templateObj=None):
+                 initialMethodComment=None):
         self._settingsManager = classCompiler
         self._classCompiler = classCompiler
         self._moduleCompiler = classCompiler._moduleCompiler
-        self._templateObj = templateObj
         self._methodName = methodName
         self._initialMethodComment = initialMethodComment
         self._setupState()
@@ -507,7 +505,7 @@ class MethodCompiler(GenUtils):
 
     def addInclude(self, sourceExpr, includeFrom, isRaw):
         # @@TR: consider soft-coding this
-        self.addChunk('self._includeCheetahSource(' + sourceExpr +
+        self.addChunk('self._handleCheetahInclude(' + sourceExpr +
                            ', trans=trans, ' +
                            'includeFrom="' + includeFrom + '", raw=' +
                            repr(isRaw) + ')')
@@ -794,9 +792,6 @@ class MethodCompiler(GenUtils):
 
     def setErrorCatcher(self, errorCatcherName):
         self.turnErrorCatcherOn()        
-        if self._templateObj:
-            self._templateObj._CHEETAH_errorCatcher = \
-                   getattr(ErrorCatchers, errorCatcherName)(self._templateObj)
 
         self.addChunk('if self._CHEETAH_errorCatchers.has_key("' + errorCatcherName + '"):')
         self.indent()
@@ -980,7 +975,6 @@ class ClassCompiler(GenUtils):
         
     def __init__(self, className, mainMethodName='respond',
                  moduleCompiler=None,
-                 templateObj=None,
                  fileName=None,
                  settingsManager=None):
 
@@ -989,7 +983,6 @@ class ClassCompiler(GenUtils):
         self._className = className
         self._moduleCompiler = moduleCompiler
         self._mainMethodName = mainMethodName
-        self._templateObj = templateObj
         self._setupState()
         methodCompiler = self._spawnMethodCompiler(
             mainMethodName,
@@ -1044,8 +1037,6 @@ class ClassCompiler(GenUtils):
         if self._mainMethodName == 'respond':
             if self.setting('setup__str__method'):
                 self._generatedAttribs.append('def __str__(self): return self.respond()')
-            if self._templateObj:
-                self._templateObj.__str__ = self._templateObj.respond
         self.addAttribute('_mainCheetahMethod_for_' + self._className +
                            '= ' + repr(self._mainMethodName)
                            )
@@ -1065,9 +1056,6 @@ class ClassCompiler(GenUtils):
         # the first bit is added to init
         self.addChunkToInit('self._filePath = ' + repr(fileName))
         self.addChunkToInit('self._fileMtime = ' + str(getmtime(fileName)) )
-        if self._templateObj:
-            setattr(self._templateObj, '_filePath', fileName)
-            setattr(self._templateObj, '_fileMtime', getmtime(fileName))
 
         # the rest is added to the main output method of the class ('mainMethod')
         self.addChunk('if exists(self._filePath) and ' +
@@ -1116,8 +1104,7 @@ class ClassCompiler(GenUtils):
         if klass is None:
             klass = self.methodCompilerClass
         methodCompiler = klass(methodName, classCompiler=self,
-                               initialMethodComment=initialMethodComment,
-                               templateObj=self._templateObj)
+                               initialMethodComment=initialMethodComment)
         self._methodsIndex[methodName] = methodCompiler
         return methodCompiler
 
@@ -1136,11 +1123,7 @@ class ClassCompiler(GenUtils):
             self._finishedMethodsList.append( methodCompiler )
         else:
             self._finishedMethodsList.insert(pos, methodCompiler)
-
-        if self._templateObj and methodCompiler.methodName() != '__init__':
-            self._templateObj._bindCompiledMethod(methodCompiler)
         return methodCompiler
-
 
     def startMethodDef(self, methodName, argsList, parserComment):
         methodCompiler = self._spawnMethodCompiler(
@@ -1167,8 +1150,6 @@ class ClassCompiler(GenUtils):
                              ' It should only contain simple Python literals.')
         ## now add the attribute
         self._generatedAttribs.append(attribExpr)
-        if self._templateObj:
-            exec('self._templateObj.' + attribExpr.strip())
 
     def addSettingsToInit(self, settingsStr, settingsType='ini'):
         #@@TR 2005-01-01: this may not be used anymore?
@@ -1394,8 +1375,7 @@ DEFAULT_COMPILER_SETTINGS = {
     # lowercase.  The filters *must* return the expr or raise an exception.
     # They can modify the expr if needed.
 
-
-    'templateMetaclass':'TemplateMetaClass',
+    'templateMetaclass':None
     }
 
 #class ModuleCompiler(Parser, GenUtils):
@@ -1407,7 +1387,6 @@ class ModuleCompiler(SettingsManager, GenUtils):
     def __init__(self, source=None, file=None, moduleName='GenTemplate',
                  mainClassName=None,
                  mainMethodName=None,
-                 templateObj=None,
                  settings=None):
         SettingsManager.__init__(self)
         if settings:
@@ -1424,7 +1403,6 @@ class ModuleCompiler(SettingsManager, GenUtils):
                 )
             self.setSetting('useStackFrames', False)                    
 
-        self._templateObj = templateObj
         self._compiled = False
         self._moduleName = moduleName
         if not mainClassName:
@@ -1518,7 +1496,6 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "import types",
             "import __builtin__",
             "from Cheetah.Template import Template",
-            "from Cheetah.Template import TemplateMetaClass",
             "from Cheetah.DummyTransaction import DummyTransaction",
             "from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, valueFromFrameOrSearchList",
             "from Cheetah.CacheRegion import CacheRegion",
@@ -1564,7 +1541,6 @@ class ModuleCompiler(SettingsManager, GenUtils):
         classCompiler = klass(className,
                               moduleCompiler=self,
                               mainMethodName=self.setting('mainMethodName'),
-                              templateObj=self._templateObj,
                               fileName=self._filePath,
                               settingsManager=self,
                               )
@@ -1649,31 +1625,6 @@ class ModuleCompiler(SettingsManager, GenUtils):
                     importStatement = "from %s import %s" % (modName, finalClassName)
                     self.addImportStatement(importStatement)
                     self.addImportedVarNames( [finalClassName,] ) 
-
-        
-        ##################################################
-        ## dynamically bind to and __init__ with this new baseclass
-        #  - this is required for dynamic use of templates compiled directly from file
-        #  - also necessary for the 'monitorSrc' fileMtime triggered recompiles
-        
-        if self._templateObj:
-            mod = self._templateObj._importAsDummyModule('\n'.join(self._importStatements))
-            baseClass = getattr(mod, self._baseClass, getattr(__builtin__,self._baseClass, None))
-            assert baseClass
-            class newClass(baseClass):pass            
-            self._templateObj._assignRequiredMethodsToClass(newClass)
-            newClass.__name__ = self._mainClassName
-            self._templateObj.__class__ = newClass
-            # must initialize it so instance attributes are accessible
-            newClass.__init__(self._templateObj,
-                              _globalSetVars=self._templateObj._CHEETAH_globalSetVars,
-                              _preBuiltSearchList=self._templateObj._CHEETAH_searchList)
-
-            if not hasattr(self._templateObj, 'transaction'):
-                self._templateObj.transaction = None
-            if (not hasattr(self._templateObj, 'respond')
-                and self._mainMethodName==self.setting('mainMethodNameForSubclasses')):                
-                self.setMainMethodName('respond')
             
     def setCompilerSetting(self, key, valueExpr):
         self.setSetting(key, eval(valueExpr) )
@@ -1726,28 +1677,12 @@ class ModuleCompiler(SettingsManager, GenUtils):
         statements and Cheetah default module constants.
         """
         self._moduleConstants.append(line)
-        if self._templateObj:
-            mod = self._execInDummyModule(line)
 
     def addSpecialVar(self, basename, contents, includeUnderscores=True):
         """Adds module __specialConstant__ to the module globals.
         """
         name = includeUnderscores and '__'+basename+'__' or basename
         self._specialVars[name] = contents.strip()
-
-    def _getDummyModuleForDynamicCompileHack(self):
-        mod = self._templateObj._getDummyModuleForDynamicCompileHack()
-        if mod not in self._templateObj._CHEETAH_searchList:
-            # @@TR 2005-01-15: testing this approach to support
-            # 'from foo import *'
-            self._templateObj._CHEETAH_searchList.append(mod)
-        return mod
-
-    def _execInDummyModule(self, code):
-        mod = self._getDummyModuleForDynamicCompileHack()        
-        co = compile(code+'\n', mod.__file__, 'exec')
-        exec co in mod.__dict__
-        return mod
 
     def addImportStatement(self, impStatement):
         self._importStatements.append(impStatement)
@@ -1757,22 +1692,9 @@ class ModuleCompiler(SettingsManager, GenUtils):
         importVarNames = [var.split()[-1] for var in importVarNames] # handles aliases
         importVarNames = [var for var in importVarNames if var!='*']
         self.addImportedVarNames(importVarNames) #used by #extend for auto-imports
-        
-        if self._templateObj:
-            mod = self._execInDummyModule(impStatement)
-            # @@TR: old buggy approach is still needed for now
-            import Template as TemplateMod
-            for varName in importVarNames: 
-                if varName == '*': continue
-                val = getattr(mod, varName.split('.')[0])
-                setattr(TemplateMod, varName, val)
 
     def addAttribute(self, attribName, expr):
         self._getActiveClassCompiler().addAttribute(attribName + ' =' + expr)
-        if self._templateObj:
-            # @@TR: this code should be delegated to the compiler
-            val = eval(expr,{},{})
-            setattr(self._templateObj, attribName, val)
         
     def addComment(self, comm):
         if re.match(r'#+$',comm):      # skip bar comments
@@ -1817,7 +1739,6 @@ class ModuleCompiler(SettingsManager, GenUtils):
         
     __str__ = getModuleCode
 
-
     def wrapModuleDef(self):
         self.addSpecialVar('CHEETAH_docstring', self.setting('defDocStrMsg'))
         self.addSpecialVar('CHEETAH_version', Version)
@@ -1843,6 +1764,9 @@ class ModuleCompiler(SettingsManager, GenUtils):
 ## CLASSES
 
 %(classes)s
+if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
+    templateClass = getattr(%(mainClassName)s, '_CHEETAH_templateClass', Template)
+    templateClass._assignRequiredMethodsToClass(%(mainClassName)s)
 
 %(footer)s
 """ %   {'header':self.moduleHeader(),
@@ -1852,6 +1776,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
          'constants':self.moduleConstants(),
          'classes':self.classDefs(),
          'footer':self.moduleFooter(),
+         'mainClassName':self._mainClassName,
          }
        
         self._moduleDef = moduleDef
