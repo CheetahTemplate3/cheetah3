@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.114 2006/01/06 21:51:42 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.115 2006/01/07 07:12:41 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.114 $
+Version: $Revision: 1.115 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/06 21:51:42 $
+Last Revision Date: $Date: 2006/01/07 07:12:41 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.114 $"[11:-2]
+__revision__ = "$Revision: 1.115 $"[11:-2]
 
 import sys
 import os
@@ -27,6 +27,7 @@ import types
 import time
 import random
 import warnings
+import __builtin__
 
 from Cheetah.Version import Version
 from Cheetah.SettingsManager import SettingsManager
@@ -48,11 +49,11 @@ class Error(Exception):
     pass
 
 class GenUtils:
-
     """An abstract baseclass for the Compiler classes that provides methods that
     perform generic utility functions or generate pieces of output code from
     information passed in by the Parser baseclass.  These methods don't do any
-    parsing themselves."""
+    parsing themselves.
+    """
 
 
     def genTimeInterval(self, timeString):
@@ -121,10 +122,10 @@ class GenUtils:
         self.dedent()
 
 
-    def genPlainVar(self, nameChunks):
-        
+    def genPlainVar(self, nameChunks):        
         """Generate Python code for a Cheetah $var without using NameMapper
-        (Unified Dotted Notation with the SearchList)."""
+        (Unified Dotted Notation with the SearchList).
+        """
         
         nameChunks.reverse()
         chunk = nameChunks.pop()
@@ -137,7 +138,6 @@ class GenUtils:
         return pythonCode
 
     def genNameMapperVar(self, nameChunks):
-        
         """Generate valid Python code for a Cheetah $var, using NameMapper
         (Unified Dotted Notation with the SearchList).
 
@@ -271,7 +271,8 @@ class MethodCompiler(GenUtils):
         
         
     def cleanupState(self):
-        """Called by the containing class compiler instance"""
+        """Called by the containing class compiler instance
+        """
         pass
 
     def methodName(self):
@@ -352,8 +353,6 @@ class MethodCompiler(GenUtils):
         self.addChunk('write(' + chunk + ')')
 
     def addFilteredChunk(self, chunk, filterArgs=None, rawExpr=None):
-        """
-        """
         if filterArgs is None:
             filterArgs = ''
         if self.setting('includeRawExprInFilterArgs') and rawExpr:
@@ -361,7 +360,7 @@ class MethodCompiler(GenUtils):
 
         if self.setting('alwaysFilterNone'):
             if rawExpr and rawExpr.find('\n')==-1 and rawExpr.find('\r')==-1:
-                self.addChunk("_v = %s # <- %s"%(chunk, rawExpr))
+                self.addChunk("_v = %s # %s"%(chunk, rawExpr))
             else:
                 self.addChunk("_v = %s"%chunk)
                 
@@ -385,13 +384,15 @@ class MethodCompiler(GenUtils):
             self._pendingStrConstChunks = [strConst]
 
     def _unescapeCheetahVars(self, theString):
-        """Unescape any escaped Cheetah \$vars in the string."""
+        """Unescape any escaped Cheetah \$vars in the string.
+        """
         
         token = self.setting('cheetahVarStartToken')
         return theString.replace('\\' + token, token)
 
     def _unescapeDirectives(self, theString):
-        """Unescape any escaped Cheetah \$vars in the string."""
+        """Unescape any escaped Cheetah \$vars in the string.
+        """
         
         token = self.setting('directiveStartToken')
         return theString.replace('\\' + token, token)
@@ -826,7 +827,8 @@ class MethodCompiler(GenUtils):
                 self.dedent()
                 self.addChunk('else:')
                 self.indent()
-                self.addChunk('_filter = self._CHEETAH_currentFilter = \\\n\t\t\tself._CHEETAH_filters[filterName] = '
+                self.addChunk('_filter = self._CHEETAH_currentFilter'
+                              +' = \\\n\t\t\tself._CHEETAH_filters[filterName] = '
                               + 'getattr(self._CHEETAH_filtersLib, filterName)(self).filter')
                 self.dedent()
                 
@@ -963,11 +965,8 @@ class AutoMethodCompiler(MethodCompiler):
 ##################################################
 ## CLASS COMPILERS
 
-_initMethod_setupArbitraryClass = """\
+_initMethod_initCheetah = """\
 if not self._CHEETAH_instanceInitialized:
-    if not hasattr(self, '_initCheetahAttributes'):
-        templateClass = getattr(self, '_CHEETAH_templateClass', Template)
-        templateClass._assignRequiredMethodsToClass(%(className)s)
     cheetahKWArgs = {}
     allowedKWs = 'searchList filter filtersLib errorCatcher'.split()
     for k,v in KWs.items():
@@ -1029,6 +1028,8 @@ class ClassCompiler(GenUtils):
         self._classDocStringLines = []
         # printed after methods in the gen class def:
         self._generatedAttribs = ['_CHEETAH_instanceInitialized = False']
+        if self.setting('templateMetaclass'):
+            self._generatedAttribs.append('__metaclass__ = '+self.setting('templateMetaclass'))
         self._initMethChunks = []
         
         self._blockMetaData = {}
@@ -1054,7 +1055,7 @@ class ClassCompiler(GenUtils):
                                              klass=self.methodCompilerClassForInit)
         __init__.setMethodSignature("def __init__(self, *args, **KWs)")
         __init__.addChunk("%s.__init__(self, *args, **KWs)" % self._baseClass)
-        __init__.addChunk(_initMethod_setupArbitraryClass%dict(className=self._className))
+        __init__.addChunk(_initMethod_initCheetah%dict(className=self._className))
         for chunk in self._initMethChunks:
             __init__.addChunk(chunk)
         __init__.cleanupState()
@@ -1257,19 +1258,30 @@ class ClassCompiler(GenUtils):
     
     def wrapClassDef(self):
         ind = self.setting('indentationStep')
-        classDefChunks = (
-            self.classSignature(),
-            self.classDocstring(),
-            ind + '#'*50,
-            ind + '## GENERATED METHODS',
-            '\n',
-            self.methodDefs(),
-            ind + '#'*50,
-            ind + '## GENERATED ATTRIBUTES',
-            '\n',
-            self.attributes(),
-            )
-
+        classDefChunks = [self.classSignature(),
+                          self.classDocstring(),
+                          ]
+        def addMethods():
+            classDefChunks.extend([
+                ind + '#'*50,
+                ind + '## CHEETAH GENERATED METHODS',
+                '\n',
+                self.methodDefs(),
+                ])
+        def addAttributes():
+            classDefChunks.extend([
+                ind + '#'*50,
+                ind + '## CHEETAH GENERATED ATTRIBUTES',
+                '\n',
+                self.attributes(),
+                ])            
+        if self.setting('outputMethodsBeforeAttributes'):
+            addMethods()
+            addAttributes()
+        else:
+            addAttributes()
+            addMethods()
+            
         classDef = '\n'.join(classDefChunks)
         self._classDef = classDef
         return classDef
@@ -1296,7 +1308,6 @@ class ClassCompiler(GenUtils):
         attribs = [self.setting('indentationStep') + str(attrib)
                       for attrib in self._generatedAttribs ]
         return '\n\n'.join(attribs)
-
 
     
 class AutoClassCompiler(ClassCompiler):
@@ -1346,7 +1357,7 @@ DEFAULT_COMPILER_SETTINGS = {
     'indentationStep': ' '*4,
     'initialMethIndentLevel': 2,
     'monitorSrcFile':False,
-    
+    'outputMethodsBeforeAttributes': True,
     
     ## @@TR: The following really belong in the parser, but I've put them
     ## here for the time being to facilitate separating the parser and
@@ -1382,7 +1393,9 @@ DEFAULT_COMPILER_SETTINGS = {
     # exprType is the name of the directive, 'psp', or 'placeholder'. all
     # lowercase.  The filters *must* return the expr or raise an exception.
     # They can modify the expr if needed.
-    
+
+
+    'templateMetaclass':'TemplateMetaClass',
     }
 
 #class ModuleCompiler(Parser, GenUtils):
@@ -1462,13 +1475,13 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self._setupCompilerState()
         
     def __getattr__(self, name):
-
         """Provide one-way access to the methods and attributes of the
         ClassCompiler, and thereby the MethodCompilers as well.
 
         WARNING: Use .setMethods to assign the attributes of the ClassCompiler
         from the methods of this class!!! or you will be assigning to attributes
-        of this object instead."""
+        of this object instead.
+        """
         
         if self.__dict__.has_key(name):
             return self.__dict__[name]
@@ -1505,6 +1518,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "import types",
             "import __builtin__",
             "from Cheetah.Template import Template",
+            "from Cheetah.Template import TemplateMetaClass",
             "from Cheetah.DummyTransaction import DummyTransaction",
             "from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, valueFromFrameOrSearchList",
             "from Cheetah.CacheRegion import CacheRegion",
@@ -1644,17 +1658,23 @@ class ModuleCompiler(SettingsManager, GenUtils):
         
         if self._templateObj:
             mod = self._templateObj._importAsDummyModule('\n'.join(self._importStatements))
-            class newClass:
-                pass
+            baseClass = getattr(mod, self._baseClass, getattr(__builtin__,self._baseClass, None))
+            assert baseClass
+            class newClass(baseClass):pass            
+            self._templateObj._assignRequiredMethodsToClass(newClass)
             newClass.__name__ = self._mainClassName
-            __bases__ = (getattr(mod, self._baseClass), )
-            newClass.__bases__ = __bases__
             self._templateObj.__class__ = newClass
             # must initialize it so instance attributes are accessible
             newClass.__init__(self._templateObj,
                               _globalSetVars=self._templateObj._CHEETAH_globalSetVars,
                               _preBuiltSearchList=self._templateObj._CHEETAH_searchList)
 
+            if not hasattr(self._templateObj, 'transaction'):
+                self._templateObj.transaction = None
+            if (not hasattr(self._templateObj, 'respond')
+                and self._mainMethodName==self.setting('mainMethodNameForSubclasses')):                
+                self.setMainMethodName('respond')
+            
     def setCompilerSetting(self, key, valueExpr):
         self.setSetting(key, eval(valueExpr) )
         self._parser.configureParser()
@@ -1890,7 +1910,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         return """
 # CHEETAH was developed by Tavis Rudd and Mike Orr
 # with code, advice and input from many other volunteers.
-# For more information visit http://www.CheetahTemplate.org
+# For more information visit http://www.CheetahTemplate.org/
 
 ##################################################
 ## if run from command line:
