@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.4 2005/01/17 14:58:00 tavis_rudd Exp $
+# $Id: CheetahWrapper.py,v 1.5 2006/01/07 07:18:44 tavis_rudd Exp $
 """Tests for the 'cheetah' command.
 
 Besides unittest usage, recognizes the following command-line options:
@@ -14,12 +14,12 @@ Besides unittest usage, recognizes the following command-line options:
 Meta-Data
 ================================================================================
 Author: Mike Orr <iron@mso.oz.net>,
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2005/01/17 14:58:00 $
+Last Revision Date: $Date: 2006/01/07 07:18:44 $
 """
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.4 $"[11:-2]
+__revision__ = "$Revision: 1.5 $"[11:-2]
 
 
 ##################################################
@@ -191,6 +191,8 @@ Found %(result)r"""
         msg = "subcommand killed by signal %d: %s" % (signal, cmd)
         self.failUnlessEqual(signal, 0, msg)
         msg = "subcommand exit status %d: %s" % (status, cmd)
+        if status!=expectedStatus:
+            print output
         self.failUnlessEqual(status, expectedStatus, msg)
         if expectedOutputSubstring is not None:
             msg = "substring %r not found in subcommand output: %s" % \
