@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.132 2006/01/07 00:59:12 tavis_rudd Exp $
+# $Id: Template.py,v 1.133 2006/01/07 07:16:25 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.132 $
+Version: $Revision: 1.133 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/07 00:59:12 $
+Last Revision Date: $Date: 2006/01/07 07:16:25 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.132 $"[11:-2]
+__revision__ = "$Revision: 1.133 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import os.path
@@ -179,9 +179,13 @@ class Template(Servlet):
                                    'varExists',
                                    'getFileContents',
                                    'runAsMainProgram',
+                                   
                                    '_includeCheetahSource',
-                                   '_genTmpFilename',
+                                   '_genTmpFilename',                                   
                                    '_importAsDummyModule',
+                                   '_bindFunctionAsMethod',
+                                   '_bindCompiledMethod',
+                                   '_getDummyModuleForDynamicCompileHack',
                                    )
 
     # the following are used by .compile()
@@ -433,13 +437,24 @@ class Template(Servlet):
                 setattr(concreteTemplateClass, methodname, newMethod)
 
         if not hasattr(concreteTemplateClass, '__str__') or concreteTemplateClass.__str__ is object.__str__:
-            mainMethName = getattr(concreteTemplateClass,
-                                   '_mainCheetahMethod_for_'+concreteTemplateClass.__name__, None)
+            mainMethNameAttr = '_mainCheetahMethod_for_'+concreteTemplateClass.__name__
+            mainMethName = getattr(concreteTemplateClass,mainMethNameAttr, None)
             if mainMethName:
                 def __str__(self): return getattr(self, mainMethName)()
-                __str__ = instancemethod(__str__, None, concreteTemplateClass)
-                setattr(concreteTemplateClass, '__str__', __str__)            
-            
+            elif hasattr(concreteTemplateClass, 'respond'):
+                def __str__(self): return self.respond()
+            else:
+                def __str__(self):
+                    if hasattr(self, mainMethNameAttr):
+                        return getattr(self,mainMethNameAttr)()
+                    elif hasattr(self, 'respond'):
+                        return self.respond()
+                    else:
+                        return super(self.__class__, self).__str__()
+                    
+            __str__ = instancemethod(__str__, None, concreteTemplateClass)
+            setattr(concreteTemplateClass, '__str__', __str__)            
+                
     _assignRequiredMethodsToClass = classmethod(_assignRequiredMethodsToClass)
 
     ## end classmethods ##
@@ -1025,9 +1040,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.132 $
+        Version: $Revision: 1.133 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/07 00:59:12 $
+        Last Revision Date: $Date: 2006/01/07 07:16:25 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
