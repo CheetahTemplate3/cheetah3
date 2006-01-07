@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.36 2006/01/01 23:41:46 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.37 2006/01/07 00:58:47 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.36 $
+Version: $Revision: 1.37 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2006/01/01 23:41:46 $
+Last Revision Date: $Date: 2006/01/07 00:58:47 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.36 $"[11:-2]
+__revision__ = "$Revision: 1.37 $"[11:-2]
 
 import sys
 import os.path
@@ -24,8 +24,12 @@ try:
     else:
         from WebKit.Servlet import Servlet as BaseServlet
     isWebwareInstalled = True
+
+    if not issubclass(BaseServlet, object):
+        class NewStyleBaseServlet(BaseServlet, object): pass
+        BaseServlet = NewStyleBaseServlet
 except:
-    class BaseServlet: 
+    class BaseServlet(object): 
         _reusable = 1
         _threadSafe = 0
     
