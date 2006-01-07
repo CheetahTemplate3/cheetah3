@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.131 2006/01/06 22:06:15 tavis_rudd Exp $
+# $Id: Template.py,v 1.132 2006/01/07 00:59:12 tavis_rudd Exp $
 """Provides the core Template class for Cheetah
 See the docstring in __init__.py and the User's Guide for more information
 
@@ -8,12 +8,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.131 $
+Version: $Revision: 1.132 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/06 22:06:15 $
+Last Revision Date: $Date: 2006/01/07 00:59:12 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.131 $"[11:-2]
+__revision__ = "$Revision: 1.132 $"[11:-2]
 
 import os                         # used to get environ vars, etc.
 import os.path
@@ -96,8 +96,15 @@ def _genUniqueModuleName(baseModuleName):
     _cheetahModuleNames.append(finalName) # prevent collisions
     _uniqueModuleNameLock.release()
     return finalName
-    
-class Template(Servlet):            
+
+class TemplateMetaClass(type):
+    def __init__(cls, name, bases, classdict):
+        super(TemplateMetaClass, cls).__init__(name, bases, classdict)
+        if not hasattr(cls, '_initCheetahAttributes'):
+            templateClass = getattr(cls, '_CHEETAH_templateClass', Template)
+            templateClass._assignRequiredMethodsToClass(cls)
+        
+class Template(Servlet):
     """This provides a) methods used at runtime by templates and b) the
     .compile() classmethod for compiling Cheetah source code into template
     classes.
@@ -1018,9 +1025,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.131 $
+        Version: $Revision: 1.132 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/06 22:06:15 $
+        Last Revision Date: $Date: 2006/01/07 00:59:12 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
