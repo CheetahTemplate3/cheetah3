@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.116 2006/01/07 22:42:42 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.117 2006/01/08 01:09:56 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.116 $
+Version: $Revision: 1.117 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/07 22:42:42 $
+Last Revision Date: $Date: 2006/01/08 01:09:56 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.116 $"[11:-2]
+__revision__ = "$Revision: 1.117 $"[11:-2]
 
 import sys
 import os
@@ -492,7 +492,7 @@ class MethodCompiler(GenUtils):
             else:
                 primary = LVALUE
                 secondary = ''            
-            LVALUE = 'self._CHEETAH_globalSetVars["' + primary + '"]' + secondary
+            LVALUE = 'self._CHEETAH__globalSetVars["' + primary + '"]' + secondary
             expr = LVALUE + ' ' + OP + ' ' + RVALUE.strip()
 
         if setStyle is SET_MODULE:
@@ -504,7 +504,6 @@ class MethodCompiler(GenUtils):
             self.addChunk(expr)
 
     def addInclude(self, sourceExpr, includeFrom, isRaw):
-        # @@TR: consider soft-coding this
         self.addChunk('self._handleCheetahInclude(' + sourceExpr +
                            ', trans=trans, ' +
                            'includeFrom="' + includeFrom + '", raw=' +
@@ -669,13 +668,13 @@ class MethodCompiler(GenUtils):
                       '. line, col ' + str(lineCol) + ' in the source.')
         self.addChunk('_RECACHE%(ID)s = False'%locals())
 
-        self.addChunk('_cacheRegion%(ID)s = self._CHEETAH_cacheRegions.get('%locals()
+        self.addChunk('_cacheRegion%(ID)s = self._CHEETAH__cacheRegions.get('%locals()
                       + repr(ID) + ')')
         
         self.addChunk('if not _cacheRegion%(ID)s:'%locals())
         self.indent()
         self.addChunk("_cacheRegion%(ID)s = CacheRegion()"%locals())
-        self.addChunk("self._CHEETAH_cacheRegions[" + repr(ID)
+        self.addChunk("self._CHEETAH__cacheRegions[" + repr(ID)
                       + "] = _cacheRegion%(ID)s"%locals())
         self.addChunk('_RECACHE%(ID)s = True'%locals())
         self.dedent()
@@ -793,14 +792,14 @@ class MethodCompiler(GenUtils):
     def setErrorCatcher(self, errorCatcherName):
         self.turnErrorCatcherOn()        
 
-        self.addChunk('if self._CHEETAH_errorCatchers.has_key("' + errorCatcherName + '"):')
+        self.addChunk('if self._CHEETAH__errorCatchers.has_key("' + errorCatcherName + '"):')
         self.indent()
-        self.addChunk('self._CHEETAH_errorCatcher = self._CHEETAH_errorCatchers["' +
+        self.addChunk('self._CHEETAH__errorCatcher = self._CHEETAH__errorCatchers["' +
             errorCatcherName + '"]')
         self.dedent()
         self.addChunk('else:')
         self.indent()
-        self.addChunk('self._CHEETAH_errorCatcher = self._CHEETAH_errorCatchers["'
+        self.addChunk('self._CHEETAH__errorCatcher = self._CHEETAH__errorCatchers["'
                       + errorCatcherName + '"] = ErrorCatchers.'
                       + errorCatcherName + '(self)'
                       )
@@ -808,27 +807,27 @@ class MethodCompiler(GenUtils):
         
     def setFilter(self, theFilter, isKlass):
         if isKlass:
-            self.addChunk('_filter = self._CHEETAH_currentFilter = ' + theFilter.strip() +
+            self.addChunk('_filter = self._CHEETAH__currentFilter = ' + theFilter.strip() +
                           '(self).filter')
         else:
             if theFilter.lower() == 'none':
-                self.addChunk('_filter = self._CHEETAH_initialFilter')
+                self.addChunk('_filter = self._CHEETAH__initialFilter')
             else:
                 # is string representing the name of a builtin filter
                 self.addChunk('filterName = ' + repr(theFilter))
-                self.addChunk('if self._CHEETAH_filters.has_key("' + theFilter + '"):')
+                self.addChunk('if self._CHEETAH__filters.has_key("' + theFilter + '"):')
                 self.indent()
-                self.addChunk('_filter = self._CHEETAH_currentFilter = self._CHEETAH_filters[filterName]')
+                self.addChunk('_filter = self._CHEETAH__currentFilter = self._CHEETAH__filters[filterName]')
                 self.dedent()
                 self.addChunk('else:')
                 self.indent()
-                self.addChunk('_filter = self._CHEETAH_currentFilter'
-                              +' = \\\n\t\t\tself._CHEETAH_filters[filterName] = '
-                              + 'getattr(self._CHEETAH_filtersLib, filterName)(self).filter')
+                self.addChunk('_filter = self._CHEETAH__currentFilter'
+                              +' = \\\n\t\t\tself._CHEETAH__filters[filterName] = '
+                              + 'getattr(self._CHEETAH__filtersLib, filterName)(self).filter')
                 self.dedent()
                 
     def closeFilterBlock(self):
-        self.addChunk('_filter = self._CHEETAH_initialFilter')        
+        self.addChunk('_filter = self._CHEETAH__initialFilter')        
 
 class AutoMethodCompiler(MethodCompiler):
 
@@ -917,9 +916,9 @@ class AutoMethodCompiler(MethodCompiler):
             elif allowSearchListAsMethArg and 'searchList' in argNames:
                 self.addChunk('SL = searchList')
             else:
-                self.addChunk('SL = self._CHEETAH_searchList')                
+                self.addChunk('SL = self._CHEETAH__searchList')                
         if self.setting('useFilters'):
-            self.addChunk('_filter = self._CHEETAH_currentFilter')
+            self.addChunk('_filter = self._CHEETAH__currentFilter')
         self.addChunk('')
 
         self.addChunk("#" *40)
@@ -961,7 +960,7 @@ class AutoMethodCompiler(MethodCompiler):
 ## CLASS COMPILERS
 
 _initMethod_initCheetah = """\
-if not self._CHEETAH_instanceInitialized:
+if not self._CHEETAH__instanceInitialized:
     cheetahKWArgs = {}
     allowedKWs = 'searchList filter filtersLib errorCatcher'.split()
     for k,v in KWs.items():
@@ -1020,7 +1019,7 @@ class ClassCompiler(GenUtils):
         self._baseClass = 'Template'
         self._classDocStringLines = []
         # printed after methods in the gen class def:
-        self._generatedAttribs = ['_CHEETAH_instanceInitialized = False']
+        self._generatedAttribs = ['_CHEETAH__instanceInitialized = False']
         if self.setting('templateMetaclass'):
             self._generatedAttribs.append('__metaclass__ = '+self.setting('templateMetaclass'))
         self._initMethChunks = []
@@ -1053,6 +1052,8 @@ class ClassCompiler(GenUtils):
         self._swallowMethodCompiler(__init__, pos=0)
 
     def _addSourceFileMonitoring(self, fileName):
+        # @@TR: this stuff needs auditing for Cheetah 2.0
+        
         # the first bit is added to init
         self.addChunkToInit('self._filePath = ' + repr(fileName))
         self.addChunkToInit('self._fileMtime = ' + str(getmtime(fileName)) )
@@ -1151,17 +1152,6 @@ class ClassCompiler(GenUtils):
         ## now add the attribute
         self._generatedAttribs.append(attribExpr)
 
-    def addSettingsToInit(self, settingsStr, settingsType='ini'):
-        #@@TR 2005-01-01: this may not be used anymore?
-        if settingsType=='python':
-            reader = 'updateSettingsFromPySrcStr'
-        else:            
-            reader = 'updateSettingsFromConfigStr'
-
-        settingsCode = ("self." + reader + "('''" +
-                        settingsStr.replace("'''","\'\'\'") +
-                        "''')")
-        self.addChunkToInit(settingsCode)
 
     def addErrorCatcherCall(self, codeChunk, rawCode='', lineCol=''):
         if self._placeholderToErrorCatcherMap.has_key(rawCode):
@@ -1189,9 +1179,9 @@ class ClassCompiler(GenUtils):
         catcherMeth.addChunk("return eval('''" + codeChunk +
                              "''', globals(), localsDict)")
         catcherMeth.dedent()
-        catcherMeth.addChunk('except self._CHEETAH_errorCatcher.exceptions(), e:')
+        catcherMeth.addChunk('except self._CHEETAH__errorCatcher.exceptions(), e:')
         catcherMeth.indent()        
-        catcherMeth.addChunk("return self._CHEETAH_errorCatcher.warn(exc_val=e, code= " +
+        catcherMeth.addChunk("return self._CHEETAH__errorCatcher.warn(exc_val=e, code= " +
                              repr(codeChunk) + " , rawCode= " +
                              repr(rawCode) + " , lineCol=" + str(lineCol) +")")
         
@@ -1340,9 +1330,8 @@ DEFAULT_COMPILER_SETTINGS = {
     'monitorSrcFile':False,
     'outputMethodsBeforeAttributes': True,
     
-    ## @@TR: The following really belong in the parser, but I've put them
-    ## here for the time being to facilitate separating the parser and
-    ## compiler:
+    ## The are used in the parser, but I've put them here for the time being to
+    ## facilitate separating the parser and compiler:    
     'cheetahVarStartToken':'$',
     'commentStartToken':'##',
     'multiLineCommentStartToken':'#*',
