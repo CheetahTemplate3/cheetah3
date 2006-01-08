@@ -2,6 +2,44 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0b5 (Jan 7, 2006)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+  Core Changes: [TR]    
+    - made Cheetah.Template a new-style class by inserting 'object' into its'
+      inheritance tree.  Templates can now use super(), properties and all the
+      other goodies that come with new-style classes.
+    - removed the WebInputMixin by placing its one method directly in the
+      Template class.
+    - removed the SettingsManager Mixin. It wasn't being used by anything
+      anymore.
+    - added a framework for caching the results of compilations in
+      Template.compile().  This is on by default and protects against bad
+      performance issues that are due to programmers misguidedly compiling
+      templates inside tight loops.  It also saves on memory usage.
+    - misc attr name changes to avoid namespace pollution
+    - more + improved docstrings
+    - replaced the oldstyle dynamic compile hacks with a wrapper around
+      Template.compile().  The old usage pattern Template(src) now benefits from
+      most of the recent changes.  
+         Template(src).__class__ == Template.compile(src)
+    - removed all the extra imports required by oldstyle dynamic compile hacks
+    - converted the cheetah #include mechanism to newstyle compilation and made it
+      more flexible
+    - made the #include mechanism work with file objects in addition to file names
+    - made the handling of args to Template.compile() more flexible.  You can now
+      provide defaults via class attributes.
+    - made preprocessors for Template.compile() work with file arguments
+    - added support for specifying a __metaclass__ on cheetah template classes
+    - refactored both the class and instance initialization processes
+    - improved the handling of __str__ in _assignRequiredMethodsToClass
+
+  The command line tool (CheetahWrapper.py):  [TR]
+    - improved error output in CheetahWrapper
+    - switched fill command over to new style compile usage
+
+  Unit tests: [TR]
+    - fixed format string bug in unittest_local_copy.py 
+
 2.0b4 (Jan 6, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]
@@ -16,7 +54,7 @@ release
       #for i,(j, k) in enumerate([('aa','bb'),('cc','dd')])
         $j.upper,$k.upper
       #end for"
-
+- refactored the class initialization process
     - improved handling of target lists in #set directive. This was previously 
       limited to fairly simple target lists.
       #set i,j = [1,2] ... #set $i,$j = [1,2]
