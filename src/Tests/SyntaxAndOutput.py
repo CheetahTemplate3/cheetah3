@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.79 2006/01/06 01:19:36 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.80 2006/01/08 01:18:11 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.79 $
+Version: $Revision: 1.80 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/06 01:19:36 $
+Last Revision Date: $Date: 2006/01/08 01:18:11 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.79 $"[11:-2]
+__revision__ = "$Revision: 1.80 $"[11:-2]
 
 
 ##################################################
@@ -164,7 +164,7 @@ Template output mismatch:
                 source=input,
                 compilerSettings=self._getCompilerSettings(),
                 keepRefToGeneratedModuleCode=True)
-            moduleCode = templateClass._generatedModuleCode
+            moduleCode = templateClass._CHEETAH_generatedModuleCode
             self.template = templateObj = templateClass(searchList=self.searchList())
         else:
             self.template = templateObj = Template(
@@ -172,7 +172,7 @@ Template output mismatch:
                 searchList=self.searchList(),
                 compilerSettings=self._getCompilerSettings(),
                 )
-            moduleCode = templateObj._generatedModuleCode
+            moduleCode = templateObj._CHEETAH_generatedModuleCode
         if self.DEBUGLEV >= 1:
             print moduleCode
         try:
@@ -182,7 +182,7 @@ Template output mismatch:
                     output = output.decode(outputEncoding)
                 assert output==expectedOutput, self._outputMismatchReport(output, expectedOutput)
             except:
-                print >>sys.stderr, moduleCode
+                #print >>sys.stderr, moduleCode
                 raise
         finally:
             templateObj.shutdown()
@@ -1305,7 +1305,7 @@ class YieldDirective(OutputTest):
 
         for src in (src1,src2,src3):
             klass = Template.compile(src, keepRefToGeneratedModuleCode=True)
-            #print klass._generatedModuleCode
+            #print klass._CHEETAH_generatedModuleCode
             iter = klass().respond()
             output = [str(i) for i in iter]
             assert ''.join(output)=='0123456789'
