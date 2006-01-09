@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.103 2006/01/06 01:11:55 tavis_rudd Exp $
+# $Id: Parser.py,v 1.104 2006/01/09 09:03:16 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.103 $
+Version: $Revision: 1.104 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/06 01:11:55 $
+Last Revision Date: $Date: 2006/01/09 09:03:16 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.103 $"[11:-2]
+__revision__ = "$Revision: 1.104 $"[11:-2]
 
 import os
 import sys
@@ -628,13 +628,6 @@ class _LowLevelParser(SourceReader):
         if not match:
             raise ParseError(self, msg='Expected Cheetah $var start token')            
         return self.readTo( match.end() )
-        
-    def _X_getCheetahVarStartToken(self):
-        """just the start token, not the enclosure or cache token"""
-        match = self.matchCheetahVarStart()
-        if not match:
-            raise ParseError(self, msg='Expected Cheetah $var start token')            
-        return self.readTo( match.end('startToken') )
 
 
     def getCacheToken(self):
@@ -675,16 +668,6 @@ class _LowLevelParser(SourceReader):
             self.getCheetahVarStartToken()
         self.getCacheToken()
         return self.getCheetahVarBody(plain=plain)
-
-    def _X_getCheetahVar(self, plain=False, skipStartToken=False):
-        # @@TR: refactoring in progress
-        if not skipStartToken:
-            self.getCheetahVarStartToken()
-        cacheToken = self.getCacheToken()
-        return CheetahVariable(nameChunks=self.getCheetahVarNameChunks(),
-                               cacheToken=cacheToken,
-                               useNameMapper=plain
-                               )
             
     def getCheetahVarBody(self, plain=False):
         # @@TR: this should be in the compiler
@@ -1735,24 +1718,6 @@ class _HighLevelParser(_LowLevelParser):
         self._src = origSrc
         self.setBreakPoint(origBP) 
         self.setPos(endPos)
-
-    def _X_eatSingleLineDef(self, methodName, argsList, startPos, endPos):
-        ## @@TR: this is an experimental version of the method
-        # filtered in calling method        
-        origPos = self.pos()
-        methodSrc = self[self.pos():endPos].strip()
-        fullSignature = self[startPos:endPos]
-        origBP = self.breakPoint()
-        self.setBreakPoint(endPos-1)
-        parserComment = ('## Generated from ' + fullSignature + 
-                         ' at line %s, col %s' % self.getRowCol(startPos)
-                         + '.')
-        self._compiler.startMethodDef(methodName, argsList, parserComment)
-        #self.getWhiteSpace()
-        self.parse(assertEmptyStack=False, endPos=endPos)
-        #print self.pos()
-        self.setBreakPoint(origBP) 
-        return fullSignature # used by the #block code        
             
     def eatImport(self):
         # filtered
