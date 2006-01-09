@@ -1,35 +1,8 @@
 Known Bugs in Cheetah
 --------------------------
-See the file CHANGES for a list of bugs that have been resolved.  
+ - See the file CHANGES for a list of bugs that have been resolved.  
+ - Developers: if a bug was significant and affected a released version of
+   Cheetah, be sure to note its fix in the CHANGES file!
+--------------------------
 
-Developers: if a bug was significant and affected a released version of
-Cheetah, be sure to note its fix in the CHANGES file!
-
-Compiler forgets commas
-=======================
-@@TR: This is not a bug.  Python and Cheetah's syntax requires commas.
-
-# Affects Cheetah 0.9.14, CVS and possibly earlier.
-# - fix bug in Parser.getDefArgList() that is mucking up lists where the comma has
-#   been forgotten:
-# 
-#   > #cache timer='.5m' id='cache1'
-#   > This is a cached region.  $voom
-#   > #end cache
-#   > 
-#   > the error is:
-#   > 
-#   > "/local/opt/Python/lib/python2.2/site-packages/Webware/Cheetah/Compiler.py",
-#   > line 102, in genCacheInfoFromArgList
-#   >     val = self.genTimeInterval(val)
-#   >   File
-#   > "/local/opt/Python/lib/python2.2/site-packages/Webware/Cheetah/Compiler.py",
-#   > line 75, in genTimeInterval
-#   >     interval = float(timeString)*60
-#   > ValueError: invalid literal for float(): .5m' id'cache1
-#   > 
-#   > 
-#   > Running under pdb shows that Parser.getDefArgList() returned:
-#   > "30m' id'cache1" .
-# 
-
+No known bugs at present.
