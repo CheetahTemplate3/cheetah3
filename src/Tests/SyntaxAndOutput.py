@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.80 2006/01/08 01:18:11 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.81 2006/01/09 09:02:42 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.80 $
+Version: $Revision: 1.81 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/08 01:18:11 $
+Last Revision Date: $Date: 2006/01/09 09:02:42 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.80 $"[11:-2]
+__revision__ = "$Revision: 1.81 $"[11:-2]
 
 
 ##################################################
@@ -163,7 +163,7 @@ Template output mismatch:
             templateClass = Template.compile(
                 source=input,
                 compilerSettings=self._getCompilerSettings(),
-                keepRefToGeneratedModuleCode=True)
+                keepRefToGeneratedCode=True)
             moduleCode = templateClass._CHEETAH_generatedModuleCode
             self.template = templateObj = templateClass(searchList=self.searchList())
         else:
@@ -1304,7 +1304,7 @@ class YieldDirective(OutputTest):
 
 
         for src in (src1,src2,src3):
-            klass = Template.compile(src, keepRefToGeneratedModuleCode=True)
+            klass = Template.compile(src, keepRefToGeneratedCode=True)
             #print klass._CHEETAH_generatedModuleCode
             iter = klass().respond()
             output = [str(i) for i in iter]
