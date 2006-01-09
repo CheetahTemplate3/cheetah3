@@ -9,13 +9,25 @@ release
     - added lots more docstring content in the Template class
     - added baseclass arg to Template.compile(). It simplifies the reuse of
       dynamically compiled templates:
-        # example 1:
+      # example 1, quickly subclassing a compiled template class:
         from Cheetah.Template import Template
         T1 = Template.compile('$meth1 #def meth1: this is meth1 in T1')
         T2 = Template.compile('#implements meth1\nthis is meth1 redefined in T2', baseclass=T1)
-	# example 2:
+
+      # example 2, quickly subclassing a normal Python class and using its
+      #  __init__ call signature:
         dictTemplate = Template.compile('hello $name from $caller', baseclass=dict)
         print dictTemplate(name='world', caller='me')
+
+      # example 3, mixing a Cheetah method into a class definition:
+        class Foo(dict):
+            def meth1(self): 
+                return 'foo'
+            def meth2(self): 
+                return 'bar'        
+        Foo = Template.compile('#implements meth3\nhello $name from $caller', 
+                               baseclass=Foo)
+	print Foo(name='world', caller='me')  
 
       A side-benefit is the possibility to use the same Cheetah source with
       several baseclass, as the baseclass is orthogonal to the source code,
