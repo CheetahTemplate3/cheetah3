@@ -5,3 +5,12 @@ curl -T  dist/Cheetah-${release}.tar.gz.asc ftp://anonymous@upload.sourceforge.n
 
 echo curl -T  dist/Cheetah-${release}.tar.gz ftp://anonymous@upload.sourceforge.net/incoming/
 curl -T  dist/Cheetah-${release}.tar.gz ftp://anonymous@upload.sourceforge.net/incoming/
+
+echo scp CHANGES tavis_rudd@cheetahtemplate.sourceforge.net:www/docs/
+scp CHANGES tavis_rudd@cheetahtemplate.sourceforge.net:www/docs/
+
+echo scp TODO tavis_rudd@cheetahtemplate.sourceforge.net:www/docs/
+scp TODO tavis_rudd@cheetahtemplate.sourceforge.net:www/docs/
+
+echo scp BUGS tavis_rudd@cheetahtemplate.sourceforge.net:www/docs/
+scp BUGS tavis_rudd@cheetahtemplate.sourceforge.net:www/docs/
