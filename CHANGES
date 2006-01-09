@@ -2,6 +2,29 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0b6 (unreleased)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+  Core Changes: [TR]    
+    - made it possible nest #filter directives
+    - added lots more docstring content in the Template class
+    - added baseclass arg to Template.compile(). It simplifies the reuse of
+      dynamically compiled templates:
+        # example 1:
+        from Cheetah.Template import Template
+        T1 = Template.compile('$meth1 #def meth1: this is meth1 in T1')
+        T2 = Template.compile('#implements meth1\nthis is meth1 redefined in T2', baseclass=T1)
+	# example 2:
+        dictTemplate = Template.compile('hello $name from $caller', baseclass=dict)
+        print dictTemplate(name='world', caller='me')
+
+      A side-benefit is the possibility to use the same Cheetah source with
+      several baseclass, as the baseclass is orthogonal to the source code,
+      unlike the #extends directive.
+
+    - added 'namespaces' as an alias for 'searchList' in Template.__init__
+    - made it possible to pass in a single namespace to 'searchList', which will
+      automatically be converted into a list.
+    
 2.0b5 (Jan 7, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]    
