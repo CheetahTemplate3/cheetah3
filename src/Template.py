@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.136 2006/01/09 09:01:05 tavis_rudd Exp $
+# $Id: Template.py,v 1.137 2006/01/09 19:55:43 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.136 $
+Version: $Revision: 1.137 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/09 09:01:05 $
+Last Revision Date: $Date: 2006/01/09 19:55:43 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.136 $"[11:-2]
+__revision__ = "$Revision: 1.137 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -155,22 +155,10 @@ class Template(Servlet):
 
     If you need to subclass a dynamically compiled Cheetah class, do something like this:
         from Cheetah.Template import Template
-        src = '''
-          #set name = 'template'
-          This is a $name
-          $meth1
-          #def meth1
-           this is meth1 in My1stTemplateClass
-          #end def
-          '''
-        My1stTemplateClass = Template.compile(src)
-        My2ndTemplateClass = Template.compile('''
-          #implements meth1
-            this is meth1 redefined in My2ndTemplateClass
-          ''', baseclass=My1stTemplateClass)
-
-        print My1stTemplateClass, My1stTemplateClass()
-        print My2ndTemplateClass, My2ndTemplateClass()
+        T1 = Template.compile('$meth1 #def meth1: this is meth1 in T1')
+        T2 = Template.compile('#implements meth1\nthis is meth1 redefined in T2', baseclass=T1)
+        print T1, T1()
+        print T2, T2()
 
 
     Note about class and instance attribute names:
@@ -718,6 +706,21 @@ class Template(Servlet):
                 
     _assignRequiredMethodsToClass = classmethod(_assignRequiredMethodsToClass)
 
+    def subclass(klass, *args, **kws):
+        """Takes the same args as the .compile() classmethod and returns a
+        template that is a subclass of the template this method is called from.
+
+        T1 = Template.compile(' foo - $meth1 - bar\n#def meth1: this is T1.meth1')
+        T2 = T1.subclass('#implements meth1\n this is T2.meth1')
+        """
+        kws['baseclass'] = klass
+        if isinstance(klass, Template):
+            templateAPIClass = klass
+        else:
+            templateAPIClass = Template
+        return templateAPIClass.compile(*args, **kws)
+    subclass = classmethod(subclass)
+
     ## end classmethods ##
 
     def __init__(self, source=None, searchList=Unspecified, namespaces=Unspecified,
@@ -1219,9 +1222,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.136 $
+        Version: $Revision: 1.137 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/09 09:01:05 $
+        Last Revision Date: $Date: 2006/01/09 19:55:43 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
