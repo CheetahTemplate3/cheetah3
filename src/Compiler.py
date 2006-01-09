@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.118 2006/01/09 09:02:13 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.119 2006/01/09 09:06:44 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.118 $
+Version: $Revision: 1.119 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/09 09:02:13 $
+Last Revision Date: $Date: 2006/01/09 09:06:44 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.118 $"[11:-2]
+__revision__ = "$Revision: 1.119 $"[11:-2]
 
 import sys
 import os
@@ -1009,7 +1009,7 @@ class AutoMethodCompiler(MethodCompiler):
 _initMethod_initCheetah = """\
 if not self._CHEETAH__instanceInitialized:
     cheetahKWArgs = {}
-    allowedKWs = 'searchList filter filtersLib errorCatcher'.split()
+    allowedKWs = 'searchList namespaces filter filtersLib errorCatcher'.split()
     for k,v in KWs.items():
         if k in allowedKWs: cheetahKWArgs[k] = v
     self._initCheetahAttributes(**cheetahKWArgs)
