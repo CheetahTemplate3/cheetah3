@@ -2,24 +2,26 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-2.0b6 (unreleased)
+2.0rc1 (Jan 10, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]    
     - made it possible nest #filter directives
     - added lots more docstring content in the Template class
+    - added Template.subclass() classmethod for quickly creating subclasses of
+      existing Cheetah template classes. It takes the same args as the
+      .compile() classmethod and returns a template that is a subclass of the
+      template .subclass() is called from:
+          T1 = Template.compile(' foo - $meth1 - bar\n#def meth1: this is T1.meth1')
+          T2 = T1.subclass('#implements meth1\n this is T2.meth1')
+
     - added baseclass arg to Template.compile(). It simplifies the reuse of
       dynamically compiled templates:
-      # example 1, quickly subclassing a compiled template class:
-        from Cheetah.Template import Template
-        T1 = Template.compile('$meth1 #def meth1: this is meth1 in T1')
-        T2 = Template.compile('#implements meth1\nthis is meth1 redefined in T2', baseclass=T1)
-
-      # example 2, quickly subclassing a normal Python class and using its
+      # example 1, quickly subclassing a normal Python class and using its
       #  __init__ call signature:
         dictTemplate = Template.compile('hello $name from $caller', baseclass=dict)
         print dictTemplate(name='world', caller='me')
 
-      # example 3, mixing a Cheetah method into a class definition:
+      # example 2, mixing a Cheetah method into a class definition:
         class Foo(dict):
             def meth1(self): 
                 return 'foo'
@@ -32,11 +34,18 @@ release
       A side-benefit is the possibility to use the same Cheetah source with
       several baseclass, as the baseclass is orthogonal to the source code,
       unlike the #extends directive.
-
+    
     - added 'namespaces' as an alias for 'searchList' in Template.__init__
     - made it possible to pass in a single namespace to 'searchList', which will
       automatically be converted into a list.
-    
+    - fixed issue with buffering and use of #call when template is used as a
+       webkit servlet
+    - added Cheetah.Utils.htmlEncode and htmlDecode
+   
+  The command line tool (CheetahWrapper.py): 
+    - changed insertion order for the --env and --pickle options so they match the
+      commandline UI of the compiled template modules themselves [TR]
+
 2.0b5 (Jan 7, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]    
