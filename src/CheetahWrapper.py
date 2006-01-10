@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.22 2006/01/06 23:52:12 tavis_rudd Exp $
+# $Id: CheetahWrapper.py,v 1.23 2006/01/10 22:03:00 tavis_rudd Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -9,12 +9,12 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.22 $
+Version: $Revision: 1.23 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/06 23:52:12 $
+Last Revision Date: $Date: 2006/01/10 22:03:00 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.22 $"[11:-2]
+__revision__ = "$Revision: 1.23 $"[11:-2]
 
 import getopt, glob, os, pprint, re, shutil, sys
 import cPickle as pickle
@@ -214,14 +214,13 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
 
         self._fixExts()
         if opts.env:
-            self.searchList.append(os.environ)
+            self.searchList.insert(0, os.environ)
         if opts.pickle:
             f = open(opts.pickle, 'rb')
             unpickled = pickle.load(f)
             f.close()
-            self.searchList.append(unpickled)
+            self.searchList.insert(0, unpickled)
         opts.verbose = not opts.stdout
-
 
     def _getTemplateClass(self):
         C, D, W = self.chatter, self.debug, self.warn
