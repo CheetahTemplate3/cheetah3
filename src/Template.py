@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.137 2006/01/09 19:55:43 tavis_rudd Exp $
+# $Id: Template.py,v 1.138 2006/01/10 21:42:16 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.137 $
+Version: $Revision: 1.138 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/09 19:55:43 $
+Last Revision Date: $Date: 2006/01/10 21:42:16 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.137 $"[11:-2]
+__revision__ = "$Revision: 1.138 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -568,6 +568,21 @@ class Template(Servlet):
             return generatedModuleCode
     compile = classmethod(compile)
 
+    def subclass(klass, *args, **kws):
+        """Takes the same args as the .compile() classmethod and returns a
+        template that is a subclass of the template this method is called from.
+
+          T1 = Template.compile(' foo - $meth1 - bar\n#def meth1: this is T1.meth1')
+          T2 = T1.subclass('#implements meth1\n this is T2.meth1')
+        """
+        kws['baseclass'] = klass
+        if isinstance(klass, Template):
+            templateAPIClass = klass
+        else:
+            templateAPIClass = Template
+        return templateAPIClass.compile(*args, **kws)
+    subclass = classmethod(subclass)
+
     def _preprocessSource(klass, source, file, preprocessors):
         """Iterates through the .compile() classmethod's preprocessors argument
         and pipes the source code through each each preprocessor.
@@ -705,21 +720,6 @@ class Template(Servlet):
             setattr(concreteTemplateClass, '__str__', __str__)            
                 
     _assignRequiredMethodsToClass = classmethod(_assignRequiredMethodsToClass)
-
-    def subclass(klass, *args, **kws):
-        """Takes the same args as the .compile() classmethod and returns a
-        template that is a subclass of the template this method is called from.
-
-        T1 = Template.compile(' foo - $meth1 - bar\n#def meth1: this is T1.meth1')
-        T2 = T1.subclass('#implements meth1\n this is T2.meth1')
-        """
-        kws['baseclass'] = klass
-        if isinstance(klass, Template):
-            templateAPIClass = klass
-        else:
-            templateAPIClass = Template
-        return templateAPIClass.compile(*args, **kws)
-    subclass = classmethod(subclass)
 
     ## end classmethods ##
 
@@ -967,6 +967,7 @@ class Template(Servlet):
         if not hasattr(self, 'transaction'):
             self.transaction = None
         self._CHEETAH__instanceInitialized = True
+        self._CHEETAH__isBuffering = False
             
     def _compile(self, source=None, file=None, compilerSettings=Unspecified,
                  moduleName=None, mainMethodName=None):
@@ -1222,9 +1223,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.137 $
+        Version: $Revision: 1.138 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/09 19:55:43 $
+        Last Revision Date: $Date: 2006/01/10 21:42:16 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit

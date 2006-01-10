@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.119 2006/01/09 09:06:44 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.120 2006/01/10 21:41:43 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.119 $
+Version: $Revision: 1.120 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/09 09:06:44 $
+Last Revision Date: $Date: 2006/01/10 21:41:43 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.119 $"[11:-2]
+__revision__ = "$Revision: 1.120 $"[11:-2]
 
 import sys
 import os
@@ -783,6 +783,8 @@ class MethodCompiler(GenUtils):
                       +' of '+functionName
                       +' at line, col ' + str(lineCol) + ' in the source.')
         self.addChunk('_orig_trans%(ID)s = trans'%locals())
+        self.addChunk('_wasBuffering%(ID)s = self._CHEETAH__isBuffering'%locals())
+        self.addChunk('self._CHEETAH__isBuffering = True')
         self.addChunk('trans = _callCollector%(ID)s = DummyTransaction()'%locals())
         self.addChunk('write = _callCollector%(ID)s.response().write'%locals())
 
@@ -809,9 +811,14 @@ class MethodCompiler(GenUtils):
         ID, callDetails = self._callRegionsStack[-1]
         functionName, initialKwArgs, lineCol = (
             callDetails.functionName, callDetails.args, callDetails.lineCol)
-        if not callDetails.usesKeywordArgs:
+
+        def reset(ID=ID):
             self.addChunk('trans = _orig_trans%(ID)s'%locals())
             self.addChunk('write = trans.response().write')
+            self.addChunk('self._CHEETAH__isBuffering = _wasBuffering%(ID)s '%locals())
+
+        if not callDetails.usesKeywordArgs:
+            reset()
             self.addChunk('_callArgVal%(ID)s = _callCollector%(ID)s.response().getvalue()'%locals())
             self.addChunk('del _callCollector%(ID)s'%locals())
             if initialKwArgs:
@@ -822,8 +829,7 @@ class MethodCompiler(GenUtils):
             if initialKwArgs:
                 initialKwArgs = initialKwArgs+', '
             self._endCallArg()
-            self.addChunk('trans = _orig_trans%(ID)s'%locals())
-            self.addChunk('write = trans.response().write')            
+            reset()
             self.addFilteredChunk('%(functionName)s(%(initialKwArgs)s**_callKws%(ID)s)'%locals())
             self.addChunk('del _callKws%(ID)s'%locals())
         self.addChunk('## END CALL REGION: '+ID
@@ -942,7 +948,8 @@ class AutoMethodCompiler(MethodCompiler):
         if self._streamingEnabled:
             if self._useKWsDictArgForPassingTrans() and self._kwargsName:
                 self.addChunk('trans = %s.get("trans")'%self._kwargsName)            
-            self.addChunk('if not trans and not callable(self.transaction):')
+            self.addChunk('if (not trans and not self._CHEETAH__isBuffering'
+                          ' and not callable(self.transaction)):')
             self.indent()
             self.addChunk('trans = self.transaction'
                           ' # is None unless self.awake() was called')
