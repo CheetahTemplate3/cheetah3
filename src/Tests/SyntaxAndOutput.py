@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.81 2006/01/09 09:02:42 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.82 2006/01/11 07:39:44 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.81 $
+Version: $Revision: 1.82 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/09 09:02:42 $
+Last Revision Date: $Date: 2006/01/11 07:39:44 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.81 $"[11:-2]
+__revision__ = "$Revision: 1.82 $"[11:-2]
 
 
 ##################################################
@@ -399,11 +399,15 @@ class Comments_SingleLine(OutputTest):
                     "")
 
 
-class Comments_MultiLine(OutputTest):
+class Comments_MultiLine_NoGobble(OutputTest):
     """
-    Note: Multiline comments don't gobble whitespace!
+    Multiline comments used to not gobble whitespace.  They do now, but this can
+    be turned off with a compilerSetting    
     """
-    
+
+    def _getCompilerSettings(self):
+        return dict(gobbleWhitespaceAroundMultiLineComments=False)
+
     def test1(self):
         """#* *# followed by WS
         Shouldn't gobble WS
@@ -432,6 +436,39 @@ class Comments_MultiLine(OutputTest):
         self.verify("   #* \nblarg\n *#   ",
                     "      ")
 
+class Comments_MultiLine(OutputTest):
+    """
+    Note: Multiline comments don't gobble whitespace!
+    """
+    
+    def test1(self):
+        """#* *# followed by WS
+        Should gobble WS
+        """
+        self.verify("#* blarg *#   ",
+                    "")
+        
+    def test2(self):
+        """#* *# preceded and followed by WS
+        Should gobble WS
+        """
+        self.verify("   #* blarg *#   ",
+                    "")
+        
+    def test3(self):
+        """#* *# followed by WS, with NEWLINE
+        Shouldn't gobble WS
+        """
+        self.verify("#* \nblarg\n *#   ",
+                    "")
+        
+    def test4(self):
+        """#* *# preceded and followed by WS, with NEWLINE
+        Shouldn't gobble WS
+        """
+        self.verify("   #* \nblarg\n *#   ",
+                    "")
+
     def test5(self):
         """#* *# containing nothing 
         """
@@ -441,7 +478,7 @@ class Comments_MultiLine(OutputTest):
     def test6(self):
         """#* *# containing only NEWLINES
         """
-        self.verify("#*\n\n\n\n\n\n\n\n*#",
+        self.verify("  #*\n\n\n\n\n\n\n\n*#  ",
                     "")
 
     def test7(self):
@@ -455,6 +492,26 @@ class Comments_MultiLine(OutputTest):
         """
         self.verify("#* #for $i in range(15) *#",
                     "")
+
+    def test9(self):
+        """ text around #* *# containing #for directive
+        """
+        self.verify("foo\nfoo bar #* #for $i in range(15) *# foo\n",
+                    "foo\nfoo bar  foo\n")
+
+    def test9(self):
+        """ text around #* *# containing #for directive and trailing whitespace
+        which should be gobbled
+        """
+        self.verify("foo\nfoo bar #* #for $i in range(15) *#   \ntest",
+                    "foo\nfoo bar \ntest")
+
+    def test10(self):
+        """ text around #* *# containing #for directive and newlines: trailing whitespace
+        which should be gobbled.
+        """
+        self.verify("foo\nfoo bar #* \n\n#for $i in range(15) \n\n*#   \ntest",
+                    "foo\nfoo bar \ntest")
 
 class Placeholders(OutputTest):
     def test1(self):
