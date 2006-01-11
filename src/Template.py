@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.138 2006/01/10 21:42:16 tavis_rudd Exp $
+# $Id: Template.py,v 1.139 2006/01/11 22:44:16 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.138 $
+Version: $Revision: 1.139 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/10 21:42:16 $
+Last Revision Date: $Date: 2006/01/11 22:44:16 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.138 $"[11:-2]
+__revision__ = "$Revision: 1.139 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -149,9 +149,8 @@ class Template(Servlet):
              new-style 'object' baseclass.  Cheetah.Template is a subclass of
              'object'.  You also can not #extend dict, list, or other builtin
              types.  
-           - If your template baseclass' __init__ constructor expects there is
-             currently no way to pass them in.
-             
+           - If your template baseclass' __init__ constructor expects args there
+             is currently no way to pass them in.
 
     If you need to subclass a dynamically compiled Cheetah class, do something like this:
         from Cheetah.Template import Template
@@ -1223,9 +1222,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.138 $
+        Version: $Revision: 1.139 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/10 21:42:16 $
+        Last Revision Date: $Date: 2006/01/11 22:44:16 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
