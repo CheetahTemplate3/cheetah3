@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.120 2006/01/10 21:41:43 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.121 2006/01/11 07:40:51 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.120 $
+Version: $Revision: 1.121 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/10 21:41:43 $
+Last Revision Date: $Date: 2006/01/11 07:40:51 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.120 $"[11:-2]
+__revision__ = "$Revision: 1.121 $"[11:-2]
 
 import sys
 import os
@@ -95,6 +95,7 @@ DEFAULT_COMPILER_SETTINGS = {
     'commentStartToken':'##',
     'multiLineCommentStartToken':'#*',
     'multiLineCommentEndToken':'*#',
+    'gobbleWhitespaceAroundMultiLineComments':True,
     'directiveStartToken':'#',
     'directiveEndToken':'#',
     'PSPStartToken':'<%',

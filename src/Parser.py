@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.104 2006/01/09 09:03:16 tavis_rudd Exp $
+# $Id: Parser.py,v 1.105 2006/01/11 07:40:36 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.104 $
+Version: $Revision: 1.105 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/09 09:03:16 $
+Last Revision Date: $Date: 2006/01/11 07:40:36 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.104 $"[11:-2]
+__revision__ = "$Revision: 1.105 $"[11:-2]
 
 import os
 import sys
@@ -1328,9 +1328,18 @@ class _HighLevelParser(_LowLevelParser):
                 break
             self.advance()
         comm = self.readTo(endPos, start=startPos)
+
         if not self.atEnd():
             self.getMultiLineCommentEndToken()
-        # don't gobble
+
+        if (not self.atEnd()) and self.setting('gobbleWhitespaceAroundMultiLineComments'):
+            restOfLine = self[self.pos():self.findEOL()]
+            if not restOfLine.strip(): # WS only to EOL
+                self.readToEOL(gobble=isLineClearToStartToken)
+
+            if isLineClearToStartToken and (self.atEnd() or self.pos() > endOfFirstLine):
+                self._compiler.handleWSBeforeDirective()
+        
         self._compiler.addComment(comm)
 
     def eatPlaceholder(self):
@@ -1383,7 +1392,7 @@ class _HighLevelParser(_LowLevelParser):
             self.readToEOL(gobble=True)
             
         if isLineClearToStartToken and (self.atEnd() or self.pos() > endOfFirstLinePos):
-            self._compiler.handleWSBeforeDirective() #command to the compiler
+            self._compiler.handleWSBeforeDirective()
 
     def eatEndDirective(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
