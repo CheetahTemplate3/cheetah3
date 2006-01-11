@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.121 2006/01/11 07:40:51 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.122 2006/01/11 07:43:05 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.121 $
+Version: $Revision: 1.122 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/11 07:40:51 $
+Last Revision Date: $Date: 2006/01/11 07:43:05 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.121 $"[11:-2]
+__revision__ = "$Revision: 1.122 $"[11:-2]
 
 import sys
 import os
@@ -124,7 +124,7 @@ DEFAULT_COMPILER_SETTINGS = {
     # lowercase.  The filters *must* return the expr or raise an exception.
     # They can modify the expr if needed.
 
-    'templateMetaclass':None
+    'templateMetaclass':None # strictly optional. Only works with new-style baseclasses
     }
 
 
