@@ -117,7 +117,7 @@
 
      </td>
      <td width="300">
-       #set sep='<span class="sep">|</span>'
+       #set sep=' <span class="sep">|</span> '
        <div class="homePageUtilLinks">
         <a href="http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss"
 	 >Mailing List</a>$sep<a href="docs/CHANGES">Changes</a>$sep<a 
@@ -682,6 +682,21 @@
 
     ##http://www.thescripts.com/forum/post365058-2.html
     $formatQuote("I'm greatly in favour of Cheetah.", 'Sybren Stuvel')
+
+    ##http://www.codegeneration.net/tiki-read_article.php?articleId=39
+    $formatQuote("""I ran across Cheetah, 'a Python-powered template engine and
+    code generator', and haven't looked back since. 
+
+    ... it was a breeze to crank out several
+    templates in a short period of time. In only a few hours a night, over three
+    nights, I was able to learn enough about Python and Cheetah to write a code
+    generator that generates my POJOs, DAOs, and WebWork2 action classes. ...
+    Given my recent experience with Python and Cheetah, I can't imagine an
+    easier way to generate code!  """,
+
+     '''Peter White, in an <a 
+     href="http://www.codegeneration.net/tiki-read_article.php?articleId=39">interview</a>
+     on the "Code Generation Network"''')
 
     ##http://blog.kodemaniak.de/archives/10-Python-template-system.html
     $formatQuote("Cheetah is very powerful and flexible.", 'Carsten Saathoff')
