@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.139 2006/01/11 22:44:16 tavis_rudd Exp $
+# $Id: Template.py,v 1.140 2006/01/13 01:32:54 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.139 $
+Version: $Revision: 1.140 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/11 22:44:16 $
+Last Revision Date: $Date: 2006/01/13 01:32:54 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.139 $"[11:-2]
+__revision__ = "$Revision: 1.140 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -96,9 +96,8 @@ _formUsedByWebInput = None
 
         
 class Template(Servlet):
-    """This provides a) methods used at runtime by templates and b) the
-    .compile() classmethod for compiling Cheetah source code into template
-    classes.
+    """This class provides a) methods used at runtime by templates and b)
+    methods for compiling Cheetah source code into template classes.
 
     This documentation assumes you already know Python and the basics of object
     oriented programming.  If you don't know Python, see the sections of the
@@ -114,20 +113,20 @@ class Template(Servlet):
     CherryPy, Quixote, etc.) provide plugins that Cheetah compilation for you.
 
     There are several possible usage patterns:          
-       1) tmplClass = Template.compile(src)
-          tmplInstance1 = tmplClass() # or tmplClass(searchList=[namespace,...])
-          tmplInstance2 = tmplClass() # or tmplClass(searchList=[namespace2,...])
-          outputStr = str(tmplInstance1) # or outputStr = tmplInstance.aMethodYouDefined()
+       1) tclass = Template.compile(src)
+          t1 = tclass() # or tclass(namespaces=[namespace,...])
+          t2 = tclass() # or tclass(namespaces=[namespace2,...])
+          outputStr = str(t1) # or outputStr = t1.aMethodYouDefined()
 
           Template.compile provides a rich and very flexible API via its
           optional arguments so there are many possible variations of this
           pattern.  One example is:
-            tmplClass = Template.compile('hello $name from $caller', baseclass=dict)
-            print tmplClass(name='world', caller='me')
+            tclass = Template.compile('hello $name from $caller', baseclass=dict)
+            print tclass(name='world', caller='me')
           See the Template.compile() docstring for more details.  
 
        2) tmplInstance = Template(src)
-             # or Template(src, searchList=[namespace,...])
+             # or Template(src, namespaces=[namespace,...])
           outputStr = str(tmplInstance) # or outputStr = tmplInstance.aMethodYouDefined(...args...)
 
     Notes on the usage patterns:
@@ -141,8 +140,8 @@ class Template(Servlet):
        2) This was Cheetah's original usage pattern.  It returns an instance,
           but you can still access the generated class via
           tmplInstance.__class__.  If you want to use several different
-          'searchLists' with a single template source definition, you're better
-          off with Template.compile (1).
+          namespace 'searchLists' with a single template source definition,
+          you're better off with Template.compile (1).
 
           Limitations (use Template.compile (1) instead):
            - Templates compiled this way can only #extend subclasses of the
@@ -173,7 +172,7 @@ class Template(Servlet):
     """
 
     #this is used by .assignRequiredMethodsToClass()
-    _CHEETAH_requiredCheetahMethodNames = ('_initCheetahAttributes',
+    _CHEETAH_requiredCheetahMethodNames = ('_initCheetahInstance',
                                            'searchList',
                                            'errorCatcher',
                                            'refreshCache',
@@ -240,10 +239,24 @@ class Template(Servlet):
         class.  You then create template instances using that class.  All
         Cheetah's other compilation API's use this method under the hood.
 
-        If you want to get the generated python source code instead, pass the
-        argument returnAClass=False.
+        Internally, this method a) parses the Cheetah source code and generates
+        Python code defining a module with a single class in it, b) dynamically
+        creates a module object with a unique name, c) execs the generated code
+        in that modules namespace then inserts the module into sys.modules, and
+        d) returns a reference to the generated class.  If you want to get the
+        generated python source code instead, pass the argument
+        returnAClass=False.
 
-        Args:
+        It provides some hooks for template source preprocessing and does some
+        caching of generated code and classes.  See the descriptions of the
+        arguments 'preprocessors', 'cacheCompilationResults', and 'useCache' for
+        details on those features.
+
+        If you are an advanced user and need to customize the way Cheetah parses
+        source code or outputs Python code, you should check out the
+        compilerSettings argument.
+
+        Arguments:
           You must provide either a 'source' or 'file' arg, but not both:
             - source (string or None)
             - file (string path, file-like object, or None)
@@ -722,24 +735,126 @@ class Template(Servlet):
 
     ## end classmethods ##
 
-    def __init__(self, source=None, searchList=Unspecified, namespaces=Unspecified,
+    def __init__(self, source=None,
+
+                 namespaces=None, searchList=None,
+                 # use either or.  They are aliases for the same thing.
+                 
                  file=None,
                  filter='EncodeUnicode', # which filter from Cheetah.Filters
                  filtersLib=Filters,
                  errorCatcher=None,
                  
                  compilerSettings=Unspecified, # control the behaviour of the compiler
-                 _globalSetVars=Unspecified, # used internally for #include'd templates
-                 _preBuiltSearchList=Unspecified # used internally for #include'd templates
+                 _globalSetVars=None, # used internally for #include'd templates
+                 _preBuiltSearchList=None # used internally for #include'd templates
                  ):        
-        """Reads in the template definition, sets up the namespace searchList,
-        processes settings, then compiles.
+        """a) compiles a new template OR b) instantiates an existing template.
 
-        Compiler configuration settings should be passed in as a dictionary via
-        the 'compilerSettings' keyword.
+        Read this docstring carefully as there are two distinct usage patterns.
+        You should also read this class' main docstring.
+        
+        a) to compile a new template:
+             t = Template(source=aSourceString)
+                 # or 
+             t = Template(file='some/path')
+                 # or 
+             t = Template(file=someFileObject)
+                 # or
+             namespaces = [{'foo':'bar'}]               
+             t = Template(source=aSourceString, namespaces=namespaces)
+                 # or 
+             t = Template(file='some/path', namespaces=namespaces)
+  
+             print t
+             
+        b) to create an instance of an existing, precompiled template class:
+             ## i) first you need a reference to a compiled template class:
+             tclass = Template.compile(source=src) # or just Template.compile(src)
+                 # or 
+             tclass = Template.compile(file='some/path')
+                 # or 
+             tclass = Template.compile(file=someFileObject)
+                 # or 
+             # if you used the command line compiler or have Cheetah's ImportHooks
+             # installed your template class is also available via Python's
+             # standard import mechanism:
+             from ACompileTemplate import AcompiledTemplate as tclass
+             
+             ## ii) then you create an instance
+             t = tclass(namespaces=namespaces)
+                 # or 
+             t = tclass(namespaces=namespaces, filter='RawOrEncodedUnicode')
+             print t
 
-        This method can also be called without arguments in cases where it is
-        called as a baseclass from a pre-compiled Template servlet.
+        Arguments:
+          for usage pattern a)           
+            If you are compiling a new template, you must provide either a
+            'source' or 'file' arg, but not both:          
+              - source (string or None)
+              - file (string path, file-like object, or None)
+
+            Optional args (see below for more) :
+              - compilerSettings
+               Default: Template._CHEETAH_compilerSettings=None
+               
+               a dictionary of settings to override those defined in
+               DEFAULT_COMPILER_SETTINGS.  See
+               Cheetah.Template.DEFAULT_COMPILER_SETTINGS and the Users' Guide
+               for details.
+
+            You can pass the source arg in as a positional arg with this usage
+            pattern.  Use keywords for all other args.           
+
+          for usage pattern b)
+            Do not use positional args with this usage pattern, unless your
+            template subclasses something other than Cheetah.Template and you
+            want to pass positional args to that baseclass.  E.g.:
+              dictTemplate = Template.compile('hello $name from $caller', baseclass=dict)
+              tmplvars = dict(name='world', caller='me')
+              print dictTemplate(tmplvars)
+            This usage requires all Cheetah args to be passed in as keyword args.
+
+          optional args for both usage patterns:
+
+            - namespaces (aka 'searchList')
+              Default: None
+              
+              an optional list of namespaces (dictionaries, objects, modules,
+              etc.) which Cheetah will search through to find the variables
+              referenced in $placeholders.
+
+              If you provide a single namespace instead of a list, Cheetah will
+              automatically convert it into a list.
+                
+              NOTE: Cheetah does NOT force you to use the namespaces search list
+              and related features.  It's on by default, but you can turn if off
+              using the compiler settings useSearchList=False or
+              useNameMapper=False.
+                
+             - filter
+               Default: 'EncodeUnicode'
+               
+               Which filter should be used for output filtering. This should
+               either be a string which is the name of a filter in the
+               'filtersLib' or a subclass of Cheetah.Filters.Filter. . See the
+               Users' Guide for more details.
+
+             - filtersLib
+               Default: Cheetah.Filters
+               
+               A module containing subclasses of Cheetah.Filters.Filter. See the
+               Users' Guide for more details. 
+
+             - errorCatcher
+               Default: None
+
+               This is a debugging tool. See the Users' Guide for more details.
+               Do not use this or the #errorCatcher diretive with live
+               production systems.
+
+          Do NOT mess with the args _globalSetVars or _preBuiltSearchList!
+
         """
         
         ##################################################           
@@ -766,10 +881,11 @@ class Template(Servlet):
             if compilerSettings is not Unspecified:
                 vt(compilerSettings, 'compilerSettings', [D], 'dictionary')
 
-            if namespaces is not Unspecified: 
-                assert not searchList
-                searchList = namespaces           
-            if not isinstance(searchList, (list, tuple)):
+            if namespaces is not None: 
+                assert searchList is None, (
+                    'Provide "namespaces" or "searchList", not both!')
+                searchList = namespaces
+            if searchList is not None and not isinstance(searchList, (list, tuple)):
                 searchList = [searchList]
 
         except TypeError, reason:
@@ -789,7 +905,7 @@ class Template(Servlet):
         ## Setup instance state attributes used during the life of template
         ## post-compile
 
-        self._initCheetahAttributes(
+        self._initCheetahInstance(
             searchList=searchList, filter=filter, filtersLib=filtersLib,
             errorCatcher=errorCatcher,
             _globalSetVars=_globalSetVars,
@@ -906,13 +1022,13 @@ class Template(Servlet):
     ##################################################
     ## internal methods -- not to be called by end-users
 
-    def _initCheetahAttributes(self,
-                               searchList=Unspecified,
-                               filter='EncodeUnicode', # which filter from Cheetah.Filters
-                               filtersLib=Filters,
-                               errorCatcher=None,
-                               _globalSetVars=Unspecified,
-                               _preBuiltSearchList=Unspecified):
+    def _initCheetahInstance(self,
+                             searchList=None,
+                             filter='EncodeUnicode', # which filter from Cheetah.Filters
+                             filtersLib=Filters,
+                             errorCatcher=None,
+                             _globalSetVars=None,
+                             _preBuiltSearchList=None):
         """Sets up the instance attributes that cheetah templates use at
         run-time.
 
@@ -922,18 +1038,18 @@ class Template(Servlet):
             return
         
         self._CHEETAH__globalSetVars = {}
-        if _globalSetVars is not Unspecified:
+        if _globalSetVars is not None:
             # this is intended to be used internally by Nested Templates in #include's
             self._CHEETAH__globalSetVars = _globalSetVars
             
-        if _preBuiltSearchList is not Unspecified:
+        if _preBuiltSearchList is not None:
             # happens with nested Template obj creation from #include's
             self._CHEETAH__searchList = list(_preBuiltSearchList)
             self._CHEETAH__searchList.append(self)
         else:
             # create our own searchList
             self._CHEETAH__searchList = [self._CHEETAH__globalSetVars]
-            if searchList is not Unspecified:
+            if searchList is not None:
                 self._CHEETAH__searchList.extend(list(searchList))
             self._CHEETAH__searchList.append( self )
         self._CHEETAH__cheetahIncludes = {}
@@ -1222,9 +1338,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.139 $
+        Version: $Revision: 1.140 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/11 22:44:16 $
+        Last Revision Date: $Date: 2006/01/13 01:32:54 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
