@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.106 2006/01/13 01:35:38 tavis_rudd Exp $
+# $Id: Parser.py,v 1.107 2006/01/13 03:48:05 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.106 $
+Version: $Revision: 1.107 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/13 01:35:38 $
+Last Revision Date: $Date: 2006/01/13 03:48:05 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.106 $"[11:-2]
+__revision__ = "$Revision: 1.107 $"[11:-2]
 
 import os
 import sys
@@ -1094,7 +1094,7 @@ class _HighLevelParser(_LowLevelParser):
         self.setupState()
 
     def setupState(self):
-        self._indentStack = []
+        self._openDirectivesStack = []
             
     def initDirectives(self):
         self._directiveEaters = {
@@ -1110,11 +1110,14 @@ class _HighLevelParser(_LowLevelParser):
             'raw': self.eatRaw,
             'include': self.eatInclude,
             'cache': self.eatCache,
-            'call': self.eatCall,
-            'arg': self.eatCallArg,
             'filter': self.eatFilter,
             'echo': self.eatEcho,
             'silent': self.eatSilent,
+
+            'call': self.eatCall,
+            'arg': self.eatCallArg,
+
+            'capture': self.eatCapture,
 
             # declaration, assignment, and deletion
             'attr':self.eatAttr,
@@ -1171,6 +1174,7 @@ class _HighLevelParser(_LowLevelParser):
             
             'cache': self.eatEndCache,
             'call': self.eatEndCall,
+            'capture': self.eatEndCapture,
             'filter': self.eatEndFilter,
             'errorCatcher':self.eatEndErrorCatcher,
             
@@ -1183,7 +1187,8 @@ class _HighLevelParser(_LowLevelParser):
             'unless': self.eatEndUnless,
             
             }
-        self._indentingDirectives = ['def','block','closure',                                     
+        self._closableDirectives = ['def','block','closure',
+                                     'capture',
                                      'if','for','while',
                                      'try',
                                      'repeat','unless']
@@ -1256,7 +1261,7 @@ class _HighLevelParser(_LowLevelParser):
             else:
                 self.eatPlainText()
         if assertEmptyStack:
-            self.assertEmptyIndentStack()
+            self.assertEmptyOpenDirectivesStack()
                 
     ## eat methods    
                 
@@ -1432,8 +1437,8 @@ class _HighLevelParser(_LowLevelParser):
         expr = self.getExpression().strip()
         directiveKey = expr.split()[0]
         expr = self._applyExpressionFilters(expr, directiveKey, startPos=startPos)
-        if directiveKey in self._indentingDirectives:
-            self.pushToIndentStack(directiveKey)
+        if directiveKey in self._closableDirectives:
+            self.pushToOpenDirectivesStack(directiveKey)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
         return expr
 
@@ -1614,7 +1619,7 @@ class _HighLevelParser(_LowLevelParser):
                  or self[self.pos()+1:self.findEOL()].strip())):
             # single-line version
             isNestedDef = (self.setting('allowNestedDefScopes')
-                           and [name for name in self._indentStack if name=='def'])
+                           and [name for name in self._openDirectivesStack if name=='def'])
             self.getc()
             rawSignature = self[startPos:endOfFirstLinePos]
             self._eatSingleLineDef(directiveKey=directiveKey,
@@ -1635,7 +1640,7 @@ class _HighLevelParser(_LowLevelParser):
         else:
             if self.peek()==':':
                 self.getc()            
-            self.pushToIndentStack(directiveKey)
+            self.pushToOpenDirectivesStack(directiveKey)
             rawSignature = self[startPos:self.pos()]
             self._eatMultiLineDef(directiveKey=directiveKey,
                                   methodName=methodName,
@@ -1659,7 +1664,7 @@ class _HighLevelParser(_LowLevelParser):
                          + '.')
 
         isNestedDef = (self.setting('allowNestedDefScopes')
-                       and len([name for name in self._indentStack if name=='def'])>1)
+                       and len([name for name in self._openDirectivesStack if name=='def'])>1)
         if directiveKey=='block' or (directiveKey=='def' and not isNestedDef):
             self._compiler.startMethodDef(methodName, argsList, parserComment)
         else: #closure
@@ -1683,7 +1688,7 @@ class _HighLevelParser(_LowLevelParser):
                          ' at line %s, col %s' % self.getRowCol(startPos)
                          + '.')
         isNestedDef = (self.setting('allowNestedDefScopes')
-                       and [name for name in self._indentStack if name=='def'])
+                       and [name for name in self._openDirectivesStack if name=='def'])
         if directiveKey=='block' or (directiveKey=='def' and not isNestedDef):
             self._compiler.startMethodDef(methodName, argsList, parserComment)
         else: #closure
@@ -1958,7 +1963,7 @@ class _HighLevelParser(_LowLevelParser):
         expr = self.getExpression()
         expr = self._applyExpressionFilters(expr, 'for', startPos=startPos)        
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
-        self.pushToIndentStack("for")
+        self.pushToOpenDirectivesStack("for")
         self._compiler.addFor(expr)
         
     def eatIf(self):
@@ -1994,7 +1999,7 @@ class _HighLevelParser(_LowLevelParser):
             falseExpr = ''.join(falseExpr)
             self._compiler.addOneLineIf(conditionExpr, trueExpr, falseExpr)
         else:
-            self.pushToIndentStack('if')
+            self.pushToOpenDirectivesStack('if')
             self._compiler.addIf(expr)
     
     def eatElse(self):
@@ -2060,7 +2065,7 @@ class _HighLevelParser(_LowLevelParser):
         expr = self.getExpression()
         expr = self._applyExpressionFilters(expr, 'repeat', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
-        self.pushToIndentStack("repeat")
+        self.pushToOpenDirectivesStack("repeat")
         self._compiler.addRepeat(expr)
 
 
@@ -2074,9 +2079,25 @@ class _HighLevelParser(_LowLevelParser):
         expr = self.getExpression()
         expr = self._applyExpressionFilters(expr, 'unless', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
-        self.pushToIndentStack("unless")
+        self.pushToOpenDirectivesStack("unless")
         self._compiler.addUnless(expr)
 
+    def eatCapture(self):
+        # filtered 
+        isLineClearToStartToken = self.isLineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        lineCol = self.getRowCol()
+
+        self.getDirectiveStartToken()
+        self.advance(len('capture'))
+        startPos = self.pos()
+        self.getWhiteSpace()
+        expr = self.getExpression()
+        expr = expr.strip()
+        expr = self._applyExpressionFilters(expr, 'capture', startPos=startPos)
+        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
+        self.pushToOpenDirectivesStack("capture")
+        self._compiler.startCaptureRegion(assignTo=expr, lineCol=lineCol)
         
     ## end directive eaters
 
@@ -2086,9 +2107,9 @@ class _HighLevelParser(_LowLevelParser):
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
 
 
-        self.popFromIndentStack("def")
+        self.popFromOpenDirectivesStack("def")
         isNestedDef = (self.setting('allowNestedDefScopes')
-                       and [name for name in self._indentStack if name=='def'])
+                       and [name for name in self._openDirectivesStack if name=='def'])
         if not isNestedDef:
             self._compiler.closeDef()
         else:
@@ -2101,8 +2122,15 @@ class _HighLevelParser(_LowLevelParser):
         endOfFirstLinePos = self.findEOL()
         self.getExpression()
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
-        self.popFromIndentStack("block")
+        self.popFromOpenDirectivesStack("block")
         self._compiler.closeBlock()
+
+    def eatEndCapture(self, isLineClearToStartToken=False):
+        endOfFirstLinePos = self.findEOL()
+        self.getExpression()
+        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
+        self.popFromOpenDirectivesStack("capture")
+        self._compiler.endCaptureRegion()
 
     def eatEndClosure(self, isLineClearToStartToken=False):
         self.eatDedentDirective('closure', isLineClearToStartToken)
@@ -2139,8 +2167,8 @@ class _HighLevelParser(_LowLevelParser):
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self._compiler.commitStrConst()
         self._compiler.dedent()
-        assert directiveKey in self._indentingDirectives
-        self.popFromIndentStack(directiveKey)
+        assert directiveKey in self._closableDirectives
+        self.popFromOpenDirectivesStack(directiveKey)
 
     def eatEndWhile(self, isLineClearToStartToken=False):
         self.eatDedentDirective('while', isLineClearToStartToken)
@@ -2162,25 +2190,25 @@ class _HighLevelParser(_LowLevelParser):
 
     ###
 
-    def pushToIndentStack(self, directiveKey):
-        assert directiveKey in self._indentingDirectives
-        self._indentStack.append(directiveKey)
+    def pushToOpenDirectivesStack(self, directiveKey):
+        assert directiveKey in self._closableDirectives
+        self._openDirectivesStack.append(directiveKey)
 
-    def popFromIndentStack(self, directiveKey):
-        if not self._indentStack:
+    def popFromOpenDirectivesStack(self, directiveKey):
+        if not self._openDirectivesStack:
             raise ParseError(self, msg="#end found, but nothing to end")
         
-        if self._indentStack[-1] == directiveKey:
-            del self._indentStack[-1]
+        if self._openDirectivesStack[-1] == directiveKey:
+            del self._openDirectivesStack[-1]
         else:
             raise ParseError(self, msg="#end %s found, expected #end %s" %(
-                directiveKey, self._indentStack[-1]))
+                directiveKey, self._openDirectivesStack[-1]))
 
-    def assertEmptyIndentStack(self):
-        if self._indentStack:
+    def assertEmptyOpenDirectivesStack(self):
+        if self._openDirectivesStack:
             errorMsg = (
                 "Some #directives are missing their corresponding #end ___ tag: %s" %(
-                ', '.join(self._indentStack)))
+                ', '.join(self._openDirectivesStack)))
             raise ParseError(self, msg=errorMsg)
 
 
