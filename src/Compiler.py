@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.122 2006/01/11 07:43:05 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.123 2006/01/13 01:33:18 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.122 $
+Version: $Revision: 1.123 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/11 07:43:05 $
+Last Revision Date: $Date: 2006/01/13 01:33:18 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.122 $"[11:-2]
+__revision__ = "$Revision: 1.123 $"[11:-2]
 
 import sys
 import os
@@ -1020,7 +1020,7 @@ if not self._CHEETAH__instanceInitialized:
     allowedKWs = 'searchList namespaces filter filtersLib errorCatcher'.split()
     for k,v in KWs.items():
         if k in allowedKWs: cheetahKWArgs[k] = v
-    self._initCheetahAttributes(**cheetahKWArgs)
+    self._initCheetahInstance(**cheetahKWArgs)
 """.replace('\n','\n'+' '*8)
 
 class ClassCompiler(GenUtils):
