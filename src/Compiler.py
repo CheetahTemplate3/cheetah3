@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.123 2006/01/13 01:33:18 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.124 2006/01/13 03:48:26 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.123 $
+Version: $Revision: 1.124 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/13 01:33:18 $
+Last Revision Date: $Date: 2006/01/13 03:48:26 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.123 $"[11:-2]
+__revision__ = "$Revision: 1.124 $"[11:-2]
 
 import sys
 import os
@@ -328,9 +328,9 @@ class MethodCompiler(GenUtils):
         self._docStringLines = []
         self._methodBodyChunks = []
 
-        self._cacheRegionOpen = False
         self._cacheRegionsStack = []
         self._callRegionsStack = []
+        self._captureRegionsStack = []
         self._filterRegionsStack = []
 
         self._isErrorCatcherOn = False
@@ -839,6 +839,36 @@ class MethodCompiler(GenUtils):
         self.addChunk('')
         self._callRegionsStack.pop() # attrib of current methodCompiler
 
+    def nextCaptureRegionID(self):
+        return self.nextCacheID()
+
+    def startCaptureRegion(self, assignTo, lineCol):
+        class CaptureDetails: pass
+        captureDetails = CaptureDetails()
+        captureDetails.ID = ID = self.nextCaptureRegionID()
+        captureDetails.assignTo = assignTo
+        captureDetails.lineCol = lineCol
+        
+        self._captureRegionsStack.append((ID,captureDetails)) # attrib of current methodCompiler
+        self.addChunk('## START CAPTURE REGION: '+ID
+                      +' '+assignTo
+                      +' at line, col ' + str(lineCol) + ' in the source.')
+        self.addChunk('_orig_trans%(ID)s = trans'%locals())
+        self.addChunk('_wasBuffering%(ID)s = self._CHEETAH__isBuffering'%locals())
+        self.addChunk('self._CHEETAH__isBuffering = True')
+        self.addChunk('trans = _captureCollector%(ID)s = DummyTransaction()'%locals())
+        self.addChunk('write = _captureCollector%(ID)s.response().write'%locals())
+
+    def endCaptureRegion(self):
+        ID, captureDetails = self._captureRegionsStack.pop()
+        assignTo, lineCol = (captureDetails.assignTo, captureDetails.lineCol)
+        self.addChunk('trans = _orig_trans%(ID)s'%locals())
+        self.addChunk('write = trans.response().write')
+        self.addChunk('self._CHEETAH__isBuffering = _wasBuffering%(ID)s '%locals())
+        self.addChunk('%(assignTo)s = _captureCollector%(ID)s.response().getvalue()'%locals())
+        self.addChunk('del _captureCollector%(ID)s'%locals())
+        self.addChunk('del _wasBuffering%(ID)s'%locals())
+        
     def setErrorCatcher(self, errorCatcherName):
         self.turnErrorCatcherOn()        
 

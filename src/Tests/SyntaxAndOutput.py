@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.82 2006/01/11 07:39:44 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.83 2006/01/13 03:47:27 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.82 $
+Version: $Revision: 1.83 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/11 07:39:44 $
+Last Revision Date: $Date: 2006/01/13 03:47:27 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.82 $"[11:-2]
+__revision__ = "$Revision: 1.83 $"[11:-2]
 
 
 ##################################################
@@ -1152,6 +1152,32 @@ $x$y#slurp
 #end call 2
 #end call 1''',
         "12345")
+
+
+class CaptureDirective(OutputTest):
+    def test1(self):
+        r"""simple #capture"""
+        self.verify('''\
+#capture cap1
+$(1234+1) foo#slurp
+#end capture
+$cap1#slurp
+''',
+        "1235 foo")
+
+
+    def test2(self):
+        r"""slightly more complex #capture"""
+        self.verify('''\
+#def meth(arg)
+$arg.upper()#slurp
+#end def
+#capture cap1
+$(1234+1) $anInt $meth("foo")#slurp
+#end capture
+$cap1#slurp
+''',
+        "1235 1 FOO")
 
 
 class SlurpDirective(OutputTest):
