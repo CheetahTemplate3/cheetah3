@@ -2,6 +2,24 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0rc2 (unreleased: Jan ..., 2006)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+  Core Changes: [TR]    
+    - added lots more docstring content in the Template class
+    - made multiline comments gobble whitespace like other directives, per JJ's
+      request.  The rather longwinded compiler setting
+      gobbleWhitespaceAroundMultiLineComments can be used to go back to the old
+      non-gobbling behaviour if needed.
+    - added #capture directive to complement the #call directive.  
+      #call executes a region of Cheetah code and passes its output into a function call
+      #capture executes a region of Cheetah code and assigns its output to a variable
+    - misc internal refactoring in the parser
+    - improved handling of keyword args in the __init__ method and fixed a
+      potential clash between the namespaces and searchList args
+
+  WWW: [TR]
+    - added the source for the new Cheetah website layout/content
+
 2.0rc1 (Jan 10, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]    
