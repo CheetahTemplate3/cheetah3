@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SourceReader.py,v 1.12 2006/01/04 09:31:56 tavis_rudd Exp $
+# $Id: SourceReader.py,v 1.13 2006/01/13 01:35:59 tavis_rudd Exp $
 """SourceReader class for Cheetah's Parser and CodeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/04 09:31:56 $
+Last Revision Date: $Date: 2006/01/13 01:35:59 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.12 $"[11:-2]
+__revision__ = "$Revision: 1.13 $"[11:-2]
 
 import re
 import sys
@@ -242,13 +242,7 @@ class SourceReader:
             return True
         else:
             return False
-        
-    def matches(self, strOrRE):
-        if isinstance(strOrRE, (str, unicode)):
-            return self.startswith(strOrRE, pos=self.pos())
-        else: # assume an re object
-            return strOrRE.match(self.src(), self.pos())
-            
+                    
     def rfind(self, it, pos):
         if pos == None:
             pos = self._pos
@@ -265,3 +259,43 @@ class SourceReader:
             pos = self._pos
 
         return EOLZre.search(self.src(), self.pos()).start()
+    
+    def isLineClearToPos(self, pos=None):
+        if pos == None:
+            pos = self.pos()
+        self.checkPos(pos)            
+        src = self.src()
+        BOL = self.findBOL()
+        return BOL == pos or src[BOL:pos].isspace()
+
+    def matches(self, strOrRE):
+        if isinstance(strOrRE, (str, unicode)):
+            return self.startswith(strOrRE, pos=self.pos())
+        else: # assume an re object
+            return strOrRE.match(self.src(), self.pos())
+
+    def matchWhiteSpace(self, WSchars=' \f\t'):
+        return (not self.atEnd()) and  self.peek() in WSchars
+
+    def getWhiteSpace(self, WSchars=' \f\t'):
+        if not self.matchWhiteSpace(WSchars):
+            return ''
+        start = self.pos()
+        while self.pos() < self.breakPoint():
+            self.advance()
+            if not self.matchWhiteSpace(WSchars):
+                break
+        return self.src()[start:self.pos()]
+
+    def matchNonWhiteSpace(self, WSchars=' \f\t\n\r'):
+        return self.atEnd() or not self.peek() in WSchars
+
+    def getNonWhiteSpace(self, WSchars=' \f\t\n\r'):
+        if not self.matchNonWhiteSpace(WSchars):
+            return ''
+        start = self.pos()
+        while self.pos() < self.breakPoint():
+            self.advance()
+            if not self.matchNonWhiteSpace(WSchars):
+                break
+        return self.src()[start:self.pos()]

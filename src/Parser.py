@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.105 2006/01/11 07:40:36 tavis_rudd Exp $
+# $Id: Parser.py,v 1.106 2006/01/13 01:35:38 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.105 $
+Version: $Revision: 1.106 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/11 07:40:36 $
+Last Revision Date: $Date: 2006/01/13 01:35:38 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.105 $"[11:-2]
+__revision__ = "$Revision: 1.106 $"[11:-2]
 
 import os
 import sys
@@ -356,7 +356,6 @@ class _LowLevelParser(SourceReader):
 
     def _makeCommentREs(self):
         """Construct the regex bits that are used in comment parsing."""
-        
         startTokenEsc = escapeRegexChars(self.setting('commentStartToken'))
         self.commentStartTokenRE = re.compile(escCharLookBehind + startTokenEsc)
         del startTokenEsc
@@ -371,31 +370,48 @@ class _LowLevelParser(SourceReader):
                                                      endTokenEsc)
         
     def _makeDirectiveREs(self):
-        
         """Construct the regexs that are used in directive parsing."""
-        
         startToken = self.setting('directiveStartToken')
         endToken = self.setting('directiveEndToken')
         startTokenEsc = escapeRegexChars(startToken)
         endTokenEsc = escapeRegexChars(endToken)
-        
         validSecondCharsLookAhead = r'(?=[A-Za-z_])'
         self.directiveStartTokenRE = re.compile(escCharLookBehind + startTokenEsc
                                                 + validSecondCharsLookAhead)
         self.directiveEndTokenRE = re.compile(escCharLookBehind + endTokenEsc)
 
     def _makePspREs(self):
-        
         """Setup the regexs for PSP parsing."""
-        
         startToken = self.setting('PSPStartToken')
         startTokenEsc = escapeRegexChars(startToken)
         self.PSPStartTokenRE = re.compile(escCharLookBehind + startTokenEsc)
-        
         endToken = self.setting('PSPEndToken')
         endTokenEsc = escapeRegexChars(endToken)
         self.PSPEndTokenRE = re.compile(escCharLookBehind + endTokenEsc)
 
+
+    def isLineClearToStartToken(self, pos=None):
+        return self.isLineClearToPos(pos)
+
+    def matchTopLevelToken(self):
+        """Returns the first match found from the following methods:
+            self.matchCommentStartToken
+            self.matchMultiLineCommentStartToken
+            self.matchVariablePlaceholderStart
+            self.matchExpressionPlaceholderStart
+            self.matchDirective
+            self.matchPSPStartToken
+            self.matchEOLSlurpToken
+
+        Returns None if no match.
+        """
+        match = None
+        if self.peek() in self._possibleNonStrConstantChars:
+            for matcher in self._nonStrConstMatchers:
+                match = matcher()
+                if match:
+                    break
+        return match
 
     def matchPyToken(self):
         match = pseudoprog.match(self.src(), self.pos())
@@ -415,13 +431,6 @@ class _LowLevelParser(SourceReader):
             from Parser import ParseError
             raise ParseError(self, msg='Malformed triple-quoted string')
         return self.readTo(match.end())
-
-    def matchNonStrConst(self):
-        if self.peek() in self._possibleNonStrConstantChars:
-            for matcher in self._nonStrConstMatchers:
-                if matcher():
-                    return True
-        return False
 
     def matchEOLSlurpToken(self):
         if self.EOLSlurpRE:
@@ -459,40 +468,6 @@ class _LowLevelParser(SourceReader):
         if not match:
             raise ParseError(self, msg='Invalid multi-line comment end token')
         return self.readTo(match.end())
-
-    def isLineClearToStartToken(self, pos=None):
-        if pos == None:
-            pos = self.pos()
-        self.checkPos(pos)            
-        src = self.src()
-        BOL = self.findBOL()
-        return BOL == pos or src[BOL:pos].isspace()
-
-    def matchWhiteSpace(self, WSchars=' \f\t'):
-        return (not self.atEnd()) and  self.peek() in WSchars
-
-    def getWhiteSpace(self, WSchars=' \f\t'):
-        if not self.matchWhiteSpace(WSchars):
-            return ''
-        start = self.pos()
-        while self.pos() < self.breakPoint():
-            self.advance()
-            if not self.matchWhiteSpace(WSchars):
-                break
-        return self.src()[start:self.pos()]
-
-    def matchNonWhiteSpace(self, WSchars=' \f\t\n\r'):
-        return self.atEnd() or not self.peek() in WSchars
-
-    def getNonWhiteSpace(self, WSchars=' \f\t\n\r'):
-        if not self.matchNonWhiteSpace(WSchars):
-            return ''
-        start = self.pos()
-        while self.pos() < self.breakPoint():
-            self.advance()
-            if not self.matchNonWhiteSpace(WSchars):
-                break
-        return self.src()[start:self.pos()]
     
     def getDottedName(self):
         srcLen = len(self)
@@ -1111,16 +1086,12 @@ class _HighLevelParser(_LowLevelParser):
     Cheetah.Compiler.Compiler.
     """
     def __init__(self, src, filename=None, breakPoint=None, compiler=None):
-        SourceReader.__init__(self, src, filename=filename, breakPoint=breakPoint)
+        _LowLevelParser.__init__(self, src, filename=filename, breakPoint=breakPoint)
         self.setSettingsManager(compiler)
         self._compiler = compiler
         self.configureParser()
         self.initDirectives()
         self.setupState()
-
-        #self._reader = SourceReader(src, filename=filename, breakPoint=breakPoint)
-        #for k, v in inspect.getmembers(self._reader, inspect.ismethod):
-        #    setattr(self, k, v)
 
     def setupState(self):
         self._indentStack = []
@@ -1283,21 +1254,24 @@ class _HighLevelParser(_LowLevelParser):
             elif self.matchEOLSlurpToken():
                 self.eatEOLSlurpToken()
             else:
-                self.eatStrConstant()
+                self.eatPlainText()
         if assertEmptyStack:
             self.assertEmptyIndentStack()
                 
     ## eat methods    
                 
-    def eatStrConstant(self):
+    def eatPlainText(self):
         startPos = self.pos()
+        match = None
         while not self.atEnd():
-            if self.matchNonStrConst():
+            match = self.matchTopLevelToken()
+            if match:
                 break
             else:
                 self.advance()
         strConst = self.readTo(self.pos(), start=startPos)
         self._compiler.addStrConst(strConst)
+        return match
 
     def eatComment(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
