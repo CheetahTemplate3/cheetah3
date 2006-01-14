@@ -2,9 +2,9 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-2.0rc2 (unreleased: Jan ..., 2006)
+2.0rc2 (Jan 13th, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
-  Core Changes: [TR]    
+  Core Changes: [TR]      
     - added lots more docstring content in the Template class
     - made multiline comments gobble whitespace like other directives, per JJ's
       request.  The rather longwinded compiler setting
@@ -13,6 +13,10 @@ release
     - added #capture directive to complement the #call directive.  
       #call executes a region of Cheetah code and passes its output into a function call
       #capture executes a region of Cheetah code and assigns its output to a variable
+    - extended the compile caching code in Template.compile so it works with the
+     'file' arg.
+    - added cacheModuleFilesForTracebacks and cacheDirForModuleFiles args to
+      Template.compile(). See the docstring for details.
     - misc internal refactoring in the parser
     - improved handling of keyword args in the __init__ method and fixed a
       potential clash between the namespaces and searchList args
@@ -231,11 +235,11 @@ release
       inside dynamically compiled Cheetah templates were opaque because
       Python didn't have access to a python source file to use in the traceback:
 
-        File "/usr/local/unsnarl/lib/python/us/ui/views/WikiPageRenderer.py", line 192, in getTextiledContent
+        File "xxxx.py", line 192, in getTextiledContent
           content = str(template(searchList=searchList))
-        File "cheetah_DynamicallyCompiledCheetahTemplate_2005123013020776922.py", line 202, in __str__
-        File "cheetah_DynamicallyCompiledCheetahTemplate_2005123013020776922.py", line 187, in respond
-        File "cheetah_DynamicallyCompiledCheetahTemplate_2005123013020788104.py", line 139, in writeBody
+        File "cheetah_yyyy.py", line 202, in __str__
+        File "cheetah_yyyy.py", line 187, in respond
+        File "cheetah_yyyy.py", line 139, in writeBody
        ZeroDivisionError: integer division or modulo by zero
 
       It is now possible to keep the generated source code from the python
@@ -245,21 +249,26 @@ release
 
        File "/usr/local/unsnarl/lib/python/us/ui/views/WikiPageRenderer.py", line 192, in getTextiledContent
          content = str(template(searchList=searchList))
-       File "/tmp/tmp9OVLwe/cheetah_2005123012172480269.py", line 202, in __str__
+       File "/tmp/CheetahCacheDir/cheetah_yyyy.py", line 202, in __str__
          def __str__(self): return self.respond()
-       File "/tmp/tmp9OVLwe/cheetah_2005123012172480269.py", line 187, in respond
+       File "/tmp/CheetahCacheDir/cheetah_yyyy.py", line 187, in respond
          self.writeBody(trans=trans)
-       File "/tmp/tmp9OVLwe/cheetah_2005123012172449990.py", line 139, in writeBody
+       File "/tmp/CheetahCacheDir/cheetah_yyyy.py", line 139, in writeBody
          __v = 0/0 # $(0/0)
       ZeroDivisionError: integer division or modulo by zero
 
       This is turned off by default. To turn it on, do this:
 
         class NiceTracebackTemplate(Template):
-            _keepGeneratedPythonModulesForTracebacks = True
-            _cacheDirForGeneratedPythonModules = 'xxxx' # change to a dirname
+            _CHEETAH_cacheModuleFilesForTracebacks = True
+            _CHEETAH_cacheDirForModuleFiles = '/tmp/CheetahCacheDir' # change to a dirname
         
         templateClass = NiceTracebackTemplate.compile(src)
+
+	# or
+        templateClass = Template.compile(src,
+           cacheModuleFilesForTracebacks=True, cacheDirForModuleFiles='/tmp/CheetahCacheDir')
+	
 
       This only works with the new Template.compile(src) usage style!
 
@@ -1117,9 +1126,10 @@ release
 ================================================================================
 KEY TO INITIALS USED ABOVE:
 TR - Tavis Rudd
-CE - Chuck Esterbrook
 MO - Mike Orr
+JJ - Shannon 'jj' Behrens
 IB - Ian Bicking
+CE - Chuck Esterbrook
 MH - Mike Halle
-JJ - Shannon 'JJ' Behrens
+
   
