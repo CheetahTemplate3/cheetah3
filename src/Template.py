@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.141 2006/01/14 02:22:39 tavis_rudd Exp $
+# $Id: Template.py,v 1.142 2006/01/14 04:19:25 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.141 $
+Version: $Revision: 1.142 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/14 02:22:39 $
+Last Revision Date: $Date: 2006/01/14 04:19:25 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.141 $"[11:-2]
+__revision__ = "$Revision: 1.142 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -27,7 +27,6 @@ import time                       # used in the cache refresh code
 from random import randrange
 import imp
 import traceback
-import __builtin__            # sometimes used by dynamically compiled templates
 import pprint
 import cgi                # Used by .webInput() if the template is a CGI script.
 import types 
@@ -96,7 +95,7 @@ _formUsedByWebInput = None
 
         
 class Template(Servlet):
-    """This class provides a) methods used at runtime by templates and b)
+    """This class provides a) methods used by templates at runtime and b)
     methods for compiling Cheetah source code into template classes.
 
     This documentation assumes you already know Python and the basics of object
@@ -131,19 +130,21 @@ class Template(Servlet):
 
     Notes on the usage patterns:
     
-       1) This is the most flexible, but it is slightly more verbose unless you
+       usage pattern 1)       
+          This is the most flexible, but it is slightly more verbose unless you
           write a wrapper function to hide the plumbing.  Under the hood, all
           other usage patterns are based on this approach.  Templates compiled
           this way can #extend (subclass) any Python baseclass: old-style or
           new-style (based on object or a builtin type).
 
-       2) This was Cheetah's original usage pattern.  It returns an instance,
+       usage pattern 2)
+          This was Cheetah's original usage pattern.  It returns an instance,
           but you can still access the generated class via
           tmplInstance.__class__.  If you want to use several different
           namespace 'searchLists' with a single template source definition,
           you're better off with Template.compile (1).
 
-          Limitations (use Template.compile (1) instead):
+          Limitations (use pattern 1 instead):
            - Templates compiled this way can only #extend subclasses of the
              new-style 'object' baseclass.  Cheetah.Template is a subclass of
              'object'.  You also can not #extend dict, list, or other builtin
@@ -171,7 +172,7 @@ class Template(Servlet):
           klass._CHEETAH__globalSetVars (_CHEETAH__xxx with 2 underscores)
     """
 
-    #this is used by .assignRequiredMethodsToClass()
+    # this is used by .assignRequiredMethodsToClass()
     _CHEETAH_requiredCheetahMethodNames = ('_initCheetahInstance',
                                            'searchList',
                                            'errorCatcher',
@@ -180,16 +181,21 @@ class Template(Servlet):
                                            'varExists',
                                            'getFileContents',
                                            'runAsMainProgram',
-                                           
+
                                            '_handleCheetahInclude',
                                            )
 
-    # the following are used by .compile()
-    _CHEETAH_keepGeneratedPythonModulesForTracebacks = False
-    _CHEETAH_cacheDirForGeneratedPythonModules = None # change to a dirname
+    ## the following are used by .compile(). Most are documented in its docstring.
+    _CHEETAH_cacheModuleFilesForTracebacks = False
+    _CHEETAH_cacheDirForModuleFiles = None # change to a dirname
+
+    _CHEETAH_compileCache = dict() # cache store for compiled code and classes
+    # To do something other than simple in-memory caching you can create an
+    # alternative cache store. It just needs to support the basics of Python's
+    # mapping/dict protocol. E.g.:
+    #   class AdvCachingTemplate(Template):
+    #       _CHEETAH_compileCache = MemoryOrFileCache()
     _CHEETAH_compileLock = Lock() # used to prevent race conditions
-    _CHEETAH_compileCache = dict()
-    #
     _CHEETAH_defaultMainMethodName = None
     _CHEETAH_compilerSettings = None
     _CHEETAH_compilerClass = Compiler
@@ -204,7 +210,7 @@ class Template(Servlet):
     _CHEETAH_defaultModuleNameForTemplates = 'DynamicallyCompiledCheetahTemplate'
     _CHEETAH_defaultModuleGlobalsForTemplates = None
     
-    # The following 3 are used by instance methods.
+    ## The following 3 are used by instance methods.
     _CHEETAH_generatedModuleCode = None
     _CHEETAH_generatedClassCode = None            
     NonNumericInputError = NonNumericInputError
@@ -229,9 +235,13 @@ class Template(Servlet):
                 moduleGlobals=Unspecified,
                 cacheCompilationResults=Unspecified,
                 useCache=Unspecified,
-                preprocessors=Unspecified,                
-                keepRefToGeneratedCode=Unspecified,
+                preprocessors=Unspecified,
+                cacheModuleFilesForTracebacks=Unspecified,
+                cacheDirForModuleFiles=Unspecified,
+                
+                keepRefToGeneratedCode=Unspecified,                
                 ):
+        
         """
         The core API for compiling Cheetah source code into template classes.
 
@@ -247,10 +257,15 @@ class Template(Servlet):
         generated python source code instead, pass the argument
         returnAClass=False.
 
-        It provides some hooks for template source preprocessing and does some
-        caching of generated code and classes.  See the descriptions of the
-        arguments 'preprocessors', 'cacheCompilationResults', and 'useCache' for
-        details on those features.
+        It caches generated code and classes.  See the descriptions of the
+        arguments 'cacheCompilationResults' and 'useCache' for details on those
+        features.  This doesn't mean that templates will automatically recompile
+        themselves when the source file changes. Rather, it means that if you
+        call Template.compile(src) or Template.compile(file=path) repeatedly it
+        will attempt to return a cached class definition instead of recompiling.
+
+        Hooks are provided template source preprocessing.  See the notes on the
+        'preprocessors' arg.
 
         If you are an advanced user and need to customize the way Cheetah parses
         source code or outputs Python code, you should check out the
@@ -263,8 +278,8 @@ class Template(Servlet):
 
           The rest of the arguments are strictly optional. All but the first
           have defaults in attributes of the Template class which can be
-          overridden in subclasses.  Working with most of these is an advanced
-          topic.
+          overridden in subclasses of this class.  Working with most of these is
+          an advanced topic.
           
             - returnAClass=True            
               If false, return the generated module code rather than a class.
@@ -323,26 +338,60 @@ class Template(Servlet):
               details for you.
 
             - moduleGlobals (a dict)
+              Default: Template._CHEETAH_defaultModuleGlobalsForTemplates=None
+
               A dict of vars that will be added to the global namespace of the
               module the generated code is executed in, prior to the execution
               of that code.  This should be Python values, not code strings!
               
-              Default:
-                  Template._CHEETAH_defaultModuleGlobalsForTemplates
-                  =None
-
             - cacheCompilationResults (True/False)
               Default: Template._CHEETAH_cacheCompilationResults=True
 
               Tells Cheetah to cache the generated code and classes so that they
               can be reused if Template.compile() is called multiple times with
               the same source and options.
-              
-              
+                           
             - useCache (True/False)
               Default: Template._CHEETAH_useCompilationCache=True
 
-              Should the compilation cache be used.              
+              Should the compilation cache be used?  If True and a previous
+              compilation created a cached template class with the same source
+              code, compiler settings and other options, the cached template
+              class will be returned.
+
+            - cacheModuleFilesForTracebacks (True/False)
+              Default: Template._CHEETAH_cacheModuleFilesForTracebacks=False
+
+              In earlier versions of Cheetah tracebacks from exceptions that
+              were raised inside dynamically compiled Cheetah templates were
+              opaque because Python didn't have access to a python source file
+              to use in the traceback:
+        
+                File "xxxx.py", line 192, in getTextiledContent
+                  content = str(template(searchList=searchList))
+                File "cheetah_yyyy.py", line 202, in __str__
+                File "cheetah_yyyy.py", line 187, in respond
+                File "cheetah_yyyy.py", line 139, in writeBody
+               ZeroDivisionError: integer division or modulo by zero
+        
+              It is now possible to keep those files in a cache dir and allow
+              Python to include the actual source lines in tracebacks and makes
+              them much easier to understand:
+        
+               File "xxxx.py", line 192, in getTextiledContent
+                 content = str(template(searchList=searchList))
+               File "/tmp/CheetahCacheDir/cheetah_yyyy.py", line 202, in __str__
+                 def __str__(self): return self.respond()
+               File "/tmp/CheetahCacheDir/cheetah_yyyy.py", line 187, in respond
+                 self.writeBody(trans=trans)
+               File "/tmp/CheetahCacheDir/cheetah_yyyy.py", line 139, in writeBody
+                 __v = 0/0 # $(0/0)
+              ZeroDivisionError: integer division or modulo by zero
+            
+            - cacheDirForModuleFiles (a string representing a dir path)
+              Default: Template._CHEETAH_cacheDirForModuleFiles=None
+
+              See notes on cacheModuleFilesForTracebacks.
 
             - preprocessors
               Default: Template._CHEETAH_preprocessors=None
@@ -410,7 +459,7 @@ class Template(Servlet):
         """
 
         ##################################################           
-        ## normalize args        
+        ## normalize and validate args 
         try:
             vt = VerifyType.VerifyType
             vtc = VerifyType.VerifyTypeClass
@@ -468,6 +517,16 @@ class Template(Servlet):
 
             moduleGlobals = valOrDefault(
                 moduleGlobals, klass._CHEETAH_defaultModuleGlobalsForTemplates)
+
+            
+            cacheModuleFilesForTracebacks = valOrDefault(
+                cacheModuleFilesForTracebacks, klass._CHEETAH_cacheModuleFilesForTracebacks)
+            vt(cacheModuleFilesForTracebacks, 'cacheModuleFilesForTracebacks', [I,B], 'boolean')
+            
+            cacheDirForModuleFiles = valOrDefault(
+                cacheDirForModuleFiles, klass._CHEETAH_cacheDirForModuleFiles)
+            vt(cacheDirForModuleFiles, 'cacheDirForModuleFiles', [N,S], 'string or None')
+
         except TypeError, reason:
             raise TypeError(reason)
 
@@ -532,12 +591,12 @@ class Template(Servlet):
 
             __file__ = uniqueModuleName+'.py' # relative file path with no dir part
 
-            if klass._CHEETAH_keepGeneratedPythonModulesForTracebacks:
-                if not os.path.exists(klass._CHEETAH_cacheDirForGeneratedPythonModules):
+            if cacheModuleFilesForTracebacks:
+                if not os.path.exists(cacheDirForModuleFiles):
                     raise Exception('%s does not exist'%
-                                    klass._CHEETAH_cacheDirForGeneratedPythonModules)
+                                    cacheDirForModuleFiles)
 
-                __file__ = os.path.join(klass._CHEETAH_cacheDirForGeneratedPythonModules,
+                __file__ = os.path.join(cacheDirForModuleFiles,
                                         __file__)
                 klass._compileLock.acquire()
                 try:
@@ -738,6 +797,11 @@ class Template(Servlet):
                     
             __str__ = new.instancemethod(__str__, None, concreteTemplateClass)
             setattr(concreteTemplateClass, '__str__', __str__)            
+
+        if not hasattr(concreteTemplateClass, 'subclass'):
+            func = klass.subclass.im_func
+            setattr(concreteTemplateClass, 'subclass', classmethod(func))
+            pass
                 
     _assignRequiredMethodsToClass = classmethod(_assignRequiredMethodsToClass)
 
@@ -1346,9 +1410,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.141 $
+        Version: $Revision: 1.142 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/14 02:22:39 $
+        Last Revision Date: $Date: 2006/01/14 04:19:25 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
