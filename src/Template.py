@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.140 2006/01/13 01:32:54 tavis_rudd Exp $
+# $Id: Template.py,v 1.141 2006/01/14 02:22:39 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.140 $
+Version: $Revision: 1.141 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/13 01:32:54 $
+Last Revision Date: $Date: 2006/01/14 02:22:39 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.140 $"[11:-2]
+__revision__ = "$Revision: 1.141 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -491,20 +491,28 @@ class Template(Servlet):
 
         cacheHash = None
         cachedResults = None
-        if source and not file:
+        if source or isinstance(file, (str, unicode)):
             compilerSettingsHash = None
             if compilerSettings:
                 items = compilerSettings.items()
                 items.sort()
                 compilerSettingsHash = hash(tuple(items))
-            cacheHash = ''.join([str(v) for v in
-                                 [hash(source),
-                                  str(moduleName),
-                                  str(mainMethodName),
-                                  hash(compilerClass),
-                                  hash(baseclass),
-                                  compilerSettingsHash]])
-            
+
+            fileHash = None
+            if file:
+                fileHash = str(hash(file))+str(os.path.getmtime(file))
+                
+            try:
+                cacheHash = ''.join([str(v) for v in
+                                     [hash(source),
+                                      fileHash,
+                                      moduleName,
+                                      mainMethodName,
+                                      hash(compilerClass),
+                                      hash(baseclass),
+                                      compilerSettingsHash]])
+            except:
+                pass
         if useCache and cacheHash and cacheHash in klass._CHEETAH_compileCache:
             cachedResults = klass._CHEETAH_compileCache[cacheHash]
             generatedModuleCode = cachedResults.code
@@ -1338,9 +1346,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.140 $
+        Version: $Revision: 1.141 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/13 01:32:54 $
+        Last Revision Date: $Date: 2006/01/14 02:22:39 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
