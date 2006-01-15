@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.124 2006/01/13 03:48:26 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.125 2006/01/15 17:47:28 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.124 $
+Version: $Revision: 1.125 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/13 03:48:26 $
+Last Revision Date: $Date: 2006/01/15 17:47:28 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.124 $"[11:-2]
+__revision__ = "$Revision: 1.125 $"[11:-2]
 
 import sys
 import os
@@ -31,10 +31,8 @@ import __builtin__
 
 from Cheetah.Version import Version
 from Cheetah.SettingsManager import SettingsManager
-from Cheetah.Parser import (
-    Parser, ParseError, specialVarRE,
-    STATIC_CACHE, REFRESH_CACHE,
-    SET_LOCAL, SET_GLOBAL,SET_MODULE)
+from Cheetah.Parser import Parser, ParseError, specialVarRE, \
+     STATIC_CACHE, REFRESH_CACHE, SET_LOCAL, SET_GLOBAL,SET_MODULE
 from Cheetah.Utils.Indenter import indentize # an undocumented preprocessor
 from Cheetah import ErrorCatchers
 from Cheetah import NameMapper
@@ -400,7 +398,7 @@ class MethodCompiler(GenUtils):
         
         ind = self._indent*2        
         docStr = (ind + '"""\n' + ind +
-                  ('\n' + ind).join(ln.replace('"""',"'''") for ln in self._docStringLines) +
+                  ('\n' + ind).join([ln.replace('"""',"'''") for ln in self._docStringLines]) +
                   '\n' + ind + '"""\n')
         return  docStr
 
@@ -1128,7 +1126,7 @@ class ClassCompiler(GenUtils):
                                              klass=self.methodCompilerClassForInit)
         __init__.setMethodSignature("def __init__(self, *args, **KWs)")
         __init__.addChunk("%s.__init__(self, *args, **KWs)" % self._baseClass)
-        __init__.addChunk(_initMethod_initCheetah%dict(className=self._className))
+        __init__.addChunk(_initMethod_initCheetah%{'className':self._className})
         for chunk in self._initMethChunks:
             __init__.addChunk(chunk)
         __init__.cleanupState()

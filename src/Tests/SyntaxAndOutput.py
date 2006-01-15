@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.83 2006/01/13 03:47:27 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.84 2006/01/15 17:44:18 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.83 $
+Version: $Revision: 1.84 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/13 03:47:27 $
+Last Revision Date: $Date: 2006/01/15 17:44:18 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.83 $"[11:-2]
+__revision__ = "$Revision: 1.84 $"[11:-2]
 
 
 ##################################################
@@ -42,6 +42,9 @@ import unittest_local_copy as unittest
 class Unspecified: pass 
 ##################################################
 ## CONSTANTS & GLOBALS ##
+
+majorVer, minorVer = sys.version_info[0], sys.version_info[1]
+versionTuple = (majorVer, minorVer)
 
 try:
     True,False
@@ -406,7 +409,7 @@ class Comments_MultiLine_NoGobble(OutputTest):
     """
 
     def _getCompilerSettings(self):
-        return dict(gobbleWhitespaceAroundMultiLineComments=False)
+        return {'gobbleWhitespaceAroundMultiLineComments':False}
 
     def test1(self):
         """#* *# followed by WS
@@ -1395,6 +1398,9 @@ class YieldDirective(OutputTest):
             #print ''.join(output)
 
         # @@TR: need to expand this to cover error conditions etc.
+
+if versionTuple < (2,3):
+    del YieldDirective
         
 class ForDirective(OutputTest):
 
@@ -1464,6 +1470,9 @@ class ForDirective(OutputTest):
                     "AA,BB\nCC,DD\n")
         self.verify("#for $i, ($j, $k) in enumerate([('aa','bb'),('cc','dd')])\n$j.upper,$k.upper\n#end for",
                     "AA,BB\nCC,DD\n")
+
+if versionTuple < (2,3):
+    del ForDirective.test12
 
 class RepeatDirective(OutputTest):
 
@@ -2442,7 +2451,7 @@ class FilterDirective(OutputTest):
     convertEOLs=False
 
     def _getCompilerSettings(self):
-        return dict(useFilterArgsInPlaceholders=True)
+        return {'useFilterArgsInPlaceholders':True}
     
     def test1(self):
         """#filter ReplaceNone
@@ -2750,7 +2759,7 @@ public class X
 
 """
     def _getCompilerSettings(self):
-        return dict(useFilterArgsInPlaceholders=True)
+        return {'useFilterArgsInPlaceholders':True}
 
     def searchList(self):    # Inside Indenter class.
         class Method:

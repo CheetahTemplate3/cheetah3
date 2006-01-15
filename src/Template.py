@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.143 2006/01/15 02:49:48 tavis_rudd Exp $
+# $Id: Template.py,v 1.144 2006/01/15 17:47:03 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.143 $
+Version: $Revision: 1.144 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/15 02:49:48 $
+Last Revision Date: $Date: 2006/01/15 17:47:03 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.143 $"[11:-2]
+__revision__ = "$Revision: 1.144 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -35,6 +35,12 @@ try:
     from types import StringTypes
 except ImportError:
     StringTypes = (types.StringType,types.UnicodeType)
+try:
+    from types import BooleanType
+    boolTypeAvailable = True
+except ImportError:
+    boolTypeAvailable = False
+    
 try:
     from threading import Lock
 except ImportError:
@@ -458,7 +464,6 @@ class Template(Servlet):
                      default is str().
             
         """
-
         ##################################################           
         ## normalize and validate args 
         try:
@@ -467,8 +472,11 @@ class Template(Servlet):
             N = types.NoneType; S = types.StringType; U = types.UnicodeType
             D = types.DictType; F = types.FileType
             C = types.ClassType;  M = types.ModuleType
-            B = types.BooleanType; I = types.IntType
+            I = types.IntType
 
+            if boolTypeAvailable:         
+                B = types.BooleanType
+            
             vt(source, 'source', [N,S,U], 'string or None')
             vt(file, 'file',[N,S,U,F], 'string, file-like object, or None')
             def valOrDefault(val, default):                
@@ -480,10 +488,12 @@ class Template(Servlet):
 
             cacheCompilationResults = valOrDefault(
                 cacheCompilationResults, klass._CHEETAH_cacheCompilationResults)
-            vt(cacheCompilationResults, 'cacheCompilationResults', [I,B], 'boolean')
+            if boolTypeAvailable:         
+                vt(cacheCompilationResults, 'cacheCompilationResults', [I,B], 'boolean')
 
             useCache = valOrDefault(useCache, klass._CHEETAH_useCompilationCache)
-            vt(cacheCompilationResults, 'cacheCompilationResults', [I,B], 'boolean')
+            if boolTypeAvailable:         
+                vt(cacheCompilationResults, 'cacheCompilationResults', [I,B], 'boolean')
 
             compilerSettings = valOrDefault(
                 compilerSettings, klass._getCompilerSettings(source, file) or {})
@@ -495,7 +505,8 @@ class Template(Servlet):
 
             keepRefToGeneratedCode = valOrDefault(
                 keepRefToGeneratedCode, klass._CHEETAH_keepRefToGeneratedCode)
-            vt(cacheCompilationResults, 'cacheCompilationResults', [I,B], 'boolean')
+            if boolTypeAvailable:         
+                vt(cacheCompilationResults, 'cacheCompilationResults', [I,B], 'boolean')
 
             vt(moduleName, 'moduleName', [N,S], 'string or None')
             __orig_file__ = None
@@ -522,7 +533,8 @@ class Template(Servlet):
             
             cacheModuleFilesForTracebacks = valOrDefault(
                 cacheModuleFilesForTracebacks, klass._CHEETAH_cacheModuleFilesForTracebacks)
-            vt(cacheModuleFilesForTracebacks, 'cacheModuleFilesForTracebacks', [I,B], 'boolean')
+            if boolTypeAvailable:
+                vt(cacheModuleFilesForTracebacks, 'cacheModuleFilesForTracebacks', [I,B], 'boolean')
             
             cacheDirForModuleFiles = valOrDefault(
                 cacheDirForModuleFiles, klass._CHEETAH_cacheDirForModuleFiles)
@@ -728,12 +740,12 @@ class Template(Servlet):
         if not hasattr(options, 'compiler'):
             def createPreprocessCompiler(prefix, compilerSettings=None):
                 class PreprocessorCompiler(klass):
-                    _compilerSettings = dict(
-                        cheetahVarStartToken='$'+prefix,
-                        directiveStartToken='#'+prefix,
-                        commentStartToken='##'+prefix,
-                        multiLineCommentStartToken='#*'+prefix,
-                        )
+                    _compilerSettings = {
+                        'cheetahVarStartToken':'$'+prefix,
+                        'directiveStartToken':'#'+prefix,
+                        'commentStartToken':'##'+prefix,
+                        'multiLineCommentStartToken':'#*'+prefix,
+                        }
                     if compilerSettings:
                         _compilerSettings.update(compilerSettings)
                 return PreprocessorCompiler
@@ -1411,9 +1423,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.143 $
+        Version: $Revision: 1.144 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/15 02:49:48 $
+        Last Revision Date: $Date: 2006/01/15 17:47:03 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
