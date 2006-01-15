@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.144 2006/01/15 17:47:03 tavis_rudd Exp $
+# $Id: Template.py,v 1.145 2006/01/15 18:45:42 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.144 $
+Version: $Revision: 1.145 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/15 17:47:03 $
+Last Revision Date: $Date: 2006/01/15 18:45:42 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.144 $"[11:-2]
+__revision__ = "$Revision: 1.145 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -259,17 +259,17 @@ class Template(Servlet):
         Internally, this method a) parses the Cheetah source code and generates
         Python code defining a module with a single class in it, b) dynamically
         creates a module object with a unique name, c) execs the generated code
-        in that modules namespace then inserts the module into sys.modules, and
+        in that module's namespace then inserts the module into sys.modules, and
         d) returns a reference to the generated class.  If you want to get the
         generated python source code instead, pass the argument
         returnAClass=False.
 
         It caches generated code and classes.  See the descriptions of the
-        arguments 'cacheCompilationResults' and 'useCache' for details on those
-        features.  This doesn't mean that templates will automatically recompile
-        themselves when the source file changes. Rather, it means that if you
-        call Template.compile(src) or Template.compile(file=path) repeatedly it
-        will attempt to return a cached class definition instead of recompiling.
+        arguments'cacheCompilationResults' and 'useCache' for details. This
+        doesn't mean that templates will automatically recompile themselves when
+        the source file changes. Rather, if you call Template.compile(src) or
+        Template.compile(file=path) repeatedly it will attempt to return a
+        cached class definition instead of recompiling.
 
         Hooks are provided template source preprocessing.  See the notes on the
         'preprocessors' arg.
@@ -295,7 +295,9 @@ class Template(Servlet):
               Default: Template._CHEETAH_compilerSettings=None
             
               a dictionary of settings to override those defined in
-              DEFAULT_COMPILER_SETTINGS. 
+              DEFAULT_COMPILER_SETTINGS. These can also be overridden in your
+              template source code with the #compiler or #compiler-settings
+              directives.
                   
             - compilerClass (a class)
               Default: Template._CHEETAH_compilerClass=Cheetah.Compiler.Compiler
@@ -1423,9 +1425,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.144 $
+        Version: $Revision: 1.145 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/15 17:47:03 $
+        Last Revision Date: $Date: 2006/01/15 18:45:42 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
