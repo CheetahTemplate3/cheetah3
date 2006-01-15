@@ -5,6 +5,8 @@ release
 2.0rc2 (Jan 13th, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      
+    - fixed some python 2.4isms that slipped in.  All the tests pass with Python
+      2.2 now
     - added lots more docstring content in the Template class
     - made multiline comments gobble whitespace like other directives, per JJ's
       request.  The rather longwinded compiler setting
