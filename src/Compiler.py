@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.125 2006/01/15 17:47:28 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.126 2006/01/15 20:45:37 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.125 $
+Version: $Revision: 1.126 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/15 17:47:28 $
+Last Revision Date: $Date: 2006/01/15 20:45:37 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.125 $"[11:-2]
+__revision__ = "$Revision: 1.126 $"[11:-2]
 
 import sys
 import os
@@ -1381,12 +1381,13 @@ class ModuleCompiler(SettingsManager, GenUtils):
         # it's painfully slow in the Python version and bites Windows users all
         # the time:
         if not NameMapper.C_VERSION:
-            warnings.warn(
-                "\nYou don't have the C version of NameMapper installed! "
-                "I'm disabling Cheetah's useStackFrames option as it is "
-                 "painfully slow with the Python version of NameMapper. "
-                "You should get a copy of Cheetah with the compiled C version of NameMapper."
-                )
+            if not sys.platform.startswith('java'):
+                warnings.warn(
+                    "\nYou don't have the C version of NameMapper installed! "
+                    "I'm disabling Cheetah's useStackFrames option as it is "
+                    "painfully slow with the Python version of NameMapper. "
+                    "You should get a copy of Cheetah with the compiled C version of NameMapper."
+                    )
             self.setSetting('useStackFrames', False)                    
 
         self._compiled = False
