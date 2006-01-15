@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Test.py,v 1.43 2005/11/02 22:26:07 tavis_rudd Exp $
+# $Id: Test.py,v 1.44 2006/01/15 20:45:10 tavis_rudd Exp $
 """Core module of Cheetah's Unit-testing framework
 
 TODO
@@ -14,12 +14,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>,
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.43 $
+Version: $Revision: 1.44 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2005/11/02 22:26:07 $
+Last Revision Date: $Date: 2006/01/15 20:45:10 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.43 $"[11:-2]
+__revision__ = "$Revision: 1.44 $"[11:-2]
 
 
 ##################################################
@@ -49,13 +49,16 @@ SyntaxSuite = unittest.findTestCases(SyntaxAndOutput)
 NameMapperSuite = unittest.findTestCases(NameMapper)
 TemplateSuite = unittest.findTestCases(Template)
 FileRefreshSuite = unittest.findTestCases(FileRefresh)
-CheetahWrapperSuite = unittest.findTestCases(CheetahWrapper)
+if not sys.platform.startswith('java'):
+    CheetahWrapperSuite = unittest.findTestCases(CheetahWrapper)
 
 from SyntaxAndOutput import *
 from NameMapper import *
 from Template import *
 from FileRefresh import *
-from CheetahWrapper import *
+
+if not sys.platform.startswith('java'):
+    from CheetahWrapper import *
 
 ##################################################
 ## if run from the command line

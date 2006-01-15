@@ -1,18 +1,17 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.10 2005/01/03 20:11:13 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.11 2006/01/15 20:45:22 tavis_rudd Exp $
 """NameMapper Tests
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>,
-Version: $Revision: 1.10 $
+Version: $Revision: 1.11 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2005/01/03 20:11:13 $
+Last Revision Date: $Date: 2006/01/15 20:45:22 $
 """
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.10 $"[11:-2]
-
 from __future__ import generators
+__author__ = "Tavis Rudd <tavis@damnsimple.com>"
+__revision__ = "$Revision: 1.11 $"[11:-2]
 import sys
 import types
 import os
@@ -528,6 +527,10 @@ class VFFSL_3(VFFSL):
 
 class VFFSL_4(VFFSL):
     _searchListLength = 4
+
+if sys.platform.startswith('java'):
+    del VFF, VFFSL, VFFSL_2, VFFSL_3, VFFSL_4
+
 
 ##################################################
 ## if run from the command line ##
