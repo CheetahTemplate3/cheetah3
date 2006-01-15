@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.142 2006/01/14 04:19:25 tavis_rudd Exp $
+# $Id: Template.py,v 1.143 2006/01/15 02:49:48 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.142 $
+Version: $Revision: 1.143 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/14 04:19:25 $
+Last Revision Date: $Date: 2006/01/15 02:49:48 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.142 $"[11:-2]
+__revision__ = "$Revision: 1.143 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -103,13 +103,14 @@ class Template(Servlet):
     Cheetah Users' Guide for non-programmers.  It also assumes you have read
     about Cheetah's syntax in the Users' Guide.
 
-    The following explains how to use this Cheetah within Python programs or via
+    The following explains how to use Cheetah from within Python programs or via
     the interpreter. If you statically compile your templates on the command
     line using the 'cheetah' script, this is not relevant to you. Statically
     compiled Cheetah template modules/classes (e.g. myTemplate.py:
     MyTemplateClasss) are just like any other Python module or class. Also note,
     most Python web frameworks (Webware, Aquarium, mod_python, Turbogears,
-    CherryPy, Quixote, etc.) provide plugins that Cheetah compilation for you.
+    CherryPy, Quixote, etc.) provide plugins that handle Cheetah compilation for
+    you.
 
     There are several possible usage patterns:          
        1) tclass = Template.compile(src)
@@ -1410,9 +1411,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.142 $
+        Version: $Revision: 1.143 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/14 04:19:25 $
+        Last Revision Date: $Date: 2006/01/15 02:49:48 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
