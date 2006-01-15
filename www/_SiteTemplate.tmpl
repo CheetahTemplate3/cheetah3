@@ -69,11 +69,13 @@
 	          $contentsMethod()
                 #end block pageContents
 		#block pageContentsFooter 
+
 		  <div class="attributionFooter"> Cheetah was created by Tavis
-		  Rudd, a freelance programmer and designer, with contributions
-		  from many open source volunteers.<br/>Its documentation is
-		  edited by Mike Orr, who also wrote its command line tool.</div>
-                  $sourceforgeWebBug	
+		  Rudd, a freelance programmer and designer, with <a
+		  href="credits$htmlExt">contributions from many open source
+		  volunteers</a>.<br/>Its documentation is edited by Mike Orr, who
+		  also wrote its command line tool.</div> $sourceforgeWebBug
+
 		#end block pageContentsFooter 
               </div>  ## pageInnerWrapper5
             </div>  ## pageInnerWrapper4
@@ -93,7 +95,7 @@
 </body>
 </html>
 ################################################################################
-################################################################################
+## The contents for each page:
 ################################################################################
 #def indexPageContents
   <table>
@@ -104,14 +106,15 @@
          <img class="" src="images/cheetah-homepage-title.gif" alt="" />
        </div> 	 
 
-       <p>Cheetah is a Python-powered template engine and code generator. It can
-       be used standalone or combined with other tools and frameworks. Web
-       development is its principle use, but Cheetah is very flexible and is
-       also being used to generate C++ game code, Java, sql, form emails and
-       even Python code.</p>
+       <p>Cheetah is an <a href="http://opensource.org/">open source</a>
+       template engine and code generation tool written in <a
+       href="http://python.org/">Python</a>.  It can be used standalone
+       or combined with other tools and frameworks. Web development is its
+       principle use, but Cheetah is very flexible and is also being used to
+       generate C++ game code, Java, sql, form emails and even Python code.</p>
 
        <p>Cheetah has a large and active user community. Products built with
-       Cheetah are <a href="whouses$htmlExt">used by most of the Fortune
+       Cheetah are <a href="whouses$htmlExt">used by many of the Fortune
        500</a>. One prominent new user is <a
        href="http://reddit.com/">reddit.com</a>, a startup funded by Paul
        Graham.</p>
@@ -134,8 +137,8 @@
   <div class="homePageDownloadBar">
    <div class="homePageDownloadBarInner">
     <b>Download</b> <a
-  href="http://sourceforge.net/project/showfiles.php?group_id=28961">Cheetah 2.0rc1</a>
- (released on Jan 10, 2006): major feature enhancements.
+  href="http://sourceforge.net/project/showfiles.php?group_id=28961">Cheetah 2.0rc2</a>
+ (released on Jan 13, 2006): major feature enhancements.
     </div>
   </div>
 
@@ -245,6 +248,112 @@
 
 #end def
 ################################################################################
+#def creditsPageContents
+
+<p>Cheetah was created by Tavis Rudd, a freelance programmer and designer, with
+contributions from many open source volunteers.  Its documentation is edited by
+Mike Orr, who also wrote its command line tool.</p>
+
+<p>We$(apos)d like to thank the following people for contributing valuable
+advice, encouragement, code and bug reports: </p> 
+
+<ul>
+#call $displayLinesAsList
+
+  Aaron Held
+  Alex Le Dain
+  Alvaro Tejero Cantero
+  Andreas Poisel
+  Andrew Johnson
+  Arkaitz Bitorika
+  Baruch Even
+  Bob Van Zant
+  Brian Bird
+  Chad Walstrom
+  Chris Murphy
+  Chuck Esterbrook
+  Chui Tey
+  Clark C. Evans
+  Craig Kattner
+  David Warnock
+  Deelan
+  Dirk Hoffmann
+  Donnie Hale
+  Doug Wyatt
+  Edmund Lian
+  Erik Forsberg
+  Federico Di Gregorio
+  Franz Geiger
+  Geir Magnusson
+  Geoff Talvola
+  Graham Dumpleton
+  Greg Czajkowski
+  Hamish Lawson
+  Henning Hasemann
+  Ian Bicking
+  Jamieson Becker
+  Jaroslaw Zabiello
+  Jay Love
+  Jeff Johnson
+  Jeremiah Bellomy
+  Johan Fredrik Ohman
+  Johannes Erdfelt
+  Jonathan Mark
+  Jose Galvez
+  Jurie Horneman
+  Keith Devens
+  Kevin Dangoor
+  Leith Parkin
+  Marcin Gajda
+  Markus Jais
+  Max Ischenko
+  Michael Engelhart
+  Michael Halle
+  Michel Thadeu
+  Mike Warren
+  Oleg Broytmann 
+  Olivier Favre-Simon
+  Paul Boddie
+  Patrick K. O$(apos)Brien
+  Paul Sorenson
+  Peter Mott
+  Peter Hunt
+  Peter Lyons
+  Peter White
+  Philippe Normand
+  Pierre-Yves Delens
+  Rene Pijlman
+  Rimon Barr
+  Robert Cowham
+  Robert Kuzelj
+  Rodrigo B. de Oliveira
+  Scott Sanders
+  Sasa Zivkov
+  Shannon -jj Behrens
+  Stephan Diehl
+  Stephane Bortzmeyer
+  Suriya Narayanan
+  Terrel Shumway
+  Todd Thomas
+  Tracy Ruggles
+  Tom Schwaller
+  Warren Smith
+  William Dode
+  Winston Wolff
+  Zed Lopez
+
+#end call
+</ul>
+
+<p>The Velocity, WebMacro, Smarty and Mason projects provided inspiration and
+design ideas. Cheetah has benefitted from the creativity and energy of their
+developers. Thank you.</p>
+
+<p>On a historical note, Cheetah is one of several templating frameworks that
+grew out of a "templates" thread on the "Webware For Python" email list.</p>
+
+#end def
+################################################################################
 #def learnPageContents
 
   <h3>Official Documentation</h3>
@@ -308,6 +417,12 @@
   Linux Gazette article by Mike Orr.  Published in Issue 117 of Linux Gazette,
   August 2005.</p>
 
+  <p><a href="$('http://www.linuxenterprise.de/itr/online_artikel/'
+  'psecom,id,639,nodeid,9.html')">Tierisch gut Das Cheetah Templating-System in
+  der Praxis</a>, a German-language article by Markus Jais. Published in the
+  December 2004 edition of <a
+  href="http://www.linuxenterprise.de/">http://www.linuxenterprise.de/</a>.
+
   <p><a href="docs/OnePageTutorial.html">One-Page Tutorial</a> for template
   maintainers.  Covers a few basic concepts.</p>
 
@@ -355,7 +470,7 @@
 
   <p>The most <a
   href="http://sourceforge.net/project/showfiles.php?group_id=28961">recent
-  development release</a> was 2.0rc1 on Jan 10, 2006.</p>
+  development release</a> was 2.0rc2 on Jan 13, 2006.</p>
 
   <p>Here$(apos)s the documentation on <a
   href="http://cheetahtemplate.org/docs/CHANGES">recent changes</a>.</p>
@@ -428,27 +543,18 @@
 #end def
 ################################################################################
 #def whousesPageContents
-
-  #def displayLinesAsList(arg): 
-    #for ln in arg.splitlines()
-     #set ln = $ln.strip
-     #if not ln
-       #continue
-     #end if 
-     <li>$ln.strip</li>
-    #end for 
-  #end def
-
-  #def makeLink(link, title=None)
-   <a href="$link">#if title then title else link#</a> #slurp
-  #end def    
   <table class="whoUsesTable">
     <tr valign="top">
       <td>
 
       <p>Cheetah is being used in a wide variety of commercial, government,
         academic, personal, and open-source projects &amp; products.  Products
-        built with Cheetah are used by most of the Fortune 500.
+        built with Cheetah are used by many of the Fortune 500.</p>
+
+      <p>This page provides selected examples. It is not an exhaustive list.  If
+      you use Cheetah and wish to be added here, please send an email to the <a
+      href="http://lists.sourceforge.net/mailman/listinfo/cheetahtemplate-discuss">mailing
+      list</a>.</p>
 
         <ul class="topLevel"> 
           <li>One major example of commercial use are the email gateway appliances from
@@ -476,7 +582,7 @@
 	  development framework:
 
 	    <ul>
-            #call displayLinesAsList
+            #call self.displayLinesAsList
   	      $pythonFrameworksUsing(includeWrapperText=False,sep='',includeWebwareInList=True)
             #end call 
             </ul>
@@ -485,7 +591,7 @@
 	  <li>Cheetah is included in FreeBSD and most major Linux distributions:
 	  Gentoo, Fedora, Debian, and Ubuntu among others.</li>
 
-          #call displayLinesAsList
+          #call self.displayLinesAsList
             <a href="http://info.patientwire.com/">PatientWire</a>
 	    <a href="http://reddit.com/">reddit.com</a>
             <a href="http://gentooexperimental.org/meatoo/">Gentoo Linux</a>
@@ -500,6 +606,7 @@
             $makeLink('http://initd.org/') (makers of psycopg and pysqlite)
 	    $makeLink('http://www.asti-usa.com/') #slurp
 		(Andrew Kuchling is currently porting their large web app to Cheetah)
+            $makeLink('http://snurf.bdash.net.nz/') a Python-based blogging system
 	    $makeLink('http://linuxgazette.com/')
 	    $makeLink('http://pyblosxom.sourceforge.net/')
 	    $makeLink('http://pyds.muensterland.org/')
@@ -518,7 +625,8 @@
 
 	  <li>Cheetah supports internationalization and has a large non-English userbase, including:
 	    <ul>
-            #call displayLinesAsList
+            #call self.displayLinesAsList
+	      $makeLink('http://www.alqua.org/') (Spanish)
               $makeLink('http://bank.muratordom.pl/') (Polish)
               $makeLink('http://bank.muratorplus.pl/') (Polish)
               $makeLink('http://www.encyclon.net/multiblast') (Korean) Bioinformatics Tool
@@ -538,14 +646,12 @@
   	    #end call  
             </ul>
 	  </li>
-
-          ## http://snurf.bdash.net.nz/
         </ul>
       </td>
       ###
       <td width="250">
        <ul>
-        #call displayLinesAsList
+        #call self.displayLinesAsList
         Dell 
         CNN
         NASDAQ
@@ -600,8 +706,9 @@
 ################################################################################
 #def contributePageContents
 
-  <p>Cheetah is the work of many volunteers.  If you use Cheetah, share your
-  experiences, tricks, customizations, and frustrations.  Please join the <a
+  <p>Cheetah is the work of <a href="credits$htmlExt">many volunteers</a>.  If
+  you use Cheetah, share your experiences, tricks, customizations, and
+  frustrations.  Please join the <a
   href="http://lists.sourceforge.net/mailman/listinfo/cheetahtemplate-discuss">mailing
   list</a>.</p>
 
@@ -678,6 +785,9 @@
     system, and simply blows away other templating systems.""", 'Mike Meyer')
 
     $formatQuote('Love your work guys.', 'Alex Le Dain')
+
+    $formatQuote("""I'm trying code generation with Cheetah.   
+      I have to say it's a pleasure compared to XSLT!""", 'Alex J. Champandard')
 
     $formatQuote("""Cheetah has successfully been introduced as a replacement for the
     overweight XSL Templates for code generation. Despite the power of XSL
@@ -766,6 +876,25 @@
 
   #end call
 #end def
+
+################################################################################
+## Helper methods & content snippets used in multiple places
+################################################################################
+
+#def displayLinesAsList(arg): 
+  #for ln in arg.splitlines()
+   #set ln = $ln.strip
+   #if not ln
+     #continue
+   #end if 
+   <li>$ln.strip</li>
+  #end for 
+#end def
+
+#def makeLink(link, title=None)
+  <a href="$link">#if title then title else link#</a> #slurp
+#end def    
+
 ################################################################################
 #def formatQuote(quote, citation)
   <div class="quote">
