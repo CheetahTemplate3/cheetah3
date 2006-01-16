@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.85 2006/01/15 20:55:12 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.86 2006/01/16 06:21:42 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.85 $
+Version: $Revision: 1.86 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/15 20:55:12 $
+Last Revision Date: $Date: 2006/01/16 06:21:42 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.85 $"[11:-2]
+__revision__ = "$Revision: 1.86 $"[11:-2]
 
 
 ##################################################
@@ -1588,31 +1588,31 @@ class DefDirective(OutputTest):
     def test11(self):
         """single line #def with extra WS"""
         self.verify(
-            "#def testMeth:   aoeuaoeu  \n- $testMeth -",
+            "#def testMeth:   aoeuaoeu\n- $testMeth -",
             "- aoeuaoeu -")
 
     def test12(self):
         """single line #def with extra WS and nested $placeholders"""
         self.verify(
-            "#def testMeth:   $anInt $aFunc(1234)  \n- $testMeth -",
+            "#def testMeth:   $anInt $aFunc(1234)\n- $testMeth -",
             "- 1 1234 -")
 
     def test13(self):
         """single line #def escaped $placeholders"""
         self.verify(
-            "#def testMeth: \$aFunc(\$anInt) \n- $testMeth -",
+            "#def testMeth: \$aFunc(\$anInt)\n- $testMeth -",
             "- $aFunc($anInt) -")
 
     def test14(self):
         """single line #def 1 escaped $placeholders"""
         self.verify(
-            "#def testMeth: \$aFunc($anInt) \n- $testMeth -",
+            "#def testMeth: \$aFunc($anInt)\n- $testMeth -",
             "- $aFunc(1) -")
 
     def test15(self):
         """single line #def 1 escaped $placeholders + more WS"""
         self.verify(
-            "#def testMeth    :  \$aFunc($anInt) \n- $testMeth -",
+            "#def testMeth    :  \$aFunc($anInt)\n- $testMeth -",
             "- $aFunc(1) -")
 
     def test16(self):
@@ -1622,12 +1622,12 @@ class DefDirective(OutputTest):
 
     def test17(self):
         """single line #def with $ on methodName"""
-        self.verify("#def $testMeth: 1234\n$testMeth",
+        self.verify("#def $testMeth:1234\n$testMeth",
                     "1234")
 
     def test18(self):
         """single line #def with an argument"""
-        self.verify("#def $testMeth($arg=1234): $arg\n$testMeth",
+        self.verify("#def $testMeth($arg=1234):$arg\n$testMeth",
                     "1234")
 
 class BlockDirective(OutputTest):
@@ -1686,7 +1686,7 @@ inner
     def test7(self):
         """single line #block with WS"""
         self.verify(
-            "#block testMeth:    This is my block      ",
+            "#block testMeth:    This is my block",
             "This is my block")
 
     def test8(self):
@@ -1698,13 +1698,13 @@ inner
     def test9(self):
         """single line #block 1 escaped $placeholders + WS"""
         self.verify(
-            "#block testMeth:   \$aFunc( $anInt )     ",
+            "#block testMeth:   \$aFunc( $anInt )",
             "$aFunc( 1 )")
 
     def test10(self):
         """single line #block 1 escaped $placeholders + more WS"""
         self.verify(
-            "#block testMeth  :   \$aFunc( $anInt )     ",
+            "#block testMeth  :   \$aFunc( $anInt )",
             "$aFunc( 1 )")
 
     def test11(self):
