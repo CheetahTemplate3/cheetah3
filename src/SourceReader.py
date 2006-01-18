@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SourceReader.py,v 1.13 2006/01/13 01:35:59 tavis_rudd Exp $
+# $Id: SourceReader.py,v 1.14 2006/01/18 03:16:59 tavis_rudd Exp $
 """SourceReader class for Cheetah's Parser and CodeGenerator
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.13 $
+Version: $Revision: 1.14 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/13 01:35:59 $
+Last Revision Date: $Date: 2006/01/18 03:16:59 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.13 $"[11:-2]
+__revision__ = "$Revision: 1.14 $"[11:-2]
 
 import re
 import sys
@@ -217,10 +217,7 @@ class SourceReader:
         if start == None:
             start = self._pos
         self._pos = to
-        if self.atEnd():
-            return self._src[start:]
-        else:
-            return self._src[start:to]
+        return self._src[start:to]
 
         
     def readToEOL(self, start=None, gobble=True):
@@ -254,11 +251,15 @@ class SourceReader:
         src = self.src()
         return max(src.rfind('\n',0,pos)+1, src.rfind('\r',0,pos)+1, 0)
         
-    def findEOL(self, pos=None):
+    def findEOL(self, pos=None, gobble=False):
         if pos == None:
             pos = self._pos
 
-        return EOLZre.search(self.src(), self.pos()).start()
+        match = EOLZre.search(self.src(), pos)
+        if gobble:
+            return match.end()
+        else:
+            return match.start()
     
     def isLineClearToPos(self, pos=None):
         if pos == None:
@@ -277,11 +278,14 @@ class SourceReader:
     def matchWhiteSpace(self, WSchars=' \f\t'):
         return (not self.atEnd()) and  self.peek() in WSchars
 
-    def getWhiteSpace(self, WSchars=' \f\t'):
+    def getWhiteSpace(self, max=None, WSchars=' \f\t'):
         if not self.matchWhiteSpace(WSchars):
             return ''
         start = self.pos()
-        while self.pos() < self.breakPoint():
+        breakPoint = self.breakPoint()
+        if max is not None:
+            breakPoint = min(breakPoint, self.pos()+max)
+        while self.pos() < breakPoint:
             self.advance()
             if not self.matchWhiteSpace(WSchars):
                 break
