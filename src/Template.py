@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.145 2006/01/15 18:45:42 tavis_rudd Exp $
+# $Id: Template.py,v 1.146 2006/01/18 03:18:15 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.145 $
+Version: $Revision: 1.146 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/15 18:45:42 $
+Last Revision Date: $Date: 2006/01/18 03:18:15 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.145 $"[11:-2]
+__revision__ = "$Revision: 1.146 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -183,12 +183,16 @@ class Template(Servlet):
     _CHEETAH_requiredCheetahMethodNames = ('_initCheetahInstance',
                                            'searchList',
                                            'errorCatcher',
-                                           'refreshCache',
                                            'getVar',
                                            'varExists',
                                            'getFileContents',
                                            'runAsMainProgram',
 
+                                           '_createCacheRegion',
+                                           'getCacheRegion',
+                                           'getCacheRegions',
+                                           'refreshCache',
+                                           
                                            '_handleCheetahInclude',
                                            )
 
@@ -1027,21 +1031,37 @@ class Template(Servlet):
         """
         return self._CHEETAH__errorCatcher
 
+    # cache methods
+    def _createCacheRegion(self, regionID):
+        return CacheRegion(regionID)
+
+    def getCacheRegion(self, regionID, cacheInfo=None, create=True):
+        cacheRegion = self._CHEETAH__cacheRegions.get(regionID)
+        if not cacheRegion and create:
+            cacheRegion = self._createCacheRegion(regionID)
+            self._CHEETAH__cacheRegions[regionID] = cacheRegion
+        return cacheRegion        
+    
+    def getCacheRegions(self):
+        """Returns a dictionary of the cache regions initialized for in a template.
+        """
+        return self._CHEETAH__cacheRegions.copy()
+
     def refreshCache(self, cacheRegionKey=None, cacheKey=None):        
         """Refresh a cache item.
         """
         
         if not cacheRegionKey:
-            # clear all template's cache regions
-            self._CHEETAH__cacheRegions.clear()
+            for key, cregion in self.getCacheRegions():
+                cregion.clear()
         else:
-            region = self._CHEETAH__cacheRegions.get(cacheRegionKey, CacheRegion())
-            if not cacheKey:
-                # clear the desired region and all its cache
-                region.clear()
-            else:
-                # clear one specific cache of a specific region
-                cache = region.getCache(cacheKey)
+            cregion = self._CHEETAH__cacheRegions.get(cacheRegionKey)
+            if not cregion:
+                return
+            if not cacheKey: # clear the desired region and all its caches
+                cregion.clear()
+            else: # clear one specific cache of a specific region
+                cache = cregion.getCache(cacheKey)
                 if cache:
                     cache.clear()
 
@@ -1425,9 +1445,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.145 $
+        Version: $Revision: 1.146 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/15 18:45:42 $
+        Last Revision Date: $Date: 2006/01/18 03:18:15 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
