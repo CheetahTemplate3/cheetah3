@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.126 2006/01/15 20:45:37 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.127 2006/01/18 03:14:53 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.126 $
+Version: $Revision: 1.127 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/15 20:45:37 $
+Last Revision Date: $Date: 2006/01/18 03:14:53 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.126 $"[11:-2]
+__revision__ = "$Revision: 1.127 $"[11:-2]
 
 import sys
 import os
@@ -417,7 +417,7 @@ class MethodCompiler(GenUtils):
     def addWriteChunk(self, chunk):
         self.addChunk('write(' + chunk + ')')
 
-    def addFilteredChunk(self, chunk, filterArgs=None, rawExpr=None):
+    def addFilteredChunk(self, chunk, filterArgs=None, rawExpr=None, lineCol=None):
         if filterArgs is None:
             filterArgs = ''
         if self.setting('includeRawExprInFilterArgs') and rawExpr:
@@ -425,7 +425,9 @@ class MethodCompiler(GenUtils):
 
         if self.setting('alwaysFilterNone'):
             if rawExpr and rawExpr.find('\n')==-1 and rawExpr.find('\r')==-1:
-                self.addChunk("_v = %s # %s"%(chunk, rawExpr))
+                self.addChunk("_v = %s # %r"%(chunk, rawExpr))
+                if lineCol:
+                    self.appendToPrevChunk(' on line %s, col %s'%lineCol)
             else:
                 self.addChunk("_v = %s"%chunk)
                 
@@ -522,7 +524,7 @@ class MethodCompiler(GenUtils):
             methodName = self._classCompiler.addErrorCatcherCall(
                 expr, rawCode=rawPlaceholder, lineCol=lineCol)
             expr = 'self.' + methodName + '(localsDict=locals())' 
-        self.addFilteredChunk(expr, filterArgs, rawPlaceholder)      
+        self.addFilteredChunk(expr, filterArgs, rawPlaceholder, lineCol=lineCol)
         if self.setting('outputRowColComments'):
             self.appendToPrevChunk(' # from line %s, col %s' % lineCol + '.')
         if cacheInfo:
@@ -586,9 +588,10 @@ class MethodCompiler(GenUtils):
         self.addChunk( expr )
         self.indent()
 
-    def addReIndentingDirective(self, expr):
+    def addReIndentingDirective(self, expr, dedent=True):
         self.commitStrConst()
-        self.dedent()
+        if dedent:
+            self.dedent()
         if not expr[-1] == ':':
             expr = expr  + ':'
             
@@ -600,7 +603,12 @@ class MethodCompiler(GenUtils):
         """
         self.addIndentingDirective(expr)
 
-    def addOneLineIf(self, conditionExpr, trueExpr, falseExpr):
+    def addOneLineIf(self, expr):
+        """For a full #if ... #end if directive
+        """
+        self.addIndentingDirective(expr)
+
+    def addTernaryExpr(self, conditionExpr, trueExpr, falseExpr):
         """For a single-lie #if ... then .... else ... directive
         <condition> then <trueExpr> else <falseExpr>
         """
@@ -611,9 +619,9 @@ class MethodCompiler(GenUtils):
         self.addFilteredChunk(falseExpr)
         self.dedent()
 
-    def addElse(self, expr):
+    def addElse(self, expr, dedent=True):
         expr = re.sub(r'else[ \f\t]+if','elif', expr)
-        self.addReIndentingDirective(expr)
+        self.addReIndentingDirective(expr, dedent=dedent)
 
     def addUnless(self, expr):
         self.addIf('if not (' + expr + ')')
@@ -632,11 +640,11 @@ class MethodCompiler(GenUtils):
     def addTry(self, expr):
         self.addIndentingDirective(expr)
         
-    def addExcept(self, expr):
-        self.addReIndentingDirective(expr)
+    def addExcept(self, expr, dedent=True):
+        self.addReIndentingDirective(expr, dedent=dedent)
         
-    def addFinally(self, expr):
-        self.addReIndentingDirective(expr)
+    def addFinally(self, expr, dedent=True):
+        self.addReIndentingDirective(expr, dedent=dedent)
             
     def addReturn(self, expr):
         assert not self._isGenerator
@@ -717,51 +725,52 @@ class MethodCompiler(GenUtils):
             ID = customID
         varyBy = cacheInfo.get('varyBy',repr(ID))
         self._cacheRegionsStack.append(ID) # attrib of current methodCompiler
-        
-        self.addChunk('## START CACHE REGION: '+ID+
+
+        # @@TR: add this to a special class var as well
+        self.addChunk('')
+
+        self.addChunk('## START CACHE REGION: ID='+ID+
                       '. line, col ' + str(lineCol) + ' in the source.')
-        self.addChunk('_RECACHE%(ID)s = False'%locals())
-        self.addChunk('_cacheRegion%(ID)s = self._CHEETAH__cacheRegions.get('%locals()
-                      + repr(ID) + ')')        
-        self.addChunk('if not _cacheRegion%(ID)s:'%locals())
-        self.indent()
-        self.addChunk("_cacheRegion%(ID)s = CacheRegion()"%locals())
-        self.addChunk("self._CHEETAH__cacheRegions[" + repr(ID)
-                      + "] = _cacheRegion%(ID)s"%locals())
-        self.addChunk('_RECACHE%(ID)s = True'%locals())
-        self.dedent()        
-        self.addChunk('_cache%(ID)s = _cacheRegion%(ID)s.getCache('%locals()
+        
+        self.addChunk('_RECACHE_%(ID)s = False'%locals())
+        self.addChunk('_cacheRegion_%(ID)s = self.getCacheRegion(regionID='%locals()
+                      + repr(ID)
+                      + ', cacheInfo=%r'%cacheInfo
+                      + ')')
+        self.addChunk('if _cacheRegion_%(ID)s.isNew(): _RECACHE_%(ID)s = True'%locals())
+        self.addChunk('_cacheItem_%(ID)s = _cacheRegion_%(ID)s.getCacheItem('%locals()
                       +varyBy+')')
         if interval:
-            self.addChunk(('if (not _cache%(ID)s.getRefreshTime())'%locals())
-                          +' or (currentTime() > cache.getRefreshTime()):')
+            self.addChunk(
+                ('if (not _cacheItem_%(ID)s.getRefreshTime())'%locals())
+                +' or (currentTime() > _cacheItem_%(ID)s.getRefreshTime()):'%locals())
             self.indent()
-            self.addChunk(("_cache%(ID)s.setRefreshTime(currentTime() +"%locals())
+            self.addChunk(("_cacheItem_%(ID)s.setRefreshTime(currentTime() +"%locals())
                           + str(interval) + ")")
-            self.addChunk('_RECACHE%(ID)s = True'%locals())
+            self.addChunk('_RECACHE_%(ID)s = True'%locals())
             self.dedent()
             
         if test:
             self.addChunk('if ' + test + ':')
             self.indent()
-            self.addChunk('_RECACHE%(ID)s = True'%locals())
+            self.addChunk('_RECACHE_%(ID)s = True'%locals())
             self.dedent()
             
-        self.addChunk('if _RECACHE%(ID)s or not _cache%(ID)s.getData():'%locals())
+        self.addChunk('if _RECACHE_%(ID)s or not _cacheItem_%(ID)s.hasData():'%locals())
         self.indent()
         self.addChunk('_orig_trans%(ID)s = trans'%locals())
-        self.addChunk('trans = _cacheCollector%(ID)s = DummyTransaction()'%locals())
-        self.addChunk('write = _cacheCollector%(ID)s.response().write'%locals())
+        self.addChunk('trans = _cacheCollector_%(ID)s = DummyTransaction()'%locals())
+        self.addChunk('write = _cacheCollector_%(ID)s.response().write'%locals())
         
     def endCacheRegion(self):
         ID = self._cacheRegionsStack.pop()
         self.addChunk('trans = _orig_trans%(ID)s'%locals())
         self.addChunk('write = trans.response().write')
         self.addChunk(
-            '_cache%(ID)s.setData(_cacheCollector%(ID)s.response().getvalue())'%locals())
-        self.addChunk('del _cacheCollector%(ID)s'%locals())
+            '_cacheItem_%(ID)s.setData(_cacheCollector_%(ID)s.response().getvalue())'%locals())
+        self.addChunk('del _cacheCollector_%(ID)s'%locals())
         self.dedent()        
-        self.addWriteChunk('_cache%(ID)s.getData()'%locals())
+        self.addWriteChunk('_cacheItem_%(ID)s.getOutput()'%locals())
         self.addChunk('## END CACHE REGION: '+ID)
         self.addChunk('')
 
@@ -1142,7 +1151,7 @@ class ClassCompiler(GenUtils):
         self.addChunk('if exists(self._filePath) and ' +
                       'getmtime(self._filePath) > self._fileMtime:')
         self.indent()
-        self.addChunk('self.compile(file=self._filePath, moduleName='+className + ')')
+        self.addChunk('self._compile(file=self._filePath, moduleName='+className + ')')
         self.addChunk(
             'write(getattr(self, self._mainCheetahMethod_for_' + self._className +
             ')(trans=trans))')            
@@ -1748,9 +1757,10 @@ class ModuleCompiler(SettingsManager, GenUtils):
 ## CLASSES
 
 %(classes)s
+
 if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
-    templateClass = getattr(%(mainClassName)s, '_CHEETAH_templateClass', Template)
-    templateClass._assignRequiredMethodsToClass(%(mainClassName)s)
+    templateAPIClass = getattr(%(mainClassName)s, '_CHEETAH_templateClass', Template)
+    templateAPIClass._assignRequiredMethodsToClass(%(mainClassName)s)
 
 %(footer)s
 """ %   {'header':self.moduleHeader(),
