@@ -2,6 +2,35 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0rc3 (Jan ?, 2006)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+  Core Changes: [TR]      
+    - added short-form single line versions of 
+      #if/#else/#elif, #for, #while, #repeat, #unless, #try, #except, #finally
+      The #def and #block directives already had single-line versions.
+          #if cond: foo
+	  #elif cond2: bar
+	  #else: blarg
+	  
+	  #for i, val in enumerate(vals): $i-$val
+
+      Note that if you accidentally leave a colon at the end of one of these
+      directives but nothing else follows it, aside from whitespace, the parser
+      will treat it as a normal multi-line directive.
+      The first leading space after the colon is discarded. Any additional
+      spaces will be included in the output.
+      
+      Also note, if use the short form versions of #if/#else/#elif you must it
+      for all three.  The following is not valid:'
+          #if cond: foo
+	  #elif cond2
+	     bar
+	  #else: blarg
+
+    - initial refactoring of CacheRegions to support a memcached extension 
+       (I'll have this finished by the time this release is ready)
+    - some under-the-hood refactoring of the parser
+
 2.0rc2 (Jan 13th, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      
