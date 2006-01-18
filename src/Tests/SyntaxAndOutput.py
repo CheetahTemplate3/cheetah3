@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.86 2006/01/16 06:21:42 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.87 2006/01/18 03:15:34 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.86 $
+Version: $Revision: 1.87 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/16 06:21:42 $
+Last Revision Date: $Date: 2006/01/18 03:15:34 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.86 $"[11:-2]
+__revision__ = "$Revision: 1.87 $"[11:-2]
 
 
 ##################################################
@@ -1471,6 +1471,26 @@ class ForDirective(OutputTest):
         self.verify("#for $i, ($j, $k) in enumerate([('aa','bb'),('cc','dd')])\n$j.upper,$k.upper\n#end for",
                     "AA,BB\nCC,DD\n")
 
+    def test13(self):
+        """single line #for"""
+        self.verify("#for $i in range($aFunc(5)): $i",
+                    "01234")
+
+    def test14(self):
+        """single line #for with 1 extra leading space"""
+        self.verify("#for $i in range($aFunc(5)):  $i",
+                    " 0 1 2 3 4")
+
+    def test15(self):
+        """2 times single line #for"""
+        self.verify("#for $i in range($aFunc(5)): $i#slurp\n"*2,
+                    "01234"*2)
+
+    def test16(self):
+        """false single line #for """
+        self.verify("#for $i in range(5): \n$i\n#end for",
+                    "0\n1\n2\n3\n4\n")
+
 if versionTuple < (2,3):
     del ForDirective.test12
 
@@ -1500,6 +1520,18 @@ class RepeatDirective(OutputTest):
         """#repeat with placeholder and WS"""
         self.verify("   #repeat $numTwo   \n1\n   #end repeat   ",
                     "1\n1\n")
+
+    def test6(self):
+        """single-line #repeat"""
+        self.verify("#repeat $numTwo: 1",
+                    "11")
+        self.verify("#repeat $numTwo: 1\n"*2,
+                    "1\n1\n"*2)
+
+        #false single-line
+        self.verify("#repeat 3:  \n1\n#end repeat",
+                    "1\n1\n1\n")
+
 
 class AttrDirective(OutputTest):
 
@@ -1588,13 +1620,13 @@ class DefDirective(OutputTest):
     def test11(self):
         """single line #def with extra WS"""
         self.verify(
-            "#def testMeth:   aoeuaoeu\n- $testMeth -",
+            "#def testMeth: aoeuaoeu\n- $testMeth -",
             "- aoeuaoeu -")
 
     def test12(self):
         """single line #def with extra WS and nested $placeholders"""
         self.verify(
-            "#def testMeth:   $anInt $aFunc(1234)\n- $testMeth -",
+            "#def testMeth: $anInt $aFunc(1234)\n- $testMeth -",
             "- 1 1234 -")
 
     def test13(self):
@@ -1612,7 +1644,7 @@ class DefDirective(OutputTest):
     def test15(self):
         """single line #def 1 escaped $placeholders + more WS"""
         self.verify(
-            "#def testMeth    :  \$aFunc($anInt)\n- $testMeth -",
+            "#def testMeth    : \$aFunc($anInt)\n- $testMeth -",
             "- $aFunc(1) -")
 
     def test16(self):
@@ -1686,7 +1718,7 @@ inner
     def test7(self):
         """single line #block with WS"""
         self.verify(
-            "#block testMeth:    This is my block",
+            "#block testMeth: This is my block",
             "This is my block")
 
     def test8(self):
@@ -1698,13 +1730,13 @@ inner
     def test9(self):
         """single line #block 1 escaped $placeholders + WS"""
         self.verify(
-            "#block testMeth:   \$aFunc( $anInt )",
+            "#block testMeth: \$aFunc( $anInt )",
             "$aFunc( 1 )")
 
     def test10(self):
         """single line #block 1 escaped $placeholders + more WS"""
         self.verify(
-            "#block testMeth  :   \$aFunc( $anInt )",
+            "#block testMeth  : \$aFunc( $anInt )",
             "$aFunc( 1 )")
 
     def test11(self):
@@ -2024,6 +2056,22 @@ class IfDirective(OutputTest):
         self.verify("#if ($anInt and not $emptyString==''' else ''') then $str('then') else 'else'",
                     "then")
 
+    def test17(self):
+        """single-line #if:  """
+        self.verify("#if 1: foo\n#if 0: bar\n#if 1: foo",
+                    "foo\nfoo")
+
+    def test18(self):
+        """single-line #if: \n#else: """
+        self.verify("#if 1: foo\n#elif 0: bar",
+                    "foo\n")
+
+        self.verify("#if 1: foo\n#elif 0: bar\n#else: blarg\n",
+                    "foo\n")
+
+        self.verify("#if 0: foo\n#elif 0: bar\n#else: blarg\n",
+                    "blarg\n")
+
 class UnlessDirective(OutputTest):
     
     def test1(self):
@@ -2051,6 +2099,12 @@ class UnlessDirective(OutputTest):
         self.verify("   #unless $numTwo   \n 1234 \n    #end unless   ",
                     "")
 
+    def test6(self):
+        """single-line #unless"""
+        self.verify("#unless 1: 1234", "")
+        self.verify("#unless 0: 1234", "1234")
+        self.verify("#unless 0: 1234\n"*2, "1234\n"*2)
+        
 class PSP(OutputTest):
     
     def test1(self):
