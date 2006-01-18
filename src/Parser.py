@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.107 2006/01/13 03:48:05 tavis_rudd Exp $
+# $Id: Parser.py,v 1.108 2006/01/18 03:12:04 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.107 $
+Version: $Revision: 1.108 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/13 03:48:05 $
+Last Revision Date: $Date: 2006/01/18 03:12:04 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.107 $"[11:-2]
+__revision__ = "$Revision: 1.108 $"[11:-2]
 
 import os
 import sys
@@ -562,6 +562,14 @@ class _LowLevelParser(SourceReader):
         if not match:
             raise ParseError(self, msg='Invalid directive end token')
         return self.readTo(match.end())
+
+        
+    def matchColonForSingleLineDirective(self):
+        if not self.atEnd() and self.peek()==':':
+            restOfLine = self[self.pos()+1:self.findEOL()]
+            if restOfLine.strip(): # not WS only to EOL
+                return True
+        return False        
 
     def matchPSPStartToken(self):
         return self.PSPStartTokenRE.match(self.src(), self.pos())
@@ -1134,7 +1142,7 @@ class _HighLevelParser(_LowLevelParser):
             'for': self.eatFor,
             'if': self.eatIf,
             'else': self.eatElse,
-            'elif': self.eatElse,
+            'elif': self.eatElif,
             'pass': self.eatPass,
             'break': self.eatBreak,
             'continue': self.eatContinue,
@@ -1241,9 +1249,13 @@ class _HighLevelParser(_LowLevelParser):
         
     ## main parse loop
 
-    def parse(self, endPos=None, assertEmptyStack=True):
-        while not self.atEnd() and not (endPos and self.pos()==endPos):
-            #print self.peek(), self.pos() #DEBUG
+    def parse(self, breakPoint=None, assertEmptyStack=True):
+        if breakPoint:
+            origBP = self.breakPoint()
+            self.setBreakPoint(breakPoint)
+            assertEmptyStack = False
+
+        while not self.atEnd():
             if self.matchCommentStartToken():
                 self.eatComment()
             elif self.matchMultiLineCommentStartToken():
@@ -1262,8 +1274,10 @@ class _HighLevelParser(_LowLevelParser):
                 self.eatPlainText()
         if assertEmptyStack:
             self.assertEmptyOpenDirectivesStack()
-                
-    ## eat methods    
+        if breakPoint:
+            self.setBreakPoint(origBP)
+            
+    ## non-directive eat methods    
                 
     def eatPlainText(self):
         startPos = self.pos()
@@ -1442,6 +1456,40 @@ class _HighLevelParser(_LowLevelParser):
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
         return expr
 
+    def eatSimpleIndentingDirective(self, directiveKey, callback,
+                                    includeDirectiveKeyInExpr=False):
+        # filtered 
+        isLineClearToStartToken = self.isLineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        self.getDirectiveStartToken()
+        if directiveKey not in 'else elif for while try except finally'.split():
+            self.advance(len(directiveKey))
+        startPos = self.pos()
+
+        self.getWhiteSpace()
+
+        expr = self.getExpression(pyTokensToBreakAt=[':'])
+        expr = self._applyExpressionFilters(expr, directiveKey, startPos=startPos)
+        if self.matchColonForSingleLineDirective():
+            self.advance() # skip over :
+            if directiveKey in 'else elif except finally'.split():
+                callback(expr, dedent=False)
+            else:
+                callback(expr)
+                
+            self.getWhiteSpace(max=1)
+            self.parse(breakPoint=self.findEOL(gobble=True))
+            self._compiler.commitStrConst()
+            self._compiler.dedent()
+        else:
+            if self.peek()==':':
+                self.advance()
+            self.getWhiteSpace()
+            self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
+            if directiveKey in self._closableDirectives:
+                self.pushToOpenDirectivesStack(directiveKey)
+            callback(expr)
+
     ## specific directive eat methods
     
     def eatBreakPoint(self):
@@ -1614,10 +1662,7 @@ class _HighLevelParser(_LowLevelParser):
         # @@TR: fix up filtering
         self._applyExpressionFilters(self[startPos:self.pos()], 'def', startPos=startPos)
 
-        if (self.peek()==':'
-            and (self.setting('allowEmptySingleLineMethods')
-                 or self[self.pos()+1:self.findEOL()].strip())):
-            # single-line version
+        if self.matchColonForSingleLineDirective():
             isNestedDef = (self.setting('allowNestedDefScopes')
                            and [name for name in self._openDirectivesStack if name=='def'])
             self.getc()
@@ -1673,17 +1718,10 @@ class _HighLevelParser(_LowLevelParser):
             self._compiler.addClosure(methodName, argsList, parserComment)
 
         return methodName
-            
+
     def _eatSingleLineDef(self, directiveKey, methodName, argsList, startPos, endPos):
         # filtered in calling method        
-        origPos = self.pos()
-        methodSrc = self[self.pos():endPos].strip()
         fullSignature = self[startPos:endPos]
-        origBP = self.breakPoint()
-        origSrc = self.src()
-        self._src = methodSrc
-        self.setPos(0)
-        self.setBreakPoint(len(methodSrc))
         parserComment = ('## Generated from ' + fullSignature + 
                          ' at line %s, col %s' % self.getRowCol(startPos)
                          + '.')
@@ -1694,18 +1732,13 @@ class _HighLevelParser(_LowLevelParser):
         else: #closure
             # @@TR: temporary hack of useSearchList
             useSearchList_orig = self.setting('useSearchList')
-            self.setSetting('useSearchList', False)
-            
+            self.setSetting('useSearchList', False)            
             self._compiler.addClosure(methodName, argsList, parserComment)            
 
-        self.parse(assertEmptyStack=False)
+        self.getWhiteSpace(max=1)
+        self.parse(breakPoint=endPos)        
         if directiveKey=='closure' or isNestedDef: # @@TR: temporary hack of useSearchList
             self.setSetting('useSearchList', useSearchList_orig)
-            
-        self.getWhiteSpace()
-        self._src = origSrc
-        self.setBreakPoint(origBP) 
-        self.setPos(endPos)
             
     def eatImport(self):
         # filtered
@@ -1876,6 +1909,7 @@ class _HighLevelParser(_LowLevelParser):
         self._compiler.startCacheRegion(cacheInfo, lineCol)
 
     def eatCall(self):
+        # @@TR: need to enable single line version of this
         isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         lineCol = self.getRowCol()
@@ -1949,39 +1983,49 @@ class _HighLevelParser(_LowLevelParser):
             errorCatcherName, 'errorcatcher', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)        
         self._compiler.setErrorCatcher(errorCatcherName)
-        
-    def eatWhile(self):
-        self._compiler.addWhile(self.eatSimpleExprDirective())
 
-    def eatFor(self):
+    def eatCapture(self):
+        # @@TR:  this could be refactored to use the code in eatSimpleIndentingDirective
         # filtered 
         isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
+        lineCol = self.getRowCol()
 
         self.getDirectiveStartToken()
+        self.advance(len('capture'))
         startPos = self.pos()
-        expr = self.getExpression()
-        expr = self._applyExpressionFilters(expr, 'for', startPos=startPos)        
-        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
-        self.pushToOpenDirectivesStack("for")
-        self._compiler.addFor(expr)
+        self.getWhiteSpace()
+
+        expr = self.getExpression(pyTokensToBreakAt=[':'])
+        expr = self._applyExpressionFilters(expr, 'capture', startPos=startPos)
+        if self.matchColonForSingleLineDirective():
+            self.advance() # skip over :
+            self._compiler.startCaptureRegion(assignTo=expr, lineCol=lineCol)
+            self.getWhiteSpace(max=1)
+            self.parse(breakPoint=self.findEOL(gobble=True))
+            self._compiler.endCaptureRegion()
+        else:
+            if self.peek()==':':
+                self.advance()
+            self.getWhiteSpace()
+            self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
+            self.pushToOpenDirectivesStack("capture")
+            self._compiler.startCaptureRegion(assignTo=expr, lineCol=lineCol)
         
+
     def eatIf(self):
         # filtered 
         isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLine = self.findEOL()
         self.getDirectiveStartToken()
         startPos = self.pos()
+        
         expressionParts = self.getExpressionParts(pyTokensToBreakAt=[':'])
-        if not self.atEnd() and self.peek()==':':
-            pass
-        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
-
         expr = ''.join(expressionParts).strip()
         expr = self._applyExpressionFilters(expr, 'if', startPos=startPos)
 
-        isTerniaryExpr = ('then' in expressionParts and 'else' in expressionParts)
-        if isTerniaryExpr:
+        isTernaryExpr = ('then' in expressionParts and 'else' in expressionParts)
+        if isTernaryExpr:
             conditionExpr = []
             trueExpr = []
             falseExpr = []
@@ -1997,27 +2041,59 @@ class _HighLevelParser(_LowLevelParser):
             conditionExpr = ''.join(conditionExpr)
             trueExpr = ''.join(trueExpr)
             falseExpr = ''.join(falseExpr)
-            self._compiler.addOneLineIf(conditionExpr, trueExpr, falseExpr)
+            self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)            
+            self._compiler.addTernaryExpr(conditionExpr, trueExpr, falseExpr)
+        elif self.matchColonForSingleLineDirective():
+            self.advance() # skip over :
+            self._compiler.addIf(expr)
+            self.getWhiteSpace(max=1)
+            self.parse(breakPoint=self.findEOL(gobble=True))            
+            self._compiler.commitStrConst()            
+            self._compiler.dedent()
         else:
+            if self.peek()==':':
+                self.advance()
+            self.getWhiteSpace()                
+            self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)            
             self.pushToOpenDirectivesStack('if')
             self._compiler.addIf(expr)
-    
+
+        
     def eatElse(self):
-        """else, elif and else if"""
+        """else and else if"""
+        # filtered
+        self.eatSimpleIndentingDirective('else', self._compiler.addElse)
+
+    def eatElif(self):
+        # filtered
+        self.eatSimpleIndentingDirective('elif', self._compiler.addElse)
+
+    def eatFor(self):
+        # filtered
+        self.eatSimpleIndentingDirective('for', self._compiler.addFor)
+
+    def eatWhile(self):
+        self.eatSimpleIndentingDirective('while', self._compiler.addWhile)
+
+    def eatRepeat(self):
         # filtered 
-        self._compiler.addElse(self.eatSimpleExprDirective())
+        self.eatSimpleIndentingDirective('repeat', self._compiler.addRepeat)
+
+    def eatUnless(self):
+        # filtered
+        self.eatSimpleIndentingDirective('unless', self._compiler.addUnless)
 
     def eatTry(self):
         # filtered
-        self._compiler.addTry(self.eatSimpleExprDirective())
+        self.eatSimpleIndentingDirective('try', self._compiler.addTry)
 
     def eatExcept(self):
         # filtered
-        self._compiler.addExcept(self.eatSimpleExprDirective())
+        self.eatSimpleIndentingDirective('except', self._compiler.addExcept)
 
     def eatFinally(self):
         # filtered
-        self._compiler.addFinally(self.eatSimpleExprDirective())
+        self.eatSimpleIndentingDirective('finally', self._compiler.addFinally)
 
     def eatPass(self):
         # filtered 
@@ -2055,50 +2131,6 @@ class _HighLevelParser(_LowLevelParser):
         # filtered 
         self._compiler.addYield(self.eatSimpleExprDirective())
 
-    def eatRepeat(self):
-        # filtered 
-        isLineClearToStartToken = self.isLineClearToStartToken()
-        endOfFirstLinePos = self.findEOL()
-        self.getDirectiveStartToken()
-        self.advance(len('repeat'))
-        startPos = self.pos()
-        expr = self.getExpression()
-        expr = self._applyExpressionFilters(expr, 'repeat', startPos=startPos)
-        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
-        self.pushToOpenDirectivesStack("repeat")
-        self._compiler.addRepeat(expr)
-
-
-    def eatUnless(self):
-        # filtered 
-        isLineClearToStartToken = self.isLineClearToStartToken()
-        endOfFirstLinePos = self.findEOL()
-        self.getDirectiveStartToken()
-        self.advance(len('unless'))
-        startPos = self.pos()
-        expr = self.getExpression()
-        expr = self._applyExpressionFilters(expr, 'unless', startPos=startPos)
-        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
-        self.pushToOpenDirectivesStack("unless")
-        self._compiler.addUnless(expr)
-
-    def eatCapture(self):
-        # filtered 
-        isLineClearToStartToken = self.isLineClearToStartToken()
-        endOfFirstLinePos = self.findEOL()
-        lineCol = self.getRowCol()
-
-        self.getDirectiveStartToken()
-        self.advance(len('capture'))
-        startPos = self.pos()
-        self.getWhiteSpace()
-        expr = self.getExpression()
-        expr = expr.strip()
-        expr = self._applyExpressionFilters(expr, 'capture', startPos=startPos)
-        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
-        self.pushToOpenDirectivesStack("capture")
-        self._compiler.startCaptureRegion(assignTo=expr, lineCol=lineCol)
-        
     ## end directive eaters
 
     def eatEndDef(self, isLineClearToStartToken=False):
