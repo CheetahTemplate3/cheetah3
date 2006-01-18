@@ -20,8 +20,8 @@ release
       The first leading space after the colon is discarded. Any additional
       spaces will be included in the output.
       
-      Also note, if use the short form versions of #if/#else/#elif you must it
-      for all three.  The following is not valid:'
+      Also note, if you use the short form versions of #if/#else/#elif you must
+      it for all three.  The following is not valid:
           #if cond: foo
 	  #elif cond2
 	     bar
