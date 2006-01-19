@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.127 2006/01/18 03:14:53 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.128 2006/01/19 05:08:52 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.127 $
+Version: $Revision: 1.128 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/18 03:14:53 $
+Last Revision Date: $Date: 2006/01/19 05:08:52 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.127 $"[11:-2]
+__revision__ = "$Revision: 1.128 $"[11:-2]
 
 import sys
 import os
@@ -623,6 +623,9 @@ class MethodCompiler(GenUtils):
         expr = re.sub(r'else[ \f\t]+if','elif', expr)
         self.addReIndentingDirective(expr, dedent=dedent)
 
+    def addElif(self, expr, dedent=True):
+        self.addElse(expr, dedent=dedent)
+        
     def addUnless(self, expr):
         self.addIf('if not (' + expr + ')')
 
