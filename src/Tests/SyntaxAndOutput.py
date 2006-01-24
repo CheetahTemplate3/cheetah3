@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.87 2006/01/18 03:15:34 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.88 2006/01/24 18:53:49 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.87 $
+Version: $Revision: 1.88 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/18 03:15:34 $
+Last Revision Date: $Date: 2006/01/24 18:53:49 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.87 $"[11:-2]
+__revision__ = "$Revision: 1.88 $"[11:-2]
 
 
 ##################################################
@@ -683,7 +683,7 @@ class UnicodeStrings(OutputTest):
     def test1(self):
         """unicode data in placeholder
         """
-        self.verify("$unicodeData", "aoeu12345\xe1\x88\xb4")
+        self.verify(u"$unicodeData", defaultTestNameSpace['unicodeData'])
 
     def test2(self):
         """unicode data in body
