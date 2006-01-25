@@ -1,3 +1,9 @@
+"""This is a copy of the htmlEncode function in Webware.
+
+
+@@TR: It implemented more efficiently.
+
+"""
 htmlCodes = [
     ['&', '&amp;'],
     ['<', '&lt;'],
