@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.88 2006/01/24 18:53:49 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.89 2006/01/25 21:48:13 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.88 $
+Version: $Revision: 1.89 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/24 18:53:49 $
+Last Revision Date: $Date: 2006/01/25 21:48:13 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.88 $"[11:-2]
+__revision__ = "$Revision: 1.89 $"[11:-2]
 
 
 ##################################################
@@ -599,6 +599,19 @@ class Placeholders(OutputTest):
         """1 placeholder surrounded by single quotes and multiple newlines"""
         self.verify("""'\n\n\n\n'$aStr'\n\n\n\n'""",
                     """'\n\n\n\n'blarg'\n\n\n\n'""")
+
+    def test20(self):
+        """silent mode $!placeholders """
+        self.verify("$!aStr$!nonExistant$!*nonExistant$!{nonExistant}", "blarg")
+
+        try:
+            self.verify("$!aStr$nonExistant",
+            "blarg")
+        except NotFound:
+            pass
+        else:
+            self.fail('should raise NotFound exception')
+            
 
 class Placeholders_Vals(OutputTest):
     convertEOLs = False
