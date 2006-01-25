@@ -107,7 +107,7 @@
        </div> 	 
 
        <p>Cheetah is an <a href="http://opensource.org/">open source</a>
-       template engine and code generation tool written in <a
+       template engine and code generation tool, written in <a
        href="http://python.org/">Python</a>.  It can be used standalone
        or combined with other tools and frameworks. Web development is its
        principle use, but Cheetah is very flexible and is also being used to
@@ -117,7 +117,7 @@
        Cheetah are <a href="whouses$htmlExt">used by many of the Fortune
        500</a>. One prominent new user is <a
        href="http://reddit.com/">reddit.com</a>, a startup funded by Paul
-       Graham.</p>
+       Graham.  It has over 20,000 unique visitors a day.</p>
 
      </td>
      <td width="300">
@@ -400,6 +400,11 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 
   <h3>Unofficial Documentation and Articles</h3>
 
+  <p><a
+  href="http://coderseye.com/2006/how-to-install-cheetah-on-dreamhost.html">How
+  to install Cheetah on Dreamhost</a>, a blog article published by Bruce Kroeze
+  in January 2006.</p>
+
   <p><a href="$('http://www-128.ibm.com/developerworks/opensource/library/'
   'os-pythcheetah/?ca=dgr-lnxw06PythonCheetah')">Building and filling out
   templates with Python and Cheetah</a> by Leonard Richardson, Software Engineer
@@ -602,7 +607,7 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 
           #call self.displayLinesAsList
             <a href="http://info.patientwire.com/">PatientWire</a>
-	    <a href="http://reddit.com/">reddit.com</a>
+	    <a href="http://reddit.com/">reddit.com</a> 20,000 unique visitors/days
             <a href="http://gentooexperimental.org/meatoo/">Gentoo Linux</a>
 	    $makeLink('http://bosco.tigris.org/') A JMI-compliant template-based code generator. #slurp
               It reads XMI files and generates the corresponding source code, #slurp
@@ -623,6 +628,7 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 	    $makeLink('http://map.wirelesslondon.info/')
 	    $makeLink('http://tboard.sourceforge.net/')
 	    $makeLink('http://singleshot.org/')
+	    $makeLink('http://invisiblecastle.com/') free gaming site, 70,000 hits a month
 	    $makeLink('http://www.python-hosting.com/')
 	    $makeLink('http://www.petersblog.org/')
 	    ###$makeLink('http://www.usenix.org/events/lisa03/tech/'
@@ -783,6 +789,22 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
       to have gone really well and the former-Lisp developers really enjoyed
       Cheetah's simple syntax.""", '''<a href="http://www.aaronsw.com/">Aaron
       Swartz</a>, co-author of the RSS 1.0 spec''')
+
+
+    $formatQuote("""<i>Socialserve.com moving over to Cheetah ... Happy little gophers:</i>
+    Socialserve.com is switching over from a J2EE stack (JBoss /
+    JPublish (used Velocity for templating)) over to a fastcgi-based web
+    publishing system with Cheetah as the star. Site-wide, we're currently
+    serving an average of 68K pages (198K 'hits') per day, with the Cheetah'd
+    pages doing more than 65% of that traffic. Our web traffic has doubled in
+    the past 6 months, and that growth curve shows no sign of slowing down.<br /><br />
+
+    We have found Cheetah to be a gloriously flexible and powerful
+    technology. Functions within templates allowed us to do far more elegant
+    structured programming at the document level. Being able to use templates as
+    python classes, importing constants and other goodies directly from our
+    middleware python code really lets them act as first class code members
+    instead of an ugly lesser citizen.""", 'James Robinson')
 
     $formatQuote("""I am using Smarty and I know it very well, but compiled Cheetah
     Templates with its inheritance approach is much powerful and easier to
