@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.110 2006/01/25 21:48:34 tavis_rudd Exp $
+# $Id: Parser.py,v 1.111 2006/01/25 23:50:11 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.110 $
+Version: $Revision: 1.111 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/25 21:48:34 $
+Last Revision Date: $Date: 2006/01/25 23:50:11 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.110 $"[11:-2]
+__revision__ = "$Revision: 1.111 $"[11:-2]
 
 import os
 import sys
@@ -891,7 +891,7 @@ class _LowLevelParser(SourceReader):
     def getExpressionParts(self,
                            enclosed=False, 
                            enclosures=None, # list of tuples (char, pos), where char is ({ or [ 
-                           pyTokensToBreakAt=None,
+                           pyTokensToBreakAt=None, # only works if not enclosed
                            useNameMapper=Unspecified,
                            ):
 
@@ -968,7 +968,10 @@ class _LowLevelParser(SourceReader):
             else:                
                 beforeTokenPos = self.pos()
                 token = self.getPyToken()
-                if pyTokensToBreakAt and token in pyTokensToBreakAt:
+                if (not enclosures 
+                    and pyTokensToBreakAt
+                    and token in pyTokensToBreakAt):
+                    
                     self.setPos(beforeTokenPos)
                     break
 
