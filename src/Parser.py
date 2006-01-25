@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.109 2006/01/18 09:31:47 tavis_rudd Exp $
+# $Id: Parser.py,v 1.110 2006/01/25 21:48:34 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.109 $
+Version: $Revision: 1.110 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/18 09:31:47 $
+Last Revision Date: $Date: 2006/01/25 21:48:34 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.109 $"[11:-2]
+__revision__ = "$Revision: 1.110 $"[11:-2]
 
 import os
 import sys
@@ -316,15 +316,19 @@ class _LowLevelParser(SourceReader):
                       r'(?P<NO_CACHE>)' +
                       ')')
         self.cacheTokenRE = re.compile(cacheToken)
+
+        silentPlaceholderToken = (r'(?:' +
+                                  r'(?P<SILENT>' +escapeRegexChars('!')+')'+
+                                  '|' +
+                                  r'(?P<NOT_SILENT>)' +
+                                  ')')
+        self.silentPlaceholderTokenRE = re.compile(silentPlaceholderToken)
         
         self.cheetahVarStartRE = re.compile(
             escCharLookBehind +
-            r'(?P<startToken>' +
-            escapeRegexChars(self.setting('cheetahVarStartToken')) +
-            ')' +
-            r'(?P<cacheToken>' +
-            cacheToken +
-            ')' +
+            r'(?P<startToken>'+escapeRegexChars(self.setting('cheetahVarStartToken'))+')'+
+            r'(?P<silenceToken>'+silentPlaceholderToken+')'+
+            r'(?P<cacheToken>'+cacheToken+')'+
             r'(?P<enclosure>|(?:(?:\{|\(|\[)[ \t\f]*))' + # allow WS after enclosure
             r'(?=[A-Za-z_])')
         validCharsLookAhead = r'(?=[A-Za-z_\*!\{\(\[])'
@@ -624,6 +628,15 @@ class _LowLevelParser(SourceReader):
         except:
             raise ParseError(self, msg='Expected cache token')
 
+    def getSilentPlaceholderToken(self):
+        try:
+            token = self.silentPlaceholderTokenRE.match(self.src(), self.pos())
+            self.setPos( token.end() )
+            return token.group()
+        except:
+            raise ParseError(self, msg='Expected silent placeholder token')
+
+
 
     def getTargetVarsList(self):
         varnames = []
@@ -638,6 +651,7 @@ class _LowLevelParser(SourceReader):
                 break
             elif self.matchCheetahVarStart():
                 self.getCheetahVarStartToken()
+                self.getSilentPlaceholderToken()
                 self.getCacheToken()
                 varnames.append( self.getDottedName() )
             elif self.matchIdentifier():
@@ -652,6 +666,7 @@ class _LowLevelParser(SourceReader):
         """
         if not skipStartToken:
             self.getCheetahVarStartToken()
+        self.getSilentPlaceholderToken()
         self.getCacheToken()
         return self.getCheetahVarBody(plain=plain)
             
@@ -1038,6 +1053,13 @@ class _LowLevelParser(SourceReader):
         startPos = self.pos()
         lineCol = self.getRowCol(startPos)
         startToken = self.getCheetahVarStartToken()
+        silentPlaceholderToken = self.getSilentPlaceholderToken()
+        if silentPlaceholderToken:
+            isSilentPlaceholder = True
+        else:
+            isSilentPlaceholder = False
+            
+        
         if allowCacheTokens:
             cacheToken = self.getCacheToken()
             cacheTokenParts = self.cacheTokenRE.match(cacheToken).groupdict()        
@@ -1086,7 +1108,8 @@ class _LowLevelParser(SourceReader):
             callback(parser=self)
 
         if returnEverything:
-            return expr, rawPlaceholder, lineCol, cacheTokenParts, filterArgs
+            return (expr, rawPlaceholder, lineCol, cacheTokenParts,
+                    filterArgs, isSilentPlaceholder)
         else:
             return expr
         
@@ -1337,13 +1360,16 @@ class _HighLevelParser(_LowLevelParser):
     def eatPlaceholder(self):
         (expr, rawPlaceholder,
          lineCol, cacheTokenParts,
-         filterArgs) = self.getPlaceholder(allowCacheTokens=True, returnEverything=True)
+         filterArgs, isSilentPlaceholder) = self.getPlaceholder(
+            allowCacheTokens=True, returnEverything=True)
+        
         self._compiler.addPlaceholder(
             expr,
             filterArgs=filterArgs,
             rawPlaceholder=rawPlaceholder,
             cacheTokenParts=cacheTokenParts,
-            lineCol=lineCol)
+            lineCol=lineCol,
+            silentMode=isSilentPlaceholder)
         return
         
     def eatPSP(self):

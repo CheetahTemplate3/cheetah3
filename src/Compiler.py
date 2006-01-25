@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.128 2006/01/19 05:08:52 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.129 2006/01/25 21:49:00 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.128 $
+Version: $Revision: 1.129 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/19 05:08:52 $
+Last Revision Date: $Date: 2006/01/25 21:49:00 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.128 $"[11:-2]
+__revision__ = "$Revision: 1.129 $"[11:-2]
 
 import sys
 import os
@@ -514,7 +514,9 @@ class MethodCompiler(GenUtils):
         offSet = self.setting('commentOffset')
         self.addChunk('#' + ' '*offSet + comm)
 
-    def addPlaceholder(self, expr, filterArgs, rawPlaceholder, cacheTokenParts, lineCol):
+    def addPlaceholder(self, expr, filterArgs, rawPlaceholder,
+                       cacheTokenParts, lineCol,
+                       silentMode=False):
         cacheInfo = self.genCacheInfo(cacheTokenParts)
         if cacheInfo:
             cacheInfo['ID'] = repr(rawPlaceholder)[1:-1]
@@ -524,7 +526,16 @@ class MethodCompiler(GenUtils):
             methodName = self._classCompiler.addErrorCatcherCall(
                 expr, rawCode=rawPlaceholder, lineCol=lineCol)
             expr = 'self.' + methodName + '(localsDict=locals())' 
-        self.addFilteredChunk(expr, filterArgs, rawPlaceholder, lineCol=lineCol)
+
+        if silentMode:
+            self.addChunk('try:')
+            self.indent()            
+            self.addFilteredChunk(expr, filterArgs, rawPlaceholder, lineCol=lineCol)
+            self.dedent()
+            self.addChunk('except NotFound: pass')            
+        else:
+            self.addFilteredChunk(expr, filterArgs, rawPlaceholder, lineCol=lineCol)
+
         if self.setting('outputRowColComments'):
             self.appendToPrevChunk(' # from line %s, col %s' % lineCol + '.')
         if cacheInfo:
