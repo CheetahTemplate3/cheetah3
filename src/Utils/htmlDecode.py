@@ -1,3 +1,9 @@
+"""This is a copy of the htmlDecode function in Webware.
+
+@@TR: It implemented more efficiently.
+
+"""
+
 from Cheetah.Utils.htmlEncode import htmlCodesReversed
 
 def htmlDecode(s, codes=htmlCodesReversed):
