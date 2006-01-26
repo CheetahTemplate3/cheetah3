@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.130 2006/01/26 00:46:33 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.131 2006/01/26 00:47:57 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.130 $
+Version: $Revision: 1.131 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/26 00:46:33 $
+Last Revision Date: $Date: 2006/01/26 00:47:57 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.130 $"[11:-2]
+__revision__ = "$Revision: 1.131 $"[11:-2]
 
 import sys
 import os
@@ -93,7 +93,7 @@ DEFAULT_COMPILER_SETTINGS = {
                                       # a callback hook for customizing the
                                       # #extends directive.  It can manipulate
                                       # the compiler's state if needed.
-    # also see allowPlaceholderFilterArgs
+    # also see allowExpressionsInExtendsDirective
     
     
     ## The are used in the parser, but I've put them here for the time being to
