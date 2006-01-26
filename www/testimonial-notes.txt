@@ -1,0 +1,280 @@
+
+http://groups.google.com/group/comp.lang.python/tree/browse_frm/thread/f063406b648c7d0c/d482be4e9971afe4?rnum=11&q=cheetah+template&_done=%2Fgroup%2Fcomp.lang.python%2Fbrowse_frm%2Fthread%2Ff063406b648c7d0c%2F369b62036e2953ed%3Flnk%3Dst%26q%3Dcheetah+template%26rnum%3D1%26#doc_369b62036e2953ed
+> A cheetah template
+> can inherit from a python class, or a cheetah template, and a Python
+> class can inherit from a cheetah template. This brings the full power
+> of OO programming facilities to the templating system, and is simply
+> blows away other templating systems
+- Mike Meyer
+............
+
+http://groups.google.com/group/comp.lang.python/tree/browse_frm/thread/6ac8c68b6060003e/f3a99fd7ec17d6d5?rnum=1&q=cheetah+template&_done=%2Fgroup%2Fcomp.lang.python%2Fbrowse_frm%2Fthread%2F6ac8c68b6060003e%2F40fe71c3d3ab0bd8%3Flnk%3Dst%26q%3Dcheetah+template%26rnum%3D22%26#doc_40fe71c3d3ab0bd8
+-----Original Message-----
+From: Wilk [mailto:wilkS...@OUTflibuste.net]
+Sent: 04 January 2004 13:38
+To: python-l...@python.org
+Subject: Re: Cheetah best for templating?
+
+"Roger Jack" <r...@elegancetech.com> writes:
+
+> I have just finished reading Code Generation In Action which uses Ruby for
+> code generation. I would like to use Python instead. Is Cheetah the best
+> tool to use for templating source code files and then generating code? Is
+> there something more mature or better?
+
+My graphist and me found it excellent, fast, clear, simple, stable: Pythonic!
+
+We found the others engines too verbose, more perlish ;-)
+
+Like python, the best is to try somes engines, you will see quickly wich
+one you need. First, like everybody, i did my own engine, but Cheetah
+was finaly a better wheel !
+
+I use it to generate html, latex and xml 
+
+................
+http://groups.google.com/group/subway-devel/tree/browse_frm/thread/899aff22ec0cc229/c46e96f07a7e1694?rnum=1&q=cheetah+template&_done=%2Fgroup%2Fsubway-devel%2Fbrowse_frm%2Fthread%2F899aff22ec0cc229%2F7d6664b07f3f397f%3Flnk%3Dst%26q%3Dcheetah+template%26rnum%3D31%26#doc_7d6664b07f3f397f
+
+>Incidentally, one Rails-like feature that I think Cheetah does well at
+>but Django (and most other templating languages) don't do, is partial
+>templates.  Rails has bunches of files, but in Cheetah you can just call
+>a method on the template to render a small portion of the template.
+>This is what Rails uses with XMLHttpRequest and innerHTML to update
+>portions of a page instead of doing a page reload.
+
+Definately one of my favorite benefits of Cheetah Templates, since it
+also makes it very easy to create a library of widgets this way.
+ 
+................
+Alex Martelli on Cheetah being used by non-programmers
+
+http://groups.google.com/group/comp.lang.python/tree/browse_frm/thread/f1389ceb34c3bac/b74b51767f51e5c2?rnum=31&q=cheetah+template&_done=%2Fgroup%2Fcomp.lang.python%2Fbrowse_frm%2Fthread%2Ff1389ceb34c3bac%2Fd3ee57d0e5f32dcf%3Flnk%3Dst%26q%3Dcheetah+template%26rnum%3D38%26#doc_d3ee57d0e5f32dcf
+
+But suppose your design intention is different -- you want your
+templates to be maintained by NON-programmers, people which DO
+have problems understanding the differences between the above
+distinct concepts!  In Cheetah, the above constructs would be
+    $myobject.func
+    $myobject.index
+    $myobject.attr
+i.e., totally polymorphic.  The Cheetah designer, on the basis of
+a LOT of experience trying to have non-programmers maintain
+templates, believe this extreme polymorphism makes things VERY
+much easier for non-programmers 
+
+................
+Alex Martelli
+http://groups.google.com/group/comp.lang.python/tree/browse_frm/thread/f1389ceb34c3bac/b74b51767f51e5c2?rnum=21&q=cheetah+template&_done=%2Fgroup%2Fcomp.lang.python%2Fbrowse_frm%2Fthread%2Ff1389ceb34c3bac%2Fd3ee57d0e5f32dcf%3Flnk%3Dst%26q%3Dcheetah+template%26rnum%3D38%26#doc_95267ccb58124c7c
+
+Cheetah, OTOH, is a serious contender for the
+"best of breed" Python templating utility (at least when templates
+need to be maintained by non-programmers).
+................
+
+Alex Martelli
+http://groups.google.com/group/comp.lang.python/tree/browse_frm/thread/772dbffa1b8ea81/41b8c28b430690a1?rnum=1&q=cheetah+template&_done=%2Fgroup%2Fcomp.lang.python%2Fbrowse_frm%2Fthread%2F772dbffa1b8ea81%2Fbf7cd796b3cf3818%3Flnk%3Dst%26q%3Dcheetah+template%26rnum%3D61%26#doc_bf7cd796b3cf3818
+
+Aldo Cortesi wrote:
+>>what are good templating systems avaliable for python?
+        ...
+> Cheetah - http://www.cheetahtemplate.org/
+> YAPTU - http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/52305
+
+Speaking as the author of YAPTU -- YAPTU is a neat little toy, but Cheetah
+is a truly powerful system, particularly if your needs coincide with those
+it was designed for (e.g., make it feasible for non-programmers to edit the
+templates).  I'd suggest looking into Cheetah (or other powerful systems --
+Cheetah looks very good to me, but I don't come close to knowing them
+all!-), maybe unless you happen to be in a peculiar niche (e.g., if you
+must bundle your templating system with a small app, and you don't need too
+much in terms of raw power, YAPTU's tiny size may be a plus). 
+
+................
+Peter Maas
+http://groups.google.com/group/comp.lang.python/tree/browse_frm/thread/2814372528876df0/b5b8517c464a4244?rnum=1&q=cheetah+template&_done=%2Fgroup%2Fcomp.lang.python%2Fbrowse_frm%2Fthread%2F2814372528876df0%2Fc438a838081aea0a%3Flnk%3Dst%26q%3Dcheetah+template%26rnum%3D41%26#doc_c438a838081aea0a
+
+ The elegance of the Cheetah way is how they map Python code
+to placeholders. Every method and every field of an object can
+be addressed in a Cheetah template. 
+................
+Jonathan P.
+http://groups.google.com/group/comp.lang.python/tree/browse_frm/thread/adbc3058a431f1b8/5b49623e0a8c782c?rnum=31&q=cheetah+template&_done=%2Fgroup%2Fcomp.lang.python%2Fbrowse_frm%2Fthread%2Fadbc3058a431f1b8%2F3a45e7ec2e495bd2%3Flnk%3Dst%26q%3Dcheetah+template%26rnum%3D67%26#doc_3a45e7ec2e495bd2
+
+Another great bonus of Spyce is that it can work with Cheetah,
+the one templating system which I felt like I could live with.
+
+................
+Wilk
+http://groups.google.com/group/comp.lang.python/tree/browse_frm/thread/aeeedc93473b9e00/c226ae2b08d2b1c4?rnum=1&q=cheetah+template&_done=%2Fgroup%2Fcomp.lang.python%2Fbrowse_frm%2Fthread%2Faeeedc93473b9e00%2F776fea58e6633b95%3Flnk%3Dst%26q%3Dcheetah+template%26rnum%3D103%26#doc_a8f7c7100764abfb
+
+> I am thinking of using templates
+> for this like Cheetah. Is there any other better solution to Cheetah?
+
+There is no better solution than Cheetah
+
+................
+Alex Martelli
+http://groups.google.com/group/comp.lang.python/tree/browse_frm/thread/a04b89c2287ca219/d8953099021eca9f?rnum=1&q=cheetah+template&_done=%2Fgroup%2Fcomp.lang.python%2Fbrowse_frm%2Fthread%2Fa04b89c2287ca219%2F8234a0c9979eb670%3Flnk%3Dst%26q%3Dcheetah+template%26rnum%3D128%26#doc_8234a0c9979eb670
+
+But a real templating system is something else again.  I've now
+personally dumped YAPTU usage and, after careful examination of
+all the various offerings around, switched to Cheetah instead.
+
+Give Cheetah a try.  You won't regret it. 
+................
+Kevin Dangoor
+
+http://groups.google.com/group/turbogears/tree/browse_frm/thread/bb7a6115ca7028c9/4bd4ca24aa61d75c?rnum=111&q=cheetah+python&_done=%2Fgroup%2Fturbogears%2Fbrowse_frm%2Fthread%2Fbb7a6115ca7028c9%2F7bffb1c3622af7a4%3Flnk%3Dst%26q%3Dcheetah+python%26rnum%3D9%26#doc_7bffb1c3622af7a4
+
+I've used Cheetah quite a bit and it's a very good package
+
+................
+Ron Stephens
+http://groups.google.com/group/turbogears/tree/browse_frm/thread/bb7a6115ca7028c9/4bd4ca24aa61d75c?rnum=111&q=cheetah+python&_done=%2Fgroup%2Fturbogears%2Fbrowse_frm%2Fthread%2Fbb7a6115ca7028c9%2F7bffb1c3622af7a4%3Flnk%3Dst%26q%3Dcheetah+python%26rnum%3D9%26#doc_7f1b09007772bccd
+
+If this is to work, in my opinion, (and by "work" I mean be successful
+enough to challenge Rails), then Cheetah must be enabled as an equal
+templating language to Kid (at least).  Kevin, you don't know me, but I
+dare make this post for the good of Python. Kid may be technically
+superior in every way to Cheetah (I don't know), but is the least
+popular choice you made for TurboGears. Cheetah is a lot more popular. 
+................
+Marek Baczynski
+http://groups.google.com/group/turbogears/tree/browse_frm/thread/bb7a6115ca7028c9/4bd4ca24aa61d75c?rnum=111&q=cheetah+python&_done=%2Fgroup%2Fturbogears%2Fbrowse_frm%2Fthread%2Fbb7a6115ca7028c9%2F7bffb1c3622af7a4%3Flnk%3Dst%26q%3Dcheetah+python%26rnum%3D9%26#doc_35c3ec66f9d8cb71
+
+People with a strong PHP background absolutely love Cheetah for being Smarty, but much, much better.
+
+................
+JZ
+http://groups.google.com/group/comp.lang.python/tree/browse_frm/thread/eac957ba7c426e30/3ebe6739c8c41752?rnum=31&q=cheetah+python&_done=%2Fgroup%2Fcomp.lang.python%2Fbrowse_frm%2Fthread%2Feac957ba7c426e30%2Fa3b9cd8f6cc9e640%3Flnk%3Dst%26q%3Dcheetah+python%26rnum%3D12%26#doc_d971f145521d6bb4
+
+> I've seen nothing in the Python world that compares to Smarty templates
+
+I am using Smarty and I know it very well, but compiled Cheetah Templates
+(http://www.cheetahtemplates.org) with its inheritance approach is much
+powerfull and easier to use than Smarty.
+
+................
+JZ
+http://groups.google.com/group/comp.lang.python/tree/browse_frm/thread/eac957ba7c426e30/3ebe6739c8c41752?rnum=31&q=cheetah+python&_done=%2Fgroup%2Fcomp.lang.python%2Fbrowse_frm%2Fthread%2Feac957ba7c426e30%2Fa3b9cd8f6cc9e640%3Flnk%3Dst%26q%3Dcheetah+python%26rnum%3D12%26#doc_c166b21577e3ad06
+
+But, the problem is PHP itself has so many bad features that I prefer
+rather Python to PHP. And I like Cheetah's inheritence aproach because it
+is scales very well for complicated web pages. I can develop internet
+application much faster using Python (e.g. using application, very cool and
+pythonic Cherry2) and Cheetah. And because extending templates using OO
+techniques is tthe feature I like, I would rather choose Cheetach than ZPT,
+SimleTAL, Nevow and similar solutions. 
+
+................
+ 	
+Alessandro Bottoni
+
+Florian Lindner wrote:
+> How suitable is Python for these kind of projects? What do think? Does the
+> stdlib offers all basic functions for this kind of requirements?
+
+http://groups.google.com/group/comp.lang.python/tree/browse_frm/thread/4865ad8dced9d4db/133ada37370deb55?rnum=1&q=cheetah+python&_done=%2Fgroup%2Fcomp.lang.python%2Fbrowse_frm%2Fthread%2F4865ad8dced9d4db%2Ff932e1952225168c%3Flnk%3Dst%26q%3Dcheetah+python%26rnum%3D95%26#doc_f932e1952225168c
+
+Regarding the template engine, the best one I'm aware of is Cheetah
+................
+Carsten Saathoff
+http://blog.kodemaniak.de/archives/10-Python-template-system.html
+Cheetah is very powerful and flexible. 
+................
+Sybren Stuvel
+http://www.thescripts.com/forum/post365058-2.html
+> But I'd like to know your opinion on what you think is best. The
+> Python framework I'll use will be to build an e-commerce
+> application looking like Amazon.com
+
+I'm greatly in favour of Cheetah. 
+................
+Ray Leyva
+http://wiki.w4py.org/webware-document-management-system.html
+
+I find working with Cheetah / Webware / Python
+substantially faster ( for me! ), in development. I came from Taglibs / JSP (
+Tomcat / WebLogic? / JRun ) / XML ( XSP via Cocoon ) / Java. Personal preference
+is to stick with Cheetah / Webware template applications, spitting out reportlab
+PDF ... but hey they can't ( currently ) support your request of XML to PDF, or
+XML to HTML, but I find it easier to work with Cheetah templates than XML / XSLT
+transformations. Personal preference only.
+................
+Keith Devens
+
+http://keithdevens.com/weblog/archive/2003/Nov/17/Python.Cheetah
+
+Cheetah is very nice. Good code even!
+
+What's especially nice about Python -- and I knew this would happen -- is that
+that huge hack I had to do to get Smarty to do what I wanted is completely taken
+care of with Python's operator overloading mixed with Cheetah's flexibility.
+
+I'm going to like working in Python.
+................
+James Gardner
+
+http://www.pythonweb.org/projects/webmodules/doc/0.5.3/html_multipage/lib/example-file-web-template-cheetah.html
+
+Cheetah is a powerful, stable and well documented templating system.
+
+................
+Martin 
+
+http://www.aquarionics.com/journal/2005/01/15/Mounting_Python#comment-2854
+
+Check out CherryPy at www.cherrypy.org. Take with a healthy dose of Cheetah
+(www.cheetahtemplate.org) and SQLObject (www.sqlobject.org).
+
+Martin
+
+................
+Andrew Glover
+http://www.onlamp.com/pub/a/python/2005/01/13/cheetah.html
+
+It's true; XSLT isn't the be-all, end-all of templating and transformation
+systems. If you use Python, consider instead Cheetah, a template engine based on
+Python. Andrew Glover demonstrates its simplicity and power for producing text
+in all kinds of formats.
+...
+Cheetah is an extremely effective Python-powered template engine that can
+generate any text-based format. Cheetah's impressive yet simple template
+language (based on Python) can yield the most complex of documents
+...
+Cheetah is surprisingly simple to use
+
+................
+The FEAR development team
+http://fear.sourceforge.net/docs/latest/guide/Build.html#id2550573
+
+Cheetah has successfully been introduced as a replacement for the overweight XSL
+Templates for code generation. Despite the power of XSL (and notably XPath
+expressions), code generation is better suited to Cheetah as templates are much
+easier to implement and manage.
+
+................
+
+
+I'm enamored with Cheetah (did anyone get the significance of the name Mombo?)  What would I lose by switching away?
+
+This just might be a deal breaker...  ;-)
+
+Note: I invested a half hour here and a half hour there over the course of a week to produce what I currently have.  I'm not particularly emotionally attached to it... in another few weeks I just might decide to pursue yet another technology and/or programming language.
+
+[P.S.  Nice use of italics in your comment.]
+Posted by Sam Ruby at 11:08
+
+
+
+--------------------------------------------------------------------------------
+
+
+http://groups.google.ca/group/comp.lang.python/browse_thread/thread/17ed53a636d55cf1/ec5d7eab42e693fc?lnk=st&q=cheetah+templates&rnum=7&hl=en#ec5d7eab42e693fc
+"I was going to try and learn Kid, but I'm in a bit of a hurry, and Cheetah's much closer
+to what I'm used to." -- Dave Benjamin
+
+
+http://groups.google.ca/group/comp.lang.python/browse_thread/thread/17ed53a636d55cf1/ec5d7eab42e693fc?lnk=st&q=cheetah+templates&rnum=7&hl=en#ec5d7eab42e693fc
+"Personally, I prefer to Cheetah Templates to PSP - it plays better in the OO
+world, and I can use intelligent HTML/XML/SGML editors on the files." -- Mike Meyer
