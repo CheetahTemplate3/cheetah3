@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.131 2006/01/26 00:47:57 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.132 2006/01/26 00:53:13 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.131 $
+Version: $Revision: 1.132 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/26 00:47:57 $
+Last Revision Date: $Date: 2006/01/26 00:53:13 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.131 $"[11:-2]
+__revision__ = "$Revision: 1.132 $"[11:-2]
 
 import sys
 import os
@@ -109,7 +109,8 @@ DEFAULT_COMPILER_SETTINGS = {
     'PSPEndToken':'%>',
     'EOLSlurpToken':'#',
     'gettextTokens': ["_", "N_", "ngettext"],
-    'allowExpressionsInExtendsDirective': False,
+    'allowExpressionsInExtendsDirective': False, # the default restricts it to
+                                        # accepting dotted names    
     'allowEmptySingleLineMethods': False,
     'allowNestedDefScopes': True,
     'allowPlaceholderFilterArgs': True,
