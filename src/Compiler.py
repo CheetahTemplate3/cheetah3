@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.129 2006/01/25 21:49:00 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.130 2006/01/26 00:46:33 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.129 $
+Version: $Revision: 1.130 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/25 21:49:00 $
+Last Revision Date: $Date: 2006/01/26 00:46:33 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.129 $"[11:-2]
+__revision__ = "$Revision: 1.130 $"[11:-2]
 
 import sys
 import os
@@ -58,11 +58,10 @@ DEFAULT_COMPILER_SETTINGS = {
     'useStackFrames': True, # use NameMapper.valueFromFrameOrSearchList
     # rather than NameMapper.valueFromSearchList
     'useErrorCatcher':False,
-
-    'autoImportForExtendDirective':True,
     'alwaysFilterNone':True, # filter out None, before the filter is called
     'useFilters':True, # use str instead if =False
     'includeRawExprInFilterArgs':True,
+
     
     #'lookForTransactionAttr':False,
     'autoAssignDummyTransactionToSelf':False,
@@ -86,6 +85,16 @@ DEFAULT_COMPILER_SETTINGS = {
     'initialMethIndentLevel': 2,
     'monitorSrcFile':False,
     'outputMethodsBeforeAttributes': True,
+
+
+    ## customizing the #extends directive
+    'autoImportForExtendsDirective':True,
+    'handlerForExtendsDirective':None, # baseClassName = handler(compiler, baseClassName)
+                                      # a callback hook for customizing the
+                                      # #extends directive.  It can manipulate
+                                      # the compiler's state if needed.
+    # also see allowPlaceholderFilterArgs
+    
     
     ## The are used in the parser, but I've put them here for the time being to
     ## facilitate separating the parser and compiler:    
@@ -1595,7 +1604,11 @@ class ModuleCompiler(SettingsManager, GenUtils):
         #    module name.  This might break if people do something really fancy 
         #    with their dots and namespaces.
 
-        if (not self.setting('autoImportForExtendDirective')
+        if self.setting('handlerForExtendsDirective'):
+            handler = self.setting('handlerForExtendsDirective')
+            baseClassName = handler(compiler=self, baseClassName=baseClassName)
+            self._getActiveClassCompiler().setBaseClass(baseClassName)
+        elif (not self.setting('autoImportForExtendsDirective')
             or baseClassName=='object' or baseClassName in self.importedVarNames()):
             self._getActiveClassCompiler().setBaseClass(baseClassName)
             # no need to import
