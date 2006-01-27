@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.133 2006/01/26 00:55:18 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.134 2006/01/27 01:04:54 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.133 $
+Version: $Revision: 1.134 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/26 00:55:18 $
+Last Revision Date: $Date: 2006/01/27 01:04:54 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.133 $"[11:-2]
+__revision__ = "$Revision: 1.134 $"[11:-2]
 
 import sys
 import os
@@ -850,6 +850,7 @@ class MethodCompiler(GenUtils):
             self.addChunk('trans = _orig_trans%(ID)s'%locals())
             self.addChunk('write = trans.response().write')
             self.addChunk('self._CHEETAH__isBuffering = _wasBuffering%(ID)s '%locals())
+            self.addChunk('del _wasBuffering%(ID)s'%locals())
 
         if not callDetails.usesKeywordArgs:
             reset()
@@ -1598,15 +1599,6 @@ class ModuleCompiler(SettingsManager, GenUtils):
         else:
             self.setMainMethodName(self.setting('mainMethodNameForSubclasses'))
        
-        ##################################################
-        ## If the #extends directive contains a classname or modulename that isn't
-        #  in self.importedVarNames() already, we assume that we need to add
-        #  an implied 'from ModName import ClassName' where ModName == ClassName.
-        #  - This is the case in WebKit servlet modules.
-        #  - We also assume that the final . separates the classname from the
-        #    module name.  This might break if people do something really fancy 
-        #    with their dots and namespaces.
-
         if self.setting('handlerForExtendsDirective'):
             handler = self.setting('handlerForExtendsDirective')
             baseClassName = handler(compiler=self, baseClassName=baseClassName)
@@ -1616,6 +1608,14 @@ class ModuleCompiler(SettingsManager, GenUtils):
             self._getActiveClassCompiler().setBaseClass(baseClassName)
             # no need to import
         else:
+            ##################################################
+            ## If the #extends directive contains a classname or modulename that isn't
+            #  in self.importedVarNames() already, we assume that we need to add
+            #  an implied 'from ModName import ClassName' where ModName == ClassName.
+            #  - This is the case in WebKit servlet modules.
+            #  - We also assume that the final . separates the classname from the
+            #    module name.  This might break if people do something really fancy 
+            #    with their dots and namespaces.
             chunks = baseClassName.split('.')
             if len(chunks)==1:
                 self._getActiveClassCompiler().setBaseClass(baseClassName)
