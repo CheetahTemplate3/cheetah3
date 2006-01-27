@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.134 2006/01/27 01:04:54 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.135 2006/01/27 01:07:40 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.134 $
+Version: $Revision: 1.135 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/27 01:04:54 $
+Last Revision Date: $Date: 2006/01/27 01:07:40 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.134 $"[11:-2]
+__revision__ = "$Revision: 1.135 $"[11:-2]
 
 import sys
 import os
@@ -795,6 +795,7 @@ class MethodCompiler(GenUtils):
         self.addChunk(
             '_cacheItem_%(ID)s.setData(_cacheCollector_%(ID)s.response().getvalue())'%locals())
         self.addChunk('del _cacheCollector_%(ID)s'%locals())
+        self.addChunk('del _orig_trans%(ID)s'%locals())
         self.dedent()        
         self.addWriteChunk('_cacheItem_%(ID)s.getOutput()'%locals())
         self.addChunk('## END CACHE REGION: '+ID)
@@ -851,6 +852,7 @@ class MethodCompiler(GenUtils):
             self.addChunk('write = trans.response().write')
             self.addChunk('self._CHEETAH__isBuffering = _wasBuffering%(ID)s '%locals())
             self.addChunk('del _wasBuffering%(ID)s'%locals())
+            self.addChunk('del _orig_trans%(ID)s'%locals())
 
         if not callDetails.usesKeywordArgs:
             reset()
@@ -900,6 +902,7 @@ class MethodCompiler(GenUtils):
         self.addChunk('write = trans.response().write')
         self.addChunk('self._CHEETAH__isBuffering = _wasBuffering%(ID)s '%locals())
         self.addChunk('%(assignTo)s = _captureCollector%(ID)s.response().getvalue()'%locals())
+        self.addChunk('del _orig_trans%(ID)s'%locals())
         self.addChunk('del _captureCollector%(ID)s'%locals())
         self.addChunk('del _wasBuffering%(ID)s'%locals())
         
