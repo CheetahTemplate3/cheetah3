@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.111 2006/01/25 23:50:11 tavis_rudd Exp $
+# $Id: Parser.py,v 1.112 2006/01/27 01:13:36 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.111 $
+Version: $Revision: 1.112 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/25 23:50:11 $
+Last Revision Date: $Date: 2006/01/27 01:13:36 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.111 $"[11:-2]
+__revision__ = "$Revision: 1.112 $"[11:-2]
 
 import os
 import sys
@@ -429,10 +429,8 @@ class _LowLevelParser(SourceReader):
     def getPyToken(self):
         match = self.matchPyToken()
         if match is None:
-            from Parser import ParseError
             raise ParseError(self)
         elif match.group() in tripleQuotedStringStarts:
-            from Parser import ParseError
             raise ParseError(self, msg='Malformed triple-quoted string')
         return self.readTo(match.end())
 
@@ -963,8 +961,8 @@ class _LowLevelParser(SourceReader):
                 else:
                     break                    
             elif self.matchCheetahVarStart():
-                token = self.getCheetahVar()
-                exprBits.append(token)
+                expr = self.getCheetahVar()
+                exprBits.append(expr)
             else:                
                 beforeTokenPos = self.pos()
                 token = self.getPyToken()
@@ -980,16 +978,8 @@ class _LowLevelParser(SourceReader):
                 exprBits.append(token)                    
                 if identRE.match(token):
                     if token == 'for':
-                        # @@TR: this needs expanding to handle more complex targetVarLists
-                        useNameMapper_orig = self.setting('useNameMapper')
-                        self.setSetting('useNameMapper', False)
-                        expr = self.getExpression(pyTokensToBreakAt=['in']) 
-                        #print 'DEBUG', expr
+                        expr = self.getExpression(useNameMapper=False, pyTokensToBreakAt=['in'])
                         exprBits.append(expr)
-                        self.setSetting('useNameMapper', useNameMapper_orig)
-                        #targetVars = self.getTargetVarsList()
-                        #print 'DEBUG', targetVars
-                        #exprBits.append(' ' + ', '.join(targetVars) + ' ')
                     else:
                         exprBits.append(self.getWhiteSpace())
                         if not self.atEnd() and self.peek() == '(':
@@ -1015,6 +1005,11 @@ class _LowLevelParser(SourceReader):
 
 
     def transformToken(self, token, beforeTokenPos):
+        """Takes a token from the expression being parsed and performs and
+        special transformations required by Cheetah.
+
+        At the moment only Cheetah's c'$placeholder strings' are transformed.
+        """
         if token=='c' and not self.atEnd() and self.peek() in '\'"':
             nextToken = self.getPyToken()
             token = nextToken.upper()
