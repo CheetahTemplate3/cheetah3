@@ -1,3 +1,4 @@
+#encoding latin1
 #from Cheetah.Utils.htmlEncode import htmlEncode
 ####################
 ## Class attributes:
@@ -14,7 +15,7 @@
 ## method and is linked into the template's __str__ method.
 ################################################################################
 #block doctypeEtc
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="latin-1" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -264,6 +265,7 @@ advice, encouragement, code and bug reports: </p>
   Alex Le Dain
   Alex Martelli
   Alvaro Tejero Cantero
+  Andrea Arcangeli
   Andreas Poisel
   Andrew Glover
   Andrew Johnson
@@ -293,6 +295,7 @@ advice, encouragement, code and bug reports: </p>
   Hamish Lawson
   Henning Hasemann
   Ian Bicking
+  James Robinson
   Jamieson Becker
   Jaroslaw Zabiello
   Jay Love
@@ -613,8 +616,12 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
               It reads XMI files and generates the corresponding source code, #slurp
 	      in different object-oriented languages (Java, Eiffel, Python, C++). #slurp 
 	      In the case of Java, the generated code implements the JMI interfaces.
-	    $makeLink('http://www.intertwingly.net/blog/') (blog of Sam Ruby, Apache Foundation Director)
-            $makeLink('http://www.electronicappraiser.com/')
+	    $makeLink('http://www.intertwingly.net/blog/'), #slurp
+	      blog of <a href="http://www.intertwingly.net/wiki/pie/SamRuby">Sam Ruby</a>, #slurp
+	      Apache Foundation Director
+	    $makeLink('http://klive.cpushare.com/'),  #slurp
+	       <a href="http://kerneltrap.org/node/3148">Andrea Arcangeli$(apos)s</a> #slurp
+	       "Linux Kernel Live Usage Monitor"
             $makeLink('http://www.instasong.com/InstaSong/')
             $makeLink('http://www.axiomfire.com/')  All internal tools and live eDialogues built with Cheetah
             $makeLink('http://initd.org/') (makers of psycopg and pysqlite)
@@ -636,6 +643,10 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 	    $makeLink('http://tools.arlut.utexas.edu/DryDock/') #slurp
 	      a large web-publishing application focussed on workflow 
 	    $makeLink('http://wiki.osuosl.org/display/DEV/OJBDoc')  
+
+            ##$makeLink('http://www.electronicappraiser.com/')
+	    ## seems to have switched to coldfusion
+
 	  #end call
 
 	  <li>Cheetah supports internationalization and has a large non-English userbase, including:
@@ -769,6 +780,80 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
   #call $shortPraiseSection
     $formatQuote("There is no better solution than Cheetah.", 'Wilk')
 
+    ##post on cheetah list about initd.org
+
+    $formatQuote('i did it in a single night (i _love_ cheetah templates ;)', 
+	  '''<a href="http://initd.org/">Federico Di Gregorio</a>, 
+          developer of Python\'s Postgresql library''')
+
+    $formatQuote("""Cheetah is an order of magnitude faster than nevow, and it's
+    more powerful and flexibile and its syntax is *much* more readable too
+    IMHO. The speedup after moving klive (<a
+    href=\"http://klive.cpushare.com/\">klive.cpushare.com</a>) from nevow to
+    Cheetah has been huge ... 300% speedup.  I used klive as a test for Cheetah
+    and it worked so well that I'm rewriting <a
+    href=\"http://cpushare.com/\">cpushare.com</a> with ... Cheetah.""", 
+
+    '''<a href="http://kerneltrap.org/node/3148">Andrea Arcangeli</a>, the
+    kernel hacker behind Linux\'s new virtual memory subsystem, and SUSE Linux
+    employee''')
+
+    ## http://bitworking.org/news/37
+    $formatQuote("""I am currently in the process of re-doing the templating
+    mechanism in RESTLog, throwing out my hand made templating scheme and
+    replacing it with Cheetah and it's been a great success. I initially learned
+    of Cheetah from Sam Ruby as he is using to write his own blogging
+    software. The transformations are fast and Cheetah, to me, has struck just
+    the right balance, sticking to adding features needed for templating and
+    avoiding the tempation to become a full-blown language on it's own, instead
+    deferring to Python when appropriate. ... Cheetah definitely passes by first
+    cut utility test, in adding Cheetah to RESTLog my code got smaller and
+    cleaner.""", 
+
+	'''<a href="http://www.xml.com/pub/au/225">Joe Gregorio</a>, editor of
+    the <a href="http://www.ietf.org/">IETF</a> <a
+    href="http://atomenabled.org/">Atom</a> <a
+    href="http://bitworking.org/projects/atom/">Publishing Protocol</a> specification
+    (along with <a href="http://dehora.net/">Bill de h”ra</a>) and creator of
+    the <a href="http://bitworking.org/projects/sparklines/">Python Sparklines
+    Module</a>''')
+
+    ## http://www.intertwingly.net/blog/1189.html
+    $formatQuote("""Cheetah looks amazing.  Wish I'd known about it before I
+    went and invented my own damn templating language for my day project.""", 
+	'''<a href="http://diveintomark.org/">Mark Pilgrim</a>, 
+        author of <a href="http://diveintopython.org/">Dive Into Python</a> &amp; 
+        <a href="http://diveintogreasemonkey.org/">Dive Into Greasemonkey</a>, 
+        and creator of <a href="http://feedparser.org/">feedparser.org</a>
+        &amp; <a href="http://feedvalidator.org/">feedvalidator.org</a>''')
+
+    $formatQuote("""Cheetah seems to be practically the only web templating
+      format with decent taste. On top of that, it doesn't try to limit the
+      programmers with needless restrictions and hoops. ...  <a
+      href=\"http://reddit.com/\">reddit.com</a> was recently rewritten with
+      Python and Cheetah Templates.  The project seems to have gone really well
+      and the former-Lisp developers really enjoyed Cheetah's simple syntax.""",
+      '''<a href="http://www.aaronsw.com/">Aaron Swartz</a>, co-author of the
+      RSS 1.0 specification''')
+
+    $formatQuote("""<i>Happy little gophers</i>...  <a
+    href=\"http://socialserve.com\">Socialserve.com</a> is switching over from a
+    J2EE stack (JBoss / JPublish (used Velocity for templating)) over to a
+    fastcgi-based web publishing system with Cheetah as the star. Site-wide,
+    we're currently serving an average of 68K pages (198K 'hits') per day, with
+    the Cheetah'd pages doing more than 65% of that traffic. Our web traffic has
+    doubled in the past 6 months, and that growth curve shows no sign of slowing
+    down.<br /><br />
+
+    We have found Cheetah to be a gloriously flexible and powerful
+    technology. Functions within templates allowed us to do far more elegant
+    structured programming at the document level. Being able to use templates as
+    python classes, importing constants and other goodies directly from our
+    middleware python code really lets them act as first class code members
+    instead of an ugly lesser citizen.""", 
+    '<a href="http://socialserve.com">James Robinson</a>')
+
+
     ##http://www.pythonweb.org/projects/webmodules/doc/0.5.3/html_multipage/lib/example-file-web-template-cheetah.html
     $formatQuote("Cheetah is a powerful, stable and well documented templating system.", 'James Gardner')
 
@@ -777,34 +862,6 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 
     $formatQuote("""People with a strong PHP background absolutely love Cheetah for being Smarty, 
     but much, much better.""", 'Marek Baczynski')
-
-    ##post on cheetah list about initd.org
-    $formatQuote('i did it in a single night (i _love_ cheetah templates ;)', 
-	  '<a href="http://initd.org/">Federico Di Gregorio</a>, developer of psycopg')
-
-    $formatQuote("""Cheetah seems to be practically the only web templating
-      format with decent taste. On top of that, it doesn't try to limit the
-      programmers with needless restrictions and hoops. ...  reddit.com was
-      recently rewritten with Python and Cheetah Templates.  The project seems
-      to have gone really well and the former-Lisp developers really enjoyed
-      Cheetah's simple syntax.""", '''<a href="http://www.aaronsw.com/">Aaron
-      Swartz</a>, co-author of the RSS 1.0 spec''')
-
-
-    $formatQuote("""<i>Socialserve.com moving over to Cheetah ... Happy little gophers:</i>
-    Socialserve.com is switching over from a J2EE stack (JBoss /
-    JPublish (used Velocity for templating)) over to a fastcgi-based web
-    publishing system with Cheetah as the star. Site-wide, we're currently
-    serving an average of 68K pages (198K 'hits') per day, with the Cheetah'd
-    pages doing more than 65% of that traffic. Our web traffic has doubled in
-    the past 6 months, and that growth curve shows no sign of slowing down.<br /><br />
-
-    We have found Cheetah to be a gloriously flexible and powerful
-    technology. Functions within templates allowed us to do far more elegant
-    structured programming at the document level. Being able to use templates as
-    python classes, importing constants and other goodies directly from our
-    middleware python code really lets them act as first class code members
-    instead of an ugly lesser citizen.""", 'James Robinson')
 
     $formatQuote("""I am using Smarty and I know it very well, but compiled Cheetah
     Templates with its inheritance approach is much powerful and easier to
@@ -931,7 +988,7 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
   <div class="quote">
     <span class="quote">&#8220;$quote&#8221;</span> 
     <div class="citation">      
-      <cite>-$citation</cite>
+      <cite>- $citation</cite>
     </div>
   </div>
 #end def
@@ -945,7 +1002,7 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 
   $formatQuote("""Give Cheetah a try.  You won't regret
      it. ... Cheetah is a truly powerful system. ... Cheetah is a serious
-     contender for the 'best of breed' Python templating.""", 
+     contender for the 'best of breed'""", ## ... Python templating.
       '''<a
      href="http://conferences.oreillynet.com/cs/os2005/view/e_spkr/1541">Alex
      Martelli</a>, Google uber techie, core Python developer 
