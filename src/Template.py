@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.148 2006/01/26 01:24:43 tavis_rudd Exp $
+# $Id: Template.py,v 1.149 2006/01/27 19:50:03 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.148 $
+Version: $Revision: 1.149 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/26 01:24:43 $
+Last Revision Date: $Date: 2006/01/27 19:50:03 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.148 $"[11:-2]
+__revision__ = "$Revision: 1.149 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -727,11 +727,12 @@ class Template(Servlet):
             if not isinstance(searchList, (list, tuple)):
                 searchList = [searchList]
             return searchList            
-        
+
+        ## parse the input arg
         if isinstance(input, str):
-            options.prefix = input            
+            options.prefix = input
         elif isinstance(input, dict):
-            options.prefix = input.get('prefix')
+            options.prefix = input.get('prefix', '')
             options.searchList = normalizeSearchList(
                 input.get('searchList',
                           input.get('namespaces', [])))            
@@ -740,20 +741,22 @@ class Template(Servlet):
         else: #it's an options object
             options = input
 
+        
+        ## normalize everything
         if not hasattr(options, 'outputTransformer'):            
             options.outputTransformer = str
 
         if not hasattr(options, 'compiler'):
             def createPreprocessCompiler(prefix, compilerSettings=None):
                 class PreprocessorCompiler(klass):
-                    _compilerSettings = {
+                    _CHEETAH_compilerSettings = {
                         'cheetahVarStartToken':'$'+prefix,
                         'directiveStartToken':'#'+prefix,
                         'commentStartToken':'##'+prefix,
                         'multiLineCommentStartToken':'#*'+prefix,
                         }
                     if compilerSettings:
-                        _compilerSettings.update(compilerSettings)
+                        _CHEETAH_compilerSettings.update(compilerSettings)
                 return PreprocessorCompiler
 
             compilerSettings = getattr(options, 'compilerSettings', None)
@@ -1450,9 +1453,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.148 $
+        Version: $Revision: 1.149 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/26 01:24:43 $
+        Last Revision Date: $Date: 2006/01/27 19:50:03 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
