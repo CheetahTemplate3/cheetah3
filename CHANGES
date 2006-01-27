@@ -27,9 +27,49 @@ release
 	     bar
 	  #else: blarg
 
+    - added support for $!silentModePlaceholders
+      This is the same as quiet mode in Velocity: 
+       http://jakarta.apache.org/velocity/docs/user-guide.html#Quiet%20Reference%20Notation
+
+    - added support for function/method @decorators.  It also works with blocks.
+      As in vanilla Python, the @decorator statement must be followed with a
+      function/method definition (i.e. #def or #block).
+
+        #from xxx import aDecorator
+        ...  
+        ...
+        #@aDecorator
+        #def func
+          foo
+        #end def
+
+        #@aDecorator
+        #def singleLineShortFormfunc: foo
+
+        #@aDecorator
+        #block func2
+          bar
+        #end block
+
+    - added a new callback hook 'handlerForExtendsDirective' to the compiler settings. It
+      can be used to customize the handling of #extends directives.  The
+      callback can dynamically add import statements or rewrite the baseclass'
+      name if needed:
+         baseClassName = handler(compiler, baseClassName)
+      See the discussion on the mailing list on Jan 25th for more details.
+
+    - changed the default filter to the one that doesn't try to encode Unicode
+      It was 'EncodeUnicode' and is now 'RawOrEncodedUnicode'.
+    - made the handling of Template.compile()'s preprocessors arg simpler and
+      fixed a bug in it.
+    - fixed attribute name bug in the .compile() method (it affected the feature
+      that allows generated module files to be cached for better exception
+      tracebacks)
     - initial refactoring of CacheRegions to support a memcached extension 
        (I'll have this finished by the time this release is ready)
     - some under-the-hood refactoring of the parser
+    - added Cheetah.Utils.htmlEncode and Cheetah.Utils.htmlDecode
+    - more docstring text
 
 2.0rc2 (Jan 13th, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
