@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.89 2006/01/25 21:48:13 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.90 2006/01/27 02:04:50 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.89 $
+Version: $Revision: 1.90 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/25 21:48:13 $
+Last Revision Date: $Date: 2006/01/27 02:04:50 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.89 $"[11:-2]
+__revision__ = "$Revision: 1.90 $"[11:-2]
 
 
 ##################################################
@@ -53,6 +53,9 @@ except NameError:
 
 ##################################################
 ## TEST DATA FOR USE IN THE TEMPLATES ##
+
+def testdecorator(func):
+    return func
 
 class DummyClass:
     _called = False
@@ -1674,6 +1677,28 @@ class DefDirective(OutputTest):
         """single line #def with an argument"""
         self.verify("#def $testMeth($arg=1234):$arg\n$testMeth",
                     "1234")
+
+
+class DecoratorDirective(OutputTest):
+    def test1(self):
+        """single line #def with decorator"""
+        self.verify("#from Cheetah.Tests.SyntaxAndOutput import testdecorator\n"
+                    +"#@testdecorator"
+                    +"\n#def $testMeth():1234\n$testMeth",
+                    
+                    "1234")
+
+        try:
+            self.verify(
+                "#from Cheetah.Tests.SyntaxAndOutput import testdecorator\n"
+                +"#@testdecorator\n sdf"
+                +"\n#def $testMeth():1234\n$testMeth",                        
+
+                "1234")
+        except ParseError:
+            pass
+        else:
+            self.fail('should raise a ParseError')
 
 class BlockDirective(OutputTest):
 
