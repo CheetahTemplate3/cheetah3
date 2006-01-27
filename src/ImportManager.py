@@ -1,11 +1,13 @@
 #!/usr/bin/env python
-# $Id: ImportManager.py,v 1.4 2006/01/27 18:27:07 tavis_rudd Exp $
+# $Id: ImportManager.py,v 1.5 2006/01/27 19:00:20 tavis_rudd Exp $
 
 """Provides an emulator/replacement for Python's standard import system.
 
 @@TR: Be warned that Import Hooks are in the deepest, darkest corner of Python's
 jungle.  If you need to start hacking with this, be prepared to get lost for a
-while.
+while. Also note, this module predates the newstyle import hooks in Python 2.3
+http://www.python.org/peps/pep-0302.html.  
+
 
 This is a hacked/documented version of Gordon McMillan's iu.py. I have:
 
@@ -22,12 +24,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>  based on Gordon McMillan's iu.py
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.4 $
+Version: $Revision: 1.5 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/27 18:27:07 $
+Last Revision Date: $Date: 2006/01/27 19:00:20 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.4 $"[11:-2]
+__revision__ = "$Revision: 1.5 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
