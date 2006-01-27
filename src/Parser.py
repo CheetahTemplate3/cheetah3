@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.112 2006/01/27 01:13:36 tavis_rudd Exp $
+# $Id: Parser.py,v 1.113 2006/01/27 02:07:09 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.112 $
+Version: $Revision: 1.113 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/27 01:13:36 $
+Last Revision Date: $Date: 2006/01/27 02:07:09 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.112 $"[11:-2]
+__revision__ = "$Revision: 1.113 $"[11:-2]
 
 import os
 import sys
@@ -379,7 +379,7 @@ class _LowLevelParser(SourceReader):
         endToken = self.setting('directiveEndToken')
         startTokenEsc = escapeRegexChars(startToken)
         endTokenEsc = escapeRegexChars(endToken)
-        validSecondCharsLookAhead = r'(?=[A-Za-z_])'
+        validSecondCharsLookAhead = r'(?=[A-Za-z_@])'
         self.directiveStartTokenRE = re.compile(escCharLookBehind + startTokenEsc
                                                 + validSecondCharsLookAhead)
         self.directiveEndTokenRE = re.compile(escCharLookBehind + endTokenEsc)
@@ -537,16 +537,26 @@ class _LowLevelParser(SourceReader):
         self.setPos(startPos)
         return directiveKey
 
-    def matchDirectiveName(self, directiveKeyChars=identchars+'-'):
+    def matchDirectiveName(self, directiveKeyChars=identchars+'-@'):
         startPos = self.pos()
-        directiveKey = ''
+        directives = self._directiveEaters.keys()
+        possibleMatches = [] 
+        name = ''
         while not self.atEnd():
             c = self.getc()
             if not c in directiveKeyChars:
                 break
-            directiveKey += c            
-        if not directiveKey in self._directiveEaters.keys():
-            directiveKey= False
+            name += c
+            if name in directives:
+                possibleMatches.append(name)
+
+        possibleMatches.sort()
+        possibleMatches.reverse() # longest match first
+        
+        directiveKey = False
+        if possibleMatches:
+            directiveKey = possibleMatches[0]
+            
         self.setPos(startPos)
         return directiveKey
         
@@ -1155,6 +1165,7 @@ class _HighLevelParser(_LowLevelParser):
             'attr':self.eatAttr,
             'def': self.eatDef,
             'block': self.eatBlock,
+            '@':self.eatDecorator,
 
             'closure': self.eatClosure,
 
@@ -1705,6 +1716,24 @@ class _HighLevelParser(_LowLevelParser):
         self._compiler.addAttribute(attribName, expr)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
 
+    def eatDecorator(self):
+        isLineClearToStartToken = self.isLineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        startPos = self.pos()
+        self.getDirectiveStartToken()
+        #self.advance() # eat @
+        startPos = self.pos()
+        decoratorExpr = self.getExpression()
+        decoratorExpr = self._applyExpressionFilters(decoratorExpr, 'decorator', startPos=startPos)
+        self._compiler.addDecorator(decoratorExpr)
+        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
+        self.getWhiteSpace()
+
+        directiveKey = self.matchDirective()
+        if not directiveKey or directiveKey not in ('def', 'block', 'closure'):
+            raise ParseError(self, msg='Expected #def, #block or #closure')
+        self.eatDirective()
+        
     def eatDef(self):
         # filtered         
         self._eatDefOrBlock('def')
