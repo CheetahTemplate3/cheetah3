@@ -177,8 +177,19 @@ div.quote {
 }
 
 div.citation {
+    padding-left: 10px;
     padding-top: 8px;
     color: #A69E8A;
+}
+
+div.citation a, 
+div.citation a:link, 
+div.citation a:visited {
+  color: #A69E8A;   
+  color: #847C68;   
+  font-weight: bold;
+  /* background-color: #FFFFbb; */
+  text-decoration: underline;
 }
 
 span.quote {
