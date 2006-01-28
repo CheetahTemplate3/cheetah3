@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.151 2006/01/28 04:20:31 tavis_rudd Exp $
+# $Id: Template.py,v 1.152 2006/01/28 23:48:11 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.151 $
+Version: $Revision: 1.152 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/28 04:20:31 $
+Last Revision Date: $Date: 2006/01/28 23:48:11 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.151 $"[11:-2]
+__revision__ = "$Revision: 1.152 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -199,7 +199,8 @@ class Template(Servlet):
                                            '_handleCheetahInclude',
                                            )
     _CHEETAH_requiredCheetahClassMethods = ('subclass',)                                              
-    _CHEETAH_requiredCheetahClassAttributes = ('cacheRegionClass','cacheStore','cacheStoreClass')
+    _CHEETAH_requiredCheetahClassAttributes = ('cacheRegionClass','cacheStore',
+                                               'cacheStoreIdPrefix','cacheStoreClass')
 
     ## the following are used by .compile(). Most are documented in its docstring.
     _CHEETAH_cacheModuleFilesForTracebacks = False
@@ -1538,9 +1539,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.151 $
+        Version: $Revision: 1.152 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/28 04:20:31 $
+        Last Revision Date: $Date: 2006/01/28 23:48:11 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
