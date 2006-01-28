@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.136 2006/01/27 02:06:32 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.137 2006/01/28 04:20:01 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.136 $
+Version: $Revision: 1.137 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/27 02:06:32 $
+Last Revision Date: $Date: 2006/01/28 04:20:01 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.136 $"[11:-2]
+__revision__ = "$Revision: 1.137 $"[11:-2]
 
 import sys
 import os
@@ -745,13 +745,16 @@ class MethodCompiler(GenUtils):
                 + str(random.randrange(10000, 99999)))
         
     def startCacheRegion(self, cacheInfo, lineCol, rawPlaceholder=None):
+
+        # @@TR: we should add some runtime logging to this
+        
         ID = self.nextCacheID()
         interval = cacheInfo.get('interval',None)
         test = cacheInfo.get('test',None)
         customID = cacheInfo.get('id',None)
         if customID:
             ID = customID
-        varyBy = cacheInfo.get('varyBy',repr(ID))
+        varyBy = cacheInfo.get('varyBy', repr(ID))
         self._cacheRegionsStack.append(ID) # attrib of current methodCompiler
 
         # @@TR: add this to a special class var as well
@@ -765,41 +768,65 @@ class MethodCompiler(GenUtils):
                       + repr(ID)
                       + ', cacheInfo=%r'%cacheInfo
                       + ')')
-        self.addChunk('if _cacheRegion_%(ID)s.isNew(): _RECACHE_%(ID)s = True'%locals())
+        self.addChunk('if _cacheRegion_%(ID)s.isNew():'%locals())
+        self.indent()
+        self.addChunk('_RECACHE_%(ID)s = True'%locals())
+        self.dedent()
+        
         self.addChunk('_cacheItem_%(ID)s = _cacheRegion_%(ID)s.getCacheItem('%locals()
                       +varyBy+')')
-        if interval:
-            self.addChunk(
-                ('if (not _cacheItem_%(ID)s.getRefreshTime())'%locals())
-                +' or (currentTime() > _cacheItem_%(ID)s.getRefreshTime()):'%locals())
-            self.indent()
-            self.addChunk(("_cacheItem_%(ID)s.setRefreshTime(currentTime() +"%locals())
-                          + str(interval) + ")")
-            self.addChunk('_RECACHE_%(ID)s = True'%locals())
-            self.dedent()
+
+        self.addChunk('if _cacheItem_%(ID)s.hasExpired():'%locals())
+        self.indent()
+        self.addChunk('_RECACHE_%(ID)s = True'%locals())
+        self.dedent()
             
         if test:
             self.addChunk('if ' + test + ':')
             self.indent()
             self.addChunk('_RECACHE_%(ID)s = True'%locals())
             self.dedent()
-            
-        self.addChunk('if _RECACHE_%(ID)s or not _cacheItem_%(ID)s.hasData():'%locals())
+
+        self.addChunk('if (not _RECACHE_%(ID)s) and _cacheItem_%(ID)s.getRefreshTime():'%locals())
+        self.indent()
+        #self.addChunk('print "DEBUG"+"-"*50')
+        self.addChunk('try:')
+        self.indent()
+        self.addChunk('_output = _cacheItem_%(ID)s.renderOutput()'%locals())        
+        self.dedent()                
+        self.addChunk('except KeyError:')
+        self.indent()
+        self.addChunk('_RECACHE_%(ID)s = True'%locals())
+        #self.addChunk('print "DEBUG"+"*"*50')
+        self.dedent()                
+        self.addChunk('else:')
+        self.indent()
+        self.addWriteChunk('_output')
+        self.addChunk('del _output')
+        self.dedent()                
+
+        self.dedent()                
+
+        self.addChunk('if _RECACHE_%(ID)s or not _cacheItem_%(ID)s.getRefreshTime():'%locals())
         self.indent()
         self.addChunk('_orig_trans%(ID)s = trans'%locals())
         self.addChunk('trans = _cacheCollector_%(ID)s = DummyTransaction()'%locals())
         self.addChunk('write = _cacheCollector_%(ID)s.response().write'%locals())
+        if interval:
+            self.addChunk(("_cacheItem_%(ID)s.setExpiryTime(currentTime() +"%locals())
+                          + str(interval) + ")")
         
     def endCacheRegion(self):
         ID = self._cacheRegionsStack.pop()
         self.addChunk('trans = _orig_trans%(ID)s'%locals())
         self.addChunk('write = trans.response().write')
-        self.addChunk(
-            '_cacheItem_%(ID)s.setData(_cacheCollector_%(ID)s.response().getvalue())'%locals())
+        self.addChunk('_cacheData = _cacheCollector_%(ID)s.response().getvalue()'%locals())
+        self.addChunk('_cacheItem_%(ID)s.setData(_cacheData)'%locals())
+        self.addWriteChunk('_cacheData')
+        self.addChunk('del _cacheData')        
         self.addChunk('del _cacheCollector_%(ID)s'%locals())
         self.addChunk('del _orig_trans%(ID)s'%locals())
-        self.dedent()        
-        self.addWriteChunk('_cacheItem_%(ID)s.getOutput()'%locals())
+        self.dedent()
         self.addChunk('## END CACHE REGION: '+ID)
         self.addChunk('')
 
@@ -1816,7 +1843,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
 if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
     templateAPIClass = getattr(%(mainClassName)s, '_CHEETAH_templateClass', Template)
-    templateAPIClass._assignRequiredMethodsToClass(%(mainClassName)s)
+    templateAPIClass._addCheetahPlumbingCodeToClass(%(mainClassName)s)
 
 %(footer)s
 """ %   {'header':self.moduleHeader(),
