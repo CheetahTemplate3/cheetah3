@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.150 2006/01/27 22:08:18 tavis_rudd Exp $
+# $Id: Template.py,v 1.151 2006/01/28 04:20:31 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.150 $
+Version: $Revision: 1.151 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/27 22:08:18 $
+Last Revision Date: $Date: 2006/01/28 04:20:31 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.150 $"[11:-2]
+__revision__ = "$Revision: 1.151 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -61,6 +61,7 @@ from Cheetah.Utils.Misc import checkKeywords     # Used in Template.__init__
 from Cheetah.Utils.Indenter import Indenter      # Used in Template.__init__ and for
                                                  # placeholders
 from Cheetah.NameMapper import NotFound, valueFromSearchList
+from Cheetah.CacheStore import MemoryCacheStore, MemcachedCacheStore
 from Cheetah.CacheRegion import CacheRegion
 from Cheetah.Utils.WebInputMixin import _Converter, _lookup, NonNumericInputError
 try:
@@ -179,8 +180,8 @@ class Template(Servlet):
           klass._CHEETAH__globalSetVars (_CHEETAH__xxx with 2 underscores)
     """
 
-    # this is used by .assignRequiredMethodsToClass()
-    _CHEETAH_requiredCheetahMethodNames = ('_initCheetahInstance',
+    # this is used by ._addCheetahPlumbingCodeToClass()
+    _CHEETAH_requiredCheetahMethods = ('_initCheetahInstance',
                                            'searchList',
                                            'errorCatcher',
                                            'getVar',
@@ -188,6 +189,8 @@ class Template(Servlet):
                                            'getFileContents',
                                            'runAsMainProgram',
 
+                                           '_getCacheStore',
+                                           '_getCacheStoreIdPrefix',
                                            '_createCacheRegion',
                                            'getCacheRegion',
                                            'getCacheRegions',
@@ -195,6 +198,8 @@ class Template(Servlet):
                                            
                                            '_handleCheetahInclude',
                                            )
+    _CHEETAH_requiredCheetahClassMethods = ('subclass',)                                              
+    _CHEETAH_requiredCheetahClassAttributes = ('cacheRegionClass','cacheStore','cacheStoreClass')
 
     ## the following are used by .compile(). Most are documented in its docstring.
     _CHEETAH_cacheModuleFilesForTracebacks = False
@@ -221,10 +226,15 @@ class Template(Servlet):
     _CHEETAH_defaultModuleNameForTemplates = 'DynamicallyCompiledCheetahTemplate'
     _CHEETAH_defaultModuleGlobalsForTemplates = None
     
-    ## The following 3 are used by instance methods.
+    ## The following attributes are used by instance methods:
     _CHEETAH_generatedModuleCode = None
     _CHEETAH_generatedClassCode = None            
     NonNumericInputError = NonNumericInputError
+    _CHEETAH_cacheRegionClass = CacheRegion
+    _CHEETAH_cacheStoreClass = MemoryCacheStore
+    #_CHEETAH_cacheStoreClass = MemcachedCacheStore
+    _CHEETAH_cacheStore = None  
+    _CHEETAH_cacheStoreIdPrefix = None  
 
     def _getCompilerClass(klass, source=None, file=None):
         return klass._CHEETAH_compilerClass
@@ -822,21 +832,32 @@ class Template(Servlet):
         return Preprocessor()
     _normalizePreprocessor = classmethod(_normalizePreprocessor)        
 
-    def _assignRequiredMethodsToClass(klass, concreteTemplateClass):
+    def _addCheetahPlumbingCodeToClass(klass, concreteTemplateClass):
         """If concreteTemplateClass is not a subclass of Cheetah.Template, add
-        the required cheetah methods to it.
+        the required cheetah methods and attributes to it.
 
         This is called on each new template class after it has been compiled.
         If concreteTemplateClass is not a subclass of Cheetah.Template but
         already has method with the same name as one of the required cheetah
         methods, this will skip that method.
         """
-        for methodname in klass._CHEETAH_requiredCheetahMethodNames:
+        for methodname in klass._CHEETAH_requiredCheetahMethods:
             if not hasattr(concreteTemplateClass, methodname):
                 method = getattr(Template, methodname)
                 newMethod = new.instancemethod(method.im_func, None, concreteTemplateClass)
                 #print methodname, method
                 setattr(concreteTemplateClass, methodname, newMethod)
+
+        for classMethName in klass._CHEETAH_requiredCheetahClassMethods:
+            if not hasattr(concreteTemplateClass, classMethName):
+                meth = getattr(klass, classMethName)
+                setattr(concreteTemplateClass, classMethName, classmethod(meth.im_func))
+            
+        for attrname in klass._CHEETAH_requiredCheetahClassAttributes:
+            attrname = '_CHEETAH_'+attrname
+            if not hasattr(concreteTemplateClass, attrname):
+                attrVal = getattr(klass, attrname)
+                setattr(concreteTemplateClass, attrname, attrVal)
 
         if (not hasattr(concreteTemplateClass, '__str__')
             or concreteTemplateClass.__str__ is object.__str__):
@@ -858,13 +879,8 @@ class Template(Servlet):
                     
             __str__ = new.instancemethod(__str__, None, concreteTemplateClass)
             setattr(concreteTemplateClass, '__str__', __str__)            
-
-        if not hasattr(concreteTemplateClass, 'subclass'):
-            func = klass.subclass.im_func
-            setattr(concreteTemplateClass, 'subclass', classmethod(func))
-            pass
                 
-    _assignRequiredMethodsToClass = classmethod(_assignRequiredMethodsToClass)
+    _addCheetahPlumbingCodeToClass = classmethod(_addCheetahPlumbingCodeToClass)
 
     ## end classmethods ##
 
@@ -1073,9 +1089,28 @@ class Template(Servlet):
         """
         return self._CHEETAH__errorCatcher
 
-    # cache methods
+    ## cache methods ##
+    def _getCacheStore(self):
+        if not self._CHEETAH__cacheStore:
+            if self._CHEETAH_cacheStore is not None:
+                self._CHEETAH__cacheStore = self._CHEETAH_cacheStore
+            else:
+                # @@TR: might want to provide a way to provide init args
+                self._CHEETAH__cacheStore = self._CHEETAH_cacheStoreClass()
+
+        return self._CHEETAH__cacheStore
+
+    def _getCacheStoreIdPrefix(self):
+        if self._CHEETAH_cacheStoreIdPrefix is not None:            
+            return self._CHEETAH_cacheStoreIdPrefix
+        else:
+            return str(id(self))
+    
     def _createCacheRegion(self, regionID):
-        return CacheRegion(regionID)
+        return self._CHEETAH_cacheRegionClass(
+            regionID=regionID,
+            templateCacheIdPrefix=self._getCacheStoreIdPrefix(),
+            cacheStore=self._getCacheStore())
 
     def getCacheRegion(self, regionID, cacheInfo=None, create=True):
         cacheRegion = self._CHEETAH__cacheRegions.get(regionID)
@@ -1085,28 +1120,35 @@ class Template(Servlet):
         return cacheRegion        
     
     def getCacheRegions(self):
-        """Returns a dictionary of the cache regions initialized for in a template.
+        """Returns a dictionary of the 'cache regions' initialized in a
+        template.
+
+        Each #cache directive block or $*cachedPlaceholder is a separate 'cache
+        region'.        
         """
+        # returns a copy to prevent users mucking it up
         return self._CHEETAH__cacheRegions.copy()
 
-    def refreshCache(self, cacheRegionKey=None, cacheKey=None):        
-        """Refresh a cache item.
+    def refreshCache(self, cacheRegionId=None, cacheItemId=None):        
+        """Refresh a cache region or a specific cache item within a region.
         """
         
-        if not cacheRegionKey:
+        if not cacheRegionId:
             for key, cregion in self.getCacheRegions():
                 cregion.clear()
         else:
-            cregion = self._CHEETAH__cacheRegions.get(cacheRegionKey)
+            cregion = self._CHEETAH__cacheRegions.get(cacheRegionId)
             if not cregion:
                 return
-            if not cacheKey: # clear the desired region and all its caches
+            if not cacheItemId: # clear the desired region and all its cacheItems
                 cregion.clear()
             else: # clear one specific cache of a specific region
-                cache = cregion.getCache(cacheKey)
+                cache = cregion.getCacheItem(cacheItemId)
                 if cache:
                     cache.clear()
-
+                    
+    ## end cache methods ##
+                    
     def shutdown(self):
         """Break reference cycles before discarding a servlet.
         """
@@ -1237,7 +1279,11 @@ class Template(Servlet):
             self.transaction = None
         self._CHEETAH__instanceInitialized = True
         self._CHEETAH__isBuffering = False
-            
+
+        self._CHEETAH__cacheStore = None
+        if self._CHEETAH_cacheStore is not None:
+            self._CHEETAH__cacheStore = self._CHEETAH_cacheStore
+        
     def _compile(self, source=None, file=None, compilerSettings=Unspecified,
                  moduleName=None, mainMethodName=None):
         """Compile the template. This method is automatically called by
@@ -1289,7 +1335,7 @@ class Template(Servlet):
                 # @@TR: might want to provide some syntax for specifying the
                 # Template class to be used for compilation so compilerSettings
                 # can be changed.
-                compiler = self._getTemplateClassForIncludeCompilation(source, file)
+                compiler = self._getTemplateClassForIncludeDirectiveCompilation(source, file)
                 nestedTemplateClass = compiler.compile(source=source,file=file)
                 nestedTemplate = nestedTemplateClass(_preBuiltSearchList=self.searchList(),
                                                      _globalSetVars=self._CHEETAH__globalSetVars)
@@ -1306,7 +1352,7 @@ class Template(Servlet):
         else:
             trans.response().write(self._CHEETAH__cheetahIncludes[_includeID])
 
-    def _getTemplateClassForIncludeCompilation(self, source, file):
+    def _getTemplateClassForIncludeDirectiveCompilation(self, source, file):
         """Returns the subclass of Template which should be used to compile
         #include directives.
 
@@ -1492,9 +1538,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.150 $
+        Version: $Revision: 1.151 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/27 22:08:18 $
+        Last Revision Date: $Date: 2006/01/28 04:20:31 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
