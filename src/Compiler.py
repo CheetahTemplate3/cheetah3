@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.137 2006/01/28 04:20:01 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.138 2006/01/29 04:36:14 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.137 $
+Version: $Revision: 1.138 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/28 04:20:01 $
+Last Revision Date: $Date: 2006/01/29 04:36:14 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.137 $"[11:-2]
+__revision__ = "$Revision: 1.138 $"[11:-2]
 
 import sys
 import os
@@ -1840,6 +1840,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
 ## CLASSES
 
 %(classes)s
+
+## END CLASS DEFINITION
 
 if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
     templateAPIClass = getattr(%(mainClassName)s, '_CHEETAH_templateClass', Template)
