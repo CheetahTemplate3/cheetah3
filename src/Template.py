@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.154 2006/01/29 00:46:10 tavis_rudd Exp $
+# $Id: Template.py,v 1.155 2006/01/29 01:22:07 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.154 $
+Version: $Revision: 1.155 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/29 00:46:10 $
+Last Revision Date: $Date: 2006/01/29 01:22:07 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.154 $"[11:-2]
+__revision__ = "$Revision: 1.155 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -103,11 +103,17 @@ _formUsedByWebInput = None
 
 
 class TemplatePreprocessor:
+    """This is used with the preprocessors argument to Template.compile().
+
+    See the docstring for Template.compile
+    
+    ** Preprocessors are an advanced topic **
+    """
     def __init__(self, settings):
         self._settings = settings
 
     def preprocess(self, source, file):
-        """Create the intermediate template and return the source code
+        """Create an intermediate template and return the source code
         it outputs                
         """
         settings = self._settings
@@ -126,16 +132,16 @@ class TemplatePreprocessor:
             inspect.getargs(templateAPIClass.compile.im_func.func_code)[0]
             if arg not in ('klass', 'source', 'file',)]
 
-        kwArgs = {}
+        compileKwArgs = {}
         for arg in possibleKwArgs:
             if hasattr(settings, arg):
-                kwArgs[arg] = getattr(settings, arg)
+                compileKwArgs[arg] = getattr(settings, arg)
 
-        tmplClass = templateAPIClass.compile(source=source, file=file, **kwArgs)
-        instance = tmplClass(searchList=settings.searchList)
-        source = settings.outputTransformer(instance)
-        file = None
-        return source, file
+        tmplClass = templateAPIClass.compile(source=source, file=file, **compileKwArgs)
+        tmplInstance = tmplClass(**settings.templateInitArgs)
+        outputSource = settings.outputTransformer(tmplInstance)
+        outputFile = None
+        return outputSource, outputFile
         
 class Template(Servlet):
     """This class provides a) methods used by templates at runtime and b)
@@ -822,12 +828,17 @@ class Template(Servlet):
                 'Preprocessor requires either a "tokens" or a "compilerSettings" arg.'
                 ' Neither was provided.')
 
-        if not hasattr(settings, 'searchList') and hasattr(settings, 'namespaces'):
-            settings.searchList = settings.namespaces
-        elif not hasattr(settings, 'searchList'):
-            settings.searchList = []
-        settings.searchList = normalizeSearchList(settings.searchList)
-        
+        if not hasattr(settings, 'templateInitArgs'):
+            settings.templateInitArgs = {}
+        if 'searchList' not in settings.templateInitArgs:
+            if not hasattr(settings, 'searchList') and hasattr(settings, 'namespaces'):
+                searchList = settings.namespaces
+            elif not hasattr(settings, 'searchList'):
+                searchList = []
+            settings.templateInitArgs['searchList'] = searchList
+        settings.templateInitArgs['searchList'] = (
+            normalizeSearchList(settings.templateInitArgs['searchList']))
+            
         if not hasattr(settings, 'outputTransformer'):
             settings.outputTransformer = unicode
 
@@ -844,6 +855,8 @@ class Template(Servlet):
         if settings.directiveToken:
             if 'directiveStartToken' not in compilerSettings:
                 compilerSettings['directiveStartToken'] = settings.directiveToken
+            if 'directiveEndToken' not in compilerSettings:
+                compilerSettings['directiveEndToken'] = settings.directiveToken
             if 'commentStartToken' not in compilerSettings:
                 compilerSettings['commentStartToken'] = settings.directiveToken*2
             if 'multiLineCommentStartToken' not in compilerSettings:
@@ -852,7 +865,10 @@ class Template(Servlet):
             if 'multiLineCommentEndToken' not in compilerSettings:
                 compilerSettings['multiLineCommentEndToken'] = (
                     '*'+settings.directiveToken)
-
+            if 'EOLSlurpToken' not in compilerSettings:
+                compilerSettings['EOLSlurpToken'] = settings.directiveToken
+                
+            
         return settings
     _normalizePreprocessorSettings = classmethod(_normalizePreprocessorSettings)
 
@@ -1562,9 +1578,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.154 $
+        Version: $Revision: 1.155 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/29 00:46:10 $
+        Last Revision Date: $Date: 2006/01/29 01:22:07 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
