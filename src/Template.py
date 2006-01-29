@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.159 2006/01/29 04:34:03 tavis_rudd Exp $
+# $Id: Template.py,v 1.160 2006/01/29 07:22:18 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.159 $
+Version: $Revision: 1.160 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/29 04:34:03 $
+Last Revision Date: $Date: 2006/01/29 07:22:18 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.159 $"[11:-2]
+__revision__ = "$Revision: 1.160 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -812,7 +812,9 @@ class Template(Servlet):
                     return arg(source, file)
             return WrapperPreprocessor()
         else:
-            class Settings(object): pass
+            class Settings(object):
+                placeholderToken = None
+                directiveToken = None
             settings = Settings()
             if isinstance(arg, str) or isinstance(arg, (list, tuple)):
                 settings.tokens = arg
@@ -858,10 +860,10 @@ class Template(Servlet):
             settings.templateInitArgs = {}
         if 'searchList' not in settings.templateInitArgs:
             if not hasattr(settings, 'searchList') and hasattr(settings, 'namespaces'):
-                searchList = settings.namespaces
+                settings.searchList = settings.namespaces
             elif not hasattr(settings, 'searchList'):
-                searchList = []
-            settings.templateInitArgs['searchList'] = searchList
+                settings.searchList = []
+            settings.templateInitArgs['searchList'] = settings.searchList
         settings.templateInitArgs['searchList'] = (
             normalizeSearchList(settings.templateInitArgs['searchList']))
             
@@ -1612,9 +1614,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.159 $
+        Version: $Revision: 1.160 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/29 04:34:03 $
+        Last Revision Date: $Date: 2006/01/29 07:22:18 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
