@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.11 2006/01/29 04:35:50 tavis_rudd Exp $
+# $Id: Template.py,v 1.12 2006/01/29 07:21:58 tavis_rudd Exp $
 """Tests of the Template class API
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>,
-Version: $Revision: 1.11 $
+Version: $Revision: 1.12 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2006/01/29 04:35:50 $
+Last Revision Date: $Date: 2006/01/29 07:21:58 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.11 $"[11:-2]
+__revision__ = "$Revision: 1.12 $"[11:-2]
 
 
 ##################################################
@@ -207,6 +207,70 @@ class ClassMethods_subclass(TemplateTest):
         t = klass3({'foo':1234})
         assert str(t)=='1234'
         
+
+class Preprocessors(TemplateTest):
+
+    def test_basicUsage1(self):
+        src='''\
+        %set foo = @a
+        $(@foo*10)
+        @a'''
+        src = '\n'.join([ln.strip() for ln in src.splitlines()])
+        preprocessors = dict(tokens='@ %', namespaces=dict(a=99))
+        klass = Template.compile(src, preprocessors=preprocessors)
+        assert str(klass())=='990\n99'
+
+    def test_normalizePreprocessorArgVariants(self):
+        src='%set foo = 12\n%%comment\n$(@foo*10)'
+
+        class Settings1: tokens = '@ %' 
+        Settings1 = Settings1()
+            
+        from Cheetah.Template import TemplatePreprocessor
+        settings = Template._normalizePreprocessorSettings(Settings1)
+        preprocObj = TemplatePreprocessor(settings)
+
+        def preprocFunc(source, file):
+            return '$(12*10)', None
+
+        class TemplateSubclass(Template):
+            pass
+
+        compilerSettings = {'cheetahVarStartToken':'@',
+                            'directiveStartToken':'%',
+                            'commentStartToken':'%%',
+                            }
+        
+        for arg in ['@ %',
+                    dict(tokens='@ %'),
+                    dict(compilerSettings=compilerSettings),
+                    dict(compilerSettings=compilerSettings, templateInitArgs={}),                    
+                    dict(tokens='@ %', templateAPIClass=TemplateSubclass),
+                    Settings1,
+                    preprocObj,
+                    preprocFunc,                    
+                    ]:
+            
+            klass = Template.compile(src, preprocessors=arg)
+            assert str(klass())=='120'
+
+
+    def test_complexUsage(self):
+        src='''\
+        %set foo = @a
+        %def func1: #def func(arg): $arg("***")
+        %% comment
+        $(@foo*10)
+        @func1
+        $func(lambda x:c"--$x--@a")'''
+        src = '\n'.join([ln.strip() for ln in src.splitlines()])
+
+        for arg in [dict(tokens='@ %', namespaces=dict(a=99)),
+                    dict(tokens='@ %', searchList=dict(a=99)),
+                    ]:
+            klass = Template.compile(src, preprocessors=arg)
+            t = klass()
+            assert str(t)=='990\n--***--99'
 
 
 ##################################################
