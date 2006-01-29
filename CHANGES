@@ -2,7 +2,7 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-2.0rc3 (Jan ?, 2006)
+2.0rc3 (Jan 28, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      
     - added short-form single line versions of 
@@ -17,6 +17,7 @@ release
       Note that if you accidentally leave a colon at the end of one of these
       directives but nothing else follows it, aside from whitespace, the parser
       will treat it as a normal multi-line directive.
+
       The first leading space after the colon is discarded. Any additional
       spaces will be included in the output.
       
@@ -60,16 +61,51 @@ release
 
     - changed the default filter to the one that doesn't try to encode Unicode
       It was 'EncodeUnicode' and is now 'RawOrEncodedUnicode'.
+
     - made the handling of Template.compile()'s preprocessors arg simpler and
       fixed a bug in it.
+
     - fixed attribute name bug in the .compile() method (it affected the feature
       that allows generated module files to be cached for better exception
       tracebacks)
-    - initial refactoring of CacheRegions to support a memcached extension 
-       (I'll have this finished by the time this release is ready)
+
+    - refactored the #cache/CacheRegions code to support abitrary backend cache
+      data stores.
+
+    - added MemcachedCacheStore, which allows cache data to be stored in a
+      memcached backend.  See http://www.linuxjournal.com/article/7451 and
+      http://www.danga.com/memcached/.  This is only appropriate for systems
+      running many Python server processes that need to share cached data to
+      reduce memory requirements. Don't bother with this unless you actually
+      need it. If you have a limited number of Python server processes it is
+      much faster, simpler, and more secure to just cache in the memory of each
+      process.
+
+      KEEP MEMCACHED'S LIMITED SECURITY IN MIND!!  It has no authentication or
+      encryption and will introduce a gaping hole in your defenses unless you
+      are careful.  If you are caching sensitive data you should take measures
+      to ensure that a) untrusted local system users cannot connect to memcached
+      server, b) untrusted external servers cannot connect, and c) untrusted
+      users on trusted external servers cannot connect.  Case (a) can be dealt
+      with via iptable's owner match module for one way to do this: "iptables -A
+      ... -m owner ..."  Cases (b) and (c) can be handled by tunnelling
+      memcached network connections over stunnel and implementing stunnel
+      authentication with mandatory peer/client certs.
+
     - some under-the-hood refactoring of the parser
-    - added Cheetah.Utils.htmlEncode and Cheetah.Utils.htmlDecode
+    
+    - fixed some bugs related to advanced usage of Template.compile(). These
+      were found via new unit tests. No one had actually run into them yet.
+
+    - added Cheetah.Utils.htmlEncode and Cheetah.Utils.htmlDecode    
+
     - more docstring text
+
+  Unit tests: [TR]
+    - extended the caching tests
+    - added copies of all the SyntaxAndOutput tests that use a template
+      baseclass other than `Template`. This ensures that all syntax & core
+      features work with 2.0's support for arbitrary baseclasses.
 
 2.0rc2 (Jan 13th, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
