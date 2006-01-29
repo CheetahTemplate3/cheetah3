@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.90 2006/01/27 02:04:50 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.91 2006/01/29 02:11:10 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.90 $
+Version: $Revision: 1.91 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/27 02:04:50 $
+Last Revision Date: $Date: 2006/01/29 02:11:10 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.90 $"[11:-2]
+__revision__ = "$Revision: 1.91 $"[11:-2]
 
 
 ##################################################
@@ -151,10 +151,13 @@ Template output mismatch:
     _useNewStyleCompilation = True
     #_useNewStyleCompilation = False
 
+    _extraCompileKwArgs = None
+
     def searchList(self):
         return self._searchList
 
     def verify(self, input, expectedOutput,
+               inputEncoding=None,
                outputEncoding=None,
                convertEOLs=Unspecified):
         if self._EOLreplacement:
@@ -166,10 +169,14 @@ Template output mismatch:
 
         self._input = input
         if self._useNewStyleCompilation:
+            extraKwArgs = self._extraCompileKwArgs or {}
+            
             templateClass = Template.compile(
                 source=input,
                 compilerSettings=self._getCompilerSettings(),
-                keepRefToGeneratedCode=True)
+                keepRefToGeneratedCode=True,
+                **extraKwArgs
+                )
             moduleCode = templateClass._CHEETAH_generatedModuleCode
             self.template = templateObj = templateClass(searchList=self.searchList())
         else:
@@ -614,7 +621,24 @@ class Placeholders(OutputTest):
             pass
         else:
             self.fail('should raise NotFound exception')
-            
+
+    def test21(self):
+        """Make sure that $*caching is actually working"""
+        namesStr = 'You Me Them Everyone'
+        names = namesStr.split()
+
+        tmpl = Template.compile('#for name in $names: $name ', baseclass=dict)
+        assert str(tmpl(names=names)).strip()==namesStr
+
+        tmpl = tmpl.subclass('#for name in $names: $*name ')
+        assert str(tmpl(names=names))=='You '*len(names)
+
+        tmpl = tmpl.subclass('#for name in $names: $*1*name ')
+        assert str(tmpl(names=names))=='You '*len(names)
+
+        tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
+        assert str(tmpl(names=names))=='You '*len(names)
+
 
 class Placeholders_Vals(OutputTest):
     convertEOLs = False
@@ -699,6 +723,7 @@ class UnicodeStrings(OutputTest):
     def test1(self):
         """unicode data in placeholder
         """
+        #self.verify(u"$unicodeData", defaultTestNameSpace['unicodeData'], outputEncoding='utf8')
         self.verify(u"$unicodeData", defaultTestNameSpace['unicodeData'])
 
     def test2(self):
@@ -1033,6 +1058,7 @@ $aStr""",
     def test4(self):
         r"""2 #cache ... #end cache blocks"""
         self.verify("""#slurp
+#def foo
 #cache ID='cache1', timer=150m
 $anInt
 #end cache
@@ -1041,13 +1067,16 @@ $anInt
 $i#slurp
  #end for
 #end cache
-$aStr""",
-                    "1\n01234blarg")
+$aStr#slurp
+#end def
+$foo$foo$foo$foo$foo""",
+                    "1\n01234blarg"*5)
 
 
     def test5(self):
         r"""nested #cache blocks"""
         self.verify("""#slurp
+#def foo      
 #cache ID='cache1', timer=150m
 $anInt
 #cache id='cache2', timer=15s
@@ -1057,9 +1086,11 @@ $i#slurp
 $*(6)#slurp
 #end cache
 #end cache
-$aStr""",
-                    "1\n012346blarg")
-
+$aStr#slurp
+#end def
+$foo$foo$foo$foo$foo""",
+                    "1\n012346blarg"*5)
+        
 
 class CallDirective(OutputTest):
     
@@ -1685,6 +1716,12 @@ class DecoratorDirective(OutputTest):
         self.verify("#from Cheetah.Tests.SyntaxAndOutput import testdecorator\n"
                     +"#@testdecorator"
                     +"\n#def $testMeth():1234\n$testMeth",
+                    
+                    "1234")
+
+        self.verify("#from Cheetah.Tests.SyntaxAndOutput import testdecorator\n"
+                    +"#@testdecorator"
+                    +"\n#block $testMeth():1234",
                     
                     "1234")
 
@@ -2748,8 +2785,9 @@ class CGI(OutputTest):
     def test3(self):
         """A (pseudo) Webware servlet.
            
-           This uses the Python syntax escape to set self.isControlledByWebKit.
-           We could instead do '#silent self.isControlledByWebKit = True',
+           This uses the Python syntax escape to set
+           self._CHEETAH__isControlledByWebKit.           
+           We could instead do '#silent self._CHEETAH__isControlledByWebKit = True',
            taking advantage of the fact that it will compile unchanged as long
            as there's no '$' in the statement.  (It won't compile with an '$'
            because that would convert to a function call, and you can't assign
@@ -2760,7 +2798,7 @@ class CGI(OutputTest):
         self._beginCGI()
         source = "#extends Cheetah.Tools.CGITemplate\n" + \
                  "#implements respond\n" + \
-                 "<% self.isControlledByWebKit = True %>#slurp\n" + \
+                 "<% self._CHEETAH__isControlledByWebKit = True %>#slurp\n" + \
                  "$cgiHeaders#slurp\n" + \
                  "Hello, world!"
         self.verify(source, "Hello, world!")
@@ -2873,19 +2911,26 @@ public class X
 
 
 ##################################################
-## CREATE CONVERTED EOL VERSIONS OF THE TEST CASES 
+## CREATE CONVERTED EOL VERSIONS OF THE TEST CASES
+extraCompileKwArgs = {'baseclass':dict}
+
 for klass in [var for var in globals().values()
               if type(var) == types.ClassType and issubclass(var, unittest.TestCase)]:
-        
+    name = klass.__name__        
     if hasattr(klass,'convertEOLs') and klass.convertEOLs:
-        name = klass.__name__
-        win32Src = r"""class %(name)s_Win32EOL(%(name)s): _EOLreplacement = '\r\n'"""%locals()
-        macSrc = r"""class %(name)s_MacEOL(%(name)s): _EOLreplacement = '\r'"""%locals()
+        win32Src = r"class %(name)s_Win32EOL(%(name)s): _EOLreplacement = '\r\n'"%locals()
+        macSrc = r"class %(name)s_MacEOL(%(name)s): _EOLreplacement = '\r'"%locals()
         #print win32Src
         #print macSrc
         exec win32Src+'\n'
         exec macSrc+'\n'
-        del name
+
+    if True:        
+        src = r"class %(name)s_DiffBaseClass(%(name)s): "%locals()
+        src += " _extraCompileKwArgs = extraCompileKwArgs"
+        exec src+'\n'
+
+    del name
     del klass
 
 ##################################################
