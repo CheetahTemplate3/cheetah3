@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.38 2006/01/29 02:09:32 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.39 2006/01/29 04:07:27 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.38 $
+Version: $Revision: 1.39 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2006/01/29 02:09:32 $
+Last Revision Date: $Date: 2006/01/29 04:07:27 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.38 $"[11:-2]
+__revision__ = "$Revision: 1.39 $"[11:-2]
 
 import sys
 import os.path
@@ -97,9 +97,6 @@ class Servlet(BaseServlet):
 couldn't find the template's main method.  If you are using #extends
 without #implements, try adding '#implements respond' to your template
 definition.""")
-
-    
-    __str__ = respond
 
     def sleep(self, transaction):
         BaseServlet.sleep(self, transaction)
