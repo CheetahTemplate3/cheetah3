@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.157 2006/01/29 02:49:32 tavis_rudd Exp $
+# $Id: Template.py,v 1.158 2006/01/29 04:06:05 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.157 $
+Version: $Revision: 1.158 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/29 02:49:32 $
+Last Revision Date: $Date: 2006/01/29 04:06:05 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.157 $"[11:-2]
+__revision__ = "$Revision: 1.158 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -235,7 +235,9 @@ class Template(Servlet):
          'shutdown',
          'webInput',
          'serverSidePath',
-         
+         'generatedClassCode',
+         'generatedModuleCode',
+
          '_getCacheStore',
          '_getCacheStoreIdPrefix',
          '_createCacheRegion',
@@ -645,7 +647,7 @@ class Template(Servlet):
             if type(baseclass) in StringTypes:
                 baseclassName = baseclass
             elif type(baseclass) in (ClassType, type):
-                baseclassName = 'CHEETAH_dynamicallyAssignedBaseClass'
+                baseclassName = 'CHEETAH_dynamicallyAssignedBaseClass_'+baseclass.__name__
                 baseclassValue = baseclass
 
 
@@ -672,6 +674,7 @@ class Template(Servlet):
                 cacheHash = ''.join([str(v) for v in
                                      [hash(source),
                                       fileHash,
+                                      className,
                                       moduleName,
                                       mainMethodName,
                                       hash(compilerClass),
@@ -686,7 +689,7 @@ class Template(Servlet):
         if useCache and cacheHash and cacheHash in klass._CHEETAH_compileCache:
             cachedResults = klass._CHEETAH_compileCache[cacheHash]
             generatedModuleCode = cachedResults.code
-        else:
+        else:            
             compiler = compilerClass(source, file,
                                      moduleName=moduleName,
                                      mainClassName=className,
@@ -745,7 +748,7 @@ class Template(Servlet):
             if keepRefToGeneratedCode:
                 templateClass._CHEETAH_generatedModuleCode = generatedModuleCode
                 templateClass._CHEETAH_generatedClassCode = str(
-                    compiler._finishedClassIndex[moduleName])
+                    compiler._finishedClassIndex[className or moduleName])
 
             if cacheCompilationResults and cacheHash:
                 class CacheResults: pass;
@@ -922,7 +925,8 @@ class Template(Servlet):
             mainMethName = getattr(concreteTemplateClass,mainMethNameAttr, None)
             if mainMethName:
                 def __str__(self): return getattr(self, mainMethName)()
-            elif hasattr(concreteTemplateClass, 'respond'):
+            elif (hasattr(concreteTemplateClass, 'respond')
+                  and concreteTemplateClass.respond!=Servlet.respond):
                 def __str__(self): return self.respond()
             else:
                 def __str__(self):
@@ -1601,9 +1605,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.157 $
+        Version: $Revision: 1.158 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/29 02:49:32 $
+        Last Revision Date: $Date: 2006/01/29 04:06:05 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
