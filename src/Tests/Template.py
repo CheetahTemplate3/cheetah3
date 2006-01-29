@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.12 2006/01/29 07:21:58 tavis_rudd Exp $
+# $Id: Template.py,v 1.13 2006/01/29 19:15:54 tavis_rudd Exp $
 """Tests of the Template class API
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>,
-Version: $Revision: 1.12 $
+Version: $Revision: 1.13 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2006/01/29 07:21:58 $
+Last Revision Date: $Date: 2006/01/29 19:15:54 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.12 $"[11:-2]
+__revision__ = "$Revision: 1.13 $"[11:-2]
 
 
 ##################################################
@@ -271,6 +271,19 @@ class Preprocessors(TemplateTest):
             klass = Template.compile(src, preprocessors=arg)
             t = klass()
             assert str(t)=='990\n--***--99'
+
+
+
+    def test_i18n(self):
+        src='''\
+        %i18n: This is a $string that needs translation
+        %i18n id="foo", domain="root": This is a $string that needs translation
+        '''
+        src = '\n'.join([ln.strip() for ln in src.splitlines()])
+        klass = Template.compile(src, preprocessors='@ %', baseclass=dict)
+        t = klass({'string':'bit of text'})
+        #print str(t)
+        assert str(t)=='This is a bit of text that needs translation\n'*2
 
 
 ##################################################
