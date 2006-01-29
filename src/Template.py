@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.158 2006/01/29 04:06:05 tavis_rudd Exp $
+# $Id: Template.py,v 1.159 2006/01/29 04:34:03 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.158 $
+Version: $Revision: 1.159 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/29 04:06:05 $
+Last Revision Date: $Date: 2006/01/29 04:34:03 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.158 $"[11:-2]
+__revision__ = "$Revision: 1.159 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -701,7 +701,9 @@ class Template(Servlet):
         
         if returnAClass:
             if cachedResults:
-                return cachedResults.klass
+                if (not keepRefToGeneratedCode
+                    or cachedResults.klass._CHEETAH_generatedModuleCode):                
+                    return cachedResults.klass
 
             __file__ = uniqueModuleName+'.py' # relative file path with no dir part
 
@@ -747,15 +749,20 @@ class Template(Servlet):
 
             if keepRefToGeneratedCode:
                 templateClass._CHEETAH_generatedModuleCode = generatedModuleCode
-                templateClass._CHEETAH_generatedClassCode = str(
-                    compiler._finishedClassIndex[className or moduleName])
-
+                templateClass._CHEETAH_generatedClassCode = generatedModuleCode[
+                    generatedModuleCode.find('\nclass '):
+                    generatedModuleCode.find('\n## END CLASS DEFINITION')]
+                    
             if cacheCompilationResults and cacheHash:
                 class CacheResults: pass;
                 cacheResults = CacheResults()
                 cacheResults.code = generatedModuleCode
                 cacheResults.klass = templateClass
+                templateClass._CHEETAH_isInCompilationCache = True
                 klass._CHEETAH_compileCache[cacheHash] = cacheResults
+            else:
+                templateClass._CHEETAH_isInCompilationCache = False
+
             return templateClass
         else:
             return generatedModuleCode
@@ -1605,9 +1612,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.158 $
+        Version: $Revision: 1.159 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/29 04:06:05 $
+        Last Revision Date: $Date: 2006/01/29 04:34:03 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
