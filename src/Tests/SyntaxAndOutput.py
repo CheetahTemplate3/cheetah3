@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.91 2006/01/29 02:11:10 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.92 2006/01/29 02:50:20 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.91 $
+Version: $Revision: 1.92 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/29 02:11:10 $
+Last Revision Date: $Date: 2006/01/29 02:50:20 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.91 $"[11:-2]
+__revision__ = "$Revision: 1.92 $"[11:-2]
 
 
 ##################################################
@@ -2912,7 +2912,11 @@ public class X
 
 ##################################################
 ## CREATE CONVERTED EOL VERSIONS OF THE TEST CASES
-extraCompileKwArgs = {'baseclass':dict}
+if OutputTest._useNewStyleCompilation:
+    extraCompileKwArgsForDiffBaseclass = {'baseclass':dict}
+else:
+    extraCompileKwArgsForDiffBaseclass = {'baseclass':object}
+    
 
 for klass in [var for var in globals().values()
               if type(var) == types.ClassType and issubclass(var, unittest.TestCase)]:
@@ -2927,7 +2931,7 @@ for klass in [var for var in globals().values()
 
     if True:        
         src = r"class %(name)s_DiffBaseClass(%(name)s): "%locals()
-        src += " _extraCompileKwArgs = extraCompileKwArgs"
+        src += " _extraCompileKwArgs = extraCompileKwArgsForDiffBaseclass"
         exec src+'\n'
 
     del name
