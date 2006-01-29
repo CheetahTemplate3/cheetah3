@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.138 2006/01/29 04:36:14 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.139 2006/01/29 19:24:06 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.138 $
+Version: $Revision: 1.139 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/29 04:36:14 $
+Last Revision Date: $Date: 2006/01/29 19:24:06 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.138 $"[11:-2]
+__revision__ = "$Revision: 1.139 $"[11:-2]
 
 import sys
 import os
@@ -28,6 +28,7 @@ import time
 import random
 import warnings
 import __builtin__
+import copy
 
 from Cheetah.Version import Version
 from Cheetah.SettingsManager import SettingsManager
@@ -115,6 +116,8 @@ DEFAULT_COMPILER_SETTINGS = {
 
     'templateMetaclass':None, # strictly optional. Only works with new-style baseclasses
 
+
+    'i18NFunctionName':'self.handleI18n',
     
     ## These are used in the parser, but I've put them here for the time being to
     ## facilitate separating the parser and compiler:    
@@ -125,6 +128,7 @@ DEFAULT_COMPILER_SETTINGS = {
     'gobbleWhitespaceAroundMultiLineComments':True,
     'directiveStartToken':'#',
     'directiveEndToken':'#',
+    'allowWhitespaceAfterDirectiveStartToken':False,    
     'PSPStartToken':'<%',
     'PSPEndToken':'%>',
     'EOLSlurpToken':'#',
@@ -833,7 +837,7 @@ class MethodCompiler(GenUtils):
     def nextCallRegionID(self):
         return self.nextCacheID()
 
-    def startCallRegion(self, functionName, args, lineCol):
+    def startCallRegion(self, functionName, args, lineCol, regionTitle='CALL'):
         class CallDetails: pass
         callDetails = CallDetails()
         callDetails.ID = ID = self.nextCallRegionID()
@@ -843,7 +847,8 @@ class MethodCompiler(GenUtils):
         callDetails.usesKeywordArgs = False
         self._callRegionsStack.append((ID, callDetails)) # attrib of current methodCompiler
 
-        self.addChunk('## START CALL REGION: '+ID
+        self.addChunk('## START %(regionTitle)s REGION: '%locals()
+                      +ID
                       +' of '+functionName
                       +' at line, col ' + str(lineCol) + ' in the source.')
         self.addChunk('_orig_trans%(ID)s = trans'%locals())
@@ -871,7 +876,7 @@ class MethodCompiler(GenUtils):
         self.addChunk('trans = _callCollector%(ID)s = DummyTransaction()'%locals())
         self.addChunk('write = _callCollector%(ID)s.response().write'%locals())
     
-    def endCallRegion(self):
+    def endCallRegion(self, regionTitle='CALL'):
         ID, callDetails = self._callRegionsStack[-1]
         functionName, initialKwArgs, lineCol = (
             callDetails.functionName, callDetails.args, callDetails.lineCol)
@@ -898,11 +903,19 @@ class MethodCompiler(GenUtils):
             reset()
             self.addFilteredChunk('%(functionName)s(%(initialKwArgs)s**_callKws%(ID)s)'%locals())
             self.addChunk('del _callKws%(ID)s'%locals())
-        self.addChunk('## END CALL REGION: '+ID
+        self.addChunk('## END %(regionTitle)s REGION: '%locals()
+                      +ID
                       +' of '+functionName
                       +' at line, col ' + str(lineCol) + ' in the source.')        
         self.addChunk('')
         self._callRegionsStack.pop() # attrib of current methodCompiler
+
+    def startI18nRegion(self, args, lineCol):        
+        functionName = self.setting('i18NFunctionName')
+        self.startCallRegion(functionName, args, lineCol, regionTitle='I18N')
+
+    def endI18nRegion(self):
+        self.endCallRegion(regionTitle='I18N')
 
     def nextCaptureRegionID(self):
         return self.nextCacheID()
@@ -984,7 +997,7 @@ class MethodCompiler(GenUtils):
                 self.dedent()
                 
     def closeFilterBlock(self):
-        ID = self._filterRegionsStack.pop()
+        ID, filterDetails = self._filterRegionsStack.pop()
         #self.addChunk('_filter = self._CHEETAH__initialFilter')
         self.addChunk('_filter = _orig_filter%(ID)s'%locals())
         
@@ -1547,7 +1560,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             raise AttributeError, name
 
     def _initializeSettings(self):
-        self.updateSettings( DEFAULT_COMPILER_SETTINGS.copy() )
+        self.updateSettings(copy.deepcopy(DEFAULT_COMPILER_SETTINGS))
         
     def _setupCompilerState(self):
         self._activeClassesList = []
