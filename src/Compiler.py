@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.139 2006/01/29 19:24:06 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.140 2006/01/29 21:23:21 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.139 $
+Version: $Revision: 1.140 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/29 19:24:06 $
+Last Revision Date: $Date: 2006/01/29 21:23:21 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.139 $"[11:-2]
+__revision__ = "$Revision: 1.140 $"[11:-2]
 
 import sys
 import os
@@ -138,7 +138,10 @@ DEFAULT_COMPILER_SETTINGS = {
     'allowEmptySingleLineMethods': False,
     'allowNestedDefScopes': True,
     'allowPlaceholderFilterArgs': True,
-    
+
+    ## See Parser.initDirectives() for the use of the next 2
+    #'directiveNamesAndParsers':{}
+    #'endDirectiveNamesAndHandlers':{}
     }
 
 
