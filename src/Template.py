@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.153 2006/01/29 00:21:12 tavis_rudd Exp $
+# $Id: Template.py,v 1.154 2006/01/29 00:46:10 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.153 $
+Version: $Revision: 1.154 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/29 00:21:12 $
+Last Revision Date: $Date: 2006/01/29 00:46:10 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.153 $"[11:-2]
+__revision__ = "$Revision: 1.154 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -101,6 +101,41 @@ def _genUniqueModuleName(baseModuleName):
 # This is only relavent to templates used as CGI scripts.
 _formUsedByWebInput = None
 
+
+class TemplatePreprocessor:
+    def __init__(self, settings):
+        self._settings = settings
+
+    def preprocess(self, source, file):
+        """Create the intermediate template and return the source code
+        it outputs                
+        """
+        settings = self._settings
+        if not source: # @@TR: this needs improving
+            if isinstance(file, (str, unicode)): # it's a filename.
+                f = open(file)
+                source = f.read()
+                f.close()
+            elif hasattr(file, 'read'):
+                source = file.read()
+            file = None        
+
+        templateAPIClass = settings.templateAPIClass
+        possibleKwArgs = [
+            arg for arg in
+            inspect.getargs(templateAPIClass.compile.im_func.func_code)[0]
+            if arg not in ('klass', 'source', 'file',)]
+
+        kwArgs = {}
+        for arg in possibleKwArgs:
+            if hasattr(settings, arg):
+                kwArgs[arg] = getattr(settings, arg)
+
+        tmplClass = templateAPIClass.compile(source=source, file=file, **kwArgs)
+        instance = tmplClass(searchList=settings.searchList)
+        source = settings.outputTransformer(instance)
+        file = None
+        return source, file
         
 class Template(Servlet):
     """This class provides a) methods used by templates at runtime and b)
@@ -219,7 +254,6 @@ class Template(Servlet):
     _CHEETAH_compilerClass = Compiler
     _CHEETAH_cacheCompilationResults = True
     _CHEETAH_useCompilationCache = True
-    _CHEETAH_preprocessors = None
     _CHEETAH_keepRefToGeneratedCode = True
     _CHEETAH_defaultBaseclassForTemplates = None
     _CHEETAH_defaultClassNameForTemplates = None
@@ -227,6 +261,8 @@ class Template(Servlet):
     _CHEETAH_defaultMainMethodNameForTemplates = None 
     _CHEETAH_defaultModuleNameForTemplates = 'DynamicallyCompiledCheetahTemplate'
     _CHEETAH_defaultModuleGlobalsForTemplates = None
+    _CHEETAH_preprocessors = None
+    _CHEETAH_defaultPreprocessorClass = TemplatePreprocessor    
     
     ## The following attributes are used by instance methods:
     _CHEETAH_generatedModuleCode = None
@@ -725,30 +761,43 @@ class Template(Servlet):
         if not isinstance(preprocessors, (list, tuple)):
             preprocessors = [preprocessors]
         for preprocessor in preprocessors:
-            preprocessor = klass._normalizePreprocessor(preprocessor)
+            preprocessor = klass._normalizePreprocessorArg(preprocessor)
             source, file = preprocessor.preprocess(source, file)
         return source, file
     _preprocessSource = classmethod(_preprocessSource)
 
-    def _normalizePreprocessor(klass, input):
+    def _normalizePreprocessorArg(klass, arg):
         """Used to convert the items in the .compile() classmethod's
         preprocessors argument into real source preprocessors.  This permits the
         use of several shortcut forms for defining preprocessors.
         """
-        if hasattr(input, 'preprocess'):
-            return input
-        elif callable(input):
-            class Preprocessor:
-                def preprocess(self, source, file):
-                    return input(source, file)
-            return Preprocessor()
-
-        ##
-        class Options(object): pass
-        options = Options()
-        options.searchList = []
-        options.keepRefToGeneratedCode = True
         
+        if hasattr(arg, 'preprocess'):
+            return arg
+        elif callable(arg):
+            class WrapperPreprocessor:
+                def preprocess(self, source, file):
+                    return arg(source, file)
+            return WrapperPreprocessor()
+        else:
+            class Settings(object): pass
+            settings = Settings()
+            if isinstance(arg, str) or isinstance(arg, (list, tuple)):
+                settings.tokens = arg
+            elif isinstance(arg, dict):
+                for k, v in arg.items():
+                    setattr(settings, k, v)   
+            else:
+                settings = arg
+
+            settings = klass._normalizePreprocessorSettings(settings)
+            return klass._CHEETAH_defaultPreprocessorClass(settings)
+
+    _normalizePreprocessorArg = classmethod(_normalizePreprocessorArg)
+        
+    def _normalizePreprocessorSettings(klass, settings):
+        settings.keepRefToGeneratedCode = True
+
         def normalizeSearchList(searchList):
             if not isinstance(searchList, (list, tuple)):
                 searchList = [searchList]
@@ -762,91 +811,50 @@ class Template(Servlet):
             else:
                 raise PreprocessError('invalid tokens argument: %r'%tokens)
 
-        ## parse the input arg
-        if isinstance(input, str) or isinstance(input, (list, tuple)):
-            (options.placeholderToken, options.directiveToken) = normalizeTokens(input)
-        elif isinstance(input, dict):
-            (options.placeholderToken, options.directiveToken) = (None, None)
-            if input.get('tokens'):
-                (options.placeholderToken,
-                 options.directiveToken) = normalizeTokens(input.get('tokens'))
-            options.searchList = normalizeSearchList(
-                input.get('searchList',
-                          input.get('namespaces', [])))            
-            for k, v in input.items():
-                setattr(options, k, v)   
-        else: #it's an options object
-            options = input
-            if options.get('tokens'):
-                (options.placeholderToken,
-                 options.directiveToken) = normalizeTokens(options.tokens)
+        if hasattr(settings, 'tokens'):
+            (settings.placeholderToken,
+             settings.directiveToken) = normalizeTokens(settings.tokens)
             
-        if (not getattr(options,'compilerSettings', None)
-            and not getattr(options, 'placeholderToken', None) ):
+        if (not getattr(settings,'compilerSettings', None)
+            and not getattr(settings, 'placeholderToken', None) ):
             
             raise TypeError(
-                'Preprocessor requires either a "prefix" or a "compilerSettings" arg.'
+                'Preprocessor requires either a "tokens" or a "compilerSettings" arg.'
                 ' Neither was provided.')
+
+        if not hasattr(settings, 'searchList') and hasattr(settings, 'namespaces'):
+            settings.searchList = settings.namespaces
+        elif not hasattr(settings, 'searchList'):
+            settings.searchList = []
+        settings.searchList = normalizeSearchList(settings.searchList)
         
-        ## normalize everything
-        if not hasattr(options, 'outputTransformer'):
-            options.outputTransformer = unicode
+        if not hasattr(settings, 'outputTransformer'):
+            settings.outputTransformer = unicode
 
-        if not hasattr(options, 'templateAPIClass'):
+        if not hasattr(settings, 'templateAPIClass'):
             class PreprocessTemplateAPIClass(klass): pass
-            options.templateAPIClass = PreprocessTemplateAPIClass
+            settings.templateAPIClass = PreprocessTemplateAPIClass
 
-        if not hasattr(options, 'compilerSettings'):
-            options.compilerSettings = {}
-        compilerSettings = options.compilerSettings
-        if (options.placeholderToken and 'cheetahVarStartToken' not in compilerSettings):
-            compilerSettings['cheetahVarStartToken'] = options.placeholderToken
-        if options.directiveToken:
+        if not hasattr(settings, 'compilerSettings'):
+            settings.compilerSettings = {}
+            
+        compilerSettings = settings.compilerSettings
+        if (settings.placeholderToken and 'cheetahVarStartToken' not in compilerSettings):
+            compilerSettings['cheetahVarStartToken'] = settings.placeholderToken
+        if settings.directiveToken:
             if 'directiveStartToken' not in compilerSettings:
-                compilerSettings['directiveStartToken'] = options.directiveToken
+                compilerSettings['directiveStartToken'] = settings.directiveToken
             if 'commentStartToken' not in compilerSettings:
-                compilerSettings['commentStartToken'] = options.directiveToken*2
+                compilerSettings['commentStartToken'] = settings.directiveToken*2
             if 'multiLineCommentStartToken' not in compilerSettings:
                 compilerSettings['multiLineCommentStartToken'] = (
-                    options.directiveToken+'*')
+                    settings.directiveToken+'*')
             if 'multiLineCommentEndToken' not in compilerSettings:
                 compilerSettings['multiLineCommentEndToken'] = (
-                    '*'+options.directiveToken)
+                    '*'+settings.directiveToken)
 
-        ## create the intermediate template and return the source code it outputs
-        class Preprocessor:
-            def __init__(self, options):
-                self._options = options
-                
-            def preprocess(self, source, file):
-                options = self._options
-                if not source: # @@TR: this needs improving
-                    if isinstance(file, (str, unicode)): # it's a filename.
-                        f = open(file)
-                        source = f.read()
-                        f.close()
-                    elif hasattr(file, 'read'):
-                        source = file.read()
-                    file = None        
-                
-                templateAPIClass = options.templateAPIClass
-                possibleKwArgs = [
-                    arg for arg in
-                    inspect.getargs(templateAPIClass.compile.im_func.func_code)[0]
-                    if arg not in ('klass', 'source', 'file',)]
-                
-                kwArgs = {}
-                for arg in possibleKwArgs:
-                    if hasattr(options, arg):
-                        kwArgs[arg] = getattr(options, arg)
-
-                tmplClass = templateAPIClass.compile(source=source, file=file, **kwArgs)
-                instance = tmplClass(searchList=options.searchList)
-                source = options.outputTransformer(instance)
-                file = None
-                return source, file
-        return Preprocessor(options)
-    _normalizePreprocessor = classmethod(_normalizePreprocessor)
+        return settings
+    _normalizePreprocessorSettings = classmethod(_normalizePreprocessorSettings)
 
     def _addCheetahPlumbingCodeToClass(klass, concreteTemplateClass):
         """If concreteTemplateClass is not a subclass of Cheetah.Template, add
@@ -1554,9 +1562,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.153 $
+        Version: $Revision: 1.154 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/29 00:21:12 $
+        Last Revision Date: $Date: 2006/01/29 00:46:10 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
