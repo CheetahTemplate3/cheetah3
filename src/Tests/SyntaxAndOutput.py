@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.92 2006/01/29 02:50:20 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.93 2006/01/29 19:09:38 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.92 $
+Version: $Revision: 1.93 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/29 02:50:20 $
+Last Revision Date: $Date: 2006/01/29 19:09:38 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.92 $"[11:-2]
+__revision__ = "$Revision: 1.93 $"[11:-2]
 
 
 ##################################################
@@ -1039,12 +1039,12 @@ class CacheDirective(OutputTest):
     
     def test1(self):
         r"""simple #cache """
-        self.verify("#cache\n$anInt",
+        self.verify("#cache:$anInt",
                     "1")
 
     def test2(self):
         r"""simple #cache + WS"""
-        self.verify("  #cache  \n$anInt",
+        self.verify("  #cache  \n$anInt#end cache",
                     "1")
 
     def test3(self):
@@ -1098,6 +1098,11 @@ class CallDirective(OutputTest):
         r"""simple #call """
         self.verify("#call int\n$anInt#end call",
                     "1")
+        # single line version
+        self.verify("#call int: $anInt",
+                    "1")
+        self.verify("#call int: 10\n$aStr",
+                    "10\nblarg")
 
     def test2(self):
         r"""simple #call + WS"""
@@ -1202,6 +1207,36 @@ $x$y#slurp
 #end call 2
 #end call 1''',
         "12345")
+
+
+
+class I18nDirective(OutputTest):
+    """
+    id = msgid in the translation catalog
+    comment = a comment to the translators
+    domain = translation domain
+    source = source lang
+    target = target lang
+
+    See:
+    http://www.zope.org/DevHome/Wikis/DevSite/Projects/ComponentArchitecture/ZPTInternationalizationSupport
+
+    Other notes:
+     - There is no need to replicate the i18n:name attribute from plone / PTL,
+       as cheetah placeholders serve the same purpose
+    
+    
+    """
+    
+    def test1(self):
+        r"""simple #call """
+        self.verify("#i18n \n$anInt#end i18n",
+                    "1")
+        # single line version
+        self.verify("#i18n: $anInt",
+                    "1")
+        self.verify("#i18n: 10\n$aStr",
+                    "10\nblarg")
 
 
 class CaptureDirective(OutputTest):
@@ -1317,6 +1352,13 @@ class RawDirective(OutputTest):
         self.verify("  #raw  #\n$aFunc().\n   #end raw  #\n$anInt",
                     "  \n$aFunc().\n\n1")
 
+    def test5(self):
+        """single-line short form #raw: """
+        self.verify("#raw: $aFunc().\n\n",
+                    "$aFunc().\n\n")
+
+        self.verify("#raw: $aFunc().\n$anInt",
+                    "$aFunc().\n1")
 
 class BreakpointDirective(OutputTest):
     def test1(self):
@@ -2589,67 +2631,70 @@ class FilterDirective(OutputTest):
     def test1(self):
         """#filter ReplaceNone
         """
-        self.verify("#filter ReplaceNone\n$none",
+        self.verify("#filter ReplaceNone\n$none#end filter",
+                    "")
+
+        self.verify("#filter ReplaceNone: $none",
                     "")
 
     def test2(self):
         """#filter ReplaceNone with WS
         """
-        self.verify("#filter ReplaceNone  \n$none",
+        self.verify("#filter ReplaceNone  \n$none#end filter",
                     "")
 
     def test3(self):
         """#filter MaxLen -- maxlen of 5"""
 
-        self.verify("#filter MaxLen  \n${tenDigits, $maxlen=5}",
+        self.verify("#filter MaxLen  \n${tenDigits, $maxlen=5}#end filter",
                     "12345")
 
     def test4(self):
         """#filter MaxLen -- no maxlen
         """
-        self.verify("#filter MaxLen  \n${tenDigits}",
+        self.verify("#filter MaxLen  \n${tenDigits}#end filter",
                     "1234567890")
 
     def test5(self):
         """#filter WebSafe -- basic usage
         """
-        self.verify("#filter WebSafe  \n$webSafeTest",
+        self.verify("#filter WebSafe  \n$webSafeTest#end filter",
                     "abc &lt;=&gt; &amp;")
 
     def test6(self):
         """#filter WebSafe -- also space
         """
-        self.verify("#filter WebSafe  \n${webSafeTest, $also=' '}",
+        self.verify("#filter WebSafe  \n${webSafeTest, $also=' '}#end filter",
                     "abc&nbsp;&lt;=&gt;&nbsp;&amp;")
         
     def test7(self):
         """#filter WebSafe -- also space, without $ on the args
         """
-        self.verify("#filter WebSafe  \n${webSafeTest, also=' '}",
+        self.verify("#filter WebSafe  \n${webSafeTest, also=' '}#end filter",
                     "abc&nbsp;&lt;=&gt;&nbsp;&amp;")
 
     def test8(self):
         """#filter Strip -- trailing newline
         """
-        self.verify("#filter Strip\n$strip1",
+        self.verify("#filter Strip\n$strip1#end filter",
                     "strippable whitespace\n")
 
     def test9(self):
         """#filter Strip -- no trailing newine
         """
-        self.verify("#filter Strip\n$strip2",
+        self.verify("#filter Strip\n$strip2#end filter",
                     "strippable whitespace")
 
     def test10(self):
         """#filter Strip -- multi-line
         """
-        self.verify("#filter Strip\n$strip3",
+        self.verify("#filter Strip\n$strip3#end filter",
                     "strippable whitespace\n1 2  3\n")
 
     def test11(self):
         """#filter StripSqueeze -- canonicalize all whitespace to ' '
         """
-        self.verify("#filter StripSqueeze\n$strip3",
+        self.verify("#filter StripSqueeze\n$strip3#end filter",
                     "strippable whitespace 1 2 3")
 
 
@@ -2819,6 +2864,19 @@ class CGI(OutputTest):
         del os.environ['QUERY_STRING']
         self._endCGI()
 
+
+
+class WhitespaceAfterDirectiveTokens(OutputTest):
+    def _getCompilerSettings(self):
+        return {'allowWhitespaceAfterDirectiveStartToken':True}
+
+    def test1(self):
+        self.verify("# for i in range(10): $i",
+                    "0123456789")
+        self.verify("# for i in range(10)\n$i# end for",
+                    "0123456789")
+        self.verify("# for i in range(10)#$i#end for",
+                    "0123456789")
 
 
 class Indenter(OutputTest):
