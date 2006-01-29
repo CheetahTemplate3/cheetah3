@@ -5,14 +5,14 @@
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.27 $
+Version: $Revision: 1.28 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2005/01/03 20:04:13 $
+Last Revision Date: $Date: 2006/01/29 07:19:12 $
 """
 
-# $Id: SettingsManager.py,v 1.27 2005/01/03 20:04:13 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.28 2006/01/29 07:19:12 tavis_rudd Exp $
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.27 $"[11:-2]
+__revision__ = "$Revision: 1.28 $"[11:-2]
 
 
 ##################################################
@@ -297,7 +297,7 @@ class _SettingsCollector:
         
         path = self.normalizePath(path)
         dirName = os.path.dirname(path)
-        tmpPath = tempfile.mktemp('webware_temp')
+        tmpPath = tempfile.mkstemp('webware_temp')
         
         pySrc = translateClassBasedConfigSyntax(open(path).read())
         modName = path.replace('.','_').replace('/','_').replace('\\','_')        
