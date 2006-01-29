@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.37 2006/01/07 00:58:47 tavis_rudd Exp $
+# $Id: Servlet.py,v 1.38 2006/01/29 02:09:32 tavis_rudd Exp $
 """Provides an abstract Servlet baseclass for Cheetah's Template class
 
 Meta-Data
@@ -7,12 +7,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.37 $
+Version: $Revision: 1.38 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2006/01/07 00:58:47 $
+Last Revision Date: $Date: 2006/01/29 02:09:32 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.37 $"[11:-2]
+__revision__ = "$Revision: 1.38 $"[11:-2]
 
 import sys
 import os.path
@@ -66,7 +66,7 @@ class Servlet(BaseServlet):
         BaseServlet.__init__(self)
        
         # this default will be changed by the .awake() method
-        self.isControlledByWebKit = False 
+        self._CHEETAH__isControlledByWebKit = False 
         
     ## methods called by Webware during the request-response
         
@@ -74,7 +74,7 @@ class Servlet(BaseServlet):
         BaseServlet.awake(self, transaction)
         
         # a hack to signify that the servlet is being run directly from WebKit
-        self.isControlledByWebKit = True
+        self._CHEETAH__isControlledByWebKit = True
         
         self.transaction = transaction        
         #self.application = transaction.application
@@ -117,7 +117,7 @@ definition.""")
                        abspath=os.path.abspath
                        ):
         
-        if self.isControlledByWebKit:
+        if self._CHEETAH__isControlledByWebKit:
             return BaseServlet.serverSidePath(self, path)
         elif path:
             return normpath(abspath(path.replace("\\",'/')))

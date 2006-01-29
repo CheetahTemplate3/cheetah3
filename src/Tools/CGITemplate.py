@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CGITemplate.py,v 1.5 2005/11/02 22:26:07 tavis_rudd Exp $
+# $Id: CGITemplate.py,v 1.6 2006/01/29 02:09:59 tavis_rudd Exp $
 """A subclass of Cheetah.Template for use in CGI scripts.
 
 Usage in a template:
@@ -32,12 +32,12 @@ Meta-Data
 Author: Mike Orr <iron@mso.oz.net>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/10/03
-Last Revision Date: $Date: 2005/11/02 22:26:07 $
+Last Revision Date: $Date: 2006/01/29 02:09:59 $
 """ 
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 import os
 from Cheetah.Template import Template
@@ -70,7 +70,7 @@ class CGITemplate(Template):
         """Is this a CGI script?
         """
         env = os.environ.has_key('REQUEST_METHOD') 
-        wk = self.isControlledByWebKit
+        wk = self._CHEETAH__isControlledByWebKit
         return env and not wk
 
 
