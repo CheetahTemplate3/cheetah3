@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.152 2006/01/28 23:48:11 tavis_rudd Exp $
+# $Id: Template.py,v 1.153 2006/01/29 00:21:12 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.152 $
+Version: $Revision: 1.153 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/28 23:48:11 $
+Last Revision Date: $Date: 2006/01/29 00:21:12 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.152 $"[11:-2]
+__revision__ = "$Revision: 1.153 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -26,6 +26,7 @@ import os.path
 import time                       # used in the cache refresh code
 from random import randrange
 import imp
+import inspect
 import traceback
 import pprint
 import cgi                # Used by .webInput() if the template is a CGI script.
@@ -491,11 +492,13 @@ class Template(Servlet):
                    - searchList: the searchList used for preprocess $placeholders
                    - compilerSettings: used in the compilation of the intermediate
                      template                
-                   - compiler: used in the compilation of the preprocess template                
+                   - templateAPIClass: an optional subclass of `Template`
                    - outputTransformer: a simple hook for passing in a callable
                      which can do further transformations of the preprocessor
                      output, or do something else like debug logging. The
                      default is str().
+                   + any keyword arguments to Template.compile which you want to
+                     provide for the compilation of the intermediate template.
                      
                    klass = Template.compile(src,
                           preprocessors=[ dict(tokens='@ %', searchList=[...]) ] )
@@ -719,14 +722,6 @@ class Template(Servlet):
         It returns the tuple (source, file) which is then used by
         Template.compile to finish the compilation.
         """
-        if not source: # @@TR: this needs improving
-            if isinstance(file, (str, unicode)): # it's a filename.
-                f = open(file)
-                source = f.read()
-                f.close()
-            elif hasattr(file, 'read'):
-                source = file.read()
-            file = None        
         if not isinstance(preprocessors, (list, tuple)):
             preprocessors = [preprocessors]
         for preprocessor in preprocessors:
@@ -779,7 +774,7 @@ class Template(Servlet):
                 input.get('searchList',
                           input.get('namespaces', [])))            
             for k, v in input.items():
-                setattr(options, k, v)                
+                setattr(options, k, v)   
         else: #it's an options object
             options = input
             if options.get('tokens'):
@@ -797,41 +792,61 @@ class Template(Servlet):
         if not hasattr(options, 'outputTransformer'):
             options.outputTransformer = unicode
 
-        if not hasattr(options, 'compiler'):
-            class PreprocessCompiler(klass): pass
-            options.compiler = PreprocessCompiler
+        if not hasattr(options, 'templateAPIClass'):
+            class PreprocessTemplateAPIClass(klass): pass
+            options.templateAPIClass = PreprocessTemplateAPIClass
 
-        customSettings = getattr(options, 'compilerSettings', {})
-        if (options.placeholderToken and 'cheetahVarStartToken' not in customSettings):
-            customSettings['cheetahVarStartToken'] = options.placeholderToken
+        if not hasattr(options, 'compilerSettings'):
+            options.compilerSettings = {}
+        compilerSettings = options.compilerSettings
+        if (options.placeholderToken and 'cheetahVarStartToken' not in compilerSettings):
+            compilerSettings['cheetahVarStartToken'] = options.placeholderToken
         if options.directiveToken:
-            if 'directiveStartToken' not in customSettings:
-                customSettings['directiveStartToken'] = options.directiveToken
-            if 'commentStartToken' not in customSettings:
-                customSettings['commentStartToken'] = options.directiveToken*2
-            if 'multiLineCommentStartToken' not in customSettings:
-                customSettings['multiLineCommentStartToken'] = (
+            if 'directiveStartToken' not in compilerSettings:
+                compilerSettings['directiveStartToken'] = options.directiveToken
+            if 'commentStartToken' not in compilerSettings:
+                compilerSettings['commentStartToken'] = options.directiveToken*2
+            if 'multiLineCommentStartToken' not in compilerSettings:
+                compilerSettings['multiLineCommentStartToken'] = (
                     options.directiveToken+'*')
-            if 'multiLineCommentEndToken' not in customSettings:
-                customSettings['multiLineCommentEndToken'] = (
+            if 'multiLineCommentEndToken' not in compilerSettings:
+                compilerSettings['multiLineCommentEndToken'] = (
                     '*'+options.directiveToken)
 
+        ## create the intermediate template and return the source code it outputs
         class Preprocessor:
+            def __init__(self, options):
+                self._options = options
+                
             def preprocess(self, source, file):
-                moduleGlobals = getattr(options, 'moduleGlobals', None)
-                templClass = options.compiler.compile(
-                    source=source,
-                    file=file,
-                    compilerSettings=customSettings,
-                    keepRefToGeneratedCode=options.keepRefToGeneratedCode,
-                    moduleGlobals=moduleGlobals,
-                    )
-                instance = templClass(searchList=options.searchList)
+                options = self._options
+                if not source: # @@TR: this needs improving
+                    if isinstance(file, (str, unicode)): # it's a filename.
+                        f = open(file)
+                        source = f.read()
+                        f.close()
+                    elif hasattr(file, 'read'):
+                        source = file.read()
+                    file = None        
+                
+                templateAPIClass = options.templateAPIClass
+                possibleKwArgs = [
+                    arg for arg in
+                    inspect.getargs(templateAPIClass.compile.im_func.func_code)[0]
+                    if arg not in ('klass', 'source', 'file',)]
+                
+                kwArgs = {}
+                for arg in possibleKwArgs:
+                    if hasattr(options, arg):
+                        kwArgs[arg] = getattr(options, arg)
+
+                tmplClass = templateAPIClass.compile(source=source, file=file, **kwArgs)
+                instance = tmplClass(searchList=options.searchList)
                 source = options.outputTransformer(instance)
                 file = None
                 return source, file
-        return Preprocessor()
-    _normalizePreprocessor = classmethod(_normalizePreprocessor)        
+        return Preprocessor(options)
+    _normalizePreprocessor = classmethod(_normalizePreprocessor)
 
     def _addCheetahPlumbingCodeToClass(klass, concreteTemplateClass):
         """If concreteTemplateClass is not a subclass of Cheetah.Template, add
@@ -1539,9 +1554,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.152 $
+        Version: $Revision: 1.153 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/28 23:48:11 $
+        Last Revision Date: $Date: 2006/01/29 00:21:12 $
         """ 
         src = src.lower()
         isCgi = not self.isControlledByWebKit
