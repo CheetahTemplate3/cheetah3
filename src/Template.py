@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.155 2006/01/29 01:22:07 tavis_rudd Exp $
+# $Id: Template.py,v 1.156 2006/01/29 02:09:17 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.155 $
+Version: $Revision: 1.156 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/29 01:22:07 $
+Last Revision Date: $Date: 2006/01/29 02:09:17 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.155 $"[11:-2]
+__revision__ = "$Revision: 1.156 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -223,23 +223,29 @@ class Template(Servlet):
     """
 
     # this is used by ._addCheetahPlumbingCodeToClass()
-    _CHEETAH_requiredCheetahMethods = ('_initCheetahInstance',
-                                           'searchList',
-                                           'errorCatcher',
-                                           'getVar',
-                                           'varExists',
-                                           'getFileContents',
-                                           'runAsMainProgram',
-
-                                           '_getCacheStore',
-                                           '_getCacheStoreIdPrefix',
-                                           '_createCacheRegion',
-                                           'getCacheRegion',
-                                           'getCacheRegions',
-                                           'refreshCache',
-                                           
-                                           '_handleCheetahInclude',
-                                           )
+    _CHEETAH_requiredCheetahMethods = (
+         '_initCheetahInstance',
+         'searchList',
+         'errorCatcher',
+         'getVar',
+         'varExists',
+         'getFileContents',
+         'runAsMainProgram',
+         'respond',
+         'shutdown',
+         'webInput',
+         'serverSidePath',
+         
+         '_getCacheStore',
+         '_getCacheStoreIdPrefix',
+         '_createCacheRegion',
+         'getCacheRegion',
+         'getCacheRegions',
+         'refreshCache',
+         
+         '_handleCheetahInclude',
+         '_getTemplateAPIClassForIncludeDirectiveCompilation',
+         )
     _CHEETAH_requiredCheetahClassMethods = ('subclass',)                                              
     _CHEETAH_requiredCheetahClassAttributes = ('cacheRegionClass','cacheStore',
                                                'cacheStoreIdPrefix','cacheStoreClass')
@@ -1255,7 +1261,7 @@ class Template(Servlet):
 
     def _initCheetahInstance(self,
                              searchList=None,
-                             filter='EncodeUnicode', # which filter from Cheetah.Filters
+                             filter='RawOrEncodedUnicode', # which filter from Cheetah.Filters
                              filtersLib=Filters,
                              errorCatcher=None,
                              _globalSetVars=None,
@@ -1319,6 +1325,7 @@ class Template(Servlet):
             self.transaction = None
         self._CHEETAH__instanceInitialized = True
         self._CHEETAH__isBuffering = False
+        self._CHEETAH__isControlledByWebKit = False 
 
         self._CHEETAH__cacheStore = None
         if self._CHEETAH_cacheStore is not None:
@@ -1366,7 +1373,10 @@ class Template(Servlet):
                 if includeFrom == 'file':
                     source = None
                     if type(srcArg) in StringTypes:
-                        file = path = self.serverSidePath(srcArg)
+                        if hasattr(self, 'serverSidePath'):
+                            file = path = self.serverSidePath(srcArg)
+                        else:
+                            file = path = os.path.normpath(srcArg)
                     else:
                         file = srcArg ## a file-like object
                 else:
@@ -1375,7 +1385,7 @@ class Template(Servlet):
                 # @@TR: might want to provide some syntax for specifying the
                 # Template class to be used for compilation so compilerSettings
                 # can be changed.
-                compiler = self._getTemplateClassForIncludeDirectiveCompilation(source, file)
+                compiler = self._getTemplateAPIClassForIncludeDirectiveCompilation(source, file)
                 nestedTemplateClass = compiler.compile(source=source,file=file)
                 nestedTemplate = nestedTemplateClass(_preBuiltSearchList=self.searchList(),
                                                      _globalSetVars=self._CHEETAH__globalSetVars)
@@ -1392,14 +1402,17 @@ class Template(Servlet):
         else:
             trans.response().write(self._CHEETAH__cheetahIncludes[_includeID])
 
-    def _getTemplateClassForIncludeDirectiveCompilation(self, source, file):
+    def _getTemplateAPIClassForIncludeDirectiveCompilation(self, source, file):
         """Returns the subclass of Template which should be used to compile
         #include directives.
 
         This abstraction allows different compiler settings to be used in the
         included template than were used in the parent.
         """
-        return self.__class__
+        if issubclass(self.__class__, Template):
+            return self.__class__
+        else:
+            return Template
 
     ## functions for using templates as CGI scripts
     def webInput(self, names, namesMulti=(), default='', src='f',
@@ -1578,12 +1591,12 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.155 $
+        Version: $Revision: 1.156 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/29 01:22:07 $
+        Last Revision Date: $Date: 2006/01/29 02:09:17 $
         """ 
         src = src.lower()
-        isCgi = not self.isControlledByWebKit
+        isCgi = not self._CHEETAH__isControlledByWebKit
         if   isCgi and src in ('f', 'v'):
             global _formUsedByWebInput
             if _formUsedByWebInput is None:
