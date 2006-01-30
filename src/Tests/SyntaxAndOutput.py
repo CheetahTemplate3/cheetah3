@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.93 2006/01/29 19:09:38 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.94 2006/01/30 00:48:15 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.93 $
+Version: $Revision: 1.94 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/29 19:09:38 $
+Last Revision Date: $Date: 2006/01/30 00:48:15 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.93 $"[11:-2]
+__revision__ = "$Revision: 1.94 $"[11:-2]
 
 
 ##################################################
@@ -2877,6 +2877,51 @@ class WhitespaceAfterDirectiveTokens(OutputTest):
                     "0123456789")
         self.verify("# for i in range(10)#$i#end for",
                     "0123456789")
+
+
+
+class DefmacroDirective(OutputTest):
+    def test1(self):
+        self.verify("""\
+#defmacro test
+#for i in range(10): @src
+#end defmacro
+#test: $i-foo#slurp
+#for i in range(3): $i""",
+                    "0-foo1-foo2-foo3-foo4-foo5-foo6-foo7-foo8-foo9-foo\n012")
+
+
+        self.verify("""\
+#defmacro test: #for i in range(10): @src
+#test: $i-foo#slurp
+-#for i in range(3): $i""",
+                    "0-foo1-foo2-foo3-foo4-foo5-foo6-foo7-foo8-foo9-foo-012")
+
+        self.verify("""\
+#defmacro test##for i in range(10): @src#end defmacro##slurp
+#test: $i-foo#slurp
+-#for i in range(3): $i""",
+                    "0-foo1-foo2-foo3-foo4-foo5-foo6-foo7-foo8-foo9-foo-012")
+
+        self.verify("""\
+#defmacro testFoo: nothing
+#defmacro test(foo=1234): #for i in range(10): @src
+#test foo=234: $i-foo#slurp
+-#for i in range(3): $i""",
+                    "0-foo1-foo2-foo3-foo4-foo5-foo6-foo7-foo8-foo9-foo-012")
+
+        self.verify("""\
+#defmacro testFoo: nothing
+#defmacro test(foo=1234): #for i in range(10): @src@foo
+#test foo='-foo'#$i#end test#-#for i in range(3): $i""",
+                    "0-foo1-foo2-foo3-foo4-foo5-foo6-foo7-foo8-foo9-foo-012")
+
+        self.verify("""\
+#defmacro testFoo: nothing
+#defmacro test(foo=1234): #for i in range(10): @src.strip()@foo
+#test foo='-foo': $i
+-#for i in range(3): $i""",
+                    "0-foo1-foo2-foo3-foo4-foo5-foo6-foo7-foo8-foo9-foo-012")
 
 
 class Indenter(OutputTest):
