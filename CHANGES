@@ -2,11 +2,17 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-2.0rc3 (Jan 28, 2006)
+2.0rc3 (Jan 29, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      
-    - added short-form single line versions of 
-      #if/#else/#elif, #for, #while, #repeat, #unless, #try, #except, #finally
+    - added short-form single line versions of all directives that have an #end
+      tag, except for #errorCatcher:
+         #if, #else, #elif, #unless,
+         #for, #while, #repeat,  
+	 #try, #except, #finally, 
+	 #cache, #raw
+ 	 #call, #capture
+
       The #def and #block directives already had single-line versions.
           #if cond: foo
 	  #elif cond2: bar
@@ -62,6 +68,18 @@ release
     - changed the default filter to the one that doesn't try to encode Unicode
       It was 'EncodeUnicode' and is now 'RawOrEncodedUnicode'.
 
+    - added optional support for parsing whitespace between the directive start
+      token (#) and directive names, per Christophe Eymard's request.  For the
+      argument behind this see the mailing list archives for Jan 29th.  This is
+      off by default.  You must turn it on using the compiler setting
+      allowWhitespaceAfterDirectiveStartToken=True
+
+        #for $something in $another
+        #  for $somethin2 in $another2
+              blahblah $something in $something2
+        #  end for
+        #end for
+        
     - made the handling of Template.compile()'s preprocessors arg simpler and
       fixed a bug in it.
 
@@ -94,9 +112,124 @@ release
 
     - some under-the-hood refactoring of the parser
     
+    - made it possible to add custom directives, or customize the
+      parsing/handling of existing ones, via the compiler settings
+      'directiveNamesAndParsers' and 'endDirectiveNamesAndHandlers'
+      
+    - added a compile-time macro facility to Cheetah. These macros are very
+      similar to macros in Lisp:
+      http://www.apl.jhu.edu/~hall/Lisp-Notes/Macros.html.  
+
+      As with Lisp macros, they take source code (Cheetah source) as input and
+      return source code (again Cheetah source) as output. They are executed at
+      compile-time, just like in Lisp and C. The resultant code
+      gets executed at run-time.
+
+      The new #defmacro directive allows users to create macros inside the
+      source of their templates.  Macros can also be provided via the compiler
+      setting 'macroDirectives'. The 'macroDirectives' setting allows you to
+      share common macros between templates.  
+
+      The syntax for the opening tag of #defmacro is the same as for #def and
+      #block.  It expects a macro name followed by an optional argument list in
+      brackets.  A `src` argument is automatically added to the beginning of
+      every macro's argument list.  The value of the `src` is the block of
+      input source code that is provided during a macro call (see below).  
+
+        #defmacro <macroname>[(argspec)]
+ 	  <macrobody>
+	#end defmacro
+
+      All of Cheetah's syntax is available for use inside macros, but the
+      placeholderStartToken is @ instead of $ and the
+      directiveStartToken/EndToken is % instead of #.  Any syntax using the
+      standard $/# tokens will be treated as plain text and included in the output
+      of the macro.
+
+      Here are some examples:
+        #defmacro addHeaderFooter
+	  header 
+	  @src 
+	  footer
+	#end defmacro
+
+        #defmacro addHeaderFooter(header='h', footer='f')
+	  @header 
+	  @src 
+	  @footer
+	#end defmacro
+
+      There is a single-line short form like for other directives:
+ 		
+        #defmacro addHeaderFooter: header @src footer
+        #defmacro addHeaderFooter(header='h', footer='f'): @header @src @footer
+     
+      The syntax for calling a macro is similar to the simplest usage of the
+      #call directive:
+
+        #addHeaderFooter
+	  Source $code to wrap
+	#end addHeaderFooter
+
+        #addHeaderFooter: Source $code to wrap
+
+        #addHeaderFooter header='header', footer='footer: Source $code to wrap
+
+
+      In Elisp you write
+        (defmacro inc (var)
+           (list 'setq var (list '1+ var)))
+      to define the macro `inc` and write
+        (inc x)  
+      which expands to 
+        (setq x (1+ x))
+
+      In Cheetah you'd write
+        #defmacro inc: #set @src +=1
+	#inc: $i
+      which expands to 
+        #set $i += 1
+      
+        print Template("""\
+	#defmacro inc: #set @src +=1
+        #set i = 1
+        #inc: $i
+        $i""").strip()==2
+  
     - fixed some bugs related to advanced usage of Template.compile(). These
       were found via new unit tests. No one had actually run into them yet.
 
+    - added the initial bits of an #i18n directive.  It has the same semantics
+      as 
+        #call self.handleI18n
+	  Some $var cheetah source
+	#end call
+      but has a simpler syntax:
+      	#i18n
+	  Some $var cheetah source
+	#end i18n  
+
+	## single-line short form:
+      	#i18n: Some $var cheetah source
+
+      The method it calls, self.handleI18n, is just a stub at the moment, but it
+      will soon be a wrapper around gettext.  It currently has one required
+      positional argument `message`. I anticipate supporting the following
+      optional arguments:
+
+      	   id = msgid in the translation catalog
+	   domain = translation domain
+	   source = source lang
+	   target = a specific target lang
+	   comment = a comment to the translation team
+
+	   plural = the plural form of the message
+	   n = a sized argument to distinguish between single and plural forms
+	   
+      #i18n is executed at runtime, but it can also be used in conjunction with
+      a Cheetah preprocessor or macro (see above) to support compile time
+      translation of strings that don't have to deal with plural forms.
+	   
     - added Cheetah.Utils.htmlEncode and Cheetah.Utils.htmlDecode    
 
     - more docstring text
