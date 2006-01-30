@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.117 2006/01/30 00:57:51 tavis_rudd Exp $
+# $Id: Parser.py,v 1.118 2006/01/30 01:56:23 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.117 $
+Version: $Revision: 1.118 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/30 00:57:51 $
+Last Revision Date: $Date: 2006/01/30 01:56:23 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.117 $"[11:-2]
+__revision__ = "$Revision: 1.118 $"[11:-2]
 
 import os
 import sys
@@ -1237,9 +1237,8 @@ class _HighLevelParser(_LowLevelParser):
         _LowLevelParser.__init__(self, src, filename=filename, breakPoint=breakPoint)
         self.setSettingsManager(compiler)
         self._compiler = compiler
-        self.configureParser()
-        self.initDirectives()
         self.setupState()
+        self.configureParser()
 
     def setupState(self):
         self._macros = {}
@@ -1248,9 +1247,9 @@ class _HighLevelParser(_LowLevelParser):
 
     def configureParser(self):
         _LowLevelParser.configureParser(self)
-        self.initDirectives()
+        self._initDirectives()
     
-    def initDirectives(self):
+    def _initDirectives(self):
         def normalizeParserVal(val):
             if isinstance(val, (str,unicode)):
                 handler = getattr(self, val)
@@ -2136,7 +2135,8 @@ class _HighLevelParser(_LowLevelParser):
         if self.matchColonForSingleLineShortFormDirective():
             self.advance() # skip over :
             self.getWhiteSpace(max=1)
-            srcBlock = self.readToEOL(gobble=True)
+            srcBlock = self.readToEOL(gobble=False)
+            self.readToEOL(gobble=True)
             #self.readToEOL(gobble=False)
         else:
             if self.peek()==':':
