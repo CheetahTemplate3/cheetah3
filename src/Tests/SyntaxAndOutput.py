@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.96 2006/01/30 01:55:20 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.97 2006/01/30 02:12:57 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.96 $
+Version: $Revision: 1.97 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/30 01:55:20 $
+Last Revision Date: $Date: 2006/01/30 02:12:57 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.96 $"[11:-2]
+__revision__ = "$Revision: 1.97 $"[11:-2]
 
 
 ##################################################
@@ -1210,24 +1210,7 @@ $x$y#slurp
 
 
 
-class I18nDirective(OutputTest):
-    """
-    id = msgid in the translation catalog
-    comment = a comment to the translators
-    domain = translation domain
-    source = source lang
-    target = target lang
-
-    See:
-    http://www.zope.org/DevHome/Wikis/DevSite/Projects/ComponentArchitecture/ZPTInternationalizationSupport
-
-    Other notes:
-     - There is no need to replicate the i18n:name attribute from plone / PTL,
-       as cheetah placeholders serve the same purpose
-    
-    
-    """
-    
+class I18nDirective(OutputTest):   
     def test1(self):
         r"""simple #call """
         self.verify("#i18n \n$anInt#end i18n",
