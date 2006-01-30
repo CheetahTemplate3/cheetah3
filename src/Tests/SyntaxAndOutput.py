@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.94 2006/01/30 00:48:15 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.95 2006/01/30 01:40:56 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.94 $
+Version: $Revision: 1.95 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/30 00:48:15 $
+Last Revision Date: $Date: 2006/01/30 01:40:56 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.94 $"[11:-2]
+__revision__ = "$Revision: 1.95 $"[11:-2]
 
 
 ##################################################
@@ -2883,12 +2883,29 @@ class WhitespaceAfterDirectiveTokens(OutputTest):
 class DefmacroDirective(OutputTest):
     def test1(self):
         self.verify("""\
+#defmacro inc: #set @src +=1
+#set i = 1
+#inc: $i
+$i""",
+                    "2")
+
+
+
+        self.verify("""\
 #defmacro test
 #for i in range(10): @src
 #end defmacro
 #test: $i-foo#slurp
 #for i in range(3): $i""",
-                    "0-foo1-foo2-foo3-foo4-foo5-foo6-foo7-foo8-foo9-foo\n012")
+                    "0-foo1-foo2-foo3-foo4-foo5-foo6-foo7-foo8-foo9-foo012")
+
+        self.verify("""\
+#defmacro test
+#for i in range(10): @src
+#end defmacro
+#test: $i-foo
+#for i in range(3): $i""",
+  "0-foo\n1-foo\n2-foo\n3-foo\n4-foo\n5-foo\n6-foo\n7-foo\n8-foo\n9-foo\n012")
 
 
         self.verify("""\
