@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.116 2006/01/30 00:47:04 tavis_rudd Exp $
+# $Id: Parser.py,v 1.117 2006/01/30 00:57:51 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.116 $
+Version: $Revision: 1.117 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/30 00:47:04 $
+Last Revision Date: $Date: 2006/01/30 00:57:51 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.116 $"[11:-2]
+__revision__ = "$Revision: 1.117 $"[11:-2]
 
 import os
 import sys
@@ -1242,6 +1242,8 @@ class _HighLevelParser(_LowLevelParser):
         self.setupState()
 
     def setupState(self):
+        self._macros = {}
+        self._macroDetails = {}
         self._openDirectivesStack = []
 
     def configureParser(self):
@@ -1249,7 +1251,7 @@ class _HighLevelParser(_LowLevelParser):
         self.initDirectives()
     
     def initDirectives(self):
-        def normalizeHandlerVal(val):
+        def normalizeParserVal(val):
             if isinstance(val, (str,unicode)):
                 handler = getattr(self, val)
             elif type(val) in (ClassType, TypeType):
@@ -1261,7 +1263,8 @@ class _HighLevelParser(_LowLevelParser):
             else:
                 raise Exception('Invalid parser/handler value %r for %s'%(val, name))
             return handler
-
+        
+        normalizeHandlerVal = normalizeParserVal
 
         _directiveNamesAndParsers = directiveNamesAndParsers.copy()
         customNamesAndParsers = self.setting('directiveNamesAndParsers',{})
@@ -1275,7 +1278,7 @@ class _HighLevelParser(_LowLevelParser):
         for name, val in _directiveNamesAndParsers.items():
             if val in (False, 0):
                 continue
-            self._directiveNamesAndParsers[name] = normalizeHandlerVal(val)
+            self._directiveNamesAndParsers[name] = normalizeParserVal(val)
 
         self._endDirectiveNamesAndHandlers = {}        
         for name, val in _endDirectiveNamesAndHandlers.items():
@@ -1293,7 +1296,16 @@ class _HighLevelParser(_LowLevelParser):
                                      'for','while','repeat',
                                      'try',
                                      ]
+        for directiveName in self.setting('closeableDirectives',[]):
+            self._closeableDirectives.append(directiveName)
 
+        for macroName, callback in self.setting('macroDirectives',{}).items():
+            if type(callback) in (ClassType, TypeType):
+                callback = callback(self)
+            assert callback                
+            self._macros[macroName] = callback
+            self._directiveNamesAndParsers[macroName] = self.eatMacroCall
+            
     def _applyExpressionFilters(self, expr, exprType, rawExpr=None, startPos=None):
         """Pipes cheetah expressions through a set of optional filter hooks.
 
@@ -2049,10 +2061,7 @@ class _HighLevelParser(_LowLevelParser):
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self._compiler.addInclude(sourceExpr, includeFrom, isRaw)
 
-
-
-    _macroDetails = {}
-    _macros = {}
+    
     def eatDefMacro(self):
         # @@TR: not filtered yet
         isLineClearToStartToken = self.isLineClearToStartToken()
