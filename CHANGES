@@ -240,7 +240,8 @@ release
     - added copies of all the SyntaxAndOutput tests that use a template
       baseclass other than `Template`. This ensures that all syntax & core
       features work with 2.0's support for arbitrary baseclasses.
-
+    - added tests for all the new directives and the new single-line short forms
+  
 2.0rc2 (Jan 13th, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      
