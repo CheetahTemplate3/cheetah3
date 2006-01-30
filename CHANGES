@@ -236,6 +236,7 @@ release
 
   Unit tests: [TR]
     - extended the caching tests
+    - added tests for the various calling styles of Template.compile()
     - added copies of all the SyntaxAndOutput tests that use a template
       baseclass other than `Template`. This ensures that all syntax & core
       features work with 2.0's support for arbitrary baseclasses.
