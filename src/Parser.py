@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.119 2006/01/30 07:02:39 tavis_rudd Exp $
+# $Id: Parser.py,v 1.120 2006/01/30 20:57:18 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.119 $
+Version: $Revision: 1.120 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/30 07:02:39 $
+Last Revision Date: $Date: 2006/01/30 20:57:18 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.119 $"[11:-2]
+__revision__ = "$Revision: 1.120 $"[11:-2]
 
 import os
 import sys
@@ -842,7 +842,7 @@ class _LowLevelParser(SourceReader):
 
     def getCallArgString(self,
                          enclosures=[],  # list of tuples (char, pos), where char is ({ or [ 
-                         useNameMapper=True):
+                         useNameMapper=Unspecified):
 
         """ Get a method/function call argument string. 
 
@@ -850,8 +850,9 @@ class _LowLevelParser(SourceReader):
         """
 
         # @@TR: this settings mangling should be removed
-        useNameMapper_orig = self.setting('useNameMapper')
-        self.setSetting('useNameMapper', useNameMapper)
+        if useNameMapper is not Unspecified:
+            useNameMapper_orig = self.setting('useNameMapper')
+            self.setSetting('useNameMapper', useNameMapper)
         
         if enclosures:
             pass
@@ -914,7 +915,9 @@ class _LowLevelParser(SourceReader):
                 token = self.transformToken(token, beforeTokenPos)
                 addBit(token)
 
-        self.setSetting('useNameMapper', useNameMapper_orig) # @@TR: see comment above
+        if useNameMapper is not Unspecified:
+            self.setSetting('useNameMapper', useNameMapper_orig) # @@TR: see comment above
+
         return ''.join(argStringBits)
     
     def getDefArgList(self, exitPos=None, useNameMapper=False):
