@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.163 2006/01/30 00:47:54 tavis_rudd Exp $
+# $Id: Template.py,v 1.164 2006/01/30 01:55:09 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.163 $
+Version: $Revision: 1.164 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/30 00:47:54 $
+Last Revision Date: $Date: 2006/01/30 01:55:09 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.163 $"[11:-2]
+__revision__ = "$Revision: 1.164 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -77,6 +77,28 @@ except ImportError:
     
 class Error(Exception):  pass
 class PreprocessError(Error): pass
+
+def hashList(l):
+    hashedList = []
+    for v in l:
+        if isinstance(v, dict):
+            v = hashedList(v)
+        elif isinstance(v, list):
+            v = hashedList(v)
+        hashedList.append(v)
+    return hash(tuple(hashedList))
+
+def hashDict(d):
+    items = d.items()
+    items.sort()
+    hashedList = []
+    for k, v in items:
+        if isinstance(v, dict):
+            v = hashDict(v)
+        elif isinstance(v, list):
+            v = hashedList(v)
+        hashedList.append((k,v))
+    return hash(tuple(hashedList))
 
 ################################################################################
 ## MODULE GLOBALS AND CONSTANTS
@@ -654,18 +676,14 @@ class Template(Servlet):
 
         cacheHash = None
         cachedResults = None
-        if source or isinstance(file, (str, unicode)):
+        if source or isinstance(file, (str, unicode)):                
             compilerSettingsHash = None
             if compilerSettings:
-                items = compilerSettings.items()
-                items.sort()
-                compilerSettingsHash = hash(tuple(items))
+                compilerSettingsHash = hashDict(compilerSettings)
 
             moduleGlobalsHash = None
             if moduleGlobals:
-                items = moduleGlobals.items()
-                items.sort()
-                moduleGlobalsHash = hash(tuple(items))
+                moduleGlobalsHash = hashDict(moduleGlobals)
 
             fileHash = None
             if file:
@@ -1627,9 +1645,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.163 $
+        Version: $Revision: 1.164 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/30 00:47:54 $
+        Last Revision Date: $Date: 2006/01/30 01:55:09 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
