@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.115 2006/01/29 21:24:49 tavis_rudd Exp $
+# $Id: Parser.py,v 1.116 2006/01/30 00:47:04 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.115 $
+Version: $Revision: 1.116 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/29 21:24:49 $
+Last Revision Date: $Date: 2006/01/30 00:47:04 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.115 $"[11:-2]
+__revision__ = "$Revision: 1.116 $"[11:-2]
 
 import os
 import sys
@@ -171,6 +171,7 @@ directiveNamesAndParsers = {
     'def': 'eatDef',
     'block': 'eatBlock',
     '@': 'eatDecorator',
+    'defmacro': 'eatDefMacro',
     
     'closure': 'eatClosure',
     
@@ -841,12 +842,16 @@ class _LowLevelParser(SourceReader):
 
     def getCallArgString(self,
                          enclosures=[],  # list of tuples (char, pos), where char is ({ or [ 
-                         ):
+                         useNameMapper=True):
 
         """ Get a method/function call argument string. 
 
         This method understands *arg, and **kw
         """
+
+        # @@TR: this settings mangling should be removed
+        useNameMapper_orig = self.setting('useNameMapper')
+        self.setSetting('useNameMapper', useNameMapper)
         
         if enclosures:
             pass
@@ -909,6 +914,7 @@ class _LowLevelParser(SourceReader):
                 token = self.transformToken(token, beforeTokenPos)
                 addBit(token)
 
+        self.setSetting('useNameMapper', useNameMapper_orig) # @@TR: see comment above
         return ''.join(argStringBits)
     
     def getDefArgList(self, exitPos=None, useNameMapper=False):
@@ -1277,7 +1283,7 @@ class _HighLevelParser(_LowLevelParser):
                 continue
             self._endDirectiveNamesAndHandlers[name] = normalizeHandlerVal(val)
         
-        self._closeableDirectives = ['def','block','closure',
+        self._closeableDirectives = ['def','block','closure','defmacro',
                                      'call',
                                      'capture',
                                      'cache',
@@ -2043,6 +2049,118 @@ class _HighLevelParser(_LowLevelParser):
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self._compiler.addInclude(sourceExpr, includeFrom, isRaw)
 
+
+
+    _macroDetails = {}
+    _macros = {}
+    def eatDefMacro(self):
+        # @@TR: not filtered yet
+        isLineClearToStartToken = self.isLineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        self.getDirectiveStartToken()
+        self.advance(len('defmacro'))
+
+        self.getWhiteSpace()
+        if self.matchCheetahVarStart():
+            self.getCheetahVarStartToken()
+        macroName = self.getIdentifier()
+        self.getWhiteSpace()
+        if self.peek() == '(':
+            argsList = self.getDefArgList(useNameMapper=False)
+            self.advance()              # past the closing ')'
+            if argsList and argsList[0][0] == 'self':
+                del argsList[0]
+        else:
+            argsList=[]
+
+        assert not self._directiveNamesAndParsers.has_key(macroName)
+        argsList.insert(0, ('src',None))
+        
+        if self.matchColonForSingleLineShortFormDirective():
+            self.advance() # skip over :
+            self.getWhiteSpace(max=1)
+            macroSrc = self.readToEOL(gobble=False)
+            self.readToEOL(gobble=True)
+        else:
+            if self.peek()==':':
+                self.advance()
+            self.getWhiteSpace()
+            self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
+            macroSrc = self._eatToThisEndDirective('defmacro')
+
+        #print argsList
+        normalizedMacroSrc = ''.join(
+            ['%def callMacro('+','.join([defv and '%s=%s'%(n,defv) or n
+                                         for n,defv in argsList])
+             +')\n',
+             macroSrc,
+             '%end def'])
+        
+        from Cheetah.Template import Template
+        compilerSettings = {}
+        Template._updateSettingsWithPreprocessTokens(
+            compilerSettings, placeholderToken='@', directiveToken='%')
+        macroTemplateClass = Template.compile(source=normalizedMacroSrc,
+                                              compilerSettings=compilerSettings)
+        #print normalizedMacroSrc
+        #t = macroTemplateClass()
+        #print t.callMacro('src')
+        #print t.generatedClassCode()
+        
+        class MacroDetails: pass
+        macroDetails = MacroDetails()
+        macroDetails.macroSrc = macroSrc
+        macroDetails.argsList = argsList
+        macroDetails.template = macroTemplateClass()
+
+        self._macroDetails[macroName] = macroDetails
+        self._macros[macroName] = macroDetails.template.callMacro
+        self._directiveNamesAndParsers[macroName] = self.eatMacroCall
+
+    def eatMacroCall(self):
+        isLineClearToStartToken = self.isLineClearToStartToken()
+        endOfFirstLinePos = self.findEOL()
+        self.getDirectiveStartToken()
+        macroName = self.getIdentifier()
+        self.getWhiteSpace()
+        args = self.getExpression(pyTokensToBreakAt=[':']).strip()
+        if self.matchColonForSingleLineShortFormDirective():
+            self.advance() # skip over :
+            self.getWhiteSpace(max=1)
+            srcBlock = self.readToEOL(gobble=True)
+            #self.readToEOL(gobble=False)
+        else:
+            if self.peek()==':':
+                self.advance()
+            self.getWhiteSpace()
+            self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
+            srcBlock = self._eatToThisEndDirective(macroName)
+
+        def getArgs(*pargs, **kws):
+            return pargs, kws
+        exec 'positionalArgs, kwArgs = getArgs(%(args)s)'%locals()
+        assert not kwArgs.has_key('src')
+        kwArgs['src']=srcBlock
+        srcFromMacroOutput = self._macros[macroName](**kwArgs)
+
+        origParseSrc = self._src
+        origBreakPoint = self.breakPoint()
+        origPos = self.pos()
+        # add a comment to the output about the macro src that is being parsed
+        # or add a comment prefix to all the comments added by the compiler
+        self._src = srcFromMacroOutput
+        self.setPos(0)
+        self.setBreakPoint(len(srcFromMacroOutput))
+
+        self.parse()
+        
+        self._src = origParseSrc
+        self.setBreakPoint(origBreakPoint)
+        self.setPos(origPos)                
+
+
+        #self._compiler.addRawText('end')
+        
     def eatCache(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
