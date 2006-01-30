@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.162 2006/01/29 19:29:47 tavis_rudd Exp $
+# $Id: Template.py,v 1.163 2006/01/30 00:47:54 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.162 $
+Version: $Revision: 1.163 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/29 19:29:47 $
+Last Revision Date: $Date: 2006/01/30 00:47:54 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.162 $"[11:-2]
+__revision__ = "$Revision: 1.163 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -877,29 +877,36 @@ class Template(Servlet):
 
         if not hasattr(settings, 'compilerSettings'):
             settings.compilerSettings = {}
-            
-        compilerSettings = settings.compilerSettings
-        if (settings.placeholderToken and 'cheetahVarStartToken' not in compilerSettings):
-            compilerSettings['cheetahVarStartToken'] = settings.placeholderToken
-        if settings.directiveToken:
-            if 'directiveStartToken' not in compilerSettings:
-                compilerSettings['directiveStartToken'] = settings.directiveToken
-            if 'directiveEndToken' not in compilerSettings:
-                compilerSettings['directiveEndToken'] = settings.directiveToken
-            if 'commentStartToken' not in compilerSettings:
-                compilerSettings['commentStartToken'] = settings.directiveToken*2
-            if 'multiLineCommentStartToken' not in compilerSettings:
-                compilerSettings['multiLineCommentStartToken'] = (
-                    settings.directiveToken+'*')
-            if 'multiLineCommentEndToken' not in compilerSettings:
-                compilerSettings['multiLineCommentEndToken'] = (
-                    '*'+settings.directiveToken)
-            if 'EOLSlurpToken' not in compilerSettings:
-                compilerSettings['EOLSlurpToken'] = settings.directiveToken
-                
-            
+
+        klass._updateSettingsWithPreprocessTokens(
+            compilerSettings=settings.compilerSettings,
+            placeholderToken=settings.placeholderToken,
+            directiveToken=settings.directiveToken
+            )                            
         return settings
     _normalizePreprocessorSettings = classmethod(_normalizePreprocessorSettings)
+
+    def _updateSettingsWithPreprocessTokens(
+        klass, compilerSettings, placeholderToken, directiveToken):
+        
+        if (placeholderToken and 'cheetahVarStartToken' not in compilerSettings):
+            compilerSettings['cheetahVarStartToken'] = placeholderToken
+        if directiveToken:
+            if 'directiveStartToken' not in compilerSettings:
+                compilerSettings['directiveStartToken'] = directiveToken
+            if 'directiveEndToken' not in compilerSettings:
+                compilerSettings['directiveEndToken'] = directiveToken
+            if 'commentStartToken' not in compilerSettings:
+                compilerSettings['commentStartToken'] = directiveToken*2
+            if 'multiLineCommentStartToken' not in compilerSettings:
+                compilerSettings['multiLineCommentStartToken'] = (
+                    directiveToken+'*')
+            if 'multiLineCommentEndToken' not in compilerSettings:
+                compilerSettings['multiLineCommentEndToken'] = (
+                    '*'+directiveToken)
+            if 'EOLSlurpToken' not in compilerSettings:
+                compilerSettings['EOLSlurpToken'] = directiveToken
+    _updateSettingsWithPreprocessTokens = classmethod(_updateSettingsWithPreprocessTokens)
 
     def _addCheetahPlumbingCodeToClass(klass, concreteTemplateClass):
         """If concreteTemplateClass is not a subclass of Cheetah.Template, add
@@ -1620,9 +1627,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.162 $
+        Version: $Revision: 1.163 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/29 19:29:47 $
+        Last Revision Date: $Date: 2006/01/30 00:47:54 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
