@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.118 2006/01/30 01:56:23 tavis_rudd Exp $
+# $Id: Parser.py,v 1.119 2006/01/30 07:02:39 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.118 $
+Version: $Revision: 1.119 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/30 01:56:23 $
+Last Revision Date: $Date: 2006/01/30 07:02:39 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.118 $"[11:-2]
+__revision__ = "$Revision: 1.119 $"[11:-2]
 
 import os
 import sys
@@ -2160,9 +2160,9 @@ class _HighLevelParser(_LowLevelParser):
         self._src = srcFromMacroOutput
         self.setPos(0)
         self.setBreakPoint(len(srcFromMacroOutput))
-
-        self.parse()
         
+        self.parse(assertEmptyStack=False)
+
         self._src = origParseSrc
         self.setBreakPoint(origBreakPoint)
         self.setPos(origPos)                
