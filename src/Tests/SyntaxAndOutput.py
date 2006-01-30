@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.97 2006/01/30 02:12:57 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.98 2006/01/30 02:37:14 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.97 $
+Version: $Revision: 1.98 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/30 02:12:57 $
+Last Revision Date: $Date: 2006/01/30 02:37:14 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.97 $"[11:-2]
+__revision__ = "$Revision: 1.98 $"[11:-2]
 
 
 ##################################################
@@ -628,17 +628,20 @@ class Placeholders(OutputTest):
         names = namesStr.split()
 
         tmpl = Template.compile('#for name in $names: $name ', baseclass=dict)
-        assert str(tmpl(names=names)).strip()==namesStr
+        assert str(tmpl({'names':names})).strip()==namesStr
 
         tmpl = tmpl.subclass('#for name in $names: $*name ')
-        assert str(tmpl(names=names))=='You '*len(names)
+        assert str(tmpl({'names':names}))=='You '*len(names)
 
         tmpl = tmpl.subclass('#for name in $names: $*1*name ')
-        assert str(tmpl(names=names))=='You '*len(names)
+        assert str(tmpl({'names':names}))=='You '*len(names)
 
         tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
-        assert str(tmpl(names=names))=='You '*len(names)
+        assert str(tmpl({'names':names}))=='You '*len(names)
 
+        if versionTuple > (2,2):
+            tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
+            assert str(tmpl(names=names))=='You '*len(names)
 
 class Placeholders_Vals(OutputTest):
     convertEOLs = False
@@ -1761,6 +1764,9 @@ class DecoratorDirective(OutputTest):
             pass
         else:
             self.fail('should raise a ParseError')
+
+if versionTuple < (2,4):
+    del DecoratorDirective
 
 class BlockDirective(OutputTest):
 
@@ -3026,7 +3032,8 @@ public class X
 
 ##################################################
 ## CREATE CONVERTED EOL VERSIONS OF THE TEST CASES
-if OutputTest._useNewStyleCompilation:
+
+if OutputTest._useNewStyleCompilation and versionTuple >= (2,3):
     extraCompileKwArgsForDiffBaseclass = {'baseclass':dict}
 else:
     extraCompileKwArgsForDiffBaseclass = {'baseclass':object}
@@ -3043,7 +3050,7 @@ for klass in [var for var in globals().values()
         exec win32Src+'\n'
         exec macSrc+'\n'
 
-    if True:        
+    if versionTuple >= (2,3):
         src = r"class %(name)s_DiffBaseClass(%(name)s): "%locals()
         src += " _extraCompileKwArgs = extraCompileKwArgsForDiffBaseclass"
         exec src+'\n'

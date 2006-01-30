@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.13 2006/01/29 19:15:54 tavis_rudd Exp $
+# $Id: Template.py,v 1.14 2006/01/30 02:37:01 tavis_rudd Exp $
 """Tests of the Template class API
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>,
-Version: $Revision: 1.13 $
+Version: $Revision: 1.14 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2006/01/29 19:15:54 $
+Last Revision Date: $Date: 2006/01/30 02:37:01 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.13 $"[11:-2]
+__revision__ = "$Revision: 1.14 $"[11:-2]
 
 
 ##################################################
@@ -27,6 +27,9 @@ from Cheetah.Template import Template
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
+
+majorVer, minorVer = sys.version_info[0], sys.version_info[1]
+versionTuple = (majorVer, minorVer)
 
 try:
     True,False
@@ -73,6 +76,8 @@ class ClassMethods_compile(TemplateTest):
         assert str(t)=='1234'
 
     def test_moduleFileCaching(self):
+        if versionTuple < (2,3):
+            return
         tmpDir = tempfile.mkdtemp()
         try:
             #print tmpDir
@@ -216,7 +221,9 @@ class Preprocessors(TemplateTest):
         $(@foo*10)
         @a'''
         src = '\n'.join([ln.strip() for ln in src.splitlines()])
-        preprocessors = dict(tokens='@ %', namespaces=dict(a=99))
+        preprocessors = {'tokens':'@ %',
+                         'namespaces':{'a':99}
+                         }
         klass = Template.compile(src, preprocessors=preprocessors)
         assert str(klass())=='990\n99'
 
@@ -242,10 +249,12 @@ class Preprocessors(TemplateTest):
                             }
         
         for arg in ['@ %',
-                    dict(tokens='@ %'),
-                    dict(compilerSettings=compilerSettings),
-                    dict(compilerSettings=compilerSettings, templateInitArgs={}),                    
-                    dict(tokens='@ %', templateAPIClass=TemplateSubclass),
+                    {'tokens':'@ %'},
+                    {'compilerSettings':compilerSettings},
+                    {'compilerSettings':compilerSettings,
+                     'templateInitArgs':{}},
+                    {'tokens':'@ %',
+                     'templateAPIClass':TemplateSubclass},
                     Settings1,
                     preprocObj,
                     preprocFunc,                    
@@ -265,8 +274,9 @@ class Preprocessors(TemplateTest):
         $func(lambda x:c"--$x--@a")'''
         src = '\n'.join([ln.strip() for ln in src.splitlines()])
 
-        for arg in [dict(tokens='@ %', namespaces=dict(a=99)),
-                    dict(tokens='@ %', searchList=dict(a=99)),
+        
+        for arg in [{'tokens':'@ %', 'namespaces':{'a':99} },
+                    {'tokens':'@ %', 'namespaces':{'a':99} },
                     ]:
             klass = Template.compile(src, preprocessors=arg)
             t = klass()
