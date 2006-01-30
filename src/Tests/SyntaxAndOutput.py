@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.95 2006/01/30 01:40:56 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.96 2006/01/30 01:55:20 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.95 $
+Version: $Revision: 1.96 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/30 01:40:56 $
+Last Revision Date: $Date: 2006/01/30 01:55:20 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.95 $"[11:-2]
+__revision__ = "$Revision: 1.96 $"[11:-2]
 
 
 ##################################################
@@ -2881,6 +2881,13 @@ class WhitespaceAfterDirectiveTokens(OutputTest):
 
 
 class DefmacroDirective(OutputTest):
+    def _getCompilerSettings(self):
+        def aMacro(src):
+            return '$aStr'
+        
+        return {'macroDirectives':{'aMacro':aMacro
+                                   }}
+
     def test1(self):
         self.verify("""\
 #defmacro inc: #set @src +=1
@@ -2939,6 +2946,10 @@ $i""",
 #test foo='-foo': $i
 -#for i in range(3): $i""",
                     "0-foo1-foo2-foo3-foo4-foo5-foo6-foo7-foo8-foo9-foo-012")
+
+    def test2(self):
+        self.verify("#aMacro: foo",
+                    "blarg")
 
 
 class Indenter(OutputTest):
