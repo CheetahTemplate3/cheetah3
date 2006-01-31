@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.120 2006/01/30 20:57:18 tavis_rudd Exp $
+# $Id: Parser.py,v 1.121 2006/01/31 05:05:31 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.120 $
+Version: $Revision: 1.121 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/30 20:57:18 $
+Last Revision Date: $Date: 2006/01/31 05:05:31 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.120 $"[11:-2]
+__revision__ = "$Revision: 1.121 $"[11:-2]
 
 import os
 import sys
@@ -26,6 +26,7 @@ from types import StringType, ListType, TupleType, ClassType, TypeType
 import time
 from tokenize import pseudoprog
 import inspect
+import new
 
 from Cheetah.SourceReader import SourceReader
 from Cheetah import Filters
@@ -159,7 +160,6 @@ directiveNamesAndParsers = {
     'filter': 'eatFilter',
     'echo': None,
     'silent': None,
-    'i18n': 'eatI18n',
     
     'call': 'eatCall',
     'arg': 'eatCallArg',
@@ -220,7 +220,6 @@ endDirectiveNamesAndHandlers = {
     'block': None,              # has short-form
     'closure': None,            # has short-form
     'cache': None,              # has short-form
-    'i18n': None,               # has short-form
     'call': None,               # has short-form
     'capture': None,            # has short-form
     'filter': None,
@@ -353,10 +352,12 @@ class _LowLevelParser(SourceReader):
             return self._settingsManager.setting(key)
         else:
             return self._settingsManager.setting(key, default=default)
-            
         
     def setSetting(self, key, val):
         self._settingsManager.setSetting(key, val)
+
+    def settings(self):
+        return self._settingsManager.settings()
         
     def updateSettings(self, settings):
         self._settingsManager.updateSettings(settings)
@@ -1244,9 +1245,18 @@ class _HighLevelParser(_LowLevelParser):
         self.configureParser()
 
     def setupState(self):
-        self._macros = {}
+        self._macros = {}        
         self._macroDetails = {}
         self._openDirectivesStack = []
+
+    def cleanup(self):
+        """Cleanup to remove any possible reference cycles
+        """
+        self._macros.clear()
+        for macroname, macroDetails in self._macroDetails.items():
+            macroDetails.template.shutdown()
+            del macroDetails.template
+        self._macroDetails.clear()
 
     def configureParser(self):
         _LowLevelParser.configureParser(self)
@@ -1293,7 +1303,6 @@ class _HighLevelParser(_LowLevelParser):
                                      'capture',
                                      'cache',
                                      'filter',
-                                     'i18n',
                                      'if','unless',
                                      'for','while','repeat',
                                      'try',
@@ -1301,9 +1310,16 @@ class _HighLevelParser(_LowLevelParser):
         for directiveName in self.setting('closeableDirectives',[]):
             self._closeableDirectives.append(directiveName)
 
-        for macroName, callback in self.setting('macroDirectives',{}).items():
+
+
+        macroDirectives = self.setting('macroDirectives',{})
+        from Cheetah.Macros.I18n import I18n
+        macroDirectives['i18n'] = I18n
+
+
+        for macroName, callback in macroDirectives.items():
             if type(callback) in (ClassType, TypeType):
-                callback = callback(self)
+                callback = callback(parser=self)
             assert callback                
             self._macros[macroName] = callback
             self._directiveNamesAndParsers[macroName] = self.eatMacroCall
@@ -1646,8 +1662,6 @@ class _HighLevelParser(_LowLevelParser):
                 self._compiler.endCaptureRegion()
             elif key == 'cache':
                 self._compiler.endCacheRegion()
-            elif key == 'i18n':
-                self._compiler.endI18nRegion()
             elif key == 'call':
                 self._compiler.endCallRegion()
             elif key == 'filter':
@@ -2086,6 +2100,13 @@ class _HighLevelParser(_LowLevelParser):
 
         assert not self._directiveNamesAndParsers.has_key(macroName)
         argsList.insert(0, ('src',None))
+        argsList.append(('parser','None'))
+        argsList.append(('macros','None'))
+        argsList.append(('compilerSettings','None'))
+        argsList.append(('isShortForm','None'))
+        argsList.append(('EOLCharsInShortForm','None'))        
+        argsList.append(('startPos','None'))
+        argsList.append(('endPos','None'))
         
         if self.matchColonForSingleLineShortFormDirective():
             self.advance() # skip over :
@@ -2106,13 +2127,22 @@ class _HighLevelParser(_LowLevelParser):
              +')\n',
              macroSrc,
              '%end def'])
+
         
         from Cheetah.Template import Template
-        compilerSettings = {}
-        Template._updateSettingsWithPreprocessTokens(
+        templateAPIClass = self.setting('templateAPIClassForDefMacro', default=Template)
+        compilerSettings = self.setting('compilerSettingsForDefMacro', default={})
+        searchListForMacros = self.setting('searchListForDefMacro', default=[])
+        searchListForMacros = list(searchListForMacros) # copy to avoid mutation bugs
+        searchListForMacros.append({'macros':self._macros,
+                                    'parser':self,
+                                    'compilerSettings':self.settings(),                                    
+                                    })
+        
+        templateAPIClass._updateSettingsWithPreprocessTokens(
             compilerSettings, placeholderToken='@', directiveToken='%')
-        macroTemplateClass = Template.compile(source=normalizedMacroSrc,
-                                              compilerSettings=compilerSettings)
+        macroTemplateClass = templateAPIClass.compile(source=normalizedMacroSrc,
+                                                      compilerSettings=compilerSettings)
         #print normalizedMacroSrc
         #t = macroTemplateClass()
         #print t.callMacro('src')
@@ -2122,7 +2152,7 @@ class _HighLevelParser(_LowLevelParser):
         macroDetails = MacroDetails()
         macroDetails.macroSrc = macroSrc
         macroDetails.argsList = argsList
-        macroDetails.template = macroTemplateClass()
+        macroDetails.template = macroTemplateClass(searchList=searchListForMacros)
 
         self._macroDetails[macroName] = macroDetails
         self._macros[macroName] = macroDetails.template.callMacro
@@ -2131,29 +2161,72 @@ class _HighLevelParser(_LowLevelParser):
     def eatMacroCall(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
+        startPos = self.pos()
         self.getDirectiveStartToken()
         macroName = self.getIdentifier()
-        self.getWhiteSpace()
-        args = self.getExpression(pyTokensToBreakAt=[':']).strip()
+        macro = self._macros[macroName]
+        if hasattr(macro, 'parse'):
+            return macro.parse(parser=self, startPos=startPos)
+        
+        if hasattr(macro, 'parseArgs'):
+            args = macro.parseArgs(parser=self, startPos=startPos)
+        else:
+            self.getWhiteSpace()
+            args = self.getExpression(useNameMapper=False,
+                                      pyTokensToBreakAt=[':']).strip()
+
         if self.matchColonForSingleLineShortFormDirective():
+            isShortForm = True
             self.advance() # skip over :
             self.getWhiteSpace(max=1)
             srcBlock = self.readToEOL(gobble=False)
-            self.readToEOL(gobble=True)
+            EOLCharsInShortForm = self.readToEOL(gobble=True)
             #self.readToEOL(gobble=False)
         else:
+            isShortForm = False
             if self.peek()==':':
                 self.advance()
             self.getWhiteSpace()
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
             srcBlock = self._eatToThisEndDirective(macroName)
 
-        def getArgs(*pargs, **kws):
-            return pargs, kws
-        exec 'positionalArgs, kwArgs = getArgs(%(args)s)'%locals()
+
+        if hasattr(macro, 'convertArgStrToDict'):
+            kwArgs = macro.convertArgStrToDict(args, parser=self, startPos=startPos)
+        else:
+            def getArgs(*pargs, **kws):
+                return pargs, kws
+            exec 'positionalArgs, kwArgs = getArgs(%(args)s)'%locals()
+
         assert not kwArgs.has_key('src')
-        kwArgs['src']=srcBlock
-        srcFromMacroOutput = self._macros[macroName](**kwArgs)
+        kwArgs['src'] = srcBlock
+
+        if type(macro)==new.instancemethod:
+            co = macro.im_func.func_code
+        elif (hasattr(macro, '__call__')
+              and type(macro.__call__)==new.instancemethod):
+            co = macro.__call__.im_func.func_code
+        else:
+            co = macro.func_code
+        availableKwArgs = inspect.getargs(co)[0]
+        
+        if 'parser' in availableKwArgs:
+            kwArgs['parser'] = self
+        if 'macros' in availableKwArgs:
+            kwArgs['macros'] = self._macros
+        if 'compilerSettings' in availableKwArgs:
+            kwArgs['compilerSettings'] = self.settings()
+        if 'isShortForm' in availableKwArgs:
+            kwArgs['isShortForm'] = isShortForm
+        if isShortForm and 'EOLCharsInShortForm' in availableKwArgs:
+            kwArgs['EOLCharsInShortForm'] = EOLCharsInShortForm
+
+        if 'startPos' in availableKwArgs:
+            kwArgs['startPos'] = startPos
+        if 'endPos' in availableKwArgs:
+            kwArgs['endPos'] = self.pos()
+
+        srcFromMacroOutput = macro(**kwArgs)
 
         origParseSrc = self._src
         origBreakPoint = self.breakPoint()
@@ -2200,31 +2273,7 @@ class _HighLevelParser(_LowLevelParser):
             self.getWhiteSpace()            
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
             self.pushToOpenDirectivesStack('cache')
-            startCache()
-
-    def eatI18n(self):
-        isLineClearToStartToken = self.isLineClearToStartToken()
-        endOfFirstLinePos = self.findEOL()
-        lineCol = self.getRowCol()
-        self.getDirectiveStartToken()
-        self.advance(len('i18n'))
-        startPos = self.pos()
-        args = self.getExpression(pyTokensToBreakAt=[':']).strip()        
-        args = self._applyExpressionFilters(args, 'i18n', startPos=startPos)
-        if self.matchColonForSingleLineShortFormDirective():            
-            self.advance() # skip over :
-            self.getWhiteSpace(max=1)
-            self._compiler.startI18nRegion(args, lineCol)
-            self.parse(breakPoint=self.findEOL(gobble=True))
-            self._compiler.endI18nRegion()
-        else:
-            if self.peek()==':':
-                self.advance()
-            self.getWhiteSpace()            
-            self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
-            self.pushToOpenDirectivesStack('i18n')
-            self._compiler.startI18nRegion(args, lineCol)
-        
+            startCache()        
 
     def eatCall(self):
         # @@TR: need to enable single line version of this
