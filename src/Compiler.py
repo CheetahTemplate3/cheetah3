@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.141 2006/01/30 00:58:10 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.142 2006/01/31 05:02:32 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.141 $
+Version: $Revision: 1.142 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/30 00:58:10 $
+Last Revision Date: $Date: 2006/01/31 05:02:32 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.141 $"[11:-2]
+__revision__ = "$Revision: 1.142 $"[11:-2]
 
 import sys
 import os
@@ -117,7 +117,7 @@ DEFAULT_COMPILER_SETTINGS = {
     'templateMetaclass':None, # strictly optional. Only works with new-style baseclasses
 
 
-    'i18NFunctionName':'self.handleI18n',
+    'i18NFunctionName':'self.i18n',
     
     ## These are used in the parser, but I've put them here for the time being to
     ## facilitate separating the parser and compiler:    
@@ -915,13 +915,6 @@ class MethodCompiler(GenUtils):
         self.addChunk('')
         self._callRegionsStack.pop() # attrib of current methodCompiler
 
-    def startI18nRegion(self, args, lineCol):        
-        functionName = self.setting('i18NFunctionName')
-        self.startCallRegion(functionName, args, lineCol, regionTitle='I18N')
-
-    def endI18nRegion(self):
-        self.endCallRegion(regionTitle='I18N')
-
     def nextCaptureRegionID(self):
         return self.nextCacheID()
 
@@ -1626,6 +1619,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self._parser.parse()
         self._swallowClassCompiler(self._popActiveClassCompiler())
         self._compiled = True
+        self._parser.cleanup()
         
     def _spawnClassCompiler(self, className, klass=None):
         if klass is None:
