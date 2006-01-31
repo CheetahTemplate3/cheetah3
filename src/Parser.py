@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.121 2006/01/31 05:05:31 tavis_rudd Exp $
+# $Id: Parser.py,v 1.122 2006/01/31 07:21:10 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.121 $
+Version: $Revision: 1.122 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/31 05:05:31 $
+Last Revision Date: $Date: 2006/01/31 07:21:10 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.121 $"[11:-2]
+__revision__ = "$Revision: 1.122 $"[11:-2]
 
 import os
 import sys
@@ -2204,7 +2204,7 @@ class _HighLevelParser(_LowLevelParser):
         if type(macro)==new.instancemethod:
             co = macro.im_func.func_code
         elif (hasattr(macro, '__call__')
-              and type(macro.__call__)==new.instancemethod):
+              and hasattr(macro.__call__, 'im_func')):
             co = macro.__call__.im_func.func_code
         else:
             co = macro.func_code
