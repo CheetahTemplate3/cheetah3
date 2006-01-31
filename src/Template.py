@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.165 2006/01/30 02:12:38 tavis_rudd Exp $
+# $Id: Template.py,v 1.166 2006/01/31 04:43:34 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.165 $
+Version: $Revision: 1.166 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/30 02:12:38 $
+Last Revision Date: $Date: 2006/01/31 04:43:34 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.165 $"[11:-2]
+__revision__ = "$Revision: 1.166 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -252,7 +252,7 @@ class Template(Servlet):
          'getVar',
          'varExists',
          'getFileContents',
-         'handleI18n',
+         'i18n',
          'runAsMainProgram',
          'respond',
          'shutdown',
@@ -271,7 +271,7 @@ class Template(Servlet):
          '_handleCheetahInclude',
          '_getTemplateAPIClassForIncludeDirectiveCompilation',
          )
-    _CHEETAH_requiredCheetahClassMethods = ('subclass',)                                              
+    _CHEETAH_requiredCheetahClassMethods = ('subclass',) 
     _CHEETAH_requiredCheetahClassAttributes = ('cacheRegionClass','cacheStore',
                                                'cacheStoreIdPrefix','cacheStoreClass')
 
@@ -1283,21 +1283,23 @@ class Template(Servlet):
     hasVar = varExists
 
 
-    def handleI18n(self, message,
-                   id=None, domain=None,
-                   source=None, target=None,
-                   comment=None
-                   ):
+    def i18n(self, message,
+             plural=None, n=None,
+                   
+             id=None, domain=None,
+             source=None, target=None,
+             comment=None
+             ):
         """This is just a stub at this time.
+
+	   plural = the plural form of the message
+	   n = a sized argument to distinguish between single and plural forms           
 
       	   id = msgid in the translation catalog
 	   domain = translation domain
 	   source = source lang
 	   target = a specific target lang
 	   comment = a comment to the translation team
-
-	   plural = the plural form of the message
-	   n = a sized argument to distinguish between single and plural forms
 
         See the following for some ideas
         http://www.zope.org/DevHome/Wikis/DevSite/Projects/ComponentArchitecture/ZPTInternationalizationSupport
@@ -1668,9 +1670,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.165 $
+        Version: $Revision: 1.166 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/30 02:12:38 $
+        Last Revision Date: $Date: 2006/01/31 04:43:34 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
