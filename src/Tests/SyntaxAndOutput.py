@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.98 2006/01/30 02:37:14 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.99 2006/01/31 05:08:10 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.98 $
+Version: $Revision: 1.99 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/30 02:37:14 $
+Last Revision Date: $Date: 2006/01/31 05:08:10 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.98 $"[11:-2]
+__revision__ = "$Revision: 1.99 $"[11:-2]
 
 
 ##################################################
@@ -1218,6 +1218,7 @@ class I18nDirective(OutputTest):
         r"""simple #call """
         self.verify("#i18n \n$anInt#end i18n",
                     "1")
+        
         # single line version
         self.verify("#i18n: $anInt",
                     "1")
@@ -2938,6 +2939,8 @@ $i""",
 
     def test2(self):
         self.verify("#aMacro: foo",
+                    "blarg")
+        self.verify("#defmacro nested: @macros.aMacro(@src)\n#nested: foo",
                     "blarg")
 
 
