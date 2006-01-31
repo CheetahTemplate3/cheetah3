@@ -6,6 +6,7 @@ author = "Tavis Rudd"
 author_email = "cheetahtemplate-discuss@lists.sf.net"
 url = "http://www.CheetahTemplate.org/"
 packages = ['Cheetah',
+            'Cheetah.Macros',            
             'Cheetah.Templates',
             'Cheetah.Tests',
             'Cheetah.Tools',
