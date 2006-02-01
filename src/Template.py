@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.166 2006/01/31 04:43:34 tavis_rudd Exp $
+# $Id: Template.py,v 1.167 2006/02/01 04:57:26 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.166 $
+Version: $Revision: 1.167 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/31 04:43:34 $
+Last Revision Date: $Date: 2006/02/01 04:57:26 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.166 $"[11:-2]
+__revision__ = "$Revision: 1.167 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -82,9 +82,9 @@ def hashList(l):
     hashedList = []
     for v in l:
         if isinstance(v, dict):
-            v = hashedList(v)
+            v = hashDict(v)
         elif isinstance(v, list):
-            v = hashedList(v)
+            v = hashList(v)
         hashedList.append(v)
     return hash(tuple(hashedList))
 
@@ -96,7 +96,7 @@ def hashDict(d):
         if isinstance(v, dict):
             v = hashDict(v)
         elif isinstance(v, list):
-            v = hashedList(v)
+            v = hashList(v)
         hashedList.append((k,v))
     return hash(tuple(hashedList))
 
@@ -1670,9 +1670,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.166 $
+        Version: $Revision: 1.167 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/01/31 04:43:34 $
+        Last Revision Date: $Date: 2006/02/01 04:57:26 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
