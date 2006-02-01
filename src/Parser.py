@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.122 2006/01/31 07:21:10 tavis_rudd Exp $
+# $Id: Parser.py,v 1.123 2006/02/01 05:01:27 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.122 $
+Version: $Revision: 1.123 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/01/31 07:21:10 $
+Last Revision Date: $Date: 2006/02/01 05:01:27 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.122 $"[11:-2]
+__revision__ = "$Revision: 1.123 $"[11:-2]
 
 import os
 import sys
@@ -1211,17 +1211,14 @@ class _LowLevelParser(SourceReader):
                             restOfExpr = restOfExpr[:-1]
                         expr += restOfExpr
             rawPlaceholder = self[startPos: self.pos()]
-            exprToFilter = self._compiler.genPlainVar(nameChunks[:])
-            if restOfExpr:
-                exprToFilter = exprToFilter + WS + restOfExpr
         else:
             expr = self.getExpression(enclosed=True, enclosures=enclosures)
             if expr[-1] == closurePairsRev[enclosureOpenChar]:
                 expr = expr[:-1]
             rawPlaceholder=self[startPos: self.pos()]
-            exprToFilter = expr
             
-        expr = self._applyExpressionFilters(expr,'placeholder',rawExpr=rawPlaceholder,startPos=startPos)
+        expr = self._applyExpressionFilters(expr,'placeholder',
+                                            rawExpr=rawPlaceholder,startPos=startPos)
         for callback in self.setting('postparsePlaceholderHooks'):
             callback(parser=self)
 
