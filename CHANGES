@@ -2,6 +2,16 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0rc4 (Jan 31, 2006)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+  Core Changes: [TR]      
+    - fixed a typo-bug in the compile hashing code in Template.compile() 
+    - improved the macros framework and made it possible to implement macros in
+      Python code so they can be shared between templates
+    - more work on the #i18n directive.  It's now a macro directive.
+    - added new Cheetah.Macros package
+    - more tests
+ 
 2.0rc3 (Jan 29, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      
