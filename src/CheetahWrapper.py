@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.23 2006/01/10 22:03:00 tavis_rudd Exp $
+# $Id: CheetahWrapper.py,v 1.24 2006/02/02 22:33:07 tavis_rudd Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -9,18 +9,18 @@
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.23 $
+Version: $Revision: 1.24 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/10 22:03:00 $
+Last Revision Date: $Date: 2006/02/02 22:33:07 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.23 $"[11:-2]
+__revision__ = "$Revision: 1.24 $"[11:-2]
 
 import getopt, glob, os, pprint, re, shutil, sys
 import cPickle as pickle
 
 from Cheetah.Version import Version
-from Cheetah.Template import Template
+from Cheetah.Template import Template, DEFAULT_COMPILER_SETTINGS
 from Cheetah.Utils.Misc import mkdirsWithPyInitFiles
 from Cheetah.Utils.optik import OptionParser
 
@@ -114,13 +114,20 @@ OPTIONS FOR "compile" AND "fill":
   --idir DIR, --odir DIR : input/output directories (default: current dir)
   --iext EXT, --oext EXT : input/output filename extensions
     (default for compile: tmpl/py,  fill: tmpl/html)
-  -R                : recurse subdirectories looking for input files
-  --debug           : print lots of diagnostic output to standard error
-  --env             : put the environment in the searchList
-  --flat            : no destination subdirectories
-  --nobackup        : don't make backups
-  --pickle FILE     : unpickle FILE and put that object in the searchList
-  --stdout, -p      : output to standard output (pipe)
+  -R                 : recurse subdirectories looking for input files
+  --debug            : print lots of diagnostic output to standard error
+  --env              : put the environment in the searchList
+  --flat             : no destination subdirectories
+  --nobackup         : don't make backups
+  --pickle FILE      : unpickle FILE and put that object in the searchList
+  --stdout, -p       : output to standard output (pipe)
+  --settings         : a string representing the compiler settings to use
+                       e.g. --settings='useNameMapper=False,useFilters=False'
+                       This string is eval'd in Python so it should contain
+                       valid Python syntax.
+  --templateAPIClass : a string representing a subclass of
+                       Cheetah.Template:Template to use for compilation
+
 Run "cheetah help" for the main help screen.
 """
 
@@ -131,6 +138,7 @@ class CheetahWrapper:
     MAKE_BACKUPS = True
     BACKUP_SUFFIX = ".bak"
     _templateClass = None
+    _compilerSettings = None    
 
     def __init__(self):
         self.progName = None
@@ -164,6 +172,11 @@ class CheetahWrapper:
         """
         fprintfMessage(sys.stderr, format, *args)
 
+    def error(self, format, *args):
+        """Always print a warning message to stderr and exit with an error code.        
+        """
+        fprintfMessage(sys.stderr, format, *args)
+        sys.exit(1)
 
     ##################################################
     ## HELPER METHODS
@@ -194,6 +207,9 @@ class CheetahWrapper:
         pao("--pickle", action="store", dest="pickle", default="")
         pao("--flat", action="store_true", dest="flat", default=False)
         pao("--nobackup", action="store_true", dest="nobackup", default=False)
+        pao("--settings", action="store", dest="compilerSettingsString", default=None)
+        pao("--templateAPIClass", action="store", dest="templateClassName", default=None)
+
         self.opts, self.files = opts, files = parser.parse_args(args)
         D("""\
 cheetah compile %s
@@ -201,16 +217,16 @@ Options are
 %s
 Files are %s""", args, pprint.pformat(vars(opts)), files)
 
+
         #cleanup trailing path separators
         seps = [sep for sep in [os.sep, os.altsep] if sep]
         for attr in ['idir', 'odir']:
             for sep in seps:
-                path = getattr(self, attr, None)
+                path = getattr(opts, attr, None)
                 if path and path.endswith(sep):
                     path = path[:-len(sep)]
-                    setattr(self, attr, path)
+                    setattr(opts, attr, path)
                     break
-
 
         self._fixExts()
         if opts.env:
@@ -224,17 +240,23 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
 
     def _getTemplateClass(self):
         C, D, W = self.chatter, self.debug, self.warn
+        modname = None
         if self._templateClass:
             return self._templateClass
-        
-        modname = os.environ.get('CHEETAH_TEMPLATE_CLASS')
+
+        modname = self.opts.templateClassName
+
         if not modname:
             return Template
         p = modname.rfind('.')
-        assert ':' in modname, 'The environment var CHEETAH_TEMPLATE_CLASS is invalid'
+        if ':' not in modname:
+            self.error('The value of option --templateAPIClass is invalid\n'
+                       'It must be in the form "module:class", '
+                       'e.g. "Cheetah.Template:Template"')
+            
         modname, classname = modname.split(':')
 
-        C('using environ[CHEETAH_TEMPLATE_CLASS]=%s:%s'%(modname, classname))
+        C('using --templateAPIClass=%s:%s'%(modname, classname))
         
         if p >= 0:
             mod = getattr(__import__(modname[:p], {}, {}, [modname[p+1:]]), modname[p+1:])
@@ -246,10 +268,36 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
             self._templateClass = klass
             return klass
         else:
-            W('**Template class specified in env[CHEETAH_TEMPLATE_CLASS] not found')
-            W('**Falling back on Cheetah.Template:Template')            
-            return Template
+            self.error('**Template class specified in option --templateAPIClass not found\n'
+                       '**Falling back on Cheetah.Template:Template')
 
+
+    def _getCompilerSettings(self):
+        if self._compilerSettings:
+            return self._compilerSettings
+
+        def getkws(**kws):
+            return kws
+        if self.opts.compilerSettingsString:
+            try:
+                exec 'settings = getkws(%s)'%self.opts.compilerSettingsString
+            except:                
+                self.error("There's an error in your --settings option."
+                          "It must be valid Python syntax.\n"
+                          +"    --settings='%s'\n"%self.opts.compilerSettingsString
+                          +"  %s: %s"%sys.exc_info()[:2] 
+                          )
+
+            validKeys = DEFAULT_COMPILER_SETTINGS.keys()
+            if [k for k in settings.keys() if k not in validKeys]:
+                self.error(
+                    'The --setting "%s" is not a valid compiler setting name.'%k)
+            
+            self._compilerSettings = settings
+            return settings
+        else:
+            return {}
+    
     def compileOrFillStdin(self):
         TemplateClass = self._getTemplateClass()
         if self.isCompile:
@@ -262,6 +310,7 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
     def compileOrFillBundle(self, b):
         C, D, W = self.chatter, self.debug, self.warn
         TemplateClass = self._getTemplateClass()
+        compilerSettings = self._getCompilerSettings()
         src = b.src
         dst = b.dst
         base = b.base
@@ -282,11 +331,14 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
 %s: base name %s contains invalid characters.  It must
 be named according to the same rules as Python modules.""" % tup)
             pysrc = TemplateClass.compile(file=src, returnAClass=False,
-                                          moduleName=basename, className=basename)
+                                          moduleName=basename,
+                                          className=basename,
+                                          compilerSettings=compilerSettings)
             output = pysrc
         else:
             #output = str(TemplateClass(file=src, searchList=self.searchList))
-            output = str(TemplateClass.compile(file=src)(searchList=self.searchList))
+            tclass = TemplateClass.compile(file=src, compilerSettings=compilerSettings)
+            output = str(tclass(searchList=self.searchList))
             
         if bak:
             shutil.copyfile(dst, bak)
