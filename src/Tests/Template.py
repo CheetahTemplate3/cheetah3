@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.15 2006/01/31 05:08:27 tavis_rudd Exp $
+# $Id: Template.py,v 1.16 2006/02/03 21:05:50 tavis_rudd Exp $
 """Tests of the Template class API
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>,
-Version: $Revision: 1.15 $
+Version: $Revision: 1.16 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2006/01/31 05:08:27 $
+Last Revision Date: $Date: 2006/02/03 21:05:50 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.15 $"[11:-2]
+__revision__ = "$Revision: 1.16 $"[11:-2]
 
 
 ##################################################
@@ -158,10 +158,11 @@ class ClassMethods_compile(TemplateTest):
     def test_keepRefToGeneratedCodeArg(self):
         klass = Template.compile(source='$foo',
                                  className='unique58',
+                                 cacheCompilationResults=False,
                                  keepRefToGeneratedCode=False)
         t = klass(namespaces={'foo':1234})
         assert str(t)=='1234'
-        assert not t.generatedClassCode()
+        assert not t.generatedModuleCode()
 
 
         klass2 = Template.compile(source='$foo',
@@ -169,7 +170,15 @@ class ClassMethods_compile(TemplateTest):
                                  keepRefToGeneratedCode=True)
         t = klass2(namespaces={'foo':1234})
         assert str(t)=='1234'
-        assert t.generatedClassCode()
+        assert t.generatedModuleCode()
+
+        klass3 = Template.compile(source='$foo',
+                                 className='unique58',
+                                 keepRefToGeneratedCode=False)
+        t = klass3(namespaces={'foo':1234})
+        assert str(t)=='1234'
+        # still there as this class came from the cache
+        assert t.generatedModuleCode() 
 
 
     def test_compilationCache(self):
