@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.170 2006/02/03 20:26:32 tavis_rudd Exp $
+# $Id: Template.py,v 1.171 2006/02/03 21:06:21 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.170 $
+Version: $Revision: 1.171 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/03 20:26:32 $
+Last Revision Date: $Date: 2006/02/03 21:06:21 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.170 $"[11:-2]
+__revision__ = "$Revision: 1.171 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -119,6 +119,9 @@ def _genUniqueModuleName(baseModuleName):
 # This is only relavent to templates used as CGI scripts.
 _formUsedByWebInput = None
 
+
+class CompileCacheItem:
+    pass
 
 class TemplatePreprocessor:
     """This is used with the preprocessors argument to Template.compile().
@@ -299,7 +302,6 @@ class Template(Servlet):
     
     ## The following attributes are used by instance methods:
     _CHEETAH_generatedModuleCode = None
-    _CHEETAH_generatedClassCode = None            
     NonNumericInputError = NonNumericInputError
     _CHEETAH_cacheRegionClass = CacheRegion
     _CHEETAH_cacheStoreClass = MemoryCacheStore
@@ -669,7 +671,7 @@ class Template(Servlet):
 
 
         cacheHash = None
-        cachedResults = None
+        cacheItem = None
         if source or isinstance(file, (str, unicode)):                
             compilerSettingsHash = None
             if compilerSettings:
@@ -700,8 +702,8 @@ class Template(Servlet):
                 #@@TR: should add some logging to this
                 pass
         if useCache and cacheHash and klass._CHEETAH_compileCache.has_key(cacheHash):
-            cachedResults = klass._CHEETAH_compileCache[cacheHash]
-            generatedModuleCode = cachedResults.code
+            cacheItem = klass._CHEETAH_compileCache[cacheHash]
+            generatedModuleCode = cacheItem.code
             #print 'DEBUG: found cached copy'
         else:
             compiler = compilerClass(source, file,
@@ -714,11 +716,9 @@ class Template(Servlet):
             generatedModuleCode = compiler.getModuleCode()
         
         if returnAClass:
-            if cachedResults:
-                if (not keepRefToGeneratedCode
-                    or cachedResults.klass._CHEETAH_generatedModuleCode):                
-                    #print 'DEBUG: returning cached copy'
-                    return cachedResults.klass
+            if cacheItem:
+                cacheItem.lastCheckoutTime = time.time()
+                return cacheItem.klass
 
             try:
                 klass._CHEETAH_compileLock.acquire()
@@ -769,22 +769,22 @@ class Template(Servlet):
                 raise
             templateClass = getattr(mod, className)
 
-            if keepRefToGeneratedCode:
-                templateClass._CHEETAH_generatedModuleCode = generatedModuleCode
-                templateClass._CHEETAH_generatedClassCode = generatedModuleCode[
-                    generatedModuleCode.find('\nclass '):
-                    generatedModuleCode.find('\n## END CLASS DEFINITION')]
-                    
-            if cacheCompilationResults and cacheHash:
-                class CacheResults: pass;
-                cacheResults = CacheResults()
-                cacheResults.code = generatedModuleCode
-                cacheResults.klass = templateClass
+            if (cacheCompilationResults
+                and cacheHash
+                and not klass._CHEETAH_compileCache.has_key(cacheHash)):
+                
+                cacheItem = CompileCacheItem()
+                cacheItem.cacheTime = cacheItem.lastCheckoutTime = time.time()
+                cacheItem.code = generatedModuleCode
+                cacheItem.klass = templateClass
                 templateClass._CHEETAH_isInCompilationCache = True
-                klass._CHEETAH_compileCache[cacheHash] = cacheResults
+                klass._CHEETAH_compileCache[cacheHash] = cacheItem
             else:
                 templateClass._CHEETAH_isInCompilationCache = False
 
+            if keepRefToGeneratedCode or cacheCompilationResults:
+                templateClass._CHEETAH_generatedModuleCode = generatedModuleCode                
+     
             return templateClass
         else:
             return generatedModuleCode
@@ -1168,8 +1168,10 @@ class Template(Servlet):
         """Return the class code the compiler generated, or None if no
         compilation took place.
         """
-
-        return self._CHEETAH_generatedClassCode
+        
+        return self._CHEETAH_generatedModuleCode[
+                    self._CHEETAH_generatedModuleCode.find('\nclass '):
+                    self._CHEETAH_generatedModuleCode.find('\n## END CLASS DEFINITION')]
     
     def searchList(self):
         """Return a reference to the searchlist
@@ -1678,9 +1680,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.170 $
+        Version: $Revision: 1.171 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/02/03 20:26:32 $
+        Last Revision Date: $Date: 2006/02/03 21:06:21 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
