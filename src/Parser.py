@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.123 2006/02/01 05:01:27 tavis_rudd Exp $
+# $Id: Parser.py,v 1.124 2006/02/03 19:37:47 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.123 $
+Version: $Revision: 1.124 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/02/01 05:01:27 $
+Last Revision Date: $Date: 2006/02/03 19:37:47 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.123 $"[11:-2]
+__revision__ = "$Revision: 1.124 $"[11:-2]
 
 import os
 import sys
@@ -235,7 +235,7 @@ endDirectiveNamesAndHandlers = {
 ##################################################
 ## CLASSES ##
 
-class ParseError(ValueError):
+class ParseError(SyntaxError):
     def __init__(self, stream, msg='Invalid Syntax', extMsg=''):
         self.stream = stream
         if stream.pos() >= len(stream):
@@ -1549,7 +1549,7 @@ class _HighLevelParser(_LowLevelParser):
                 if self.matchDirective() == 'end':
                     endRawPos = self.pos()
                     self.getDirectiveStartToken()
-                    self.advance(3)                 # to end of 'end'
+                    self.advance(len('end'))
                     self.getWhiteSpace()
                     if self.startswith(directiveName):
                         if self.isLineClearToStartToken(endRawPos):
