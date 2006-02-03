@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.167 2006/02/01 04:57:26 tavis_rudd Exp $
+# $Id: Template.py,v 1.168 2006/02/03 19:37:09 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.167 $
+Version: $Revision: 1.168 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/01 04:57:26 $
+Last Revision Date: $Date: 2006/02/03 19:37:09 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.167 $"[11:-2]
+__revision__ = "$Revision: 1.168 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -116,6 +116,8 @@ def _genUniqueModuleName(baseModuleName):
                      + str(randrange(10000, 99999)))
 
     _cheetahModuleNames.append(finalName) # prevent collisions
+    if len(_cheetahModuleNames) > 20: 
+        del _cheetahModuleNames[:20] # to prevent memory leaks
     _uniqueModuleNameLock.release()
     return finalName
 
@@ -620,7 +622,7 @@ class Template(Servlet):
                 keepRefToGeneratedCode, klass._CHEETAH_keepRefToGeneratedCode)
             if boolTypeAvailable:         
                 vt(cacheCompilationResults, 'cacheCompilationResults', [I,B], 'boolean')
-
+        
             vt(moduleName, 'moduleName', [N,S], 'string or None')
             __orig_file__ = None
             if not moduleName:
@@ -629,8 +631,10 @@ class Template(Servlet):
                     __orig_file__ = file
                 else:
                     moduleName = klass._CHEETAH_defaultModuleNameForTemplates
+
             uniqueModuleName = _genUniqueModuleName(moduleName)
-            
+
+        
             className = valOrDefault(
                 className, klass._CHEETAH_defaultClassNameForTemplates)
             vt(className, 'className', [N,S], 'string or None')
@@ -643,7 +647,6 @@ class Template(Servlet):
             moduleGlobals = valOrDefault(
                 moduleGlobals, klass._CHEETAH_defaultModuleGlobalsForTemplates)
 
-            
             cacheModuleFilesForTracebacks = valOrDefault(
                 cacheModuleFilesForTracebacks, klass._CHEETAH_cacheModuleFilesForTracebacks)
             if boolTypeAvailable:
@@ -705,10 +708,11 @@ class Template(Servlet):
             except:
                 #@@TR: should add some logging to this
                 pass
-        if useCache and cacheHash and cacheHash in klass._CHEETAH_compileCache:
+        if useCache and cacheHash and klass._CHEETAH_compileCache.has_key(cacheHash):
             cachedResults = klass._CHEETAH_compileCache[cacheHash]
             generatedModuleCode = cachedResults.code
-        else:            
+            #print 'DEBUG: found cached copy'
+        else:
             compiler = compilerClass(source, file,
                                      moduleName=moduleName,
                                      mainClassName=className,
@@ -722,6 +726,7 @@ class Template(Servlet):
             if cachedResults:
                 if (not keepRefToGeneratedCode
                     or cachedResults.klass._CHEETAH_generatedModuleCode):                
+                    #print 'DEBUG: returning cached copy'
                     return cachedResults.klass
 
             __file__ = uniqueModuleName+'.py' # relative file path with no dir part
@@ -1125,13 +1130,6 @@ class Template(Servlet):
             if compilerSettings is not Unspecified:
                 vt(compilerSettings, 'compilerSettings', [D], 'dictionary')
 
-            if namespaces is not None: 
-                assert searchList is None, (
-                    'Provide "namespaces" or "searchList", not both!')
-                searchList = namespaces
-            if searchList is not None and not isinstance(searchList, (list, tuple)):
-                searchList = [searchList]
-
         except TypeError, reason:
             # Re-raise the exception here so that the traceback will end in
             # this function rather than in some utility function.
@@ -1150,7 +1148,8 @@ class Template(Servlet):
         ## post-compile
 
         self._initCheetahInstance(
-            searchList=searchList, filter=filter, filtersLib=filtersLib,
+            searchList=searchList, namespaces=namespaces,
+            filter=filter, filtersLib=filtersLib,
             errorCatcher=errorCatcher,
             _globalSetVars=_globalSetVars,
             _preBuiltSearchList=_preBuiltSearchList)
@@ -1284,10 +1283,13 @@ class Template(Servlet):
 
 
     def i18n(self, message,
-             plural=None, n=None,
+             plural=None,
+             n=None,
                    
-             id=None, domain=None,
-             source=None, target=None,
+             id=None,
+             domain=None,
+             source=None,
+             target=None,
              comment=None
              ):
         """This is just a stub at this time.
@@ -1340,6 +1342,7 @@ class Template(Servlet):
 
     def _initCheetahInstance(self,
                              searchList=None,
+                             namespaces=None,
                              filter='RawOrEncodedUnicode', # which filter from Cheetah.Filters
                              filtersLib=Filters,
                              errorCatcher=None,
@@ -1357,7 +1360,14 @@ class Template(Servlet):
         """
         if getattr(self, '_CHEETAH__instanceInitialized', False):
             return
-        
+
+        if namespaces is not None: 
+            assert searchList is None, (
+                'Provide "namespaces" or "searchList", not both!')
+            searchList = namespaces
+        if searchList is not None and not isinstance(searchList, (list, tuple)):
+            searchList = [searchList]
+
         self._CHEETAH__globalSetVars = {}
         if _globalSetVars is not None:
             # this is intended to be used internally by Nested Templates in #include's
@@ -1670,9 +1680,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.167 $
+        Version: $Revision: 1.168 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/02/01 04:57:26 $
+        Last Revision Date: $Date: 2006/02/03 19:37:09 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
