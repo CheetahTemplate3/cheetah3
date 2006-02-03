@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.169 2006/02/03 20:10:39 tavis_rudd Exp $
+# $Id: Template.py,v 1.170 2006/02/03 20:26:32 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.169 $
+Version: $Revision: 1.170 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/03 20:10:39 $
+Last Revision Date: $Date: 2006/02/03 20:26:32 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.169 $"[11:-2]
+__revision__ = "$Revision: 1.170 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -735,8 +735,8 @@ class Template(Servlet):
                                         cacheDirForModuleFiles)
 
                     __file__ = os.path.join(cacheDirForModuleFiles, __file__)
-                    klass._CHEETAH_compileLock.acquire()
                     try:
+                        klass._CHEETAH_compileLock.acquire()
                         # @@TR: might want to assert that it doesn't already exist
                         try:
                             open(__file__, 'w').write(generatedModuleCode)
@@ -1678,9 +1678,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.169 $
+        Version: $Revision: 1.170 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/02/03 20:10:39 $
+        Last Revision Date: $Date: 2006/02/03 20:26:32 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
