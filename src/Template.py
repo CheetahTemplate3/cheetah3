@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.168 2006/02/03 19:37:09 tavis_rudd Exp $
+# $Id: Template.py,v 1.169 2006/02/03 20:10:39 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.168 $
+Version: $Revision: 1.169 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/03 19:37:09 $
+Last Revision Date: $Date: 2006/02/03 20:10:39 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.168 $"[11:-2]
+__revision__ = "$Revision: 1.169 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -103,22 +103,16 @@ def hashDict(d):
 ################################################################################
 ## MODULE GLOBALS AND CONSTANTS
 
-_cheetahModuleNames = [] # used by _genUniqueModuleName
-_uniqueModuleNameLock = Lock() # _genUniqueModuleName(): prevent collisions in sys.modules
 def _genUniqueModuleName(baseModuleName):
-    _uniqueModuleNameLock.acquire()
-    if baseModuleName not in sys.modules and baseModuleName not in _cheetahModuleNames:
+    """The calling code is responsible for concurrency locking.
+    """
+    if baseModuleName not in sys.modules:
         finalName = baseModuleName
     else:
         finalName = ('cheetah_'+baseModuleName
                      +'_'
                      +''.join(map(lambda x: '%02d' % x, time.localtime(time.time())[:6]))
                      + str(randrange(10000, 99999)))
-
-    _cheetahModuleNames.append(finalName) # prevent collisions
-    if len(_cheetahModuleNames) > 20: 
-        del _cheetahModuleNames[:20] # to prevent memory leaks
-    _uniqueModuleNameLock.release()
     return finalName
 
 # Cache of a cgi.FieldStorage() instance, maintained by .webInput().
@@ -631,9 +625,6 @@ class Template(Servlet):
                     __orig_file__ = file
                 else:
                     moduleName = klass._CHEETAH_defaultModuleNameForTemplates
-
-            uniqueModuleName = _genUniqueModuleName(moduleName)
-
         
             className = valOrDefault(
                 className, klass._CHEETAH_defaultClassNameForTemplates)
@@ -729,46 +720,53 @@ class Template(Servlet):
                     #print 'DEBUG: returning cached copy'
                     return cachedResults.klass
 
-            __file__ = uniqueModuleName+'.py' # relative file path with no dir part
-
-            if cacheModuleFilesForTracebacks:
-                if not os.path.exists(cacheDirForModuleFiles):
-                    raise Exception('%s does not exist'%
-                                    cacheDirForModuleFiles)
-
-                __file__ = os.path.join(cacheDirForModuleFiles,
-                                        __file__)
-                klass._CHEETAH_compileLock.acquire()
-                try:
-                    # @@TR: might want to assert that it doesn't already exist
-                    try:
-                        open(__file__, 'w').write(generatedModuleCode)
-                        # @@TR: should probably restrict the perms, etc.
-                    except OSError:
-                        # @@ TR: should this optionally raise?
-                        traceback.print_exc(file=sys.stderr)
-                finally:
-                    klass._CHEETAH_compileLock.release()
             try:
-                co = compile(generatedModuleCode, __file__, 'exec')
+                klass._CHEETAH_compileLock.acquire()
+                uniqueModuleName = _genUniqueModuleName(moduleName)
+                __file__ = uniqueModuleName+'.py' # relative file path with no dir part
+                mod = new.module(uniqueModuleName)
+                sys.modules[uniqueModuleName] = mod
+            finally:
+                klass._CHEETAH_compileLock.release()
+            try:
+                if cacheModuleFilesForTracebacks:
+                    if not os.path.exists(cacheDirForModuleFiles):
+                        raise Exception('%s does not exist'%
+                                        cacheDirForModuleFiles)
+
+                    __file__ = os.path.join(cacheDirForModuleFiles, __file__)
+                    klass._CHEETAH_compileLock.acquire()
+                    try:
+                        # @@TR: might want to assert that it doesn't already exist
+                        try:
+                            open(__file__, 'w').write(generatedModuleCode)
+                            # @@TR: should probably restrict the perms, etc.
+                        except OSError:
+                            # @@ TR: should this optionally raise?
+                            traceback.print_exc(file=sys.stderr)
+                    finally:
+                        klass._CHEETAH_compileLock.release()
+                try:
+                    co = compile(generatedModuleCode, __file__, 'exec')
+                except:
+                    print generatedModuleCode
+                    raise
+
+                mod.__file__ = __file__
+                if __orig_file__ and os.path.exists(__orig_file__):
+                    # this is used in the WebKit filemonitoring code
+                    mod.__orig_file__ = __orig_file__
+
+                if moduleGlobals:
+                    for k, v in moduleGlobals.items():
+                        setattr(mod, k, v)
+
+                if baseclass and baseclassValue:
+                    setattr(mod, baseclassName, baseclassValue)
+                exec co in mod.__dict__
             except:
-                print generatedModuleCode
+                del sys.modules[uniqueModuleName]
                 raise
-            mod = new.module(uniqueModuleName)
-            mod.__file__ = __file__
-            if __orig_file__ and os.path.exists(__orig_file__):
-                # this is used in the WebKit filemonitoring code
-                mod.__orig_file__ = __orig_file__
-
-            if moduleGlobals:
-                for k, v in moduleGlobals.items():
-                    setattr(mod, k, v)
-
-            if baseclass and baseclassValue:
-                setattr(mod, baseclassName, baseclassValue)
-            exec co in mod.__dict__
-
-            sys.modules[uniqueModuleName] = mod
             templateClass = getattr(mod, className)
 
             if keepRefToGeneratedCode:
@@ -1680,9 +1678,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.168 $
+        Version: $Revision: 1.169 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/02/03 19:37:09 $
+        Last Revision Date: $Date: 2006/02/03 20:10:39 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
