@@ -2,6 +2,17 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0rc5 (Feb 3, 2006)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+  Core Changes: [TR]      
+    - fixed a memory leak in Template.compile(), reported by Andrea Arcangeli
+    - simplified concurrency locking and compile caching in Template.compile()
+
+  The command line tool (CheetahWrapper.py): 
+    - added new option --settings for supplying compiler settings
+    - added new option --templateAPIClass to replace the environment var
+      CHEETAH_TEMPLATE_CLASS lookup I added in 2.0b1
+
 2.0rc4 (Jan 31, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      
