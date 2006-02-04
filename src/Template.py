@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.172 2006/02/04 06:05:12 tavis_rudd Exp $
+# $Id: Template.py,v 1.173 2006/02/04 23:05:15 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.172 $
+Version: $Revision: 1.173 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/04 06:05:12 $
+Last Revision Date: $Date: 2006/02/04 23:05:15 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.172 $"[11:-2]
+__revision__ = "$Revision: 1.173 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -49,7 +49,8 @@ except ImportError:
         def acquire(self): pass
         def release(self): pass
 
-
+from Cheetah.Version import convertVersionStringToTuple, MinCompatibleVersionTuple
+from Cheetah.Version import MinCompatibleVersion
 # Base classes for Template
 from Cheetah.Servlet import Servlet                 
 # More intra-package imports ...
@@ -771,6 +772,7 @@ class Template(Servlet):
                 exec co in mod.__dict__
             except:
                 del sys.modules[uniqueModuleName]
+                print generatedModuleCode
                 raise
 
             templateClass = getattr(mod, className)
@@ -1145,6 +1147,23 @@ class Template(Servlet):
         ## Do superclass initialization.
         Servlet.__init__(self)
 
+        ##################################################           
+        ## Do required version check
+        if not hasattr(self, '_CHEETAH_versionTuple'):
+            try:
+                mod = sys.modules[self.__class__.__module__]
+                compiledVersion = mod.__CHEETAH_version__
+                compiledVersionTuple = convertVersionStringToTuple(compiledVersion)
+                if compiledVersionTuple < MinCompatibleVersionTuple:
+                    raise AssertionError(
+                     'This template was compiled with Cheetah version'
+                     ' %s. Templates compiled before version %s must be recompiled.'%(
+                        compiledVersion, MinCompatibleVersion))                    
+            except AssertionError:
+                raise 
+            except:
+                pass
+        
         ##################################################           
         ## Setup instance state attributes used during the life of template
         ## post-compile
@@ -1684,9 +1703,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.172 $
+        Version: $Revision: 1.173 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/02/04 06:05:12 $
+        Last Revision Date: $Date: 2006/02/04 23:05:15 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit

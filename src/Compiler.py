@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.143 2006/02/04 22:09:55 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.144 2006/02/04 23:05:36 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.143 $
+Version: $Revision: 1.144 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/02/04 22:09:55 $
+Last Revision Date: $Date: 2006/02/04 23:05:36 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.143 $"[11:-2]
+__revision__ = "$Revision: 1.144 $"[11:-2]
 
 import sys
 import os
@@ -1189,6 +1189,8 @@ class ClassCompiler(GenUtils):
         self._classDocStringLines = []
         # printed after methods in the gen class def:
         self._generatedAttribs = ['_CHEETAH__instanceInitialized = False']
+        self._generatedAttribs.append('_CHEETAH_versionTuple = %r'%(VersionTuple,))
+
         if self.setting('templateMetaclass'):
             self._generatedAttribs.append('__metaclass__ = '+self.setting('templateMetaclass'))
         self._initMethChunks = []        
