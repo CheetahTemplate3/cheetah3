@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.171 2006/02/03 21:06:21 tavis_rudd Exp $
+# $Id: Template.py,v 1.172 2006/02/04 06:05:12 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.171 $
+Version: $Revision: 1.172 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/03 21:06:21 $
+Last Revision Date: $Date: 2006/02/04 06:05:12 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.171 $"[11:-2]
+__revision__ = "$Revision: 1.172 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -118,6 +118,11 @@ def _genUniqueModuleName(baseModuleName):
 # Cache of a cgi.FieldStorage() instance, maintained by .webInput().
 # This is only relavent to templates used as CGI scripts.
 _formUsedByWebInput = None
+
+# used in Template.compile()
+def valOrDefault(val, default):                
+    if val is not Unspecified: return val
+    else: return default
 
 
 class CompileCacheItem:
@@ -590,9 +595,6 @@ class Template(Servlet):
             
             vt(source, 'source', [N,S,U], 'string or None')
             vt(file, 'file',[N,S,U,F], 'string, file-like object, or None')
-            def valOrDefault(val, default):                
-                if val is not Unspecified: return val
-                else: return default
 
             baseclass = valOrDefault(baseclass, klass._CHEETAH_defaultBaseclassForTemplates)
             vt(baseclass, 'baseclass', [N,S,C,type], 'string, class or None')
@@ -666,6 +668,7 @@ class Template(Servlet):
             if type(baseclass) in StringTypes:
                 baseclassName = baseclass
             elif type(baseclass) in (ClassType, type):
+                # @@TR: should soft-code this
                 baseclassName = 'CHEETAH_dynamicallyAssignedBaseClass_'+baseclass.__name__
                 baseclassValue = baseclass
 
@@ -714,8 +717,10 @@ class Template(Servlet):
                                      settings=(compilerSettings or {}))
             compiler.compile()
             generatedModuleCode = compiler.getModuleCode()
-        
-        if returnAClass:
+
+        if not returnAClass:
+            return generatedModuleCode
+        else:
             if cacheItem:
                 cacheItem.lastCheckoutTime = time.time()
                 return cacheItem.klass
@@ -767,6 +772,7 @@ class Template(Servlet):
             except:
                 del sys.modules[uniqueModuleName]
                 raise
+
             templateClass = getattr(mod, className)
 
             if (cacheCompilationResults
@@ -786,8 +792,6 @@ class Template(Servlet):
                 templateClass._CHEETAH_generatedModuleCode = generatedModuleCode                
      
             return templateClass
-        else:
-            return generatedModuleCode
     compile = classmethod(compile)
 
     def subclass(klass, *args, **kws):
@@ -1680,9 +1684,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.171 $
+        Version: $Revision: 1.172 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/02/03 21:06:21 $
+        Last Revision Date: $Date: 2006/02/04 06:05:12 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
