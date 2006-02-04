@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.142 2006/01/31 05:02:32 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.143 2006/02/04 22:09:55 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.142 $
+Version: $Revision: 1.143 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/01/31 05:02:32 $
+Last Revision Date: $Date: 2006/02/04 22:09:55 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.142 $"[11:-2]
+__revision__ = "$Revision: 1.143 $"[11:-2]
 
 import sys
 import os
@@ -30,7 +30,7 @@ import warnings
 import __builtin__
 import copy
 
-from Cheetah.Version import Version
+from Cheetah.Version import Version, VersionTuple
 from Cheetah.SettingsManager import SettingsManager
 from Cheetah.Parser import Parser, ParseError, specialVarRE, \
      STATIC_CACHE, REFRESH_CACHE, SET_LOCAL, SET_GLOBAL,SET_MODULE
@@ -1579,6 +1579,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "import time",
             "import types",
             "import __builtin__",
+            "from Cheetah.Version import MinCompatibleVersion as RequiredCheetahVersion",            
+            "from Cheetah.Version import MinCompatibleVersionTuple as RequiredCheetahVersionTuple",
             "from Cheetah.Template import Template",
             "from Cheetah.DummyTransaction import DummyTransaction",
             "from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, valueFromFrameOrSearchList",
@@ -1835,7 +1837,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
             timestamp = self.timestamp(self._fileMtime)
             self.addSpecialVar('CHEETAH_src', self._filePath)
             self.addSpecialVar('CHEETAH_srcLastModified', timestamp)
-            
+        self.addModuleGlobal('__CHEETAH_versionTuple__ = %r'%(VersionTuple,))
+
         moduleDef = """%(header)s
 %(docstring)s
 
@@ -1847,6 +1850,12 @@ class ModuleCompiler(SettingsManager, GenUtils):
 ## MODULE CONSTANTS
 %(constants)s
 %(specialVars)s
+
+if __CHEETAH_versionTuple__ < RequiredCheetahVersionTuple:
+    raise AssertionError(
+      'This template was compiled with Cheetah version'
+      ' %%s. Templates compiled before version %%s must be recompiled.'%%(
+         __CHEETAH_version__, RequiredCheetahVersion))
 
 ##################################################
 ## CLASSES
