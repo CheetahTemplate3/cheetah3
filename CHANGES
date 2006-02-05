@@ -9,6 +9,9 @@ release
       template was compiled with an previous version of Cheetah whose templates
       must be recompiled.
 
+    - made the Cheetah compilation metadata accessible via class attributes in
+      addition to module globals
+
     - major improvement to exception reporting in cases where bad Python syntax
       slips past the Cheetah parser:
       """
