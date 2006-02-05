@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.176 2006/02/05 02:43:35 tavis_rudd Exp $
+# $Id: Template.py,v 1.177 2006/02/05 02:53:12 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.176 $
+Version: $Revision: 1.177 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/05 02:43:35 $
+Last Revision Date: $Date: 2006/02/05 02:53:12 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.176 $"[11:-2]
+__revision__ = "$Revision: 1.177 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -779,7 +779,7 @@ class Template(Servlet):
                 try:
                     co = compile(generatedModuleCode, __file__, 'exec')
                     exec co in mod.__dict__
-                except Exception, e:
+                except SyntaxError, e:
                     try:
                         parseError = genParserErrorFromPyTraceback(
                             source, file, generatedModuleCode, exception=e)
@@ -790,6 +790,11 @@ class Template(Servlet):
                         raise e
                     else:
                         raise parseError
+                except Exception, e:
+                    updateLinecache(__file__, generatedModuleCode)
+                    e.generatedModuleCode = generatedModuleCode
+                    raise
+                    
             except:
                 del sys.modules[uniqueModuleName]
                 raise
@@ -1722,9 +1727,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.176 $
+        Version: $Revision: 1.177 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/02/05 02:43:35 $
+        Last Revision Date: $Date: 2006/02/05 02:53:12 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
