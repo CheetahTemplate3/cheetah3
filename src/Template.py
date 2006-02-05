@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.174 2006/02/05 02:06:12 tavis_rudd Exp $
+# $Id: Template.py,v 1.175 2006/02/05 02:34:45 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.174 $
+Version: $Revision: 1.175 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/05 02:06:12 $
+Last Revision Date: $Date: 2006/02/05 02:34:45 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.174 $"[11:-2]
+__revision__ = "$Revision: 1.175 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -1721,9 +1721,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.174 $
+        Version: $Revision: 1.175 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/02/05 02:06:12 $
+        Last Revision Date: $Date: 2006/02/05 02:34:45 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
@@ -1782,7 +1782,7 @@ def genParserErrorFromPyTraceback(source, file, generatedPyCode, exception):
     filename = isinstance(file, (str, unicode)) and file or None
     formatedExcLines = formatedExc.splitlines()
     pyLineno = int(re.search('[ \t]*File.*line (\d+)', formatedExc).group(1))
-    
+       
     lines = generatedPyCode.splitlines()
     
     prevLines = []                  # (i, content)
@@ -1808,13 +1808,6 @@ def genParserErrorFromPyTraceback(source, file, generatedPyCode, exception):
         report += "%(row)-4d|%(line)s\n"% {'row':lineInfo[0], 'line':lineInfo[1]}
     
     
-    cheetahPosMatch = re.search('line (\d+), col (\d+)', formatedExc)
-    if cheetahPosMatch:
-        lineno = int(cheetahPosMatch.group(1))
-        col = int(cheetahPosMatch.group(2))
-    else:
-        lineno = None
-        col = None
     message = [
         "Error in the Python code which Cheetah generated for this template:",
         '='*80,
@@ -1824,8 +1817,25 @@ def genParserErrorFromPyTraceback(source, file, generatedPyCode, exception):
         report,
         '='*80,
         ]
-    if lineno:
+    cheetahPosMatch = re.search('line (\d+), col (\d+)', formatedExc)
+    if cheetahPosMatch:
+        lineno = int(cheetahPosMatch.group(1))
+        col = int(cheetahPosMatch.group(2))
+        #if hasattr(exception, 'offset'):
+        #    col = exception.offset
         message.append('\nHere is the corresponding Cheetah code:\n')
+    else:
+        lineno = None
+        col = None
+        cheetahPosMatch = re.search('line (\d+), col (\d+)',
+                                    '\n'.join(lines[max(pyLineno-2, 0):]))
+        if cheetahPosMatch:
+            lineno = int(cheetahPosMatch.group(1))
+            col = int(cheetahPosMatch.group(2))
+            message.append('\nHere is the corresponding Cheetah code.')
+            message.append('** I had to guess the line & column numbers,'
+                           ' so they are probably incorrect:\n')
+
     
     message = '\n'.join(message)
     reader = SourceReader(source, filename=filename)
