@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.126 2006/02/05 02:10:02 tavis_rudd Exp $
+# $Id: Parser.py,v 1.125 2006/02/05 02:06:33 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.126 $
+Version: $Revision: 1.125 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/02/05 02:10:02 $
+Last Revision Date: $Date: 2006/02/05 02:06:33 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.126 $"[11:-2]
+__revision__ = "$Revision: 1.125 $"[11:-2]
 
 import os
 import sys
@@ -2389,7 +2389,7 @@ class _HighLevelParser(_LowLevelParser):
         lineCol = self.getRowCol()
 
         self.getDirectiveStartToken()
-        self.advance(len('capture'))        
+        self.advance(len('capture'))
         startPos = self.pos()
         self.getWhiteSpace()
 
@@ -2414,7 +2414,6 @@ class _HighLevelParser(_LowLevelParser):
         # filtered 
         isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLine = self.findEOL()
-        lineCol = self.getRowCol()
         self.getDirectiveStartToken()
         startPos = self.pos()
         
@@ -2440,10 +2439,10 @@ class _HighLevelParser(_LowLevelParser):
             trueExpr = ''.join(trueExpr)
             falseExpr = ''.join(falseExpr)
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)            
-            self._compiler.addTernaryExpr(conditionExpr, trueExpr, falseExpr, lineCol=lineCol)
+            self._compiler.addTernaryExpr(conditionExpr, trueExpr, falseExpr)
         elif self.matchColonForSingleLineShortFormDirective():
             self.advance() # skip over :
-            self._compiler.addIf(expr, lineCol=lineCol)
+            self._compiler.addIf(expr)
             self.getWhiteSpace(max=1)
             self.parse(breakPoint=self.findEOL(gobble=True))            
             self._compiler.commitStrConst()            
@@ -2454,7 +2453,7 @@ class _HighLevelParser(_LowLevelParser):
             self.getWhiteSpace()                
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)            
             self.pushToOpenDirectivesStack('if')
-            self._compiler.addIf(expr, lineCol=lineCol)
+            self._compiler.addIf(expr)
 
     ## end directive handlers
     def handleEndDef(self):

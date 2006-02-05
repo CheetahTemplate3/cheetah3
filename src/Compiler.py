@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.146 2006/02/05 02:10:10 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.145 2006/02/05 02:06:46 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.146 $
+Version: $Revision: 1.145 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/02/05 02:10:10 $
+Last Revision Date: $Date: 2006/02/05 02:06:46 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.146 $"[11:-2]
+__revision__ = "$Revision: 1.145 $"[11:-2]
 
 import sys
 import os
@@ -614,7 +614,7 @@ class MethodCompiler(GenUtils):
     def addRepeat(self, expr, lineCol=None):
         #the _repeatCount stuff here allows nesting of #repeat directives        
         self._repeatCount = getattr(self, "_repeatCount", -1) + 1
-        self.addFor('for __i%s in range(%s)' % (self._repeatCount,expr), lineCol=lineCol)
+        self.addFor('for __i%s in range(%s)' % (self._repeatCount,expr))
 
     def addIndentingDirective(self, expr, lineCol=None):
         if expr and not expr[-1] == ':':
@@ -632,8 +632,6 @@ class MethodCompiler(GenUtils):
             expr = expr  + ':'
             
         self.addChunk( expr )
-        if lineCol:
-            self.appendToPrevChunk(' # generated from line %s, col %s'%lineCol )
         self.indent()
 
     def addIf(self, expr, lineCol=None):
@@ -646,11 +644,11 @@ class MethodCompiler(GenUtils):
         """
         self.addIndentingDirective(expr, lineCol=lineCol)
 
-    def addTernaryExpr(self, conditionExpr, trueExpr, falseExpr, lineCol=None):
+    def addTernaryExpr(self, conditionExpr, trueExpr, falseExpr):
         """For a single-lie #if ... then .... else ... directive
         <condition> then <trueExpr> else <falseExpr>
         """
-        self.addIndentingDirective(conditionExpr, lineCol=lineCol)            
+        self.addIndentingDirective(conditionExpr)            
         self.addFilteredChunk(trueExpr)
         self.dedent()
         self.addIndentingDirective('else')            
