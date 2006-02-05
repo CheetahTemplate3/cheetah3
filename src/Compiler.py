@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.144 2006/02/04 23:05:36 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.146 2006/02/05 02:10:10 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.144 $
+Version: $Revision: 1.146 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/02/04 23:05:36 $
+Last Revision Date: $Date: 2006/02/05 02:10:10 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.144 $"[11:-2]
+__revision__ = "$Revision: 1.146 $"[11:-2]
 
 import sys
 import os
@@ -605,24 +605,26 @@ class MethodCompiler(GenUtils):
                            'includeFrom="' + includeFrom + '", raw=' +
                            repr(isRaw) + ')')
 
-    def addWhile(self, expr):
-        self.addIndentingDirective(expr)
+    def addWhile(self, expr, lineCol=None):
+        self.addIndentingDirective(expr, lineCol=lineCol)
         
-    def addFor(self, expr):
-        self.addIndentingDirective(expr)
+    def addFor(self, expr, lineCol=None):
+        self.addIndentingDirective(expr, lineCol=lineCol)
 
-    def addRepeat(self, expr):
+    def addRepeat(self, expr, lineCol=None):
         #the _repeatCount stuff here allows nesting of #repeat directives        
         self._repeatCount = getattr(self, "_repeatCount", -1) + 1
-        self.addFor('for __i%s in range(%s)' % (self._repeatCount,expr))
+        self.addFor('for __i%s in range(%s)' % (self._repeatCount,expr), lineCol=lineCol)
 
-    def addIndentingDirective(self, expr):
+    def addIndentingDirective(self, expr, lineCol=None):
         if expr and not expr[-1] == ':':
             expr = expr  + ':'
         self.addChunk( expr )
+        if lineCol:
+            self.appendToPrevChunk(' # generated from line %s, col %s'%lineCol )
         self.indent()
 
-    def addReIndentingDirective(self, expr, dedent=True):
+    def addReIndentingDirective(self, expr, dedent=True, lineCol=None):
         self.commitStrConst()
         if dedent:
             self.dedent()
@@ -630,37 +632,39 @@ class MethodCompiler(GenUtils):
             expr = expr  + ':'
             
         self.addChunk( expr )
+        if lineCol:
+            self.appendToPrevChunk(' # generated from line %s, col %s'%lineCol )
         self.indent()
 
-    def addIf(self, expr):
+    def addIf(self, expr, lineCol=None):
         """For a full #if ... #end if directive
         """
-        self.addIndentingDirective(expr)
+        self.addIndentingDirective(expr, lineCol=lineCol)
 
-    def addOneLineIf(self, expr):
+    def addOneLineIf(self, expr, lineCol=None):
         """For a full #if ... #end if directive
         """
-        self.addIndentingDirective(expr)
+        self.addIndentingDirective(expr, lineCol=lineCol)
 
-    def addTernaryExpr(self, conditionExpr, trueExpr, falseExpr):
+    def addTernaryExpr(self, conditionExpr, trueExpr, falseExpr, lineCol=None):
         """For a single-lie #if ... then .... else ... directive
         <condition> then <trueExpr> else <falseExpr>
         """
-        self.addIndentingDirective(conditionExpr)            
+        self.addIndentingDirective(conditionExpr, lineCol=lineCol)            
         self.addFilteredChunk(trueExpr)
         self.dedent()
         self.addIndentingDirective('else')            
         self.addFilteredChunk(falseExpr)
         self.dedent()
 
-    def addElse(self, expr, dedent=True):
+    def addElse(self, expr, dedent=True, lineCol=None):
         expr = re.sub(r'else[ \f\t]+if','elif', expr)
-        self.addReIndentingDirective(expr, dedent=dedent)
+        self.addReIndentingDirective(expr, dedent=dedent, lineCol=lineCol)
 
-    def addElif(self, expr, dedent=True):
-        self.addElse(expr, dedent=dedent)
+    def addElif(self, expr, dedent=True, lineCol=None):
+        self.addElse(expr, dedent=dedent, lineCol=lineCol)
         
-    def addUnless(self, expr):
+    def addUnless(self, expr, lineCol=None):
         self.addIf('if not (' + expr + ')')
 
     def addClosure(self, functionName, argsList, parserComment):
@@ -674,14 +678,14 @@ class MethodCompiler(GenUtils):
         self.addIndentingDirective(signature)
         self.addChunk('#'+parserComment)
 
-    def addTry(self, expr):
-        self.addIndentingDirective(expr)
+    def addTry(self, expr, lineCol=None):
+        self.addIndentingDirective(expr, lineCol=lineCol)
         
-    def addExcept(self, expr, dedent=True):
-        self.addReIndentingDirective(expr, dedent=dedent)
+    def addExcept(self, expr, dedent=True, lineCol=None):
+        self.addReIndentingDirective(expr, dedent=dedent, lineCol=lineCol)
         
-    def addFinally(self, expr, dedent=True):
-        self.addReIndentingDirective(expr, dedent=dedent)
+    def addFinally(self, expr, dedent=True, lineCol=None):
+        self.addReIndentingDirective(expr, dedent=dedent, lineCol=lineCol)
             
     def addReturn(self, expr):
         assert not self._isGenerator
@@ -770,7 +774,7 @@ class MethodCompiler(GenUtils):
         self.addChunk('')
 
         self.addChunk('## START CACHE REGION: ID='+ID+
-                      '. line, col ' + str(lineCol) + ' in the source.')
+                      '. line %s, col %s'%lineCol + ' in the source.')
         
         self.addChunk('_RECACHE_%(ID)s = False'%locals())
         self.addChunk('_cacheRegion_%(ID)s = self.getCacheRegion(regionID='%locals()
@@ -855,7 +859,7 @@ class MethodCompiler(GenUtils):
         self.addChunk('## START %(regionTitle)s REGION: '%locals()
                       +ID
                       +' of '+functionName
-                      +' at line, col ' + str(lineCol) + ' in the source.')
+                      +' at line %s, col %s'%lineCol + ' in the source.')
         self.addChunk('_orig_trans%(ID)s = trans'%locals())
         self.addChunk('_wasBuffering%(ID)s = self._CHEETAH__isBuffering'%locals())
         self.addChunk('self._CHEETAH__isBuffering = True')
@@ -911,7 +915,7 @@ class MethodCompiler(GenUtils):
         self.addChunk('## END %(regionTitle)s REGION: '%locals()
                       +ID
                       +' of '+functionName
-                      +' at line, col ' + str(lineCol) + ' in the source.')        
+                      +' at line %s, col %s'%lineCol + ' in the source.')        
         self.addChunk('')
         self._callRegionsStack.pop() # attrib of current methodCompiler
 
@@ -928,7 +932,7 @@ class MethodCompiler(GenUtils):
         self._captureRegionsStack.append((ID,captureDetails)) # attrib of current methodCompiler
         self.addChunk('## START CAPTURE REGION: '+ID
                       +' '+assignTo
-                      +' at line, col ' + str(lineCol) + ' in the source.')
+                      +' at line %s, col %s'%lineCol + ' in the source.')
         self.addChunk('_orig_trans%(ID)s = trans'%locals())
         self.addChunk('_wasBuffering%(ID)s = self._CHEETAH__isBuffering'%locals())
         self.addChunk('self._CHEETAH__isBuffering = True')
@@ -1335,7 +1339,7 @@ class ClassCompiler(GenUtils):
             methodName = self._placeholderToErrorCatcherMap[rawCode]
             if not self.setting('outputRowColComments'):
                 self._methodsIndex[methodName].addMethDocString(
-                    'plus at line, col ' + str(lineCol))
+                    'plus at line %s, col %s'%lineCol)
             return methodName
 
         self._errorCatcherCount += 1
@@ -1346,7 +1350,7 @@ class ClassCompiler(GenUtils):
             methodName,
             klass=MethodCompiler,
             initialMethodComment=('## CHEETAH: Generated from ' + rawCode +
-                                  ' at line, col ' + str(lineCol) + '.')
+                                  ' at line %s, col %s'%lineCol + '.')
             )        
         catcherMeth.setMethodSignature('def ' + methodName +
                                        '(self, localsDict={})')

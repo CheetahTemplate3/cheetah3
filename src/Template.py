@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.173 2006/02/04 23:05:15 tavis_rudd Exp $
+# $Id: Template.py,v 1.174 2006/02/05 02:06:12 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.173 $
+Version: $Revision: 1.174 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/04 23:05:15 $
+Last Revision Date: $Date: 2006/02/05 02:06:12 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.173 $"[11:-2]
+__revision__ = "$Revision: 1.174 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -54,6 +54,7 @@ from Cheetah.Version import MinCompatibleVersion
 # Base classes for Template
 from Cheetah.Servlet import Servlet                 
 # More intra-package imports ...
+from Cheetah.Parser import ParseError, SourceReader
 from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
 from Cheetah import ErrorCatchers              # for placeholder tags
 from Cheetah import Filters                    # the output filters
@@ -726,6 +727,15 @@ class Template(Servlet):
                 cacheItem.lastCheckoutTime = time.time()
                 return cacheItem.klass
 
+            def updateLinecache(filename, src):
+                import linecache
+                size = len(src)
+                mtime = time.time()
+                lines = src.splitlines()
+                fullname = filename
+                linecache.cache[filename] = size, mtime, lines, fullname
+
+
             try:
                 klass._CHEETAH_compileLock.acquire()
                 uniqueModuleName = _genUniqueModuleName(moduleName)
@@ -734,6 +744,7 @@ class Template(Servlet):
                 sys.modules[uniqueModuleName] = mod
             finally:
                 klass._CHEETAH_compileLock.release()
+
             try:
                 if cacheModuleFilesForTracebacks:
                     if not os.path.exists(cacheDirForModuleFiles):
@@ -752,27 +763,34 @@ class Template(Servlet):
                             traceback.print_exc(file=sys.stderr)
                     finally:
                         klass._CHEETAH_compileLock.release()
-                try:
-                    co = compile(generatedModuleCode, __file__, 'exec')
-                except:
-                    print generatedModuleCode
-                    raise
 
+                if moduleGlobals:
+                    for k, v in moduleGlobals.items():
+                        setattr(mod, k, v)
                 mod.__file__ = __file__
                 if __orig_file__ and os.path.exists(__orig_file__):
                     # this is used in the WebKit filemonitoring code
                     mod.__orig_file__ = __orig_file__
 
-                if moduleGlobals:
-                    for k, v in moduleGlobals.items():
-                        setattr(mod, k, v)
-
                 if baseclass and baseclassValue:
                     setattr(mod, baseclassName, baseclassValue)
-                exec co in mod.__dict__
+
+                try:
+                    co = compile(generatedModuleCode, __file__, 'exec')
+                    exec co in mod.__dict__
+                except Exception, e:
+                    try:
+                        parseError = genParserErrorFromPyTraceback(
+                            source, file, generatedModuleCode, exception=e)
+                    except:
+                        traceback.print_exc()
+                        updateLinecache(__file__, generatedModuleCode)
+                        e.generatedModuleCode = generatedModuleCode
+                        raise e
+                    else:
+                        raise parseError
             except:
                 del sys.modules[uniqueModuleName]
-                print generatedModuleCode
                 raise
 
             templateClass = getattr(mod, className)
@@ -1703,9 +1721,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.173 $
+        Version: $Revision: 1.174 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/02/04 23:05:15 $
+        Last Revision Date: $Date: 2006/02/05 02:06:12 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
@@ -1757,5 +1775,61 @@ class Template(Servlet):
         return dic
 
 T = Template   # Short and sweet for debugging at the >>> prompt.
+
+
+def genParserErrorFromPyTraceback(source, file, generatedPyCode, exception):
+    formatedExc = traceback.format_exc(limit=0)
+    filename = isinstance(file, (str, unicode)) and file or None
+    formatedExcLines = formatedExc.splitlines()
+    pyLineno = int(re.search('[ \t]*File.*line (\d+)', formatedExc).group(1))
+    
+    lines = generatedPyCode.splitlines()
+    
+    prevLines = []                  # (i, content)
+    for i in range(1,4):
+        if pyLineno-i <=0:
+            break
+        prevLines.append( (pyLineno+1-i,lines[pyLineno-i]) )
+    
+    nextLines = []                  # (i, content)
+    for i in range(1,4):
+        if not pyLineno+i < len(lines):
+            break
+        nextLines.append( (pyLineno+i,lines[pyLineno+i]) )
+    nextLines.reverse()
+    report = 'Line|Python Code\n'
+    report += '----|-------------------------------------------------------------\n'
+    while prevLines:
+        lineInfo = prevLines.pop()
+        report += "%(row)-4d|%(line)s\n"% {'row':lineInfo[0], 'line':lineInfo[1]}
+    report += ' '*8+formatedExcLines[3]+'\n'
+    while nextLines:
+        lineInfo = nextLines.pop()
+        report += "%(row)-4d|%(line)s\n"% {'row':lineInfo[0], 'line':lineInfo[1]}
+    
+    
+    cheetahPosMatch = re.search('line (\d+), col (\d+)', formatedExc)
+    if cheetahPosMatch:
+        lineno = int(cheetahPosMatch.group(1))
+        col = int(cheetahPosMatch.group(2))
+    else:
+        lineno = None
+        col = None
+    message = [
+        "Error in the Python code which Cheetah generated for this template:",
+        '='*80,
+        '',
+        str(exception),
+        '',                            
+        report,
+        '='*80,
+        ]
+    if lineno:
+        message.append('\nHere is the corresponding Cheetah code:\n')
+    
+    message = '\n'.join(message)
+    reader = SourceReader(source, filename=filename)
+    return ParseError(reader, message, lineno=lineno,col=col)
+    
 
 # vim: shiftwidth=4 tabstop=4 expandtab

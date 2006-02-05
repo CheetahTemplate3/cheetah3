@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.124 2006/02/03 19:37:47 tavis_rudd Exp $
+# $Id: Parser.py,v 1.126 2006/02/05 02:10:02 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.124 $
+Version: $Revision: 1.126 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/02/03 19:37:47 $
+Last Revision Date: $Date: 2006/02/05 02:10:02 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.124 $"[11:-2]
+__revision__ = "$Revision: 1.126 $"[11:-2]
 
 import os
 import sys
@@ -27,6 +27,7 @@ import time
 from tokenize import pseudoprog
 import inspect
 import new
+import traceback
 
 from Cheetah.SourceReader import SourceReader
 from Cheetah import Filters
@@ -235,13 +236,17 @@ endDirectiveNamesAndHandlers = {
 ##################################################
 ## CLASSES ##
 
-class ParseError(SyntaxError):
-    def __init__(self, stream, msg='Invalid Syntax', extMsg=''):
+# @@TR: SyntaxError doesn't call exception.__str__ for some reason!
+#class ParseError(SyntaxError):
+class ParseError(ValueError):
+    def __init__(self, stream, msg='Invalid Syntax', extMsg='', lineno=None, col=None):
         self.stream = stream
         if stream.pos() >= len(stream):
             stream.setPos(len(stream) -1)
         self.msg = msg
         self.extMsg = extMsg
+        self.lineno = lineno
+        self.col = col
         
     def __str__(self):
         return self.report()
@@ -253,8 +258,12 @@ class ParseError(SyntaxError):
         else:
             f = ''
         report = ''
-        row, col, line = self.stream.getRowColLine()
-
+        if self.lineno:
+            lineno = self.lineno
+            row, col, line = (lineno, (self.col or 0),
+                              self.stream.splitlines()[lineno-1])
+        else:
+            row, col, line = self.stream.getRowColLine()
 
         ## get the surrounding lines
         lines = stream.splitlines()
@@ -272,8 +281,9 @@ class ParseError(SyntaxError):
         nextLines.reverse()
         
         ## print the main message
-        report += "\n\n%s. Line %i, column %i%s\n\n" % (self.msg, row, col, f)
-        report += 'Line|Line contents\n'
+        report += "\n\n%s\n" %self.msg
+        report += "Line %i, column %i%s\n\n" % (row, col, f)
+        report += 'Line|Cheetah Code\n'
         report += '----|-------------------------------------------------------------\n'
         while prevLines:
             lineInfo = prevLines.pop()
@@ -1513,7 +1523,7 @@ class _HighLevelParser(_LowLevelParser):
             if not handlerName:
                 handlerName = 'add'+directiveName.capitalize()
             handler = getattr(self._compiler, handlerName)
-            self.eatSimpleIndentingDirective(directiveName, handler)
+            self.eatSimpleIndentingDirective(directiveName, callback=handler)
         elif directiveName in self._simpleExprDirectives:
             handlerName = self._directiveHandlerNames.get(directiveName)
             if not handlerName:
@@ -1598,6 +1608,7 @@ class _HighLevelParser(_LowLevelParser):
         # filtered 
         isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
+        lineCol = self.getRowCol()
         self.getDirectiveStartToken()
         if directiveName not in 'else elif for while try except finally'.split():
             self.advance(len(directiveName))
@@ -1610,9 +1621,9 @@ class _HighLevelParser(_LowLevelParser):
         if self.matchColonForSingleLineShortFormDirective():
             self.advance() # skip over :
             if directiveName in 'else elif except finally'.split():
-                callback(expr, dedent=False)
+                callback(expr, dedent=False, lineCol=lineCol)
             else:
-                callback(expr)
+                callback(expr, lineCol=lineCol)
                 
             self.getWhiteSpace(max=1)
             self.parse(breakPoint=self.findEOL(gobble=True))
@@ -1625,7 +1636,7 @@ class _HighLevelParser(_LowLevelParser):
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
             if directiveName in self._closeableDirectives:
                 self.pushToOpenDirectivesStack(directiveName)
-            callback(expr)
+            callback(expr, lineCol=lineCol)
 
     def eatEndDirective(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
@@ -2378,7 +2389,7 @@ class _HighLevelParser(_LowLevelParser):
         lineCol = self.getRowCol()
 
         self.getDirectiveStartToken()
-        self.advance(len('capture'))
+        self.advance(len('capture'))        
         startPos = self.pos()
         self.getWhiteSpace()
 
@@ -2403,6 +2414,7 @@ class _HighLevelParser(_LowLevelParser):
         # filtered 
         isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLine = self.findEOL()
+        lineCol = self.getRowCol()
         self.getDirectiveStartToken()
         startPos = self.pos()
         
@@ -2428,10 +2440,10 @@ class _HighLevelParser(_LowLevelParser):
             trueExpr = ''.join(trueExpr)
             falseExpr = ''.join(falseExpr)
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)            
-            self._compiler.addTernaryExpr(conditionExpr, trueExpr, falseExpr)
+            self._compiler.addTernaryExpr(conditionExpr, trueExpr, falseExpr, lineCol=lineCol)
         elif self.matchColonForSingleLineShortFormDirective():
             self.advance() # skip over :
-            self._compiler.addIf(expr)
+            self._compiler.addIf(expr, lineCol=lineCol)
             self.getWhiteSpace(max=1)
             self.parse(breakPoint=self.findEOL(gobble=True))            
             self._compiler.commitStrConst()            
@@ -2442,7 +2454,7 @@ class _HighLevelParser(_LowLevelParser):
             self.getWhiteSpace()                
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)            
             self.pushToOpenDirectivesStack('if')
-            self._compiler.addIf(expr)
+            self._compiler.addIf(expr, lineCol=lineCol)
 
     ## end directive handlers
     def handleEndDef(self):
