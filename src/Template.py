@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.177 2006/02/05 02:53:12 tavis_rudd Exp $
+# $Id: Template.py,v 1.178 2006/02/05 03:43:11 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.177 $
+Version: $Revision: 1.178 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/05 02:53:12 $
+Last Revision Date: $Date: 2006/02/05 03:43:11 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.177 $"[11:-2]
+__revision__ = "$Revision: 1.178 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -781,7 +781,7 @@ class Template(Servlet):
                     exec co in mod.__dict__
                 except SyntaxError, e:
                     try:
-                        parseError = genParserErrorFromPyTraceback(
+                        parseError = genParserErrorFromPythonException(
                             source, file, generatedModuleCode, exception=e)
                     except:
                         traceback.print_exc()
@@ -1727,9 +1727,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.177 $
+        Version: $Revision: 1.178 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/02/05 02:53:12 $
+        Last Revision Date: $Date: 2006/02/05 03:43:11 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
@@ -1783,13 +1783,20 @@ class Template(Servlet):
 T = Template   # Short and sweet for debugging at the >>> prompt.
 
 
-def genParserErrorFromPyTraceback(source, file, generatedPyCode, exception):
-    sio = StringIO.StringIO()
-    traceback.print_exc(0, sio)
-    formatedExc = sio.getvalue()
+def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
+
+    #print dir(exception)
+    
     filename = isinstance(file, (str, unicode)) and file or None
-    formatedExcLines = formatedExc.splitlines()
-    pyLineno = int(re.search('[ \t]*File.*line (\d+)', formatedExc).group(1))
+
+    sio = StringIO.StringIO()
+    traceback.print_exc(1, sio)
+    formatedExc = sio.getvalue()
+    
+    if hasattr(exception, 'lineno'):
+        pyLineno = exception.lineno
+    else:
+        pyLineno = int(re.search('[ \t]*File.*line (\d+)', formatedExc).group(1))
        
     lines = generatedPyCode.splitlines()
     
@@ -1810,7 +1817,10 @@ def genParserErrorFromPyTraceback(source, file, generatedPyCode, exception):
     while prevLines:
         lineInfo = prevLines.pop()
         report += "%(row)-4d|%(line)s\n"% {'row':lineInfo[0], 'line':lineInfo[1]}
-    report += ' '*8+formatedExcLines[3]+'\n'
+
+    if hasattr(exception, 'offset'):
+        report += ' '*(3+exception.offset) + '^\n'
+    
     while nextLines:
         lineInfo = nextLines.pop()
         report += "%(row)-4d|%(line)s\n"% {'row':lineInfo[0], 'line':lineInfo[1]}
