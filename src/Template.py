@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.175 2006/02/05 02:34:45 tavis_rudd Exp $
+# $Id: Template.py,v 1.176 2006/02/05 02:43:35 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.175 $
+Version: $Revision: 1.176 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/05 02:34:45 $
+Last Revision Date: $Date: 2006/02/05 02:43:35 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.175 $"[11:-2]
+__revision__ = "$Revision: 1.176 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -27,6 +27,7 @@ import time                       # used in the cache refresh code
 from random import randrange
 import imp
 import inspect
+import StringIO
 import traceback
 import pprint
 import cgi                # Used by .webInput() if the template is a CGI script.
@@ -1721,9 +1722,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.175 $
+        Version: $Revision: 1.176 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/02/05 02:34:45 $
+        Last Revision Date: $Date: 2006/02/05 02:43:35 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
@@ -1778,7 +1779,9 @@ T = Template   # Short and sweet for debugging at the >>> prompt.
 
 
 def genParserErrorFromPyTraceback(source, file, generatedPyCode, exception):
-    formatedExc = traceback.format_exc(limit=0)
+    sio = StringIO.StringIO()
+    traceback.print_exc(0, sio)
+    formatedExc = sio.getvalue()
     filename = isinstance(file, (str, unicode)) and file or None
     formatedExcLines = formatedExc.splitlines()
     pyLineno = int(re.search('[ \t]*File.*line (\d+)', formatedExc).group(1))
