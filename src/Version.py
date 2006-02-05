@@ -1,9 +1,10 @@
-Version = '2.0rc5'
-VersionTuple = (2,0,0,'candidate',5)
+Version = '2.0rc6'
+VersionTuple = (2,0,0,'candidate',6)
 
-MinCompatibleVersion = '2.0rc3'
-MinCompatibleVersionTuple = (2,0,0,'candidate',3)
+MinCompatibleVersion = '2.0rc6'
+MinCompatibleVersionTuple = (2,0,0,'candidate',6)
 
+####
 def convertVersionStringToTuple(s):
     versionNum = [0,0,0]
     releaseType = 'final'
