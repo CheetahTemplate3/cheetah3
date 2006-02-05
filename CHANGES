@@ -2,6 +2,52 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0rc6 (Feb 4, 2006)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+  Core Changes: [TR]      
+    - added a Cheetah version dependency check that raises an assertion if a
+      template was compiled with an previous version of Cheetah whose templates
+      must be recompiled.
+
+    - major improvement to exception reporting in cases where bad Python syntax
+      slips past the Cheetah parser:
+      """
+         File "/usr/lib/python2.4/site-packages/Cheetah/Template.py", line 792, in compile
+           raise parseError
+       Cheetah.Parser.ParseError: 
+       
+       Error in the Python code which Cheetah generated for this template:
+       ================================================================================
+       
+       invalid syntax (DynamicallyCompiledCheetahTemplate.py, line 86)
+       
+       Line|Python Code
+       ----|-------------------------------------------------------------
+       84  |        
+       85  |        write('\n\n')
+       86  |        for i an range(10): # generated from line 4, col 1
+                           ^
+       87  |            _v = i # '$i' on line 5, col 3
+       88  |            if _v is not None: write(_filter(_v, rawExpr='$i')) # from line 5, col 3.
+       89  |            write('\n')
+       
+       ================================================================================
+       
+       Here is the corresponding Cheetah code:
+       
+       Line 4, column 1
+       
+       Line|Cheetah Code
+       ----|-------------------------------------------------------------
+       2   |#compiler useNameMapper=False
+       3   |
+       4   |#for i an range(10)
+            ^
+       5   |  $i
+       6   |#end for
+       7   |
+       """
+       
 2.0rc5 (Feb 3, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      
