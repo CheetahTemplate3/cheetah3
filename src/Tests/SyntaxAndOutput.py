@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.99 2006/01/31 05:08:10 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.100 2006/02/09 18:35:43 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.99 $
+Version: $Revision: 1.100 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/31 05:08:10 $
+Last Revision Date: $Date: 2006/02/09 18:35:43 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.99 $"[11:-2]
+__revision__ = "$Revision: 1.100 $"[11:-2]
 
 
 ##################################################
@@ -1969,8 +1969,10 @@ class SetDirective(OutputTest):
 
     def test1(self):
         """simple #set"""
-        self.verify("#set $testVar = 'blarg'",
-                    "")
+        self.verify("#set $testVar = 'blarg'\n$testVar",
+                    "blarg")
+        self.verify("#set testVar = 'blarg'\n$testVar",
+                    "blarg")
 
     def test2(self):
         """simple #set with no WS between operands"""
