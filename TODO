@@ -12,6 +12,11 @@ Required for Cheetah 2.0
 - Replace Optik with Python's optparse.  Optik license has been removed from
   Users' Guide.
 
+Desired for Cheetah 2.0
+=======================
+- Smart HTML filter that escapes all values except those individually marked as
+  preformatted, a la Kid/PTL/QPY. (MO)
+
 
 TODO Items (many are just ideas. This is not an official roadmap!)
 ================================================================================

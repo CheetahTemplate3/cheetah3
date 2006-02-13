@@ -5,4 +5,12 @@ Known Bugs in Cheetah
    Cheetah, be sure to note its fix in the CHANGES file!
 --------------------------
 
-No known bugs at present.
+Dict method bug
+---------------
+Do not use placeholder names identical to Python dict methods, or Cheetah will
+return the wrong value.  The most notorious names are $update, $keys, $values,
+$items.  A complete list is at http://docs.python.org/lib/typesmapping.html.
+Note that future versions of Python may add dict methods.  This bug is
+difficult to fix given Cheetah's NameMapper, so it will remain around for a
+long time.  (MO 2006/02/11)
+
