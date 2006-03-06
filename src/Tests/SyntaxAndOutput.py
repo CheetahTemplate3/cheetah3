@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.101 2006/03/06 21:18:40 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.102 2006/03/06 21:28:59 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.101 $
+Version: $Revision: 1.102 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/03/06 21:18:40 $
+Last Revision Date: $Date: 2006/03/06 21:28:59 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.101 $"[11:-2]
+__revision__ = "$Revision: 1.102 $"[11:-2]
 
 
 ##################################################
@@ -2135,6 +2135,9 @@ class IfDirective(OutputTest):
 
         self.verify("#if 1 ##comment \n$aStr\n#end if\n",
                         "blarg\n")
+
+        self.verify("#if 1##for i in range(10)#$i#end for##end if",
+                    '0123456789')
 
     def test2(self):
         """simple #if block, with WS"""
