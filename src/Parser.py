@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.125 2006/02/05 02:06:33 tavis_rudd Exp $
+# $Id: Parser.py,v 1.127 2006/03/06 21:19:14 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.125 $
+Version: $Revision: 1.127 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/02/05 02:06:33 $
+Last Revision Date: $Date: 2006/03/06 21:19:14 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.125 $"[11:-2]
+__revision__ = "$Revision: 1.127 $"[11:-2]
 
 import os
 import sys
@@ -692,7 +692,12 @@ class _LowLevelParser(SourceReader):
     def matchColonForSingleLineShortFormDirective(self):
         if not self.atEnd() and self.peek()==':':
             restOfLine = self[self.pos()+1:self.findEOL()]
-            if restOfLine.strip(): # not WS only to EOL
+            restOfLine = restOfLine.strip()
+            if not restOfLine:
+                return False
+            elif self.commentStartTokenRE.match(restOfLine):
+                return False
+            else: # non-whitespace, non-commment chars found
                 return True
         return False        
 
@@ -1542,9 +1547,21 @@ class _HighLevelParser(_LowLevelParser):
             callback(parser=self, directiveName=directiveName)
 
     def _eatRestOfDirectiveTag(self, isLineClearToStartToken, endOfFirstLinePos):
-        if self.matchDirectiveEndToken():
-            self.getDirectiveEndToken()
+        foundComment = False
+        if self.matchCommentStartToken():
+            pos = self.pos()
+            self.advance()
+            if not self.matchDirective():
+                self.setPos(pos)
+                foundComment = True
+                self.eatComment() # this won't gobble the EOL
+            else:
+                self.setPos(pos)
+            
+        if not foundComment and self.matchDirectiveEndToken():
+                self.getDirectiveEndToken()
         elif isLineClearToStartToken and (not self.atEnd()) and self.peek() in '\r\n':
+            # still gobble the EOL if a comment was found. 
             self.readToEOL(gobble=True)
             
         if isLineClearToStartToken and (self.atEnd() or self.pos() > endOfFirstLinePos):
@@ -2009,7 +2026,6 @@ class _HighLevelParser(_LowLevelParser):
             self.getWhiteSpace()
             style = SET_MODULE
 
-        # @@TR: this needs expanding to handle (i,j) = list style assignments
         startsWithDollar = self.matchCheetahVarStart()
         startPos = self.pos()
         LVALUE = self.getExpression(pyTokensToBreakAt=assignmentOps, useNameMapper=False).strip()
@@ -2389,7 +2405,7 @@ class _HighLevelParser(_LowLevelParser):
         lineCol = self.getRowCol()
 
         self.getDirectiveStartToken()
-        self.advance(len('capture'))
+        self.advance(len('capture'))        
         startPos = self.pos()
         self.getWhiteSpace()
 
@@ -2414,6 +2430,7 @@ class _HighLevelParser(_LowLevelParser):
         # filtered 
         isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLine = self.findEOL()
+        lineCol = self.getRowCol()
         self.getDirectiveStartToken()
         startPos = self.pos()
         
@@ -2439,10 +2456,10 @@ class _HighLevelParser(_LowLevelParser):
             trueExpr = ''.join(trueExpr)
             falseExpr = ''.join(falseExpr)
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)            
-            self._compiler.addTernaryExpr(conditionExpr, trueExpr, falseExpr)
+            self._compiler.addTernaryExpr(conditionExpr, trueExpr, falseExpr, lineCol=lineCol)
         elif self.matchColonForSingleLineShortFormDirective():
             self.advance() # skip over :
-            self._compiler.addIf(expr)
+            self._compiler.addIf(expr, lineCol=lineCol)
             self.getWhiteSpace(max=1)
             self.parse(breakPoint=self.findEOL(gobble=True))            
             self._compiler.commitStrConst()            
@@ -2453,7 +2470,7 @@ class _HighLevelParser(_LowLevelParser):
             self.getWhiteSpace()                
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)            
             self.pushToOpenDirectivesStack('if')
-            self._compiler.addIf(expr)
+            self._compiler.addIf(expr, lineCol=lineCol)
 
     ## end directive handlers
     def handleEndDef(self):
