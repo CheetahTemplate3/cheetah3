@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.103 2006/03/06 21:33:38 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.104 2006/03/06 22:10:14 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.103 $
+Version: $Revision: 1.104 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/03/06 21:33:38 $
+Last Revision Date: $Date: 2006/03/06 22:10:14 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.103 $"[11:-2]
+__revision__ = "$Revision: 1.104 $"[11:-2]
 
 
 ##################################################
@@ -251,6 +251,9 @@ class EmptyTemplate(OutputTest):
             self.fail("This should barf about respond() not being implemented.")
 
         self.verify("#implements respond", "")
+
+        self.verify("#implements respond(foo=1234)", "")
+
 
 class Backslashes(OutputTest):
     convertEOLs = False
@@ -2647,6 +2650,14 @@ class ExtendsDirective(OutputTest):
 $spacer()
 """,
                     '<img src="spacer.gif" width="1" height="1" alt="" />\n')
+
+
+        self.verify("""#from Cheetah.Templates._SkeletonPage import _SkeletonPage
+#extends _SkeletonPage
+#implements respond(foo=1234)
+$spacer()$foo
+""",
+                    '<img src="spacer.gif" width="1" height="1" alt="" />1234\n')
 
     def test2(self):
         """#extends Cheetah.Templates.SkeletonPage without #import"""
