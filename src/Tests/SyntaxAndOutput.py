@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.100 2006/02/09 18:35:43 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.101 2006/03/06 21:18:40 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.100 $
+Version: $Revision: 1.101 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/09 18:35:43 $
+Last Revision Date: $Date: 2006/03/06 21:18:40 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.100 $"[11:-2]
+__revision__ = "$Revision: 1.101 $"[11:-2]
 
 
 ##################################################
@@ -1485,6 +1485,16 @@ class ForDirective(OutputTest):
         self.verify("#for $i in range(5)\n$i\n#end for",
                     "0\n1\n2\n3\n4\n")
 
+        self.verify("#for $i in range(5):\n$i\n#end for",
+                    "0\n1\n2\n3\n4\n")
+
+        self.verify("#for $i in range(5): ##comment\n$i\n#end for",
+                    "0\n1\n2\n3\n4\n")
+
+        self.verify("#for $i in range(5) ##comment\n$i\n#end for",
+                    "0\n1\n2\n3\n4\n")
+
+
     def test2(self):
         """#for loop with WS in loop"""
         self.verify("#for $i in range(5)\n$i \n#end for",
@@ -1576,6 +1586,14 @@ class RepeatDirective(OutputTest):
         """basic #repeat"""
         self.verify("#repeat 3\n1\n#end repeat",
                     "1\n1\n1\n")
+        self.verify("#repeat 3: \n1\n#end repeat",
+                    "1\n1\n1\n")
+
+        self.verify("#repeat 3 ##comment\n1\n#end repeat",
+                    "1\n1\n1\n")
+
+        self.verify("#repeat 3: ##comment\n1\n#end repeat",
+                    "1\n1\n1\n")
 
     def test2(self):
         """#repeat with numeric expression"""
@@ -1644,6 +1662,12 @@ class DefDirective(OutputTest):
     def test1(self):
         """#def without argstring"""
         self.verify("#def testMeth\n1234\n#end def\n$testMeth",
+                    "1234\n")
+
+        self.verify("#def testMeth ## comment\n1234\n#end def\n$testMeth",
+                    "1234\n")
+
+        self.verify("#def testMeth: ## comment\n1234\n#end def\n$testMeth",
                     "1234\n")
 
     def test2(self):
@@ -1774,6 +1798,9 @@ class BlockDirective(OutputTest):
     def test1(self):
         """#block without argstring"""
         self.verify("#block testBlock\n1234\n#end block",
+                    "1234\n")
+
+        self.verify("#block testBlock ##comment\n1234\n#end block",
                     "1234\n")
 
     def test2(self):
@@ -1960,6 +1987,9 @@ class SilentDirective(OutputTest):
         self.verify("#silent $anObj.callIt\n$anObj.callArg",
                     "1234")
 
+        self.verify("#silent $anObj.callIt ##comment\n$anObj.callArg",
+                    "1234")
+
     def test3(self):
         """simple #silent"""
         self.verify("#silent $anObj.callIt(99)\n$anObj.callArg",
@@ -1972,6 +2002,10 @@ class SetDirective(OutputTest):
         self.verify("#set $testVar = 'blarg'\n$testVar",
                     "blarg")
         self.verify("#set testVar = 'blarg'\n$testVar",
+                    "blarg")
+
+
+        self.verify("#set testVar = 'blarg'##comment\n$testVar",
                     "blarg")
 
     def test2(self):
@@ -2089,6 +2123,19 @@ class IfDirective(OutputTest):
         """simple #if block"""
         self.verify("#if 1\n$aStr\n#end if\n",
                     "blarg\n")
+
+        self.verify("#if 1:\n$aStr\n#end if\n",
+                    "blarg\n")
+
+        self.verify("#if 1:   \n$aStr\n#end if\n",
+                    "blarg\n")
+
+        self.verify("#if 1: ##comment \n$aStr\n#end if\n",
+                        "blarg\n")
+
+        self.verify("#if 1 ##comment \n$aStr\n#end if\n",
+                        "blarg\n")
+
     def test2(self):
         """simple #if block, with WS"""
         self.verify("   #if 1\n$aStr\n  #end if  \n",
@@ -2170,6 +2217,10 @@ class IfDirective(OutputTest):
         self.verify("#if 1: foo\n#if 0: bar\n#if 1: foo",
                     "foo\nfoo")
 
+
+        self.verify("#if 1: foo\n#if 0: bar\n#if 1: foo",
+                    "foo\nfoo")
+
     def test18(self):
         """single-line #if: \n#else: """
         self.verify("#if 1: foo\n#elif 0: bar",
@@ -2187,6 +2238,16 @@ class UnlessDirective(OutputTest):
         """#unless 1"""
         self.verify("#unless 1\n 1234 \n#end unless",
                     "")
+
+        self.verify("#unless 1:\n 1234 \n#end unless",
+                    "")
+
+        self.verify("#unless 1: ##comment\n 1234 \n#end unless",
+                    "")
+
+        self.verify("#unless 1 ##comment\n 1234 \n#end unless",
+                    "")
+
 
     def test2(self):
         """#unless 0"""
