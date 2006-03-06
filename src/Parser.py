@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.128 2006/03/06 22:13:16 tavis_rudd Exp $
+# $Id: Parser.py,v 1.129 2006/03/06 22:18:30 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.128 $
+Version: $Revision: 1.129 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/03/06 22:13:16 $
+Last Revision Date: $Date: 2006/03/06 22:18:30 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.128 $"[11:-2]
+__revision__ = "$Revision: 1.129 $"[11:-2]
 
 import os
 import sys
@@ -32,8 +32,7 @@ import traceback
 from Cheetah.SourceReader import SourceReader
 from Cheetah import Filters
 from Cheetah import ErrorCatchers
-
-class Unspecified: pass
+from Cheetah.Unspecified import Unspecified
 
 # re tools
 def escapeRegexChars(txt,
@@ -142,9 +141,6 @@ EOLre=re.compile(r'(?:\r\n|\r|\n)')
 
 specialVarRE=re.compile(r'([a-zA-z_]+)@') # for matching specialVar comments
 # e.g. ##author@ Tavis Rudd
-
-
-
 
 directiveNamesAndParsers = {
     # importing and inheritance

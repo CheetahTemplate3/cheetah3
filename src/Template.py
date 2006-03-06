@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.178 2006/02/05 03:43:11 tavis_rudd Exp $
+# $Id: Template.py,v 1.179 2006/03/06 22:19:00 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.178 $
+Version: $Revision: 1.179 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/05 03:43:11 $
+Last Revision Date: $Date: 2006/03/06 22:19:00 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.178 $"[11:-2]
+__revision__ = "$Revision: 1.179 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -68,16 +68,9 @@ from Cheetah.NameMapper import NotFound, valueFromSearchList
 from Cheetah.CacheStore import MemoryCacheStore, MemcachedCacheStore
 from Cheetah.CacheRegion import CacheRegion
 from Cheetah.Utils.WebInputMixin import _Converter, _lookup, NonNumericInputError
-try:
-    from ds.sys.Unspecified import Unspecified
-except ImportError:
-    class _Unspecified:
-        def __repr__(self):
-            return 'Unspecified'        
-        def __str__(self):
-            return 'Unspecified'
-    Unspecified = _Unspecified()
-    
+
+from Cheetah.Unspecified import Unspecified
+
 class Error(Exception):  pass
 class PreprocessError(Error): pass
 
@@ -1727,9 +1720,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.178 $
+        Version: $Revision: 1.179 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/02/05 03:43:11 $
+        Last Revision Date: $Date: 2006/03/06 22:19:00 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
