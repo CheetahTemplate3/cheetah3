@@ -2,6 +2,38 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0rc7 (unreleased )
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+  Core Changes: [TR]      
+    - extended the #implements directive so an arguments list can be declared in
+      the same fashion as #def and #block.
+
+    - tweaked the parser so it's possible to place a comment on the same line as
+      a directive without needing to explicitly close the directive first. This
+      works regardless of whether or not you added a colon.
+      
+              self.verify("#if 1:\n$aStr\n#end if\n",
+                          "blarg\n")
+      
+              self.verify("#if 1:   \n$aStr\n#end if\n",
+                          "blarg\n")
+      
+              self.verify("#if 1: ##comment \n$aStr\n#end if\n",
+                              "blarg\n")
+      
+              self.verify("#if 1 ##comment \n$aStr\n#end if\n",
+                              "blarg\n")
+      
+      Previously, that last test would have required an extra # to close the #if 
+      directive before the comment directive started:
+              self.verify("#if 1 ###comment \n$aStr\n#end if\n",
+                              "blarg\n")
+      
+      Code that makes use of explicit directive close tokens immediately followed by 
+      another directive will still work as expected:
+      #if test##for i in range(10)# foo $i#end for##end if
+          
+
 2.0rc6 (Feb 4, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      
