@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.127 2006/03/06 21:19:14 tavis_rudd Exp $
+# $Id: Parser.py,v 1.128 2006/03/06 22:13:16 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.127 $
+Version: $Revision: 1.128 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/03/06 21:19:14 $
+Last Revision Date: $Date: 2006/03/06 22:13:16 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.127 $"[11:-2]
+__revision__ = "$Revision: 1.128 $"[11:-2]
 
 import os
 import sys
@@ -1998,11 +1998,24 @@ class _HighLevelParser(_LowLevelParser):
         endOfFirstLine = self.findEOL()
         self.getDirectiveStartToken()
         self.advance(len('implements'))
-        self.getWhiteSpace()
+        self.getWhiteSpace()       
         startPos = self.pos()
         methodName = self.getIdentifier()
-        methodName = self._applyExpressionFilters(methodName, 'implements', startPos=startPos)
+        if not self.atEnd() and self.peek() == '(':
+            argsList = self.getDefArgList()
+            self.advance()              # past the closing ')'
+            if argsList and argsList[0][0] == 'self':
+                del argsList[0]
+        else:
+            argsList=[]
+
+        # @@TR: need to split up filtering of the methodname and the args
+        #methodName = self._applyExpressionFilters(methodName, 'implements', startPos=startPos)
+        self._applyExpressionFilters(self[startPos:self.pos()], 'implements', startPos=startPos)
+
         self._compiler.setMainMethodName(methodName)
+        self._compiler.setMainMethodArgs(argsList)
+            
         self.getExpression()  # throw away and unwanted crap that got added in
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
 
