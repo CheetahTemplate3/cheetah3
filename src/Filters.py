@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.27 2005/12/13 04:50:57 tavis_rudd Exp $
+# $Id: Filters.py,v 1.28 2006/06/16 20:15:24 hierro Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -7,15 +7,17 @@ Class DummyTemplate, instance _dummyTemplateObj and class NoDefault exist only
 for this, to provide a default argument for the filter constructors (which
 would otherwise require a real template object).  
 
+The default filter is now RawOrEncodedUnicode.  Please use this as a base class instead of Filter because it handles non-ASCII characters better.
+
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.27 $
+Version: $Revision: 1.28 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/12/13 04:50:57 $
+Last Revision Date: $Date: 2006/06/16 20:15:24 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.27 $"[11:-2]
+__revision__ = "$Revision: 1.28 $"[11:-2]
 
 from StringIO import StringIO # not cStringIO because of unicode support
 
@@ -52,7 +54,7 @@ _dummyTemplateObj = DummyTemplate()
 ##################################################
 ## BASE CLASS
 
-class Filter:
+class Filter(object):
     """A baseclass for the Cheetah Filters."""
     
     def __init__(self, templateObj=_dummyTemplateObj):
@@ -141,20 +143,18 @@ class RawOrEncodedUnicode(Filter):
         return filtered
 
 #####
-class MaxLen(Filter):
+class MaxLen(RawOrEncodedUnicode):
     def filter(self, val, **kw):
         """Replace None with '' and cut off at maxlen."""
         
-        if val is None:
-            return ''
-        output = str(val)
+    	output = super(MaxLen, self).filter(val, **kw)
         if kw.has_key('maxlen') and len(output) > kw['maxlen']:
             return output[:kw['maxlen']]
         return output
 
 
 #####
-class Pager(Filter):
+class Pager(RawOrEncodedUnicode):
     def __init__(self, templateObj=_dummyTemplateObj):
         Filter.__init__(self, templateObj)
         self._IDcounter = 0
@@ -174,9 +174,7 @@ class Pager(Filter):
     
     def filter(self, val, **kw):
         """Replace None with '' and cut off at maxlen."""
-        if val is None:
-            return ''
-        output = str(val)
+    	output = super(Pager, self).filter(val, **kw)
         if kw.has_key('trans') and kw['trans']:
             ID = kw['ID']
             marker = kw.get('marker', '<split>')
@@ -203,14 +201,11 @@ class Pager(Filter):
 
 
 #####
-class WebSafe(Filter):
+class WebSafe(RawOrEncodedUnicode):
     """Escape HTML entities in $placeholders.
     """
     def filter(self, val, **kw):
-        # Do the default conversion.
-        if val is None:
-            return ''
-        s = str(val)
+    	s = super(WebSafe, self).filter(val, **kw)
         # These substitutions are copied from cgi.escape().
         s = s.replace("&", "&amp;") # Must be done first!
         s = s.replace("<", "&lt;")
@@ -230,7 +225,7 @@ class WebSafe(Filter):
 
 
 #####
-class Strip(Filter):
+class Strip(RawOrEncodedUnicode):
     """Strip leading/trailing whitespace but preserve newlines.
 
     This filter goes through the value line by line, removing leading and
@@ -246,35 +241,32 @@ class Strip(Filter):
     with the proposed #sed directive (which has not been ratified yet.)
     """
     def filter(self, val, **kw):
-        if val is None:
-            return ''
-        s = str(val)
-        result = StringIO()
+    	s = super(Strip, self).filter(val, **kw)
+        result = []
         start = 0   # The current line will be s[start:end].
         while 1: # Loop through each line.
             end = s.find('\n', start)  # Find next newline.
             if end == -1:  # If no more newlines.
                 break
             chunk = s[start:end].strip()
-            result.write(chunk)
-            result.write('\n')
+            result.append(chunk)
+            result.append('\n')
             start = end + 1
         # Write the unfinished portion after the last newline, if any.
         chunk = s[start:].strip()
-        result.write(chunk)
-        return result.getvalue()
+        result.append(chunk)
+        return "".join(result)
 
 #####
-class StripSqueeze(Filter):
+class StripSqueeze(RawOrEncodedUnicode):
     """Canonicalizes every chunk of whitespace to a single space.
 
     Strips leading/trailing whitespace.  Removes all newlines, so multi-line
     input is joined into one ling line with NO trailing newline.
     """
     def filter(self, val, **kw):
-        if val is None:
-            return ''
-        s = str(val).split()
+    	s = super(StripSqueeze, self).filter(val, **kw)
+        s = s.split()
         return " ".join(s)
     
 ##################################################
