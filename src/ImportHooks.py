@@ -1,20 +1,24 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.24 2006/01/03 19:55:57 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.25 2006/06/20 19:23:27 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
+
+To use these:
+  import Cheetah.ImportHooks
+  Cheetah.ImportHooks.install()
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.24 $
+Version: $Revision: 1.25 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/03 19:55:57 $
+Last Revision Date: $Date: 2006/06/20 19:23:27 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.24 $"[11:-2]
+__revision__ = "$Revision: 1.25 $"[11:-2]
 
 import sys
 import os.path
@@ -47,29 +51,33 @@ class CheetahDirOwner(DirOwner):
     _lock = Lock()
     _acquireLock = _lock.acquire
     _releaseLock = _lock.release
-    
 
-    def getmod(self, name):        
-        tmplPath =  os.path.join(self.path, name + '.tmpl')
-        mod = DirOwner.getmod(self, name)
-        if mod:
-            return mod
-        elif not os.path.exists(tmplPath):
-            return None
-        else:
+    templateFileExtensions = ('.tmpl',)
+
+    def getmod(self, name):
+        try:        
             self._acquireLock()
-            try:
-                try:
-                    return self._compile(name, tmplPath)
-                except:
-                    # @@TR: log the error
-                    exc_txt = traceback.format_exc()
-                    exc_txt ='  '+('  \n'.join(exc_txt.splitlines()))
-                    raise ImportError(
-                        'Error while compiling Cheetah module'
+            mod = DirOwner.getmod(self, name)
+            if mod:
+                return mod
+
+            for ext in self.templateFileExtensions:
+                tmplPath =  os.path.join(self.path, name + ext)
+                if os.path.exists(tmplPath):
+                    try:
+                        return self._compile(name, tmplPath)
+                    except:
+                        # @@TR: log the error
+                        exc_txt = traceback.format_exc()
+                        exc_txt ='  '+('  \n'.join(exc_txt.splitlines()))
+                        raise ImportError(
+                            'Error while compiling Cheetah module'
                         ' %(name)s, original traceback follows:\n%(exc_txt)s'%locals())
-            finally:
-                self._releaseLock()          
+            ##
+            return None
+
+        finally:
+            self._releaseLock()          
 
     def _compile(self, name, tmplPath):
         ## @@ consider adding an ImportError raiser here
@@ -100,10 +108,12 @@ class CheetahDirOwner(DirOwner):
 ##################################################
 ## FUNCTIONS
 
-def install():
+def install(templateFileExtensions=('.tmpl',)):
     """Install the Cheetah Import Hooks"""
+
     global _installed
     if not _installed:
+        CheetahDirOwner.templateFileExtensions = templateFileExtensions
         import __builtin__
         if type(__builtin__.__import__) == types.BuiltinFunctionType:
             global __oldimport__
