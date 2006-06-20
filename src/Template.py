@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.179 2006/03/06 22:19:00 tavis_rudd Exp $
+# $Id: Template.py,v 1.180 2006/06/20 06:07:13 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.179 $
+Version: $Revision: 1.180 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/03/06 22:19:00 $
+Last Revision Date: $Date: 2006/06/20 06:07:13 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.179 $"[11:-2]
+__revision__ = "$Revision: 1.180 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -593,6 +593,8 @@ class Template(Servlet):
             vt(file, 'file',[N,S,U,F], 'string, file-like object, or None')
 
             baseclass = valOrDefault(baseclass, klass._CHEETAH_defaultBaseclassForTemplates)
+            if isinstance(baseclass, Template):
+                baseclass = baseclass.__class__
             vt(baseclass, 'baseclass', [N,S,C,type], 'string, class or None')
 
             cacheCompilationResults = valOrDefault(
@@ -1720,9 +1722,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.179 $
+        Version: $Revision: 1.180 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/03/06 22:19:00 $
+        Last Revision Date: $Date: 2006/06/20 06:07:13 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
