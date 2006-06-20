@@ -138,8 +138,8 @@
   <div class="homePageDownloadBar">
    <div class="homePageDownloadBarInner">
     <b>Download</b> <a
-  href="http://sourceforge.net/project/showfiles.php?group_id=28961">Cheetah 2.0rc4</a>
- (released on Jan 31, 2006): major feature enhancements.
+  href="http://sourceforge.net/project/showfiles.php?group_id=28961">Cheetah 2.0rc6</a>
+ (released on Feb 4, 2006): major feature enhancements.
     </div>
   </div>
 
@@ -347,7 +347,7 @@ advice, encouragement, code and bug reports: </p>
   Tracy Ruggles
   Tom Schwaller
   Warren Smith
-  William Dode
+  William Dodé
   Winston Wolff
   Zed Lopez
 
@@ -384,13 +384,13 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
   <a href="docs/users_guide.pdf">PDF</a>
   </p>
 
-  <p><b>Cheetah Developers$(apos) Guide:</b>
-  <a href="docs/devel_guide_html/"><b>HTML</b></a>
-  <a href="docs/devel_guide_html_multipage/">Multi-page HTML</a>
-  <a href="docs/devel_guide.ps">Postscript</a>
-  <a href="docs/devel_guide.txt">Text</a>
-  <a href="docs/devel_guide.pdf">PDF</a>
-  </p>
+  ##<p><b>Cheetah Developers$(apos) Guide:</b>
+  ##<a href="docs/devel_guide_html/"><b>HTML</b></a>
+  ##<a href="docs/devel_guide_html_multipage/">Multi-page HTML</a>
+  ##<a href="docs/devel_guide.ps">Postscript</a>
+  ##<a href="docs/devel_guide.txt">Text</a>
+  ##<a href="docs/devel_guide.pdf">PDF</a>
+  ##</p>
 
   <p> Also see the latest 
   <a href="docs/CHANGES">CHANGES</a>,
@@ -488,7 +488,7 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 
   <p>The most <a
   href="http://sourceforge.net/project/showfiles.php?group_id=28961">recent
-  development release</a> was 2.0rc4 on Jan 31, 2006.</p>
+  development release</a> was 2.0rc6 on Feb 4, 2006.</p>
 
   <p>Here$(apos)s the documentation on <a
   href="http://cheetahtemplate.org/docs/CHANGES">recent changes</a>.</p>
@@ -629,7 +629,7 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 	    $makeLink('http://www.asti-usa.com/') #slurp
 		(Andrew Kuchling is currently porting their large web app to Cheetah)
             $makeLink('http://snurf.bdash.net.nz/') a Python-based blogging system
-	    $makeLink('http://linuxgazette.com/')
+	    $makeLink('http://linuxgazette.net/')
 	    $makeLink('http://pyblosxom.sourceforge.net/')
 	    $makeLink('http://pyds.muensterland.org/')
 	    $makeLink('http://faces.homeip.net/')
@@ -656,6 +656,7 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 	      $makeLink('http://www.alqua.org/') (Spanish)
               $makeLink('http://bank.muratordom.pl/') (Polish)
               $makeLink('http://bank.muratorplus.pl/') (Polish)
+   	      $makeLink('http://ustawki.net/') game-manager for soccer fans (Polish) 
               $makeLink('http://www.encyclon.net/multiblast') (Korean) Bioinformatics Tool
               $makeLink('http://www.aufeinander.de/') (German)
               $makeLink('http://www.katechese.at/') (German)
@@ -667,9 +668,9 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
               $makeLink('http://flibuste.net/') (French)
               $makeLink('http://www.tac.cz/') (Czech) 
               $makeLink('http://www.cestovatel.cz/') (Czech) 
+              $makeLink('http://www.geogr.muni.cz/') (Czech) 
               $makeLink('http://www.iddk.ru/') (Russian)
               $makeLink('http://shop.iddk.ru/') (Russian)
-   	      $makeLink('http://ustawki.net/') game-manager for soccer fans (Czech?) 
   	    #end call  
             </ul>
 	  </li>
@@ -779,7 +780,7 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 ################################################################################
 #def praisePageContents
   #call $shortPraiseSection
-    $formatQuote("There is no better solution than Cheetah.", 'Wilk')
+    $formatQuote("There is no better solution than Cheetah.", 'William Dodé')
 
     ##post on cheetah list about initd.org
 
@@ -955,7 +956,7 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
     $formatQuote(
 	"""My graphist and me found it excellent, fast, clear, simple, stable: Pythonic! 
         We found the others engines too verbose ... I use it to generate html, latex and xml""", 
-	'Wilk')
+	'William Dodé')
 
     $formatQuote("""I was going to try and learn Kid, but I'm in a bit of a hurry, 
      and Cheetah's much closer to what I'm used to.""", 'Dave Benjamin')
@@ -972,12 +973,12 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 
 #def displayLinesAsList(arg): 
   #for ln in arg.splitlines()
-   #set ln = $ln.strip
+   #set ln = $ln.strip()
    #if not ln
      #continue
    #end if 
-   <li>$ln.strip</li>
-  #end for 
+   <li>$ln</li>
+  #end for
 #end def
 
 #def makeLink(link, title=None)
