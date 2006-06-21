@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.104 2006/03/06 22:10:14 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.105 2006/06/21 23:48:19 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.104 $
+Version: $Revision: 1.105 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/03/06 22:10:14 $
+Last Revision Date: $Date: 2006/06/21 23:48:19 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.104 $"[11:-2]
+__revision__ = "$Revision: 1.105 $"[11:-2]
 
 
 ##################################################
@@ -2188,15 +2188,32 @@ class IfDirective(OutputTest):
     def test10(self):
         """#if block using $*emptyString
 
-        Cache tokens are ignored unless they are on top-level placeholders
+        This should barf
         """
-        self.verify("#if $*emptyString\n$aStr\n#end if\n",
-                    "")
-    def test11(self):
-        """#if block using $*5*emptyString"""
-        self.verify("#if $*5*emptyString\n$aStr\n#end if\n",
-                    "")
+        try:
+            self.verify("#if $*emptyString\n$aStr\n#end if\n",
+                        "")
+        except ParseError:
+            pass
+        else:
+            self.fail('This should barf')
 
+    def test11(self):
+        """#if block using invalid top-level $(placeholder) syntax - should barf"""
+
+        for badSyntax in ("#if $*5*emptyString\n$aStr\n#end if\n",
+                          "#if ${emptyString}\n$aStr\n#end if\n",
+                          "#if $(emptyString)\n$aStr\n#end if\n",
+                          "#if $[emptyString]\n$aStr\n#end if\n",
+                          "#if $!emptyString\n$aStr\n#end if\n",
+                          ):
+            try:
+                self.verify(badSyntax, "")
+            except ParseError:
+                pass
+            else:
+                self.fail('This should barf')
+            
     def test12(self):
         """#if ... #else if ... #else ... block using a $emptyString
         Same as test 8 but using else if instead of elif"""
