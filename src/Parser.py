@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.129 2006/03/06 22:18:30 tavis_rudd Exp $
+# $Id: Parser.py,v 1.130 2006/06/21 23:49:14 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.129 $
+Version: $Revision: 1.130 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2006/03/06 22:18:30 $
+Last Revision Date: $Date: 2006/06/21 23:49:14 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.129 $"[11:-2]
+__revision__ = "$Revision: 1.130 $"[11:-2]
 
 import os
 import sys
@@ -442,6 +442,11 @@ class _LowLevelParser(SourceReader):
             +validCharsLookAhead
             )
 
+        self.cheetahVarInExpressionStartTokenRE = re.compile(
+            escapeRegexChars(self.setting('cheetahVarStartToken'))
+            +r'(?=[A-Za-z_])'
+            )
+
         self.expressionPlaceholderStartRE = re.compile(
             escCharLookBehind +
             r'(?P<startToken>' + escapeRegexChars(self.setting('cheetahVarStartToken')) + ')' +
@@ -723,6 +728,10 @@ class _LowLevelParser(SourceReader):
         """includes the enclosure and cache token"""
         return self.cheetahVarStartTokenRE.match(self.src(), self.pos())
 
+    def matchCheetahVarInExpressionStartToken(self):
+        """no enclosures or cache tokens allowed"""
+        return self.cheetahVarInExpressionStartTokenRE.match(self.src(), self.pos())
+
     def matchVariablePlaceholderStart(self):
         """includes the enclosure and cache token"""
         return self.cheetahVarStartRE.match(self.src(), self.pos())
@@ -768,7 +777,8 @@ class _LowLevelParser(SourceReader):
                 self.advance()
             elif self.startswith('in ') or self.startswith('in\t'):
                 break
-            elif self.matchCheetahVarStart():
+            #elif self.matchCheetahVarStart():
+            elif self.matchCheetahVarInExpressionStartToken():
                 self.getCheetahVarStartToken()
                 self.getSilentPlaceholderToken()
                 self.getCacheToken()
@@ -902,7 +912,7 @@ class _LowLevelParser(SourceReader):
                     raise ParseError(self)
             elif c in " \t\f\r\n":
                 addBit(self.getc())
-            elif self.matchCheetahVarStart():
+            elif self.matchCheetahVarInExpressionStartToken():
                 startPos = self.pos()
                 codeFor1stToken = self.getCheetahVar()
                 WS = self.getWhiteSpace()
@@ -918,6 +928,9 @@ class _LowLevelParser(SourceReader):
                     addBit( codeFor1stToken + WS + nextToken )
                 else:
                     addBit( codeFor1stToken + WS)
+            elif self.matchCheetahVarStart():
+                # it has syntax that is only valid at the top level
+                self._raiseErrorAboutInvalidCheetahVarSyntaxInExpr()
             else:
                 beforeTokenPos = self.pos()
                 token = self.getPyToken()
@@ -992,8 +1005,11 @@ class _LowLevelParser(SourceReader):
             elif self.matchIdentifier() and not onDefVal:
                 argList.addArgName( self.getIdentifier() )
             elif onDefVal:
-                if self.matchCheetahVarStart():
+                if self.matchCheetahVarInExpressionStartToken():
                     token = self.getCheetahVar()
+                elif self.matchCheetahVarStart():
+                    # it has syntax that is only valid at the top level                    
+                    self._raiseErrorAboutInvalidCheetahVarSyntaxInExpr()
                 else:
                     beforeTokenPos = self.pos()
                     token = self.getPyToken()
@@ -1091,9 +1107,12 @@ class _LowLevelParser(SourceReader):
                     self.advance()                    
                 else:
                     break                    
-            elif self.matchCheetahVarStart():
+            elif self.matchCheetahVarInExpressionStartToken():
                 expr = self.getCheetahVar()
                 exprBits.append(expr)
+            elif self.matchCheetahVarStart():
+                # it has syntax that is only valid at the top level                
+                self._raiseErrorAboutInvalidCheetahVarSyntaxInExpr()                    
             else:                
                 beforeTokenPos = self.pos()
                 token = self.getPyToken()
@@ -1173,6 +1192,25 @@ class _LowLevelParser(SourceReader):
             #    print 'DEBUG***'
             token = "''.join(["+','.join(outputExprs)+"])"
         return token
+
+    def _raiseErrorAboutInvalidCheetahVarSyntaxInExpr(self):
+        match = self.matchCheetahVarStart()
+        groupdict = match.groupdict()
+        if groupdict.get('cacheToken'):
+            raise ParseError(
+                self,
+                msg='Cache tokens are not valid inside expressions. '
+                'Use them in top-level $placeholders only.')                    
+        elif groupdict.get('enclosure'):                    
+            raise ParseError(
+                self,
+                msg='Long-form placeholders - ${}, $(), $[], etc. are not valid inside expressions. '
+                'Use them in top-level $placeholders only.')
+        else:
+            raise ParseError(
+                self,
+                msg='This form of $placeholder syntax is not valid here.')
+        
 
     def getPlaceholder(self, allowCacheTokens=False, plain=False, returnEverything=False):
         # filtered 
