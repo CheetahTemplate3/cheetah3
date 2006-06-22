@@ -7,6 +7,10 @@ release
   Core Changes: [TR]      
     - extended the #implements directive so an arguments list can be declared in
       the same fashion as #def and #block.
+    
+    - made the parser raise ParseError when $*placeholder, $*5*placeholder,
+      $(placeholder), etc. are found within expressions.  They are only valid in
+      top-level text. 
 
     - tweaked the parser so it's possible to place a comment on the same line as
       a directive without needing to explicitly close the directive first. This
@@ -32,6 +36,15 @@ release
       Code that makes use of explicit directive close tokens immediately followed by 
       another directive will still work as expected:
       #if test##for i in range(10)# foo $i#end for##end if
+
+    - safer handling of the baseclass arg to Template.compile().  It now does
+      the right thing if the user passes in an instance rather than a class.
+
+  ImportHooks: [TR]
+    - made it possible to specify a list of template filename extentions that are
+      looped through while searching for template modules. E.g.:
+        import Cheetah.ImportHooks
+	Cheetah.ImportHooks.install(templateFileExtensions=('.tmpl','.cheetah'))
 
   Core changes by MO:
     - WebSafe and the other optional filters in Filters.py now use
