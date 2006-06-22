@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.147 2006/02/05 02:27:33 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.148 2006/06/22 00:18:22 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.147 $
+Version: $Revision: 1.148 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/02/05 02:27:33 $
+Last Revision Date: $Date: 2006/06/22 00:18:22 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.147 $"[11:-2]
+__revision__ = "$Revision: 1.148 $"[11:-2]
 
 import sys
 import os
@@ -1158,6 +1158,7 @@ class ClassCompiler(GenUtils):
         methodCompiler = self._spawnMethodCompiler(
             mainMethodName,
             initialMethodComment='## CHEETAH: main method generated for this template')
+
         self._setActiveMethodCompiler(methodCompiler)
         if fileName and self.setting('monitorSrcFile'):
             self._addSourceFileMonitoring(fileName)
@@ -1258,6 +1259,8 @@ class ClassCompiler(GenUtils):
         self._baseClass = baseClassName
                
     def setMainMethodName(self, methodName):
+        if methodName == self._mainMethodName:
+            return
         ## change the name in the methodCompiler and add new reference
         mainMethod = self._methodsIndex[self._mainMethodName]
         mainMethod.setMethodName(methodName)
@@ -1270,9 +1273,15 @@ class ClassCompiler(GenUtils):
             for i in range(len(chunks)):
                 if chunks[i] == chunkToChange:
                     chunks[i] = ('write(self.' + methodName + '(trans=trans))')
-        ## get rid of the old reference and update self._mainMethodName
+        ## get rid of the old reference and update self._mainMethodName                   
         del self._methodsIndex[self._mainMethodName]
         self._mainMethodName = methodName
+
+    def setMainMethodArgs(self, argsList):
+        mainMethodCompiler = self._methodsIndex[self._mainMethodName]
+        for argName, defVal in argsList:
+            mainMethodCompiler.addMethArg(argName, defVal)
+        
           
     def _spawnMethodCompiler(self, methodName, klass=None, 
                              initialMethodComment=None):
