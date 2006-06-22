@@ -2,6 +2,9 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0rc8 (unreleased)
+    - Bugfix in Template.py now that filters are new-style classes.
+
 2.0rc7 (June 21, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      

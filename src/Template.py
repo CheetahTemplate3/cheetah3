@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.180 2006/06/20 06:07:13 tavis_rudd Exp $
+# $Id: Template.py,v 1.181 2006/06/22 20:25:16 hierro Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.180 $
+Version: $Revision: 1.181 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/06/20 06:07:13 $
+Last Revision Date: $Date: 2006/06/22 20:25:16 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.180 $"[11:-2]
+__revision__ = "$Revision: 1.181 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -1142,12 +1142,12 @@ class Template(Servlet):
         try:
             vt(source, 'source', [N,S,U], 'string or None')
             vt(file, 'file', [N,S,U,F], 'string, file open for reading, or None')
-            vtc(filter, 'filter', [S,C], 'string or class', 
+            vtc(filter, 'filter', [S,C,type], 'string or class', 
                 Filters.Filter,
                 '(if class, must be subclass of Cheetah.Filters.Filter)')
             vt(filtersLib, 'filtersLib', [S,M], 'string or module',
                 '(if module, must contain subclasses of Cheetah.Filters.Filter)')
-            vtc(errorCatcher, 'errorCatcher', [N,S,C], 'string, class or None',
+            vtc(errorCatcher, 'errorCatcher', [N,S,C,type], 'string, class or None',
                ErrorCatchers.ErrorCatcher,
                '(if class, must be subclass of Cheetah.ErrorCatchers.ErrorCatcher)')
             if compilerSettings is not Unspecified:
@@ -1722,9 +1722,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.180 $
+        Version: $Revision: 1.181 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/06/20 06:07:13 $
+        Last Revision Date: $Date: 2006/06/22 20:25:16 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
