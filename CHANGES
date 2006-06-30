@@ -2,8 +2,6 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-2.0rc8 (unreleased)
-    - Bugfix in Template.py now that filters are new-style classes.
 
 2.0rc7 (June 21, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
@@ -50,6 +48,7 @@ release
 	Cheetah.ImportHooks.install(templateFileExtensions=('.tmpl','.cheetah'))
 
   Core changes by MO:
+    - Filters are now new-style classes.
     - WebSafe and the other optional filters in Filters.py now use
       RawOrEncodedUnicode instead of Filter as a base class.  This allows them
       to work with Unicode values containing non-ASCII characters.
@@ -58,7 +57,6 @@ release
       str() as of Python 2.4.2 still converts Unicode to string using
       ASCII codec, which raises UnicodeEncodeError if it contains non-ASCII
       characters.
-          
 
 2.0rc6 (Feb 4, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
