@@ -2,8 +2,7 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-
-2.0rc7 (June 21, 2006)
+2.0rc7 (July 4, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      
     - extended the #implements directive so an arguments list can be declared in
