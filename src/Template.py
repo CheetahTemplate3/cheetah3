@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.181 2006/06/22 20:25:16 hierro Exp $
+# $Id: Template.py,v 1.182 2006/07/06 23:09:04 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.181 $
+Version: $Revision: 1.182 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/06/22 20:25:16 $
+Last Revision Date: $Date: 2006/07/06 23:09:04 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.181 $"[11:-2]
+__revision__ = "$Revision: 1.182 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -687,6 +687,11 @@ class Template(Servlet):
                 fileHash = str(hash(file))+str(os.path.getmtime(file))
                 
             try:
+                # @@TR: find some way to create a cacheHash that is consistent
+                # between process restarts.  It would allow for caching the
+                # compiled module on disk and thereby reduce the startup time
+                # for applications that use a lot of dynamically compiled
+                # templates.                
                 cacheHash = ''.join([str(v) for v in
                                      [hash(source),
                                       fileHash,
@@ -1722,9 +1727,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.181 $
+        Version: $Revision: 1.182 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/06/22 20:25:16 $
+        Last Revision Date: $Date: 2006/07/06 23:09:04 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
