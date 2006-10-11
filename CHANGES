@@ -2,6 +2,13 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0 final (unreleased)
+  - added new compiler setting 'addTimestampsToCompilerOutput'. See Brian Bird's
+    post about it today.  He stores his cheetah generated .py files in
+    subversion and needed to disable the timestamp code so svn wouldn't care
+    when he recompiles those .py modules.
+
+
 2.0rc7 (July 4, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      
