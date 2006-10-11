@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.148 2006/06/22 00:18:22 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.149 2006/10/11 23:49:15 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.148 $
+Version: $Revision: 1.149 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/06/22 00:18:22 $
+Last Revision Date: $Date: 2006/10/11 23:49:15 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.148 $"[11:-2]
+__revision__ = "$Revision: 1.149 $"[11:-2]
 
 import sys
 import os
@@ -86,7 +86,7 @@ DEFAULT_COMPILER_SETTINGS = {
     'initialMethIndentLevel': 2,
     'monitorSrcFile':False,
     'outputMethodsBeforeAttributes': True,
-
+    'addTimestampsToCompilerOutput': True,
 
     ## customizing the #extends directive
     'autoImportForExtendsDirective':True,
@@ -1197,8 +1197,11 @@ class ClassCompiler(GenUtils):
         self._generatedAttribs.append('_CHEETAH_version = __CHEETAH_version__')
         self._generatedAttribs.append(
             '_CHEETAH_versionTuple = __CHEETAH_versionTuple__')
-        self._generatedAttribs.append('_CHEETAH_genTime = __CHEETAH_genTime__')
-        self._generatedAttribs.append('_CHEETAH_genTimestamp = __CHEETAH_genTimestamp__')
+
+        if self.setting('addTimestampsToCompilerOutput'):
+            self._generatedAttribs.append('_CHEETAH_genTime = __CHEETAH_genTime__')
+            self._generatedAttribs.append('_CHEETAH_genTimestamp = __CHEETAH_genTimestamp__')
+
         self._generatedAttribs.append('_CHEETAH_src = __CHEETAH_src__')
         self._generatedAttribs.append(
             '_CHEETAH_srcLastModified = __CHEETAH_srcLastModified__')
@@ -1855,8 +1858,9 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self.addSpecialVar('CHEETAH_docstring', self.setting('defDocStrMsg'))
         self.addModuleGlobal('__CHEETAH_version__ = %r'%Version)
         self.addModuleGlobal('__CHEETAH_versionTuple__ = %r'%(VersionTuple,))        
-        self.addModuleGlobal('__CHEETAH_genTime__ = %r'%time.time())
-        self.addModuleGlobal('__CHEETAH_genTimestamp__ = %r'%self.timestamp())
+        if self.setting('addTimestampsToCompilerOutput'):
+            self.addModuleGlobal('__CHEETAH_genTime__ = %r'%time.time())
+            self.addModuleGlobal('__CHEETAH_genTimestamp__ = %r'%self.timestamp())
         if self._filePath:
             timestamp = self.timestamp(self._fileMtime)
             self.addModuleGlobal('__CHEETAH_src__ = %r'%self._filePath)
