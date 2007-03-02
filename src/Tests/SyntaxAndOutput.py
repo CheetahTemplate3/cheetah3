@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.105 2006/06/21 23:48:19 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.106 2007/03/02 07:56:26 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +12,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.105 $
+Version: $Revision: 1.106 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/06/21 23:48:19 $
+Last Revision Date: $Date: 2007/03/02 07:56:26 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.105 $"[11:-2]
+__revision__ = "$Revision: 1.106 $"[11:-2]
 
 
 ##################################################
@@ -1097,6 +1097,12 @@ $aStr#slurp
 $foo$foo$foo$foo$foo""",
                     "1\n012346blarg"*5)
         
+    def test6(self):
+        r"""Make sure that partial directives don't match"""
+        self.verify("#cache_foo",
+                    "#cache_foo")
+        self.verify("#cached",
+                    "#cached")
 
 class CallDirective(OutputTest):
     
@@ -1769,6 +1775,11 @@ class DefDirective(OutputTest):
 class DecoratorDirective(OutputTest):
     def test1(self):
         """single line #def with decorator"""
+
+        self.verify("#@ blah", "#@ blah")
+        self.verify("#@23 blah", "#@23 blah")
+        self.verify("#@@TR: comment", "#@@TR: comment")
+
         self.verify("#from Cheetah.Tests.SyntaxAndOutput import testdecorator\n"
                     +"#@testdecorator"
                     +"\n#def $testMeth():1234\n$testMeth",
