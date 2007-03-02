@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.131 2007/03/02 07:49:56 tavis_rudd Exp $
+# $Id: Parser.py,v 1.132 2007/03/02 07:56:16 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.131 $
+Version: $Revision: 1.132 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2007/03/02 07:49:56 $
+Last Revision Date: $Date: 2007/03/02 07:56:16 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.131 $"[11:-2]
+__revision__ = "$Revision: 1.132 $"[11:-2]
 
 import os
 import sys
@@ -665,8 +665,9 @@ class _LowLevelParser(SourceReader):
             if not c in directiveNameChars:
                 break
             name += c
-            if name == '@' and not self.atEnd() and self.peek() in identchars:
-                match = '@'
+            if name == '@':
+                if not self.atEnd() and self.peek() in identchars:
+                    match = '@'
                 break
             possibleMatches = [dn for dn in possibleMatches if dn.startswith(name)]
             if not possibleMatches:
