@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.5 2006/01/07 07:18:44 tavis_rudd Exp $
+# $Id: CheetahWrapper.py,v 1.6 2007/03/28 16:17:41 tavis_rudd Exp $
 """Tests for the 'cheetah' command.
 
 Besides unittest usage, recognizes the following command-line options:
@@ -14,12 +14,12 @@ Besides unittest usage, recognizes the following command-line options:
 Meta-Data
 ================================================================================
 Author: Mike Orr <iron@mso.oz.net>,
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/10/01
-Last Revision Date: $Date: 2006/01/07 07:18:44 $
+Last Revision Date: $Date: 2007/03/28 16:17:41 $
 """
 __author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 
 ##################################################
@@ -128,7 +128,7 @@ class CFBase(unittest.TestCase):
     def checkCompile(self, path):
         # Raw string to prevent "\n" from being converted to a newline.
         #expected = R"write('Hello, world!\n')"
-        expected = R"'Hello, world!\n')" # might output a u'' string
+        expected = "Hello, world!" # might output a u'' string
         errmsg = """\
 destination file %(path)s doesn't contain expected substring:
 %(expected)r"""
