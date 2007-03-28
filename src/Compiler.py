@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.149 2006/10/11 23:49:15 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.150 2007/03/28 16:28:23 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.149 $
+Version: $Revision: 1.150 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2006/10/11 23:49:15 $
+Last Revision Date: $Date: 2007/03/28 16:28:23 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.149 $"[11:-2]
+__revision__ = "$Revision: 1.150 $"[11:-2]
 
 import sys
 import os
@@ -46,6 +46,8 @@ currentTime=time.time
 
 class Error(Exception): pass
 
+
+escapedNewlineRE = re.compile(r'(?<!\\)\\n')
 DEFAULT_COMPILER_SETTINGS = {
     ## controlling the handling of Cheetah $placeholders
     'useNameMapper': True,      # Unified dotted notation and the searchList
@@ -62,17 +64,13 @@ DEFAULT_COMPILER_SETTINGS = {
     'alwaysFilterNone':True, # filter out None, before the filter is called
     'useFilters':True, # use str instead if =False
     'includeRawExprInFilterArgs':True,
-
     
     #'lookForTransactionAttr':False,
     'autoAssignDummyTransactionToSelf':False,
     'useKWsDictArgForPassingTrans':True,
     
-    ## controlling the aesthetic appearance / behaviour of generated code
+    ## controlling the aesthetic appearance / behaviour of generated code    
     'commentOffset': 1,
-    # should shorter str constant chunks be printed using repr rather than ''' quotes
-    'reprShortStrConstants': True, 
-    'reprNewlineThreshold':3,
     'outputRowColComments':True,
     # should #block's be wrapped in a comment in the template's output
     'includeBlockMarkers': False,   
@@ -494,17 +492,24 @@ class MethodCompiler(GenUtils):
             self._pendingStrConstChunks = []
             if not strConst:
                 return
-            if self.setting('reprShortStrConstants') and \
-               strConst.count('\n') < self.setting('reprNewlineThreshold'):
-                self.addWriteChunk( repr(strConst).replace('\\012','\\n'))
             else:
-                strConst = strConst.replace('\\','\\\\').replace("'''","'\'\'\'")
-                if strConst[0] == "'":
-                    strConst = '\\' + strConst
-                if strConst[-1] == "'":
-                    strConst = strConst[:-1] + '\\' + strConst[-1]
-                    
-                self.addWriteChunk("'''" + strConst + "'''" )
+                reprstr = repr(strConst).replace('\\012','\n')
+                i = 0
+                out = []
+                if reprstr.startswith('u'):
+                    i = 1
+                    out = ['u']
+                body = escapedNewlineRE.sub('\n', reprstr[i+1:-1])
+                
+                if reprstr[i]=="'":
+                    out.append("'''")
+                    out.append(body)
+                    out.append("'''")
+                else:
+                    out.append('"""')
+                    out.append(body)
+                    out.append('"""')
+                self.addWriteChunk(''.join(out))
 
     def handleWSBeforeDirective(self):
         """Truncate the pending strCont to the beginning of the current line.
