@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.182 2006/07/06 23:09:04 tavis_rudd Exp $
+# $Id: Template.py,v 1.183 2007/03/28 22:17:34 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.182 $
+Version: $Revision: 1.183 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/07/06 23:09:04 $
+Last Revision Date: $Date: 2007/03/28 22:17:34 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.182 $"[11:-2]
+__revision__ = "$Revision: 1.183 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -105,10 +105,9 @@ def _genUniqueModuleName(baseModuleName):
     if baseModuleName not in sys.modules:
         finalName = baseModuleName
     else:
-        finalName = ('cheetah_'+baseModuleName
-                     +'_'
-                     +''.join(map(lambda x: '%02d' % x, time.localtime(time.time())[:6]))
-                     + str(randrange(10000, 99999)))
+        finalName = ('cheetah_%s_%s_%s'%(baseModuleName,
+                                         str(time.time()).replace('.','_'),
+                                         str(randrange(10000, 99999))))
     return finalName
 
 # Cache of a cgi.FieldStorage() instance, maintained by .webInput().
@@ -1727,9 +1726,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.182 $
+        Version: $Revision: 1.183 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2006/07/06 23:09:04 $
+        Last Revision Date: $Date: 2007/03/28 22:17:34 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
@@ -1819,7 +1818,7 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
         report += "%(row)-4d|%(line)s\n"% {'row':lineInfo[0], 'line':lineInfo[1]}
 
     if hasattr(exception, 'offset'):
-        report += ' '*(3+exception.offset) + '^\n'
+        report += ' '*(3+(exception.offset or 0)) + '^\n'
     
     while nextLines:
         lineInfo = nextLines.pop()
