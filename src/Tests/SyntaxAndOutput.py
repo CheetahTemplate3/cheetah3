@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# $Id: SyntaxAndOutput.py,v 1.106 2007/03/02 07:56:26 tavis_rudd Exp $
+# -*- coding: latin-1 -*-
+# $Id: SyntaxAndOutput.py,v 1.107 2007/03/29 17:38:36 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -12,12 +13,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.106 $
+Version: $Revision: 1.107 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2007/03/02 07:56:26 $
+Last Revision Date: $Date: 2007/03/29 17:38:36 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.106 $"[11:-2]
+__revision__ = "$Revision: 1.107 $"[11:-2]
 
 
 ##################################################
@@ -2730,18 +2731,18 @@ class FilterDirective(OutputTest):
         return {'useFilterArgsInPlaceholders':True}
     
     def test1(self):
-        """#filter ReplaceNone
+        """#filter Filter
         """
-        self.verify("#filter ReplaceNone\n$none#end filter",
+        self.verify("#filter Filter\n$none#end filter",
                     "")
 
-        self.verify("#filter ReplaceNone: $none",
+        self.verify("#filter Filter: $none",
                     "")
 
     def test2(self):
         """#filter ReplaceNone with WS
         """
-        self.verify("#filter ReplaceNone  \n$none#end filter",
+        self.verify("#filter Filter  \n$none#end filter",
                     "")
 
     def test3(self):
