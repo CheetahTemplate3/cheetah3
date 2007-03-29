@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.29 2007/03/03 07:43:31 tavis_rudd Exp $
+# $Id: Filters.py,v 1.30 2007/03/29 17:41:52 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Filters may now be used standalone, for debugging or for use outside Cheetah.
@@ -7,19 +7,15 @@ Class DummyTemplate, instance _dummyTemplateObj and class NoDefault exist only
 for this, to provide a default argument for the filter constructors (which
 would otherwise require a real template object).  
 
-The default filter is now RawOrEncodedUnicode.  Please use this as a base class instead of Filter because it handles non-ASCII characters better.
-
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.29 $
+Version: $Revision: 1.30 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2007/03/03 07:43:31 $
+Last Revision Date: $Date: 2007/03/29 17:41:52 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.29 $"[11:-2]
-
-from StringIO import StringIO # not cStringIO because of unicode support
+__revision__ = "$Revision: 1.30 $"[11:-2]
 
 # Additional entities WebSafe knows how to transform.  No need to include
 # '<', '>' or '&' since those will have been done already.
@@ -30,7 +26,6 @@ class Error(Exception):
 
 class NoDefault:
     pass
-
 
 class DummyTemplate:
     """Fake template class to allow filters to be used standalone.
@@ -71,7 +66,6 @@ class Filter(object):
             self.settings = lambda: {}
 
     def generateAutoArgs(self):
-        
         """This hook allows the filters to generate an arg-list that will be
         appended to the arg-list of a $placeholder tag when it is being
         translated into Python code during the template compilation process. See
@@ -79,27 +73,29 @@ class Filter(object):
         
         return ''
         
-    def filter(self, val, **kw):
-        
-        """Reimplement this method if you  want more advanced filterting."""
-        
-        return str(val)
+    def filter(self, val,
+               #encoding='utf8',
+               encoding=None,
+               str=str, 
+               **kw):
+        """Pass Unicode strings through unmolested, unless an encoding is specified.
+        """
+        if isinstance(val, unicode):
+            if encoding:
+                filtered = val.encode(encoding)
+            else:
+                filtered = val
+        elif val is None:
+            filtered = ''
+        else:
+            filtered = str(val)
+        return filtered
 
+RawOrEncodedUnicode = Filter
 
 ##################################################
 ## ENHANCED FILTERS
 
-#####
-class ReplaceNone(Filter):
-    def filter(self, val, **kw):
-        
-        """Replace None with an empty string.  Reimplement this method if you
-        want more advanced filterting."""
-        
-        if val is None:
-            return ''
-        return str(val)
-#####
 class EncodeUnicode(Filter):
     def filter(self, val,
                encoding='utf8',
@@ -123,27 +119,7 @@ class EncodeUnicode(Filter):
             filtered = str(val)
         return filtered
 
-class RawOrEncodedUnicode(Filter):
-    def filter(self, val,
-               #encoding='utf8',
-               encoding=None,
-               str=str, 
-               **kw):
-        """Pass Unicode strings through unmolested, unless an encoding is specified.
-        """
-        if isinstance(val, unicode):
-            if encoding:
-                filtered = val.encode(encoding)
-            else:
-                filtered = val
-        elif val is None:
-            filtered = ''
-        else:
-            filtered = str(val)
-        return filtered
-
-#####
-class MaxLen(RawOrEncodedUnicode):
+class MaxLen(Filter):
     def filter(self, val, **kw):
         """Replace None with '' and cut off at maxlen."""
         
@@ -152,56 +128,7 @@ class MaxLen(RawOrEncodedUnicode):
             return output[:kw['maxlen']]
         return output
 
-
-#####
-class Pager(RawOrEncodedUnicode):
-    def __init__(self, templateObj=_dummyTemplateObj):
-        Filter.__init__(self, templateObj)
-        self._IDcounter = 0
-        
-    def buildQString(self,varsDict, updateDict):
-        finalDict = varsDict.copy()
-        finalDict.update(updateDict)
-        qString = '?'
-        for key, val in finalDict.items():
-            qString += str(key) + '=' + str(val) + '&'
-        return qString
-
-    def generateAutoArgs(self):
-        ID = str(self._IDcounter)
-        self._IDcounter += 1
-        return ', trans=trans, ID=' + ID
-    
-    def filter(self, val, **kw):
-        """Replace None with '' and cut off at maxlen."""
-    	output = super(Pager, self).filter(val, **kw)
-        if kw.has_key('trans') and kw['trans']:
-            ID = kw['ID']
-            marker = kw.get('marker', '<split>')
-            req = kw['trans'].request()
-            URI = req.environ()['SCRIPT_NAME'] + req.environ()['PATH_INFO']
-            queryVar = 'pager' + str(ID) + '_page'
-            fields = req.fields()
-            page = int(fields.get( queryVar, 1))
-            pages = output.split(marker)
-            output = pages[page-1]
-            output += '<BR>'
-            if page > 1:
-                output +='<A HREF="' + URI + self.buildQString(fields, {queryVar:max(page-1,1)}) + \
-                          '">Previous Page</A>&nbsp;&nbsp;&nbsp;'
-            if page < len(pages):
-                output += '<A HREF="' + URI + self.buildQString(
-                    fields,
-                    {queryVar:
-                     min(page+1,len(pages))}) + \
-                     '">Next Page</A>' 
-
-            return output
-        return output
-
-
-#####
-class WebSafe(RawOrEncodedUnicode):
+class WebSafe(Filter):
     """Escape HTML entities in $placeholders.
     """
     def filter(self, val, **kw):
@@ -224,8 +151,7 @@ class WebSafe(RawOrEncodedUnicode):
         return s
 
 
-#####
-class Strip(RawOrEncodedUnicode):
+class Strip(Filter):
     """Strip leading/trailing whitespace but preserve newlines.
 
     This filter goes through the value line by line, removing leading and
@@ -257,8 +183,7 @@ class Strip(RawOrEncodedUnicode):
         result.append(chunk)
         return "".join(result)
 
-#####
-class StripSqueeze(RawOrEncodedUnicode):
+class StripSqueeze(Filter):
     """Canonicalizes every chunk of whitespace to a single space.
 
     Strips leading/trailing whitespace.  Removes all newlines, so multi-line
