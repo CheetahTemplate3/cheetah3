@@ -1,21 +1,16 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.30 2007/03/29 17:41:52 tavis_rudd Exp $
+# $Id: Filters.py,v 1.31 2007/03/29 19:29:54 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
-
-Filters may now be used standalone, for debugging or for use outside Cheetah.
-Class DummyTemplate, instance _dummyTemplateObj and class NoDefault exist only
-for this, to provide a default argument for the filter constructors (which
-would otherwise require a real template object).  
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.30 $
+Version: $Revision: 1.31 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2007/03/29 17:41:52 $
+Last Revision Date: $Date: 2007/03/29 19:29:54 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.30 $"[11:-2]
+__revision__ = "$Revision: 1.31 $"[11:-2]
 
 # Additional entities WebSafe knows how to transform.  No need to include
 # '<', '>' or '&' since those will have been done already.
@@ -24,47 +19,21 @@ webSafeEntities = {' ': '&nbsp;', '"': '&quot;'}
 class Error(Exception):
     pass
 
-class NoDefault:
-    pass
-
-class DummyTemplate:
-    """Fake template class to allow filters to be used standalone.
-
-    This is provides only the level of Template compatibility required by the
-    standard filters.  Namely, the get-settings interface works but there are
-    no settings.  Other aspects of Template are not implemented.
-    """
-    def setting(self, name, default=NoDefault):
-        if default is NoDefault:
-            raise KeyError(name)
-        else:
-            return default
-
-    def settings(self):
-        return {}
-
-_dummyTemplateObj = DummyTemplate()
-
-
 ##################################################
 ## BASE CLASS
 
 class Filter(object):
     """A baseclass for the Cheetah Filters."""
     
-    def __init__(self, templateObj=_dummyTemplateObj):
-        """Setup a ref to the templateObj.  Subclasses should call this method.
+    def __init__(self, template=None):
+        """Setup a reference to the template that is using the filter instance.
+        This reference isn't used by any of the standard filters, but is
+        available to Filter subclasses, should they need it.
+        
+        Subclasses should call this method.
         """
-        if hasattr(templateObj, 'setting'):
-            self.setting = templateObj.setting
-        else:
-            self.setting = lambda k: None
-
-        if hasattr(templateObj, 'settings'):
-            self.settings = templateObj.settings
-        else:
-            self.settings = lambda: {}
-
+        self.template = template
+    
     def generateAutoArgs(self):
         """This hook allows the filters to generate an arg-list that will be
         appended to the arg-list of a $placeholder tag when it is being
