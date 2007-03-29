@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.31 2007/03/29 19:29:54 tavis_rudd Exp $
+# $Id: Filters.py,v 1.32 2007/03/29 19:31:15 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.31 $
+Version: $Revision: 1.32 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2007/03/29 19:29:54 $
+Last Revision Date: $Date: 2007/03/29 19:31:15 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.31 $"[11:-2]
+__revision__ = "$Revision: 1.32 $"[11:-2]
 
 # Additional entities WebSafe knows how to transform.  No need to include
 # '<', '>' or '&' since those will have been done already.
@@ -33,14 +33,6 @@ class Filter(object):
         Subclasses should call this method.
         """
         self.template = template
-    
-    def generateAutoArgs(self):
-        """This hook allows the filters to generate an arg-list that will be
-        appended to the arg-list of a $placeholder tag when it is being
-        translated into Python code during the template compilation process. See
-        the 'Pager' filter class for an example."""
-        
-        return ''
         
     def filter(self, val,
                #encoding='utf8',
