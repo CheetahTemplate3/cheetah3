@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.152 2007/04/03 02:04:36 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.153 2007/04/03 02:58:52 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.152 $
+Version: $Revision: 1.153 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2007/04/03 02:04:36 $
+Last Revision Date: $Date: 2007/04/03 02:58:52 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.152 $"[11:-2]
+__revision__ = "$Revision: 1.153 $"[11:-2]
 
 import sys
 import os
@@ -46,6 +46,8 @@ currentTime=time.time
 
 class Error(Exception): pass
 
+unicodeDirectiveRE = re.compile(r'(?:^|\n)\s*#\s{0,5}unicode[:\s]*([-\w.]*)\s*\n', re.MULTILINE)
+encodingDirectiveRE = re.compile(r'(?:^|\n)\s*#\s{0,5}encoding[:\s]*([-\w.]*)\s*\n', re.MULTILINE)
 
 escapedNewlineRE = re.compile(r'(?<!\\)\\n')
 DEFAULT_COMPILER_SETTINGS = {
@@ -1548,31 +1550,35 @@ class ModuleCompiler(SettingsManager, GenUtils):
             source = file.read()  # Can't set filename or mtime--they're not accessible.
         elif file:
             raise TypeError("'file' argument must be a filename string or file-like object")
-
-        if False and isinstance(source, str):
-            #re.compile(coding[=:]\s*([-\w.]+))
-            encodingRE = re.compile(r'[^\n]{0,1}\s*#\s{0,5}encoding[:\s]*([-\w.]+)', re.MULTILINE)
-            encodingMatch = encodingRE.search(source)
-            if encodingMatch:
-                encoding = encodingMatch.group(1)
-                source = unicode(source, encoding)
-                #print encoding
                 
         if self._filePath:
             self._fileDirName, self._fileBaseName = os.path.split(self._filePath)
-            self._fileBaseNameRoot, self._fileBaseNameExt = \
-                                    os.path.splitext(self._fileBaseName)
+            self._fileBaseNameRoot, self._fileBaseNameExt = os.path.splitext(self._fileBaseName)
 
         if not isinstance(source, (str,unicode)):
             source = str(source)
-        # by converting to string here we allow objects such as other Templates
-        # to be passed in
+            # by converting to string here we allow objects such as other Templates
+            # to be passed in
 
         # Handle the #indent directive by converting it to other directives.
         # (Over the long term we'll make it a real directive.)
         if source == "":
             warnings.warn("You supplied an empty string for the source!", )
         
+        else:
+            unicodeMatch = unicodeDirectiveRE.search(source)
+            if unicodeMatch:
+                if encodingDirectiveRE.match(source):
+                    raise ParseError(
+                        self, "#encoding and #unicode are mutually exclusive! "
+                        "Use one or the other.")
+                source = unicodeDirectiveRE.sub('', source)
+                if isinstance(source, str):
+                    encoding = unicodeMatch.group(1) or 'ascii'
+                    source = unicode(source, encoding)
+                
+                #print encoding
+
         if source.find('#indent') != -1: #@@TR: undocumented hack
             source = indentize(source)
 
