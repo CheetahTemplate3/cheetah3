@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.132 2007/03/02 07:56:16 tavis_rudd Exp $
+# $Id: Parser.py,v 1.133 2007/04/03 02:01:32 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.132 $
+Version: $Revision: 1.133 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2007/03/02 07:56:16 $
+Last Revision Date: $Date: 2007/04/03 02:01:32 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.132 $"[11:-2]
+__revision__ = "$Revision: 1.133 $"[11:-2]
 
 import os
 import sys
@@ -984,7 +984,6 @@ class _LowLevelParser(SourceReader):
 
         while 1:
             if self.atEnd():
-                self.setPos(enclosures[-1][1])
                 raise ParseError(
                     self, msg="EOF was reached before a matching ')'"+
                     " was found for the '('")
@@ -1797,7 +1796,7 @@ class _HighLevelParser(_LowLevelParser):
         if self.peek() == '=':
             self.advance()
         else:
-            raise ParserError(self)
+            raise ParseError(self)
         valueExpr = self.getExpression()
         endPos = self.pos()
 

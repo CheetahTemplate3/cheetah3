@@ -5,14 +5,14 @@
 Meta-Data
 ==========
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.28 $
+Version: $Revision: 1.29 $
 Start Date: 2001/05/30
-Last Revision Date: $Date: 2006/01/29 07:19:12 $
+Last Revision Date: $Date: 2007/04/03 02:03:26 $
 """
 
-# $Id: SettingsManager.py,v 1.28 2006/01/29 07:19:12 tavis_rudd Exp $
+# $Id: SettingsManager.py,v 1.29 2007/04/03 02:03:26 tavis_rudd Exp $
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.28 $"[11:-2]
+__revision__ = "$Revision: 1.29 $"[11:-2]
 
 
 ##################################################
@@ -28,11 +28,8 @@ from types import *
 import types
 import new
 import tempfile
-import imp
 import time
-
 from StringIO import StringIO # not cStringIO because of unicode support
-
 import imp                 # used by SettingsManager.updateSettingsFromPySrcFile()
 
 try:
@@ -487,11 +484,11 @@ class SettingsManager(_SettingsCollector):
         
     def copySettings(self):
         """Returns a shallow copy of the settings dictionary"""
-        return copy(self._settings)
+        return copyModule.copy(self._settings)
 
     def deepcopySettings(self):
         """Returns a deep copy of the settings dictionary"""
-        return deepcopy(self._settings)
+        return copyModule.deepcopy(self._settings)
     
     def updateSettings(self, newSettings, merge=True):
         

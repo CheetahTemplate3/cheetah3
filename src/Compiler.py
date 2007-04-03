@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.151 2007/04/03 01:47:15 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.152 2007/04/03 02:04:36 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.151 $
+Version: $Revision: 1.152 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2007/04/03 01:47:15 $
+Last Revision Date: $Date: 2007/04/03 02:04:36 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.151 $"[11:-2]
+__revision__ = "$Revision: 1.152 $"[11:-2]
 
 import sys
 import os
@@ -1251,7 +1251,7 @@ class ClassCompiler(GenUtils):
         self.addChunk('if exists(self._filePath) and ' +
                       'getmtime(self._filePath) > self._fileMtime:')
         self.indent()
-        self.addChunk('self._compile(file=self._filePath, moduleName='+className + ')')
+        self.addChunk('self._compile(file=self._filePath, moduleName='+self._className + ')')
         self.addChunk(
             'write(getattr(self, self._mainCheetahMethod_for_' + self._className +
             ')(trans=trans))')            
@@ -1563,7 +1563,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             self._fileBaseNameRoot, self._fileBaseNameExt = \
                                     os.path.splitext(self._fileBaseName)
 
-        if not (isinstance(source, str) or isinstance(source, unicode)):
+        if not isinstance(source, (str,unicode)):
             source = str(source)
         # by converting to string here we allow objects such as other Templates
         # to be passed in
