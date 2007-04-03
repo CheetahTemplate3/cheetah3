@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.29 2006/01/15 20:27:42 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.30 2007/04/03 01:58:20 tavis_rudd Exp $
 
 """This module supports Cheetah's optional NameMapper syntax.
 
@@ -135,14 +135,14 @@ Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@damnsimple.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.29 $
+Version: $Revision: 1.30 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2006/01/15 20:27:42 $
+Last Revision Date: $Date: 2007/04/03 01:58:20 $
 """
 from __future__ import generators
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__revision__ = "$Revision: 1.29 $"[11:-2]
+__revision__ = "$Revision: 1.30 $"[11:-2]
 import types
 from types import StringType, InstanceType, ClassType, TypeType
 from pprint import pformat
@@ -182,7 +182,7 @@ def _wrapNotFoundException(exc, fullName, namespace):
         if excStr.find('while searching')==-1: # only wrap once!
             excStr +=" while searching for '%s'"%fullName
             if _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS:
-                excString += ' in the namespace %s'%pformat(namespace)
+                excStr += ' in the namespace %s'%pformat(namespace)
             exc.args = (excStr,)
         raise
     
