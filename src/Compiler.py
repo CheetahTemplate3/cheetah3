@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.150 2007/03/28 16:28:23 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.151 2007/04/03 01:47:15 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.150 $
+Version: $Revision: 1.151 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2007/03/28 16:28:23 $
+Last Revision Date: $Date: 2007/04/03 01:47:15 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.150 $"[11:-2]
+__revision__ = "$Revision: 1.151 $"[11:-2]
 
 import sys
 import os
@@ -290,7 +290,7 @@ class GenUtils:
 
         nameChunks.reverse()
         name, useAC, remainder = nameChunks.pop()
-
+        
         if not useSearchList:
             firstDotIdx = name.find('.')
             if firstDotIdx != -1 and firstDotIdx < len(name):
@@ -392,6 +392,7 @@ class MethodCompiler(GenUtils):
             return self.wrapCode()
 
     __str__ = methodDef
+    __unicode__ = methodDef
     
     def wrapCode(self):
         self.commitStrConst()
@@ -1431,6 +1432,7 @@ class ClassCompiler(GenUtils):
             return self.wrapClassDef()
 
     __str__ = classDef
+    __unicode__ = classDef
     
     def wrapClassDef(self):
         ind = self.setting('indentationStep')
@@ -1477,7 +1479,7 @@ class ClassCompiler(GenUtils):
         return  docStr
 
     def methodDefs(self):
-        methodDefs = [str(methGen) for methGen in self._finishedMethods() ]
+        methodDefs = [methGen.methodDef() for methGen in self._finishedMethods()]
         return '\n\n'.join(methodDefs)
 
     def attributes(self):
@@ -1536,8 +1538,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         
         if source and file:
             raise TypeError("Cannot compile from a source string AND file.")
-        elif isinstance(file, types.StringType) or isinstance(file, types.UnicodeType): # it's a filename.
-
+        elif isinstance(file, (str, unicode)): # it's a filename.
             f = open(file) # Raises IOError.
             source = f.read()
             f.close()
@@ -1548,14 +1549,22 @@ class ModuleCompiler(SettingsManager, GenUtils):
         elif file:
             raise TypeError("'file' argument must be a filename string or file-like object")
 
-
+        if False and isinstance(source, str):
+            #re.compile(coding[=:]\s*([-\w.]+))
+            encodingRE = re.compile(r'[^\n]{0,1}\s*#\s{0,5}encoding[:\s]*([-\w.]+)', re.MULTILINE)
+            encodingMatch = encodingRE.search(source)
+            if encodingMatch:
+                encoding = encodingMatch.group(1)
+                source = unicode(source, encoding)
+                #print encoding
+                
         if self._filePath:
             self._fileDirName, self._fileBaseName = os.path.split(self._filePath)
             self._fileBaseNameRoot, self._fileBaseNameExt = \
                                     os.path.splitext(self._fileBaseName)
 
         if not (isinstance(source, str) or isinstance(source, unicode)):
-            source = str( source )
+            source = str(source)
         # by converting to string here we allow objects such as other Templates
         # to be passed in
 
@@ -1958,7 +1967,7 @@ if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
         return '\n'.join(self._moduleConstants)
 
     def classDefs(self):
-        classDefs = [str(klass) for klass in self._finishedClasses() ]
+        classDefs = [klass.classDef() for klass in self._finishedClasses()]
         return '\n\n'.join(classDefs)
 
     def moduleFooter(self):
