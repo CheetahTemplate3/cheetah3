@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportManager.py,v 1.5 2006/01/27 19:00:20 tavis_rudd Exp $
+# $Id: ImportManager.py,v 1.6 2007/04/03 01:56:24 tavis_rudd Exp $
 
 """Provides an emulator/replacement for Python's standard import system.
 
@@ -24,12 +24,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>  based on Gordon McMillan's iu.py
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.5 $
+Version: $Revision: 1.6 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/01/27 19:00:20 $
+Last Revision Date: $Date: 2007/04/03 01:56:24 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.5 $"[11:-2]
+__revision__ = "$Revision: 1.6 $"[11:-2]
 
 ##################################################
 ## DEPENDENCIES
@@ -80,7 +80,6 @@ def _os_bootstrap():
         def join(a, b):
             if a == '':
                 return b
-            path = s
             if ':' not in a:
                 a = ':' + a
             if a[-1:] != ':':
