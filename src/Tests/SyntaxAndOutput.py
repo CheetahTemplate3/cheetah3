@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
-# $Id: SyntaxAndOutput.py,v 1.107 2007/03/29 17:38:36 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.108 2007/04/03 03:14:31 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -13,12 +13,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.107 $
+Version: $Revision: 1.108 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2007/03/29 17:38:36 $
+Last Revision Date: $Date: 2007/04/03 03:14:31 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.107 $"[11:-2]
+__revision__ = "$Revision: 1.108 $"[11:-2]
 
 
 ##################################################
@@ -764,6 +764,31 @@ class EncodingDirective(OutputTest):
         """basic #encoding """
         self.verify("#encoding latin-1\nAndr\202",
                     u'Andr\202', outputEncoding='latin-1')
+
+class UnicodeDirective(OutputTest):
+    def test1(self):
+        """basic #unicode """
+        self.verify("#unicode utf-8\n1234",
+                    u"1234")
+        
+        self.verify("#unicode ascii\n1234",
+                    u"1234")
+
+        self.verify("#unicode latin-1\n1234",
+                    u"1234")
+
+        self.verify("#unicode latin-1\n1234ü",
+                    u"1234ü")
+        self.verify("#unicode: latin-1\n1234ü",
+                    u"1234ü")
+        self.verify("#  unicode  : latin-1\n1234ü",
+                    u"1234ü")
+
+        self.verify(u"#unicode latin-1\n1234ü",
+                    u"1234ü")
+
+        self.verify("#encoding latin-1\n1234ü",
+                    "1234ü")
 
 class Placeholders_Esc(OutputTest):
     convertEOLs = False
