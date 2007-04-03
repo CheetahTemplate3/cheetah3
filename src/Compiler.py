@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.153 2007/04/03 02:58:52 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.154 2007/04/03 18:47:33 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.153 $
+Version: $Revision: 1.154 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2007/04/03 02:58:52 $
+Last Revision Date: $Date: 2007/04/03 18:47:33 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.153 $"[11:-2]
+__revision__ = "$Revision: 1.154 $"[11:-2]
 
 import sys
 import os
@@ -46,8 +46,10 @@ currentTime=time.time
 
 class Error(Exception): pass
 
-unicodeDirectiveRE = re.compile(r'(?:^|\n)\s*#\s{0,5}unicode[:\s]*([-\w.]*)\s*\n', re.MULTILINE)
-encodingDirectiveRE = re.compile(r'(?:^|\n)\s*#\s{0,5}encoding[:\s]*([-\w.]*)\s*\n', re.MULTILINE)
+unicodeDirectiveRE = re.compile(
+    r'(?:^|\r\n|\r|\n)\s*#\s{0,5}unicode[:\s]*([-\w.]*)\s*(?:\r\n|\r|\n)', re.MULTILINE)
+encodingDirectiveRE = re.compile(
+    r'(?:^|\r\n|\r|\n)\s*#\s{0,5}encoding[:\s]*([-\w.]*)\s*(?:\r\n|\r|\n)', re.MULTILINE)
 
 escapedNewlineRE = re.compile(r'(?<!\\)\\n')
 DEFAULT_COMPILER_SETTINGS = {
