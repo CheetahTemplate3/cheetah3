@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
-# $Id: SyntaxAndOutput.py,v 1.108 2007/04/03 03:14:31 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.109 2007/04/04 00:28:21 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -13,12 +13,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.108 $
+Version: $Revision: 1.109 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2007/04/03 03:14:31 $
+Last Revision Date: $Date: 2007/04/04 00:28:21 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.108 $"[11:-2]
+__revision__ = "$Revision: 1.109 $"[11:-2]
 
 
 ##################################################
@@ -2737,6 +2737,29 @@ $spacer()
 $g $numOne
 """,
                     'Hello 1\n')
+
+
+class SuperDirective(OutputTest):
+    def test1(self):
+        tmpl1 = Template.compile('''$foo $bar(99)
+        #def foo: this is base foo
+        #def bar(arg): super-$arg''')
+
+        tmpl2 = tmpl1.subclass('''
+        #implements dummy
+        #def foo
+          #super
+          This is child foo
+          #super(trans=trans)
+          $bar(1234)
+        #end def
+        #def bar(arg): #super($arg)
+        ''')
+        expected = ('this is base foo          '
+                    'This is child foo\nthis is base foo          '
+                    'super-1234\n super-99')
+        assert str(tmpl2()).strip()==expected
+
 
 class ImportantExampleCases(OutputTest):
     def test1(self):

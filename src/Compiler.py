@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.154 2007/04/03 18:47:33 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.155 2007/04/04 00:28:35 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.154 $
+Version: $Revision: 1.155 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2007/04/03 18:47:33 $
+Last Revision Date: $Date: 2007/04/04 00:28:35 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.154 $"[11:-2]
+__revision__ = "$Revision: 1.155 $"[11:-2]
 
 import sys
 import os
@@ -32,11 +32,12 @@ import copy
 
 from Cheetah.Version import Version, VersionTuple
 from Cheetah.SettingsManager import SettingsManager
-from Cheetah.Parser import Parser, ParseError, specialVarRE, \
-     STATIC_CACHE, REFRESH_CACHE, SET_LOCAL, SET_GLOBAL,SET_MODULE
 from Cheetah.Utils.Indenter import indentize # an undocumented preprocessor
 from Cheetah import ErrorCatchers
 from Cheetah import NameMapper
+from Cheetah.Parser import Parser, ParseError, specialVarRE, \
+     STATIC_CACHE, REFRESH_CACHE, SET_LOCAL, SET_GLOBAL,SET_MODULE, \
+     unicodeDirectiveRE, encodingDirectiveRE,escapedNewlineRE
 
 from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, valueFromFrameOrSearchList
 VFFSL=valueFromFrameOrSearchList
@@ -46,12 +47,6 @@ currentTime=time.time
 
 class Error(Exception): pass
 
-unicodeDirectiveRE = re.compile(
-    r'(?:^|\r\n|\r|\n)\s*#\s{0,5}unicode[:\s]*([-\w.]*)\s*(?:\r\n|\r|\n)', re.MULTILINE)
-encodingDirectiveRE = re.compile(
-    r'(?:^|\r\n|\r|\n)\s*#\s{0,5}encoding[:\s]*([-\w.]*)\s*(?:\r\n|\r|\n)', re.MULTILINE)
-
-escapedNewlineRE = re.compile(r'(?<!\\)\\n')
 DEFAULT_COMPILER_SETTINGS = {
     ## controlling the handling of Cheetah $placeholders
     'useNameMapper': True,      # Unified dotted notation and the searchList
@@ -1362,6 +1357,20 @@ class ClassCompiler(GenUtils):
         ## now add the attribute
         self._generatedAttribs.append(attribExpr)
 
+    def addSuper(self, argsList, parserComment=None):        
+        className = self._className #self._baseClass
+        methodName = self._getActiveMethodCompiler().methodName()
+
+        argStringChunks = []
+        for arg in argsList:
+            chunk = arg[0]
+            if not arg[1] == None:
+                chunk += '=' + arg[1]
+            argStringChunks.append(chunk)
+        argString = ','.join(argStringChunks)
+
+        self.addFilteredChunk(
+            'super(%(className)s, self).%(methodName)s(%(argString)s)'%locals())
 
     def addErrorCatcherCall(self, codeChunk, rawCode='', lineCol=''):
         if self._placeholderToErrorCatcherMap.has_key(rawCode):

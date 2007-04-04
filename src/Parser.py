@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.133 2007/04/03 02:01:32 tavis_rudd Exp $
+# $Id: Parser.py,v 1.134 2007/04/04 00:28:50 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.133 $
+Version: $Revision: 1.134 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2007/04/03 02:01:32 $
+Last Revision Date: $Date: 2007/04/04 00:28:50 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.133 $"[11:-2]
+__revision__ = "$Revision: 1.134 $"[11:-2]
 
 import os
 import sys
@@ -148,12 +148,20 @@ EOLre=re.compile(r'(?:\r\n|\r|\n)')
 specialVarRE=re.compile(r'([a-zA-z_]+)@') # for matching specialVar comments
 # e.g. ##author@ Tavis Rudd
 
+unicodeDirectiveRE = re.compile(
+    r'(?:^|\r\n|\r|\n)\s*#\s{0,5}unicode[:\s]*([-\w.]*)\s*(?:\r\n|\r|\n)', re.MULTILINE)
+encodingDirectiveRE = re.compile(
+    r'(?:^|\r\n|\r|\n)\s*#\s{0,5}encoding[:\s]*([-\w.]*)\s*(?:\r\n|\r|\n)', re.MULTILINE)
+
+escapedNewlineRE = re.compile(r'(?<!\\)\\n')
+
 directiveNamesAndParsers = {
     # importing and inheritance
     'import':None,
     'from':None,
     'extends': 'eatExtends',
     'implements': 'eatImplements',
+    'super': 'eatSuper',
 
     # output, filtering, and caching
     'slurp': 'eatSlurp',
@@ -2059,6 +2067,32 @@ class _HighLevelParser(_LowLevelParser):
             
         self.getExpression()  # throw away and unwanted crap that got added in
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
+
+    def eatSuper(self):
+        # filtered
+        isLineClearToStartToken = self.isLineClearToStartToken()
+        endOfFirstLine = self.findEOL()
+        self.getDirectiveStartToken()
+        self.advance(len('super'))
+        self.getWhiteSpace()
+        startPos = self.pos()
+        if not self.atEnd() and self.peek() == '(':
+            argsList = self.getDefArgList()
+            self.advance()              # past the closing ')'
+            if argsList and argsList[0][0] == 'self':
+                del argsList[0]
+        else:
+            argsList=[]
+
+        self._applyExpressionFilters(self[startPos:self.pos()], 'super', startPos=startPos)
+
+        #parserComment = ('## CHEETAH: generated from ' + signature + 
+        #                 ' at line %s, col %s' % self.getRowCol(startPos)
+        #                 + '.')
+
+        self.getExpression()  # throw away and unwanted crap that got added in
+        self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
+        self._compiler.addSuper(argsList)
 
     def eatSet(self):
         # filtered
