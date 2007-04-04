@@ -2,11 +2,60 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-2.0 final (unreleased)
-  - added new compiler setting 'addTimestampsToCompilerOutput'. See Brian Bird's
-    post about it today.  He stores his cheetah generated .py files in
-    subversion and needed to disable the timestamp code so svn wouldn't care
-    when he recompiles those .py modules.
+2.0rc8 (April 3, 2007)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+  Core Changes: [TR]      
+  
+    - added a '#unicode <encoding>' directive to indicate that the output of the
+      template should be a unicode string even if the template source is a
+      normal byte string.
+          
+          - #unicode and #encoding are mutually exclusive.  Use one or the other. 
+          - #unicode must be on a line by itself.
+          - Strings in embedded code must be explictly marked as unicode if they 
+            contain non-ascii chars:
+          
+            #unicode latin-1
+            $f(u"<some non-ascii char>") ## right
+            $f("<some non-ascii char>") ## wrong
+          
+            However, this works fine:
+          
+            #unicode latin-1 
+            blah blah <some non-ascii char> blah blah
+          
+    - fixed several unicode bugs in the compiler.
+
+    - fixed some unicode issues in the standard filters.
+  
+    - fixed a few minor bugs in code that never gets called.  Thanks to
+      Alejandro Dubrovsky for pointing them out.
+  
+    - make RawOrEncodedUnicode the baseclass of all filters and remove some
+      unused/redudant filters
+
+    - added new compiler setting 'addTimestampsToCompilerOutput'. See Brian
+      Bird's post about it.  He stores his cheetah generated .py files in
+      subversion and needed to disable the timestamp code so svn wouldn't care
+      when he recompiles those .py modules.
+  
+    - added the #super directive, which calls the method from the parent class
+      which has the same as the current #def or #block method.  
+  
+       #def foo
+       	   ... child output
+	   #super  ## includes output of super(<CurrentClass>, self).foo()
+	   ... child output
+       #end def 
+
+
+       #def bar(arg)
+       	   ... child output
+	   #super(arg)  ## includes output of super(<CurrentClass>, self).bar(arg)
+	   ... child output
+       #end def 
+
+    - added some unit tests for the new directives
 
 
 2.0rc7 (July 4, 2006)
