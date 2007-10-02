@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.184 2007/04/04 00:56:05 tavis_rudd Exp $
+# $Id: Template.py,v 1.185 2007/10/02 01:36:26 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.184 $
+Version: $Revision: 1.185 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2007/04/04 00:56:05 $
+Last Revision Date: $Date: 2007/10/02 01:36:26 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.184 $"[11:-2]
+__revision__ = "$Revision: 1.185 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -119,6 +119,13 @@ def valOrDefault(val, default):
     if val is not Unspecified: return val
     else: return default
 
+def updateLinecache(filename, src):
+    import linecache
+    size = len(src)
+    mtime = time.time()
+    lines = src.splitlines()
+    fullname = filename
+    linecache.cache[filename] = size, mtime, lines, fullname
 
 class CompileCacheItem:
     pass
@@ -706,10 +713,9 @@ class Template(Servlet):
             except:
                 #@@TR: should add some logging to this
                 pass
-        if useCache and cacheHash and klass._CHEETAH_compileCache.has_key(cacheHash):
+        if useCache and cacheHash and cacheHash in klass._CHEETAH_compileCache:
             cacheItem = klass._CHEETAH_compileCache[cacheHash]
             generatedModuleCode = cacheItem.code
-            #print 'DEBUG: found cached copy'
         else:
             compiler = compilerClass(source, file,
                                      moduleName=moduleName,
@@ -727,43 +733,25 @@ class Template(Servlet):
                 cacheItem.lastCheckoutTime = time.time()
                 return cacheItem.klass
 
-            def updateLinecache(filename, src):
-                import linecache
-                size = len(src)
-                mtime = time.time()
-                lines = src.splitlines()
-                fullname = filename
-                linecache.cache[filename] = size, mtime, lines, fullname
-
-
             try:
                 klass._CHEETAH_compileLock.acquire()
                 uniqueModuleName = _genUniqueModuleName(moduleName)
                 __file__ = uniqueModuleName+'.py' # relative file path with no dir part
-                mod = new.module(uniqueModuleName)
-                sys.modules[uniqueModuleName] = mod
-            finally:
-                klass._CHEETAH_compileLock.release()
 
-            try:
                 if cacheModuleFilesForTracebacks:
                     if not os.path.exists(cacheDirForModuleFiles):
-                        raise Exception('%s does not exist'%
-                                        cacheDirForModuleFiles)
+                        raise Exception('%s does not exist'%cacheDirForModuleFiles)
 
                     __file__ = os.path.join(cacheDirForModuleFiles, __file__)
+                    # @@TR: might want to assert that it doesn't already exist
                     try:
-                        klass._CHEETAH_compileLock.acquire()
-                        # @@TR: might want to assert that it doesn't already exist
-                        try:
-                            open(__file__, 'w').write(generatedModuleCode)
-                            # @@TR: should probably restrict the perms, etc.
-                        except OSError:
-                            # @@ TR: should this optionally raise?
-                            traceback.print_exc(file=sys.stderr)
-                    finally:
-                        klass._CHEETAH_compileLock.release()
+                        open(__file__, 'w').write(generatedModuleCode)
+                        # @@TR: should probably restrict the perms, etc.
+                    except OSError:
+                        # @@ TR: should this optionally raise?
+                        traceback.print_exc(file=sys.stderr)
 
+                mod = new.module(uniqueModuleName)
                 if moduleGlobals:
                     for k, v in moduleGlobals.items():
                         setattr(mod, k, v)
@@ -774,7 +762,7 @@ class Template(Servlet):
 
                 if baseclass and baseclassValue:
                     setattr(mod, baseclassName, baseclassValue)
-
+                ##
                 try:
                     co = compile(generatedModuleCode, __file__, 'exec')
                     exec co in mod.__dict__
@@ -793,16 +781,16 @@ class Template(Servlet):
                     updateLinecache(__file__, generatedModuleCode)
                     e.generatedModuleCode = generatedModuleCode
                     raise
-                    
-            except:
-                del sys.modules[uniqueModuleName]
-                raise
+                ##
+                sys.modules[uniqueModuleName] = mod
+            finally:
+                klass._CHEETAH_compileLock.release()
 
             templateClass = getattr(mod, className)
 
             if (cacheCompilationResults
                 and cacheHash
-                and not klass._CHEETAH_compileCache.has_key(cacheHash)):
+                and cacheHash not in klass._CHEETAH_compileCache):
                 
                 cacheItem = CompileCacheItem()
                 cacheItem.cacheTime = cacheItem.lastCheckoutTime = time.time()
@@ -1524,6 +1512,12 @@ class Template(Servlet):
                 nestedTemplateClass = compiler.compile(source=source,file=file)
                 nestedTemplate = nestedTemplateClass(_preBuiltSearchList=self.searchList(),
                                                      _globalSetVars=self._CHEETAH__globalSetVars)
+                # Set the inner template filters to the initial filter of the
+                # outer template:
+                # this is the only really safe way to use
+                # filter='WebSafe'.
+                nestedTemplate._CHEETAH__initialFilter = self._CHEETAH__initialFilter
+                nestedTemplate._CHEETAH__currentFilter = self._CHEETAH__initialFilter   
                 self._CHEETAH__cheetahIncludes[_includeID] = nestedTemplate
             else:
                 if includeFrom == 'file':
@@ -1726,9 +1720,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.184 $
+        Version: $Revision: 1.185 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2007/04/04 00:56:05 $
+        Last Revision Date: $Date: 2007/10/02 01:36:26 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
