@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.25 2006/02/04 00:59:46 tavis_rudd Exp $
+# $Id: CheetahWrapper.py,v 1.26 2007/10/02 01:22:04 tavis_rudd Exp $
 """Cheetah command-line interface.
 
 2002-09-03 MSO: Total rewrite.
@@ -8,13 +8,13 @@
 
 Meta-Data
 ================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>
-Version: $Revision: 1.25 $
+Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <sluggoster@gmail.com>>
+Version: $Revision: 1.26 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/02/04 00:59:46 $
+Last Revision Date: $Date: 2007/10/02 01:22:04 $
 """
-__author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.25 $"[11:-2]
+__author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <sluggoster@gmail.com>"
+__revision__ = "$Revision: 1.26 $"[11:-2]
 
 import getopt, glob, os, pprint, re, shutil, sys
 import cPickle as pickle
@@ -87,7 +87,7 @@ WRAPPER_TOP = """\
           \/    *   *     \/    CHEETAH %(Version)s Command-Line Tool
            \      |       / 
             \  ==----==  /      by Tavis Rudd <tavis@damnsimple.com>
-             \__________/       and Mike Orr <iron@mso.oz.net>
+             \__________/       and Mike Orr <sluggoster@gmail.com>
               
 """ % globals()
 
