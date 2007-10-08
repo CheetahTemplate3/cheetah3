@@ -4,11 +4,11 @@ DocStrings in NameMapper for details on the purpose and interface of this
 module.
 
 ===============================================================================
-$Id: _namemapper.c,v 1.31 2005/01/06 15:13:16 tavis_rudd Exp $
+$Id: _namemapper.c,v 1.32 2007/10/08 03:53:52 tavis_rudd Exp $
 Authors: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.31 $
+Version: $Revision: 1.32 $
 Start Date: 2001/08/07
-Last Revision Date: $Date: 2005/01/06 15:13:16 $
+Last Revision Date: $Date: 2007/10/08 03:53:52 $
 */
 
 /* *************************************************************************** */
@@ -99,7 +99,8 @@ wrapInternalNotFoundException(char *fullName, PyObject *namespace)
   if (PyErr_Occurred() && PyErr_GivenExceptionMatches(PyErr_Occurred(), NotFound)) {
     PyErr_Fetch(&excType, &excValue, &excTraceback);
     isAlreadyWrapped = PyObject_CallMethod(excValue, "find", "s", "while searching");
-    if (PyInt_AsLong(isAlreadyWrapped)==-1) { /* only wrap once */
+
+    if (isAlreadyWrapped != NULL && PyInt_AsLong(isAlreadyWrapped)==-1) { /* only wrap once */
       PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " while searching for '"));
       PyString_ConcatAndDel(&excValue, Py_BuildValue("s", fullName));
       PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "'"));
