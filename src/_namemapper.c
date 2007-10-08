@@ -4,11 +4,11 @@ DocStrings in NameMapper for details on the purpose and interface of this
 module.
 
 ===============================================================================
-$Id: _namemapper.c,v 1.32 2007/10/08 03:53:52 tavis_rudd Exp $
+$Id: _namemapper.c,v 1.33 2007/10/08 04:01:24 tavis_rudd Exp $
 Authors: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.32 $
+Version: $Revision: 1.33 $
 Start Date: 2001/08/07
-Last Revision Date: $Date: 2007/10/08 03:53:52 $
+Last Revision Date: $Date: 2007/10/08 04:01:24 $
 */
 
 /* *************************************************************************** */
@@ -100,18 +100,20 @@ wrapInternalNotFoundException(char *fullName, PyObject *namespace)
     PyErr_Fetch(&excType, &excValue, &excTraceback);
     isAlreadyWrapped = PyObject_CallMethod(excValue, "find", "s", "while searching");
 
-    if (isAlreadyWrapped != NULL && PyInt_AsLong(isAlreadyWrapped)==-1) { /* only wrap once */
-      PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " while searching for '"));
-      PyString_ConcatAndDel(&excValue, Py_BuildValue("s", fullName));
-      PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "'"));
-      if (INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS) {
-	PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " in "));
-	PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "the top-level namespace "));
-	PyString_ConcatAndDel(&excValue, 
-			      PyObject_CallFunctionObjArgs(pprintMod_pformat, namespace, NULL));
-      }
+    if (isAlreadyWrapped != NULL) {
+	if (PyInt_AsLong(isAlreadyWrapped)==-1) { /* only wrap once */
+	    PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " while searching for '"));
+	    PyString_ConcatAndDel(&excValue, Py_BuildValue("s", fullName));
+	    PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "'"));
+	    if (INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS) {
+		PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " in "));
+		PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "the top-level namespace "));
+		PyString_ConcatAndDel(&excValue, 
+				      PyObject_CallFunctionObjArgs(pprintMod_pformat, namespace, NULL));
+	    }
+	}
+	Py_DECREF(isAlreadyWrapped);
     }
-    Py_DECREF(isAlreadyWrapped);
     PyErr_Restore(excType, excValue, excTraceback);
     return -1;
   } else {
