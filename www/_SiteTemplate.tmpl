@@ -614,7 +614,9 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 	  </li>  
 
 	  <li>Cheetah is included in FreeBSD and most major Linux distributions:
-	  Gentoo, Fedora, Debian, and Ubuntu among others.</li>
+	  Gentoo, Fedora, Red Hat, Debian, and Ubuntu among others.  
+	  The <a href="http://cobbler.et.redhat.com">Cobbler</a>
+	  boot/provisioning server for Fedora and Red Hat uses Cheetah heavily.</li>
 
           #call self.displayLinesAsList
             <a href="http://info.patientwire.com/">PatientWire</a>
@@ -632,6 +634,12 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 	    $makeLink('http://klive.cpushare.com/'),  #slurp
 	       <a href="http://kerneltrap.org/node/3148">Andrea Arcangeli$(apos)s</a> #slurp
 	       "Linux Kernel Live Usage Monitor"
+	    $makeLink('http://cobbler.et.redhat.com/'),  #slurp
+	       <a href="http://cobbler.et.redhat.com">Cobbler</a> is a centralized #slurp
+               provisioning (network deployment) server for Fedora and Red Hat #slurp
+               based Linux distributions. Cobbler uses Cheetah for rendering #slurp
+               kickstart files, DHCP configurations, PXE configuration trees, #slurp
+               and to power its web user interface. 
             $makeLink('http://www.instasong.com/InstaSong/')
             $makeLink('http://www.axiomfire.com/')  All internal tools and live eDialogues built with Cheetah
             $makeLink('http://initd.org/') (makers of psycopg and pysqlite)
