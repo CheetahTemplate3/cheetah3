@@ -2,6 +2,19 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0 (Oct 12, 2007)
+  !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
+  
+  - fixed exception handling issue in the C implemenation of NameMapper 
+    [patch from Eric Huss]
+
+  - fixed filtering of #included subtemplates
+    [patch from Brian Bird]
+
+  See the release notes from 2.0b1-5 and 2.0rc1-8 for other changes since
+  Cheetah 1.0.
+
+
 2.0rc8 (April 11, 2007)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]      

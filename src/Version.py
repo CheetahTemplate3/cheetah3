@@ -1,5 +1,5 @@
-Version = '2.0rc8'
-VersionTuple = (2,0,0,'candidate',8)
+Version = '2.0'
+VersionTuple = (2,0,0,'final',0)
 
 MinCompatibleVersion = '2.0rc6'
 MinCompatibleVersionTuple = (2,0,0,'candidate',6)
