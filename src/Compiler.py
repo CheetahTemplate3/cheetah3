@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.155 2007/04/04 00:28:35 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.156 2007/10/30 20:17:09 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.155 $
+Version: $Revision: 1.156 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2007/04/04 00:28:35 $
+Last Revision Date: $Date: 2007/10/30 20:17:09 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.155 $"[11:-2]
+__revision__ = "$Revision: 1.156 $"[11:-2]
 
 import sys
 import os
@@ -1006,8 +1006,9 @@ class MethodCompiler(GenUtils):
     def closeFilterBlock(self):
         ID, filterDetails = self._filterRegionsStack.pop()
         #self.addChunk('_filter = self._CHEETAH__initialFilter')
-        self.addChunk('_filter = _orig_filter%(ID)s'%locals())
-        
+        #self.addChunk('_filter = _orig_filter%(ID)s'%locals())
+        self.addChunk('_filter = self._CHEETAH__currentFilter = _orig_filter%(ID)s'%locals())
+
 class AutoMethodCompiler(MethodCompiler):
 
     def _setupState(self):
