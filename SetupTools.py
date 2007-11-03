@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: SetupTools.py,v 1.8 2006/01/01 23:40:54 tavis_rudd Exp $
+# $Id: SetupTools.py,v 1.9 2007/11/03 19:44:38 tavis_rudd Exp $
 """Some tools for extending and working with distutils
 
 CREDITS: This module borrows code and ideas from M.A. Lemburg's excellent setup
@@ -8,7 +8,7 @@ tools for the mxBase package.
 """
 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__version__ = "$Revision: 1.8 $"[11:-2]
+__version__ = "$Revision: 1.9 $"[11:-2]
 
 import os
 from os import listdir
@@ -21,6 +21,9 @@ import traceback
 
 from distutils.core import setup
 if 'CHEETAH_USE_SETUPTOOLS' in os.environ:
+    # @@TR: Please note that this is for testing purposes only!  PEAK setuptools
+    # is not required or recommended for installing Cheetah.  Downstream
+    # package managers (linux distros, etc.) should *not* enable this.
     try:
         # use http://peak.telecommunity.com/DevCenter/setuptools if it's installed
         # requires Py >=2.3
