@@ -2,6 +2,10 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0.1 (unreleased)
+  - fixed a deadlock Christoph Zwerschke found in Cheetah.ImportHooks.
+    [TR]
+
 2.0 (Oct 12, 2007)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   

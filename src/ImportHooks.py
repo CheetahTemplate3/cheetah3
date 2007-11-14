@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: ImportHooks.py,v 1.25 2006/06/20 19:23:27 tavis_rudd Exp $
+# $Id: ImportHooks.py,v 1.26 2007/11/14 23:16:08 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
@@ -13,12 +13,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.25 $
+Version: $Revision: 1.26 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2006/06/20 19:23:27 $
+Last Revision Date: $Date: 2007/11/14 23:16:08 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.25 $"[11:-2]
+__revision__ = "$Revision: 1.26 $"[11:-2]
 
 import sys
 import os.path
@@ -26,7 +26,7 @@ import types
 import __builtin__
 import new
 import imp
-from threading import Lock
+from threading import RLock
 import string
 import traceback
 from Cheetah import ImportManager
@@ -48,7 +48,7 @@ def setCacheDir(cacheDir):
 ## CLASSES
 
 class CheetahDirOwner(DirOwner):
-    _lock = Lock()
+    _lock = RLock()
     _acquireLock = _lock.acquire
     _releaseLock = _lock.release
 
