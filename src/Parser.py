@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.134 2007/04/04 00:28:50 tavis_rudd Exp $
+# $Id: Parser.py,v 1.135 2007/11/16 18:26:01 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.134 $
+Version: $Revision: 1.135 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2007/04/04 00:28:50 $
+Last Revision Date: $Date: 2007/11/16 18:26:01 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.134 $"[11:-2]
+__revision__ = "$Revision: 1.135 $"[11:-2]
 
 import os
 import sys
@@ -33,6 +33,7 @@ from Cheetah.SourceReader import SourceReader
 from Cheetah import Filters
 from Cheetah import ErrorCatchers
 from Cheetah.Unspecified import Unspecified
+from Cheetah.Macros.I18n import I18n
 
 # re tools
 _regexCache = {}
@@ -1374,7 +1375,6 @@ class _HighLevelParser(_LowLevelParser):
 
 
         macroDirectives = self.setting('macroDirectives',{})
-        from Cheetah.Macros.I18n import I18n
         macroDirectives['i18n'] = I18n
 
 
