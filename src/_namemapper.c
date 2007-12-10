@@ -4,11 +4,11 @@ DocStrings in NameMapper for details on the purpose and interface of this
 module.
 
 ===============================================================================
-$Id: _namemapper.c,v 1.33 2007/10/08 04:01:24 tavis_rudd Exp $
+$Id: _namemapper.c,v 1.34 2007/12/10 18:25:20 tavis_rudd Exp $
 Authors: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.33 $
+Version: $Revision: 1.34 $
 Start Date: 2001/08/07
-Last Revision Date: $Date: 2007/10/08 04:01:24 $
+Last Revision Date: $Date: 2007/12/10 18:25:20 $
 */
 
 /* *************************************************************************** */
@@ -121,6 +121,34 @@ wrapInternalNotFoundException(char *fullName, PyObject *namespace)
   }
 }
 
+
+static int 
+isInstanceOrClass(PyObject *nextVal) {
+    /* old style classes or instances */
+    if((PyInstance_Check(nextVal)) || (PyClass_Check(nextVal))) {
+        return 1;
+    }
+
+    if(PyObject_HasAttrString(nextVal, "__class__")) {
+	/* new style classes or instances */
+        if(PyType_Check(nextVal) || PyObject_HasAttrString(nextVal, "mro")) {
+            return 1;
+        }
+        if(PyObject_HasAttrString(nextVal, "im_func") 
+	   || PyObject_HasAttrString(nextVal, "func_code")
+	   || PyObject_HasAttrString(nextVal, "__self__")) {
+	    /* method, func, or builtin func */
+            return 0;
+	}
+        if ((!PyObject_HasAttrString(nextVal, "mro")) && PyObject_HasAttrString(nextVal, "__init__")) {
+	    /* instance */
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
 static int getNameChunks(char *nameChunks[], char *name, char *nameCopy) 
 {
   char c;
@@ -213,8 +241,13 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
     if (i>0) {
       Py_DECREF(currentVal);
     }
-    if (executeCallables && PyCallable_Check(nextVal) && (!PyInstance_Check(nextVal)) 
-	&& (!PyClass_Check(nextVal)) && (!PyType_Check(nextVal)) ) {
+
+    if (executeCallables && PyCallable_Check(nextVal) && (!isInstanceOrClass(nextVal)) ) {
+
+	//if (executeCallables && PyCallable_Check(nextVal) && (!PyInstance_Check(nextVal)) 
+ 	//&& (!PyClass_Check(nextVal)) && (!PyType_Check(nextVal)) ) {
+
+
       if (!(currentVal = PyObject_CallObject(nextVal, NULL))){
 	Py_DECREF(nextVal);
 	return NULL;
