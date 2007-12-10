@@ -2,6 +2,12 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.0.2 (not released yet)
+  - make autocalling in valueForName correctly ignore newstyle classes and instances
+    that are callable, as it does for oldstyle classes and instances.  Patch
+    from lucas@endian.com
+    [TR]
+
 2.0.1 (Nov 16, 2007)
   - fixed a deadlock Christoph Zwerschke found in Cheetah.ImportHooks.
     [TR]
