@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.31 2007/12/10 19:19:00 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.32 2007/12/10 19:20:09 tavis_rudd Exp $
 
 """This module supports Cheetah's optional NameMapper syntax.
 
@@ -135,14 +135,14 @@ Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@damnsimple.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.31 $
+Version: $Revision: 1.32 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2007/12/10 19:19:00 $
+Last Revision Date: $Date: 2007/12/10 19:20:09 $
 """
 from __future__ import generators
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__revision__ = "$Revision: 1.31 $"[11:-2]
+__revision__ = "$Revision: 1.32 $"[11:-2]
 import types
 from types import StringType, InstanceType, ClassType, TypeType
 from pprint import pformat
@@ -304,7 +304,6 @@ def hasName(obj, name):
     except NotFound:
         return False
 try:
-    0/0
     from _namemapper import NotFound, valueForKey, valueForName, \
          valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
     # it is possible with Jython or Windows, for example, that _namemapper.c hasn't been compiled
