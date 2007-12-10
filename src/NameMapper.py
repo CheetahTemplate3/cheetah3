@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.30 2007/04/03 01:58:20 tavis_rudd Exp $
+# $Id: NameMapper.py,v 1.31 2007/12/10 19:19:00 tavis_rudd Exp $
 
 """This module supports Cheetah's optional NameMapper syntax.
 
@@ -135,14 +135,14 @@ Meta-Data
 ================================================================================
 Authors: Tavis Rudd <tavis@damnsimple.com>,
          Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.30 $
+Version: $Revision: 1.31 $
 Start Date: 2001/04/03
-Last Revision Date: $Date: 2007/04/03 01:58:20 $
+Last Revision Date: $Date: 2007/12/10 19:19:00 $
 """
 from __future__ import generators
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__revision__ = "$Revision: 1.30 $"[11:-2]
+__revision__ = "$Revision: 1.31 $"[11:-2]
 import types
 from types import StringType, InstanceType, ClassType, TypeType
 from pprint import pformat
@@ -185,6 +185,25 @@ def _wrapNotFoundException(exc, fullName, namespace):
                 excStr += ' in the namespace %s'%pformat(namespace)
             exc.args = (excStr,)
         raise
+
+def _isInstanceOrClass(obj):
+    if type(obj) in (InstanceType, ClassType):
+        # oldstyle
+        return True
+
+    if hasattr(obj, "__class__"):
+        # newstyle
+        if hasattr(obj, 'mro'):
+            # type/class
+            return True
+        elif (hasattr(obj, 'im_func') or hasattr(obj, 'func_code') or hasattr(obj, '__self__')):
+            # method, func, or builtin func
+            return False
+        elif hasattr(obj, '__init__'):
+            # instance
+            return True
+    return False
+
     
 def hasKey(obj, key):
     """Determine if 'obj' has 'key' """
@@ -214,8 +233,7 @@ def _valueForName(obj, name, executeCallables=False):
         else:
             _raiseNotFoundException(key, obj)
         
-        if (executeCallables and callable(nextObj)
-            and (type(nextObj) not in (InstanceType, ClassType))):
+        if executeCallables and callable(nextObj) and not _isInstanceOrClass(nextObj):
             obj = nextObj()
         else:
             obj = nextObj
@@ -286,6 +304,7 @@ def hasName(obj, name):
     except NotFound:
         return False
 try:
+    0/0
     from _namemapper import NotFound, valueForKey, valueForName, \
          valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
     # it is possible with Jython or Windows, for example, that _namemapper.c hasn't been compiled
