@@ -1,16 +1,16 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.32 2007/03/29 19:31:15 tavis_rudd Exp $
+# $Id: Filters.py,v 1.33 2007/12/29 23:08:18 tavis_rudd Exp $
 """Filters for the #filter directive; output filters Cheetah's $placeholders .
 
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.32 $
+Version: $Revision: 1.33 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2007/03/29 19:31:15 $
+Last Revision Date: $Date: 2007/12/29 23:08:18 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.32 $"[11:-2]
+__revision__ = "$Revision: 1.33 $"[11:-2]
 
 # Additional entities WebSafe knows how to transform.  No need to include
 # '<', '>' or '&' since those will have been done already.
@@ -103,12 +103,11 @@ class WebSafe(Filter):
             also = kw['also']
             entities = webSafeEntities   # Global variable.
             for k in also:
-                if entities.has_key(k):
+                if k in entities:
                     v = entities[k]
                 else:
                     v = "&#%s;" % ord(k)
                 s = s.replace(k, v)
-        # Return the puppy.
         return s
 
 
