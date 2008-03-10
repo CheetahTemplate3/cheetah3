@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.136 2008/03/10 05:04:12 tavis_rudd Exp $
+# $Id: Parser.py,v 1.137 2008/03/10 05:25:13 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.136 $
+Version: $Revision: 1.137 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2008/03/10 05:04:12 $
+Last Revision Date: $Date: 2008/03/10 05:25:13 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.136 $"[11:-2]
+__revision__ = "$Revision: 1.137 $"[11:-2]
 
 import os
 import sys
@@ -1896,8 +1896,9 @@ class _HighLevelParser(_LowLevelParser):
         self.getWhiteSpace()
 
         directiveName = self.matchDirective()
-        if not directiveName or directiveName not in ('def', 'block', 'closure'):
-            raise ParseError(self, msg='Expected #def, #block or #closure')
+        if not directiveName or directiveName not in ('def', 'block', 'closure', '@'):
+            raise ParseError(
+                self, msg='Expected #def, #block, #closure or another @decorator')
         self.eatDirective()
         
     def eatDef(self):
