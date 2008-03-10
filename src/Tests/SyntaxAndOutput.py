@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
-# $Id: SyntaxAndOutput.py,v 1.109 2007/04/04 00:28:21 tavis_rudd Exp $
+# $Id: SyntaxAndOutput.py,v 1.110 2008/03/10 07:50:18 tavis_rudd Exp $
 """Syntax and Output tests.
 
 TODO
@@ -13,12 +13,12 @@ TODO
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.109 $
+Version: $Revision: 1.110 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2007/04/04 00:28:21 $
+Last Revision Date: $Date: 2008/03/10 07:50:18 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.109 $"[11:-2]
+__revision__ = "$Revision: 1.110 $"[11:-2]
 
 
 ##################################################
@@ -1797,6 +1797,14 @@ class DefDirective(OutputTest):
         self.verify("#def $testMeth($arg=1234):$arg\n$testMeth",
                     "1234")
 
+    def test19(self):
+        """#def that extends over two lines with arguments"""
+        self.verify("#def $testMeth($arg=1234,\n"
+                    +"  $arg2=5678)\n"
+                    +"$arg $arg2\n"
+                    +"#end def\n"
+                    +"$testMeth",
+                    "1234 5678\n")
 
 class DecoratorDirective(OutputTest):
     def test1(self):
@@ -1829,6 +1837,17 @@ class DecoratorDirective(OutputTest):
             pass
         else:
             self.fail('should raise a ParseError')
+
+    def test2(self):
+        """#def with multiple decorators"""
+        self.verify("#from Cheetah.Tests.SyntaxAndOutput import testdecorator\n"
+                    +"#@testdecorator\n"
+                    +"#@testdecorator\n"
+                    +"#def testMeth\n"
+                    +"1234\n"
+                    "#end def\n"
+                    "$testMeth",
+                    "1234\n")
 
 if versionTuple < (2,4):
     del DecoratorDirective
