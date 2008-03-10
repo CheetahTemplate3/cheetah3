@@ -7,6 +7,11 @@ release
     that are callable, as it does for oldstyle classes and instances.  Patch
     from lucas@endian.com
     [TR]
+  - made it possible to chain multiple decorators to a method #def [TR with
+    patch from Graham Dennis]
+  - fixed a bug in _eatMultiLineDef that Graham Dennis reported. [TR] 
+  - fixed 'module.__init__() argument 1 must be string, not unicode' bug in
+    Template.py reported by Erwin Ambrosch [TR]
 
 2.0.1 (Nov 16, 2007)
   - fixed a deadlock Christoph Zwerschke found in Cheetah.ImportHooks.
