@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Compiler.py,v 1.156 2007/10/30 20:17:09 tavis_rudd Exp $
+# $Id: Compiler.py,v 1.157 2008/03/10 04:58:48 tavis_rudd Exp $
 """Compiler classes for Cheetah:
 ModuleCompiler aka 'Compiler'
 ClassCompiler
@@ -11,12 +11,12 @@ ModuleCompiler.compile, and ModuleCompiler.__getattr__.
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.156 $
+Version: $Revision: 1.157 $
 Start Date: 2001/09/19
-Last Revision Date: $Date: 2007/10/30 20:17:09 $
+Last Revision Date: $Date: 2008/03/10 04:58:48 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.156 $"[11:-2]
+__revision__ = "$Revision: 1.157 $"[11:-2]
 
 import sys
 import os
@@ -325,14 +325,14 @@ class GenUtils:
 class MethodCompiler(GenUtils):
     def __init__(self, methodName, classCompiler,
                  initialMethodComment=None,
-                 decorator=None):
+                 decorators=None):
         self._settingsManager = classCompiler
         self._classCompiler = classCompiler
         self._moduleCompiler = classCompiler._moduleCompiler
         self._methodName = methodName
         self._initialMethodComment = initialMethodComment
         self._setupState()
-        self._decorator = decorator
+        self._decorators = decorators or []
 
     def setting(self, key):
         return self._settingsManager.setting(key)
@@ -1126,8 +1126,9 @@ class AutoMethodCompiler(MethodCompiler):
         argString = (', ').join(argStringChunks)
 
         output = []
-        if self._decorator:
-            output.append(self._indent + self._decorator+'\n')
+        if self._decorators:
+            output.append(''.join([self._indent + decorator + '\n'
+                                   for decorator in self._decorators]))
         output.append(self._indent + "def "
                       + self.methodName() + "(" +
                       argString + "):\n\n")
@@ -1192,7 +1193,7 @@ class ClassCompiler(GenUtils):
 
     def _setupState(self):
         self._classDef = None
-        self._decoratorForNextMethod = None
+        self._decoratorsForNextMethod = []
         self._activeMethodsList = []        # stack while parsing/generating
         self._finishedMethodsList = []      # store by order
         self._methodsIndex = {}      # store by name
@@ -1297,12 +1298,10 @@ class ClassCompiler(GenUtils):
         if klass is None:
             klass = self.methodCompilerClass
 
-        decorator = None
-        if self._decoratorForNextMethod:
-            decorator = self._decoratorForNextMethod
-            self._decoratorForNextMethod = None
+        decorators = self._decoratorsForNextMethod or []
+        self._decoratorsForNextMethod = []
         methodCompiler = klass(methodName, classCompiler=self,
-                               decorator=decorator,
+                               decorators=decorators,
                                initialMethodComment=initialMethodComment)
         self._methodsIndex[methodName] = methodCompiler
         return methodCompiler
@@ -1340,7 +1339,7 @@ class ClassCompiler(GenUtils):
         See _spawnMethodCompiler() and MethodCompiler for the details of how
         this is used.
         """
-        self._decoratorForNextMethod = decoratorExpr
+        self._decoratorsForNextMethod.append(decoratorExpr)
 
     def addClassDocString(self, line):
         self._classDocStringLines.append( line.replace('%','%%')) 
