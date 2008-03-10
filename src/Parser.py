@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Parser.py,v 1.135 2007/11/16 18:26:01 tavis_rudd Exp $
+# $Id: Parser.py,v 1.136 2008/03/10 05:04:12 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 
 Classes:
@@ -11,12 +11,12 @@ Classes:
 Meta-Data
 ================================================================================
 Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.135 $
+Version: $Revision: 1.136 $
 Start Date: 2001/08/01
-Last Revision Date: $Date: 2007/11/16 18:26:01 $
+Last Revision Date: $Date: 2008/03/10 05:04:12 $
 """
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.135 $"[11:-2]
+__revision__ = "$Revision: 1.136 $"[11:-2]
 
 import os
 import sys
@@ -1988,6 +1988,7 @@ class _HighLevelParser(_LowLevelParser):
         signature = self[startPos:self.pos()]
         endOfFirstLinePos = self.findEOL()
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
+        signature = ' '.join([line.strip() for line in signature.splitlines()]) 
         parserComment = ('## CHEETAH: generated from ' + signature + 
                          ' at line %s, col %s' % self.getRowCol(startPos)
                          + '.')
