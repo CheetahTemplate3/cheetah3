@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.185 2007/10/02 01:36:26 tavis_rudd Exp $
+# $Id: Template.py,v 1.186 2008/03/10 04:48:11 tavis_rudd Exp $
 """Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
@@ -9,12 +9,12 @@ Meta-Data
 Author: Tavis Rudd <tavis@damnsimple.com>
 License: This software is released for unlimited distribution under the
          terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.185 $
+Version: $Revision: 1.186 $
 Start Date: 2001/03/30
-Last Revision Date: $Date: 2007/10/02 01:36:26 $
+Last Revision Date: $Date: 2008/03/10 04:48:11 $
 """ 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.185 $"[11:-2]
+__revision__ = "$Revision: 1.186 $"[11:-2]
 
 ################################################################################
 ## DEPENDENCIES
@@ -751,7 +751,7 @@ class Template(Servlet):
                         # @@ TR: should this optionally raise?
                         traceback.print_exc(file=sys.stderr)
 
-                mod = new.module(uniqueModuleName)
+                mod = new.module(str(uniqueModuleName))
                 if moduleGlobals:
                     for k, v in moduleGlobals.items():
                         setattr(mod, k, v)
@@ -1420,6 +1420,8 @@ class Template(Servlet):
         self._CHEETAH__cheetahIncludes = {}
         self._CHEETAH__cacheRegions = {}
         self._CHEETAH__indenter = Indenter()
+
+        # @@TR: consider allowing simple callables as the filter argument
         self._CHEETAH__filtersLib = filtersLib
         self._CHEETAH__filters = {}
         if type(filter) in StringTypes:
@@ -1430,6 +1432,7 @@ class Template(Servlet):
             filterName = klass.__name__            
         self._CHEETAH__currentFilter = self._CHEETAH__filters[filterName] = klass(self).filter
         self._CHEETAH__initialFilter = self._CHEETAH__currentFilter
+
         self._CHEETAH__errorCatchers = {}
         if errorCatcher:
             if type(errorCatcher) in StringTypes:
@@ -1720,9 +1723,9 @@ class Template(Servlet):
         Author: Mike Orr <iron@mso.oz.net>
         License: This software is released for unlimited distribution under the
                  terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.185 $
+        Version: $Revision: 1.186 $
         Start Date: 2002/03/17
-        Last Revision Date: $Date: 2007/10/02 01:36:26 $
+        Last Revision Date: $Date: 2008/03/10 04:48:11 $
         """ 
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
