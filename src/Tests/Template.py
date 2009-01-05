@@ -307,8 +307,8 @@ class Preprocessors(TemplateTest):
 
 class TryExceptImportTest(TemplateTest):
     def test_FailCase(self):
+        ''' Test situation where an inline #import statement will get relocated '''
         source = '''
-            
             #def myFunction()
                 Ahoy!
                 #try
@@ -318,8 +318,8 @@ class TryExceptImportTest(TemplateTest):
                 #end try
             #end def
             '''
+        # This should raise an IndentationError (if the bug exists)
         klass = Template.compile(source=source)
-        print klass
         t = klass(namespaces={'foo' : 1234})
 
 
