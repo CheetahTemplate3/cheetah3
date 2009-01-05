@@ -305,6 +305,26 @@ class Preprocessors(TemplateTest):
         assert str(t)==('This is a bit of text that needs translation\n'*2)[:-1]
 
 
+class TryExceptImportTest(TemplateTest):
+    def test_FailCase(self):
+        source = '''
+            
+            #def myFunction()
+                Ahoy!
+                #try
+                    #import sys
+                #except ImportError
+                    $print "This will never happen!"
+                #end try
+            #end def
+            '''
+        klass = Template.compile(source=source)
+        print klass
+        t = klass(namespaces={'foo' : 1234})
+
+
+
+
 ##################################################
 ## if run from the command line ##
         
