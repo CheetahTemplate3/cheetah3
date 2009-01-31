@@ -203,7 +203,6 @@ def _isInstanceOrClass(obj):
             # instance
             return True
     return False
-
     
 def hasKey(obj, key):
     """Determine if 'obj' has 'key' """
@@ -228,10 +227,11 @@ def _valueForName(obj, name, executeCallables=False):
         key = nameChunks[i]
         if hasattr(obj, 'has_key') and obj.has_key(key):
             nextObj = obj[key]
-        elif hasattr(obj, key):
-            nextObj = getattr(obj, key)
         else:
-            _raiseNotFoundException(key, obj)
+            try:
+                nextObj = getattr(obj, key)
+            except AttributeError:
+                _raiseNotFoundException(key, obj)
         
         if executeCallables and callable(nextObj) and not _isInstanceOrClass(nextObj):
             obj = nextObj()
