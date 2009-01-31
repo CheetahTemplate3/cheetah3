@@ -229,18 +229,21 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
     
     if (PyMapping_Check(currentVal) && PyMapping_HasKeyString(currentVal, currentKey)) {
       nextVal = PyMapping_GetItemString(currentVal, currentKey);
-    } else if (PyObject_HasAttrString(currentVal, currentKey)) {
-      nextVal = PyObject_GetAttrString(currentVal, currentKey);
     } else {
-      setNotFoundException(currentKey, currentVal);
-      if (i>0) {
-	Py_DECREF(currentVal);
+      nextVal = PyObject_GetAttrString(currentVal, currentKey);
+      PyObject *exc = PyErr_Occurred();
+      if (exc != NULL) {
+        // if exception == AttributeError
+        if (PyErr_ExceptionMatches(PyExc_AttributeError)) {
+            setNotFoundException(currentKey, currentVal);
+            if (i > 0) 
+                Py_DECREF(currentVal);
+            return NULL;
+        }
       }
-      return NULL;
     }
-    if (i>0) {
-      Py_DECREF(currentVal);
-    }
+    if (i > 0) 
+        Py_DECREF(currentVal);
 
     if (executeCallables && PyCallable_Check(nextVal) && (!isInstanceOrClass(nextVal)) ) {
 
