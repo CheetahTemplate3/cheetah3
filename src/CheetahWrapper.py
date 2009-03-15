@@ -128,6 +128,9 @@ OPTIONS FOR "compile" AND "fill":
   --templateAPIClass : a string representing a subclass of
                        Cheetah.Template:Template to use for compilation
 
+  --parallel         : compile or fill templates in parallel, e.g. 
+                       --parallel 4
+
 Run "cheetah help" for the main help screen.
 """
 
@@ -204,6 +207,7 @@ class CheetahWrapper:
         pao("--nobackup", action="store_true", dest="nobackup", default=False)
         pao("--settings", action="store", dest="compilerSettingsString", default=None)
         pao("--templateAPIClass", action="store", dest="templateClassName", default=None)
+        pao("--parallel", action="store", type="int", dest="parallel", default=1)
 
         self.opts, self.pathArgs = opts, files = parser.parse_args(args)
         D("""\
@@ -343,8 +347,48 @@ you do have write permission to and re-run the tests.""")
         D("All bundles: %s", pprint.pformat(bundles))
         if self.opts.flat:
             self._checkForCollisions(bundles)
-        for b in bundles:
-            self._compileOrFillBundle(b)
+
+        # In parallel mode a new process is forked for each template
+        # compilation, out of a pool of size self.opts.parallel. This is not
+        # really optimal in all cases (e.g. probably wasteful for small
+        # templates), but seems to work well in real life for me.
+        #
+        # It also won't work for Windows users, but I'm not going to lose any
+        # sleep over that.
+        if self.opts.parallel > 1:
+            bad_child_exit = 0
+            pid_pool = set()
+
+            def child_wait():
+                pid, status = os.wait()
+                pid_pool.remove(pid)
+                return os.WEXITSTATUS(status)
+
+            while bundles:
+                b = bundles.pop()
+                pid = os.fork()
+                if pid:
+                    pid_pool.add(pid)
+                else:
+                    self._compileOrFillBundle(b)
+                    sys.exit(0)
+
+                if len(pid_pool) == self.opts.parallel:
+                    bad_child_exit = child_wait()
+                    if bad_child_exit:
+                        break
+
+            while pid_pool:
+                child_exit = child_wait()
+                if not bad_child_exit:
+                    bad_child_exit = child_exit
+
+            if bad_child_exit:
+                sys.exit("Child process failed, exited with code %d" % bad_child_exit)
+
+        else:
+            for b in bundles:
+                self._compileOrFillBundle(b)
 
     def _checkForCollisions(self, bundles):
         """Check for multiple source paths writing to the same destination
