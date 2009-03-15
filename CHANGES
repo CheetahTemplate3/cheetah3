@@ -2,7 +2,9 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-2.0.2 (not released yet)
+2.1.0 (not released yet)
+  - Apply patch to support parallel compilation of templates courtesy of Evan Klitzke <evan@eklitzke.org>
+  - Corrected issue when __getattr__ calls on searchList objects raise exceptions (tyler@slide.com)
   - make autocalling in valueForName correctly ignore newstyle classes and instances
     that are callable, as it does for oldstyle classes and instances.  Patch
     from lucas@endian.com
