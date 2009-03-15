@@ -1712,8 +1712,13 @@ class ModuleCompiler(SettingsManager, GenUtils):
         return self._importedVarNames
     
     def addImportedVarNames(self, varNames):
-        self.addChunk('import %s' % ', '.join(varNames))
-        
+        if not varNames:
+            return 
+        if self._methodBodyChunks:
+            self.addChunk('import %s' % ', '.join(varNames))
+        else:
+            self._importedVarNames.extend(varNames)
+
     ## methods for adding stuff to the module and class definitions
 
     def setBaseClass(self, baseClassName):
