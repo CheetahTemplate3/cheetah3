@@ -2,7 +2,7 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
-2.1.0 (not released yet)
+2.1.0 (March 16, 2009)
   - Quiet DeprecationWarnings being printed to stderr when using Cheetah on Python 2.6 and up. Patch suggested by Satoru SATOH <satoru.satoh@gmail.com>
   - Apply patch to support parallel compilation of templates courtesy of Evan Klitzke <evan@eklitzke.org>
   - Corrected issue when __getattr__ calls on searchList objects raise exceptions (tyler@slide.com)
