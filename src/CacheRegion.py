@@ -27,15 +27,7 @@ Last Revision Date: $Date: 2006/01/28 04:19:30 $
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Philippe Normand <phil@base-art.net>"
 __revision__ = "$Revision: 1.3 $"[11:-2]
 
-try:
-    import hashlib
-    def md5digest(material):
-        return hashlib.md5(material).digest()
-except ImportError:
-    import md5
-    def md5digest(material):
-        return md5.new(material).hexdigest()
-
+import md5
 from time import time as currentTime
 from Cheetah.CacheStore import MemoryCacheStore
 
@@ -136,8 +128,8 @@ class CacheRegion:
             
             Returns a `CacheItem` instance.
         """
-        cacheItemID = md5digest(str(cacheItemID))
-
+        cacheItemID = md5.new(str(cacheItemID)).hexdigest()
+        
         if not self._cacheItems.has_key(cacheItemID):
             cacheItem = self._cacheItemClass(
                 cacheItemID=cacheItemID, cacheStore=self._wrappedCacheDataStore)
