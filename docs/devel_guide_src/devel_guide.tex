@@ -1,0 +1,55 @@
+\documentclass{howto}
+\usepackage{moreverb}                   %% Verbatim Code Listings
+
+\title{Cheetah Developers' Guide}
+\release{0.9.15a1}
+
+\author{Mike Orr with assistance from Tavis Rudd}
+\authoraddress{\email{iron@mso.oz.net}}
+
+\begin{document}
+\maketitle
+
+
+\tableofcontents
+
+\copyright{Copyright 2002, Mike Orr.
+      This document may be copied and modified under the terms of the
+      {\bf Open Publication License} \url{http://www.opencontent.org/openpub/} }
+
+
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \include{introduction}
+
+    %% How the directives affect the .py template module.
+    \include{pyModules}
+    \include{placeholders}
+    \include{cache}
+    \include{comments}
+    \include{output}
+    \include{inheritanceEtc}
+    \include{flowControl}
+    \include{errorHandling}
+    \include{parserInstructions}
+
+    %% A walk through the Cheetah source.
+    \include{files}
+    \include{template}
+    \include{parser}
+    \include{compiler}
+
+    %% Other development issues and howtos.
+    \include{history}
+    \include{design}
+    \include{patching}
+    \include{documenting}
+    
+    %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \appendix
+    \include{bnf}
+    \include{safeDelegation}
+\end{document}
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      

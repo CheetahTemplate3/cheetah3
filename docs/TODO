@@ -1,0 +1,46 @@
+Cheetah Documentation TODO
+--------------------------
+
+Cheetah FAQ
+===============================================================================
+A place for specific questions & answers for troubleshooting.  Some questions
+may duplicate material in the Users' Guide, but some paragraphs in the UG will
+be moved to the FAQ.
+- Why am I getting a NotFound error?  I put my variable in the searchList!
+- Why is my template output empty?
+- Why are my $property, $file, ... placeholders misbehaving?
+
+Users' Guide:
+===============================================================================
+- 200+ e-mails in MO's mailbox regarding possible doc updates.
+- more examples in the Webware section (EL)
+- more examples/advice all over the Users' Guide about recommended/
+  non-recommended strategies (MO)
+
+Developers' Guide:
+===============================================================================
+- Finish. (MO)
+
+Quick Reference Guide: 
+===============================================================================
+Cheat sheet on Cheetah syntax and usage.  (MO but not soon)
+
+Beginners' Guide: 
+===============================================================================
+Written for somebody who has to maintain templates but
+doesn't know Python.  Looking for a writer, somebody who trains such 
+maintainers and knows what their needs are.  To get the correct LaTeX
+structure, copy users_guide.tex and one of its chapters, and modify as
+necessary.  
+
+
+HOWTOs:
+=======
+Somebody offered to write some HOWTOs on specialized topics.  Who was it?
+
+BNF:
+====
+- write a formalized grammar for Cheetah in BNF.  MO partly did in
+a Developer's Guide appendix.  Essentially, the directives still need
+to be done, and a proofreading of the rest.  Move to separate text file and
+find somebody to finish it.

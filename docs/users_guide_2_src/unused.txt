@@ -1,0 +1,67 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Give me an example of a Webware servlet!}
+\label{intro.example.servlet}
+
+This example uses an HTML form to ask the user's name, then invokes itself
+again to display a {\em personalized} friendly greeting.  
+
+\begin{verbatim}
+<HTML><HEAD><TITLE>My Template-Servlet</TITLE></HEAD><BODY>   
+#set $name = $request.field('name', None)
+#if $name  
+Hello $name
+#else
+<FORM ACTION="" METHOD="GET">
+Name: <INPUT TYPE="text" NAME="name"><BR>
+<INPUT TYPE="submit">
+</FORM>
+#end if
+</BODY></HTML>
+\end{verbatim}
+
+To try it out for yourself on a Webware system:
+\begin{enumerate}
+\item copy the template definition to a file {\bf test.tmpl} in your
+    Webware servlet directory.
+\item Run ``\code{cheetah compile test.tmpl}''.  This produces
+    {\bf test.py} (a .py template module) in the same directory.
+\item In your web browser, go to {\bf test.py}, using whatever site and
+    directory is appropriate.  Depending on your Webware configuration, you may
+    also be able to go to {\bf test}.
+\end{enumerate}
+
+At the first request, field `name' will be blank (false) so the ``\#else''
+portion will execute and present a form.  You type your name and press submit.
+The form invokes the same page.  Now `name' is true so the ``\#if'' portion
+executes, which displays the greeting.  The ``\#set'' directive creates a
+local variable that lasts while the template is being filled.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+To install Cheetah in your system-wide Python library:
+* Login as a user with privileges to install system-wide Python packages.
+  On POSIX systems (AIX, Solaris, Linux, IRIX, etc.), the command is
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Certain test failures are insignificant:
+\begin{description}
+\item{**AssertionError: Template output mismatch: Expected Output = 0(end)
+Actual Output = False(end)**}  Python 2.3 changed the string representation of
+booleans, and the tests haven't yet been updated to reflect this.  
+\item{**AssertionError: subcommand exit status 127**}  Certain tests run
+"cheetah" as a subcommand.  The failure may mean the command wasn't found
+in your system path. (What happens if you run "cheetah" on the command line?)
+The failure also happens on some Windows systems for unknown reasons.  This
+failure has never been observed outside the test suite.  Long term, we plan to
+rewrite the tests to do a function call rather than a subcommand, which will
+also make the tests run significantly faster.
+\item{**ImportError: No module named SampleBaseClass**}  The test tried to
+write a temporary module in the current directory and ``import`` it.  Reread
+the first paragraph in this section about the current directory.
+\item{**ImportError: No module named tmp**}  May be the same problem as
+SampleBaseClass; let us know if changing the current directory doesn't work.
+\end{description}
+
+  normally 'su root'.  On non-POSIX systems such as Windows NT, login as an
+  administrator.

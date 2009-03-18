@@ -1,0 +1,66 @@
+Glossary
+========
+
+..
+    :label: glossary
+
+**Template** is an informal term meaning a template definition, a template
+class or a template instance.  A **template definition** is what the human
+maintainer writes: a file or string consisting of text, placeholders and
+directives.  **Placeholders** are variables that will be looked up when the
+template is filled.  **Directives** are commands to be executed when the
+template is filled, or instructions to the Cheetah compiler.  Placeholders
+normally start with "$"; directives with "#".  The conventional suffix for a
+file containing a template definition is **.tmpl**.
+
+To use a template, you first **compile** the template definition into
+**template class**.  Then you instantiate the class and **fill** it by calling
+one of its instance methods.  Filling does all the placeholder lookups and
+returns the finished result.  Templates can be compiled in memory or written to
+a Python module, called a **precompiled template**.
+
+Every template has a **main** method that fills the entire template.  The main
+method is usually ``.respond()``.  Calling ``str()`` or ``unicode()`` on a
+template instance is the same as calling the main method.  Templates can also
+contain **#def methods** (via ``#def`` or ``#block``), which can be called
+directly.
+
+A **placeholder** consists of one or more **identifiers** separated by periods.
+Identifiers must follow the same rules as Python variable names, and may be
+followed by the usual ``[]`` and ``()`` as in Python.  Example with three
+identifiers: ``a.b[2].c("arg")``.  The value discovered at fill time is the
+**placeholder value**.
+
+The first (or only) identifier of a placeholder name represents a **variable**
+to be looked up.  If Cheetah's **NameMapper** is turned on (the default), it
+looks in various **namespaces** including the template instance's ``self``,
+Python variables local/global to the template method, and an arbitrary list of
+**user-defined namespaces** you may have passed to the template constructor.
+A user-defined namespace is any Python object; Cheetah searches its attributes
+and keys for a matching name.  ``#set`` and ``#for`` create local
+variables.  ``#import`` and ``#set module global`` create global variables.
+``#attr``, ``#def``, and ``#block`` create ``self`` variables.  When the
+NameMapper is turned off, only local/global variables are accessible.
+
+The NameMapper also handles universal dotted notation and autocalling.
+**Universal dotted notation** means that keys may be written as if they were
+attributes: ``a.b`` instead of ``a['b']``.  **Autocalling** means that
+if any identifier's value is found to be a function or method, Cheetah will
+call it without arguments if there is no ``()`` following.  More about the
+NameMapper is in section \ref{language.namemapper}.
+
+Cheetah 1 used the term "searchList" for user-defined namespaces.  However,
+Cheetah has another **search list** internally: the actual list of namespaces
+it consults.  This is almost the same thing but not quite.  To avoid confusion,
+this Guide uses the term "search list" only for the internal list.
+
+Some directives are multi-line, meaning they have a matching **\#end** tag.
+The lines of text between the start and end tags is the **body** of the
+directive.  Arguments on the same line as the start tag, in contrast, are
+considered part of the directive tag.
+
+A **template-servlet** is a Webware_-specific construct.  Any .py template
+module in a Webware servlet directory can be filled directly through the web by
+requesting the URL. 
+
+.. _Webware: http://www.webwareforpython.org/

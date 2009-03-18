@@ -1,0 +1,420 @@
+\section{How Cheetah Works}
+\label{howWorks}
+
+As mentioned before, you can do two things with templates: compile them and
+fill them.  (Actually you can query them too, to see their attributes and
+method values.)  Using templates in a Python program was shown in section
+\ref{gettingStarted.tutorial} (Quickstart tutorial).  Here we'll focus on
+compiling and filling templates from the shell command line, and how to make
+.py template modules.  The compiling information here is also important for
+template-servlets, which will be otherwise covered in chapter \ref{webware}
+(Webware).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Constructing Template Objects}
+\label{howWorks.templateClass}
+\label{howWorks.constructing}
+
+The heart of Cheetah is the \code{Template} class in the
+\code{Cheetah.Template} module.  You can use it directly if you have a
+template definition in hand, or indirectly through a precompiled template,
+which is a subclass.  The constructor accepts the following keyword
+arguments.  (If you're a beginner, learn the first three arguments now;
+the others are much less frequent.)
+
+\begin{description}
+\item{{\bf source}}
+     The template definition as a string.  You may omit the \code{source=}
+     prefix {\em if it's the first argument}, as in all the examples below.
+     The source can be a string literal in your module, or perhaps a string
+     you read from a database or other data structure.
+\item{{\bf file}}
+     A filename or file object containing the template definition.
+     A filename must be a string, and a file object must be open for reading.
+     By convention, template definition files have the extension
+     {\bf .tmpl}.
+\item{{\bf searchList}}
+     A list of objects to add to the searchList.  The attributes/keys of these
+     objects will be consulted for \code{\$placeholder} lookup.
+\item{{\bf filter}}
+     A class that will format every \code{\$placeholder} value.  You may
+     specify a class object or string.  If a class object,
+     it must be a subclass of \code{Cheetah.Filters.Filter}.  If a string, it
+     must be the name of one of the filters in filtersLib module (see next 
+     item).
+     (You may also use the \code{\#filter} directive (section
+     \ref{output.filter}) to switch filters at runtime.)
+\item{{\bf filtersLib}}
+     A module containing the filters Cheetah should look up by name.  The
+     default is \code{Cheetah.Filters}.  All classes in this module that are
+     subclasses of \code{Cheetah.Filters.Filter} are considered filters.
+\item{{\bf errorCatcher}}
+     A class to handle \code{\$placeholder} errors.  You may
+     specify a class object or string.  If a class object,
+     it must be a subclass of \code{Cheetah.ErrorCatchers.ErrorCatcher}.  
+     If a string, it must be the name of one of the error catchers in
+     \code{Cheetah.ErrorCatchers}.  This is similar to the 
+     \code{\#errorCatcher} directive 
+     (section \ref{errorHandling.errorCatcher}).
+\item{{\bf compilerSettings}}
+     A dictionary (or dictionary hierarchy) of settings that change Cheetah's
+     behavior.  Not yet documented.
+\end{description}
+
+To use \code{Template} directly, you {\em must} specify either \code{source}
+or \code{file}, but not both.  To use a precompiled template, you 
+{\em must not} specify either one, because the template definition is already
+built into the class.  The other arguments, however, may be used in either case.
+Here are typical ways to create a template instance:
+\begin{description}
+\item{\code{t = Template("The king is a \$placeholder1.")}}
+     \\ Pass the template definition as a string.
+\item{\code{t = Template(file="fink.tmpl")}}
+     \\ Read the template definition from a file named "fink.tmpl".  
+\item{\code{t = Template(file=f)}}
+     \\ Read the template definition from file-like object 'f'.
+\item{\code{t = Template("The king is a \$placeholder1.", searchList=[dict, obj])}}
+     \\ Pass the template definition as a string.  Also pass two namespaces for
+     the searchList: a dictionary 'dict' and an instance 'obj'.
+\item{\code{t = Template(file="fink.txt", searchList=[dict, obj])}}
+     \\ Same, but pass a filename instead of a string.
+\item{\code{t = Template(file=f, searchList=[dict, obj])}}
+     \\ Same with a file object.
+\end{description}
+
+If you use \code{Template} directly, the template definition will be compiled
+the first time it's filled.  Compilation creates a template-specific class
+called the {\bf generated class}, which is a subclass of \code{Template}.  It
+then dynamically switches the instance so it's now an instance of this class.
+Don't worry if you don't understand this; it works.
+
+% By convention, you give a file containing a template definition the extension
+% {\bf .tmpl}.
+
+When you precompile a template using the ``cheetah compile'' command, it 
+writes the generated class to a file.  Actually, what it writes is the source
+code for a Python module that contains the generated class.  Again, the
+generated class is a subclass of \code{Template}.  We call the generated
+module a {\bf .py template module}.  Thus, if you always use
+precompiled templates (as many people do), you can view Cheetah as a 
+convenient front-end for writing certain kinds of Python modules, the way
+you might use a graphical dialog builder to make a dialog module.  
+
+Precompiled templates provide a slight performance boost because the
+compilation happens only once rather than every time it's instantiated.
+Also, once you import the .py template module and allow Python to create a 
+.pyc or .pyo file, you skip the Python compiler too.  The speed advantage
+of all this is negligable, but it may make a difference in programs that
+use templates many times a second.
+
+\code{Template} subclasses Webware's \code{Servlet} class when available,
+so the generated class can be used as a Webware servlet.  This is practical
+only with precompiled templates.
+
+To fill a template, you call its {\bf main method}.  This is normally 
+\code{.respond()}, but under certain circumstances it's \code{.writeBody()} or
+a user-defined name.  (Section \ref{inheritanceEtc.implements} explains why
+the method name is not always the same.)  However, \code{.\/\_\_str\_\_()} is
+always an alias for the main method, so you can always use
+\code{print\ myTemplateInstance} or \code{str(myTempateInstance)} to fill it.
+You can also call any \code{\#def} or \code{\#block} method and it will fill
+just that portion of the template, although this feature is not often used.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{``cheetah compile'' and .py template modules}
+\label{howWorks.cheetah-compile}
+
+To create a .py template module, do either of these:
+
+\begin{verbatim}
+cheetah compile [options] [FILES ...]
+cheetah c [options] [FILES ...]
+\end{verbatim}
+
+The following options are supported:
+\begin{verbatim}
+  --idir DIR, --odir DIR : input/output directories (default: current dir)
+  --iext EXT, --oext EXT : input/output filename extensions
+    (default input: tmpl,  default output:  py)
+  -R : recurse subdirectories looking for input files
+  --debug : print lots of diagnostic output to standard error
+  --flat : no destination subdirectories
+  --nobackup : don't make backups
+  --stdout, -p : output to standard output (pipe)
+\end{verbatim}
+
+{\em Note:} If Cheetah can't find your input files, or if it puts output files
+in the wrong place, use the \code{--debug} option to see what Cheetah thinks 
+of your command line.
+
+The most basic usage is:
+\begin{verbatim}
+cheetah compile a.tmpl           : writes a.py
+cheetah compile a.tmpl b.tmpl    : writes a.py and b.py
+\end{verbatim}
+
+Cheetah will automatically add the default input extension (.tmpl) if the
+file is not found.  So the following two examples are the same as above
+(provided files ``a'' and ``b'' don't exist):
+\begin{verbatim}
+cheetah compile a                : writes a.py (from a.tmpl)
+cheetah compile a b              : writes a.py and b.py
+\end{verbatim}
+
+You can override the default input extension and output extension
+(\code{py}) using \code{--iext} and \code{--oext}, although there's
+little reason to do so.  Cheetah assumes the extension has a leading dot
+(.) even if you don't specify it.
+
+Use the \code{-R} option to recurse subdirectories:
+\begin{verbatim}
+cheetah compile dir1             : error, file is a directory
+cheetah compile -R dir1          : look in `dir1' for files to compile
+cheetah compile                  : error, no file specified
+cheetah compile -R               : look in current directory for files
+                                   to compile
+cheetah compile -R a b dir1      : compile files and recurse
+\end{verbatim}
+When recursing, only regular files that end in the input extension (.tmpl) are
+considered source files.  All other filenames are ignored.
+
+The options \code{--idir} and \code{--odir} allow you to specify that
+the source (and/or destination) paths are relative to a certain directory
+rather than to the current directory.  This is useful if you keep your
+*.tmpl and *.py files in separate directory hierarchies.  After editing a 
+source file, just run one of these (or put the command in a script or 
+Makefile):
+\begin{verbatim}
+cheetah compile --odir /var/webware a.tmpl
+cheetah compile -R --odir /var/webware
+cheetah c --odir /var/webware sub/a.tmpl
+                                 : writes /var/webware/sub/a.py
+\end{verbatim}
+
+``cheetah compile'' overwrites any existing \code{.py} file it finds, after
+backing it up to FILENAME.py\_bak (unless you specify \code{--nobackup}).  For
+this reason, you should make changes to the \code{.tmpl} version of the
+template rather than to the \code{.py} version.
+
+For the same reason, if your template requires custom Python methods or
+other Python code, don't put it in the \code{FILENAME.py} file.  Instead, put
+it in a separate base class and use the \code{\#extends} directive to
+inherit from it.
+
+Because FILENAME will be used as a class and module name, it must be a valid
+Python identifier.  For instance, \code{cheetah compile spam-eggs.tmpl} is 
+illegal because of the hyphen ("-").  This is sometimes inconvenient when
+converting a site of HTML files into Webware servlets.  Fortunately, the
+{\em directory} it's in does not have to be an identifier.  ({\em Hint:} for
+date-specific files, try converting 2002/04/12.html to 2002/04/12/index.tmpl.
+This also gives you a directory to store images or supplemental files.)
+
+Occasionally you may want output files put directly into the output directory
+(or current directory), rather than into a subdirectory parallel to the input
+file.  The \code{--flat} option does this.  Note that this introduces the
+possibility that several input files might map to one output file.  Cheetah
+checks for output file collisions before writing any files, and aborts if there
+are any collisions.
+\begin{verbatim}
+cheetah c sub/a.py            : writes sub/a.py
+cheetah c --flat sub/a.py     : writes a.py
+cheetah c --odir DEST sub/a.tmpl
+                              : writes DEST/sub/a.py
+cheetah c --flat --odir DEST sub/a.tmpl
+                              : writes DEST/a.py
+cheetah c --idir /home/henry sub/rollins.tmpl
+                              : writes sub/rollins.py
+cheetah c --flat --idir /home/henry sub/rollins.tmpl
+                              : writes rollins.py
+cheetah c --idir /home/henry --odir /home/henry sub/rollins.tmpl
+                              : writes /home/henry/sub/rollins.py
+cheetah c --flat --idir /home/henry --odir /home/henry sub/rollins.tmpl
+                              : writes /home/henry/rollins.py
+\end{verbatim}
+
+Whenever ``cheetah compile'' has to create an output directory or subdirectory, it
+also creates an \_\_init\_\_.py file in it.  This file is necessary
+in order to make Python treat the directory as a Python package.
+
+One of the advantages of .py template modules is that you don't lose any
+flexibility.  The generated class contains all \code{\#attr} values and
+\code{\#def}/\code{\#block} values as ordinary attributes and methods, so you
+can read the values individually from other Python tools for any kind of custom
+processing you want.  For instance, you can extract the titles of all
+your templates into a database, or find all the servlets with a certain
+\code{\$author} value.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{``cheetah fill''}
+\label{howWorks.cheetah-fill}
+
+You can compile and fill a large number of template definitions from the
+command line in one step using \code{cheetah fill}.  This compiles the template
+in memory; it does {\em not} save the .py template module to disk.  Instead it
+writes a finished output file, which has the extension \code{.html} by default.
+All the options to \code{cheetah compile} work the same way here, and there are
+also a couple additional options:
+\begin{verbatim}
+  --env : put the environment in the searchList
+  --pickle FILE : unpickle FILE and put that object in the searchList
+\end{verbatim}
+
+Because you can't provide a searchList on the command line, the 
+templates must either contain or inherit all the variables it needs,
+or use the \code{--env} and \code{--pickle} options to
+provide additional variables.  
+
+Examples:
+\begin{verbatim}
+cheetah fill a.tmpl              : writes a.html
+cheetah fill a.tmpl b.tmpl       : writes a.html and b.html
+cheetah f --oext txt a           : writes a.txt (from a.tmpl)
+\end{verbatim}
+
+Using \code{--env} may have security or reliability implications because the
+environment normally contains lots of variables you inherited rather than
+defining yourself.  If any of these variables override any of yours (say a
+\code{\#def}), you will get incorrect output, may reveal private information,
+and may get an exception due to the variable being an unexpected type
+(environmental variables are always strings).  Your calling program may wish
+to clear out the environment before setting environmental variables for the
+template.
+
+There are two other differences between ``cheetah compile'' and ``cheetah fill''.
+Cheetah doesn't create \_\_init\_\_.py files when creating directories in
+fill mode.  Also, the source filenames don't have to be identifiers.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Some trivia about .py template modules}
+\label{howWorks.pyTrivia}
+
+We won't look inside .py template modules in this Guide except to note that
+they are very different from template definitions.  The following template
+definition fragment:
+
+\begin{verbatim}
+The number is $Test.unittest.main.
+\end{verbatim}
+
+compiles to this:
+
+\begin{verbatim}
+write("The number is ")  
+write(filter(VFN(VFS(SL,"Test.unittest",1),"main",0)
+write(".")
+\end{verbatim}
+
+The Cheetah Developers' Guide looks at .py template
+modules in depth, and shows what the various directives compile to.
+But you are welcome to take a peek at some .py template modules yourself
+if you're curious about what Cheetah does under the hood.  It's all
+regular Python code: writing strings and function calls to a file-like
+object.
+
+Looking at a .py template module may also help you see why something
+doesn't work, by seeing what Cheetah thought you meant.  It also helps 
+discourage you from modifying the .py file yourself, because who wants to
+keep all those function calls and arguments straight?  Let the computer
+do the drudgery work.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Running a .py template module as a standalone program}
+\label{howWorks.standalone}
+
+In addition to importing your .py template module file into a Python
+script or using it as a Webware servlet, you can also run it from the
+command line as a standalone program.  The program will print the filled
+template on standard output.  This is useful while debugging the template,
+and for producing formatted output in shell scripts.
+
+When running the template as a program, you cannot provide a searchList or
+set \code{self.} attributes in the normal way, so you must take
+alternative measures to ensure that every placeholder has a value.
+Otherwise, you will get the usual \code{NameMapper.NotFound} exception at
+the first missing value.  You can either set default values in the template
+itself (via the \code{\#attr} or \code{\#def} directives) or in a Python
+superclass, or use the \code{--env} or \code{--pickle} command-line options,
+which work just like their ``cheetah fill'' counterparts.
+
+Run \code{python FILENAME.py --help} to see all the command-line
+options your .py template module accepts.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Object-Oriented Documents}
+\label{howWorks.objoriented}
+
+Because Cheetah documents are actually class definitions, templates may inherit
+from one another in a natural way, using regular Python semantics. For
+instance, consider this template, FrogBase.tmpl:
+
+\begin{verbatim}
+#def title
+This document has not defined its title
+#end def
+#def htTitle
+$title
+#end def
+<HTML><HEAD>
+<TITLE>$title</TITLE>
+</HEAD><BODY>
+<H1>$htTitle</H1>
+$body
+</BODY></HTML>
+\end{verbatim}
+
+And its subclassed document, Frog1.tmpl:
+\begin{verbatim}
+#from FrogBase import FrogBase
+#extends FrogBase
+#def title
+The Frog Page
+#end def
+#def htTitle
+The <IMG SRC="Frog.png"> page
+#end def
+#def body
+... lots of info about frogs ...
+#end def
+\end{verbatim}
+
+This is a classic use of inheritance. The parent ``template'' is simply an
+abstract superclass.  Each document specializes the output of its parent.
+ For instance, here the parent defines
+\code{\$htTitle} so that by default it's identical to whatever the 
+\code{\$title} is, but it can also be customized.  
+
+In many other templating systems, you'd have to use case statements or
+if-elseif blocks of some sort, repeated in many different sections of code.
+
+While we show another Cheetah document inheriting from this parent, a Python
+class can inherit from it just as easily. This Python class could define its
+programmatically-driven value for \code{\$body} and \code{\$title}, simply by
+defining body() and title() methods that return a string.  (Actually they
+can return anything, but we'll get into that later.)  
+
+\begin{verbatim}
+from FrogBase import FrogBase
+class Frog2(FrogBase):
+	def title(self):
+		return "Frog 2 Page"
+	# We don't override .htTitle, so it defaults to "Frog 2 Page" too.
+	def body(self):
+		return " ... more info about frogs ..."
+\end{verbatim}
+
+Similarly, the Cheetah document can inherit from an arbitrary class. That's
+how Cheetah makes templates usable as Webware servlets, by subclassing
+\code{Servlet}.  This technique should be possible for non-Webware systems
+too.
+
+({\em Note:}\ \code{FrogBase.tmpl} could be improved by using the
+\code{\#block} directive, section \ref{inheritanceEtc.block}.)
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      
+

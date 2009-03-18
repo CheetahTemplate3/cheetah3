@@ -1,0 +1,282 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Directives: Output}
+\label{output}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#echo}
+\label{output.echo}
+
+The template:
+\begin{verbatim}
+Here is my #echo ', '.join(['silly']*5) # example
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+Here is my silly, silly, silly, silly, silly example
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+write('Here is my ')
+write(filter(', '.join(['silly']*5) ))
+write(' example\n')
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#silent}
+\label{output.silent}
+
+The template:
+\begin{verbatim}
+Here is my #silent ', '.join(['silly']*5) # example
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+Here is my  example
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+        write('Here is my ')
+        ', '.join(['silly']*5) 
+        write(' example\n')
+\end{verbatim}
+
+OK, it's not quite covert because that extra space gives it away, but it 
+almost succeeds.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#raw}
+\label{output.raw}
+
+The template:
+\begin{verbatim}
+Text before raw.
+#raw
+Text in raw.  $alligator.  $croc.o['dile'].  #set $a = $b + $c.
+#end raw
+Text after raw.
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+Text before raw.
+Text in raw.  $alligator.  $croc.o['dile'].  #set $a = $b + $c.
+Text after raw.
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+        write('''Text before raw.
+Text in raw.  $alligator.  $croc.o['dile'].  #set $a = $b + $c.
+Text after raw.
+''')
+\end{verbatim}
+
+So we see that \code{\#raw} is really like a quoting mechanism.  It says that
+anything inside it is ordinary text, and Cheetah joins a \code{\#raw} section 
+with adjacent string literals rather than generating a separate \code{write}
+call.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#include}
+\label{output.include}
+
+The main template:
+\begin{verbatim}
+#include "y.tmpl"
+\end{verbatim}
+
+The included template y.tmpl:
+\begin{verbatim}
+Let's go $voom!
+\end{verbatim}
+
+The shell command and output:
+\begin{verbatim}
+% voom="VOOM" x.py --env
+Let's go VOOM!
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+write(self._includeCheetahSource("y.tmpl", trans=trans, includeFrom="file",
+    raw=0))
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{\#include raw}
+\label{output.include.raw}
+
+The main template:
+\begin{verbatim}
+#include raw "y.tmpl"
+\end{verbatim}
+
+The shell command and output:
+\begin{verbatim}
+% voom="VOOM" x.py --env
+Let's go $voom!
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+write(self._includeCheetahSource("y.tmpl", trans=trans, includeFrom="fil
+e", raw=1))
+\end{verbatim}
+
+That last argument, \code{raw}, makes the difference.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{\#include from a string or expression (eval)}
+\label{output.include.expression}
+
+The template:
+\begin{verbatim}
+#attr $y = "Let's go $voom!"
+#include source=$y
+#include raw source=$y
+#include source="Bam!  Bam!"
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+% voom="VOOM" x.py --env
+Let's go VOOM!Let's go $voom!Bam!  Bam!
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+write(self._includeCheetahSource(VFS(SL,"y",1), trans=trans, 
+    includeFrom="str", raw=0, includeID="481020889808.74"))
+write(self._includeCheetahSource(VFS(SL,"y",1), trans=trans, 
+    includeFrom="str", raw=1, includeID="711020889808.75"))
+write(self._includeCheetahSource("Bam!  Bam!", trans=trans, 
+    includeFrom="str", raw=0, includeID="1001020889808.75"))
+\end{verbatim}
+
+Later in the generated class:
+\begin{verbatim}
+y = "Let's go $voom!"
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#slurp}
+\label{output.slurp}
+
+The template:
+\begin{verbatim}
+#for $i in range(5)
+$i
+#end for
+#for $i in range(5)
+$i #slurp
+#end for
+Line after slurp.
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+0
+1
+2
+3
+4
+0 1 2 3 4 Line after slurp.
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+for i in range(5):
+    write(filter(i)) # generated from '$i' at line 2, col 1.
+    write('\n')
+for i in range(5):
+    write(filter(i)) # generated from '$i' at line 5, col 1.
+    write(' ')
+write('Line after slurp.\n')
+\end{verbatim}
+
+The space after each number is because of the space before \code{\#slurp} in 
+the template definition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#filter}
+\label{output.filter}
+
+The template:
+\begin{verbatim}
+#attr $ode = ">> Rubber Ducky, you're the one!  You make bathtime so much fun! <<"
+$ode
+#filter WebSafe
+$ode
+#filter MaxLen
+${ode, maxlen=13}
+#filter None
+${ode, maxlen=13}
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+>> Rubber Ducky, you're the one!  You make bathtime so much fun! <<
+&gt;&gt; Rubber Ducky, you're the one!  You make bathtime so much fun! &lt;&lt;
+>> Rubber Duc
+>> Rubber Ducky, you're the one!  You make bathtime so much fun! <<
+\end{verbatim}
+
+The \code{WebSafe} filter escapes characters that have a special meaning in 
+HTML.  The \code{MaxLen} filter chops off values at the specified length.
+\code{\#filter None} returns to the default filter, which ignores the \code{maxlen}
+argument.
+
+The generated code:
+\begin{verbatim}
+ 1  write(filter(VFS(SL,"ode",1))) # generated from '$ode' at line 2, col 1.
+ 2  write('\n')
+ 3  filterName = 'WebSafe'
+ 4  if self._filters.has_key("WebSafe"):
+ 5      filter = self._currentFilter = self._filters[filterName]
+ 6  else:
+ 7      filter = self._currentFilter = \
+ 8                  self._filters[filterName] = getattr(self._filtersLib, 
+                       filterName)(self).filter
+ 9  write(filter(VFS(SL,"ode",1))) # generated from '$ode' at line 4, col 1.
+10  write('\n')
+11  filterName = 'MaxLen'
+12  if self._filters.has_key("MaxLen"):
+13      filter = self._currentFilter = self._filters[filterName]
+14  else:
+15      filter = self._currentFilter = \
+16                  self._filters[filterName] = getattr(self._filtersLib, 
+                       filterName)(self).filter
+17  write(filter(VFS(SL,"ode",1), maxlen=13)) # generated from 
+        #'${ode, maxlen=13}' at line 6, col 1.
+18  write('\n')
+19  filter = self._initialFilter
+20  write(filter(VFS(SL,"ode",1), maxlen=13)) # generated from 
+       #'${ode, maxlen=13}' at line 8, col 1.
+21  write('\n')
+\end{verbatim}
+
+As we've seen many times, Cheetah wraps all placeholder lookups in a
+\code{filter} call.  (This also applies to non-searchList lookups: local,
+global and builtin variables.)  The \code{filter} ``function''
+is actually an alias to the current filter object:
+\begin{verbatim}
+filter = self._currentFilter
+\end{verbatim}
+as set at the top of the main method.  Here in lines 3-8 and 11-16 we see
+the filter being changed.  Whoops, I lied.  \code{filter} is not an alias to
+the filter object itself but to that object's \code{.filter} method.  Line 19
+switches back to the default filter.  
+
+In line 17 we see the \code{maxlen} argument being passed as a keyword
+argument to \code{filter} (not to \code{VFS}).  In line 20 the same thing
+happens although the default filter ignores the argument.
+
+% Local Variables:
+% TeX-master: "devel_guide"
+% End:      

@@ -1,0 +1,17 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Non-HTML Output}
+\label{nonHTML}
+
+Cheetah can also output any other text format besides HTML.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Python source code}
+\label{nonHTML.python}
+
+To be written.  We're in the middle of working on an autoindenter to
+make it easier to encode Python indentation in a Cheetah template.
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      
+%# vim: sw=4 ts=4 expandtab

@@ -1,0 +1,15 @@
+users_guide_src/ :
+    Users' Guide for Cheetah 1.0.  Will be deleted when users Guide 2 is
+    finished.
+
+users_guide_2_src/ :
+    Users' Guide and Cookbook for Cheetah 2.0.  HTML version has both parts
+    in one; PDF version has them as two documents.  This section is under
+    construction.
+
+devel_guide_src/ :
+    Developers' Guide for Cheetah 1.0.  Will be deleted when Users' Guide 2 
+    is finished.
+
+howto_extras/ :
+    Extra content for future HOWTOs and FAQs.  May or may not be up to date.

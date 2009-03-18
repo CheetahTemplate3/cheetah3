@@ -1,0 +1,232 @@
+\section{Directives: Import, Inheritance, Declaration and Assignment}
+\label{inheritanceEtc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#import and \#from}
+\label{inheritanceEtc.import}
+
+The template:
+\begin{verbatim}
+#import math
+\end{verbatim}
+
+This construct does not produce any output.
+
+The generated module, at the bottom of the import section:
+\begin{verbatim}
+import math
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#extends}
+\label{inheritanceEtc.extends}
+
+The template:
+\begin{verbatim}
+#extends SomeClass
+\end{verbatim}
+
+The generated import (skipped if \code{SomeClass} has already been
+imported):
+\begin{verbatim}
+from SomeClass import SomeClass
+\end{verbatim}
+
+The generated class:
+\begin{verbatim}
+class x(SomeClass):
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#implements}
+\label{inheritanceEtc.implements}
+
+The template:
+\begin{verbatim}
+#implements doOutput
+\end{verbatim}
+
+In the generated class, the main method is \code{.doOutput} instead of
+\code{.respond}, and the attribute naming this method is:
+\begin{verbatim}
+_mainCheetahMethod_for_x2= 'doOutput'
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#set and \#set global}
+\label{inheritanceEtc.set}
+
+The template:
+\begin{verbatim}
+#set $namesList = ['Moe','Larry','Curly']
+$namesList
+#set global $toes = ['eeny', 'meeny', 'miney', 'moe']
+$toes
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+['Moe', 'Larry', 'Curly']
+['eeny', 'meeny', 'miney', 'moe']
+\end{verbatim}
+
+
+The generated code:
+\begin{verbatim}
+1  namesList = ['Moe','Larry','Curly']
+2  write(filter(namesList)) # generated from '$namesList' at line 2, col 1.
+3  write('\n')
+4  globalSetVars["toes"] = ['eeny', 'meeny', 'miney', 'moe']
+5  write(filter(VFS(SL,"toes",1))) # generated from '$toes' at line 4, col 1.
+6  write('\n')
+\end{verbatim}
+
+\code{globalSetVars} is a local variable referencing \code{.\_globalSetVars}.
+Writes go into it directly, but reads take advantage of the fact that
+\code{.\_globalSetVars} is on the searchList.  (In fact, it's the very first
+namespace.)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#del}
+\label{inheritanceEtc.del}
+
+The template:
+\begin{verbatim}
+#set $a = 1
+#del $a
+#set $a = 2
+#set $arr = [0, 1, 2]
+#del $a, $arr[1]
+\end{verbatim}
+
+In the generated class:
+\begin{verbatim}
+1  a = 1
+2  del a
+3  a = 2
+4  arr = [0, 1, 2]
+5  del a, arr[1]
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#attr}
+\label{inheritanceEtc.attr}
+
+The template:
+\begin{verbatim}
+#attr $namesList = ['Moe', 'Larry', 'Curly']
+\end{verbatim}
+
+In the generated class:
+\begin{verbatim}
+## GENERATED ATTRIBUTES
+
+namesList = ['Moe', 'Larry', 'Curly']
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#def}
+\label{inheritanceEtc.def}
+
+The template:
+\begin{verbatim}
+#def printArg($arg)
+The argument is $arg.
+#end def
+My method returned $printArg(5).
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+My method returned The argument is 5.
+.
+\end{verbatim}
+
+Hmm, not exactly what we expected.  The method returns a trailing newline
+because we didn't end the last line with \code{\#slurp}.  So the second
+period (outside the method) appears on a separate line.
+
+The \code{\#def} generates a method \code{.printArg} whose structure is similar
+to the main method:
+\begin{verbatim}
+def printArg(self,
+        arg,
+        trans=None,
+        dummyTrans=False,
+        VFS=valueFromSearchList,
+        VFN=valueForName,
+        getmtime=getmtime,
+        currentTime=time.time):
+
+
+    """
+    Generated from #def printArg($arg) at line 1, col 1.
+    """
+
+    if not trans:
+        trans = DummyTransaction()
+        dummyTrans = True
+    write = trans.response().write
+    SL = self._searchList
+    filter = self._currentFilter
+    globalSetVars = self._globalSetVars
+    
+    ########################################
+    ## START - generated method body
+    
+    write('The argument is ')
+    write(filter(arg)) # generated from '$arg' at line 2, col 17.
+    write('.\n')
+    
+    ########################################
+    ## END - generated method body
+    
+    if dummyTrans:
+        return trans.response().getvalue()
+    else:
+        return ""
+\end{verbatim}
+
+When \code{.printArg} is called from a placeholder, only the arguments the user
+supplied are passed.  The other arguments retain their default values.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#block}
+\label{inheritanceEtc.block}
+
+The template:
+\begin{verbatim}
+#block content
+This page is under construction.
+#end block
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+This page is under construction.
+\end{verbatim}
+
+This construct generates a method \code{.content} in the same structure
+as \code{.printArg} above, containing the write code:
+\begin{verbatim}
+write('This page is under construction.\n')
+\end{verbatim}
+
+In the main method, the write code is:
+\begin{verbatim}
+self.content(trans=trans) # generated from ('content', '#block content')
+    # at line 1, col 1.
+\end{verbatim}
+
+So a block placeholder implicitly passes the current transaction to the method.
+
+
+% Local Variables:
+% TeX-master: "devel_guide"
+% End:      

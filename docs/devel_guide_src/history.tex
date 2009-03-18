@@ -1,0 +1,92 @@
+\section{History of Cheetah}
+\label{history}
+
+In Spring 2001, several members of the webware-discuss mailing list expressed
+the need for a template engine.  Webware like Python is great for organizing
+logic, but they both suffer when you need to do extensive variable
+interpolation into large pieces of text, or to build up a text string from its
+nested parts.  Python's \code{\%} operator gets you only so far, the syntax is
+cumbersome, and you have to use a separate format string for each nested part.
+Most of us had used template systems from other platforms--chiefly Zope's DTML,
+PHPLib's Template object and Java's Velocity--and wanted to port something like
+those so it could be used both in Webware servlets and in standalone Python
+programs.  
+
+% @@MO: What influence did PSP have on Cheetah?
+
+Since I (Mike Orr) am writing this history, I'll describe how I encountered
+Cheetah.  I had written a template module called PlowPlate based on PHPLib's
+Template library.  Like PHPLib, it used regular expressions to search
+and destroy--er, replace--placeholders, behaved like a dictionary to
+specify placeholder values, contained no directives, but did have BEGIN and
+END markers which could be used to extract a named block (subtemplate).
+Meanwhile, Tavis Rudd was also on webware-discuss and interested in templates,
+and he lived just a few hours away.  So on 12 May 2001 we met in Vancouver at
+a gelato shop on Denman Street and discussed Webware, and he drew on a napkin
+the outline of a template system he was working on.  
+
+[Note from Tavis: Mikes got the dates and sequence of things a little out of order,
+but what the hell ...]
+
+Instead of filling the template by search-and-replace, he wanted to break it up
+into parts.  This was a primitive form of template compiling: do the
+time-consuming work once and put it to a state where you can fill the template
+quickly multiple times.  A template without directives happens to break down
+naturally into a list of alternating text/placeholder pairs.  The odd
+subscript values are literal strings; the even subscripts are string keys into
+a dictionary of placeholder values.  The project was called TemplateServer.
+
+In a couple months, Tavis decided that instead of compiling to a list, he
+wanted to compile to Python source code: a series of \code{write} calls that
+would output into a file-like object.  This was the nucleus that became
+Cheetah.  I thought that idea was stupid, but it turned out that this
+not-so-stupid idea blew all the others out of the water in terms of
+performance.  
+
+Another thing Tavis pushed hard for from near the beginning was ``display
+logic'', or simple directives like \code{\#for}, \code{\#if} and
+\code{\#echo}.  (OK, \code{\#echo} came later, but conceptually it belongs
+here.  I thought display logic was even stupider than compiling to Python
+source code because it would just lead to ``DTML hell''--complicated templates
+that are hard to read and maintain, and for which you have to learn (and debug)
+a whole new language when Python does it just fine.  But others (hi Chuck!) had
+templates that were maintained by secretaries who didn't know Python, and the
+secretaries needed display logic, so that was that.  Finally, after working
+with Cheetah templates (with display logic) and PlowPlate templates (with just
+blocks rather than display logic), I realized Tavis was smarter than I was and
+display logic really did belong in the template.
+
+The next step was making directives for all the Python flow-control
+statements: \code{\#while}, \code{\#try}, \code{\#assert}, etc.  Some of
+them we couldn't think of a use for.  Nevertheless, they were easy to code,
+and ``somebody'' would probably need them ``someday'', so we may as well
+implement them now.
+
+During all this, Chuck Esterbrook, Ian Bicking and others offered (and still
+offer) their support and suggestions, and Chuck gave us feedback about his use
+of Cheetah--its first deployment in a commercial production environment.
+Later, Edmund Lian became our \#1 bug reporter and suggester as he used Cheetah
+in his web applications.
+
+% @@MO: Write more about the contributions of Chuck, Ian and others.  My
+% memory is faulty so I'll have to ask them.
+
+We were going to release 1.0 in January 2002, but we decided to delay it
+until more people used it in real-world situations and gave us feedback
+about what is still needed.  This has led to many refinements, and we have
+added (and removed) features according to this feedback.  Nevertheless,
+Cheetah has been changing but stable since the late-binding rewrite in 
+fall 2001, and anybody who keeps up with the cheetah-discuss mailing list
+will know when changes occur that require modifying one's template, and
+since most people use point releases rather than CVS, they generally have
+a few week's warning about any significant changes.
+
+More detail on Cheetah's history and evolution, and why it is the way it is,
+can be found in our paper for the Python10 conference,
+\url{http://www.cheetahtemplate.org/Py10.html}.
+
+% @@MO: Look through the changelog for important milestones to mention.
+
+% Local Variables:
+% TeX-master: "devel_guide"
+% End:      

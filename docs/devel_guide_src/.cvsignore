@@ -1,0 +1,4 @@
+.cvsignore
+*.aux
+*.l2h
+devel_guide

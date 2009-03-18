@@ -1,0 +1,262 @@
+Getting Started
+========================================
+
+..
+    :label: gettingStarted
+
+
+Requirements
+----------------------------------------
+
+..
+    :label: gettingStarted.requirements
+
+Cheetah requires Python release 2.2 or newer, and has been tested with all
+versions through 2.4.2.  It should run everywhere Python runs, and has been
+tested on Linux, Windows NT/98/XP, FreeBSD, Solaris, and Mac OS X.
+
+99% of Cheetah is written in Python.  There is one small C module
+(``_namemapper.so``) for speed, but Cheetah automatically falls back to a
+Python equivalent (``NameMapper.py``) if the C module is not available.
+
+
+Installation
+----------------------------------------
+
+..
+    :label: gettingStarted.install
+
+If you have ``easy_install``
+(http://peak.telecommunity.com/DevCenter/EasyInstall) set up, this command will
+download and install the latest version of Cheetah as a Python Egg
+(http://peak.telecommunity.com/DevCenter/PythonEggs)::
+
+    # easy_install Cheetah
+
+Or from an already-downloaded tarball::
+
+    # easy_install Cheetah-2.0.tar.gz
+
+Or from an unpacked source directory or CVS sandbox::
+
+    # easy_install .
+
+If you don't have ``easy_install``, you'll have to install Cheetah manually::
+
+    # tar xzvf Cheetah-2.0.tar.gz
+    # cd Cheetah-2.0
+    # python setup.py install
+
+You can also specify non-default locations::
+
+    # python setup.py install --install-lib=/home/tavis/python
+    # python setup.py install --home=/home/tavis
+    # python setup.py install --help
+
+.. tip::
+
+    If you install Cheetah manually and then install an egg that depends on
+    Cheetah (like TurboCheetah_), ``easy_install`` may *reinstall*
+    Cheetah as an egg.  This leaves two copies of Cheetah on your system,
+    possibly different versions.  Python will use whichever version comes
+    first in the Python path.  To avoid this, use ``easy_install``'s
+    **--no-deps** option or delete the copy you don't wish to use.
+
+
+Uninstalling
+----------------------------------------
+
+..
+    :label: gettingstarted.uninstalling
+
+To uninstall Cheetah: 
+
+1. Delete the "cheetah" program
+from whichever bin/ directory it was put in (perhaps /usr/local/bin/).  
+
+2. If Cheetah was installed as an egg, delete the egg directory
+(e.g., /usr/local/lib/python2.4/site-packages/Cheetah-2.0-py2.4.egg/), and
+remove the "Cheetah" line in **easy-install.pth** in the same directory.  
+
+3. If Cheetah was not installed as an egg, delete the package directory
+(e.g., /usr/local/lib/python2.4/site-packages/Cheetah/).
+
+
+The 'cheetah' command
+----------------------------------------
+
+..
+    :label: gettingStarted.cheetah
+
+Cheetah comes with a utility "cheetah" that provides a command-line
+interface to various housekeeping tasks.  The command's first argument is
+the name of the task.  The following commands are currently supported::
+
+    cheetah compile [options] [FILES ...]     : Compile template definitions
+    cheetah fill [options] [FILES ...]        : Fill template definitions
+    cheetah help                              : Print this help message
+    cheetah options                           : Print options help message
+    cheetah test                              : Run Cheetah's regression tests
+    cheetah version                           : Print Cheetah version number
+
+You only have to type the first letter of the command:
+``cheetah c`` is the same as ``cheetah compile``.
+
+The test suite is described in the next section.  The ``compile``
+command in section \ref{howWorks.cheetah-compile}, 
+and the ``fill`` command in section \ref{howWorks.cheetah-fill}.
+
+
+Testing your installation
+----------------------------------------
+
+..
+    :label: gettingStarted.test
+
+After installing Cheetah, you can run its self-test routine to verify it's
+working properly on your system.  First cd to to any directory you have write
+permission in (the tests write temporary files) *except* the unpacked Cheetah
+source directory (it might produce spurious errors).  Type the following at the
+command prompt::
+
+    $ cheetah test 
+
+The tests will run for about three minutes and print a success/failure
+message.  If the tests pass, start Python in interactive mode and try the
+example in the next section.
+
+Sometimes the CheetahWrapper tests fail on Windows because they can't execute 
+"cheetah" via ``os.system()``.  Ignore these; you won't be doing this when
+you use Cheetah.
+
+If any other tests fail, please send a message to the e-mail list with a copy
+of the test output and the following details about your installation:
+
+* your version of Cheetah
+* your version of Python
+* your operating system
+* whether you have changed anything in the Cheetah installation
+
+
+
+Quickstart tutorial
+----------------------------------------
+
+..
+    :label: gettingStarted.tutorial
+
+This tutorial briefly introduces how to use Cheetah from the Python prompt.
+The following chapters will discuss other ways to use templates and more of
+Cheetah's features.
+
+The core of Cheetah is the ``Template`` class in the ``Cheetah.Template``
+module. The following example shows how to use the ``Template`` class in an
+interactive Python session. ``t`` is the Template instance.  Lines prefixed
+with ``>>>`` and ``...`` are user input.  The remaining lines are Python
+output. ::
+
+    >>> from Cheetah.Template import Template
+    >>> templateDef = """
+    ... <HTML>
+    ... <HEAD><TITLE>$title</TITLE></HEAD>
+    ... <BODY>
+    ... $contents
+    ... ## this is a single-line Cheetah comment and won't appear in the output
+    ... #* This is a multi-line comment and won't appear in the output
+    ...    blah, blah, blah 
+    ... *#
+    ... </BODY>
+    ... </HTML>"""
+    >>> namespace = {'title': 'Hello World Example', 'contents': 'Hello World!'}
+    >>> t = Template(templateDef, namespaces=[namespace])
+    >>> print t
+     
+    <HTML>
+    <HEAD><TITLE>Hello World Example</TITLE></HEAD>
+    <BODY>
+    Hello World!
+    </BODY>
+    </HTML>
+    >>> print t    # print it as many times as you want
+          [ ... same output as above ... ]
+    >>> namespace['title'] = 'Example #2'
+    >>> namespace['contents'] = 'Hiya Planet Earth!'
+    >>> print t   # Now with different plug-in values.
+    <HTML>
+    <HEAD><TITLE>Example #2</TITLE></HEAD>
+    <BODY>
+    Hiya Planet Earth!
+    </BODY>
+    </HTML>
+
+Because Cheetah is extremely flexible, you can achieve the same result this
+way::  
+
+    >>> t2 = Template(templateDef)
+    >>> t2.title = 'Hello World Example!'
+    >>> t2.contents = 'Hello World'
+    >>> print t2
+          [ ... same output as the first example above ... ]
+    >>> t2.title = 'Example #2'
+    >>> t2.contents = 'Hello World!'
+    >>> print t2
+         [ ... same as Example #2 above ... ]
+
+Or the values can be extracted from an object's attributes.
+
+    >>> myInstance.title
+    'Hello World Example!'
+    >>> myInstance.contents = 'Hello World!'
+    >>> t2 = Template(templateDef, namespaces=[myInstance])
+
+The template will search your namespaces in order, then its own ``self``
+attributes, until it finds a match.  The template definition can also 
+come from a file rather than a string.
+
+Let's look at the ``Template`` constructor again::
+
+    t = Template(templateDef, namespaces=[namespace])
+
+This does more than it appears.  It compiles the template definition into a
+template class, a subclass of ``Template``, and instantiates it.  Sometimes
+it's desirable to separate these operations, and the ``.compile`` class method
+does this::
+
+    tclass = Template.compile(templateDef)
+    t = tclass(namespaces=[namespace])
+
+The first line compiles the template class; the second line instantiates it.
+You can also do this on one line::
+
+    t = Template.compile(templateDef)(namespaces=[namespace])
+
+You can use either ``Template()`` or ``Template.compile()`` in your programs,
+but you should learn both styles so you'll recognize them in other people's
+code.
+
+This is all fine for short templates, but for long templates or for an
+application that depends on many templates, it's easier to store the templates
+in separate \*.tmpl files and use the **cheetah** program to compile
+them into Python modules.  This will be covered in section
+\ref{howWorks.cheetah-compile}.  Here's how you use a precompiled template::
+
+    >>> from MyPrecompiledTemplate import MyPrecompiledTemplate
+    >>> t = MyPrecompiledTemplate()
+    >>> t.name = "Fred Flintstone"
+    >>> t.city = "Bedrock City"
+    >>> print t
+
+Or::
+
+    >>> from MyPrecompiledTemplate import MyPrecompiledTemplate
+    >>> namespace = {"name": "Fred Flintstone", "city": "Bedrock City"}
+    >>> t = MyPrecompiledTemplate(namespaces=[namespace])
+    >>> print t
+
+For the minimalists out there, here's a template compilation,
+instantiation and filling all in one Python statement::
+
+    >>> print Template("Templates are pretty useless without placeholders.")
+    Templates are useless without placeholders.
+
+.. _TurboCheetah:  http://python.org/pypi/TurboCheetah/

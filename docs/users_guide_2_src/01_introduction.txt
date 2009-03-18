@@ -1,0 +1,291 @@
+Introduction
+============
+
+..
+    :label: intro
+
+Who should read this Guide?
+---------------------------
+
+..
+    :label: intro.whoShouldRead
+
+This Users' Guide is for Python programmers.  Part I is a tutorial/reference
+and should be read by everybody.  Part II is a cookbook of of techniques for
+using Cheetah with various web frameworks and various non-HTML output formats,
+plus some technical appendices.  The PDF version of this Guide is distributed
+as two files so you can print Part I to read offline without having to print a
+lot of pages from Part II that don't apply to you.
+
+What is Cheetah?
+----------------
+
+..
+    :label: intro.whatIs
+
+Cheetah is a template engine for Python.  A template engine is like Python's
+``%`` operator for strings: it has fixed parts which are output verbatim, and
+*placeholders* which are replaced by their values::
+
+    # Python's "%" operator (not Cheetah)
+    >>> "The king is a %(noun)s!" % {"noun": "fink"}
+    'The king is a fink!"
+
+Templates are useful for form letters, dynamic web pages, customized source
+code or SQL, and innumerable other tasks.  Cheetah is like a super-powered
+``%`` operator, but it also has many other features needed in real-world
+templating situations.
+
+Viewed another way, Cheetah is an alternate source format for Python modules,
+one that's friendlier for large chunks of text.  Compiled templates are
+ordinary Python modules which can be imported.  Cheetah is one of Python's
+oldest template engines and perhaps the most widely used.  This is mainly due
+to its speed (hence the name Cheetah), stability, and suitability for many
+output formats.  Cheetah has been used in production environments since 2001
+(0.9.9a1), and changes are committed conservatively, so even the CVS version is
+usually more bug-free than the previous release.
+
+Cheetah's syntax uses ``$`` before placeholders and a ``#``
+before control structures (directives), although these characters can be
+changed.  This differs from Python's other template systems which generally use
+XML tags (Kid and Tal) or a function syntax (PTL and QPY).  The difference
+allows Cheetah to be more suitable for a variety of output formats, and even
+users of the other systems often use Cheetah for non-HTML output such as
+text, Python source code, or SQL.  Cheetah's syntax and behavior was
+inspired most directly by Velocity, a Java template engine.  In PHP, Smarty is
+Cheetah's closest equivalent.  Cheetah templates tend to be function-driven:
+define a method with ``#def``, and call it via a placeholder with arguments.
+Cheetah also has PSP-style tags (``<% %>``) and ``#include``, which will be
+familiar to people coming from ASP/JSP/PHP.  However, we'll argue that these
+should be used sparingly, since there are other constructs which are more
+readable.
+
+
+Cheetah:
+
+* generates HTML, SGML, XML, SQL, Postscript, form email, LaTeX, or any
+  other text-based format.  It has also been used to produce Python, Java
+  and PHP source code.
+    
+* cleanly separates content, graphic design, and program code.  This leads
+  to highly modular, flexible, and reusable site architectures; faster
+  development time; and HTML and program code that is easier to understand
+  and maintain. It is particularly well suited for team efforts.
+    
+* blends the power and flexibility of Python with a simple template language
+  that non*programmers can understand.
+    
+* gives template writers full access in their templates to any Python data
+  structure, module, function, object, or method.
+    
+* makes code reuse easy by providing an object-oriented interface to
+  templates that is accessible from Python code or other Cheetah templates.
+  One template can subclass another and selectively reimplement sections of
+  it.  A compiled template {\em is} a Python class, so it can subclass a
+  pure Python class and vice*versa.
+    
+* provides a simple yet powerful caching mechanism 
+
+Here's a simple example of a Cheetah template::
+
+    <HTML>
+    <HEAD><TITLE>$title</TITLE></HEAD>
+    <BODY>
+
+    <TABLE>
+    #for client in clients
+    <TR>
+    <TD>$client.surname, $client.firstname</TD>
+    <TD><A HREF="mailto:$client.email">$client.email</A></TD>
+    </TR>
+    #end for
+    </TABLE>
+
+    </BODY>
+    </HTML>
+
+* has a lot of features but most of them are optional.  Cheetah is easy to use
+  in simple cases, and scales well to complex cases.  Most of Cheetah's
+  features were added due to demonstrated needs in production environments
+  where Cheetah was already runing.  
+
+Cheetah is distributed under a BSD-style open-source license.  See appendix E
+(E_license.txt) for details.  Cheetah exists thanks to the help of many
+open-source volunteers (http://cheetahtemplate.sourceforge.net/credits.html).
+
+
+
+What is the philosophy behind Cheetah?
+--------------------------------------
+
+..
+    :label: intro.philosophy
+
+Cheetah's design was guided by these principles:
+
+* Python for the back end (business logic), Cheetah for the front end
+  (presentation format).  Cheetah was designed to complement Python, not
+  replace it.
+    
+* Cheetah's core syntax should be easy for non-programmers to learn.
+         
+* Cheetah should make code reuse easy by providing an object-oriented
+  interface to templates that is accessible from Python code or other
+  Cheetah templates.
+    
+* Python objects, functions, and other data structures should be fully
+  accessible in Cheetah.
+      
+* Cheetah should provide flow control and error handling.  Logic
+  that belongs in the front end shouldn't be relegated to the 
+  back end simply because it's complex.
+
+* It should be easy to {\bf separate} content, graphic design, and program
+  code, but also easy to {\bf integrate} them.
+
+  A clean separation makes it easier for a team of content writers,
+  HTML/graphic designers, and programmers to work together without stepping
+  on each other's toes and polluting each other's work.  The HTML framework
+  and the content it contains are two separate things, and analytical
+  calculations (program code) is a third thing.  Each team member should be
+  able to concentrate on their specialty and to implement their changes
+  without having to go through one of the others (i.e., the dreaded
+  "webmaster bottleneck").
+  
+  While it should be easy to develop content, graphics and program
+  code separately, it should be easy to integrate them together into a 
+  website.  In particular, it should be easy:
+
+  - for {\bf programmers} to create reusable components and functions
+    that are accessible and understandable to designers.
+  - for {\bf designers} to mark out placeholders for content and 
+    dynamic components in their templates.
+  - for {\bf designers} to soft-code aspects of their design that are
+    either repeated in several places or are subject to change.
+  - for {\bf designers} to reuse and extend existing templates and thus
+    minimize duplication of effort and code.
+  - and, of course, for {\bf content writers} to use the templates that
+    designers have created.
+
+* Features are added only to support a demonstrated need in production
+  applications, and generally only if the feature is useful for a wide variety
+  of situations and output formats.  This prevents Cheetah from accumulating
+  lots of esoteric features which are used only rarely.  
+
+
+Why Cheetah doesn't use HTML-style tags
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+..
+    :label: intro.htmlStyleTags
+
+Cheetah does not use HTML/XML-style tags for flow control, unlike some other
+Python template engines, for the following reasons:
+
+* Cheetah is not limited to HTML,
+* HTML-style tags are hard to distinguish from real HTML tags,
+* HTML-style tags are not visible in rendered HTML when something goes wrong,
+* HTML-style tags often lead to invalid HTML (e.g., 
+  \code{<img src="<template*directive>">}),
+
+Cheetah tags are less verbose and easier to understand than HTML-style tags, 
+and HTML-style tags aren't compatible with most WYSIWYG editors.  In a WSYWIG
+editor, Cheetah tags appear to be literal text.
+
+Besides being much more compact, Cheetah also has some advantages over
+languages that put information inside the HTML tags, such as Zope Page
+Templates or PHP:
+
+* HTML or XML-bound languages do not work well with other languages,
+* While ZPT-like syntaxes work well in many ways with WYSIWYG HTML editors,
+  they also give up a significant advantage of those editors -- concrete
+  editing of the document.  When logic is hidden away in (largely
+  inaccessible) tags it is hard to understand a page simply by viewing it,
+  and it is hard to confirm or modify that logic.
+
+
+How stable is Cheetah?  How do I upgrade?
+-----------------------------------------
+
+..
+    :label: intro.stable
+
+Cheetah 2.0 was released [MONTH] [YEAR] with internal restructuring,
+easier-to-understand usage, updated documentation, and many other improvements.
+Cheetah 1.0 was released December 2005 after a three-year stable beta.
+Production sites have been using Cheetah since 2001.  Most changes since then
+have been based on requests from production sites: things they need that we
+hadn't considered.  
+
+Templates and calling code from Cheetah 1.0 remain 100% compatible.  Those from
+pre-1.0 versions since December 2001 (0.9.9) remain compatible except in rare
+cases.  
+
+.. important:: 
+    You must recompile all precompiled templates when upgrading
+    to Cheetah 2.0.
+
+Upgrades from 2.0 to a future version may or may not require
+recompilation.  Try filling a single precompiled template and see if you get a
+version exception.  If you do, recompile them all.  Or to be safe on a
+production site, just recompile them all anyway.
+
+Cheetah's development version is normally as stable as the last release if not
+better.  All CVS checkins are installed and run through the test suite before
+being checked in.
+
+Additional information is in these files in the Cheetah source distribution:
+
+CHANGES: 
+    All changes in each version.
+BUGS: 
+    Known bugs we haven't fixed yet.
+TODO: 
+    Enhancements we're planning, thing's like to do someday, and user requests
+    we haven't committed to.
+
+
+Web site and mailing list
+-------------------------
+
+..
+    :label: intro.news
+
+Cheetah releases and other stuff can be obtained from the the Cheetah 
+{\bf Web site}:
+\url{http://CheetahTemplate.sourceforge.net}
+
+Cheetah discussions take place on the {\bf mailing list}
+\email{cheetahtemplate-discuss@lists.sourceforge.net}.  This is where to hear
+the latest news first.
+
+If you encounter difficulties, or are unsure about how to do something,
+please post a detailed message to the list.  Also please share your
+experiences, tricks, customizations, and frustrations.  And if you have a
+success story for the "Who Is Using Cheetah" 
+(http://cheetahtemplate.sourceforge.net/whouses.html) or
+"Testimonials" (http://cheetahtemplate.sourceforge.net/praise.html)
+page on the website, send it to the mailing list.
+
+
+Bug reports, patches, and the test suite
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+If you think there is a bug in Cheetah, send a message to the mailing list
+with the following information:
+
+* a description of what you were trying to do and what happened
+* all tracebacks and error output
+* your version of Cheetah
+* your version of Python
+* your operating system
+* whether you have changed anything in the Cheetah installation
+
+Cheetah is packaged with a regression testing suite that is run with each
+new release to ensure that everything is working as expected and that recent
+changes haven't broken anything.  The test cases are in the Cheetah.Tests
+module.  If you find a reproduceable bug please consider writing a test case
+that will pass only when the bug is fixed.  Send any new test cases to the email
+list with the subject-line "new test case for Cheetah".  (@@MO Shorten
+paragraph, link to testing section.)
+

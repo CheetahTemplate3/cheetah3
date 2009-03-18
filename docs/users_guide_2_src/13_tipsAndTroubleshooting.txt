@@ -1,0 +1,549 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Tips, Tricks and Troubleshooting}
+\label{tips}
+
+Troubleshooting: make a precomiled template with "cheetah compile" and inspect
+the Python code.  Put $_CHEETAH__searchList in the template.  (Caveat about
+"<value>" results.)  Make a tiny template containing only the suspicious code
+and precompile it.  
+
+This chapter contains short stuff that doesn't fit anywhere else.
+
+See the Cheetah FAQ for more specialized issues and for troubleshooting tips.
+Check the wiki periodically for recent tips contributed by users.  If you
+get stuck and none of these resources help, ask on the mailing list.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Placeholder Tips}
+\label{tips.placeholder}
+
+Here's how to do certain important lookups that may not be obvious.
+For each, we show first the Cheetah expression and then the Python equivalent,
+because you can use these either in templates or in pure Python subclasses.
+The Cheetah examples use NameMapper shortcuts (uniform dotted notation, 
+autocalling) as much as possible.
+
+To verify whether a variable exists in the searchList:
+\begin{verbatim}
+$varExists('theVariable')
+self.varExists('theVariable')
+\end{verbatim}
+This is useful in \code{\#if} or \code{\#unless} constructs to avoid a
+\code{\#NameMapper.NotFound} error if the variable doesn't exist.  For instance,
+a CGI GET parameter that is normally supplied but in this case the user typed
+the URL by hand and forgot the parameter (or didn't know about it).
+(\code{.hasVar} is a synonym for \code{.varExists}.)
+
+To look up a variable in the searchList from a Python method:
+\begin{verbatim}
+self.getVar('theVariable')
+self.getVar('theVariable', myDefault)
+\end{verbatim}
+This is the equivalent to \code{\$theVariable} in the template.  If the 
+variable is missing, it returns the second argument, \code{myDefault}, if 
+present, or raises \code{NameMapper.NotFound} if there is no second argument.
+However, it usually easier to write your method so that all needed searchList
+values come in as method arguments.  That way the caller can just use a
+\code{\$placeholder} to specify the argument, which is less verbose than you
+writing a getVar call.
+
+To do a ``safe'' placeholder lookup that returns a default value if the
+variable is missing:
+\begin{verbatim}
+$getVar('theVariable', None)
+$getVar('theVariable', $myDefault)
+\end{verbatim}
+
+To get an environmental variable, put \code{os.environ} on the searchList as a
+container.  Or read the envvar in Python code and set a placeholder variable
+for it.
+
+Remember that variables found earlier in the searchList override same-name
+variables located in a later searchList object.  Be careful when adding objects
+containing other variables besides the ones you want (e.g., \code{os.environ},
+CGI parameters).  The "other" variables may override variables your application
+depends on, leading to hard-to-find bugs.  Also, users can inadvertently or
+maliciously set an environmental variable or CGI parameter you didn't expect,
+screwing up your program.  To avoid all this, know what your namespaces
+contain, and place the namespaces you have the most control over first.  For
+namespaces that could contain user-supplied "other" variables, don't put the
+namespace itself in the searchList; instead, copy the needed variables into
+your own "safe" namespace.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Diagnostic Output}
+\label{tips.diagnostic}
+
+If you need send yourself some debugging output, you can use \code{\#silent} to
+output it to standard error:
+\begin{verbatim}
+#silent $sys.stderr.write("Incorrigible var is '$incorrigible'.\n")
+#silent $sys.stderr.write("Is 'unknown' in the searchList? " +
+    $getVar("unknown", "No.") + "\n" )
+\end{verbatim}
+(Tip contributed by Greg Czajkowski.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{When to use Python methods}
+\label{tips.pythonMethods}
+
+You always have a choice whether to code your methods as Cheetah \code{\#def}
+methods or Python methods (the Python methods being located in a class your
+template inherits).  So how do you choose?
+
+Generally, if the method consists mostly of text and placeholders, use a 
+Cheetah method (a \code{\#def} method).  That's why \code{\#def} exists, to
+take the tedium out of writing those kinds of methods.  And if you have a
+couple \code{\#if} stanzas to \code{\#set} some variables, followed by a
+\code{\#for} loop, no big deal.  But if your method consists mostly of
+directives and only a little text, you're better off writing it in Python.
+Especially be on the watch for extensive use of \code{\#set}, \code{\#echo} and
+\code{\#silent} in a Cheetah method--it's a sure sign you're probably using the
+wrong language.  Of course, though, you are free to do so if you wish.  
+
+Another thing that's harder to do in Cheetah is adjacent or nested
+multiline stanzas (all those directives with an accompanying \code{\#end}
+directive).  Python uses indentation to show the beginning and end of nested
+stanzas, but Cheetah can't do that because any indentation shows up in the
+output, which may not be desired.  So unless all those extra spaces and tabs
+in the output are acceptable, you have to keep directives flush with the left
+margin or the preceding text.  
+
+The most difficult decisions come when you have conflicting goals.  What if
+a method generates its output in parts (i.e., output concatenation), contains
+many searchList placeholders and lots of text, {\em and} requires lots of
+\code{\#if \ldots \#set \ldots \#else \#set \ldots \#end if} stanzas.  A Cheetah
+method would be more advantageous in some ways, but a Python method in others.
+You'll just have to choose, perhaps coding groups of methods all the same
+way.  Or maybe you can split your method into two, one Cheetah and one Python,
+and have one method call the other.  Usually this means the Cheetah method
+calling the Python method to calculate the needed values, then the Cheetah
+method produces the output.  One snag you might run into though is that
+\code{\#set} currently can set only one variable per statement, so if your
+Python method needs to return multiple values to your Cheetah method, you'll
+have to do it another way.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Calling superclass methods, and why you have to}
+\label{tips.callingSuperclassMethods}
+
+If your template or pure Python class overrides a standard method or attribute
+of \code{Template} or one of its base classes, you should call the superclass
+method in your method to prevent various things from breaking.  The most common
+methods to override are \code{.awake} and \code{.\_\_init\_\_}.  \code{.awake}
+is called automatically by Webware early during the web transaction, so it makes
+a convenient place to put Python initialization code your template needs.
+You'll definitely want to call the superclass \code{.awake} because it sets up
+many wonderful attributes and methods, such as those to access the CGI input
+fields.
+
+There's nothing Cheetah-specific to calling superclass methods, but
+because it's vital, we'll recap the standard Python techniques
+here. We mention only the solution for old-style classes because
+Cheetah classes are old-style (in other Python documentation, you will
+find the technique for new-style classes, but they are not listed here
+because they cannot be used with Cheetah if you use
+dynamically-compiled templates).
+
+\begin{verbatim}
+from Cheetah.Template import Template
+class MyClass(Template):
+	def awake(self, trans):
+		Template.awake(self, trans)
+		... great and exciting features written by me ...
+\end{verbatim}
+
+[ @@MO: Need to test this.  .awake is in Servlet, which is a superclass
+of Template.  Do we really need both imports?  Can we call
+Template.awake? ]
+
+To avoid hardcoding the superclass name, you can use this
+function \code{callbase()}, which emulates \code{super()} for older versions of
+Python.  It also works even \code{super()} does exist, so you don't have to
+change your servlets immediately when upgrading.  Note that the argument
+sequence is different than \code{super} uses.
+
+\begin{verbatim}
+===========================================================================
+# Place this in a module SOMEWHERE.py .  Contributed by Edmund Lian.
+class CallbaseError(AttributeError):
+    pass
+
+def callbase(obj, base, methodname='__init__', args=(), kw={},
+    raiseIfMissing=None):
+    try: method = getattr(base, methodname)
+    except AttributeError:
+        if raiseIfMissing:
+            raise CallbaseError, methodname
+        return None
+    if args is None: args = ()
+    return method(obj, *args, **kw)
+===========================================================================
+# Place this in your class that's overriding .awake (or any method).
+from SOMEWHERE import callbase
+class MyMixin:
+        def awake(self, trans):
+                args = (trans,)
+                callbase(self, MyMixin, 'awake', args)
+                ... everything else you want to do ...
+===========================================================================
+\end{verbatim}
+
+% @@MO: Edmund wants us to mention delegation too, as an alternative to
+% inheritance.  Contact elian@inbrief.net for details.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{All methods}
+\label{tips.allMethods}
+
+Here is a list of all the standard methods and attributes that can be accessed
+from a placeholder.  Some of them exist for you to call, others are mainly used
+by Cheetah internally but you can call them if you wish, and others are only
+for internal use by Cheetah or Webware.  Do not use these method names in mixin
+classes (\code{\#extends}, section \ref{inheritanceEtc.extends}) unless you
+intend to override the standard method.  
+
+Variables with a star prefix ({\bf *}) are frequently used in templates or in
+pure Python classes.
+
+\paragraph*{Inherited from Cheetah.Template}
+
+\begin{description}
+\item{{\bf compile(source=None, file=None, moduleName=None, 
+    mainMethodName='respond')}}  Compile the template.  Automatically called
+    by \code{.\_\_init\_\_}.
+\item{{\bf generatedModuleCode()}}  Return the module code the compiler
+    generated, or \code{None} if no compilation took place.
+\item{{\bf generatedClassCode()}}   Return the class code the compiler
+    generated, or \code{None} if no compilation took place.
+\item{{\bf * searchList()}}  Return a reference to the underlying search list.
+    (a list of objects).  Use this to print out your searchList for debugging.
+    Modifying the returned list will affect your placeholder searches!
+\item{{\bf * errorCatcher()}}  Return a reference to the current error
+    catcher.
+\item{{\bf * refreshCache(cacheKey=None)}}  If 'cacheKey' is not \code{None},
+    refresh that item in the cache.  If \code{None}, delete all items in the
+    cache so they will be recalculated the next time they are encountered.
+\item{{\bf * shutdown()}}  Break reference cycles before discarding a servlet.
+\item{{\bf * getVar(varName, default=NoDefault, autoCall=True)}}  Look up a
+    variable in the searchList.  Same as \code{\$varName} but allows you to
+    specify a default value and control whether autocalling occurs.
+\item{{\bf * varExists(varName, autoCall=True)}}
+\item{{\bf * getFileContents(path)}}  Read the named file.  If used as a
+    placeholder, inserts the file's contents in the output without
+    interpretation, like \code{\#include\ raw}.  If used in an expression,
+    returns the file's content (e.g., to assign it to a variable).
+\item{{\bf runAsMainProgram()}}  This is what happens if you run a
+    .py template module as a standalone program.
+\end{description}
+
+%Private methods: {\bf \_bindCompiledMethod}, {\bf \_bindFunctionAsMethod},
+%{\bf \_includeCheetahSource}, {\bf \_genTmpFilename}, 
+%{\bf \_importAsDummyModule}, {\bf \_makeDummyPackageForDir},
+%{\bf \_importFromDummyPackage}, {\bf \_importModuleFromDirectory}.
+%
+%Other private attributes:
+%\begin{description}
+%\item{{\bf * \_fileMtime}}  Time the template definition was modified, in
+%    Unix ticks.  \code{None} if the template definition came from a string or
+%    file handle rather than a named file, same for the next three variables.
+%\item{{\bf * \_fileDirName}}  The directory containing the template definition.
+%\item{{\bf * \_fileBaseName}}  The basename of the template definition  file.
+%\item{{\bf * \_filePath}}  The directory+filename of the template definition.
+%\end{description}
+
+\paragraph*{Inherited from Cheetah.Utils.WebInputMixin}
+
+\begin{description}
+\item{{\bf nonNumericInputError}}  Exception raised by \code{.webInput}.
+\item{{\bf * webInput(...)}}  Convenience method to access GET/POST variables
+    from a Webware servlet or CGI script, or Webware cookie or session
+    variables.  See section \ref{webware.webInput} for usage information.
+\end{description}
+
+\paragraph*{Inherited from Cheetah.SettingsManager}
+
+\begin{description}
+\item{{\bf setting(name, default=NoDefault)}}  Get a compiler setting.
+\item{{\bf hasSetting(name)}}  Does this compiler setting exist?
+\item{{\bf setSetting(name, value)}}  Set setting 'name' to 'value'.
+    See \code{\#compiler-settings}, section 
+    \ref{parserInstructions.compiler-settings}.
+\item{{\bf settings()}}  Return the underlying settings dictionary.  (Warning:
+    modifying this dictionary will change Cheetah's behavior.)
+\item{{\bf copySettings()}}  Return a copy of the underlying settings
+    dictionary.
+\item{{\bf deepcopySettings()}}  Return a deep copy of the underlying settings
+    dictionary.  See Python's \code{copy} module.
+\item{{\bf updateSettings(newSettings, merge=True)}}  Update Cheetah's 
+    compiler settings from the 'newSettings' dictionary.  If 'merge' is true,
+    update only the names in newSettings and leave the other names alone.
+    (The SettingsManager is smart enough to update nested dictionaries one
+    key at a time rather than overwriting the entire old dictionary.)
+    If 'merge' is false, delete all existing settings so that the new ones are
+    the only settings.
+\item{{\bf updateSettingsFromPySrcStr(theString, merge=True)}}  Same, 
+    but pass a string of \code{name=value} pairs rather
+    than a dictionary, the same as you would provide in a
+    \code{\#compiler-settings} directive, section
+    \ref{parserInstructions.compiler-settings}.
+\item{{\bf updateSettingsFromPySrcFile(path, merge=True)}}  Same, but
+    exec a Python source file and use the variables it contains as the new
+    settings.  (e.g., \code{cheetahVarStartToken\ =\ "@"}).
+\item{{\bf updateSettingsFromConfigFile(path, **kw)}}  Same, but get the new
+    settings from a text file in ConfigParser format (similar to Windows'
+    *.ini file format).  See Python's \code{ConfigParser} module.
+\item{{\bf updateSettingsFromConfigFileObj}}  Same, but read the open file
+    object 'inFile' for the new settings.  
+\item{{\bf updateSettingsFromConfigStr(configStr, convert=True, merge=True}}
+    Same, but read the new settings from a string in ConfigParser format.
+\item{{\bf writeConfigFile(path)}}  Write the current compiler settings to
+    a file named 'path' in *.ini format.
+\item{{\bf getConfigString()}}  Return a string containing the current
+    compiler settings in *.ini format.
+\end{description}
+
+\paragraph*{Inherited from Cheetah.Servlet}
+
+{\em Do not override these in a subclass or assign to them as attributes
+if your template will be used as a servlet,} otherwise Webware will behave
+unpredictably.  However, it {\em is} OK to put same-name variables in the
+searchList, because Webware does not use the searchList.
+
+EXCEPTION: It's OK to override {\bf awake} and {\bf sleep} as long as you
+call the superclass methods.  (See section
+\ref{tips.callingSuperclassMethods}.)
+
+\begin{description}
+\item{{\bf * isControlledByWebKit}}  True if this template instance is
+    part of a live transaction in a running WebKit servlet.
+\item{{\bf * isWebwareInstalled}}  True if Webware is installed and the
+    template instance inherits from WebKit.Servlet.  If not, it inherits
+    from Cheetah.Servlet.DummyServlet.
+\item{{\bf * awake(transaction)}}  Called by WebKit at the beginning of
+    the web transaction.
+\item{{\bf * sleep(transaction)}}  Called by WebKit at the end of the
+    web transaction.
+\item{{\bf * respond(transaction)}}  Called by WebKit to produce the 
+    web transaction content.  For a template-servlet, this means
+    filling the template.
+\item{{\bf shutdown()}}  Break reference cycles before deleting instance.
+\item{{\bf * serverSidePath()}}  The filesystem pathname of the 
+    template-servlet (as opposed to the URL path).
+\item{{\bf transaction}}  The current Webware transaction.
+\item{{\bf application}}  The current Webware application.
+\item{{\bf response}}  The current Webware response.
+\item{{\bf request}}  The current Webware request.
+\item{{\bf session}}  The current Webware session.
+\item{{\bf write}}  Call this method to insert text in the filled template
+    output.
+\end{description}
+
+Several other goodies are available to template-servlets under the 
+\code{request} attribute, see section \ref{webware.input}.
+
+\code{transaction}, \code{response}, \code{request} and \code{session} are
+created from the current transaction when WebKit calls \code{awake}, and don't
+exist otherwise.  Calling \code{awake} yourself (rather than letting WebKit
+call it) will raise an exception because the \code{transaction} argument won't
+have the right attributes.  
+
+\paragraph*{Inherited from WebKit.Servlet}
+These are accessible only if Cheetah knows Webware is installed.  This 
+listing is based on a CVS snapshot of Webware dated 22 September 2002, and
+may not include more recent changes.
+
+The same caveats about overriding these methods apply.
+
+\begin{description}
+\item{name()}  The simple name of the class.  Used by Webware's logging and
+    debugging routines.
+\item{log()}  Used by Webware's logging and debugging routines.
+\item{canBeThreaded()}  True if the servlet can be multithreaded.
+\item{canBeReused()}  True if the servlet can be used for another transaction
+    after the current transaction is finished.
+\item{serverSideDir()}  Depreciated by \code{.serverSidePath()}.
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optimizing templates}
+\label{tips.optimizing}
+
+Here are some things you can do to make your templates fill faster and user
+fewer CPU cycles.  Before you put a lot of energy into this, however, make
+sure you really need to.  In many situations, templates appear to initialize
+and fill instantaneously, so no optimization is necessary.  If you do find a
+situation where your templates are filling slowly or taking too much memory or
+too many CPU cycles, we'd like to hear about it on the mailing list.
+
+Cache \$placeholders whose values don't change frequently.  (Section
+\ref{output.caching}).
+
+Use \code{\#set} for values that are very frequently used, especially if they
+come out of an expensive operation like a deeply.nested.structure or a database
+lookup.  \code{\#set} variables are set to Python local variables, which have a
+faster lookup time than Python globals or values from Cheetah's searchList.
+
+Moving variable lookups into Python code may provide a speedup in certain
+circumstances.  If you're just reading \code{self} attributes, there's no
+reason to use NameMapper lookup (\$placeholders) for them.  NameMapper does
+a lot more work than simply looking up a \code{self} attribute.  
+
+On the other hand, if you don't know exactly where the value will come from
+(maybe from \code{self}, maybe from the searchList, maybe from a CGI input
+variable, etc), it's easier to just make that an argument to your method, and
+then the template can handle all the NameMapper lookups for you:
+\begin{verbatim}
+#silent $myMethod($arg1, $arg2, $arg3)
+\end{verbatim}
+Otherwise you'd have to call \code{self.getVar('arg1')} etc in your
+method, which is more wordy, and tedious.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{PSP-style tags}
+\label{tips.PSP}
+
+\code{<\%= \ldots \%>} and \code{<\% \ldots \%>} allow an escape
+to Python syntax inside the template.  You do not need it to use Cheetah
+effectively, and we're hard pressed to think of a case to recommend it.
+Nevertheless, it's there in case you encounter a situation you can't
+express adequately in Cheetah syntax.  For instance, to set a local
+variable to an elaborate initializer.  
+
+\code{<\%= \ldots \%>} encloses a Python expression whose result will
+be printed in the output.  
+
+\code{<\% \ldots \%>} encloses a Python statement or expression (or set of
+statements or expressions) that will be included as-is into the generated
+method.  The statements themselves won't produce any output, but you can use
+the local function \code{write(EXPRESSION)} to produce your own output.
+(Actually, it's a method of a file-like object, but it looks like a local
+function.) This syntax also may be used to set a local variable with a
+complicated initializer.
+
+To access Cheetah services, you must use Python code like you would in an
+inherited Python class.  For instance, use \code{self.getVar()} to look up
+something in the searchList.
+
+{\em Warning:} {\bf No error checking is done!}  If you write:
+\begin{verbatim}
+<% break %>      ## Wrong!
+\end{verbatim}
+you'll get a \code{SyntaxError} when you fill the template, but that's what you
+deserve.
+
+Note that these are PSP-{\em style} tags, not PSP tags.  A Cheetah template
+is not a PSP document, and you can't use PSP commands in it.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Makefiles}
+\label{tips.Makefile}
+
+If your project has several templates and you get sick of typing
+``cheetah compile FILENAME.tmpl'' all the time--much less remembering which
+commands to type when--and your system has the \code{make}
+command available, consider building a Makefile to make your life easier.
+
+Here's a simple Makefile that controls two templates, ErrorsTemplate and
+InquiryTemplate.  Two external commands, \code{inquiry} and \code{receive},
+depend on ErrorsTemplate.py.  Aditionally, InquiryTemplate
+itself depends on ErrorsTemplate.
+
+\begin{verbatim}
+all:  inquiry  receive
+
+.PHONY:  all  receive  inquiry  printsource
+
+printsource:
+        a2ps InquiryTemplate.tmpl ErrorsTemplate.tmpl
+
+ErrorsTemplate.py:  ErrorsTemplate.tmpl
+        cheetah compile ErrorsTemplate.tmpl
+
+InquiryTemplate.py:  InquiryTemplate.tmpl ErrorsTemplate.py
+        cheetah compile InquiryTemplate.tmpl
+
+inquiry: InquiryTemplate.py  ErrorsTemplate.py
+
+receive: ErrorsTemplate.py
+\end{verbatim}
+
+Now you can type \code{make} anytime and it will recompile all the templates
+that have changed, while ignoring the ones that haven't.  Or you can
+recompile all the templates \code{receive} needs by typing \code{make receive}.
+Or you can recompile only ErrorsTemplate by typing
+\code{make ErrorsTemplate}.  There's also another target, ``printsource'':
+this sends a Postscript version of the project's source files to the printer.
+The .PHONY target is explained in the \code{make} documentation; essentially,
+you have it depend on every target that doesn't produce an output file with
+the same name as the target.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Using Cheetah in a Multi-Threaded Application}
+\label{tips.threads}
+
+Template classes may be shared freely between threads.  However, template
+instances should not be shared unless you either:
+\begin{itemize}
+\item Use a lock (mutex) to serialize template fills, to prevent two threads
+from filling the template at the same time.
+\item Avoid thread-unsafe features:
+    \begin{itemize}
+    \item Modifying searchList values or instance variables.
+    \item Caching (\code{\$*var}, \code{\#cache}, etc).
+    \item \code{\#set global}, \code{\#filter}, \code{\#errorCatcher}.
+    \end{itemize}
+    Any changes to these in one thread will be visible in other threads,
+    causing them to give inconsistent output.
+\end{itemize}
+
+About the only advantage in sharing a template instance is building up the
+placeholder cache.  But template instances are so low overhead that it
+probably wouldn't take perceptibly longer to let each thread instantiate its
+own template instance.  Only if you're filling templates several times a
+second would the time difference be significant, or if some of the placeholders
+trigger extremely slow calculations (e.g., parsing a long text file each time).
+The biggest overhead in Cheetah is importing the \code{Template} module in
+the first place, but that has to be done only once in a long-running
+application.
+
+You can use Python's \code{mutex} module for the lock, or any similar
+mutex.  If you have to change searchList values or instance variables
+before each fill (which is usually the case), lock the mutex before 
+doing this, and unlock it only after the fill is complete.
+
+For Webware servlets, you're probably better off using Webware's servlet
+caching rather than Cheetah's caching.  Don't override the servlet's
+\code{.canBeThreaded()} method unless you avoid the unsafe operations
+listed above.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Using Cheetah with gettext}
+\label{tips.gettext}
+
+{\bf gettext} is a project for creating internationalized applications.  For 
+more details, visit \url{http://docs.python.org/lib/module-gettext.html}.
+gettext can be used with Cheetah to create internationalized applications, even
+for CJK character sets, but you must keep a couple things in mind:
+\begin{itemize}
+\item xgettext is used on compiled templates, not on the templates themselves.
+\item The way the NameMapper syntax gets compiled to Python gets in the way of 
+the syntax that xgettext recognizes.  Hence, a special case exists for the
+functions \code{_}, \code{N_}, and \code{ngettext}.  If you need to use a
+different set of functions for marking strings for translation, you must set
+the Cheetah setting \code{gettextTokens} to a list of strings representing the
+names of the functions you are using to mark strings for translation.
+\end{itemize}
+
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      

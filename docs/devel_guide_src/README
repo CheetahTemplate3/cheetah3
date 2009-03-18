@@ -1,0 +1,9 @@
+To build the Cheetah documentation, you need the 'mkhowto' program from
+the Python source distribution.  So:
+
+1) Get the Python source distribution and unpack it in some directory.
+
+2) Edit the Cheetah documentation's Makefile and change PYTHONSRC to
+point to the top-level directory of your Python source distribution.
+
+3) Run 'make'.

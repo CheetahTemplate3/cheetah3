@@ -1,0 +1,546 @@
+<!--  OnePageTutorial.html :  
+      Originally this was Chuck Esterbrook's tutorial for his template
+      maintainers.  Eventually this may expand into the future Cheetah
+      Quick Reference or Beginners' Guide.
+-->
+
+<html>
+
+<head>
+<title>Cheetah Template One-Page Tutorial</title>
+
+<style type="text/css">
+<!--
+
+/* Document-wide styles */
+
+BODY {
+	background-color: white;
+}
+
+
+/* Header styles */
+
+TD.banner-top {
+	background-color: #A43403;
+}
+TD.banner-bottom {
+	background-color: #C75509;
+	color:						#EFA84B;
+	font-family:			sans-serif;
+	font-weight:			normal;
+	font-size:				14px;
+}
+TD.banner-bottom-active {
+	background-color: #C75509;
+	color:						#EFA84B;
+	font-family:			sans-serif;
+	font-weight:			normal;
+	font-size:				14px;
+}
+TD.banner-bottom-inactive {
+	background-color: #C75509;
+	color:						#EFA84B;
+	font-family:			sans-serif;
+	font-weight:			normal;
+	font-size:				14px;
+}
+SPAN.banner-bottom-active {
+	background-color:	#A43403;
+	color:						#EFA84B;
+	font-family:			sans-serif;
+	font-weight:			bold;
+	font-size:				14px;
+}
+SPAN.banner-bottom-inactive {
+	background-color:	#C75509;
+	color:						#EFA84B;
+	font-family:			sans-serif;
+	font-weight:			bold;
+	font-size:				14px;
+}
+
+
+
+TD.banner-menu {
+	background-color:	#A43403;
+	color:						#EFA84B;
+	font-family:			sans-serif;
+	font-weight:			normal;
+	font-size:				14px;
+}
+SPAN.banner-menu {
+	background-color:	#A43403;
+	color:						#EFA84B;
+	font-family:			sans-serif;
+	font-weight:			bold;
+	font-size:				14px;
+}
+
+
+
+
+
+/* Interface body styles */
+
+
+A:link {
+	color:						#00638E;
+	font-family:			sans-serif;
+	font-weight:			bold;
+	text-decoration:	none;
+}
+
+/* A:visited */
+/* A:active */
+
+TD.action-header {
+	color:        #7A311C;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight:	bold;
+	font-size:		16px;
+}
+
+TD.body {
+	color:				#C75509;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight:	normal;
+	font-size:		14px;
+}
+SPAN.doc_title {
+	color:				#666666;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight:	normal;
+	font-size:		12px;
+}
+
+P.instructions {
+	color:				#C75509;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight:	normal;
+	font-size:		12px;
+}
+
+
+	/*
+	 * Top level page
+	 */
+
+	body {
+		font-family: Verdana, Arial, Helvetica, sans-serif;
+		font-size: 80%;
+		background-color: #FFFFFF;
+		color: black;
+	}
+
+	p {
+		font-family: Verdana, Arial, Helvetica, sans-serif;
+		font-size: 12px;
+		color: black;
+	}
+
+	table.banner {
+		width: 100%;
+	}
+
+	td.bannerLogo {
+		color: #FFA;
+		background-color: orange;
+		text-align: center;
+		border: 2px solid #FFA;
+		padding-left: 3px;
+		padding-right: 3px;
+		letter-spacing: -2px;
+		white-space: nowrap;
+		font-family: Arial, Helvetica, sans-serif;
+		font-weight: bold;
+		font-size: 18px;
+	}
+
+	td.bannerTitle {
+		width: 95%;
+		color: darkorange;
+		text-align: center;
+		font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+		font-weight: bold;
+		font-size: 24px;
+	}
+
+	td.bannerStuff {
+		text-align: right;
+		white-space: nowrap;
+		font-family: Arial, Helvetica, sans-serif;
+	}
+
+	a.bannerStuff {
+		text-decoration: none;
+	}
+
+	a.bannerStuff:hover {
+		text-decoration: underline;
+	}
+
+	span.pageFooter {
+	}
+
+	a.mainMenuLink {
+		font-size: 175%;
+	}
+
+	.error {
+		color: red;
+	}
+
+	/*
+	 * Tab navigation
+	 */
+
+	tr.tabTop {
+		font-size: 14px;
+	}
+
+	tr.tabBottom {
+		background-color: #149;
+	}
+
+	td.activeTab {
+		font-family: Arial, Helvetica, sans-serif;
+		font-weight: bold;
+		color: #FFA;
+		background-color: #149;
+	}
+
+	td.inactiveTab {
+		font-family: Arial, Helvetica, sans-serif;
+		color: #FFA;
+		background-color: #DEF;
+	}
+
+	a.activeTab {
+		color: #FFA;
+		text-decoration: none;
+	}
+
+	a.activeTab:hover {
+		color: #FFA;
+		text-decoration: underline;
+	}
+
+	a.inactiveTab {
+		color: black;
+		text-decoration: none;
+	}
+
+	a.inactiveTab:hover {
+		color: black;
+		text-decoration: underline;
+	}
+
+	/*
+	 * Panels
+	 */
+
+	table.panel {
+	}
+
+	tr.panelTitle {
+		font-weight: bold;
+		background-color: lightblue;
+	}
+
+	td.panelTitle {
+	}
+
+	tr.panelBody {
+		background-color: #EEEEEE;
+	}
+
+
+	/*
+	 * Other
+	 */
+
+	table.ObjectBrowser {
+	}
+
+	tr.ObjectBrowser{
+	}
+
+	/* This is for a body row of the document list table */
+	td.ObjectBrowserBody {
+		background-color: #EEE;
+	}
+
+	/* This is for the header row of the document list table */
+	td.ObjectBrowserHeader {
+		background-color: #C6EFF7;
+		font-weight: bold;
+	}
+
+	td.ObjectBrowserLink {
+		background-color: #DEF3BD;
+		font-weight: bold;
+	}
+
+	table.ObjectViewer {
+	}
+
+	tr.ObjectViewer {
+	}
+
+	/* This is for the name column of the object view table */
+	td.ObjectViewerName {
+		background-color: #C6EFF7;
+		font-weight: bold;
+	}
+
+	/* This is for the value column of the object view table */
+	td.ObjectViewerValue {
+		background-color: #EEE;
+	}
+
+	/* This is for the info column of the object view table */
+	td.ObjectViewerInfo {
+		background-color: white;
+	}
+
+	table.ObjectEditor {
+	}
+
+	tr.ObjectEditor {
+	}
+
+	/* This is for the section label of the document edit table */
+	td.ObjectEditorSection {
+		background-color: #E6E6E6;
+		font-weight: bold;
+		font-size: 18px;
+		color: #AC003B;
+	}
+
+	/* This is for the field name column of the document edit table */
+	td.ObjectEditorName {
+		background-color: white;
+		font-weight: bold;
+	}
+
+	/* This is for the field value column of the document edit table */
+	td.ObjectEditorValue {
+		background-color: white;
+	}
+
+	/* This is for the info column of the object edit table */
+	td.ObjectEditorInfo {
+		background-color: white;
+	}
+
+	/* This is for the error column of the object edit table */
+	td.ObjectEditorError {
+		background-color: white;
+		color: red;
+		font-weight: bold;
+		font-size: 12px;
+	}
+
+
+	/*
+	 * Help
+	 */
+
+	blockquote.example {
+		background-color: #EEE;
+	}
+
+
+	/*********************** from other site *********************/
+
+	td.ColumnHeading {
+		font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+		font-size: 150%;
+		font-weight: bold;
+		background-color: #FFFF77;
+	}
+
+
+	/*
+	 * Sidebar
+	 */
+
+	span.SidebarHeading {
+		font-weight: bold;
+	}
+
+	a.SidebarLink {
+	}
+
+
+	/*
+	 * News
+	 */
+
+	span.NewsHeading {
+		font-family: Tahoma;
+		font-size: 14px;
+		font-weight: bold;
+	}
+
+
+	/*
+	 * Headings
+	 */
+
+	h1 {
+		font-family: Arial, Helvetica;
+		font-size: 14px;
+		padding-top: 1em;
+		padding-bottom: 0;
+	}
+
+	/*
+	 * Other
+	 */
+
+	h2	{	font-family: Arial, Helvetica;
+			font-size: 14px;
+			color: darkblue;
+			padding-top: 1em;
+			padding-bottom: 0;
+		}
+	h3	{	font-family: Arial, Helvetica;
+			font-size: 13px;
+			padding-top: 1em;
+			padding-bottom: 0;
+		}
+	h4	{	font-family: Arial, Helvetica;
+			font-size: 12px;
+			padding-top: 1em;
+			padding-bottom: 0;
+		}
+	dl	{	padding-left: 2em;
+		}
+	ol	{	padding-left: 0.5em;
+		}
+	ul	{	list-style-type: disc;
+			padding-left: 1.0em;
+		}
+	li	{	padding-top: 0em;
+		}
+	table {
+		font-family: Verdana, Arial, Helvetica, sans-serif;
+		font-size: 100%;
+		color: black;
+	}
+
+-->
+</style>
+
+</head>
+
+<body>
+
+<h1>Cheetah Template One-Page Tutorial<BR>
+<SMALL>By Chuck Esterbrook, now maintained by Mike Orr<BR>
+Updated May 17, 2002</SMALL></h1>
+
+<h2>Substitution</h2>
+
+<p> The most commonly used templating feature is substitution:
+
+<blockquote class=example><pre>
+My name is $name
+</pre></blockquote>
+
+<p> You can use <i>dotted notation</i> to traverse objects. For example:
+
+<blockquote class=example><pre>
+$author.person.primaryEmail
+</pre></blockquote>
+
+<p> When a variable name is flush against other text you must use curly braces to separate it:
+
+<blockquote class=example><pre>
+Jim is a ${vice}maniac.
+</pre></blockquote>
+
+<p> However, the template language is savvy enough to handle sentence endings and variables:
+
+<blockquote class=example><pre>
+My name is $name.
+$foo$bar
+</pre></blockquote>
+
+
+<h2>#if (conditional)</h2>
+
+<p> The <i>#if</i> statement can be used to detect if a value is blank/undefined/NULL. The most common use for an #if statement is showing a different form of content if something is undefined.
+
+<blockquote class=example><pre>
+#if $keywords
+    $keywords
+#else
+    There are no keywords!
+#end if
+</pre></blockquote>
+
+<p> The #else part is optional:
+
+<blockquote class=example><pre>
+#if $keywords
+    &lt;span class=keywords&gt;$keywords&lt;/span&gt;
+#end if
+</blockquote>
+
+
+<h2>#for (looping)</h2>
+
+<p> The <i>#for</i> statement is used to loop through any kind of list.
+
+<blockquote class=example><pre>
+#for $author in $authors
+    $author.person.fullName
+#end for
+</pre></blockquote>
+
+
+<h2>Combining statements</h2>
+
+<p> You can combine statements. For example,
+
+<p> Template.html:
+<blockquote class=example><pre>
+$name
+
+&lt;p&gt; $content
+
+#include "authors.html"
+</pre></blockquote>
+
+Authors.html:
+<blockquote class=example><pre>
+#if $authors
+    &lt;table class=Author&gt;
+    #for $author in $authors
+        &lt;tr class=Author&gt; &lt;td class=Author&gt;
+            $author
+        &lt;/td&gt; &lt;/tr&gt;
+    #end for
+    &lt;/table&gt;
+#end if
+</pre></blockquote>
+
+
+<h2>Examples</h2>
+
+<p> Here is an example that lists several names and puts commas between them. Note the use of #slurp to slurp up extra whitespace that might interfere.
+
+<blockquote class=example><pre>
+#set sep = ''
+#for $author in $authors
+${sep}${author.person}#slurp
+#set sep = ', '
+#end for
+</pre></blockquote>
+
+</body>
+
+</html>

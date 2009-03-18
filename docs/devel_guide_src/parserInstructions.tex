@@ -1,0 +1,61 @@
+\section{Directives: Parser Instructions}
+\label{parserInstructions}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#breakpoint}
+\label{parserInstructions.breakpoint}
+
+
+The template:
+\begin{verbatim}
+Text before breakpoint.
+#breakpoint
+Text after breakpoint.
+#raise RuntimeError
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+Text before breakpoint.
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+write('Text before breakpoint.\n')
+\end{verbatim}
+
+Nothing after the breakpoint was compiled.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#compiler}
+\label{parserInstructions.compiler}
+
+The template:
+\begin{verbatim}
+// Not a comment
+#compiler commentStartToken = '//'
+// A comment
+#compiler reset
+// Not a comment
+\end{verbatim}
+
+The output:
+\begin{verbatim}
+// Not a comment
+// Not a comment
+\end{verbatim}
+
+The generated code:
+\begin{verbatim}
+write('// Not a comment\n')
+#  A comment
+write('// Not a comment\n')
+\end{verbatim}
+
+So this didn't affect the generated program, it just affected how the
+template definition was read.
+
+% Local Variables:
+% TeX-master: "devel_guide"
+% End:      

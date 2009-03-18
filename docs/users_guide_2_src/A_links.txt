@@ -1,0 +1,112 @@
+\section{Useful Web Links}
+\label{links}
+
+See the wiki for more links.  (The wiki is also updated more often than this
+chapter is.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cheetah Links}
+\label{links.cheetah}
+
+\begin{description}
+\item[Home Page] -- \url{http:www.CheetahTemplate.org/}
+     
+\item[On-line Documentation] -- \url{http:www.CheetahTemplate.org/learn.html}
+     
+\item[SourceForge Project Page] -- \url{http:sf.net/projects/cheetahtemplate/}
+     
+\item[Mailing List Subscription Page] --
+     \url{http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss}
+     
+\item[Mailing List Archive @ Geocrawler] --
+     \url{http://www.geocrawler.com/lists/3/SourceForge/12986/0/}
+
+\item[Mailing List Archive @ Yahoo] --
+     \url{http://groups.yahoo.com/group/cheetah-archive/}
+    
+\item[CVS Repository] -- \url{http://sourceforge.net/cvs/?group\_id=28961}
+     
+\item[CVS-commits archive] --
+     \url{http://www.geocrawler.com/lists/3/SourceForge/13091/0/}
+
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Third-party Cheetah Stuff}
+\label{links.thirdParty}
+
+\begin{itemize}
+\item Steve Howell has written a photo viewer using Python.
+     \url{http://mountainwebtools.com/PicViewer/install.htm}
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Webware Links}
+\label{links.webware}
+
+\begin{description}
+\item[Home Page] -- \url{http://webware.sf.net/}
+     
+\item[On-line Documentation] -- \url{http://webware.sf.net/Webware/Docs/}
+     
+\item[SourceForge Project Page] -- \url{http://sf.net/projects/webware/}
+     
+\item[Mailing List Subscription Page] --
+     \url{http://lists.sourceforge.net/lists/listinfo/webware-discuss}
+
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Python Links}
+\label{links.python}
+
+\begin{description}
+\item[Home Page] -- \url{http://www.python.org/}
+\item[On-line Documentation] -- \url{http://www.python.org/doc/}
+\item[SourceForge Project Page] -- \url{http://sf.net/projects/python/}
+\item[The Vaults of Parnassus: Python Resources] --
+     \url{http://www.vex.net/parnassus/}
+\item[Python Cookbook] -- \url{http://aspn.activestate.com/ASPN/Cookbook/Python}
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Other Useful Links}
+\label{links.other}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Python Database Modules and Open Source Databases}
+\label{links.database}
+
+\begin{description}
+\item[Python Database Topic Guide] -- \url{http://python.org/topics/database/}
+\item[PostgreSQL Database] -- \url{http://www.postgresql.org/index.html}
+\item[MySQL Database] -- \url{http://www.mysql.com/}
+\item[A comparison of PostgreSQL and MySQL] --
+     \url{http://phpbuilder.com/columns/tim20001112.php3}
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Other Template Systems}
+\label{links.other.templateSystems}
+
+\begin{description}
+\item[Chuck's ``Templates'' Summary Page] -- \url{http://webware.sf.net/Papers/Templates/}
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Other Internet development frameworks}
+\label{links.internet}
+
+\begin{description}
+\item[ZOPE (Z Object Publishing Environment)] -- \url{http://zope.org/}
+\item[Server Side Java] -- \url{http://jakarta.apache.org/}
+\item[PHP] -- \url{http://php.net/}
+\item[IBM Websphere] -- \url{http://www.ibm.com/websphere/}
+\item[Coldfusion and Spectra] -- \url{http://www.macromedia.com/}
+\end{description}
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      

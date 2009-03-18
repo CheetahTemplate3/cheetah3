@@ -1,0 +1,109 @@
+A look inside precompiled template modules
+==========================================
+
+..
+    :label: howWorks.pyTrivia
+
+When debugging a template, it's useful to compile it with "cheetah compile"
+and then inspect the resulting Python module.  This will often clear up whether
+Cheetah misinterpreted your intent.  You can do this even if you don't intend to
+use the precompiled templates in production.  It's also a good way to learn how
+Cheetah works.  Simply make a throwaway template definition containing only one
+placeholder or directive, compile it with "cheetah compile", and see what
+Python code Cheetah generated.
+
+However, precompiled template modules can be a bit cryptic to read unless you
+have a bit of background information.  Let's look at an example.  Put the
+following into /tmp/x.tmpl (or any other file) and run "cheetah compile" on
+it::
+
+    The number is $Test.unittest.main.
+    #set mood = "lucky"
+    I'm feeling $lucky.
+
+Open the resulting /tmp/x.py in your favorite text editor.  You'll see a class
+with the same name as the module::
+
+    class x(Template):
+
+This template class contains a method ``.respond()``::
+
+    def respond(self, trans=None):
+        ## CHEETAH: main method generated for this template
+        if (not trans and not self._CHEETAH__isBuffering and 
+            not callable(self.transaction)):
+            trans = self.transaction # is None unless self.awake() was called
+        if not trans:
+            trans = DummyTransaction()
+            _dummyTrans = True
+        else: _dummyTrans = False
+        write = trans.response().write
+        SL = self._CHEETAH__searchList
+        _filter = self._CHEETAH__currentFilter
+        
+        ########################################
+        ## START - generated method body
+
+        
+        write('The number is ')
+        _v = VFFSL(SL,"Test.unittest.main",True) 
+        # '$Test.unittest.main' on line 1, col 15
+        if _v is not None: write(_filter(_v, rawExpr='$Test.unittest.main')) 
+        # from line 1, col 15.
+        write('.\n')
+        mood = "lucky"
+        write("I'm feeling ")
+        _v = VFFSL(SL,"lucky",True) # '$lucky' on line 3, col 13
+        if _v is not None: write(_filter(_v, rawExpr='$lucky')) 
+        # from line 3, col 13.
+        write('.\n') 
+        
+        ########################################
+        ## END - generated method body
+        
+        return _dummyTrans and trans.response().getvalue() or ""
+
+This becomes clearer when we scroll up to see some important imports and
+global variables::
+
+    from Cheetah.Template import Template
+    from Cheetah.DummyTransaction import DummyTransaction
+    from Cheetah.NameMapper import NotFound, valueFromFrameOrSearchList
+    VFFSL=valueFromFrameOrSearchList
+    __CHEETAH_version__ = '2.0rc6'
+    __CHEETAH_src__ = 'x.tmpl'
+
+The actual code will differ slightly depending on your Cheetah version.  Also,
+we've split some long lines to make this page printer-friendly.  
+
+Placeholder lookup is handled by ``VFFSL``, which is really the
+``Cheetah.NameMapper.valueFromFrameOrSearchList`` function or its equivalent
+in Cheetah/_namemapper.c.  
+
+``trans`` and ``write()`` are Webware compatibility features.  Normally 
+``trans`` is not specified and Cheetah creates a ``DummyTransaction``
+instance.  ``write()`` is a shortcut for ``trans.response().write()``,
+which concatenates the output to an internal buffer.  The method returns
+the result: ``trans.response().getvalue()``.  You might assume from 
+``.getvalue()`` that Cheetah uses ``StringIO`` internally, but you'd be wrong.
+Cheetah *used* to use ``StringIO`` but now it uses a list and ``str.join()``.
+The ``.getvalue()`` name is retained for backward compatibility.
+
+If this template is part of a Webware site and the user enters its URL, Webware
+calls ``.respond()`` with a live Webware transaction.  In this case,
+``write()`` writes the output directly to Webware's output stream.  (Or to
+a Webware buffer, but that's not our concern.)  There's nothing to return
+because the output has already been written, so the method returns the empty
+string.  That way if it accidentally gets concatenated to the output, no harm
+will be done.
+
+You can write your own transaction class to support non-Webware output 
+streaming, but Cheetah currently comes with no examples of this.  Ask on
+the mailing list if you need help with it.
+
+Global variables and class attributes defined by Cheetah have a 
+``_CHEETAH_`` prefix.  Instance attributes defined by Cheetah have a
+``__CHEETAH__`` prefix (two trailing underscores).  You should normally
+never write to these but you can read them if desired; many are
+self-explanatory.  One such attribute is ``._CHEETAH__searchList``.  This
+is the actual search List ``VFFSL()`` will consult for placeholder lookups.

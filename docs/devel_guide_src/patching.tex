@@ -1,0 +1,134 @@
+\section{Patching Cheetah}
+\label{patching}
+
+How to commit changes to CVS or submit patches, how to run the test suite.
+Describe distutils and how the regression tests work.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{File Requirements}
+\label{patching.fileRequirements}
+
+The code{Template} class contains not only the Cheetah infrastructure, but also
+some convenience methods useful in all templates.  More methods may be added if
+it's generally agreed among Cheetah developers that the method is sufficiently
+useful to all types of templates, or at least to all types of HTML-output
+templates.  If a method is too long to fit into \code{Template} -- especially
+if it has helper methods -- put it in a mixin class under \code{Cheetah.Utils}
+and inherit it.
+
+Routines for a specific problem domain should be put under
+\code{Cheetah.Tools}, so that it doesn't clutter the namespace unless the user
+asks for it.  
+
+Remember: \code{Cheetah.Utils} is for objects required by any part of Cheetah's
+core.  \code{Cheetah.Tools} is for completely optional objects.  It should
+always be possible to delete \code{Cheetah.Tools} without breaking Cheetah's
+core services.
+
+If a core method needs to look up an attribute defined under
+\code{Cheetah.Tools}, it should use \code{hasattr()} and gracefully provide a
+default if the attribute does not exist (meaning the user has not imported that
+subsystem).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Testing Changes and Building Regression Tests}
+\label{patching.testing}
+
+Cheetah ships with a regression test suite.  To run the built-in tests, 
+execute at the shell prompt:
+\begin{verbatim}
+    cheetah test
+\end{verbatim}
+
+Before checking any changes in, run the tests and verify they all pass.  That
+way, users can check out the CVS version of Cheetah at any time with a fairly
+high confidence that it will work.  If you fix a bug or add a feature, please
+take the time to add a test that exploits the bug/feature.  This will help in
+the future, to prevent somebody else from breaking it again without realizing
+it.  Users can also run the test suite to verify all the features work on their
+particular platform and computer.
+
+The general procedure for modifying Cheetah is as follows:
+\begin{enumerate}
+\item Write a simple Python program that exploits the bug/feature you're
+    working on.  You can either write a regression test (see below), or a
+    separate program that writes the template output to one file and put the
+    expected output in another file; then you can run \code{diff} on the two
+    outputs.  (\code{diff} is a utility included on all Unix-like systems.  It
+    shows the differences between two files line by line.  A precompiled
+    Windows version is at
+    \url{http://gnuwin32.sourceforge.net/packages/diffutils.htm}, and MacOS
+    sources at \url{http://perso.wanadoo.fr/gilles.depeyrot/DevTools\_en.html}.)
+\item Make the change in your Cheetah CVS sandbox or in your installed
+    version of Cheetah.  If you make it in the sandbox, you'll have to run
+    \code{python setup.py install} before testing it.  If you make it in the
+    installed version, do {\em not} run the installer or it will overwrite your
+    changes!
+\item Run \code{cheetah test} to verify you didn't break anything.  Then run
+    your little test program.
+\item Repeat steps 2-3 until everything is correct.
+\item Turn your little program into a regression test as described below.
+\item When \code{cheetah test} runs cleanly with your regression test
+    included, update the \code{CHANGES} file and check in your changes.  If you
+    made the changes in your installed copy of Cheetah, you'll have to copy
+    them back into the CVS sandbox first.  If you added any files that must be
+    distributed, {\em be sure to} \code{cvs add} them before committing.
+    Otherwise Cheetah will run fine on your computer but fail on anybody
+    else's, and the test suite can't check for this.
+\item Announce the change on the cheetahtemplate-discuss list and provide a
+    tutorial if necessary.  The documentation maintainer will update the
+    Users' Guide and Developers' Guide based on this message and on the
+    changelog.  
+\end{enumerate}
+
+If you add a directory to Cheetah, you have to mention it in \code{setup.py} or
+it won't be installed.
+
+The tests are in the \code{Cheetah.Tests} package, aka the \code{src/Tests/}
+directory of your CVS sandbox.  Most of the tests are in
+\code{SyntaxAndOutput.py}.  You can either run all the tests or choose which
+to run:
+\begin{description}
+\item{\code{python Test.py}}  
+    Run all the tests.  (Equivalent to \code{cheetah test}.)
+\item{\code{python SyntaxAndOutput.py}}  
+    Run only the tests in that module.
+\item{\code{python SyntaxAndOutput.py CGI}}  
+    Run only the tests in the class \code{CGI} inside the module.  The class
+    must be a direct or indirect subclass of
+    \code{unittest\_local\_copy.TestCase}.
+\item{\code{python SyntaxAndOutput.py CGI Indenter}}  
+    Run the tests in classes \code{CGI} and \code{Indenter}.
+\item{\code{python SyntaxAndOutput.py CGI.test1}}  
+    Run only test \code{test1}, which is a method in the \code{CGI} class.
+\item{etc...}
+\end{description}
+
+To make a SyntaxAndOutput test, first see if your test logically fits into one
+of the existing classes.  If so, simply add a method; e.g., \code{test16}.
+The method should not require any arguments except \code{self}, and should
+call \code{.verify(source, expectedOutput)}, where the two arguments are
+a template definition string and a control string.  The tester will complain
+if the template output does not match the control string.  You have a wide
+variety of placeholder variables to choose from, anything that's included in
+the \code{defaultTestNameSpace} global dictionary.  If that's not enough, add
+items to the dictionary, but please keep it from being cluttered with wordy
+esoteric items for a single test).
+
+If your test logically belongs in a separate class, create a subclass of
+\code{OutputTest}.  You do not need to do anything else; the test suite will
+automatically find your class in the module.  Having a separate class allows
+you to define state variables needed by your tests (see the \code{CGI} class)
+or override \code{.searchList()} (see the \code{Indenter} class) to provide 
+your own searchList.
+
+To modify another test module or create your own test module, you'll have to
+study the existing modules, the \code{unittest\_local\_copy} source, and the
+\code{unittest} documentation in the Python Library Reference.  Note that we
+are using a hacked version of \code{unittest} to make a more convenient test
+structure for Cheetah.  The differences between \code{unittest\_local\_copy}
+and Python's standard \code{unittest} are documented at the top of the module.
+
+% Local Variables:
+% TeX-master: "devel_guide"
+% End:      

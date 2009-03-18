@@ -1,0 +1,369 @@
+How Cheetah Works
+=================
+
+..
+    :label: howWorks
+
+
+
+Constructing Template Objects
+-----------------------------
+
+..
+    :label: howWorks.templateClass
+
+..
+    :label: howWorks.constructing
+
+The heart of Cheetah is the ``Template`` class in the
+``Cheetah.Template`` module.  There are several ways to construct templates,
+each with slightly different arguments.  Where *source* is shown, it's always
+the first argument and may be specified positionally.  The order of the 
+other arguments may change, so always specify them as keyword arguments.
+
+``Template()`` accepts the following arguments:
+
+    source
+         The template definition as a string.  The source can be a string
+         literal in your module, or perhaps a string you read from a database
+         or other data structure.
+
+    file
+         A filename or file object containing the template definition.  A
+         filename must be a string, and a file object must be open for reading.
+         By convention, template definition files have the extension **.tmpl**.
+
+    namespaces, searchList
+        A list of objects which Cheetah will search for placeholder values.
+        (Cheetah also searches certain other objects automatically; see the
+        "Placeholders" chapter for details.)  Use either argument; they both
+        mean the same thing.
+
+    filter
+        Equivalent to putting ``#filter`` at the top of the template.  The
+        argument may be a subclass of ``Cheetah.Filters.Filter``, or a string
+        naming a class in filtersLib (the next argument below).  See
+        ``#filter`` for details.
+
+    filtersLib
+         A module containing the filters Cheetah should look up by name.  The
+         default is ``Cheetah.Filters``.  All classes in this module that are
+         subclasses of ``Cheetah.Filters.Filter`` are considered filters.
+
+    errorCatcher
+        Equivalent to putting ``#errorCatcher`` at the top of the template.
+        The object may be a subclass of ``Cheetah.ErrorCatchers.ErrorCatcher``,
+        or a string naming a class in ``Cheetah.ErrorCatchers``.  See
+        ``#errorCatcher`` for details.
+
+    compilerSettings
+        Equivalent to putting ``#compiler-settings`` at the top of the
+        template.  The argument is a dictionary or nesting of dictionaries.
+        See ``#compiler-settings`` for details.
+
+A template class returned by ``Cheetah.compile`` or precompiled via "cheetah
+compile" takes the same constructor arguments as above, except "source" and
+"file" which are not allowed.  Use keyword arguments for all arguments
+because their order may change.
+
+The class method ``Template.compile()`` takes the following
+arguments:
+
+    source, file, compilerSettings
+        Same as above.  *These are the only arguments most users will ever
+        use.*  The other args below are for specialized advanced uses.
+
+    returnAClass
+        If true (default), return a subclass of ``Template`` specific to this
+        template definition.  If false, return the Python source of a module
+        containing this class; i.e., what "cheetah compile" would write to a
+        file.
+
+    moduleName, className, mainMethodName
+        Override the default names.  For instance, TurboCheetah (a third-party
+        library) requires its templates to have a fixed class name, so it uses
+        *className*.
+
+    compilerClass
+        Use an You'll probably never need this.
+
+    baseclass
+        Equivalent to putting ``#extends`` at the top of the template.
+        ``#extends`` overrides this, unlike other arguments.
+
+    moduleGlobals
+        In case you want to sneak in some extra variables that don't require
+        the NameMapper.
+
+    preprocessors
+        A list of filter functions which will modify the template definition
+        before Cheetah's compiler sees it.  See chapter @@MO for details.
+
+    compilerClass, cacheCompilationResults, useCache, cacheModuleFilesForTracebacks, cacheDirForModuleFiles, keepRefToGeneratedCode
+        You'll probably never need these.  They are used to provide an
+        alternate compiler, disable Cheetah's template caching (*not* related
+        to ``#cache``), or modify Cheetah's enhanced traceback reporting.  See
+        the ``Template.compile()`` docstring for details.
+
+Here are typical ways to create a template instance:
+
+``t = Template("The king is a \$placeholder1.")``
+     Pass the template definition as a string.
+``t = Template(file="fink.tmpl")``
+     Read the template definition from a file named "fink.tmpl".  
+``t = Template(file=f)``
+     Read the template definition from file-like object 'f'.
+``t = Template("The king is a \$placeholder1.", namespaces=[dict, obj])``
+     Pass the template definition as a string.  Also pass two namespaces for
+     the namespaces: a dictionary 'dict' and an instance 'obj'.
+``t = Template(file="fink.txt", namespaces=[dict, obj])``
+     Same, but pass a filename instead of a string.
+``t = Template(file=f, namespaces=[dict, obj])``
+     Same with a file object.
+
+Filling templates and extracting data
+-------------------------------------
+
+There are several ways to fill a template.  Assume ``t`` is a template
+instance::
+
+    1 output = t.respond()
+    2 output = str(t)            # Shortcut for "str(t.respond())".
+    3 output = unicode(t)        # Shortcut for "unicode(t.respond())".
+    4 print t                    # Shortcut for "print str(t.respond())".
+    4 sys.stderr.write( unicode(t).encode('latin1') )
+    5 result = t.my_def_method(arg1, arg2)
+
+These all assume the template's main method is ``.respond``, which is true
+in the normal case.  [#]_  ``str()`` and
+``unicode()`` will always call the main method whatever it's named.
+
+If the output contains non-ASCII characters, examples 2 and 4 will raise
+an exception.  Use one of the other examples instead.
+
+Example 5 calls a ``#def`` method with arguments.  Only that method's output
+is returned.
+
+If the template contains ``#attr`` attributes, you can access those directly::
+
+    title = t.title
+    author = t.author
+
+
+.. [#] See the Inheritance chapter... (#implements, mainMethodName, 
+   inheritance).
+
+"cheetah compile" and precompiled templates
+-------------------------------------------
+
+..
+    :label: howWorks.cheetah-compile
+
+To create a precompiled template module, do either of these::
+
+    cheetah compile [options] [FILES ...]
+    cheetah c [options] [FILES ...]
+
+There are several advantages of precompiled templates:
+
+- Precompiled templates are easier to debug because you can see the generated
+  Python code, and the line numbers in error messages will correspond to the
+  actual line in the template definition file.  (If the template definition is
+  embedded in a string literal inside a module, you'll have to count down from
+  the first line in the string to find the error line.)
+
+- Data analysis programs can import the template classes and query their
+  attributes, which can be set via ``#attr``.  Example: a directory of 
+  templates can each contain ``.title`` and ``.author`` attributes, and 
+  another program can read them all and make an index page.
+
+- Slightly faster performance since the compilation is done before
+  the user runs your application, and Python will optimize this further
+  with .pyc or .pyo files.  The actual speed difference is minimal --
+  Cheetah appears to compile templates instantaneously anyway, and it caches
+  templates in memory if possible, but precompiling templates will make
+  some developers feel better for conserving electrons.
+  
+- ``#extends`` requires that the base template be precompiled, or the
+  child template cannot be instantiated.  (@@MO: The *baseclass* constructor
+  arg can be used to set the parent class for a dynamically-compiled 
+  template.)
+
+- Only precompiled templates may be used as Webware servlets.
+
+Some of Cheetah's developers use only precompiled templates and recommend the
+same.  However, it's your choice whether to do this.
+
+The following options are supported::
+
+  --idir DIR, --odir DIR : input/output directories (default: current dir)
+  --iext EXT, --oext EXT : input/output filename extensions
+    (default input: tmpl,  default output:  py)
+  -R : recurse subdirectories looking for input files
+  --debug : print lots of diagnostic output to standard error
+  --flat : no destination subdirectories
+  --nobackup : don't make backups
+  --stdout, -p : output to standard output (pipe)
+  --settings         : a string representing the compiler settings to use
+                       e.g. --settings='useNameMapper=False,useFilters=False'
+                       This string is eval'd in Python so it should contain
+                       valid Python syntax.
+  --templateAPIClass : a string representing a subclass of
+                       Cheetah.Template:Template to use for compilation
+
+.. tip::
+    If Cheetah can't find your input files, or if it puts output files
+    in the wrong place, use the ``--debug`` option to see how Cheetah
+    interpreted your command line.
+
+The most basic usage is::
+
+    cheetah compile a.tmpl           : writes a.py
+    cheetah compile a.tmpl b.tmpl    : writes a.py and b.py
+
+
+Cheetah will automatically add the default input extension (.tmpl) if the exact
+file is not found.  So the following two examples are the same as above if
+"a" and "b" don't exist::
+
+    cheetah compile a                : writes a.py (from a.tmpl)
+    cheetah compile a b              : writes a.py and b.py
+
+
+Use the ``-R`` option to recurse subdirectories::
+
+    cheetah compile dir1             : error, file is a directory
+    cheetah compile -R dir1          : look under `dir1' for files to compile
+    cheetah compile                  : error, no file specified
+    cheetah compile -R               : compile all templates under current
+                                       directory and subdirectories
+    cheetah compile -R a b dir1      : compile files and recurse
+
+When recursing, only regular files that end in the input extension (.tmpl) are
+considered source files.  All other filenames are ignored.
+
+The options ``--idir`` and ``--odir`` allow you to specify that
+the source (and/or destination) paths are relative to a certain directory
+rather than to the current directory.  This is useful if you keep your
+\*.tmpl and \*.py files in separate directory hierarchies.  After editing a 
+source file, just run one of these (or put the command in a script or 
+Makefile)::
+
+    cheetah compile --odir /var/webware a.tmpl
+    cheetah compile -R --odir /var/webware
+    cheetah c --odir /var/webware sub/a.tmpl
+                                     : writes /var/webware/sub/a.py
+
+
+"cheetah compile" overwrites any existing ``.py`` file it finds, after
+backing it up to FILENAME.py_bak (unless you specify ``--nobackup``).  For
+this reason, you should make changes to the ``.tmpl`` version of the
+template rather than to the ``.py`` version.
+
+For the same reason, if your template requires custom Python methods or
+other Python code, don't put it in the ``FILENAME.py`` file or it will be
+overwritten!  Instead, put it in a separate base class and use
+``#extends`` to inherit from it.
+
+Because FILENAME will be used as a class and module name, it must be a valid
+Python identifier.  For instance, ``cheetah compile spam-eggs.tmpl`` is 
+illegal because of the hyphen ("-").  This is sometimes inconvenient when
+converting a site of HTML files into Webware servlets.  Fortunately, the
+*directory* it's in does not have to be an identifier.  (*Hint:* for
+date-specific files, try converting 2002/04/12.html to 2002/04/12/index.tmpl.
+This also gives you a directory to store images or supplemental files.)
+
+Occasionally you may want output files put directly into the output directory
+(or current directory), rather than into subdirectories parallel to the input
+file.  The ``--flat`` option does this.  This may cause several input files
+might map to the same output file.  Cheetah checks for output file collisions
+before writing any files, and aborts if there are any collisions. ::
+
+    cheetah c sub/a.py            : writes sub/a.py
+    cheetah c --flat sub/a.py     : writes a.py
+    cheetah c --odir DEST sub/a.tmpl
+                                  : writes DEST/sub/a.py
+    cheetah c --flat --odir DEST sub/a.tmpl
+                                  : writes DEST/a.py
+    cheetah c --idir /home/henry sub/rollins.tmpl
+                                  : writes sub/rollins.py
+    cheetah c --flat --idir /home/henry sub/rollins.tmpl
+                                  : writes rollins.py
+    cheetah c --idir /home/henry --odir /home/henry sub/rollins.tmpl
+                                  : writes /home/henry/sub/rollins.py
+    cheetah c --flat --idir /home/henry --odir /home/henry sub/rollins.tmpl
+                                  : writes /home/henry/rollins.py
+
+
+Whenever "cheetah compile" has to create an output directory or subdirectory,
+it also creates an __init__.py file in it.  This file is necessary in order
+to make Python treat the directory as a Python package.
+
+Chapter @@MO has a look inside a precompiled template module.
+
+"cheetah fill"
+--------------
+
+..
+    :label: howWorks.cheetah-fill
+
+You can fill templates from the command line with "cheetah fill".  The most
+common example is static HTML files which are generated from templates.  The
+output extension is .html by default.  The compiled template modules are not
+written to disk.  All the options to "cheetah compile" are allowed.  
+
+Examples::
+
+    cheetah fill a.tmpl              : writes a.html
+    cheetah fill a.tmpl b.tmpl       : writes a.html and b.html
+    cheetah f --oext txt a           : writes a.txt (from a.tmpl)
+
+You can't specify user-defined namespaces the normal way, so the templates must
+be written to have default values for all variables.  However, there is limited
+support for gathering placeholder values from operating-system resources::
+
+  --env : make the environment variables a user-defined namespace
+  --pickle FILE : unpickle FILE and make that object a user-defined namespace
+
+Using ``--env`` may have security or reliability implications because the
+environment normally contains lots of variables you inherited rather than
+defining yourself.  If any of these variables override any of yours (say a
+``#def``), you will get incorrect output, may reveal private information,
+and may get an exception due to the variable being an unexpected type
+(environment variables are always strings).  Your calling program may wish
+to clear out the environment before setting environment variables for the
+template.
+
+There are two other differences between "cheetah compile" and "cheetah fill".
+Cheetah doesn't create __init__.py files when creating directories in
+fill mode.  Also, the source filenames don't have to be identifiers.  This
+allows you to create any .html filename even if it contains characters like "-"
+that are illegal in identifiers.
+
+
+Running a .py template module as a standalone program
+-----------------------------------------------------
+
+..
+    :label: howWorks.standalone
+
+In addition to importing your .py template module file into a Python
+script or using it as a Webware servlet, you can also run it from the
+command line as a standalone program.  The program will print the filled
+template on standard output.  This is useful while debugging the template,
+and for producing formatted output in shell scripts.
+
+When running the template as a program, you cannot provide a searchList or
+set ``self.`` attributes in the normal way, so you must take
+alternative measures to ensure that every placeholder has a value.
+Otherwise, you will get the usual ``NameMapper.NotFound`` exception at
+the first missing value.  You can either set default values in the template
+itself (via the ``\#attr`` or ``\#def`` directives) or in a Python
+superclass, or use the ``--env`` or ``--pickle`` command-line options,
+which work just like their "cheetah fill" counterparts.
+
+Run ``python FILENAME.py --help`` to see all the command-line
+options your .py template module accepts.
+
+
+

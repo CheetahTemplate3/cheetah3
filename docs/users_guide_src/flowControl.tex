@@ -1,0 +1,414 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Flow Control}
+\label{flowControl}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#for ... \#end for}
+\label{flowControl.for}
+
+Syntax:
+\begin{verbatim}
+#for $var in EXPR
+#end for
+\end{verbatim}
+
+
+The \code{\#for} directive iterates through a sequence.  The syntax is the same
+as Python,  but remember the \code{\$} before variables.
+
+Here's a simple client listing:
+\begin{verbatim}
+<TABLE>
+#for $client in $service.clients
+<TR>
+<TD>$client.surname, $client.firstname</TD>
+<TD><A HREF="mailto:$client.email" >$client.email</A></TD>
+</TR>
+#end for
+</TABLE>
+\end{verbatim}
+
+Here's how to loop through the  keys and values of a dictionary:
+\begin{verbatim}
+<PRE>
+#for $key, $value in $dict.items()
+$key: $value
+#end for
+</PRE>
+\end{verbatim}
+
+Here's how to create list of numbers separated by hyphens. This ``\#end for''
+tag shares the last line to avoid introducing a newline character after each
+hyphen.  
+\begin{verbatim}
+#for $i in range(15)
+$i - #end for
+\end{verbatim}
+
+If the location of the \code{\#end for} offends your sense of indentational
+propriety, you can do this instead:
+\begin{verbatim}
+#for $i in $range(15)
+$i - #slurp
+#end for
+\end{verbatim}
+
+The previous two examples will put an extra hyphen after last number.  Here's
+how to get around that problem, using the \code{\#set} directive, which will be
+dealt with in more detail below.
+\begin{verbatim}
+#set $sep = '' 
+#for $name in $names 
+$sep$name 
+#set $sep = ', ' 
+#end for 
+\end{verbatim}
+
+Although to just put a separator between strings, you don't need a for loop:
+\begin{verbatim}
+#echo ', '.join($names)
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#repeat ... \#end repeat}
+\label{flowControl.repeat}
+
+Syntax:
+\begin{verbatim}
+#repeat EXPR
+#end repeat
+\end{verbatim}
+
+
+Do something a certain number of times.
+The argument may be any numeric expression.
+If it's zero or negative, the loop will execute zero times.
+\begin{verbatim}
+#repeat $times + 3
+She loves me, she loves me not.
+#repeat
+She loves me.
+\end{verbatim}
+
+
+Inside the loop, there's no way to tell which iteration you're on.  If you
+need a counter variable, use \code{\#for} instead with Python's \code{range}
+function.  Since Python's ranges are base 0 by default, there are two ways
+to start counting at 1.  Say we want to count from 1 to 5, and that
+\code{\$count} is 5.
+\begin{verbatim}
+#for $i in $range($count)
+#set $step = $i + 1
+$step.  Counting from 1 to $count.
+#end for
+
+
+#for $i in $range(1, $count + 1)
+$i.  Counting from 1 to $count.
+#end for
+\end{verbatim}
+
+
+A previous implementation used a local variable \code{\$i} as the repeat
+counter.  However, this prevented instances of \code{\#repeat} from
+being nested.  The current implementation does not have this problem as it
+uses a new local variable for every instance of \code{\#repeat}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#while ... \#end while}
+\label{flowControl.while}
+
+Syntax:
+\begin{verbatim}
+#while EXPR
+#end while
+\end{verbatim}
+
+
+\code{\#while} is the same as Python's \code{while} statement.  It may be
+followed by any boolean expression:
+\begin{verbatim}
+#while $someCondition('arg1', $arg2)
+The condition is true.
+#end while
+\end{verbatim}
+
+Be careful not to create an infinite loop.  \code{\#while 1} will loop until
+the computer runs out of memory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#if ... \#else if ... \#else ... \#end if}
+\label{flowControl.if}
+
+Syntax:
+\begin{verbatim}
+#if EXPR
+#else if EXPR
+#elif EXPR
+#else
+#end if
+\end{verbatim}
+
+
+The \code{\#if} directive and its kin are used to display a portion of text
+conditionally. \code{\#if} and \code{\#else if} should be followed by a
+true/false expression, while \code{\#else} should not.  Any valid Python 
+expression is allowed.  As in Python, the expression is true unless it evaluates
+to 0, '', None, an empty list, or an empty dictionary.  In deference to Python,
+\code{\#elif} is accepted as a synonym for \code{\#else if}.
+
+Here are some examples:
+\begin{verbatim}
+#if $size >= 1500
+It's big
+#else if $size < 1500 and $size > 0 
+It's small
+#else
+It's not there
+#end if
+\end{verbatim}
+
+\begin{verbatim}
+#if $testItem($item)
+The item $item.name is OK.
+#end if
+\end{verbatim}
+ 
+Here's an example that combines an \code{\#if} tag with a \code{\#for} tag.
+\begin{verbatim}
+#if $people
+<table>
+<tr>
+<th>Name</th>
+<th>Address</th>
+<th>Phone</th>
+</tr>
+#for $p in $people
+<tr>
+<td>$p.name</td>
+<td>$p.address</td>
+<td>$p.phone</td>
+</tr>
+#end for
+</table>
+#else
+<p> Sorry, the search did not find any people. </p>
+#end if
+\end{verbatim}
+
+See section \ref{output.oneLineIf} for the one-line \code{\#if} directive,
+which is equivalent to Perl's and C's \code{?:} operator.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#unless ... \#end unless}
+\label{flowControl.unless}
+
+Syntax:
+\begin{verbatim}
+#unless EXPR
+#end unless
+\end{verbatim}
+
+
+\code{\#unless} is the opposite of \code{\#if}: the text is executed if the
+condition is {\bf false}.  Sometimes this is more convenient.
+\code{\#unless EXPR} is equivalent to \code{\#if not (EXPR)}.
+
+\begin{verbatim}
+#unless $alive
+This parrot is no more!  He has ceased to be!
+'E's expired and gone to meet 'is maker! ...
+THIS IS AN EX-PARROT!!
+#end unless
+\end{verbatim}
+
+You cannot use \code{\#else if} or \code{\#else} inside an \code{\#unless}
+construct.  If you need those, use \code{\#if} instead.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#break and \#continue}
+\label{flowControl.break}
+
+Syntax:
+\begin{verbatim}
+#break
+#continue
+\end{verbatim}
+
+
+These directives are used as in Python. \code{\#break} will
+exit a \code{\#for} loop prematurely, while \code{\#continue} will immediately
+jump to the next iteration in the \code{\#for} loop.
+
+In this example the output list will not contain ``10 - ''. 
+\begin{verbatim}
+#for $i in range(15)
+#if $i == 10
+  #continue
+#end if
+$i - #slurp
+#end for
+\end{verbatim}
+
+In this example the loop will exit if it finds a name that equals 'Joe':
+\begin{verbatim}
+#for $name in $names
+#if $name == 'Joe'
+  #break
+#end if
+$name - #slurp
+#end for
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#pass}
+\label{flowControl.pass}
+
+Syntax:
+\begin{verbatim}
+#pass
+\end{verbatim}
+
+
+The \code{\#pass} directive is identical to Python \code{pass} statement: it
+does nothing. It can be used when a statement is required syntactically but the
+program requires no action.
+
+The following example does nothing if only \$A is true
+\begin{verbatim}
+#if $A and $B
+   do something
+#elif $A
+  #pass
+#elif $B
+  do something
+#else
+  do something
+#end if
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#stop}
+\label{flowControl.stop}
+
+Syntax:
+\begin{verbatim}
+#stop
+\end{verbatim}
+
+
+The \code{\#stop} directive is used to stop processing of a template at a
+certain point.  The output will show {\em only} what has been processed up to
+that point.  
+
+When \code{\#stop} is called inside an \code{\#include} it skips the rest of
+the included code and continues on from after the \code{\#include} directive.
+stop the processing of the included code.  Likewise, when \code{\#stop} is
+called inside a \code{\#def} or \code{\#block}, it stops only the \code{\#def}
+or \code{\#block}.
+
+\begin{verbatim}
+A cat
+#if 1
+  sat on a mat
+  #stop
+  watching a rat
+#end if
+in a flat.
+\end{verbatim}
+
+will print 
+\begin{verbatim}
+A cat
+  sat on a mat
+\end{verbatim}
+
+And
+\begin{verbatim}
+A cat
+#block action
+  sat on a mat
+  #stop
+  watching a rat
+#end block
+in a flat.
+\end{verbatim}
+
+will print
+
+\begin{verbatim}
+A cat
+  sat on a mat
+in a flat.
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#return}
+\label{flowControl.return}
+
+Syntax:
+\begin{verbatim}
+#return
+\end{verbatim}
+
+
+This is used as in Python. \code{\#return} will exit the current method with a
+default return value of \code{None} or the value specified.  It may be used 
+only inside a \code{\#def} or a \code{\#block}.  
+
+Note that \code{\#return} is different from the \code{\#stop} directive,
+which returns the sum of all text output from the method in which it is called.
+The following examples illustrate this point:
+
+\begin{verbatim}
+1
+$test[1]
+3
+#def test
+1.5
+#if 1
+#return '123'
+#else
+99999
+#end if
+#end def
+\end{verbatim}
+
+will produce
+\begin{verbatim}
+1
+2
+3
+\end{verbatim}
+
+while
+\begin{verbatim}
+1
+$test
+3
+#def test
+1.5
+#if 1
+#stop
+#else
+99999
+#end if
+#end def
+\end{verbatim}
+
+will produce
+\begin{verbatim}
+1
+1.5
+3
+\end{verbatim}
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      

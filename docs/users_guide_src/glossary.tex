@@ -1,0 +1,96 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Vocabulary}
+\label{glossary}
+\label{vocabulary}
+
+{\bf Template} is an informal term meaning a template definition, a
+template instance or a template class.  A {\bf template definition} is what
+the human {\bf template maintainer} writes: a string consisting of text,
+placeholders and directives.  {\bf Placeholders} are variables that will be
+looked up when the template is filled.  {\bf Directives} are commands to be
+executed when the template is filled, or instructions to the Cheetah compiler.  
+The conventional suffix for a file containing a template definition is 
+{\bf .tmpl}.
+
+There are two things you can do with a template: compile it or fill it.
+{\bf Filling} is the reason you have a template in the first place:
+to get a finished string out of it.  Compiling is a necessary prerequisite: the
+{\bf Cheetah compiler} takes a template definition and produces Python code
+to create the finished string.  Cheetah provides several ways to compile
+and fill templates, either as one step or two.
+
+Cheetah's compiler produces a subclass of \code{Cheetah.Template}
+specific to that template definition; this is called the {\bf generated
+class}.  A {\bf template instance} is an instance of a generated class.
+
+If the user calls the \code{Template} constructor directly (rather than a
+subclass constructor), s/he will get what appears to be an instance of 
+\code{Template} but is actually a subclass created on-the-fly.
+
+The user can make the subclass explicit by using the ``cheetah compile''
+command to write the template class to a Python module.  Such a module is
+called a {\bf .py template module}.
+
+The {\bf Template Definition Language} -- or the ``Cheetah language'' for short
+-- is the syntax rules governing placeholders and directives.  These are
+discussed in sections \ref{language} and following in this Guide.
+
+To fill a template, you call its {\bf main method}.  This is normally
+\code{.respond()}, but it may be something else, and you can use the
+\code{\#implements} directive to choose the method name.  (Section
+\ref{inheritanceEtc.implements}.
+
+A {\bf template-servlet} is a .py template module in a Webware servlet
+directory.  Such templates can be filled directly through the web by requesting
+the URL.  ``Template-servlet'' can also refer to the instance being filled by
+a particular web request.  If a Webware servlet that is not a
+template-servlet invokes a template, that template is not a template-servlet
+either.
+
+A {\bf placeholder tag} is the substring in the template
+definition that is the placeholder, including the start and end delimeters (if
+there is an end delimeter).  The {\bf placeholder name} is the same but without
+the delimeters.  
+
+Placeholders consist of one or more {\bf identifiers} separated by periods
+(e.g., \code{a.b}).  Each identifier must follow the same rules as Python
+identifiers; that is, a letter or underscore followed by one or more letters,
+digits or underscores.  (This is the regular expression
+\verb+[A-Za-z_][A-Za-z0-9_]*+.)
+
+The first (or only) identifier of a placeholder name represents a {\bf
+variable} to be looked up.  Cheetah looks up variables in various {\bf
+namespaces}: the searchList, local variables, and certain other places.  The
+searchList is a list of objects ({\bf containers}) with attributes
+and/or keys: each container is a namespace.  Every template instance has
+exactly one searchList.  Identifiers after the first are looked up only in
+the parent object.  The final value after all lookups have been performed is
+the {\bf placeholder value}.
+
+Placeholders may occur in three positions: top-level, expression and LVALUE.
+{\bf Top-level} placeholders are those in ordinary text (``top-level text'').
+{\bf Expression} placeholders are those in Python expressions.  
+{\bf LVALUE} placeholders are those naming a variable to receive a value.
+(LVALUE is computerese for ``the left side of the equal sign''.)  Section 
+\ref{language.placeholders.positions} explains the differences between these
+three positions.
+
+The routine that does the placeholder lookups is called the {\bf NameMapper}.
+Cheetah's NameMapper supports universal dotted notation and autocalling.
+{\bf Universal dotted notation} means that keys may be written as if they were
+attributes: \code{a.b} instead of \code{a['b']}.  {\bf Autocalling} means that
+if any identifier's value is found to be a function or method, Cheetah will
+call it without arguments if there is no \verb+()+ following.  More about the
+NameMapper is in section \ref{language.namemapper}.
+
+Some directives are multi-line, meaning they have a matching {\bf \#end} tag.
+The lines of text between the start and end tags is the {\bf body} of the
+directive.  Arguments on the same line as the start tag, in contrast, are
+considered part of the directive tag.  More details are in section
+\ref{language.directives.syntax} (Directive Syntax Rules).
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      
+
+% # vim: sw=4 ts=4 expandtab

@@ -1,0 +1,116 @@
+\section{Instructions to the Parser/Compiler}
+\label{parserInstructions}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#breakpoint}
+\label{parserInstructions.breakpoint}
+
+Syntax:
+\begin{verbatim}
+#breakpoint
+\end{verbatim}
+
+
+\code{\#breakpoint} is a debugging tool that tells the parser to stop
+parsing at a specific point. All source code from that point on will be ignored.
+
+The difference between \code{\#breakpoint} and \code{\#stop} is that
+\code{\#stop} occurs in normal templates (e.g., inside an \code{\#if}) but
+\code{\#breakpoint} is used only when debugging Cheetah.  Another difference is
+that \code{\#breakpoint} operates at compile time, while \code{\#stop} is
+executed at run time while filling the template.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\#compiler-settings}
+\label{parserInstructions.compiler-settings}
+
+Syntax:
+\begin{verbatim}
+#compiler-settings
+key = value    (no quotes)
+#end compiler-settings
+
+#compiler-settings reset
+\end{verbatim}
+
+
+The \code{\#compiler-settings} directive overrides Cheetah's standard settings,
+changing how it parses source code and generates Python code.  This
+makes it possible to change the behaviour of Cheetah's parser/compiler for a
+certain template, or within a portion of the template.
+
+The \code{reset} argument reverts to the default settings.  With \code{reset},
+there's no end tag.
+
+Here are some examples of what you can do:
+\begin{verbatim}
+$myVar
+#compiler-settings
+cheetahVarStartToken = @
+#end compiler-settings
+@myVar
+#compiler-settings reset
+$myVar
+\end{verbatim}
+
+
+\begin{verbatim}
+## normal comment
+#compiler-settings
+commentStartToken = //
+#end compiler-settings
+
+// new style of comment
+
+#compiler-settings reset
+
+## back to normal comments
+\end{verbatim}
+
+\begin{verbatim}
+#slurp
+#compiler-settings
+directiveStartToken = %
+#end compiler-settings
+
+%slurp
+%compiler-settings reset
+
+#slurp
+\end{verbatim}
+
+Here's a partial list of the settings you can change:
+\begin{enumerate}
+\item syntax settings
+     \begin{enumerate}
+     \item cheetahVarStartToken
+     \item commentStartToken
+     \item multilineCommentStartToken
+     \item multilineCommentEndToken
+     \item directiveStartToken
+     \item directiveEndToken
+     \end{enumerate}
+\item code generation settings
+     \begin{enumerate}
+     \item commentOffset
+     \item outputRowColComments
+     \item defDocStrMsg
+     \item useNameMapper
+     \item useAutocalling
+     \item reprShortStrConstants
+     \item reprNewlineThreshold
+     \end{enumerate}
+\end{enumerate}
+The meaning of these settings and their default values will be documented in
+the future.
+
+
+% Local Variables:
+% TeX-master: "users_guide"
+% End:      
+
+
+
+
