@@ -3,7 +3,7 @@
 ####################
 ## Class attributes:
 #attr navBarSep = '<span class="navBarSep">|</span>'
-#attr title = 'Cheetah - The Python-Powered Template Engine'
+#attr title = 'Cheetah Community Engine - The Python-Powered Template Engine'
 #attr htmlExt = '.html'
 #attr pageId = 'index'
 ## $apos used to avoid a syntax highlight issue in Emacs:
@@ -35,7 +35,7 @@
          class="bannerImg" src="images/cheetah-face-black-medium.jpg" alt="" /></a>
 
       <a href="index$htmlExt"><img class="bannerText" src="images/banner_text.gif" 
-	  alt="Cheetah: The Python-Powered Template Engine" /></a>
+	  alt="Cheetah Community Edition: The Python-Powered Template Engine" /></a>
     </div>
   #end block banner
   <div class="pageOuterWrapper" align="center">
@@ -107,12 +107,20 @@
          <img class="" src="images/cheetah-homepage-title.gif" alt="" />
        </div> 	 
 
-       <p>Cheetah is an <a href="http://opensource.org/">open source</a>
+       <p>Cheetah Community Edition is a community supported release of the 
+	   Cheetah template engine and code generation tool, 
        template engine and code generation tool, written in <a
        href="http://python.org/">Python</a>.  It can be used standalone
        or combined with other tools and frameworks. Web development is its
        principle use, but Cheetah is very flexible and is also being used to
        generate C++ game code, Java, sql, form emails and even Python code.</p>
+
+	   <p>The reasons behind the Community Edition is to maintain active development
+	   outside the mostly-stale <a href="http://sourceforge.net/scm/?type=cvs&group_id=28961">Cheetah CVS tree</a>.
+	   Cheetah CE is not intended on diverging from the main goals of the original releases
+	   of Cheetah, stability, speed and ease of use, but is to serve as a means of reinvigorating
+	   the Cheetah community with <strong>monthly</strong> releases with patches provided by the 
+	   community as they're needed.
 
        <p>Cheetah has a large and active user community. Products built with
        Cheetah are <a href="whouses$htmlExt">used by many of the Fortune
@@ -126,7 +134,7 @@
        <div class="homePageUtilLinks">
         <a href="http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss"
 	 >Mailing List</a>$sep<a href="docs/CHANGES">Changes</a>$sep<a 
-	 href="http://sourceforge.net/cvs/?group_id=28961">CVS</a>
+	 href="http://github.com/rtyler/cheetah/tree/master">Git</a>
        </div>
 
        <div class="homePageQuotes">$shortPraiseSection</div> 	
@@ -138,13 +146,13 @@
   <div class="homePageDownloadBar">
    <div class="homePageDownloadBarInner">
     <b>Download</b> <a
-  href="http://sourceforge.net/project/showfiles.php?group_id=28961">Cheetah 2.0.1</a>
- (released on November 16, 2007: minor bug fix).
+  href="http://github.com/rtyler/cheetah/tarball/v2.1.0">Cheetah CE v2.1.0</a>
+ (released on March 16, 2009: collection of bugfixes/improvements).
     </div>
   </div>
 
   ##################################################
-  <p><b>Cheetah</b>:</p>
+  <p><b>Cheetah Community Edition</b>:</p>
 
   <ul class="topLevel">
     <li><b>is supported by every major Python web framework</b>.</li>  
@@ -253,7 +261,9 @@
 
 <p>Cheetah was created by Tavis Rudd, a freelance programmer and designer, with
 contributions from many open source volunteers.  Its documentation is edited by
-Mike Orr, who also wrote its command line tool.</p>
+Mike Orr, who also wrote its command line tool. The Community Edition of Cheetah
+is being maintained by R. Tyler Ballance of Slide, Inc, but is contributed to by
+the members of the Cheetah community.</p>
 
 <p>We$(apos)d like to thank the following people for contributing valuable
 advice, encouragement, code and bug reports: </p> 
@@ -275,6 +285,7 @@ advice, encouragement, code and bug reports: </p>
   Brian Bird
   Chad Walstrom
   Chris Murphy
+  Christoph Zwerschke
   Christophe Eymard
   Chuck Esterbrook
   Chui Tey
@@ -286,11 +297,15 @@ advice, encouragement, code and bug reports: </p>
   Donnie Hale
   Doug Wyatt
   Edmund Lian
+  Eric Huss
   Erik Forsberg
+  Erwin Ambrosch
+  Evan Klitzke
   Federico Di Gregorio
   Franz Geiger
   Geir Magnusson
   Geoff Talvola
+  Graham Dennis
   Graham Dumpleton
   Greg Czajkowski
   Hamish Lawson
@@ -335,8 +350,10 @@ advice, encouragement, code and bug reports: </p>
   Robert Cowham
   Robert Kuzelj
   Rodrigo B. de Oliveira
+  R. Tyler Ballance
   Scott Sanders
   Sasa Zivkov
+  Satoru Satoh
   Shannon -jj Behrens
   Stephan Diehl
   Stephane Bortzmeyer
@@ -489,18 +506,15 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
 #def downloadPageContents
 
   <p>The most <a
-  href="http://sourceforge.net/project/showfiles.php?group_id=28961">recent
-  stable release</a> was 2.0.1 on November 16th, 2007. Cheetah has been <b>stable,
+  href="http://github.com/rtyler/cheetah/tarball/v2.1.0">recent stable release</a>
+  was Cheetah Community Edition v2.1.0, was released on March 16th, 2009.
+  The latest Cheetah "official" release was 2.0.1 on November 16th, 2007. Cheetah has been <b>stable,
   production quality, post-beta code since 2001</b>. All new releases since then
   (40+) have been almost <b>100% backwards compatible</b>. The 2.0 code itself
   has production ready since early 2006.</p>
 
   <p>Here$(apos)s the documentation on <a
-  href="http://cheetahtemplate.org/docs/CHANGES">recent changes</a>.</p>
-
-  <p>You can also get the current unreleased development version of Cheetah from
-  our <a href="http://sourceforge.net/cvs/?group_id=28961">CVS
-  repository</a>.</p>
+  href="CHANGES">recent changes</a>.</p>
 
   <p>Cheetah is included in FreeBSD and most major Linux distributions:
   Gentoo, Fedora, Debian, and Ubuntu among others.</p>
@@ -585,7 +599,9 @@ href="http://www.webwareforpython.org/">Webware for Python</a> email list.</p>
           <a href="http://www.ironport.com/products/">IronPort Systems</a>, which are
           used by the largest corporations and ISPs in the world.  IronPort$(apos)s products
           contain over a million lines of Python and use Cheetah plus <a
-          href="http://aquarium.sf.net">Aquarium</a> for their user interfaces.</li>
+          href="http://aquarium.sf.net">Aquarium</a> for their user interfaces. Other 
+		  major startup users of Cheetah include companies like <a href="http://youtube.com">YouTube</a>,
+		  <a href="http://www.yelp.com">Yelp</a> and <a href="http://www.slide.com">Slide</a>.</li>
 
           <li>A prominent example of government use is <a
           href="http://www.incidentnews.gov/">Incident News</a>, which provides news,
