@@ -7,10 +7,14 @@ Cheetah TODO list
   in the CHANGES file if the bug is considered significant enough and it
   affected a released version of Cheetah.
 
-Required for Cheetah 2.0
+Cheetah Community Edition v2.1.1
 ========================
-- Replace Optik with Python's optparse.  Optik license has been removed from
-  Users' Guide.
+- Move Cheetah off of the optik parser to optparse
+- "cheetah compile --shbang '#!/usr/bin/python2.6' "
+- Add option "--namemapper=strict" to compilation to optionally disable 
+  "auto-calling".
+
+
 
 Desired for Cheetah 2.0
 =======================
@@ -38,7 +42,6 @@ TODO Items (many are just ideas. This is not an official roadmap!)
   leak from one fill to the next.
 
 - CheetahWrapper stuff: (MO)
-  * "cheetah compile --shbang '#!/usr/bin/python2.2'"
   * "cheetah preview [options] [FILES]"  print template-specific portion of main
     method(s) to stdout, with line numbers based on the .py template module.  
     Make a Template method to do the same thing, a la .generatedModuleCode().
