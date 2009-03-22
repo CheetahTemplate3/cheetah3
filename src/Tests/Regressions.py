@@ -36,9 +36,11 @@ class GetAttrTest(unittest.TestCase):
 
         template = Cheetah.Template.Template.compile(template, compilerSettings={}, keepRefToGeneratedCode=True)
         template = template(searchList=[{'obj' : CustomGetAttrClass()}])
-        assert template, 'We should have a vallid template object by now'
+        assert template, 'We should have a valid template object by now'
 
         self.failUnlessRaises(GetAttrException, template.raiseme)
+
+
 
 if __name__ == '__main__':
     unittest.main()
