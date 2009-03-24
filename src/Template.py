@@ -1413,10 +1413,9 @@ class Template(Servlet):
             self._CHEETAH__searchList.append(self)
         else:
             # create our own searchList
-            self._CHEETAH__searchList = [self._CHEETAH__globalSetVars]
+            self._CHEETAH__searchList = [self._CHEETAH__globalSetVars, self]
             if searchList is not None:
                 self._CHEETAH__searchList.extend(list(searchList))
-            self._CHEETAH__searchList.append( self )
         self._CHEETAH__cheetahIncludes = {}
         self._CHEETAH__cacheRegions = {}
         self._CHEETAH__indenter = Indenter()
