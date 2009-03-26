@@ -44,11 +44,16 @@ import NameMapper
 import Template
 import FileRefresh
 import CheetahWrapper
+import Regressions
+import Unicode
 
 SyntaxSuite = unittest.findTestCases(SyntaxAndOutput)
 NameMapperSuite = unittest.findTestCases(NameMapper)
 TemplateSuite = unittest.findTestCases(Template)
 FileRefreshSuite = unittest.findTestCases(FileRefresh)
+Regressions = unittest.findTestCases(Regressions)
+Unicode = unittest.findTestCases(Unicode)
+
 if not sys.platform.startswith('java'):
     CheetahWrapperSuite = unittest.findTestCases(CheetahWrapper)
 
@@ -56,6 +61,8 @@ from SyntaxAndOutput import *
 from NameMapper import *
 from Template import *
 from FileRefresh import *
+from Regressions import *
+from Unicode import *
 
 if not sys.platform.startswith('java'):
     from CheetahWrapper import *

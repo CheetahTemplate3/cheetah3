@@ -3,7 +3,7 @@
 
 from Cheetah.Template import Template
 import traceback
-import unittest
+import unittest_local_copy as unittest # This is stupid
 
 class JPQ_UTF8_Test1(unittest.TestCase):
     def runTest(self):
