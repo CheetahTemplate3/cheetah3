@@ -679,7 +679,7 @@ class Template(Servlet):
 
         cacheHash = None
         cacheItem = None
-        if source or isinstance(file, (str, unicode)):                
+        if source or isinstance(file, basestring):
             compilerSettingsHash = None
             if compilerSettings:
                 compilerSettingsHash = hashDict(compilerSettings)
