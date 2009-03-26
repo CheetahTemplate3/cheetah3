@@ -834,8 +834,9 @@ class TestLoader:
     def getTestCaseNames(self, testCaseClass):
         """Return a sorted sequence of method names found within testCaseClass.
         """
-        testFnNames = filter(lambda n,p=self.testMethodPrefix: n[:len(p)] == p,
-                             dir(testCaseClass))
+        testFnNames = [fn for fn in dir(testCaseClass) if fn.startswith(self.testMethodPrefix)]
+        if hasattr(testCaseClass, 'runTest'):
+            testFnNames.append('runTest')
         for baseclass in testCaseClass.__bases__:
             for testFnName in self.getTestCaseNames(baseclass):
                 if testFnName not in testFnNames:  # handle overridden methods
