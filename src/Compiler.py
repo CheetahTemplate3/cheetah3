@@ -1566,8 +1566,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
             self._fileDirName, self._fileBaseName = os.path.split(self._filePath)
             self._fileBaseNameRoot, self._fileBaseNameExt = os.path.splitext(self._fileBaseName)
 
-        if not isinstance(source, (str,unicode)):
-            source = str(source)
+        if not isinstance(source, basestring):
+            source = unicode(source)
             # by converting to string here we allow objects such as other Templates
             # to be passed in
 
