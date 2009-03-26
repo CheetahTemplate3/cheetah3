@@ -49,7 +49,10 @@ class Filter(object):
         elif val is None:
             filtered = ''
         else:
-            filtered = str(val)
+            try:
+                filtered = str(val)
+            except UnicodeEncodeError:
+                filtered = unicode(val)
         return filtered
 
 RawOrEncodedUnicode = Filter
