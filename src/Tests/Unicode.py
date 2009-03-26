@@ -50,10 +50,7 @@ class JPQ_UTF8_Test3(unittest.TestCase):
         t.v = u'Unicode String with eacute é'
         t.other.v = u'Unicode String and an eacute é'
 
-        try:
-            assert unicode(t())
-        except Exception, ex:
-            self.fail('Failed to properly execute the template, %s' % ex)
+        assert unicode(t())
 
 class JPQ_UTF8_Test4(unittest.TestCase):
     def runTest(self):
@@ -70,10 +67,7 @@ class JPQ_UTF8_Test5(unittest.TestCase):
 
         t.v = u'Unicode String'
 
-        try:
-            print t()
-        except Exception, ex:
-            self.fail('Failed to fill template with unicode template variables with #encoding (%s)' % ex)
+        print t()
 
 if __name__ == '__main__':
     unittest.main()
