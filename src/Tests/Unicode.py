@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf8 -*-
+# -*- encoding: utf8 -*-
 
 from Cheetah.Template import Template
 import traceback
@@ -66,8 +66,8 @@ class JPQ_UTF8_Test5(unittest.TestCase):
         Main file with |$v| and eacute in the template é""")
 
         t.v = u'Unicode String'
-
-        print t()
+        rc = t().__str__()
+        assert rc
 
 if __name__ == '__main__':
     unittest.main()
