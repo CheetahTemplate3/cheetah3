@@ -1711,11 +1711,11 @@ class ModuleCompiler(SettingsManager, GenUtils):
     def importedVarNames(self):
         return self._importedVarNames
     
-    def addImportedVarNames(self, varNames):
+    def addImportedVarNames(self, varNames, raw_statement=None):
         if not varNames:
             return 
-        if self._methodBodyChunks:
-            self.addChunk('import %s' % ', '.join(varNames))
+        if self._methodBodyChunks and raw_statement:
+            self.addChunk(raw_statement)
         else:
             self._importedVarNames.extend(varNames)
 
@@ -1841,8 +1841,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
         #@@TR 2005-01-01: there's almost certainly a cleaner way to do this!
         importVarNames = impStatement[impStatement.find('import') + len('import'):].split(',')
         importVarNames = [var.split()[-1] for var in importVarNames] # handles aliases
-        importVarNames = [var for var in importVarNames if var!='*']
-        self.addImportedVarNames(importVarNames) #used by #extend for auto-imports
+        importVarNames = [var for var in importVarNames if not var == '*']
+        self.addImportedVarNames(importVarNames, raw_statement=impStatement) #used by #extend for auto-imports
 
     def addAttribute(self, attribName, expr):
         self._getActiveClassCompiler().addAttribute(attribName + ' =' + expr)
