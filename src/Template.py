@@ -979,7 +979,8 @@ class Template(Servlet):
             mainMethNameAttr = '_mainCheetahMethod_for_'+concreteTemplateClass.__name__
             mainMethName = getattr(concreteTemplateClass,mainMethNameAttr, None)
             if mainMethName:
-                def __str__(self): return getattr(self, mainMethName)()
+                def __str__(self): 
+                    return getattr(self, mainMethName)()
             elif (hasattr(concreteTemplateClass, 'respond')
                   and concreteTemplateClass.respond!=Servlet.respond):
                 def __str__(self): return self.respond()
