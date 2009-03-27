@@ -19,7 +19,7 @@ class JBQ_UTF8_Test1(unittest.TestCase):
         t.v = u'Unicode String'
         t.other.v = u'Unicode String'
 
-        assert t()
+        assert unicode(t())
 
 class JBQ_UTF8_Test2(unittest.TestCase):
     def runTest(self):
@@ -35,7 +35,6 @@ class JBQ_UTF8_Test2(unittest.TestCase):
         t.other.v = u'Unicode String'
 
         assert unicode(t())
-        assert t().__str__()
 
 
 class JBQ_UTF8_Test3(unittest.TestCase):
@@ -55,11 +54,12 @@ class JBQ_UTF8_Test3(unittest.TestCase):
 
 class JBQ_UTF8_Test4(unittest.TestCase):
     def runTest(self):
-        t = Template.compile(source="""Main file with |$v| and eacute in the template é""")
+        t = Template.compile(source="""#encoding utf-8
+        Main file with |$v| and eacute in the template é""")
 
         t.v = 'Unicode String'
 
-        assert t()
+        assert unicode(t())
 
 class JBQ_UTF8_Test5(unittest.TestCase):
     def runTest(self):
@@ -67,8 +67,8 @@ class JBQ_UTF8_Test5(unittest.TestCase):
         Main file with |$v| and eacute in the template é""")
 
         t.v = u'Unicode String'
-        rc = t().__str__()
-        assert rc
+
+        assert unicode(t())
 
 def loadModule(moduleName, path=None):
     if path:
@@ -95,7 +95,13 @@ class JBQ_UTF8_Test6(unittest.TestCase):
 
         t.v = u'Unicode String'
 
-        assert t()
+        assert unicode(t())
+
+class JBQ_UTF8_Test7(unittest.TestCase):
+    def runTest(self):
+        source = """#encoding utf-8
+        #set $someUnicodeString = u"Bébé"
+        Main file with |$v| and eacute in the template é"""
 
         sourcefile = tempfile.mktemp()
         f = open("%s.tmpl" % sourcefile, "w")
@@ -105,8 +111,10 @@ class JBQ_UTF8_Test6(unittest.TestCase):
         cw.main(["cheetah", "compile", "--nobackup", sourcefile])
         modname = os.path.basename(sourcefile)
         mod = loadModule(modname, ["/tmp"])
-        t = eval("mod.%s()" % modname)
+        t = eval("mod.%s" % modname)
         t.v = u'Unicode String'
+
+        assert unicode(t())
 
 if __name__ == '__main__':
     unittest.main()
