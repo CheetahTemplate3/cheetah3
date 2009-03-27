@@ -41,6 +41,31 @@ class GetAttrTest(unittest.TestCase):
         self.failUnlessRaises(GetAttrException, template.raiseme)
 
 
+class InlineFromImportTest(unittest.TestCase):
+    '''
+        Verify that a bug introduced in v2.1.0 where an inline:
+            #from module import class
+        would result in the following code being generated:
+            improt class
+    '''
+    def runTest(self):
+        template = '''
+            #def myfunction()
+                #if True
+                    #from os import path
+                    #return 17
+                    Hello!
+                #end if
+            #end def
+        '''
+        template = Cheetah.Template.Template.compile(template, compilerSettings={}, keepRefToGeneratedCode=True)
+        template = template(searchList=[{}])
+
+        assert template, 'We should have a valid template object by now'
+
+        rc = template.myfunction()
+        assert rc == 17, (template, 'Didn\'t get a proper return value')
+
 
 if __name__ == '__main__':
     unittest.main()
