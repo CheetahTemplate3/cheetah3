@@ -5,6 +5,9 @@ release
 2.1.1 (not yet released)
   - Support __eq__() and __ne__() the way you might expect in src/Tools/RecursiveNull (patch suggested by Peter Warasin <peter@endian.com>)
 
+2.1.0.1 (March 27, 2009)
+  - Fix inline import issue introduced in v2.1.0
+
 2.1.0 (March 16, 2009)
   - Quiet DeprecationWarnings being printed to stderr when using Cheetah on Python 2.6 and up. Patch suggested by Satoru SATOH <satoru.satoh@gmail.com>
   - Apply patch to support parallel compilation of templates courtesy of Evan Klitzke <evan@eklitzke.org>
