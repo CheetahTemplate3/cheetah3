@@ -744,12 +744,8 @@ class Template(Servlet):
 
                     __file__ = os.path.join(cacheDirForModuleFiles, __file__)
                     # @@TR: might want to assert that it doesn't already exist
-                    try:
-                        open(__file__, 'w').write(generatedModuleCode)
-                        # @@TR: should probably restrict the perms, etc.
-                    except OSError:
-                        # @@ TR: should this optionally raise?
-                        traceback.print_exc(file=sys.stderr)
+                    open(__file__, 'w').write(generatedModuleCode)
+                    # @@TR: should probably restrict the perms, etc.
 
                 mod = new.module(str(uniqueModuleName))
                 if moduleGlobals:
@@ -771,7 +767,6 @@ class Template(Servlet):
                         parseError = genParserErrorFromPythonException(
                             source, file, generatedModuleCode, exception=e)
                     except:
-                        traceback.print_exc()
                         updateLinecache(__file__, generatedModuleCode)
                         e.generatedModuleCode = generatedModuleCode
                         raise e
