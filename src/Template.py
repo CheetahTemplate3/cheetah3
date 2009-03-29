@@ -71,6 +71,11 @@ from Cheetah.Utils.WebInputMixin import _Converter, _lookup, NonNumericInputErro
 
 from Cheetah.Unspecified import Unspecified
 
+# Decide whether to use the file modification time in file's cache key 
+__checkFileMtime = True
+def checkFileMtime(value):
+    globals()['__checkFileMtime'] = value
+
 class Error(Exception):  pass
 class PreprocessError(Error): pass
 
@@ -690,7 +695,9 @@ class Template(Servlet):
 
             fileHash = None
             if file:
-                fileHash = str(hash(file))+str(os.path.getmtime(file))
+                fileHash = str(hash(file))
+                if globals()['__checkFileMtime']:
+                    fileHash += str(os.path.getmtime(file))
                 
             try:
                 # @@TR: find some way to create a cacheHash that is consistent
