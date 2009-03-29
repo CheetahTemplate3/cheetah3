@@ -11,8 +11,6 @@ Cheetah Community Edition v2.1.1
 ========================
 - Move Cheetah off of the optik parser to optparse
 - "cheetah compile --shbang '#!/usr/bin/python2.6' "
-- Add option "--namemapper=strict" to compilation to optionally disable 
-  "auto-calling".
 - Correct Unicode test failures in src/Tests/Unicode.py
 
 
