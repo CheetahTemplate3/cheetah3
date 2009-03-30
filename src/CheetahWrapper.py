@@ -18,11 +18,11 @@ __revision__ = "$Revision: 1.26 $"[11:-2]
 
 import getopt, glob, os, pprint, re, shutil, sys
 import cPickle as pickle
+from optparse import OptionParser
 
 from Cheetah.Version import Version
 from Cheetah.Template import Template, DEFAULT_COMPILER_SETTINGS
 from Cheetah.Utils.Misc import mkdirsWithPyInitFiles
-from Cheetah.Utils.optik import OptionParser
 
 optionDashesRE = re.compile(  R"^-{1,2}"  )
 moduleNameRE = re.compile(  R"^[a-zA-Z_][a-zA-Z_0-9]*$"  )
@@ -54,7 +54,7 @@ class Bundle:
 
 
 class MyOptionParser(OptionParser):
-    standard_option_list = [] # We use commands for Optik's standard options.
+    standard_option_list = [] 
 
     def error(self, msg):
         """Print our usage+error page."""
@@ -108,36 +108,10 @@ If FILES is a single "-", read standard input and write standard output.
 Run "cheetah options" for the list of valid options.
 """
 
-HELP_PAGE2 = """\
-OPTIONS FOR "compile" AND "fill":
----------------------------------
-  --idir DIR, --odir DIR : input/output directories (default: current dir)
-  --iext EXT, --oext EXT : input/output filename extensions
-    (default for compile: tmpl/py,  fill: tmpl/html)
-  -R                 : recurse subdirectories looking for input files
-  --debug            : print lots of diagnostic output to standard error
-  --env              : put the environment in the searchList
-  --flat             : no destination subdirectories
-  --nobackup         : don't make backups
-  --pickle FILE      : unpickle FILE and put that object in the searchList
-  --stdout, -p       : output to standard output (pipe)
-  --settings         : a string representing the compiler settings to use
-                       e.g. --settings='useNameMapper=False,useFilters=False'
-                       This string is eval'd in Python so it should contain
-                       valid Python syntax.
-  --templateAPIClass : a string representing a subclass of
-                       Cheetah.Template:Template to use for compilation
-
-  --parallel         : compile or fill templates in parallel, e.g. 
-                       --parallel 4
-
-Run "cheetah help" for the main help screen.
-"""
-
 ##################################################
 ## CheetahWrapper CLASS
 
-class CheetahWrapper:
+class CheetahWrapper(object):
     MAKE_BACKUPS = True
     BACKUP_SUFFIX = ".bak"
     _templateClass = None
@@ -150,6 +124,7 @@ class CheetahWrapper:
         self.pathArgs = None
         self.sourceFiles = []
         self.searchList = []
+        self.parser = None
 
     ##################################################
     ## MAIN ROUTINE
@@ -192,24 +167,24 @@ class CheetahWrapper:
         C, D, W = self.chatter, self.debug, self.warn
         self.isCompile = isCompile = self.command[0] == 'c'
         defaultOext = isCompile and ".py" or ".html"
-        parser = MyOptionParser()
-        pao = parser.add_option
-        pao("--idir", action="store", dest="idir", default="")
-        pao("--odir", action="store", dest="odir", default="")
-        pao("--iext", action="store", dest="iext", default=".tmpl")
-        pao("--oext", action="store", dest="oext", default=defaultOext)
-        pao("-R", action="store_true", dest="recurse", default=False)
-        pao("--stdout", "-p", action="store_true", dest="stdout", default=False)
-        pao("--debug", action="store_true", dest="debug", default=False)
-        pao("--env", action="store_true", dest="env", default=False)
-        pao("--pickle", action="store", dest="pickle", default="")
-        pao("--flat", action="store_true", dest="flat", default=False)
-        pao("--nobackup", action="store_true", dest="nobackup", default=False)
-        pao("--settings", action="store", dest="compilerSettingsString", default=None)
-        pao("--templateAPIClass", action="store", dest="templateClassName", default=None)
-        pao("--parallel", action="store", type="int", dest="parallel", default=1)
+        self.parser = MyOptionParser()
+        pao = self.parser.add_option
+        pao("--idir", action="store", dest="idir", default='', help='Input directory (defaults to current directory)')
+        pao("--odir", action="store", dest="odir", default="", help='Output directory (defaults to current directory)')
+        pao("--iext", action="store", dest="iext", default=".tmpl", help='File input extension (defaults: compile: .tmpl, fill: .tmpl)')
+        pao("--oext", action="store", dest="oext", default=defaultOext, help='File output extension (defaults: compile: .py, fill: .html)')
+        pao("-R", action="store_true", dest="recurse", default=False, help='Recurse through subdirectories looking for input files')
+        pao("--stdout", "-p", action="store_true", dest="stdout", default=False, help='Verbosely print informational messages to stdout')
+        pao("--debug", action="store_true", dest="debug", default=False, help='Print diagnostic/debug information to stderr')
+        pao("--env", action="store_true", dest="env", default=False, help='Pass the environment into the search list')
+        pao("--pickle", action="store", dest="pickle", default="", help='Unpickle FILE and pass it through in the search list')
+        pao("--flat", action="store_true", dest="flat", default=False, help='Do not build destination subdirectories')
+        pao("--nobackup", action="store_true", dest="nobackup", default=False, help='Do not make backup files when generating new ones')
+        pao("--settings", action="store", dest="compilerSettingsString", default=None, help='String of compiler settings to pass through, e.g. --settings="useNameMapper=False,useFilters=False"')
+        pao("--templateAPIClass", action="store", dest="templateClassName", default=None, help='Name of a subclass of Cheetah.Template.Template to use for compilation, e.g. MyTemplateClass')
+        pao("--parallel", action="store", type="int", dest="parallel", default=1, help='Compile/fill templates in parallel, e.g. --parallel=4')
 
-        self.opts, self.pathArgs = opts, files = parser.parse_args(args)
+        self.opts, self.pathArgs = opts, files = self.parser.parse_args(args)
         D("""\
 cheetah compile %s
 Options are
@@ -252,7 +227,7 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
         usage(HELP_PAGE1, "", sys.stdout)
 
     def options(self):
-        usage(HELP_PAGE2, "", sys.stdout)
+        return self.parser.print_help()
 
     def test(self):
         # @@MO: Ugly kludge.
