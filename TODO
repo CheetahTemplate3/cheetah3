@@ -1,3 +1,6 @@
+Please see http://bugs.communitycheetah.org for future feature requests/bugs/TODO
+
+
 Cheetah TODO list
 -----------------
 * If you are working on a task please put your initials at the end of the
@@ -6,12 +9,6 @@ Cheetah TODO list
 * Unresolved bugs are listed in the BUGS file.  Resolved bugs are be listed
   in the CHANGES file if the bug is considered significant enough and it
   affected a released version of Cheetah.
-
-Cheetah Community Edition v2.1.1
-========================
-- Move Cheetah off of the optik parser to optparse
-- "cheetah compile --shbang '#!/usr/bin/python2.6' "
-- Correct Unicode test failures in src/Tests/Unicode.py
 
 
 
