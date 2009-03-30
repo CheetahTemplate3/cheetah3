@@ -53,18 +53,6 @@ class Bundle:
         return "<Bundle %r>" % self.__dict__
 
 
-class MyOptionParser(OptionParser):
-    standard_option_list = [] 
-
-    def error(self, msg):
-        """Print our usage+error page."""
-        usage(HELP_PAGE2, msg)
-
-    def print_usage(self, file=None):
-        """Our usage+error page already has this."""
-        pass
-    
-
 ##################################################
 ## USAGE FUNCTION & MESSAGES
 
@@ -167,7 +155,7 @@ class CheetahWrapper(object):
         C, D, W = self.chatter, self.debug, self.warn
         self.isCompile = isCompile = self.command[0] == 'c'
         defaultOext = isCompile and ".py" or ".html"
-        self.parser = MyOptionParser()
+        self.parser = OptionParser()
         pao = self.parser.add_option
         pao("--idir", action="store", dest="idir", default='', help='Input directory (defaults to current directory)')
         pao("--odir", action="store", dest="odir", default="", help='Output directory (defaults to current directory)')
@@ -183,6 +171,7 @@ class CheetahWrapper(object):
         pao("--settings", action="store", dest="compilerSettingsString", default=None, help='String of compiler settings to pass through, e.g. --settings="useNameMapper=False,useFilters=False"')
         pao("--templateAPIClass", action="store", dest="templateClassName", default=None, help='Name of a subclass of Cheetah.Template.Template to use for compilation, e.g. MyTemplateClass')
         pao("--parallel", action="store", type="int", dest="parallel", default=1, help='Compile/fill templates in parallel, e.g. --parallel=4')
+        pao('--shbang', dest='shbang', default='#!/usr/bin/env python', help='Specify the shbang to place at the top of compiled templates, e.g. --shbang="#!/usr/bin/python2.6"')
 
         self.opts, self.pathArgs = opts, files = self.parser.parse_args(args)
         D("""\
@@ -579,6 +568,7 @@ be named according to the same rules as Python modules.""" % tup)
             pysrc = TemplateClass.compile(file=src, returnAClass=False,
                                           moduleName=basename,
                                           className=basename,
+                                          commandlineopts=self.opts,
                                           compilerSettings=compilerSettings)
             output = pysrc
         else:

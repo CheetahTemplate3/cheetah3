@@ -344,7 +344,7 @@ class Template(Servlet):
                 preprocessors=Unspecified,
                 cacheModuleFilesForTracebacks=Unspecified,
                 cacheDirForModuleFiles=Unspecified,
-                
+                commandlineopts=None,
                 keepRefToGeneratedCode=Unspecified,                
                 ):
         
@@ -622,7 +622,6 @@ class Template(Servlet):
             vt(compilerSettings, 'compilerSettings', [D], 'dictionary')
 
             compilerClass = valOrDefault(compilerClass, klass._getCompilerClass(source, file))
-
             preprocessors = valOrDefault(preprocessors, klass._CHEETAH_preprocessors)
 
             keepRefToGeneratedCode = valOrDefault(
@@ -730,6 +729,8 @@ class Template(Servlet):
                                      baseclassName=baseclassName,
                                      mainMethodName=mainMethodName,
                                      settings=(compilerSettings or {}))
+            if commandlineopts:
+                compiler.setShBang(commandlineopts.shbang)
             compiler.compile()
             generatedModuleCode = compiler.getModuleCode()
 
