@@ -11,6 +11,7 @@ release
   - Correct unicode issue when calling/embedding unicode templates inside of other templtes (testcase Tests.Unicode.JPQ_UTF8_Test3. reported by Jean-Baptiste Quenot <jbq@caraldi.com>)
   - Added --shbang option (e.g. "cheetah compile --shbang '#!/usr/bin/python2.6' ")
   - Removed dependency on optik OptionParser in favor of builtin Python optparse module
+  - Convert unicode compiled template to an utf8 char buffer when writing to a file (Jean-Baptiste Quenot <jbq@caraldi.com>)
 
 2.1.0.1 (March 27, 2009)
   - Fix inline import issue introduced in v2.1.0
