@@ -2,6 +2,10 @@ Please initial your changes (there's a key at bottom) and add a date for each
 release
 ================================================================================
 
+2.2.0 (not yet released)
+  - Switch all internal representations of template code to unicode objects instead of str() objects
+  - Convert unicode compiled template to an utf8 char buffer when writing to a file (Jean-Baptiste Quenot <jbq@caraldi.com>)
+
 2.1.1 (not yet released)
   - Support __eq__() and __ne__() the way you might expect in src/Tools/RecursiveNull (patch suggested by Peter Warasin <peter@endian.com>)
   - Applied patch to avoid hitting the filesystem to get the file modification time everytime a #include directive is processed (Jean-Baptiste Quenot <jbq@caraldi.com>)
