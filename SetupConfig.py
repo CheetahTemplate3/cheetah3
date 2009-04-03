@@ -1,10 +1,10 @@
 #-------Main Package Settings-----------#
-name = "Cheetah"
+name = "Cheetah Community Edition"
 from src.Version import Version as version
-maintainer = "Tavis Rudd"
+maintainer = "R. Tyler Ballance"
 author = "Tavis Rudd"
 author_email = "cheetahtemplate-discuss@lists.sf.net"
-url = "http://www.CheetahTemplate.org/"
+url = "http://www.communitycheetah.org/"
 packages = ['Cheetah',
             'Cheetah.Macros',            
             'Cheetah.Templates',
@@ -64,7 +64,7 @@ used to generate C++ game code, Java, sql, form emails and even Python code.
 Documentation
 ================================================================================
 For a high-level introduction to Cheetah please refer to the User\'s Guide
-at http://cheetahtemplate.org/learn.html
+at http://www.communitycheetah.org/learn.html
 
 Mailing list
 ================================================================================
@@ -73,7 +73,7 @@ Subscribe at http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss
 
 Credits
 ================================================================================
-http://cheetahtemplate.org/credits.html
+http://www.communitycheetah.org/credits.html
 
 Praise
 ================================================================================
@@ -109,12 +109,6 @@ lead developer of TurboGears.
 
 Recent Changes
 ================================================================================
-See http://cheetahtemplate.org/docs/CHANGES for full details.
+See http://www.communitycheetah.org/docs/CHANGES for full details
 
 '''
-try:
-    recentChanges = open('CHANGES').read().split('\n1.0')[0]
-    long_description += recentChanges
-    del recentChanges
-except:
-    pass
