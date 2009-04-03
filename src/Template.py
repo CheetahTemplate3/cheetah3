@@ -719,6 +719,7 @@ class Template(Servlet):
             except:
                 #@@TR: should add some logging to this
                 pass
+        outputEncoding = 'ascii'
         if useCache and cacheHash and cacheHash in klass._CHEETAH_compileCache:
             cacheItem = klass._CHEETAH_compileCache[cacheHash]
             generatedModuleCode = cacheItem.code
@@ -733,9 +734,16 @@ class Template(Servlet):
                 compiler.setShBang(commandlineopts.shbang)
             compiler.compile()
             generatedModuleCode = compiler.getModuleCode()
+            outputEncoding = compiler.getModuleEncoding()
 
         if not returnAClass:
-            return generatedModuleCode
+            # This is a bit of a hackish solution to make sure we're setting the proper 
+            # encoding on generated code that is destined to be written to a file
+            if not outputEncoding == 'ascii':
+                generatedModuleCode = generatedModuleCode.split('\n')
+                generatedModuleCode.insert(1, '# -*- coding: %s -*-' % outputEncoding)
+                generatedModuleCode = '\n'.join(generatedModuleCode)
+            return generatedModuleCode.encode(outputEncoding)
         else:
             if cacheItem:
                 cacheItem.lastCheckoutTime = time.time()
@@ -768,7 +776,7 @@ class Template(Servlet):
                     setattr(mod, baseclassName, baseclassValue)
                 ##
                 try:
-                    co = compile(generatedModuleCode, __file__, 'exec')
+                    co = compile(generatedModuleCode.encode(outputEncoding), __file__, 'exec')
                     exec co in mod.__dict__
                 except SyntaxError, e:
                     try:

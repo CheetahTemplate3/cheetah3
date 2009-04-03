@@ -1813,10 +1813,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self._moduleShBang = shBang
     
     def setModuleEncoding(self, encoding):
-        #print ('setModuleEncoding', locals())
-        return
         self._moduleEncoding = encoding
-        self._moduleEncodingStr = '# -*- coding: %s -*-' %encoding
 
     def getModuleEncoding(self):
         return self._moduleEncoding
