@@ -587,7 +587,7 @@ be named according to the same rules as Python modules.""" % tup)
             sys.stdout.write(output)
         else:
             f = open(dst, 'w')
-            f.write(output.encode('utf8'))
+            f.write(output)
             f.close()
             
 
