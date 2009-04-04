@@ -1,16 +1,12 @@
-Please see http://bugs.communitycheetah.org for future feature requests/bugs/TODO
 
 
-Cheetah TODO list
------------------
-* If you are working on a task please put your initials at the end of the
-  description
-* When a task is completed please remember to note it in the CHANGES file
-* Unresolved bugs are listed in the BUGS file.  Resolved bugs are be listed
-  in the CHANGES file if the bug is considered significant enough and it
-  affected a released version of Cheetah.
+NOTE: Please see http://bugs.communitycheetah.org
+	for future feature requests/bugs/TODO
 
 
+===============================================================================
+===============================================================================
+===============================================================================
 
 Desired for Cheetah 2.0
 =======================
