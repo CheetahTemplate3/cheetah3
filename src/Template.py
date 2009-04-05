@@ -76,8 +76,10 @@ __checkFileMtime = True
 def checkFileMtime(value):
     globals()['__checkFileMtime'] = value
 
-class Error(Exception):  pass
-class PreprocessError(Error): pass
+class Error(Exception):
+    pass
+class PreprocessError(Error):
+    pass
 
 def hashList(l):
     hashedList = []
@@ -986,7 +988,8 @@ class Template(Servlet):
                     return getattr(self, mainMethName)()
             elif (hasattr(concreteTemplateClass, 'respond')
                   and concreteTemplateClass.respond!=Servlet.respond):
-                def __str__(self): return self.respond()
+                def __str__(self):
+                    return self.respond()
             else:
                 def __str__(self):
                     if hasattr(self, mainMethNameAttr):

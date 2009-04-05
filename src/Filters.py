@@ -1,26 +1,24 @@
 #!/usr/bin/env python
-# $Id: Filters.py,v 1.33 2007/12/29 23:08:18 tavis_rudd Exp $
-"""Filters for the #filter directive; output filters Cheetah's $placeholders .
+'''
+    Filters for the #filter directive as well as #transform
+    
+    #filter results in output filters Cheetah's $placeholders .
+    #transform results in a filter on the entirety of the output
+'''
+import sys
+import Cheetah.contrib
+import Cheetah.Template
 
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.33 $
-Start Date: 2001/08/01
-Last Revision Date: $Date: 2007/12/29 23:08:18 $
-"""
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.33 $"[11:-2]
+# This is a bit of a hack to allow outright embedding of the markdown module
+markdown_path = '/'.join(Cheetah.contrib.__file__.split('/')[:-1])
+sys.path.append(markdown_path)
+from Cheetah.contrib import markdown
+sys.path.pop()
+
 
 # Additional entities WebSafe knows how to transform.  No need to include
 # '<', '>' or '&' since those will have been done already.
 webSafeEntities = {' ': '&nbsp;', '"': '&quot;'}
-
-class Error(Exception):
-    pass
-
-##################################################
-## BASE CLASS
 
 class Filter(object):
     """A baseclass for the Cheetah Filters."""
@@ -57,8 +55,6 @@ class Filter(object):
 
 RawOrEncodedUnicode = Filter
 
-##################################################
-## ENHANCED FILTERS
 
 class EncodeUnicode(Filter):
     def filter(self, val,
@@ -76,12 +72,33 @@ class EncodeUnicode(Filter):
         >>> print t
         """
         if isinstance(val, unicode):
-            filtered = val.encode(encoding)
-        elif val is None:
-            filtered = ''
-        else:
-            filtered = str(val)
-        return filtered
+            return val.encode(encoding)
+        if val is None:
+            return ''
+        return str(val)
+
+
+class Markdown(EncodeUnicode):
+    '''
+        Markdown will change regular strings to Markdown
+            (http://daringfireball.net/projects/markdown/)
+
+        Such that:
+            My Header
+            =========
+        Becaomes:
+            <h1>My Header</h1>
+
+        and so on.
+
+        Markdown is meant to be used with the #transform 
+        tag, as it's usefulness with #filter is marginal at
+        best
+    '''
+    def filter(self,  value, **kwargs):
+        encoded = super(Markdown, self).filter(value, **kwargs)
+        return markdown.markdown(rc)
+
 
 class MaxLen(Filter):
     def filter(self, val, **kw):
