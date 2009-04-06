@@ -97,7 +97,7 @@ class Markdown(EncodeUnicode):
     '''
     def filter(self,  value, **kwargs):
         encoded = super(Markdown, self).filter(value, **kwargs)
-        return markdown.markdown(rc)
+        return markdown.markdown(encoded)
 
 
 class MaxLen(Filter):

@@ -11,15 +11,18 @@ class BasicMarkdownFilterTest(unittest.TestCase):
     '''
     def test_BasicHeader(self):
         template = '''  
-#import Cheetah.Filters
-#transform Cheetah.Filters.Markdown
+#from Cheetah.Filters import Markdown
+#transform Markdown
 $foo
 
 Header
 ======
         '''
+        expected = '''<p>bar</p>
+<h1>Header</h1>'''
         template = Cheetah.Template.Template(template, searchList=[{'foo' : 'bar'}])
-        print template
+        template = str(template)
+        assert template == expected
 
 if __name__ == '__main__':
     unittest.main()

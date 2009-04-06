@@ -973,9 +973,16 @@ class MethodCompiler(GenUtils):
 
     def nextFilterRegionID(self):
         return self.nextCacheID()
+
+    def setTransform(self, transformer, isKlass):
+        self.addChunk('trans = TransformerTransaction()')
+        self.addChunk('trans._response = trans.response()')
+        self.addChunk('trans._response._filter = %s' % transformer)
+        self.addChunk('write = trans._response.write')
         
     def setFilter(self, theFilter, isKlass):
-        class FilterDetails: pass
+        class FilterDetails: 
+            pass
         filterDetails = FilterDetails()
         filterDetails.ID = ID = self.nextFilterRegionID()
         filterDetails.theFilter = theFilter
@@ -1638,7 +1645,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "from Cheetah.Version import MinCompatibleVersion as RequiredCheetahVersion",            
             "from Cheetah.Version import MinCompatibleVersionTuple as RequiredCheetahVersionTuple",
             "from Cheetah.Template import Template",
-            "from Cheetah.DummyTransaction import DummyTransaction",
+            "from Cheetah.DummyTransaction import *",
             "from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, valueFromFrameOrSearchList",
             "from Cheetah.CacheRegion import CacheRegion",
             "import Cheetah.Filters as Filters",
