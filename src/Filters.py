@@ -136,12 +136,9 @@ class CodeHighlighter(EncodeUnicode):
         formatter = formatters.HtmlFormatter(cssclass='code_highlighter')
         encoded = highlight(encoded, lexer, formatter)
         css = formatter.get_style_defs('.code_highlighter')
-        return '''<style type="text/css">
-            <!--
+        return '''<style type="text/css"><!--
                 %(css)s
-            -->
-            </style>
-            %(source)s''' % {'css' : css, 'source' : encoded}
+            --></style>%(source)s''' % {'css' : css, 'source' : encoded}
 
 
 
