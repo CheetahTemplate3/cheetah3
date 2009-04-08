@@ -24,5 +24,33 @@ Header
         template = str(template)
         assert template == expected
 
+class BasicCodeHighlighterFilterTest(unittest.TestCase):
+    '''
+        Test that our code highlighter filter works
+    '''
+    def test_Python(self):
+        template = '''  
+#from Cheetah.Filters import CodeHighlighter
+#transform CodeHighlighter
+
+def foo(self):
+    return '$foo'
+        '''
+        template = Cheetah.Template.Template(template, searchList=[{'foo' : 'bar'}])
+        template = str(template)
+        assert template, (template, 'We should have some content here...')
+
+    def test_Html(self):
+        template = '''  
+#from Cheetah.Filters import CodeHighlighter
+#transform CodeHighlighter
+
+<html><head></head><body>$foo</body></html>
+        '''
+        template = Cheetah.Template.Template(template, searchList=[{'foo' : 'bar'}])
+        template = str(template)
+        assert template, (template, 'We should have some content here...')
+
+
 if __name__ == '__main__':
     unittest.main()

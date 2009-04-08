@@ -99,12 +99,57 @@ class Markdown(EncodeUnicode):
         encoded = super(Markdown, self).filter(value, **kwargs)
         return markdown.markdown(encoded)
 
+class CodeHighlighter(EncodeUnicode):
+    '''
+        The CodeHighlighter filter depends on the "pygments" module which you can 
+        download and install from: http://pygments.org
+
+        What the CodeHighlighter assumes the string that it's receiving is source
+        code and uses pygments.lexers.guess_lexer() to try to guess which parser
+        to use when highlighting it. 
+
+        CodeHighlighter will return the HTML and CSS to render the code block, syntax 
+        highlighted, in a browser
+
+        NOTE: I had an issue installing pygments on Linux/amd64/Python 2.6 dealing with
+        importing of pygments.lexers, I was able to correct the failure by adding:
+            raise ImportError
+        to line 39 of pygments/plugin.py (since importing pkg_resources was causing issues)
+    '''
+    def filter(self, source, **kwargs):
+        encoded = super(CodeHighlighter, self).filter(source, **kwargs)
+        try:
+            from pygments import highlight
+            from pygments import lexers
+            from pygments import formatters
+        except ImportError, ex:
+            print '<%s> - Failed to import pygments! (%s)' % (self.__class__.__name__, ex)
+            print '-- You may need to install it from: http://pygments.org'
+            return encoded
+
+        lexer = None
+        try:
+            lexer = lexers.guess_lexer(source)
+        except lexers.ClassNotFound:
+            lexer = lexers.PythonLexer()
+
+        formatter = formatters.HtmlFormatter(cssclass='code_highlighter')
+        encoded = highlight(encoded, lexer, formatter)
+        css = formatter.get_style_defs('.code_highlighter')
+        return '''<style type="text/css">
+            <!--
+                %(css)s
+            -->
+            </style>
+            %(source)s''' % {'css' : css, 'source' : encoded}
+
+
 
 class MaxLen(Filter):
     def filter(self, val, **kw):
         """Replace None with '' and cut off at maxlen."""
         
-    	output = super(MaxLen, self).filter(val, **kw)
+        output = super(MaxLen, self).filter(val, **kw)
         if kw.has_key('maxlen') and len(output) > kw['maxlen']:
             return output[:kw['maxlen']]
         return output
@@ -113,7 +158,7 @@ class WebSafe(Filter):
     """Escape HTML entities in $placeholders.
     """
     def filter(self, val, **kw):
-    	s = super(WebSafe, self).filter(val, **kw)
+        s = super(WebSafe, self).filter(val, **kw)
         # These substitutions are copied from cgi.escape().
         s = s.replace("&", "&amp;") # Must be done first!
         s = s.replace("<", "&lt;")
@@ -147,7 +192,7 @@ class Strip(Filter):
     with the proposed #sed directive (which has not been ratified yet.)
     """
     def filter(self, val, **kw):
-    	s = super(Strip, self).filter(val, **kw)
+        s = super(Strip, self).filter(val, **kw)
         result = []
         start = 0   # The current line will be s[start:end].
         while 1: # Loop through each line.
@@ -170,7 +215,7 @@ class StripSqueeze(Filter):
     input is joined into one ling line with NO trailing newline.
     """
     def filter(self, val, **kw):
-    	s = super(StripSqueeze, self).filter(val, **kw)
+        s = super(StripSqueeze, self).filter(val, **kw)
         s = s.split()
         return " ".join(s)
     
