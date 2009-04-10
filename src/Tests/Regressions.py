@@ -41,14 +41,14 @@ class GetAttrTest(unittest.TestCase):
         self.failUnlessRaises(GetAttrException, template.raiseme)
 
 
-class InlineFromImportTest(unittest.TestCase):
-    '''
-        Verify that a bug introduced in v2.1.0 where an inline:
-            #from module import class
-        would result in the following code being generated:
-            improt class
-    '''
-    def runTest(self):
+class InlineImportTest(unittest.TestCase):
+    def test_FromFooImportThing(self):
+        '''
+            Verify that a bug introduced in v2.1.0 where an inline:
+                #from module import class
+            would result in the following code being generated:
+                import class
+        '''
         template = '''
             #def myfunction()
                 #if True
@@ -66,6 +66,29 @@ class InlineFromImportTest(unittest.TestCase):
         rc = template.myfunction()
         assert rc == 17, (template, 'Didn\'t get a proper return value')
 
+    def test_ImportFailModule(self):
+        template = '''
+            #try
+                #import invalidmodule
+            #except
+                #set invalidmodule = dict(FOO='BAR!')
+            #end try
+
+            $invalidmodule.FOO
+        '''
+        template = Cheetah.Template.Template.compile(template, compilerSettings={}, keepRefToGeneratedCode=True)
+        template = template(searchList=[{}])
+
+        assert template, 'We should have a valid template object by now'
+        assert str(template), 'We weren\'t able to properly generate the result from the template'
+
+    def test_ProperImportOfBadModule(self):
+        template = '''
+            #from invalid import fail
+                
+            This should totally $fail
+        '''
+        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={}, keepRefToGeneratedCode=True)
 
 if __name__ == '__main__':
     unittest.main()

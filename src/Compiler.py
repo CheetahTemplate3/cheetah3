@@ -1843,7 +1843,10 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self._specialVars[name] = contents.strip()
 
     def addImportStatement(self, impStatement):
-        self._importStatements.append(impStatement)
+        if not self._methodBodyChunks:
+            # In the case where we are importing inline in the middle of a source block
+            # we don't want to inadvertantly import the module at the top of the file either
+            self._importStatements.append(impStatement)
 
         #@@TR 2005-01-01: there's almost certainly a cleaner way to do this!
         importVarNames = impStatement[impStatement.find('import') + len('import'):].split(',')
