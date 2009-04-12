@@ -13,7 +13,8 @@
   - Added --shbang option (e.g. "cheetah compile --shbang '#!/usr/bin/python2.6' ")
   - Removed dependency on optik OptionParser in favor of builtin Python optparse module
   - Introduction of the #transform directive for whole-document filtering
-  - Introduction of Cheetah.contrib.markdown and Cheetah.Filters.Markdown for outputting a markdown processed template (meant for #transform_
+  - Introduction of Cheetah.contrib.markdown and Cheetah.Filters.Markdown for outputting a markdown processed template (meant for #transform)
+  - Cheetah.Filters.CodeHighlighter, pygments-based code highlighting filter for use with #transform
 
 2.1.0.1 (March 27, 2009)
   - Fix inline import issue introduced in v2.1.0

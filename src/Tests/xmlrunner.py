@@ -74,7 +74,7 @@ class _TestInfo(object):
         text = escape(str(error[1]))
         stream.write('\n')
         stream.write('    <%s type="%s">%s\n' \
-            % (tagname, str(error[0]), text))
+            % (tagname, issubclass(error[0], Exception) and error[0].__name__ or str(error[0]), text))
         tb_stream = StringIO()
         traceback.print_tb(error[2], None, tb_stream)
         stream.write(escape(tb_stream.getvalue()))
