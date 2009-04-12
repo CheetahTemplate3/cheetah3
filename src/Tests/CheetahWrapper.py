@@ -29,8 +29,8 @@ import commands, os, shutil, sys, tempfile
 import unittest_local_copy as unittest
 
 import re                                     # Used by listTests.
+from optparse import OptionParser
 from Cheetah.CheetahWrapper import CheetahWrapper  # Used by NoBackup.
-from Cheetah.Utils.optik import OptionParser  # Used by main.
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
