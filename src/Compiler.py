@@ -973,9 +973,16 @@ class MethodCompiler(GenUtils):
 
     def nextFilterRegionID(self):
         return self.nextCacheID()
+
+    def setTransform(self, transformer, isKlass):
+        self.addChunk('trans = TransformerTransaction()')
+        self.addChunk('trans._response = trans.response()')
+        self.addChunk('trans._response._filter = %s' % transformer)
+        self.addChunk('write = trans._response.write')
         
     def setFilter(self, theFilter, isKlass):
-        class FilterDetails: pass
+        class FilterDetails: 
+            pass
         filterDetails = FilterDetails()
         filterDetails.ID = ID = self.nextFilterRegionID()
         filterDetails.theFilter = theFilter
@@ -1644,7 +1651,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "from Cheetah.Version import MinCompatibleVersion as RequiredCheetahVersion",            
             "from Cheetah.Version import MinCompatibleVersionTuple as RequiredCheetahVersionTuple",
             "from Cheetah.Template import Template",
-            "from Cheetah.DummyTransaction import DummyTransaction",
+            "from Cheetah.DummyTransaction import *",
             "from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, valueFromFrameOrSearchList",
             "from Cheetah.CacheRegion import CacheRegion",
             "import Cheetah.Filters as Filters",
@@ -1841,7 +1848,10 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self._specialVars[name] = contents.strip()
 
     def addImportStatement(self, impStatement):
-        self._importStatements.append(impStatement)
+        if not self._methodBodyChunks:
+            # In the case where we are importing inline in the middle of a source block
+            # we don't want to inadvertantly import the module at the top of the file either
+            self._importStatements.append(impStatement)
 
         #@@TR 2005-01-01: there's almost certainly a cleaner way to do this!
         importVarNames = impStatement[impStatement.find('import') + len('import'):].split(',')

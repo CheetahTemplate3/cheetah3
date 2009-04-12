@@ -15,6 +15,8 @@ Last Revision Date: $Date: 2005/11/13 01:12:13 $
 __author__ = "Tavis Rudd <tavis@damnsimple.com>"
 __revision__ = "$Revision: 1.13 $"[11:-2]
 
+import types
+
 def flush():
     pass
 
@@ -56,3 +58,41 @@ class DummyTransaction:
         def response(resp=DummyResponse()):
             return resp
         self.response = response
+
+class TransformerResponse(object):
+    def __init__(self, *args, **kwargs):
+        self._output = []
+        self._filter = None
+
+    def write(self, value):
+        self._output.append(value)
+
+    def flush(self):
+        pass
+
+    def writeln(self, line):
+        self.write(line)
+        self.write('\n')
+
+    def writelines(self, *lines):
+        [self.writeln(line) for line in lines]
+
+    def getvalue(self, **kwargs):
+        output = kwargs.get('outputChunks') or self._output
+        rc = ''.join(output)
+        if self._filter:
+            _filter = self._filter
+            if isinstance(_filter, types.TypeType):
+                _filter = _filter()
+            return _filter.filter(rc)
+        return rc
+
+
+class TransformerTransaction(object):
+    def __init__(self, *args, **kwargs):
+        self._response = None
+    def response(self):
+        if self._response:
+            return self._response
+        return TransformerResponse()
+

@@ -11,6 +11,8 @@ packages = ['Cheetah',
             'Cheetah.Tests',
             'Cheetah.Tools',
             'Cheetah.Utils',
+            'Cheetah.contrib',
+            'Cheetah.contrib.markdown',
             ]
 classifiers = [line.strip() for line in '''\
   #Development Status :: 4 - Beta

@@ -158,8 +158,9 @@ class XMLTestRunner(object):
 
     """
 
-    def __init__(self, stream=None):
-        self._stream = stream
+    def __init__(self, *args, **kwargs):
+        self._stream = kwargs.get('stream')
+        self._filename = kwargs.get('filename')
         self._path = "."
 
     def run(self, test):
@@ -168,6 +169,8 @@ class XMLTestRunner(object):
         classname = class_.__module__ + "." + class_.__name__
         if self._stream == None:
             filename = "TEST-%s.xml" % classname
+            if self._filename:
+                filename = self._filename
             stream = file(os.path.join(self._path, filename), "w")
             stream.write('<?xml version="1.0" encoding="utf-8"?>\n')
         else:
