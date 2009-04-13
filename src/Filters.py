@@ -9,13 +9,6 @@ import sys
 import Cheetah.contrib
 import Cheetah.Template
 
-# This is a bit of a hack to allow outright embedding of the markdown module
-markdown_path = '/'.join(Cheetah.contrib.__file__.split('/')[:-1])
-sys.path.append(markdown_path)
-from Cheetah.contrib import markdown
-sys.path.pop()
-
-
 # Additional entities WebSafe knows how to transform.  No need to include
 # '<', '>' or '&' since those will have been done already.
 webSafeEntities = {' ': '&nbsp;', '"': '&quot;'}
@@ -96,6 +89,18 @@ class Markdown(EncodeUnicode):
         best
     '''
     def filter(self,  value, **kwargs):
+        # This is a bit of a hack to allow outright embedding of the markdown module
+        try:
+            markdown_path = '/'.join(Cheetah.contrib.__file__.split('/')[:-1])
+            sys.path.append(markdown_path)
+            from Cheetah.contrib import markdown
+            sys.path.pop()
+        except:
+            print '>>> Exception raised importing the "markdown" module'
+            print '>>> Are you sure you have the ElementTree module installed?'
+            print '          http://effbot.org/downloads/#elementtree'
+            raise
+
         encoded = super(Markdown, self).filter(value, **kwargs)
         return markdown.markdown(encoded)
 
