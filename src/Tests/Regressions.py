@@ -2,6 +2,7 @@
 
 import Cheetah.NameMapper 
 import Cheetah.Template
+import pdb
 
 import unittest_local_copy as unittest # This is just stupid
 
@@ -89,6 +90,15 @@ class InlineImportTest(unittest.TestCase):
             This should totally $fail
         '''
         self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={}, keepRefToGeneratedCode=True)
+
+    def test_AutoImporting(self):
+        template = '''
+            #extends FakeyTemplate
+
+            Boo!
+        '''
+        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template)
+
 
 if __name__ == '__main__':
     unittest.main()
