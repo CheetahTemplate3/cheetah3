@@ -7,7 +7,6 @@
 '''
 import sys
 import Cheetah.contrib
-import Cheetah.Template
 
 # Additional entities WebSafe knows how to transform.  No need to include
 # '<', '>' or '&' since those will have been done already.
