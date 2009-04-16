@@ -99,6 +99,17 @@ class InlineImportTest(unittest.TestCase):
         '''
         self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template)
 
+    def test_GarbageBeforeImport(self):
+        template = '''
+###
+### I like comments before import
+###
+#extends Foo
+Bar
+'''
+        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template)
+
+
 
 if __name__ == '__main__':
     unittest.main()
