@@ -63,6 +63,7 @@ DEFAULT_COMPILER_SETTINGS = {
     'alwaysFilterNone':True, # filter out None, before the filter is called
     'useFilters':True, # use str instead if =False
     'includeRawExprInFilterArgs':True,
+    'useLegacyImportMode' : True,
     
     #'lookForTransactionAttr':False,
     'autoAssignDummyTransactionToSelf':False,
@@ -1719,9 +1720,10 @@ class ModuleCompiler(SettingsManager, GenUtils):
         return self._importedVarNames
     
     def addImportedVarNames(self, varNames, raw_statement=None):
+        settings = self.settings()
         if not varNames:
             return 
-        if self._methodBodyChunks and raw_statement:
+        if self._methodBodyChunks and raw_statement and not settings.get('useLegacyImportMode'):
             self.addChunk(raw_statement)
         else:
             self._importedVarNames.extend(varNames)
@@ -1843,7 +1845,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self._specialVars[name] = contents.strip()
 
     def addImportStatement(self, impStatement):
-        if not self._methodBodyChunks:
+        settings = self.settings()
+        if not self._methodBodyChunks or settings.get('useLegacyImportMode'):
             # In the case where we are importing inline in the middle of a source block
             # we don't want to inadvertantly import the module at the top of the file either
             self._importStatements.append(impStatement)

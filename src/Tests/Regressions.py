@@ -59,7 +59,7 @@ class InlineImportTest(unittest.TestCase):
                 #end if
             #end def
         '''
-        template = Cheetah.Template.Template.compile(template, compilerSettings={}, keepRefToGeneratedCode=True)
+        template = Cheetah.Template.Template.compile(template, compilerSettings={'useLegacyImportMode' : False}, keepRefToGeneratedCode=True)
         template = template(searchList=[{}])
 
         assert template, 'We should have a valid template object by now'
@@ -77,7 +77,7 @@ class InlineImportTest(unittest.TestCase):
 
             $invalidmodule.FOO
         '''
-        template = Cheetah.Template.Template.compile(template, compilerSettings={}, keepRefToGeneratedCode=True)
+        template = Cheetah.Template.Template.compile(template, compilerSettings={'useLegacyImportMode' : False}, keepRefToGeneratedCode=True)
         template = template(searchList=[{}])
 
         assert template, 'We should have a valid template object by now'
@@ -89,7 +89,7 @@ class InlineImportTest(unittest.TestCase):
                 
             This should totally $fail
         '''
-        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={}, keepRefToGeneratedCode=True)
+        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={'useLegacyImportMode' : False}, keepRefToGeneratedCode=True)
 
     def test_AutoImporting(self):
         template = '''
@@ -99,7 +99,7 @@ class InlineImportTest(unittest.TestCase):
         '''
         self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template)
 
-    def test_GarbageBeforeImport(self):
+    def test_StuffBeforeImport_Legacy(self):
         template = '''
 ###
 ### I like comments before import
@@ -107,7 +107,7 @@ class InlineImportTest(unittest.TestCase):
 #extends Foo
 Bar
 '''
-        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template)
+        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={'useLegacyImportMode' : True}, keepRefToGeneratedCode=True)
 
 
 
