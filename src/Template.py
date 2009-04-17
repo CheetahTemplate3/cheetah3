@@ -71,8 +71,15 @@ from Cheetah.Utils.WebInputMixin import _Converter, _lookup, NonNumericInputErro
 
 from Cheetah.Unspecified import Unspecified
 
-class Error(Exception):  pass
-class PreprocessError(Error): pass
+# Decide whether to use the file modification time in file's cache key 
+__checkFileMtime = True
+def checkFileMtime(value):
+    globals()['__checkFileMtime'] = value
+
+class Error(Exception):
+    pass
+class PreprocessError(Error):
+    pass
 
 def hashList(l):
     hashedList = []
@@ -339,7 +346,7 @@ class Template(Servlet):
                 preprocessors=Unspecified,
                 cacheModuleFilesForTracebacks=Unspecified,
                 cacheDirForModuleFiles=Unspecified,
-                
+                commandlineopts=None,
                 keepRefToGeneratedCode=Unspecified,                
                 ):
         
@@ -617,7 +624,6 @@ class Template(Servlet):
             vt(compilerSettings, 'compilerSettings', [D], 'dictionary')
 
             compilerClass = valOrDefault(compilerClass, klass._getCompilerClass(source, file))
-
             preprocessors = valOrDefault(preprocessors, klass._CHEETAH_preprocessors)
 
             keepRefToGeneratedCode = valOrDefault(
@@ -679,7 +685,7 @@ class Template(Servlet):
 
         cacheHash = None
         cacheItem = None
-        if source or isinstance(file, (str, unicode)):                
+        if source or isinstance(file, basestring):
             compilerSettingsHash = None
             if compilerSettings:
                 compilerSettingsHash = hashDict(compilerSettings)
@@ -690,7 +696,9 @@ class Template(Servlet):
 
             fileHash = None
             if file:
-                fileHash = str(hash(file))+str(os.path.getmtime(file))
+                fileHash = str(hash(file))
+                if globals()['__checkFileMtime']:
+                    fileHash += str(os.path.getmtime(file))
                 
             try:
                 # @@TR: find some way to create a cacheHash that is consistent
@@ -723,6 +731,8 @@ class Template(Servlet):
                                      baseclassName=baseclassName,
                                      mainMethodName=mainMethodName,
                                      settings=(compilerSettings or {}))
+            if commandlineopts:
+                compiler.setShBang(commandlineopts.shbang)
             compiler.compile()
             generatedModuleCode = compiler.getModuleCode()
 
@@ -744,12 +754,8 @@ class Template(Servlet):
 
                     __file__ = os.path.join(cacheDirForModuleFiles, __file__)
                     # @@TR: might want to assert that it doesn't already exist
-                    try:
-                        open(__file__, 'w').write(generatedModuleCode)
-                        # @@TR: should probably restrict the perms, etc.
-                    except OSError:
-                        # @@ TR: should this optionally raise?
-                        traceback.print_exc(file=sys.stderr)
+                    open(__file__, 'w').write(generatedModuleCode)
+                    # @@TR: should probably restrict the perms, etc.
 
                 mod = new.module(str(uniqueModuleName))
                 if moduleGlobals:
@@ -771,7 +777,6 @@ class Template(Servlet):
                         parseError = genParserErrorFromPythonException(
                             source, file, generatedModuleCode, exception=e)
                     except:
-                        traceback.print_exc()
                         updateLinecache(__file__, generatedModuleCode)
                         e.generatedModuleCode = generatedModuleCode
                         raise e
@@ -979,10 +984,12 @@ class Template(Servlet):
             mainMethNameAttr = '_mainCheetahMethod_for_'+concreteTemplateClass.__name__
             mainMethName = getattr(concreteTemplateClass,mainMethNameAttr, None)
             if mainMethName:
-                def __str__(self): return getattr(self, mainMethName)()
+                def __str__(self): 
+                    return getattr(self, mainMethName)()
             elif (hasattr(concreteTemplateClass, 'respond')
                   and concreteTemplateClass.respond!=Servlet.respond):
-                def __str__(self): return self.respond()
+                def __str__(self):
+                    return self.respond()
             else:
                 def __str__(self):
                     if hasattr(self, mainMethNameAttr):
@@ -1413,10 +1420,9 @@ class Template(Servlet):
             self._CHEETAH__searchList.append(self)
         else:
             # create our own searchList
-            self._CHEETAH__searchList = [self._CHEETAH__globalSetVars]
+            self._CHEETAH__searchList = [self._CHEETAH__globalSetVars, self]
             if searchList is not None:
                 self._CHEETAH__searchList.extend(list(searchList))
-            self._CHEETAH__searchList.append( self )
         self._CHEETAH__cheetahIncludes = {}
         self._CHEETAH__cacheRegions = {}
         self._CHEETAH__indenter = Indenter()

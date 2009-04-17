@@ -2,8 +2,9 @@
 
 import Cheetah.NameMapper 
 import Cheetah.Template
+import pdb
 
-import unittest
+import unittest_local_copy as unittest # This is just stupid
 
 class GetAttrException(Exception):
     pass
@@ -36,19 +37,19 @@ class GetAttrTest(unittest.TestCase):
 
         template = Cheetah.Template.Template.compile(template, compilerSettings={}, keepRefToGeneratedCode=True)
         template = template(searchList=[{'obj' : CustomGetAttrClass()}])
-        assert template, 'We should have a vallid template object by now'
+        assert template, 'We should have a valid template object by now'
 
         self.failUnlessRaises(GetAttrException, template.raiseme)
 
 
-class InlineFromImportTest(unittest.TestCase):
-    '''
-        Verify that a bug introduced in v2.1.0 where an inline:
-            #from module import class
-        would result in the following code being generated:
-            improt class
-    '''
-    def runTest(self):
+class InlineImportTest(unittest.TestCase):
+    def test_FromFooImportThing(self):
+        '''
+            Verify that a bug introduced in v2.1.0 where an inline:
+                #from module import class
+            would result in the following code being generated:
+                import class
+        '''
         template = '''
             #def myfunction()
                 #if True
@@ -58,13 +59,56 @@ class InlineFromImportTest(unittest.TestCase):
                 #end if
             #end def
         '''
-        template = Cheetah.Template.Template.compile(template, compilerSettings={}, keepRefToGeneratedCode=True)
+        template = Cheetah.Template.Template.compile(template, compilerSettings={'useLegacyImportMode' : False}, keepRefToGeneratedCode=True)
         template = template(searchList=[{}])
 
         assert template, 'We should have a valid template object by now'
 
         rc = template.myfunction()
         assert rc == 17, (template, 'Didn\'t get a proper return value')
+
+    def test_ImportFailModule(self):
+        template = '''
+            #try
+                #import invalidmodule
+            #except
+                #set invalidmodule = dict(FOO='BAR!')
+            #end try
+
+            $invalidmodule.FOO
+        '''
+        template = Cheetah.Template.Template.compile(template, compilerSettings={'useLegacyImportMode' : False}, keepRefToGeneratedCode=True)
+        template = template(searchList=[{}])
+
+        assert template, 'We should have a valid template object by now'
+        assert str(template), 'We weren\'t able to properly generate the result from the template'
+
+    def test_ProperImportOfBadModule(self):
+        template = '''
+            #from invalid import fail
+                
+            This should totally $fail
+        '''
+        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={'useLegacyImportMode' : False}, keepRefToGeneratedCode=True)
+
+    def test_AutoImporting(self):
+        template = '''
+            #extends FakeyTemplate
+
+            Boo!
+        '''
+        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template)
+
+    def test_StuffBeforeImport_Legacy(self):
+        template = '''
+###
+### I like comments before import
+###
+#extends Foo
+Bar
+'''
+        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={'useLegacyImportMode' : True}, keepRefToGeneratedCode=True)
+
 
 
 if __name__ == '__main__':

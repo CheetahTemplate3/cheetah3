@@ -1,6 +1,17 @@
-Please initial your changes (there's a key at bottom) and add a date for each
-release
-================================================================================
+
+2.1.1 (April 16, 2009)
+  - Support __eq__() and __ne__() the way you might expect in src/Tools/RecursiveNull (patch suggested by Peter Warasin <peter@endian.com>)
+  - Applied patch to avoid hitting the filesystem to get the file modification time everytime a #include directive is processed (Jean-Baptiste Quenot <jbq@caraldi.com>)
+  - Applied patch to fix some annoying cases when Cheetah writes to stderr instead of propagating the exception (Jean-Baptiste Quenot <jbq@caraldi.com>)
+  - Added KDE editor support
+  - Applied patch to correct importHook behavior on Python 2.6 (reported/patched by Toshio Ernie Kuratomi <a.badger@gmail.com>)
+  - Correct unicode issue when calling/embedding unicode templates inside of other templtes (testcase Tests.Unicode.JPQ_UTF8_Test3. reported by Jean-Baptiste Quenot <jbq@caraldi.com>)
+  - Added --shbang option (e.g. "cheetah compile --shbang '#!/usr/bin/python2.6' ")
+  - Removed dependency on optik OptionParser in favor of builtin Python optparse module
+  - Introduction of the #transform directive for whole-document filtering
+  - Introduction of Cheetah.contrib.markdown and Cheetah.Filters.Markdown for outputting a markdown processed template (meant for #transform)
+  - Cheetah.Filters.CodeHighlighter, pygments-based code highlighting filter for use with #transform
+  - Addition of "useLegacyImportMode" compiler setting (defaulted to True) to allow for older (read: broken) import behavior
 
 2.1.0.1 (March 27, 2009)
   - Fix inline import issue introduced in v2.1.0

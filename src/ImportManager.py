@@ -407,7 +407,12 @@ class ImportManager:
         __builtin__.__import__ = self.importHook
         __builtin__.reload = self.reloadHook
         
-    def importHook(self, name, globals=None, locals=None, fromlist=None):
+    def importHook(self, name, globals=None, locals=None, fromlist=None, level=-1):
+        '''
+            NOTE: Currently importHook will accept the keyword-argument "level" 
+            but it will *NOT* use it (currently). Details about the "level" keyword
+            argument can be found here: http://www.python.org/doc/2.5.2/lib/built-in-funcs.html
+        '''
         # first see if we could be importing a relative name
         #print "importHook(%s, %s, locals, %s)" % (name, globals['__name__'], fromlist)
         _sys_modules_get = sys.modules.get

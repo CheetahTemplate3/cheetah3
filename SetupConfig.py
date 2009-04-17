@@ -1,5 +1,5 @@
 #-------Main Package Settings-----------#
-name = "Cheetah Community Edition"
+name = 'Cheetah'
 from src.Version import Version as version
 maintainer = "R. Tyler Ballance"
 author = "Tavis Rudd"
@@ -11,7 +11,8 @@ packages = ['Cheetah',
             'Cheetah.Tests',
             'Cheetah.Tools',
             'Cheetah.Utils',
-	    'Cheetah.Utils.optik',
+            'Cheetah.contrib',
+            'Cheetah.contrib.markdown',
             ]
 classifiers = [line.strip() for line in '''\
   #Development Status :: 4 - Beta

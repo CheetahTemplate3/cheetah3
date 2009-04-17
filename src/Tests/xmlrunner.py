@@ -19,6 +19,7 @@ from xml.sax.saxutils import escape
 from StringIO import StringIO
 
 
+
 class _TestInfo(object):
 
     """Information about a particular test.
@@ -28,29 +29,12 @@ class _TestInfo(object):
     """
 
     def __init__(self, test, time):
-        (self._class, self._method) = test.id().rsplit(".", 1)
+        _pieces = test.id().split('.')
+        (self._class, self._method) = ('.'.join(_pieces[:-1]), _pieces[-1])
         self._time = time
         self._error = None
         self._failure = None
 
-    @staticmethod
-    def create_success(test, time):
-        """Create a _TestInfo instance for a successful test."""
-        return _TestInfo(test, time)
-
-    @staticmethod
-    def create_failure(test, time, failure):
-        """Create a _TestInfo instance for a failed test."""
-        info = _TestInfo(test, time)
-        info._failure = failure
-        return info
-
-    @staticmethod
-    def create_error(test, time, error):
-        """Create a _TestInfo instance for an erroneous test."""
-        info = _TestInfo(test, time)
-        info._error = error
-        return info
 
     def print_report(self, stream):
         """Print information about this test case in XML format to the
@@ -74,13 +58,29 @@ class _TestInfo(object):
         text = escape(str(error[1]))
         stream.write('\n')
         stream.write('    <%s type="%s">%s\n' \
-            % (tagname, str(error[0]), text))
+            % (tagname, issubclass(error[0], Exception) and error[0].__name__ or str(error[0]), text))
         tb_stream = StringIO()
         traceback.print_tb(error[2], None, tb_stream)
         stream.write(escape(tb_stream.getvalue()))
         stream.write('    </%s>\n' % tagname)
         stream.write('  ')
 
+# Module level functions since Python 2.3 doesn't grok decorators
+def create_success(test, time):
+    """Create a _TestInfo instance for a successful test."""
+    return _TestInfo(test, time)
+
+def create_failure(test, time, failure):
+    """Create a _TestInfo instance for a failed test."""
+    info = _TestInfo(test, time)
+    info._failure = failure
+    return info
+
+def create_error(test, time, error):
+    """Create a _TestInfo instance for an erroneous test."""
+    info = _TestInfo(test, time)
+    info._error = error
+    return info
 
 class _XMLTestResult(unittest.TestResult):
 
@@ -108,11 +108,11 @@ class _XMLTestResult(unittest.TestResult):
         time_taken = time.time() - self._start_time
         unittest.TestResult.stopTest(self, test)
         if self._error:
-            info = _TestInfo.create_error(test, time_taken, self._error)
+            info = create_error(test, time_taken, self._error)
         elif self._failure:
-            info = _TestInfo.create_failure(test, time_taken, self._failure)
+            info = create_failure(test, time_taken, self._failure)
         else:
-            info = _TestInfo.create_success(test, time_taken)
+            info = create_success(test, time_taken)
         self._tests.append(info)
 
     def addError(self, test, err):
@@ -158,8 +158,9 @@ class XMLTestRunner(object):
 
     """
 
-    def __init__(self, stream=None):
-        self._stream = stream
+    def __init__(self, *args, **kwargs):
+        self._stream = kwargs.get('stream')
+        self._filename = kwargs.get('filename')
         self._path = "."
 
     def run(self, test):
@@ -168,6 +169,8 @@ class XMLTestRunner(object):
         classname = class_.__module__ + "." + class_.__name__
         if self._stream == None:
             filename = "TEST-%s.xml" % classname
+            if self._filename:
+                filename = self._filename
             stream = file(os.path.join(self._path, filename), "w")
             stream.write('<?xml version="1.0" encoding="utf-8"?>\n')
         else:
