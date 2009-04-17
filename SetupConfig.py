@@ -78,6 +78,6 @@ http://www.communitycheetah.org/credits.html
 
 Recent Changes
 ================================================================================
-See http://www.communitycheetah.org/docs/CHANGES for full details
+See http://www.communitycheetah.org/CHANGES.txt for full details
 
 '''
