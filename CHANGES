@@ -15,6 +15,7 @@
   - Introduction of the #transform directive for whole-document filtering
   - Introduction of Cheetah.contrib.markdown and Cheetah.Filters.Markdown for outputting a markdown processed template (meant for #transform)
   - Cheetah.Filters.CodeHighlighter, pygments-based code highlighting filter for use with #transform
+  - Addition of "useLegacyImportMode" compiler setting (defaulted to True) to allow for older (read: broken) import behavior
 
 2.1.0.1 (March 27, 2009)
   - Fix inline import issue introduced in v2.1.0

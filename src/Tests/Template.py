@@ -319,7 +319,7 @@ class TryExceptImportTest(TemplateTest):
             #end def
             '''
         # This should raise an IndentationError (if the bug exists)
-        klass = Template.compile(source=source)
+        klass = Template.compile(source=source, compilerSettings={'useLegacyImportMode' : False})
         t = klass(namespaces={'foo' : 1234})
 
 

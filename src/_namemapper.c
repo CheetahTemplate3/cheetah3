@@ -212,56 +212,57 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
 			  int numChunks, 
 			  int executeCallables)
 {
-  int i;
-  char *currentKey;
-  PyObject *currentVal = NULL;
-  PyObject *nextVal = NULL;
+    int i;
+    char *currentKey;
+    PyObject *currentVal = NULL;
+    PyObject *nextVal = NULL;
 
-  currentVal = obj;
-  for (i=0; i < numChunks;i++) {
-    currentKey = nameChunks[i];
-    if (PyErr_CheckSignals()) {	/* not sure if I really need to do this here, but what the hell */
-      if (i>0) {
-	Py_DECREF(currentVal);
-      }
-      return NULL;
-    }
-    
-    if (PyMapping_Check(currentVal) && PyMapping_HasKeyString(currentVal, currentKey)) {
-      nextVal = PyMapping_GetItemString(currentVal, currentKey);
-    } else {
-      nextVal = PyObject_GetAttrString(currentVal, currentKey);
-      PyObject *exc = PyErr_Occurred();
-      if (exc != NULL) {
-        // if exception == AttributeError
-        if (PyErr_ExceptionMatches(PyExc_AttributeError)) {
-            setNotFoundException(currentKey, currentVal);
-            if (i > 0) 
+    currentVal = obj;
+    for (i=0; i < numChunks;i++) {
+        currentKey = nameChunks[i];
+        if (PyErr_CheckSignals()) {	/* not sure if I really need to do this here, but what the hell */
+            if (i>0) {
                 Py_DECREF(currentVal);
+            }
             return NULL;
         }
-      }
+        
+        if (PyMapping_Check(currentVal) && PyMapping_HasKeyString(currentVal, currentKey)) {
+            nextVal = PyMapping_GetItemString(currentVal, currentKey);
+        } 
+        else {
+          nextVal = PyObject_GetAttrString(currentVal, currentKey);
+          PyObject *exc = PyErr_Occurred();
+          if (exc != NULL) {
+            // if exception == AttributeError
+            if (PyErr_ExceptionMatches(PyExc_AttributeError)) {
+                setNotFoundException(currentKey, currentVal);
+                if (i > 0) {
+                    Py_DECREF(currentVal);
+                }
+                return NULL;
+            }
+          }
+        }
+        if (i > 0) {
+            Py_DECREF(currentVal);
+        }
+
+        if (executeCallables && PyCallable_Check(nextVal) && (!isInstanceOrClass(nextVal)) ) {
+            //if (executeCallables && PyCallable_Check(nextVal) && (!PyInstance_Check(nextVal)) 
+            //&& (!PyClass_Check(nextVal)) && (!PyType_Check(nextVal)) ) {
+            if (!(currentVal = PyObject_CallObject(nextVal, NULL))) {
+                Py_DECREF(nextVal);
+                return NULL;
+            }
+
+            Py_DECREF(nextVal);
+        } else {
+            currentVal = nextVal;
+        }
     }
-    if (i > 0) 
-        Py_DECREF(currentVal);
 
-    if (executeCallables && PyCallable_Check(nextVal) && (!isInstanceOrClass(nextVal)) ) {
-
-	//if (executeCallables && PyCallable_Check(nextVal) && (!PyInstance_Check(nextVal)) 
- 	//&& (!PyClass_Check(nextVal)) && (!PyType_Check(nextVal)) ) {
-
-
-      if (!(currentVal = PyObject_CallObject(nextVal, NULL))){
-	Py_DECREF(nextVal);
-	return NULL;
-      };
-      Py_DECREF(nextVal);
-    } else {
-      currentVal = nextVal;
-    }
-  }
-
-  return currentVal;
+    return currentVal;
 }
 
 

@@ -2,6 +2,7 @@
 
 import Cheetah.NameMapper 
 import Cheetah.Template
+import pdb
 
 import unittest_local_copy as unittest # This is just stupid
 
@@ -58,7 +59,7 @@ class InlineImportTest(unittest.TestCase):
                 #end if
             #end def
         '''
-        template = Cheetah.Template.Template.compile(template, compilerSettings={}, keepRefToGeneratedCode=True)
+        template = Cheetah.Template.Template.compile(template, compilerSettings={'useLegacyImportMode' : False}, keepRefToGeneratedCode=True)
         template = template(searchList=[{}])
 
         assert template, 'We should have a valid template object by now'
@@ -76,7 +77,7 @@ class InlineImportTest(unittest.TestCase):
 
             $invalidmodule.FOO
         '''
-        template = Cheetah.Template.Template.compile(template, compilerSettings={}, keepRefToGeneratedCode=True)
+        template = Cheetah.Template.Template.compile(template, compilerSettings={'useLegacyImportMode' : False}, keepRefToGeneratedCode=True)
         template = template(searchList=[{}])
 
         assert template, 'We should have a valid template object by now'
@@ -88,7 +89,27 @@ class InlineImportTest(unittest.TestCase):
                 
             This should totally $fail
         '''
-        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={}, keepRefToGeneratedCode=True)
+        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={'useLegacyImportMode' : False}, keepRefToGeneratedCode=True)
+
+    def test_AutoImporting(self):
+        template = '''
+            #extends FakeyTemplate
+
+            Boo!
+        '''
+        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template)
+
+    def test_StuffBeforeImport_Legacy(self):
+        template = '''
+###
+### I like comments before import
+###
+#extends Foo
+Bar
+'''
+        self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={'useLegacyImportMode' : True}, keepRefToGeneratedCode=True)
+
+
 
 if __name__ == '__main__':
     unittest.main()
