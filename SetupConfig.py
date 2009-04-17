@@ -1,5 +1,5 @@
 #-------Main Package Settings-----------#
-name = 'Cheetah'
+name = "Cheetah Community Edition"
 from src.Version import Version as version
 maintainer = "R. Tyler Ballance"
 author = "Tavis Rudd"
