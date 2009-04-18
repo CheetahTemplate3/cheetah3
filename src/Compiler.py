@@ -62,7 +62,7 @@ _DEFAULT_COMPILER_SETTINGS = [
     ('setup__str__method', False, ''),
     ('mainMethodName', 'respond', ''),
     ('mainMethodNameForSubclasses', 'writeBody', ''),
-    ('indentationStep', '       ', ''),
+    ('indentationStep', ' ' * 4, ''),
     ('initialMethIndentLevel', 2, ''),
     ('monitorSrcFile', False, ''),
     ('outputMethodsBeforeAttributes', True, ''),
