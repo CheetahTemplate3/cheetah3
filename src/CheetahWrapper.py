@@ -169,6 +169,7 @@ class CheetahWrapper(object):
         pao("--flat", action="store_true", dest="flat", default=False, help='Do not build destination subdirectories')
         pao("--nobackup", action="store_true", dest="nobackup", default=False, help='Do not make backup files when generating new ones')
         pao("--settings", action="store", dest="compilerSettingsString", default=None, help='String of compiler settings to pass through, e.g. --settings="useNameMapper=False,useFilters=False"')
+        pao('--print-settings', action='store_true', dest='print_settings', help='Print out the list of available compiler settings')
         pao("--templateAPIClass", action="store", dest="templateClassName", default=None, help='Name of a subclass of Cheetah.Template.Template to use for compilation, e.g. MyTemplateClass')
         pao("--parallel", action="store", type="int", dest="parallel", default=1, help='Compile/fill templates in parallel, e.g. --parallel=4')
         pao('--shbang', dest='shbang', default='#!/usr/bin/env python', help='Specify the shbang to place at the top of compiled templates, e.g. --shbang="#!/usr/bin/python2.6"')
@@ -180,6 +181,17 @@ Options are
 %s
 Files are %s""", args, pprint.pformat(vars(opts)), files)
 
+
+        if opts.print_settings:
+            print 
+            print '>> Available Cheetah compiler settings:'
+            from Cheetah.Compiler import _DEFAULT_COMPILER_SETTINGS
+            listing = _DEFAULT_COMPILER_SETTINGS
+            listing.sort(key=lambda l: l[0][0].lower())
+
+            for l in listing:
+                print '\t%s (default: "%s")\t%s' % l
+            sys.exit(0)
 
         #cleanup trailing path separators
         seps = [sep for sep in [os.sep, os.altsep] if sep]
