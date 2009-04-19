@@ -1538,7 +1538,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         
         if source and file:
             raise TypeError("Cannot compile from a source string AND file.")
-        elif isinstance(file, (str, unicode)): # it's a filename.
+        elif isinstance(file, basestring): # it's a filename.
             f = open(file) # Raises IOError.
             source = f.read()
             f.close()
@@ -1565,8 +1565,9 @@ class ModuleCompiler(SettingsManager, GenUtils):
         
         else:
             unicodeMatch = unicodeDirectiveRE.search(source)
+            encodingMatch = encodingDirectiveRE.match(source)
             if unicodeMatch:
-                if encodingDirectiveRE.match(source):
+                if encodingMatch:
                     raise ParseError(
                         self, "#encoding and #unicode are mutually exclusive! "
                         "Use one or the other.")
@@ -1574,8 +1575,13 @@ class ModuleCompiler(SettingsManager, GenUtils):
                 if isinstance(source, str):
                     encoding = unicodeMatch.group(1) or 'ascii'
                     source = unicode(source, encoding)
-                
-                #print encoding
+            elif encodingMatch:
+                encodings = encodingMatch.groups()
+                if len(encodings):
+                    encoding = encodings[0]
+                    source = source.decode(encoding)
+            else:
+                source = unicode(source)
 
         if source.find('#indent') != -1: #@@TR: undocumented hack
             source = indentize(source)
@@ -1791,7 +1797,6 @@ class ModuleCompiler(SettingsManager, GenUtils):
     
     def setModuleEncoding(self, encoding):
         self._moduleEncoding = encoding
-        self._moduleEncodingStr = '# -*- coding: %s -*-' %encoding
 
     def getModuleEncoding(self):
         return self._moduleEncoding
