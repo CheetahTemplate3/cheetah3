@@ -812,7 +812,8 @@ class MethodCompiler(GenUtils):
         return self.nextCacheID()
 
     def startCallRegion(self, functionName, args, lineCol, regionTitle='CALL'):
-        class CallDetails: pass
+        class CallDetails(object):
+            pass
         callDetails = CallDetails()
         callDetails.ID = ID = self.nextCallRegionID()
         callDetails.functionName = functionName
@@ -982,6 +983,8 @@ class AutoMethodCompiler(MethodCompiler):
         MethodCompiler._setupState(self)
         self._argStringList = [ ("self",None) ]
         self._streamingEnabled = True
+        self._isClassMethod = None
+        self._isStaticMethod = None
 
     def _useKWsDictArgForPassingTrans(self):
         alreadyHasTransArg = [argname for argname,defval in self._argStringList
@@ -989,6 +992,16 @@ class AutoMethodCompiler(MethodCompiler):
         return (self.methodName()!='respond'
                 and not alreadyHasTransArg
                 and self.setting('useKWsDictArgForPassingTrans'))
+
+    def isClassMethod(self):
+        if self._isClassMethod is None:
+            self._isClassMethod = '@classmethod' in self._decorators
+        return self._isClassMethod
+
+    def isStaticMethod(self):
+        if self._isStaticMethod is None:
+            self._isStaticMethod = '@staticmethod' in self._decorators
+        return self._isStaticMethod
     
     def cleanupState(self):
         MethodCompiler.cleanupState(self)
@@ -1030,7 +1043,7 @@ class AutoMethodCompiler(MethodCompiler):
         if self._initialMethodComment:
             self.addChunk(self._initialMethodComment)
             
-        if self._streamingEnabled:
+        if self._streamingEnabled and not self.isClassMethod() and not self.isStaticMethod():
             if self._useKWsDictArgForPassingTrans() and self._kwargsName:
                 self.addChunk('trans = %s.get("trans")'%self._kwargsName)            
             self.addChunk('if (not trans and not self._CHEETAH__isBuffering'
@@ -1058,9 +1071,11 @@ class AutoMethodCompiler(MethodCompiler):
                 pass
             elif allowSearchListAsMethArg and 'searchList' in argNames:
                 self.addChunk('SL = searchList')
-            else:
+            elif not self.isClassMethod() and not self.isStaticMethod():
                 self.addChunk('SL = self._CHEETAH__searchList')                
-        if self.setting('useFilters'):
+            else:
+                self.addChunk('SL = [KWS]')
+        if self.setting('useFilters') and not self.isClassMethod() and not self.isStaticMethod():
             self.addChunk('_filter = self._CHEETAH__currentFilter')
         self.addChunk('')
         self.addChunk("#" *40)
@@ -1087,6 +1102,11 @@ class AutoMethodCompiler(MethodCompiler):
         argStringChunks = []
         for arg in self._argStringList:
             chunk = arg[0]
+            if chunk == 'self' and self.isClassMethod():
+                chunk = 'cls'
+            if chunk == 'self' and self.isStaticMethod():
+                # Skip the "self" method for @staticmethod decorators
+                continue
             if not arg[1] == None:
                 chunk += '=' + arg[1]
             argStringChunks.append(chunk)
