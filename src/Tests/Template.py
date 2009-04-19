@@ -322,6 +322,36 @@ class TryExceptImportTest(TemplateTest):
         klass = Template.compile(source=source, compilerSettings={'useLegacyImportMode' : False})
         t = klass(namespaces={'foo' : 1234})
 
+class ClassMethodSupport(TemplateTest):
+    def test_BasicDecorator(self):
+        template = '''
+            #@classmethod
+            #def myClassMethod()
+                #return '$foo = %s' % $foo
+            #end def
+        '''
+        template = Template.compile(source=template)
+        try:
+            rc = template.myClassMethod(foo='bar')
+            assert rc == '$foo = bar', (rc, 'Template class method didn\'t return what I expected')
+        except AttributeError, ex:
+            self.fail(ex)
+
+class StaticMethodSupport(TemplateTest):
+    def test_BasicDecorator(self):
+        template = '''
+            #@staticmethod
+            #def myStaticMethod()
+                #return '$foo = %s' % $foo
+            #end def
+        '''
+        template = Template.compile(source=template)
+        try:
+            rc = template.myStaticMethod(foo='bar')
+            assert rc == '$foo = bar', (rc, 'Template class method didn\'t return what I expected')
+        except AttributeError, ex:
+            self.fail(ex)
+
 
 
 
