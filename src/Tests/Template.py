@@ -324,6 +324,9 @@ class TryExceptImportTest(TemplateTest):
 
 class ClassMethodSupport(TemplateTest):
     def test_BasicDecorator(self):
+        if sys.version_info[0] == 2 and sys.version_info[1] == 3:
+                print 'This version of Python doesn\'t support decorators, skipping tests'
+                return
         template = '''
             #@classmethod
             #def myClassMethod()
@@ -339,6 +342,9 @@ class ClassMethodSupport(TemplateTest):
 
 class StaticMethodSupport(TemplateTest):
     def test_BasicDecorator(self):
+        if sys.version_info[0] == 2 and sys.version_info[1] == 3:
+                print 'This version of Python doesn\'t support decorators, skipping tests'
+                return
         template = '''
             #@staticmethod
             #def myStaticMethod()
