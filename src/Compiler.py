@@ -834,6 +834,7 @@ class MethodCompiler(GenUtils):
 
     def setCallArg(self, argName, lineCol):
         ID, callDetails = self._callRegionsStack[-1]
+        argName = str(argName)
         if callDetails.usesKeywordArgs:
             self._endCallArg()
         else:

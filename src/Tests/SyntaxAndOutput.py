@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
-# $Id: SyntaxAndOutput.py,v 1.110 2008/03/10 07:50:18 tavis_rudd Exp $
-"""Syntax and Output tests.
+
+'''
+Syntax and Output tests.
 
 TODO
 - #finally
@@ -9,16 +10,7 @@ TODO
 - #errorCatcher
 - #echo
 - #silent
-
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.110 $
-Start Date: 2001/03/30
-Last Revision Date: $Date: 2008/03/10 07:50:18 $
-"""
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.110 $"[11:-2]
+'''
 
 
 ##################################################
@@ -31,6 +23,7 @@ from copy import deepcopy
 import os
 import os.path
 import new
+import pdb
 import warnings
 
 from Cheetah.NameMapper import NotFound
