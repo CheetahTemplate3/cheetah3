@@ -129,6 +129,14 @@ class Mantis_Issue_11_Regression_Test(unittest.TestCase):
         self.failUnlessRaises(AttributeError, template.respond)
 
 
+    def test_FailingBehaviorWithSetting(self):
+        import cgi
+        template = Cheetah.Template.Template("$escape($request)", 
+                searchList=[{'escape' : cgi.escape, 'request' : 'foobar'}], 
+                compilerSettings={'prioritizeSearchListOverSelf' : True})
+        assert template
+        assert template.respond()
+
 
 if __name__ == '__main__':
     unittest.main()

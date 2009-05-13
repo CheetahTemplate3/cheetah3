@@ -1194,25 +1194,32 @@ class Template(Servlet):
         ## Setup instance state attributes used during the life of template
         ## post-compile
         reserved_searchlist = dir(self)
-        for namespace in searchList or []:
-            if isinstance(namespace, dict):
-                intersection = set(reserved_searchlist) & set(namespace.keys())
-                if intersection:
-                    print
-                    print ''' *** WARNING *** '''
-                    print ''' The following keys are members of the Template class and will result in NameMapper collisions! '''
-                    print '''  > %s ''' % ', '.join(list(intersection))
-                    print 
-                    print ''' Please change the key's name or use the compiler setting "prioritizeSearchListOverSelf=True" to prevent the NameMapper from using '''
-                    print ''' the Template member in place of your searchList variable '''
-                    print ''' *************** '''
-                    print 
+        if searchList:
+            for namespace in searchList:
+                if isinstance(namespace, dict):
+                    intersection = set(reserved_searchlist) & set(namespace.keys())
+                    warn = False
+                    if intersection:
+                        warn = True
+                    if isinstance(compilerSettings, dict) and compilerSettings.get('prioritizeSearchListOverSelf'):
+                        warn = False
+                    if warn:
+                        print
+                        print ''' *** WARNING *** '''
+                        print ''' The following keys are members of the Template class and will result in NameMapper collisions! '''
+                        print '''  > %s ''' % ', '.join(list(intersection))
+                        print 
+                        print ''' Please change the key's name or use the compiler setting "prioritizeSearchListOverSelf=True" to prevent the NameMapper from using '''
+                        print ''' the Template member in place of your searchList variable '''
+                        print ''' *************** '''
+                        print 
 
         self._initCheetahInstance(
             searchList=searchList, namespaces=namespaces,
             filter=filter, filtersLib=filtersLib,
             errorCatcher=errorCatcher,
             _globalSetVars=_globalSetVars,
+            compilerSettings=compilerSettings,
             _preBuiltSearchList=_preBuiltSearchList)
         
         ##################################################
@@ -1410,6 +1417,7 @@ class Template(Servlet):
                              filtersLib=Filters,
                              errorCatcher=None,
                              _globalSetVars=None,
+                             compilerSettings=None,
                              _preBuiltSearchList=None):
         """Sets up the instance attributes that cheetah templates use at
         run-time.
@@ -1444,7 +1452,10 @@ class Template(Servlet):
             # create our own searchList
             self._CHEETAH__searchList = [self._CHEETAH__globalSetVars, self]
             if searchList is not None:
-                self._CHEETAH__searchList.extend(list(searchList))
+                if isinstance(compilerSettings, dict) and compilerSettings.get('prioritizeSearchListOverSelf'):
+                    self._CHEETAH__searchList = searchList + self._CHEETAH__searchList
+                else:
+                    self._CHEETAH__searchList.extend(list(searchList))
         self._CHEETAH__cheetahIncludes = {}
         self._CHEETAH__cacheRegions = {}
         self._CHEETAH__indenter = Indenter()

@@ -49,6 +49,7 @@ _DEFAULT_COMPILER_SETTINGS = [
     ('useFilters', True, 'If False, pass output through str()'),
     ('includeRawExprInFilterArgs', True, ''),
     ('useLegacyImportMode', True, 'All #import statements are relocated to the top of the generated Python module'),
+    ('prioritizeSearchListOverSelf', False, 'When iterating the searchList, look into the searchList passed into the initializer instead of Template members first'),
 
     ('autoAssignDummyTransactionToSelf', False, ''),
     ('useKWsDictArgForPassingTrans', True, ''),
