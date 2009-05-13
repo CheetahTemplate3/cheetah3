@@ -183,12 +183,8 @@ Template output mismatch:
         if self.DEBUGLEV >= 1:
             print moduleCode
         try:
-            try:
-                output = templateObj.respond() # rather than __str__, because of unicode
-                assert output==expectedOutput, self._outputMismatchReport(output, expectedOutput)
-            except:
-                #print >>sys.stderr, moduleCode
-                raise
+            output = templateObj.respond() # rather than __str__, because of unicode
+            assert output==expectedOutput, self._outputMismatchReport(output, expectedOutput)
         finally:
             templateObj.shutdown()
 
@@ -748,13 +744,13 @@ class EncodingDirective(OutputTest):
 
     def test4(self):
         """basic #encoding """
-        self.verify("#encoding ascii\n\xe1\x88\xb4",
-                    "\xe1\x88\xb4")
+        self.verify("#encoding latin-1\n\xe1\x88\xb4",
+                    u"\xe1\x88\xb4")
 
     def test5(self):
         """basic #encoding """
         self.verify("#encoding latin-1\nAndr\202",
-                    u'Andr\202', outputEncoding='latin-1')
+                    u'Andr\202')
 
 class UnicodeDirective(OutputTest):
     def test1(self):
