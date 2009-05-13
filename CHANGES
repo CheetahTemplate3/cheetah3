@@ -2,6 +2,7 @@
 2.2.0 (not yet released)
   - Switch all internal representations of template code to unicode objects instead of str() objects
   - Convert unicode compiled template to an utf8 char buffer when writing to a file (Jean-Baptiste Quenot <jbq@caraldi.com>)
+  - 0000011: [Templates] Calling a function with arguments calls the function with None (rtyler) 
 
 2.1.2 (May 5, 2009)
   - 0000006: [Templates] Support @staticmethod and @classmethod (rtyler) 
