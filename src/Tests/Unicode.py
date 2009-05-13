@@ -4,6 +4,7 @@
 from Cheetah.Template import Template
 from Cheetah import CheetahWrapper
 import traceback, tempfile, sys, imp, os
+import pdb
 import unittest_local_copy as unittest # This is stupid
 
 class JBQ_UTF8_Test1(unittest.TestCase):
@@ -115,6 +116,38 @@ class JBQ_UTF8_Test7(unittest.TestCase):
         t.v = u'Unicode String'
 
         assert unicode(t())
+
+class Unicode_in_SearchList_Test(unittest.TestCase):
+    def createAndCompile(self, source):
+        sourcefile = tempfile.mktemp()
+        fd = open('%s.tmpl' % sourcefile, 'w')
+        fd.write(source)
+        fd.close()
+
+        wrap = CheetahWrapper.CheetahWrapper()
+        wrap.main(['cheetah', 'compile', '--nobackup', sourcefile])
+        module_name = os.path.basename(sourcefile)
+        module = loadModule(module_name, ['/tmp'])
+        template = getattr(module, module_name)
+        return template
+
+    def test_BasicASCII(self):
+        source = '''This is $adjective'''
+
+        template = self.createAndCompile(source)
+        assert template and issubclass(template, Template)
+        template = template(searchList=[{'adjective' : u'neat'}])
+        assert template.respond()
+
+    def test_Thai(self):
+        # The string is something in Thai
+        source = '''This is $foo $adjective'''
+        template = self.createAndCompile(source)
+        assert template and issubclass(template, Template)
+        template = template(searchList=[{'foo' : 'bar', 
+            'adjective' : u'\u0e22\u0e34\u0e19\u0e14\u0e35\u0e15\u0e49\u0e2d\u0e19\u0e23\u0e31\u0e1a'}])
+        assert template.respond()
+
 
 if __name__ == '__main__':
     unittest.main()
