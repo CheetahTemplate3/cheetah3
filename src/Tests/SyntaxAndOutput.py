@@ -185,8 +185,6 @@ Template output mismatch:
         try:
             try:
                 output = templateObj.respond() # rather than __str__, because of unicode
-                if outputEncoding:
-                    output = output.decode(outputEncoding)
                 assert output==expectedOutput, self._outputMismatchReport(output, expectedOutput)
             except:
                 #print >>sys.stderr, moduleCode
