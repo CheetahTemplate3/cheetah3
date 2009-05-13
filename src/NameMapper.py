@@ -147,6 +147,7 @@ import types
 from types import StringType, InstanceType, ClassType, TypeType
 from pprint import pformat
 import inspect
+import pdb
 
 _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS = False
 _ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS = True
@@ -273,7 +274,8 @@ def valueFromFrameOrSearchList(searchList, name, executeCallables=False,
             frame = inspect.stack()[1][0]
         key = name.split('.')[0]
         for namespace in _namespaces(frame, searchList):
-            if hasKey(namespace, key): return __valueForName()
+            if hasKey(namespace, key):
+                return __valueForName()
         _raiseNotFoundException(key, searchList)
     finally:
         del frame

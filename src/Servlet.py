@@ -1,18 +1,7 @@
 #!/usr/bin/env python
-# $Id: Servlet.py,v 1.41 2007/04/04 00:55:27 tavis_rudd Exp $
-"""Provides an abstract Servlet baseclass for Cheetah's Template class
-
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>
-License: This software is released for unlimited distribution under the
-         terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.41 $
-Start Date: 2001/10/03
-Last Revision Date: $Date: 2007/04/04 00:55:27 $
-""" 
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.41 $"[11:-2]
+'''
+Provides an abstract Servlet baseclass for Cheetah's Template class
+'''
 
 import sys
 import os.path
@@ -26,16 +15,14 @@ try:
     isWebwareInstalled = True
 
     if not issubclass(BaseServlet, object):
-        class NewStyleBaseServlet(BaseServlet, object): pass
+        class NewStyleBaseServlet(BaseServlet, object):
+            pass
         BaseServlet = NewStyleBaseServlet
 except:
     class BaseServlet(object): 
         _reusable = 1
         _threadSafe = 0
     
-        def __init__(self):
-            pass
-            
         def awake(self, transaction):
             pass
             
@@ -63,7 +50,7 @@ class Servlet(BaseServlet):
     session = None
     
     def __init__(self):
-        BaseServlet.__init__(self)
+        super(Servlet, self).__init__()
        
         # this default will be changed by the .awake() method
         self._CHEETAH__isControlledByWebKit = False 

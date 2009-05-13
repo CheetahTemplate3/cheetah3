@@ -110,6 +110,25 @@ Bar
         self.failUnlessRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={'useLegacyImportMode' : True}, keepRefToGeneratedCode=True)
 
 
+class Mantis_Issue_11_Regression_Test(unittest.TestCase):
+    ''' 
+        Test case for bug outlined in Mantis issue #11:
+            
+        Output:
+        Traceback (most recent call last):
+          File "test.py", line 12, in <module>
+            t.respond()
+          File "DynamicallyCompiledCheetahTemplate.py", line 86, in respond
+          File "/usr/lib64/python2.6/cgi.py", line 1035, in escape
+            s = s.replace("&", "&") # Must be done first! 
+    '''
+    def test_FailingBehavior(self):
+        import cgi
+        template = Cheetah.Template.Template("$escape($request)", searchList=[{'escape' : cgi.escape, 'request' : 'foobar'}])
+        assert template
+        self.failUnlessRaises(AttributeError, template.respond)
+
+
 
 if __name__ == '__main__':
     unittest.main()
