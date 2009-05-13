@@ -1625,6 +1625,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "import sys",
             "import os",
             "import os.path",
+            "import __builtin__",
             "from os.path import getmtime, exists",
             "import time",
             "import types",
