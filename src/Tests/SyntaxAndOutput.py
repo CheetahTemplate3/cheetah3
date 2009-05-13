@@ -781,7 +781,7 @@ class UnicodeDirective(OutputTest):
                     u"1234ü")
 
         self.verify("#encoding latin-1\n1234ü",
-                    "1234ü")
+                    u"1234ü")
 
 class Placeholders_Esc(OutputTest):
     convertEOLs = False
