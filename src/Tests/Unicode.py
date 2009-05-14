@@ -3,9 +3,30 @@
 
 from Cheetah.Template import Template
 from Cheetah import CheetahWrapper
-import traceback, tempfile, sys, imp, os
+import imp
+import os
 import pdb
+import random
+import sys
+import tempfile
 import unittest_local_copy as unittest # This is stupid
+
+class CommandLineTest(unittest.TestCase):
+    def createAndCompile(self, source):
+        sourcefile = '-'
+        while sourcefile.find('-') != -1:
+            sourcefile = tempfile.mktemp()
+        
+        fd = open('%s.tmpl' % sourcefile, 'w')
+        fd.write(source)
+        fd.close()
+
+        wrap = CheetahWrapper.CheetahWrapper()
+        wrap.main(['cheetah', 'compile', '--nobackup', sourcefile])
+        module_name = os.path.basename(sourcefile)
+        module = loadModule(module_name, ['/tmp'])
+        template = getattr(module, module_name)
+        return template
 
 class JBQ_UTF8_Test1(unittest.TestCase):
     def runTest(self):
@@ -98,39 +119,18 @@ class JBQ_UTF8_Test6(unittest.TestCase):
 
         assert unicode(t())
 
-class JBQ_UTF8_Test7(unittest.TestCase):
+class JBQ_UTF8_Test7(CommandLineTest):
     def runTest(self):
         source = """#encoding utf-8
         #set $someUnicodeString = u"Bébé"
         Main file with |$v| and eacute in the template é"""
 
-        sourcefile = tempfile.mktemp()
-        f = open("%s.tmpl" % sourcefile, "w")
-        f.write(source)
-        f.close()
-        cw = CheetahWrapper.CheetahWrapper()
-        cw.main(["cheetah", "compile", "--nobackup", sourcefile])
-        modname = os.path.basename(sourcefile)
-        mod = loadModule(modname, ["/tmp"])
-        t = eval("mod.%s" % modname)
-        t.v = u'Unicode String'
+        template = self.createAndCompile(source)
+        template.v = u'Unicode String'
 
-        assert unicode(t())
+        assert unicode(template())
 
-class Unicode_in_SearchList_Test(unittest.TestCase):
-    def createAndCompile(self, source):
-        sourcefile = tempfile.mktemp()
-        fd = open('%s.tmpl' % sourcefile, 'w')
-        fd.write(source)
-        fd.close()
-
-        wrap = CheetahWrapper.CheetahWrapper()
-        wrap.main(['cheetah', 'compile', '--nobackup', sourcefile])
-        module_name = os.path.basename(sourcefile)
-        module = loadModule(module_name, ['/tmp'])
-        template = getattr(module, module_name)
-        return template
-
+class Unicode_in_SearchList_Test(CommandLineTest):
     def test_BasicASCII(self):
         source = '''This is $adjective'''
 
