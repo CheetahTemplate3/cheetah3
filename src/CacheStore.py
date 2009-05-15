@@ -1,4 +1,4 @@
-"""
+'''
 Provides several CacheStore backends for Cheetah's caching framework.  The
 methods provided by these classes have the same semantics as those in the
 python-memcached API, except for their return values:
@@ -13,8 +13,7 @@ get(key, val)
   returns val or raises a KeyError
 delete(key)
   deletes or raises a KeyError
-
-"""
+'''
 import time
 
 from Cheetah.Utils.memcache import Client as MemcachedClient

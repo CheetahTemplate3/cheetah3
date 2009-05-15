@@ -1,20 +1,9 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.186 2008/03/10 04:48:11 tavis_rudd Exp $
-"""Provides the core API for Cheetah.
+'''
+Provides the core API for Cheetah.
 
 See the docstring in the Template class and the Users' Guide for more information
-
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>
-License: This software is released for unlimited distribution under the
-         terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.186 $
-Start Date: 2001/03/30
-Last Revision Date: $Date: 2008/03/10 04:48:11 $
-""" 
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.186 $"[11:-2]
+'''
 
 ################################################################################
 ## DEPENDENCIES
@@ -47,8 +36,10 @@ try:
     from threading import Lock
 except ImportError:
     class Lock:
-        def acquire(self): pass
-        def release(self): pass
+        def acquire(self):
+            pass
+        def release(self): 
+            pass
 
 from Cheetah.Version import convertVersionStringToTuple, MinCompatibleVersionTuple
 from Cheetah.Version import MinCompatibleVersion
@@ -123,8 +114,9 @@ _formUsedByWebInput = None
 
 # used in Template.compile()
 def valOrDefault(val, default):                
-    if val is not Unspecified: return val
-    else: return default
+    if val is not Unspecified:
+        return val
+    return default
 
 def updateLinecache(filename, src):
     import linecache
@@ -134,16 +126,18 @@ def updateLinecache(filename, src):
     fullname = filename
     linecache.cache[filename] = size, mtime, lines, fullname
 
-class CompileCacheItem:
+class CompileCacheItem(object):
     pass
 
-class TemplatePreprocessor:
-    """This is used with the preprocessors argument to Template.compile().
+class TemplatePreprocessor(object):
+    '''
+    This is used with the preprocessors argument to Template.compile().
 
     See the docstring for Template.compile
-    
+
     ** Preprocessors are an advanced topic **
-    """
+    '''
+    
     def __init__(self, settings):
         self._settings = settings
 
@@ -179,7 +173,8 @@ class TemplatePreprocessor:
         return outputSource, outputFile
         
 class Template(Servlet):
-    """This class provides a) methods used by templates at runtime and b)
+    '''
+    This class provides a) methods used by templates at runtime and b)
     methods for compiling Cheetah source code into template classes.
 
     This documentation assumes you already know Python and the basics of object
@@ -255,7 +250,7 @@ class Template(Servlet):
 
       Instance attributes look like this:
           klass._CHEETAH__globalSetVars (_CHEETAH__xxx with 2 underscores)
-    """
+    '''
 
     # this is used by ._addCheetahPlumbingCodeToClass()
     _CHEETAH_requiredCheetahMethods = (
