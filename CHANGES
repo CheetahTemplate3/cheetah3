@@ -4,6 +4,7 @@
   - Convert unicode compiled template to an utf8 char buffer when writing to a file (Jean-Baptiste Quenot <jbq@caraldi.com>)
   - 0000011: [Templates] Calling a function with arguments calls the function with None (rtyler) 
   - 0000015: [Tests] Resolve test failures in 'next' branch (rtyler)
+  - 0000019: [Templates] Properly warn when joining unicode and non-unicode objects in DummyTransaction (rtyler)
 
 2.1.2 (May 5, 2009)
   - 0000006: [Templates] Support @staticmethod and @classmethod (rtyler) 
