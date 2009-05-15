@@ -41,6 +41,12 @@ except ImportError:
         def release(self): 
             pass
 
+try:
+    x = set()
+except NameError:
+    # Python 2.3 compatibility
+    from sets import Set as set
+
 from Cheetah.Version import convertVersionStringToTuple, MinCompatibleVersionTuple
 from Cheetah.Version import MinCompatibleVersion
 # Base classes for Template
