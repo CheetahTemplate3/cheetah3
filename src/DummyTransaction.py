@@ -11,6 +11,9 @@ specific DummyTransaction or DummyResponse behavior
 
 import types
 
+class DummyResponseFailure(Exception):
+    pass
+
 class DummyResponse(object):
     '''
         A dummy Response class is used by Cheetah in place of real Webware
@@ -32,12 +35,24 @@ class DummyResponse(object):
 
     def getvalue(self, outputChunks=None):
         chunks = outputChunks or self._outputChunks
-        return ''.join(chunks)
+        try: 
+            return ''.join(chunks)
+        except UnicodeDecodeError, ex:
+            nonunicode = [c for c in chunks if not isinstance(c, unicode)]
+            raise DummyResponseFailure('''Looks like you're trying to mix encoded strings with Unicode strings
+            (most likely utf-8 encoded ones)
+
+            This can happen if you're using the `EncodeUnicode` filter, or if you're manually
+            encoding strings as utf-8 before passing them in on the searchList (possible offenders: 
+            %s) 
+            (%s)''' % (nonunicode, ex))
+
 
     def writelines(self, *lines):
         ## not used
         [self.writeln(ln) for ln in lines]
         
+
 class DummyTransaction(object):
     '''
         A dummy Transaction class is used by Cheetah in place of real Webware
@@ -54,6 +69,7 @@ class DummyTransaction(object):
         if self._response is None:
             self._response = resp or DummyResponse()
         return self._response
+
 
 class TransformerResponse(DummyResponse):
     def __init__(self, *args, **kwargs):

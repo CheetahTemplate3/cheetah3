@@ -3,6 +3,7 @@
 
 from Cheetah.Template import Template
 from Cheetah import CheetahWrapper
+from Cheetah import DummyTransaction
 import imp
 import os
 import pdb
@@ -147,6 +148,16 @@ class Unicode_in_SearchList_Test(CommandLineTest):
         template = template(searchList=[{'foo' : 'bar', 
             'adjective' : u'\u0e22\u0e34\u0e19\u0e14\u0e35\u0e15\u0e49\u0e2d\u0e19\u0e23\u0e31\u0e1a'}])
         assert template.respond()
+
+    def test_ErrorReporting(self):
+        utf8 = '\xe0\xb8\xa2\xe0\xb8\xb4\xe0\xb8\x99\xe0\xb8\x94\xe0\xb8\xb5\xe0\xb8\x95\xe0\xb9\x89\xe0\xb8\xad\xe0\xb8\x99\xe0\xb8\xa3\xe0\xb8\xb1\xe0\xb8\x9a'
+
+        source = '''This is $adjective'''
+        template = self.createAndCompile(source)
+        assert template and issubclass(template, Template)
+        template = template(searchList=[{'adjective' : utf8}])
+        self.failUnlessRaises(DummyTransaction.DummyResponseFailure, template.respond)
+
 
 
 if __name__ == '__main__':
