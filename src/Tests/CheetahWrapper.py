@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-# $Id: CheetahWrapper.py,v 1.6 2007/03/28 16:17:41 tavis_rudd Exp $
-"""Tests for the 'cheetah' command.
+'''
+Tests for the 'cheetah' command.
 
 Besides unittest usage, recognizes the following command-line options:
     --list CheetahWrapper.py
@@ -10,21 +10,7 @@ Besides unittest usage, recognizes the following command-line options:
         Don't delete scratch directory at end.
      --output
         Show the output of each subcommand.  (Normally suppressed.)
-
-Meta-Data
-================================================================================
-Author: Mike Orr <iron@mso.oz.net>,
-Version: $Revision: 1.6 $
-Start Date: 2001/10/01
-Last Revision Date: $Date: 2007/03/28 16:17:41 $
-"""
-__author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.6 $"[11:-2]
-
-
-##################################################
-## DEPENDENCIES ##
-
+'''
 import commands, os, shutil, sys, tempfile
 import unittest_local_copy as unittest
 
@@ -32,27 +18,14 @@ import re                                     # Used by listTests.
 from optparse import OptionParser
 from Cheetah.CheetahWrapper import CheetahWrapper  # Used by NoBackup.
 
-##################################################
-## CONSTANTS & GLOBALS ##
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
 
 DELETE = True # True to clean up after ourselves, False for debugging.
 OUTPUT = False # Normally False, True for debugging.
-
-#DELETE = False # True to clean up after ourselves, False for debugging.
-#OUTPUT = True # Normally False, True for debugging.
 
 BACKUP_SUFFIX = CheetahWrapper.BACKUP_SUFFIX
 
 def warn(msg):
     sys.stderr.write(msg + '\n')
-
-##################################################
-## TEST BASE CLASSES
 
 class CFBase(unittest.TestCase):
     """Base class for "cheetah compile" and "cheetah fill" unit tests.
@@ -528,13 +501,6 @@ class NoBackup(CFBase):
         self.go("cheetah fill --nobackup --oext txt a.tmpl")
         self.checkNoBackup("a.txt" + BACKUP_SUFFIX)
 
-
-
-
-
-##################################################
-## LIST TESTS ##
-
 def listTests(cheetahWrapperFile):
     """cheetahWrapperFile, string, path of this script.
 
@@ -551,24 +517,14 @@ def listTests(cheetahWrapperFile):
             print m.group(1)
     f.close()
 
-##################################################
-## MAIN ROUTINE ##
-
-class MyOptionParser(OptionParser):
-    """Disable the standard --help and --verbose options since
-       --help is used for another purpose.
-    """
-    standard_option_list = []
-
 def main():
     global DELETE, OUTPUT
-    parser = MyOptionParser()
+    parser = OptionParser()
     parser.add_option("--list", action="store", dest="listTests")
     parser.add_option("--nodelete", action="store_true")
     parser.add_option("--output", action="store_true")
     # The following options are passed to unittest.
     parser.add_option("-e", "--explain", action="store_true")
-    parser.add_option("-h", "--help", action="store_true")
     parser.add_option("-v", "--verbose", action="store_true")
     parser.add_option("-q", "--quiet", action="store_true")
     opts, files = parser.parse_args()
@@ -582,15 +538,13 @@ def main():
         # Eliminate script-specific command-line arguments to prevent
         # errors in unittest.
         del sys.argv[1:]
-        for opt in ("explain", "help", "verbose", "quiet"):
+        for opt in ("explain", "verbose", "quiet"):
             if getattr(opts, opt):
                 sys.argv.append("--" + opt)
         sys.argv.extend(files)
         unittest.main()
         
-##################################################
-## if run from the command line ##
-        
-if __name__ == '__main__':  main()
+if __name__ == '__main__':
+    main()
 
 # vim: sw=4 ts=4 expandtab
