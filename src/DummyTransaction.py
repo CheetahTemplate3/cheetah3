@@ -4,12 +4,12 @@
 Provides dummy Transaction and Response classes is used by Cheetah in place
 of real Webware transactions when the Template obj is not used directly as a
 Webware servlet.
+
+Warning: This may be deprecated in the future, please do not rely on any 
+specific DummyTransaction or DummyResponse behavior
 '''
 
 import types
-
-def flush():
-    pass
 
 class DummyResponse(object):
     '''
@@ -18,17 +18,21 @@ class DummyResponse(object):
         servlet
     ''' 
     def __init__(self):
-        self._outputChunks = outputChunks = []
-        self.write = write = outputChunks.append
-        def getvalue(outputChunks=outputChunks):
-            return ''.join(outputChunks)
-        self.getvalue = getvalue
-            
-        def writeln(txt):
-            write(txt)
-            write('\n')
-        self.writeln = writeln        
-        self.flush = flush
+        self._outputChunks = []
+
+    def flush(self):
+        pass
+        
+    def write(self, value):
+        self._outputChunks.append(value)
+
+    def writeln(self, txt):
+        write(txt)
+        write('\n')
+
+    def getvalue(self, outputChunks=None):
+        chunks = outputChunks or self._outputChunks
+        return ''.join(chunks)
 
     def writelines(self, *lines):
         ## not used
@@ -51,33 +55,19 @@ class DummyTransaction(object):
             self._response = resp or DummyResponse()
         return self._response
 
-class TransformerResponse(object):
+class TransformerResponse(DummyResponse):
     def __init__(self, *args, **kwargs):
-        self._output = []
+        super(TransformerResponse, self).__init__(*args, **kwargs)
         self._filter = None
 
-    def write(self, value):
-        self._output.append(value)
-
-    def flush(self):
-        pass
-
-    def writeln(self, line):
-        self.write(line)
-        self.write('\n')
-
-    def writelines(self, *lines):
-        [self.writeln(line) for line in lines]
-
     def getvalue(self, **kwargs):
-        output = kwargs.get('outputChunks') or self._output
-        rc = ''.join(output)
+        output = super(TransformerResponse, self).getvalue(**kwargs)
         if self._filter:
             _filter = self._filter
             if isinstance(_filter, types.TypeType):
                 _filter = _filter()
-            return _filter.filter(rc)
-        return rc
+            return _filter.filter(output)
+        return output
 
 
 class TransformerTransaction(object):
