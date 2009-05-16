@@ -13,4 +13,4 @@ def render(template_file, **kwargs):
     import django.template.loader
     source, loader = django.template.loader.find_template_source(template_file)
     t = Cheetah.Template.Template(source, searchList=[kwargs])
-    return django.http.HttpResponse(t._str__())
+    return django.http.HttpResponse(t.__str__())
