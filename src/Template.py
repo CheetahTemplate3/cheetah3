@@ -1204,6 +1204,7 @@ class Template(Servlet):
                         warn = True
                     if isinstance(compilerSettings, dict) and compilerSettings.get('prioritizeSearchListOverSelf'):
                         warn = False
+                    warn = False
                     if warn:
                         print
                         print ''' *** WARNING *** '''
