@@ -32,20 +32,40 @@ class DummyResponse(object):
     def writeln(self, txt):
         write(txt)
         write('\n')
+    
+    def safeConvert(self, chunk):
+        if not chunk:
+            return u''
+        if isinstance(chunk, unicode):
+            return chunk
+        try:
+            return chunk.decode('utf-8', 'strict')
+        except UnicodeDecodeError:
+            try:
+                return chunk.decode('latin-1', 'strict')
+            except UnicodeDecodeError:
+                return chunk.decode('ascii', 'ignore')
+        except AttributeError:
+            return unicode(chunk)
+        return chunk
 
     def getvalue(self, outputChunks=None):
         chunks = outputChunks or self._outputChunks
         try: 
-            return ''.join(chunks)
+            return u''.join(chunks)
         except UnicodeDecodeError, ex:
             nonunicode = [c for c in chunks if not isinstance(c, unicode)]
-            raise DummyResponseFailure('''Looks like you're trying to mix encoded strings with Unicode strings
+            message = '''Looks like you're trying to mix encoded strings with Unicode strings
             (most likely utf-8 encoded ones)
 
             This can happen if you're using the `EncodeUnicode` filter, or if you're manually
             encoding strings as utf-8 before passing them in on the searchList (possible offenders: 
             %s) 
-            (%s)''' % (nonunicode, ex))
+            (%s)''' % (nonunicode, ex)
+            chunks = [self.safeConvert(c) for c in chunks]
+            print message
+            return u''.join(chunks)
+
 
 
     def writelines(self, *lines):
