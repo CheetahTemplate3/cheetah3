@@ -211,7 +211,7 @@ class Mantis_Issue_22_Regression_Test(unittest.TestCase):
             else:
                 _filter = self._CHEETAH__currentFilter = \
                             self._CHEETAH__filters[filterName] = getattr(self._CHEETAH__filtersLib, filterName)(self).filter
-            write(u'''                    This is my ''')
+            write(u'                    This is my ')
             _v = VFFSL(SL,"output",True) # u'$output' on line 5, col 32
             if _v is not None: write(_filter(_v, rawExpr=u'$output')) # from line 5, col 32.
 
