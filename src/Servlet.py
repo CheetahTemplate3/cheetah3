@@ -49,8 +49,8 @@ class Servlet(BaseServlet):
     request = None
     session = None
     
-    def __init__(self):
-        super(Servlet, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(Servlet, self).__init__(*args, **kwargs)
        
         # this default will be changed by the .awake() method
         self._CHEETAH__isControlledByWebKit = False 
@@ -58,7 +58,7 @@ class Servlet(BaseServlet):
     ## methods called by Webware during the request-response
         
     def awake(self, transaction):
-        BaseServlet.awake(self, transaction)
+        super(Servlet, self).awake(transaction)
         
         # a hack to signify that the servlet is being run directly from WebKit
         self._CHEETAH__isControlledByWebKit = True
@@ -86,7 +86,7 @@ without #implements, try adding '#implements respond' to your template
 definition.""")
 
     def sleep(self, transaction):
-        BaseServlet.sleep(self, transaction)
+        super(Servlet, self).sleep(transaction)
         self.session = None
         self.request  = None
         self._request  = None        
@@ -102,7 +102,7 @@ definition.""")
                        ):
         
         if self._CHEETAH__isControlledByWebKit:
-            return BaseServlet.serverSidePath(self, path)
+            return super(Servlet, self).serverSidePath(path)
         elif path:
             return normpath(abspath(path.replace("\\",'/')))
         elif hasattr(self, '_filePath') and self._filePath:

@@ -1,21 +1,6 @@
 #!/usr/bin/env python
-# $Id: Template.py,v 1.16 2006/02/03 21:05:50 tavis_rudd Exp $
-"""Tests of the Template class API
 
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>,
-Version: $Revision: 1.16 $
-Start Date: 2001/10/01
-Last Revision Date: $Date: 2006/02/03 21:05:50 $
-"""
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.16 $"[11:-2]
-
-
-##################################################
-## DEPENDENCIES ##
-
+import pdb
 import sys
 import types
 import os
@@ -25,28 +10,11 @@ import shutil
 import unittest_local_copy as unittest
 from Cheetah.Template import Template
 
-##################################################
-## CONSTANTS & GLOBALS ##
-
 majorVer, minorVer = sys.version_info[0], sys.version_info[1]
 versionTuple = (majorVer, minorVer)
 
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
-
-##################################################
-## TEST DATA FOR USE IN THE TEMPLATES ##
-
-##################################################
-## TEST BASE CLASSES
-
 class TemplateTest(unittest.TestCase):
     pass
-
-##################################################
-## TEST CASE CLASSES
 
 class ClassMethods_compile(TemplateTest):
     """I am using the same Cheetah source for each test to root out clashes
