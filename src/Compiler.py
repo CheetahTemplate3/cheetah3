@@ -1077,8 +1077,11 @@ class AutoMethodCompiler(MethodCompiler):
                 self.addChunk('SL = self._CHEETAH__searchList')                
             else:
                 self.addChunk('SL = [KWS]')
-        if self.setting('useFilters') and not self.isClassMethod() and not self.isStaticMethod():
-            self.addChunk('_filter = self._CHEETAH__currentFilter')
+        if self.setting('useFilters'):
+            if self.isClassMethod() or self.isStaticMethod():
+                self.addChunk('_filter = lambda x, **kwargs: unicode(x)')
+            else:
+                self.addChunk('_filter = self._CHEETAH__currentFilter')
         self.addChunk('')
         self.addChunk("#" *40)
         self.addChunk('## START - generated method body')

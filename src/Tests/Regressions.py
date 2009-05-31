@@ -137,6 +137,26 @@ class Mantis_Issue_11_Regression_Test(unittest.TestCase):
         assert template
         assert template.respond()
 
+class Mantis_Issue_21_Regression_Test(unittest.TestCase):
+    ''' 
+        Test case for bug outlined in issue #21
+
+        Effectively @staticmethod and @classmethod
+        decorated methods in templates don't 
+        properly define the _filter local, which breaks
+        when using the NameMapper
+    '''
+    template = '''
+        #@staticmethod
+        #def testMethod()
+            This is my $output
+        #end def
+    '''
+    template = Cheetah.Template.Template.compile(template)
+    assert template
+    assert template.testMethod(output='bug') # raises a NameError: global name '_filter' is not defined
+
+
 
 if __name__ == '__main__':
     unittest.main()
