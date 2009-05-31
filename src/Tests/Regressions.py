@@ -146,16 +146,83 @@ class Mantis_Issue_21_Regression_Test(unittest.TestCase):
         properly define the _filter local, which breaks
         when using the NameMapper
     '''
-    template = '''
-        #@staticmethod
-        #def testMethod()
-            This is my $output
-        #end def
-    '''
-    template = Cheetah.Template.Template.compile(template)
-    assert template
-    assert template.testMethod(output='bug') # raises a NameError: global name '_filter' is not defined
+    def runTest(self):
+        template = '''
+            #@staticmethod
+            #def testMethod()
+                This is my $output
+            #end def
+        '''
+        template = Cheetah.Template.Template.compile(template)
+        assert template
+        assert template.testMethod(output='bug') # raises a NameError: global name '_filter' is not defined
 
+
+class Mantis_Issue_22_Regression_Test(unittest.TestCase):
+    ''' 
+        Test case for bug outlined in issue #22
+
+        When using @staticmethod and @classmethod
+        in conjunction with the #filter directive
+        the generated code for the #filter is reliant
+        on the `self` local, breaking the function
+    '''
+    def test_NoneFilter(self):
+        template = '''
+            #@staticmethod
+            #def testMethod()
+                #filter None
+                    This is my $output
+                #end filter
+            #end def
+        '''
+        template = Cheetah.Template.Template.compile(template)
+        assert template
+        assert template.testMethod(output='bug')
+
+    def test_DefinedFilter(self):
+        template = '''
+            #@staticmethod
+            #def testMethod()
+                #filter Filter
+                    This is my $output
+                #end filter
+            #end def
+        '''
+        # The generated code for the template's testMethod() should look something
+        # like this in the 'error' case:
+        '''
+        @staticmethod
+        def testMethod(**KWS):
+            ## CHEETAH: generated from #def testMethod() at line 3, col 13.
+            trans = DummyTransaction()
+            _dummyTrans = True
+            write = trans.response().write
+            SL = [KWS]
+            _filter = lambda x, **kwargs: unicode(x)
+
+            ########################################
+            ## START - generated method body
+
+            _orig_filter_18517345 = _filter
+            filterName = u'Filter'
+            if self._CHEETAH__filters.has_key("Filter"):
+                _filter = self._CHEETAH__currentFilter = self._CHEETAH__filters[filterName]
+            else:
+                _filter = self._CHEETAH__currentFilter = \
+                            self._CHEETAH__filters[filterName] = getattr(self._CHEETAH__filtersLib, filterName)(self).filter
+            write(u'''                    This is my ''')
+            _v = VFFSL(SL,"output",True) # u'$output' on line 5, col 32
+            if _v is not None: write(_filter(_v, rawExpr=u'$output')) # from line 5, col 32.
+
+            ########################################
+            ## END - generated method body
+
+            return _dummyTrans and trans.response().getvalue() or ""
+        '''
+        template = Cheetah.Template.Template.compile(template)
+        assert template
+        assert template.testMethod(output='bug')
 
 
 if __name__ == '__main__':
