@@ -2,9 +2,18 @@
 
 import Cheetah.NameMapper 
 import Cheetah.Template
+
 import pdb
+import sys
 
 import unittest_local_copy as unittest # This is just stupid
+
+majorVer, minorVer = sys.version_info[0], sys.version_info[1]
+versionTuple = (majorVer, minorVer)
+
+def isPython23():
+    ''' Python 2.3 is still supported by Cheetah, but doesn't support decorators '''
+    return majorVer == 2 and minorVer < 4
 
 class GetAttrException(Exception):
     pass
@@ -147,6 +156,8 @@ class Mantis_Issue_21_Regression_Test(unittest.TestCase):
         when using the NameMapper
     '''
     def runTest(self):
+        if isPython23():
+            return
         template = '''
             #@staticmethod
             #def testMethod()
@@ -168,6 +179,8 @@ class Mantis_Issue_22_Regression_Test(unittest.TestCase):
         on the `self` local, breaking the function
     '''
     def test_NoneFilter(self):
+        if isPython23():
+            return
         template = '''
             #@staticmethod
             #def testMethod()
@@ -181,6 +194,8 @@ class Mantis_Issue_22_Regression_Test(unittest.TestCase):
         assert template.testMethod(output='bug')
 
     def test_DefinedFilter(self):
+        if isPython23():
+            return
         template = '''
             #@staticmethod
             #def testMethod()

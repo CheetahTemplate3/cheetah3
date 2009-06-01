@@ -33,20 +33,11 @@ from Cheetah.Parser import ParseError
 from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
 import unittest_local_copy as unittest
 
-class Unspecified: pass 
-##################################################
-## CONSTANTS & GLOBALS ##
+class Unspecified(object):
+    pass
 
 majorVer, minorVer = sys.version_info[0], sys.version_info[1]
 versionTuple = (majorVer, minorVer)
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
-
-##################################################
-## TEST DATA FOR USE IN THE TEMPLATES ##
 
 def testdecorator(func):
     return func

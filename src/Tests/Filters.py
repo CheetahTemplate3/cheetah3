@@ -7,6 +7,9 @@ import Cheetah.Filters
 
 import unittest_local_copy as unittest 
 
+majorVer, minorVer = sys.version_info[0], sys.version_info[1]
+versionTuple = (majorVer, minorVer)
+
 class BasicMarkdownFilterTest(unittest.TestCase):
     '''
         Test that our markdown filter works
@@ -27,7 +30,7 @@ Header
             template = str(template)
             assert template == expected
         except Exception, ex:
-            if ex.__class__.__name__ == 'MarkdownException' and sys.version_info[0] == 2 and sys.version_info[1] < 5:
+            if ex.__class__.__name__ == 'MarkdownException' and majorVer == 2 and minorVer < 5:
                 print '>>> NOTE: Support for the Markdown filter will be broken for you. Markdown says: %s' % ex
                 return
             raise
