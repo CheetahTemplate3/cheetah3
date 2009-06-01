@@ -17,17 +17,22 @@ At its core, Cheetah is a domain-specific language for markup generation and
 templating which allows for full integration with existing Python code but also 
 offers extensions to traditional Python syntax to allow for easier text-generation.
 
+Talk Cheetah
+^^^^^^^^^^^^
+You can get involved and talk with Cheetah developers on the `Cheetah mailing list <http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss>`_
+(*cheetahtemplate-discuss@lists.sourceforge.net*) or on the **IRC** channel: 
+**#cheetah** on `Freenode <http://freenode.net/>`_
 
-
-Contents:
+Contents
 ^^^^^^^^^
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    developers.rst
    download.rst
    roadmap.rst
+   documentation.rst
 
 
 Cheetah in a nutshell
