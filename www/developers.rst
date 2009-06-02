@@ -9,7 +9,7 @@ Getting the Code
 ----------------
 The Cheetah source code is stored in a central **Git** repository
 hosted primarily by `GitHub <http://github.com>`_. The primary Git 
-repository can be found `here <http://github.com/rtyler/cheetah>`_.
+repository can be found `here <http://github.com/cheetahtemplate/cheetah>`_.
 
 
 Development Process
@@ -22,11 +22,12 @@ the current release of Cheetah will go, it's common for a patch
 to be applied to maint and next at the same time.
 
 Anyone and everyone is encouraged to submit patches at any time, but as far 
-as bugs or feature requests go, we try to file those *first* in the `Cheetah Bug Tracker <bugs.cheetahtemplate.org>`_
+as bugs or feature requests go, we try to file those *first* in the `Cheetah Bug Tracker <http://bugs.cheetahtemplate.org>`_
 and then they can be organized into particular releases as is necessary.
 
 In addition to the bug tracker, Cheetah uses `Hudson <http://hudson-ci.org>`_ for 
-automating builds and test runs on a number of platforms. Prior to the tarballing of
+automating builds and test runs on a number of platforms (see: `Cheetah's Hudson <http://hudson.cheetahtemplate.org>`_).
+Prior to the tarballing of
 a release, **all** tests must be passing before the **next** branch is merged down
 to the Git **master** branch where the release tarball will actually be created from.
 
@@ -35,7 +36,7 @@ Filing Bugs
 -----------
 No software is perfect, and unfortunately no bug report is either. If you've 
 found yourself faced with a bug in Cheetah, or just have a good idea for a 
-new feature, we kindly ask that you create an issue in the `Cheetah Bug Tracker <bugs.cheetahtemplate.org>`_.
+new feature, we kindly ask that you create an issue in the `Cheetah Bug Tracker <http://bugs.cheetahtemplate.org>`_.
 
 Some tips for filing a *useful* bug report, try to include the following:
 
