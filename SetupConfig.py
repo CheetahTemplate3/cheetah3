@@ -4,7 +4,7 @@ from src.Version import Version as version
 maintainer = "R. Tyler Ballance"
 author = "Tavis Rudd"
 author_email = "cheetahtemplate-discuss@lists.sf.net"
-url = "http://www.communitycheetah.org/"
+url = "http://www.cheetahtemplate.org/"
 packages = ['Cheetah',
             'Cheetah.Macros',            
             'Cheetah.Templates',
@@ -65,7 +65,7 @@ used to generate C++ game code, Java, sql, form emails and even Python code.
 Documentation
 ================================================================================
 For a high-level introduction to Cheetah please refer to the User\'s Guide
-at http://www.communitycheetah.org/learn.html
+at http://www.cheetahtemplate.org/learn.html
 
 Mailing list
 ================================================================================
@@ -74,10 +74,10 @@ Subscribe at http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss
 
 Credits
 ================================================================================
-http://www.communitycheetah.org/credits.html
+http://www.cheetahtemplate.org/credits.html
 
 Recent Changes
 ================================================================================
-See http://www.communitycheetah.org/CHANGES.txt for full details
+See http://www.cheetahtemplate.org/CHANGES.txt for full details
 
 '''
