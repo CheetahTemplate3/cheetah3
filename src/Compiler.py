@@ -106,7 +106,7 @@ DEFAULT_COMPILER_SETTINGS = dict([(v[0], v[1]) for v in _DEFAULT_COMPILER_SETTIN
 
 
 
-class GenUtils:
+class GenUtils(object):
     """An abstract baseclass for the Compiler classes that provides methods that
     perform generic utility functions or generate pieces of output code from
     information passed in by the Parser baseclass.  These methods don't do any
@@ -1511,7 +1511,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
                  extraImportStatements=None, # list of strings
                  settings=None # dict
                  ):
-        SettingsManager.__init__(self)
+        super(ModuleCompiler, self).__init__()
         if settings:
             self.updateSettings(settings)
         # disable useStackFrames if the C version of NameMapper isn't compiled
