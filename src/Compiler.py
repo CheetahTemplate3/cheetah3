@@ -1709,8 +1709,9 @@ class ModuleCompiler(SettingsManager, GenUtils):
         settings = self.settings()
         if not varNames:
             return 
-        if self._methodBodyChunks and raw_statement and not settings.get('useLegacyImportMode'):
-            self.addChunk(raw_statement)
+        if not settings.get('useLegacyImportMode'):
+            if raw_statement and getattr(self, '_methodBodyChunks'):
+                self.addChunk(raw_statement)
         else:
             self._importedVarNames.extend(varNames)
 
