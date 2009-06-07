@@ -10,7 +10,8 @@ Existing CHEPs
 --------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1 
     
    cheps/1_chep.rst
    cheps/2_import.rst
+   cheps/3_super.rst

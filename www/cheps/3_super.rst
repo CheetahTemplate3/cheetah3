@@ -1,9 +1,9 @@
-(#2) Conditionalized #import behavior
-=====================================
+(#3) Exposing of super() and self via Template searchList 
+=========================================================
 
 
-:CHEP: 2
-:Title: Conditionalized #import behavior
+:CHEP: 3
+:Title: Exposing of super() and self via Template searchList 
 :Version: 1
 :Author: R Tyler Ballance <tyler at slide.com>
 :Status: Draft
