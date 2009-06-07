@@ -33,6 +33,7 @@ Contents
    download.rst
    roadmap.rst
    documentation.rst
+   chep.rst
 
 
 Cheetah in a nutshell
