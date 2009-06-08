@@ -24,9 +24,9 @@ Motivation
 ----------
 Currently Cheetah (v2.2.1) provides two different, but mutually exclusive, 
 means of importing Python modules with the #from/#import directives. The 
-"traditional" handling for #from/#import is that the generated import 
-statements shall all be relocated to the top of the generated module's 
-source code, i.e. ::
+"traditional" handling for #from/#import (hereafter referred to as "module imports")
+is that the generated import statements shall all be relocated to 
+the top of the generated module's source code, i.e. ::
 
     #import cjson
 
@@ -45,7 +45,8 @@ Will result in generated module code along the lines of::
 
 Also currently in Cheetah is the ability to switch off this 
 behavior and enable location specific #from/#import handling
-in the generated code, with this block of Cheetah for example::
+(hereafter referred to as "function imports") in the generated 
+code, with this block of Cheetah for example::
 
     #def aFunction(arg)
         #try
@@ -75,6 +76,19 @@ exclusive fashions.
 
 Specification
 -------------
+The change in #from/#import behavior and how these directives 
+are handled is all based on context of their use, making the 
+#from/#import handling "intelligent". For module imports, the
+"traditional" handling of the #from/#import directives will
+still apply. Whereas function imports will result in inline 
+generated import code.
+
+The basic premise of the change proposed by this document is 
+that all #from/#import directives contained within a #def/#end def
+closure will result in import statements contained within that 
+function block whereas everywhere else the statements will be relocated
+to the top of the generated module code (i.e. the module import)
+
 
 Rationale
 ---------
