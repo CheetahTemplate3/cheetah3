@@ -92,12 +92,30 @@ to the top of the generated module code (i.e. the module import)
 
 Rationale
 ---------
+The concept of the "function import" was introduced in Cheetah v2.1.0
+and quickly retrofitted to "live" behind a compiler setting due to the 
+regressions with older templates or templates that were designed to utilize
+module imports (through heavy #block/#end block use, etc). Through discussion
+with Tavis Rudd, this middle ground between the two styles of importing was 
+concluded to be the most reasonable solution to providing "pythonic" import
+functionality (i.e. "function import" also known as "inline imports") while 
+still providing the ability to have #from/#import directives declared at the 
+module scope within the template (within the Cheetah templates, markup and most
+directives declared within the module scope are placed inside the default method).
+
 
 Backwards Compatibility
 -----------------------
+Changes proposed in this document should be *mostly* backwards 
+compatible with current versions of Cheetah, Any unforeseen issues 
+could arise from the use of #from/#import inside of a function 
+expecting those symbols to be available outside of the function
+that they're declared in.
+
 
 Reference Implementation
 ------------------------
+*still in development*
 
 Copyright
 ---------
