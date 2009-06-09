@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 """
 client module for memcached (memory cache daemon)

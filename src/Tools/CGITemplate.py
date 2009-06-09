@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: CGITemplate.py,v 1.6 2006/01/29 02:09:59 tavis_rudd Exp $
 """A subclass of Cheetah.Template for use in CGI scripts.
 

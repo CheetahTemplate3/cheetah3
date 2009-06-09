@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: NameMapper.py,v 1.32 2007/12/10 19:20:09 tavis_rudd Exp $
 
 """This module supports Cheetah's optional NameMapper syntax.

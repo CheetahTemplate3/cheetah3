@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 @@TR: This code is pretty much unsupported.
 

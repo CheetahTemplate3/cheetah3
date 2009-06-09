@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: SourceReader.py,v 1.15 2007/04/03 01:57:42 tavis_rudd Exp $
 """SourceReader class for Cheetah's Parser and CodeGenerator
 

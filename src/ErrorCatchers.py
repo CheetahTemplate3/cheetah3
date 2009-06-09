@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: ErrorCatchers.py,v 1.7 2005/01/03 19:59:07 tavis_rudd Exp $
 """ErrorCatcher class for Cheetah Templates
 

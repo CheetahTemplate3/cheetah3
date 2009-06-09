@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 '''
 Provides dummy Transaction and Response classes is used by Cheetah in place

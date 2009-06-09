@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: SiteHierarchy.py,v 1.1 2001/10/11 03:25:54 tavis_rudd Exp $
 """Create menus and crumbs from a site hierarchy.
 

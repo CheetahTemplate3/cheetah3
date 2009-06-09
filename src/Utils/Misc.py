@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: Misc.py,v 1.8 2005/11/02 22:26:08 tavis_rudd Exp $
 """Miscellaneous functions/objects used by Cheetah but also useful standalone.
 

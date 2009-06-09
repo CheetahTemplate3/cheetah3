@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: ImportHooks.py,v 1.27 2007/11/16 18:28:47 tavis_rudd Exp $
 
 """Provides some import hooks to allow Cheetah's .tmpl files to be imported
