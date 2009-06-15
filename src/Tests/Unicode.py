@@ -131,6 +131,27 @@ class JBQ_UTF8_Test7(CommandLineTest):
 
         assert unicode(template())
 
+class JBQ_UTF8_Test8(CommandLineTest):
+    def testStaticCompile(self):
+        source = """#encoding utf-8
+#set $someUnicodeString = u"Bébé"
+$someUnicodeString"""
+
+        template = self.createAndCompile(source)()
+
+        a = unicode(template).encode("utf-8")
+        self.assertEquals("Bébé", a)
+
+    def testDynamicCompile(self):
+        source = """#encoding utf-8
+#set $someUnicodeString = u"Bébé"
+$someUnicodeString"""
+
+        template = Template(source = source)
+
+        a = unicode(template).encode("utf-8")
+        self.assertEquals("Bébé", a)
+
 class Unicode_in_SearchList_Test(CommandLineTest):
     def test_BasicASCII(self):
         source = '''This is $adjective'''
