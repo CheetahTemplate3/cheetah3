@@ -9,12 +9,11 @@ import string
 import traceback
 
 from distutils.core import setup
-try:
-    # use http://peak.telecommunity.com/DevCenter/setuptools if it's installed
-    # requires Py >=2.3
-    from setuptools import setup
-except ImportError:   
-    from distutils.core import setup
+if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
+    try:
+        from setuptools import setup
+    except ImportError:   
+        from distutils.core import setup
 
 from distutils.core import Command
 from distutils.command.install_data import install_data
