@@ -2,6 +2,7 @@
 
 import Cheetah.NameMapper 
 import Cheetah.Template
+from Cheetah.Utils import statprof
 
 import os
 import sys
@@ -79,6 +80,44 @@ class DynamicTemplatePerformanceTest(unittest.TestCase):
         for i in xrange(self.loops):
             klass = Cheetah.Template.Template.compile(template)
             assert klass
+
+class PerformanceTest(unittest.TestCase):
+    iterations = 10000
+    display = False
+    def setUp(self):
+        super(PerformanceTest, self).setUp()
+        statprof.start()
+
+    def runTest(self):
+        for i in xrange(self.iterations):
+            if hasattr(self, 'performanceSample'):
+                self.display = True
+                self.performanceSample()
+
+    def tearDown(self):
+        super(PerformanceTest, self).tearDown()
+        statprof.stop()
+        if self.display:
+            print '>>> %s (%d iterations) ' % (self.__class__.__name__,
+                    self.iterations)
+            statprof.display()
+
+class DynamicCompilationTest(PerformanceTest):
+    iterations = 1000000
+    def performanceSample(self):
+        template = '''
+            #import sys
+            #import os
+            #def testMethod()
+                #set foo = [1, 2, 3, 4]
+                #return $foo[0]
+            #end def
+        '''
+        template = Cheetah.Template.Template.compile(template, 
+            keepRefToGeneratedCode=False)
+        template = template()
+        value = template.testMethod()
+
 
 if __name__ == '__main__':
     if '--debug' in sys.argv:
