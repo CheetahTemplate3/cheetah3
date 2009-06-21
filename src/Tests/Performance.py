@@ -82,7 +82,7 @@ class DynamicTemplatePerformanceTest(unittest.TestCase):
             assert klass
 
 class PerformanceTest(unittest.TestCase):
-    iterations = 10000
+    iterations = 1000000
     display = False
     def setUp(self):
         super(PerformanceTest, self).setUp()
@@ -102,8 +102,7 @@ class PerformanceTest(unittest.TestCase):
                     self.iterations)
             statprof.display()
 
-class DynamicCompilationTest(PerformanceTest):
-    iterations = 1000000
+class DynamicMethodCompilationTest(PerformanceTest):
     def performanceSample(self):
         template = '''
             #import sys
@@ -117,6 +116,22 @@ class DynamicCompilationTest(PerformanceTest):
             keepRefToGeneratedCode=False)
         template = template()
         value = template.testMethod()
+
+class DynamicSimpleCompilationTest(PerformanceTest):
+    def performanceSample(self):
+        template = '''
+            #import sys
+            #import os
+            #set foo = [1,2,3,4]
+
+            Well hello there! This is basic.
+
+            Here's an array too: $foo
+        '''
+        template = Cheetah.Template.Template.compile(template, 
+            keepRefToGeneratedCode=False)
+        template = template()
+        template = unicode(template)
 
 
 if __name__ == '__main__':
