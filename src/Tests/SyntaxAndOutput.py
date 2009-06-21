@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
-# $Id: SyntaxAndOutput.py,v 1.110 2008/03/10 07:50:18 tavis_rudd Exp $
-"""Syntax and Output tests.
+
+'''
+Syntax and Output tests.
 
 TODO
 - #finally
@@ -9,16 +10,7 @@ TODO
 - #errorCatcher
 - #echo
 - #silent
-
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.110 $
-Start Date: 2001/03/30
-Last Revision Date: $Date: 2008/03/10 07:50:18 $
-"""
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.110 $"[11:-2]
+'''
 
 
 ##################################################
@@ -31,6 +23,7 @@ from copy import deepcopy
 import os
 import os.path
 import new
+import pdb
 import warnings
 
 from Cheetah.NameMapper import NotFound
@@ -40,20 +33,11 @@ from Cheetah.Parser import ParseError
 from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
 import unittest_local_copy as unittest
 
-class Unspecified: pass 
-##################################################
-## CONSTANTS & GLOBALS ##
+class Unspecified(object):
+    pass
 
 majorVer, minorVer = sys.version_info[0], sys.version_info[1]
 versionTuple = (majorVer, minorVer)
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
-
-##################################################
-## TEST DATA FOR USE IN THE TEMPLATES ##
 
 def testdecorator(func):
     return func
@@ -190,14 +174,8 @@ Template output mismatch:
         if self.DEBUGLEV >= 1:
             print moduleCode
         try:
-            try:
-                output = templateObj.respond() # rather than __str__, because of unicode
-                if outputEncoding:
-                    output = output.decode(outputEncoding)
-                assert output==expectedOutput, self._outputMismatchReport(output, expectedOutput)
-            except:
-                #print >>sys.stderr, moduleCode
-                raise
+            output = templateObj.respond() # rather than __str__, because of unicode
+            assert output==expectedOutput, self._outputMismatchReport(output, expectedOutput)
         finally:
             templateObj.shutdown()
 
@@ -757,13 +735,13 @@ class EncodingDirective(OutputTest):
 
     def test4(self):
         """basic #encoding """
-        self.verify("#encoding ascii\n\xe1\x88\xb4",
-                    "\xe1\x88\xb4")
+        self.verify("#encoding latin-1\n\xe1\x88\xb4",
+                    u"\xe1\x88\xb4")
 
     def test5(self):
         """basic #encoding """
         self.verify("#encoding latin-1\nAndr\202",
-                    u'Andr\202', outputEncoding='latin-1')
+                    u'Andr\202')
 
 class UnicodeDirective(OutputTest):
     def test1(self):
@@ -788,7 +766,7 @@ class UnicodeDirective(OutputTest):
                     u"1234ü")
 
         self.verify("#encoding latin-1\n1234ü",
-                    "1234ü")
+                    u"1234ü")
 
 class Placeholders_Esc(OutputTest):
     convertEOLs = False

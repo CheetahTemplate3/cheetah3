@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
     Compiler classes for Cheetah:
     ModuleCompiler aka 'Compiler'
@@ -49,6 +48,7 @@ _DEFAULT_COMPILER_SETTINGS = [
     ('useFilters', True, 'If False, pass output through str()'),
     ('includeRawExprInFilterArgs', True, ''),
     ('useLegacyImportMode', True, 'All #import statements are relocated to the top of the generated Python module'),
+    ('prioritizeSearchListOverSelf', False, 'When iterating the searchList, look into the searchList passed into the initializer instead of Template members first'),
 
     ('autoAssignDummyTransactionToSelf', False, ''),
     ('useKWsDictArgForPassingTrans', True, ''),
@@ -105,7 +105,7 @@ DEFAULT_COMPILER_SETTINGS = dict([(v[0], v[1]) for v in _DEFAULT_COMPILER_SETTIN
 
 
 
-class GenUtils:
+class GenUtils(object):
     """An abstract baseclass for the Compiler classes that provides methods that
     perform generic utility functions or generate pieces of output code from
     information passed in by the Parser baseclass.  These methods don't do any
@@ -834,6 +834,7 @@ class MethodCompiler(GenUtils):
 
     def setCallArg(self, argName, lineCol):
         ID, callDetails = self._callRegionsStack[-1]
+        argName = str(argName)
         if callDetails.usesKeywordArgs:
             self._endCallArg()
         else:
@@ -1075,8 +1076,11 @@ class AutoMethodCompiler(MethodCompiler):
                 self.addChunk('SL = self._CHEETAH__searchList')                
             else:
                 self.addChunk('SL = [KWS]')
-        if self.setting('useFilters') and not self.isClassMethod() and not self.isStaticMethod():
-            self.addChunk('_filter = self._CHEETAH__currentFilter')
+        if self.setting('useFilters'):
+            if self.isClassMethod() or self.isStaticMethod():
+                self.addChunk('_filter = lambda x, **kwargs: unicode(x)')
+            else:
+                self.addChunk('_filter = self._CHEETAH__currentFilter')
         self.addChunk('')
         self.addChunk("#" *40)
         self.addChunk('## START - generated method body')
@@ -1222,8 +1226,8 @@ class ClassCompiler(GenUtils):
         __init__ = self._spawnMethodCompiler('__init__',
                                              klass=self.methodCompilerClassForInit)
         __init__.setMethodSignature("def __init__(self, *args, **KWs)")
-        __init__.addChunk("%s.__init__(self, *args, **KWs)" % self._baseClass)
-        __init__.addChunk(_initMethod_initCheetah%{'className':self._className})
+        __init__.addChunk('super(%s, self).__init__(*args, **KWs)' % self._className)
+        __init__.addChunk(_initMethod_initCheetah % {'className' : self._className})
         for chunk in self._initMethChunks:
             __init__.addChunk(chunk)
         __init__.cleanupState()
@@ -1506,7 +1510,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
                  extraImportStatements=None, # list of strings
                  settings=None # dict
                  ):
-        SettingsManager.__init__(self)
+        super(ModuleCompiler, self).__init__()
         if settings:
             self.updateSettings(settings)
         # disable useStackFrames if the C version of NameMapper isn't compiled
@@ -1624,6 +1628,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "import sys",
             "import os",
             "import os.path",
+            "import __builtin__",
             "from os.path import getmtime, exists",
             "import time",
             "import types",
@@ -1703,8 +1708,9 @@ class ModuleCompiler(SettingsManager, GenUtils):
         settings = self.settings()
         if not varNames:
             return 
-        if self._methodBodyChunks and raw_statement and not settings.get('useLegacyImportMode'):
-            self.addChunk(raw_statement)
+        if not settings.get('useLegacyImportMode'):
+            if raw_statement and getattr(self, '_methodBodyChunks'):
+                self.addChunk(raw_statement)
         else:
             self._importedVarNames.extend(varNames)
 

@@ -1,17 +1,3 @@
-"""Provides a mixin/base class for collecting and managing application settings
-
-Meta-Data
-==========
-Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.30 $
-Start Date: 2001/05/30
-Last Revision Date: $Date: 2008/02/14 03:03:16 $
-"""
-
-# $Id: SettingsManager.py,v 1.30 2008/02/14 03:03:16 tavis_rudd Exp $
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.30 $"[11:-2]
-
 import sys
 import os.path
 import copy as copyModule
@@ -25,13 +11,6 @@ import time
 from StringIO import StringIO # not cStringIO because of unicode support
 import imp                 # used by SettingsManager.updateSettingsFromPySrcFile()
 
-##################################################
-## CONSTANTS & GLOBALS ##
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
 
 numberRE = re.compile(Number)
 complexNumberRE = re.compile('[\(]*' +Number + r'[ \t]*\+[ \t]*' + Number + '[\)]*')
@@ -89,13 +68,10 @@ def convStringToNum(theString):
     return eval(theString, {}, {})
 
 
-##################################################
-## CLASSES ##
-
 class Error(Exception):
     pass
 
-class NoDefault:
+class NoDefault(object):
     pass
 
 class ConfigParserCaseSensitive(ConfigParser):
@@ -105,7 +81,7 @@ class ConfigParserCaseSensitive(ConfigParser):
         """Don't change the case as is done in the default implemenation."""
         return optionstr
 
-class _SettingsCollector:
+class _SettingsCollector(object):
     """An abstract base class that provides the methods SettingsManager uses to
     collect settings from config files and strings.
 
@@ -114,9 +90,6 @@ class _SettingsCollector:
     """
 
     _ConfigParserClass = ConfigParserCaseSensitive 
-
-    def __init__(self):
-        pass
 
     def readSettingsFromModule(self, mod, ignoreUnderscored=True):
         """Returns all settings from a Python module.
@@ -230,8 +203,7 @@ class SettingsManager(_SettingsCollector):
     """
 
     def __init__(self):
-        """MUST BE CALLED BY SUBCLASSES"""
-        _SettingsCollector.__init__(self)
+        super(SettingsManager, self).__init__()
         self._settings = {}
         self._initializeSettings()
 

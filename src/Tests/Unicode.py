@@ -3,8 +3,31 @@
 
 from Cheetah.Template import Template
 from Cheetah import CheetahWrapper
-import traceback, tempfile, sys, imp, os
+from Cheetah import DummyTransaction
+import imp
+import os
+import pdb
+import random
+import sys
+import tempfile
 import unittest_local_copy as unittest # This is stupid
+
+class CommandLineTest(unittest.TestCase):
+    def createAndCompile(self, source):
+        sourcefile = '-'
+        while sourcefile.find('-') != -1:
+            sourcefile = tempfile.mktemp()
+        
+        fd = open('%s.tmpl' % sourcefile, 'w')
+        fd.write(source)
+        fd.close()
+
+        wrap = CheetahWrapper.CheetahWrapper()
+        wrap.main(['cheetah', 'compile', '--nobackup', sourcefile])
+        module_name = os.path.basename(sourcefile)
+        module = loadModule(module_name, ['/tmp'])
+        template = getattr(module, module_name)
+        return template
 
 class JBQ_UTF8_Test1(unittest.TestCase):
     def runTest(self):
@@ -97,24 +120,66 @@ class JBQ_UTF8_Test6(unittest.TestCase):
 
         assert unicode(t())
 
-class JBQ_UTF8_Test7(unittest.TestCase):
+class JBQ_UTF8_Test7(CommandLineTest):
     def runTest(self):
         source = """#encoding utf-8
         #set $someUnicodeString = u"Bébé"
         Main file with |$v| and eacute in the template é"""
 
-        sourcefile = tempfile.mktemp()
-        f = open("%s.tmpl" % sourcefile, "w")
-        f.write(source)
-        f.close()
-        cw = CheetahWrapper.CheetahWrapper()
-        cw.main(["cheetah", "compile", "--nobackup", sourcefile])
-        modname = os.path.basename(sourcefile)
-        mod = loadModule(modname, ["/tmp"])
-        t = eval("mod.%s" % modname)
-        t.v = u'Unicode String'
+        template = self.createAndCompile(source)
+        template.v = u'Unicode String'
 
-        assert unicode(t())
+        assert unicode(template())
+
+class JBQ_UTF8_Test8(CommandLineTest):
+    def testStaticCompile(self):
+        source = """#encoding utf-8
+#set $someUnicodeString = u"Bébé"
+$someUnicodeString"""
+
+        template = self.createAndCompile(source)()
+
+        a = unicode(template).encode("utf-8")
+        self.assertEquals("Bébé", a)
+
+    def testDynamicCompile(self):
+        source = """#encoding utf-8
+#set $someUnicodeString = u"Bébé"
+$someUnicodeString"""
+
+        template = Template(source = source)
+
+        a = unicode(template).encode("utf-8")
+        self.assertEquals("Bébé", a)
+
+class Unicode_in_SearchList_Test(CommandLineTest):
+    def test_BasicASCII(self):
+        source = '''This is $adjective'''
+
+        template = self.createAndCompile(source)
+        assert template and issubclass(template, Template)
+        template = template(searchList=[{'adjective' : u'neat'}])
+        assert template.respond()
+
+    def test_Thai(self):
+        # The string is something in Thai
+        source = '''This is $foo $adjective'''
+        template = self.createAndCompile(source)
+        assert template and issubclass(template, Template)
+        template = template(searchList=[{'foo' : 'bar', 
+            'adjective' : u'\u0e22\u0e34\u0e19\u0e14\u0e35\u0e15\u0e49\u0e2d\u0e19\u0e23\u0e31\u0e1a'}])
+        assert template.respond()
+
+    def test_ErrorReporting(self):
+        utf8 = '\xe0\xb8\xa2\xe0\xb8\xb4\xe0\xb8\x99\xe0\xb8\x94\xe0\xb8\xb5\xe0\xb8\x95\xe0\xb9\x89\xe0\xb8\xad\xe0\xb8\x99\xe0\xb8\xa3\xe0\xb8\xb1\xe0\xb8\x9a'
+
+        source = '''This is $adjective'''
+        template = self.createAndCompile(source)
+        assert template and issubclass(template, Template)
+        template = template(searchList=[{'adjective' : utf8}])
+        self.failUnlessRaises(DummyTransaction.DummyResponseFailure, template.respond)
+
+
 
 if __name__ == '__main__':
     unittest.main()

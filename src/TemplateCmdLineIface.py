@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: TemplateCmdLineIface.py,v 1.13 2006/01/10 20:34:35 tavis_rudd Exp $
 
 """Provides a command line interface to compiled Cheetah template modules.

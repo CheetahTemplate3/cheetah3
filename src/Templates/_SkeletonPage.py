@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: _SkeletonPage.py,v 1.13 2002/10/01 17:52:02 tavis_rudd Exp $
 """A baseclass for the SkeletonPage template
 

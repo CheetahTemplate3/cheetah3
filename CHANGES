@@ -1,7 +1,24 @@
 
-2.2.0 (not yet released)
+2.2.2 (Unreleased)
+  - Prevent _namemapper.c from segfaulting when PyImport_ImportModule fails for some reason (Bogdano Arendartchuk <debogdano@gmail.com>)
+  - Removal of the contrib/markdown module (in favor of a setuptools dependency)
+  - Default setup.py to use setuptools by default, failing that, fall back to distutils
+
+2.2.1 (June 1st, 2009)
+  - 0000020: [Templates] Builtin support for using Cheetah with Django (rtyler) 
+  - 0000021: [Compiler] @static and @classmethod don't properly define the _filter local (rtyler) 
+  - 0000023: [Compiler] Update Template super calls to use super() (rtyler) 
+  - Update all references to communitycheetah.org to point back at cheetahtemplate.org
+
+2.2.0 (May 17th, 2009)
   - Switch all internal representations of template code to unicode objects instead of str() objects
   - Convert unicode compiled template to an utf8 char buffer when writing to a file (Jean-Baptiste Quenot <jbq@caraldi.com>)
+  - 0000011: [Templates] Calling a function with arguments calls the function with None (rtyler) 
+  - 0000015: [Tests] Resolve test failures in 'next' branch (rtyler)
+  - 0000019: [Templates] Properly warn when joining unicode and non-unicode objects in DummyTransaction (rtyler)
+
+2.1.2 (May 5, 2009)
+  - 0000006: [Templates] Support @staticmethod and @classmethod (rtyler) 
 
 2.1.1 (April 16, 2009)
   - Support __eq__() and __ne__() the way you might expect in src/Tools/RecursiveNull (patch suggested by Peter Warasin <peter@endian.com>)

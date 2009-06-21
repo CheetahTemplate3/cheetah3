@@ -1,5 +1,6 @@
 # $Id: CacheRegion.py,v 1.3 2006/01/28 04:19:30 tavis_rudd Exp $
-"""Cache holder classes for Cheetah:
+'''
+Cache holder classes for Cheetah:
 
 Cache regions are defined using the #cache Cheetah directive. Each
 cache region can be viewed as a dictionary (keyed by cacheRegionID)
@@ -16,31 +17,24 @@ in the following example::
 
 The code above will generate a CacheRegion and add new cacheItem for each value
 of $getArticleID().
-
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com> and Philippe Normand <phil@base-art.net> 
-Version: $Revision: 1.3 $
-Start Date: 2005/06/20
-Last Revision Date: $Date: 2006/01/28 04:19:30 $
-"""
-__author__ = "Tavis Rudd <tavis@damnsimple.com> and Philippe Normand <phil@base-art.net>"
-__revision__ = "$Revision: 1.3 $"[11:-2]
+'''
 
 try:
     from hashlib import md5
 except ImportError:
     from md5 import md5
-from time import time as currentTime
-from Cheetah.CacheStore import MemoryCacheStore
 
-class CacheItem:
-    """A CacheItem is a container storing:
+import time
+import Cheetah.CacheStore
+
+class CacheItem(object):
+    '''
+    A CacheItem is a container storing:
 
         - cacheID (string)
         - refreshTime (timestamp or None) : last time the cache was refreshed
         - data (string) : the content of the cache
-    """
+    '''
     
     def __init__(self, cacheItemID, cacheStore):
         self._cacheItemID = cacheItemID
@@ -49,7 +43,7 @@ class CacheItem:
         self._expiryTime = 0
 
     def hasExpired(self):
-        return (self._expiryTime and currentTime() > self._expiryTime)
+        return (self._expiryTime and time.time() > self._expiryTime)
     
     def setExpiryTime(self, time):
         self._expiryTime = time
@@ -58,7 +52,7 @@ class CacheItem:
         return self._expiryTime
 
     def setData(self, data):
-        self._refreshTime = currentTime()
+        self._refreshTime = time.time()
         self._cacheStore.set(self._cacheItemID, data, self._expiryTime)
 
     def getRefreshTime(self):
@@ -76,7 +70,7 @@ class CacheItem:
         self._cacheStore.delete(self._cacheItemID)
         self._refreshTime = None
 
-class _CacheDataStoreWrapper:
+class _CacheDataStoreWrapper(object):
     def __init__(self, dataStore, keyPrefix):
         self._dataStore = dataStore
         self._keyPrefix = keyPrefix
@@ -90,8 +84,9 @@ class _CacheDataStoreWrapper:
     def set(self, key, val, time=0):        
         self._dataStore.set(self._keyPrefix+key, val, time=time)
 
-class CacheRegion:
-    """ A `CacheRegion` stores some `CacheItem` instances.
+class CacheRegion(object):
+    '''
+    A `CacheRegion` stores some `CacheItem` instances.
 
     This implementation stores the data in the memory of the current process.
     If you need a more advanced data store, create a cacheStore class that works
@@ -99,7 +94,7 @@ class CacheRegion:
     to __init__.  For example you could use
     Cheetah.CacheStore.MemcachedCacheStore, a wrapper around the Python
     memcached API (http://www.danga.com/memcached).
-    """
+    '''
     _cacheItemClass = CacheItem
     
     def __init__(self, regionID, templateCacheIdPrefix='', cacheStore=None):
@@ -107,7 +102,7 @@ class CacheRegion:
         self._regionID = regionID
         self._templateCacheIdPrefix = templateCacheIdPrefix
         if not cacheStore:
-            cacheStore = MemoryCacheStore()
+            cacheStore = Cheetah.CacheStore.MemoryCacheStore()
         self._cacheStore = cacheStore
         self._wrappedCacheDataStore = _CacheDataStoreWrapper(
             cacheStore, keyPrefix=templateCacheIdPrefix+':'+regionID+':')

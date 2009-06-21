@@ -514,7 +514,9 @@ init_namemapper(void)
   TooManyPeriods = PyErr_NewException("NameMapper.TooManyPeriodsInName",NULL,NULL);
   PyDict_SetItemString(d, "NotFound", NotFound);
   PyDict_SetItemString(d, "TooManyPeriodsInName", TooManyPeriods);
-  pprintMod = PyImport_ImportModule("pprint"); /* error check this */
+  pprintMod = PyImport_ImportModule("pprint");
+  if (!pprintMod)
+        return;
   pprintMod_pformat = PyObject_GetAttrString(pprintMod, "pformat");
   Py_DECREF(pprintMod);
   /* check for errors */

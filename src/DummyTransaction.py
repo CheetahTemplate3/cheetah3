@@ -1,91 +1,88 @@
-#!/usr/bin/env python
-# $Id: DummyTransaction.py,v 1.13 2005/11/13 01:12:13 tavis_rudd Exp $
 
-"""Provides dummy Transaction and Response classes is used by Cheetah in place
+'''
+Provides dummy Transaction and Response classes is used by Cheetah in place
 of real Webware transactions when the Template obj is not used directly as a
 Webware servlet.
 
-Meta-Data
-==========
-Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.13 $
-Start Date: 2001/08/30
-Last Revision Date: $Date: 2005/11/13 01:12:13 $
-"""
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.13 $"[11:-2]
+Warning: This may be deprecated in the future, please do not rely on any 
+specific DummyTransaction or DummyResponse behavior
+'''
 
 import types
 
-def flush():
+class DummyResponseFailure(Exception):
     pass
 
-class DummyResponse:
-    
-    """A dummy Response class is used by Cheetah in place of real Webware
-    Response objects when the Template obj is not used directly as a Webware
-    servlet.  """
-
-    
+class DummyResponse(object):
+    '''
+        A dummy Response class is used by Cheetah in place of real Webware
+        Response objects when the Template obj is not used directly as a Webware
+        servlet
+    ''' 
     def __init__(self):
-        self._outputChunks = outputChunks = []
-        self.write = write = outputChunks.append
-        def getvalue(outputChunks=outputChunks):
-            return ''.join(outputChunks)
-        self.getvalue = getvalue
-            
-        def writeln(txt):
-            write(txt)
-            write('\n')
-        self.writeln = writeln        
-        self.flush = flush
+        self._outputChunks = []
+
+    def flush(self):
+        pass
+        
+    def write(self, value):
+        self._outputChunks.append(value)
+
+    def writeln(self, txt):
+        write(txt)
+        write('\n')
+
+    def getvalue(self, outputChunks=None):
+        chunks = outputChunks or self._outputChunks
+        try: 
+            return ''.join(chunks)
+        except UnicodeDecodeError, ex:
+            nonunicode = [c for c in chunks if not isinstance(c, unicode)]
+            raise DummyResponseFailure('''Looks like you're trying to mix encoded strings with Unicode strings
+            (most likely utf-8 encoded ones)
+
+            This can happen if you're using the `EncodeUnicode` filter, or if you're manually
+            encoding strings as utf-8 before passing them in on the searchList (possible offenders: 
+            %s) 
+            (%s)''' % (nonunicode, ex))
+
 
     def writelines(self, *lines):
         ## not used
         [self.writeln(ln) for ln in lines]
         
-class DummyTransaction:
 
-    """A dummy Transaction class is used by Cheetah in place of real Webware
-    transactions when the Template obj is not used directly as a Webware
-    servlet.
+class DummyTransaction(object):
+    '''
+        A dummy Transaction class is used by Cheetah in place of real Webware
+        transactions when the Template obj is not used directly as a Webware
+        servlet.
 
-    It only provides a response object and method.  All other methods and
-    attributes make no sense in this context.
-    """
-    
-    def __init__(self, DummyResponse=DummyResponse):       
-        def response(resp=DummyResponse()):
-            return resp
-        self.response = response
-
-class TransformerResponse(object):
+        It only provides a response object and method.  All other methods and
+        attributes make no sense in this context.
+    '''
     def __init__(self, *args, **kwargs):
-        self._output = []
+        self._response = None
+
+    def response(self, resp=None):
+        if self._response is None:
+            self._response = resp or DummyResponse()
+        return self._response
+
+
+class TransformerResponse(DummyResponse):
+    def __init__(self, *args, **kwargs):
+        super(TransformerResponse, self).__init__(*args, **kwargs)
         self._filter = None
 
-    def write(self, value):
-        self._output.append(value)
-
-    def flush(self):
-        pass
-
-    def writeln(self, line):
-        self.write(line)
-        self.write('\n')
-
-    def writelines(self, *lines):
-        [self.writeln(line) for line in lines]
-
     def getvalue(self, **kwargs):
-        output = kwargs.get('outputChunks') or self._output
-        rc = ''.join(output)
+        output = super(TransformerResponse, self).getvalue(**kwargs)
         if self._filter:
             _filter = self._filter
             if isinstance(_filter, types.TypeType):
                 _filter = _filter()
-            return _filter.filter(rc)
-        return rc
+            return _filter.filter(output)
+        return output
 
 
 class TransformerTransaction(object):

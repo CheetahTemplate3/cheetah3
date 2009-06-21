@@ -23,7 +23,7 @@ import Regressions
 import Unicode
 
 suites = [
-   #unittest.findTestCases(SyntaxAndOutput),
+   unittest.findTestCases(SyntaxAndOutput),
    unittest.findTestCases(NameMapper),
    unittest.findTestCases(Template),
    unittest.findTestCases(Regressions),
