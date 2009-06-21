@@ -57,6 +57,7 @@ from Cheetah import ErrorCatchers              # for placeholder tags
 from Cheetah import Filters                    # the output filters
 from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
 from Cheetah.Utils import VerifyType             # Used in Template.__init__
+from Cheetah import _verifytype
 from Cheetah.Utils.Misc import checkKeywords     # Used in Template.__init__
 from Cheetah.Utils.Indenter import Indenter      # Used in Template.__init__ and for
                                                  # placeholders
@@ -592,7 +593,7 @@ class Template(Servlet):
         ##################################################           
         ## normalize and validate args 
         try:
-            vt = VerifyType.VerifyType
+            vt = _verifytype.verifyType
             vtc = VerifyType.VerifyTypeClass
             N = types.NoneType; S = types.StringType; U = types.UnicodeType
             D = types.DictType; F = types.FileType
@@ -1144,7 +1145,7 @@ class Template(Servlet):
         D = types.DictType;   F = types.FileType
         C = types.ClassType;  M = types.ModuleType
         N = types.NoneType
-        vt = VerifyType.VerifyType
+        vt = _verifytype.verifyType
         vtc = VerifyType.VerifyTypeClass
         try:
             vt(source, 'source', [N,S,U], 'string or None')
@@ -1160,10 +1161,8 @@ class Template(Servlet):
             if compilerSettings is not Unspecified:
                 vt(compilerSettings, 'compilerSettings', [D], 'dictionary')
 
-        except TypeError, reason:
-            # Re-raise the exception here so that the traceback will end in
-            # this function rather than in some utility function.
-            raise TypeError(reason)
+        except TypeError:
+            raise
         
         if source is not None and file is not None:
             raise TypeError("you must supply either a source string or the" + 

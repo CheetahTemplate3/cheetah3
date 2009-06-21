@@ -9,11 +9,13 @@ class VerifyType_Test(unittest.TestCase):
         legalTypes = [str, unicode]
         try:
             rc = VerifyType.VerifyType(arg, 'arg', legalTypes, 'string') 
+            assert rc
         except TypeError:
             self.fail('Should not have raised a TypeError here')
 
         try:
             rc = _verifytype.verifyType(arg, 'arg', legalTypes, 'string')
+            assert rc
         except TypeError:
             self.fail('Should not have raised a TypeError here')
 

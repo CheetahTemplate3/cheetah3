@@ -20,12 +20,16 @@ static PyObject *py_verifytype(PyObject *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *argument, *legalTypes;
     char *arg_string, *types_string;
+    char *extra = NULL;
     PyObject *iterator, *item;
     bool rc = false;
+    static char *kwlist[] = {"argument", "argument_name", "legalType",
+                "types_string", "errmsgExtra", NULL};
 
-    if (!PyArg_ParseTuple(args, "OsOs", &argument, &arg_string, 
-                &legalTypes, &types_string)) 
-        Py_RETURN_FALSE;
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OsOs|s", kwlist, &argument, 
+                &arg_string, &legalTypes, &types_string, &extra)) {
+        return NULL;
+    }
 
     iterator = PyObject_GetIter(legalTypes);
     if (iterator == NULL) {
@@ -46,7 +50,7 @@ static PyObject *py_verifytype(PyObject *self, PyObject *args, PyObject *kwargs)
         Py_RETURN_TRUE;
 
     PyErr_SetObject(PyExc_TypeError, _errorMessage(arg_string,
-            types_string, NULL));
+            types_string, extra));
     return NULL;
 }
 
@@ -54,7 +58,7 @@ static const char _verifytypedoc[] = "\
 \n\
 ";
 static struct PyMethodDef _verifytype_methods[] = {
-    {"verifyType", py_verifytype, METH_VARARGS, NULL},
+    {"verifyType", py_verifytype, METH_VARARGS | METH_KEYWORDS, NULL},
     {NULL}
 };
 
