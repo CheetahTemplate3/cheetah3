@@ -18,11 +18,12 @@ static PyObject *_errorMessage(char *arg, char *legalTypes, char *extra)
 
 static PyObject *py_verifytype(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-    PyObject *argument, *arg_string, *legalTypes, *types_string;
+    PyObject *argument, *legalTypes;
+    char *arg_string, *types_string;
     PyObject *iterator, *item;
     bool rc = false;
 
-    if (!PyArg_ParseTuple(args, "OSOS", &argument, &arg_string, 
+    if (!PyArg_ParseTuple(args, "OsOs", &argument, &arg_string, 
                 &legalTypes, &types_string)) 
         Py_RETURN_FALSE;
 
@@ -43,7 +44,10 @@ static PyObject *py_verifytype(PyObject *self, PyObject *args, PyObject *kwargs)
 
     if (rc)
         Py_RETURN_TRUE;
-    Py_RETURN_FALSE;
+
+    PyErr_SetObject(PyExc_TypeError, _errorMessage(arg_string,
+            types_string, NULL));
+    return NULL;
 }
 
 static const char _verifytypedoc[] = "\
