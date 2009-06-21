@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: FileUtils.py,v 1.12 2005/11/02 22:26:07 tavis_rudd Exp $
 """File utitilies for Python:
 

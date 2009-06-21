@@ -1,29 +1,16 @@
 #!/usr/bin/env python
-# $Id: NameMapper.py,v 1.11 2006/01/15 20:45:22 tavis_rudd Exp $
-"""NameMapper Tests
 
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>,
-Version: $Revision: 1.11 $
-Start Date: 2001/10/01
-Last Revision Date: $Date: 2006/01/15 20:45:22 $
-"""
 from __future__ import generators
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.11 $"[11:-2]
 import sys
 import types
 import os
 import os.path
 
-import unittest_local_copy as unittest
+#import unittest_local_copy as unittest
+import unittest
 from Cheetah.NameMapper import NotFound, valueForKey, \
      valueForName, valueFromSearchList, valueFromFrame, valueFromFrameOrSearchList
 
-
-##################################################
-## TEST DATA FOR USE IN THE TEMPLATES ##
 
 class DummyClass:
     classVar1 = 123

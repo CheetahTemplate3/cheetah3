@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
 Provides the core API for Cheetah.
 

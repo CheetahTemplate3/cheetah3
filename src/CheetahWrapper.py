@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: CheetahWrapper.py,v 1.26 2007/10/02 01:22:04 tavis_rudd Exp $
 """Cheetah command-line interface.
 

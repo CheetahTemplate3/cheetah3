@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: Parser.py,v 1.137 2008/03/10 05:25:13 tavis_rudd Exp $
 """Parser classes for Cheetah's Compiler
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
     Compiler classes for Cheetah:
     ModuleCompiler aka 'Compiler'

@@ -12,7 +12,6 @@ packages = ['Cheetah',
             'Cheetah.Tools',
             'Cheetah.Utils',
             'Cheetah.contrib',
-            'Cheetah.contrib.markdown',
             ]
 classifiers = [line.strip() for line in '''\
   #Development Status :: 4 - Beta
@@ -53,6 +52,15 @@ scripts = ['bin/cheetah-compile',
            ]
 data_files = ['recursive: src *.tmpl *.txt LICENSE README TODO CHANGES',
               ]
+if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
+    try:
+        from setuptools import setup
+        install_requires = [
+                "Markdown >= 2.0.1",
+        ]
+    except ImportError:
+        print 'Not using setuptools, so we cannot install the Markdown dependency'
+
 
 description = "Cheetah is a template engine and code generation tool."
 

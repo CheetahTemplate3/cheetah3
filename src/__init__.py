@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 '''
 Cheetah is an open source template engine and code generation tool.
 

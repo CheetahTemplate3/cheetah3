@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
 Provides an abstract Servlet baseclass for Cheetah's Template class
 '''

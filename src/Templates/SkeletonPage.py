@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 
 
 """A Skeleton HTML page template, that provides basic structure and utility methods.

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Nothing, but in a friendly way.  Good for filling in for objects you want to
 hide.  If $form.f1 is a RecursiveNull object, then

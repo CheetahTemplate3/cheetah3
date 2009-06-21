@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: ImportManager.py,v 1.6 2007/04/03 01:56:24 tavis_rudd Exp $
 
 """Provides an emulator/replacement for Python's standard import system.

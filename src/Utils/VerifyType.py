@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: VerifyType.py,v 1.4 2005/11/02 22:26:08 tavis_rudd Exp $
 """Functions to verify an argument's type
 

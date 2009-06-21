@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: WebInputMixin.py,v 1.10 2006/01/06 21:56:54 tavis_rudd Exp $
 """Provides helpers for Template.webInput(), a method for importing web
 transaction variables in bulk.  See the docstring of webInput for full details.

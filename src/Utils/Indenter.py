@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # $Id: Indenter.py,v 1.7 2006/01/08 01:09:30 tavis_rudd Exp $
 """Indentation maker.
 @@TR: this code is unsupported and largely undocumented ...
