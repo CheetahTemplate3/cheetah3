@@ -39,7 +39,7 @@ typedef struct {
 static PyObject *py_filter(PyObject *self, PyObject *args, PyObject *kwargs);
 
 static struct PyMethodDef py_filtermethods[] = {
-    {"filter", (PyCFunction)(py_filter), METH_STATIC | METH_VARARGS | METH_KEYWORDS,
+    {"filter", (PyCFunction)(py_filter), METH_VARARGS | METH_KEYWORDS,
             PyDoc_STR("Filter stuff")},
     {NULL},
 };
