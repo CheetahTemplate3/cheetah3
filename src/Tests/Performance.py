@@ -134,6 +134,28 @@ class DynamicSimpleCompilationTest(PerformanceTest):
         template = unicode(template)
 
 
+class FilterTest(PerformanceTest):
+    template = None
+    def setUp(self):
+        super(FilterTest, self).setUp()
+        template = '''
+            #import sys
+            #import os
+            #set foo = [1, 2, 3, 4]
+
+            $foo, $foo, $foo
+        '''
+        template = Cheetah.Template.Template.compile(template, 
+            keepRefToGeneratedCode=False)
+        self.template = template()
+
+    def performanceSample(self):
+        value = unicode(self.template)
+
+
+        
+
+
 if __name__ == '__main__':
     if '--debug' in sys.argv:
         DEBUG = True
