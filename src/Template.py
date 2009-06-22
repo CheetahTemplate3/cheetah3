@@ -1462,7 +1462,7 @@ class Template(Servlet):
         # @@TR: consider allowing simple callables as the filter argument
         self._CHEETAH__filtersLib = filtersLib
         self._CHEETAH__filters = {}
-        if type(filter) in StringTypes:
+        if isinstance(filter, basestring):
             filterName = filter
             klass = getattr(self._CHEETAH__filtersLib, filterName)
         else:
@@ -1473,7 +1473,7 @@ class Template(Servlet):
 
         self._CHEETAH__errorCatchers = {}
         if errorCatcher:
-            if type(errorCatcher) in StringTypes:
+            if isinstance(errorCatcher, basestring):
                 errorCatcherClass = getattr(ErrorCatchers, errorCatcher)
             elif type(errorCatcher) == ClassType:
                 errorCatcherClass = errorCatcher
