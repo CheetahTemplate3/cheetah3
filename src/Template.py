@@ -56,8 +56,14 @@ from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
 from Cheetah import ErrorCatchers              # for placeholder tags
 from Cheetah import Filters                    # the output filters
 from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
-from Cheetah.Utils import VerifyType             # Used in Template.__init__
-from Cheetah import _verifytype
+
+try:
+    from Cheetah._verifyType import *
+except ImportError:
+    from Cheetah.Utils import VerifyType
+    verifyType = VerifyType.VerifyType
+    verifyTypeClass = VerifyType.VerifyTypeClass
+
 from Cheetah.Utils.Misc import checkKeywords     # Used in Template.__init__
 from Cheetah.Utils.Indenter import Indenter      # Used in Template.__init__ and for
                                                  # placeholders
@@ -593,8 +599,8 @@ class Template(Servlet):
         ##################################################           
         ## normalize and validate args 
         try:
-            vt = _verifytype.verifyType
-            vtc = _verifytype.verifyTypeClass
+            vt = verifyType
+            vtc = verifyTypeClass
             N = types.NoneType; S = types.StringType; U = types.UnicodeType
             D = types.DictType; F = types.FileType
             C = types.ClassType;  M = types.ModuleType
@@ -1145,8 +1151,8 @@ class Template(Servlet):
         D = types.DictType;   F = types.FileType
         C = types.ClassType;  M = types.ModuleType
         N = types.NoneType
-        vt = _verifytype.verifyType
-        vtc = _verifytype.verifyTypeClass
+        vt = verifyType
+        vtc = verifyTypeClass
         try:
             vt(source, 'source', [N,S,U], 'string or None')
             vt(file, 'file', [N,S,U,F], 'string, file open for reading, or None')
