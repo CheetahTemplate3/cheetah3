@@ -9,8 +9,6 @@
 extern "C" {
 #endif
 
-static PyObject *typesModule = NULL;
-
 static PyObject *_errorMessage(char *arg, char *legalTypes, char *extra)
 {
     return PyString_FromFormat("Argument '%s' must be %s\n", arg, legalTypes);
@@ -19,17 +17,15 @@ static PyObject *_errorMessage(char *arg, char *legalTypes, char *extra)
 static PyObject *py_verifytype(PyObject *self, PyObject *args, PyObject *kwargs)
 {
     PyObject *argument, *legalTypes;
-    char *arg_string, *types_string;
-    char *extra = NULL;
+    char *arg_string, *types_string, *extra;
     PyObject *iterator, *item;
     bool rc = false;
-    static char *kwlist[] = {"argument", "argument_name", "legalType",
+    char *kwlist[] = {"argument", "argument_name", "legalType",
                 "types_string", "errmsgExtra", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OsOs|s", kwlist, &argument, 
-                &arg_string, &legalTypes, &types_string, &extra)) {
+                &arg_string, &legalTypes, &types_string, &extra))
         return NULL;
-    }
 
     iterator = PyObject_GetIter(legalTypes);
     if (iterator == NULL) {
@@ -54,11 +50,41 @@ static PyObject *py_verifytype(PyObject *self, PyObject *args, PyObject *kwargs)
     return NULL;
 }
 
+static PyObject *py_verifytypeclass(PyObject *self, PyObject *args, PyObject *kwargs) 
+{
+    PyObject *argument, *legalTypes, *klass, *classType;
+    PyObject *verifyTypeArgs, *verifyTypeKwargs;
+    char *arg_string, *types_string, *extra;
+    bool rc = false;
+
+    char *kwlist[] = {"argument", "argument_name", "legalTypes", 
+           "types_string", "klass", "errmsgExtra", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "OsOsO|s", kwlist, &argument,
+                &arg_string, &legalTypes, &types_string, &klass, &extra))
+        return NULL;
+
+    verifyTypeArgs = Py_BuildValue("OsOs", argument, arg_string, legalTypes, 
+            types_string);
+    PyObject *v = py_verifytype(self, verifyTypeArgs, NULL);
+
+    if (PyErr_Occurred())
+        return NULL;
+
+    if (PyClass_Check(argument) && (!PyClass_IsSubclass(argument, klass)) ) {
+        PyErr_SetObject(PyExc_TypeError, _errorMessage(arg_string,
+                types_string, extra));
+        return NULL;
+    }
+    Py_RETURN_TRUE;
+}
+
 static const char _verifytypedoc[] = "\
 \n\
 ";
 static struct PyMethodDef _verifytype_methods[] = {
     {"verifyType", py_verifytype, METH_VARARGS | METH_KEYWORDS, NULL},
+    {"verifyTypeClass", py_verifytypeclass, METH_VARARGS | METH_KEYWORDS, NULL},
     {NULL}
 };
 
@@ -66,7 +92,6 @@ PyMODINIT_FUNC init_verifytype()
 {
     PyObject *module = Py_InitModule3("_verifytype", _verifytype_methods,
             _verifytypedoc);
-    typesModule = PyImport_ImportModule("types");
 }
 
 #ifdef __cplusplus

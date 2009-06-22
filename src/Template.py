@@ -594,7 +594,7 @@ class Template(Servlet):
         ## normalize and validate args 
         try:
             vt = _verifytype.verifyType
-            vtc = VerifyType.VerifyTypeClass
+            vtc = _verifytype.verifyTypeClass
             N = types.NoneType; S = types.StringType; U = types.UnicodeType
             D = types.DictType; F = types.FileType
             C = types.ClassType;  M = types.ModuleType
@@ -1146,7 +1146,7 @@ class Template(Servlet):
         C = types.ClassType;  M = types.ModuleType
         N = types.NoneType
         vt = _verifytype.verifyType
-        vtc = VerifyType.VerifyTypeClass
+        vtc = _verifytype.verifyTypeClass
         try:
             vt(source, 'source', [N,S,U], 'string or None')
             vt(file, 'file', [N,S,U,F], 'string, file open for reading, or None')
