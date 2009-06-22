@@ -24,25 +24,25 @@ class Filter(object):
         self.template = template
         
     def filter(self, val,
-               #encoding='utf8',
                encoding=None,
                str=str, 
                **kw):
-        """Pass Unicode strings through unmolested, unless an encoding is specified.
-        """
+        '''
+            Pass Unicode strings through unmolested, unless an encoding is specified.
+        '''
+        if val is None:
+            return u''
         if isinstance(val, unicode):
             if encoding:
-                filtered = val.encode(encoding)
+                return val.encode(encoding)
             else:
-                filtered = val
-        elif val is None:
-            filtered = ''
+                return val
         else:
             try:
-                filtered = str(val)
+                return str(val)
             except UnicodeEncodeError:
-                filtered = unicode(val)
-        return filtered
+                return unicode(val)
+        return u''
 
 RawOrEncodedUnicode = Filter
 
