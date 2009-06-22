@@ -46,7 +46,6 @@ class Filter(object):
 
 RawOrEncodedUnicode = Filter
 
-
 class EncodeUnicode(Filter):
     def filter(self, val,
                encoding='utf8',
@@ -235,6 +234,7 @@ def test():
 
     print "Unicode:", `EncodeUnicode().filter(u'aoeu12345\u1234')`
     
-if __name__ == "__main__":  test()
+if __name__ == "__main__":  
+    test()
     
 # vim: shiftwidth=4 tabstop=4 expandtab

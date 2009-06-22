@@ -1,4 +1,8 @@
-
+/*
+ * C-version of the src/Utils/VerifyType.py module.
+ *
+ * (c) 2009, R. Tyler Ballance <tyler@slide.com>
+ */
 #include <Python.h>
 
 #include <stdbool.h>

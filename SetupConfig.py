@@ -44,6 +44,8 @@ if os.name == 'posix':
                            ),
                  Extension("Cheetah._verifytype", 
                             [os.path.join('src', 'c', '_verifytype.c')]),
+                 Extension("Cheetah._filters", 
+                            [os.path.join('src', 'c', '_filters.c')]),
                  ]
 else:
     ext_modules=[]

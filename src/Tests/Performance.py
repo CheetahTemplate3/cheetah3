@@ -152,10 +152,6 @@ class FilterTest(PerformanceTest):
     def performanceSample(self):
         value = unicode(self.template)
 
-
-        
-
-
 if __name__ == '__main__':
     if '--debug' in sys.argv:
         DEBUG = True
