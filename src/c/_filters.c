@@ -16,6 +16,7 @@ extern "C" {
 
 static PyObject *py_filter(PyObject *self, PyObject *args, PyObject *kwargs)
 {
+    Py_RETURN_FALSE;
 }
 
 static const char _filtersdoc[] = "\

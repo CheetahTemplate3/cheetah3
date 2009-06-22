@@ -4,10 +4,9 @@
  * (c) 2009, R. Tyler Ballance <tyler@slide.com>
  */
 #include <Python.h>
-
 #include <stdbool.h>
-#include <stdlib.h>
-#include <stdio.h>
+
+#include "Cheetah.h"
 
 #ifdef __cplusplus
 extern "C" {

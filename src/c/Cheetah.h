@@ -11,6 +11,22 @@
 extern "C" {
 #endif
 
+/*
+ * Python 2.3 compatibility
+ */
+#ifndef Py_RETURN_TRUE
+#define Py_RETURN_TRUE Py_INCREF(Py_True);\
+    return Py_True
+#endif
+#ifndef Py_RETURN_FALSE
+#define Py_RETURN_FALSE Py_INCREF(Py_False);\
+    return Py_False
+#endif 
+#ifndef Py_RETURN_NONE
+#define Py_RETURN_NONE Py_INCREF(Py_None);\
+    return Py_None
+#endif
+
 
 /*
  * Filter Module
@@ -23,7 +39,7 @@ typedef struct {
 static PyObject *py_filter(PyObject *self, PyObject *args, PyObject *kwargs);
 
 static struct PyMethodDef py_filtermethods[] = {
-    {"filter", (PyCFunction)(py_filter), METH_STATIC | METH_VARAGES | METH_KEYWORDS,
+    {"filter", (PyCFunction)(py_filter), METH_STATIC | METH_VARARGS | METH_KEYWORDS,
             PyDoc_STR("Filter stuff")},
     {NULL},
 };
