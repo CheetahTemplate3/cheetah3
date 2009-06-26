@@ -12,7 +12,6 @@ Besides unittest usage, recognizes the following command-line options:
         Show the output of each subcommand.  (Normally suppressed.)
 '''
 import os, shutil, sys, tempfile
-import popen2
 import unittest_local_copy as unittest
 
 import re                                     # Used by listTests.
@@ -150,17 +149,12 @@ Found %(result)r"""
                   test.
            out: None.
         """
-        proc = popen2.Popen4(cmd)
-        status = proc.wait()
-        output = proc.fromchild.read()
-        proc.fromchild.close()
-
-        if status >= 0:
-            status = status
-            signal = 0
-        else:
+        proc_stdin, proc_stdout = os.popen4(cmd)
+        proc_stdin.close()
+        output = proc_stdout.read()
+        status = proc_stdout.close()
+        if status == None:
             status = 0
-            signal = -status
         if OUTPUT:
             if output.endswith("\n"):
                 output = output[:-1]
@@ -168,8 +162,6 @@ Found %(result)r"""
             print "SUBCOMMAND:", cmd
             print output
             print
-        msg = "subcommand killed by signal %d: %s" % (signal, cmd)
-        self.failUnlessEqual(signal, 0, msg)
         msg = "subcommand exit status %d: %s" % (status, cmd)
         if status!=expectedStatus:
             print output
@@ -187,19 +179,12 @@ Found %(result)r"""
            in : cmd, string, the command to run.
            out: None.
         """
-        proc = popen2.Popen4(cmd)
-        status = proc.wait()
-        output = proc.fromchild.read()
-        proc.fromchild.close()
-
-        if status >= 0:
-            status = status
-            signal = 0
-        else:
+        proc_stdin, proc_stdout = os.popen4(cmd)
+        proc_stdin.close()
+        output = proc_stdout.read()
+        status = proc_stdout.close()
+        if status == None:
             status = 0
-            signal = -status
-        msg = "subcommand killed by signal %s: %s" % (signal, cmd)
-        self.failUnlessEqual(signal, 0, msg) # Signal must be 0.
         msg = "subcommand exit status %s: %s" % (status, cmd)
         self.failIfEqual(status, 0, msg) # Status must *not* be 0.
         if OUTPUT:
