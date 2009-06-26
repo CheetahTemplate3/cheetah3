@@ -11,7 +11,7 @@ Besides unittest usage, recognizes the following command-line options:
      --output
         Show the output of each subcommand.  (Normally suppressed.)
 '''
-import commands, os, shutil, sys, tempfile
+import subprocess, os, shutil, sys, tempfile
 import unittest_local_copy as unittest
 
 import re                                     # Used by listTests.
@@ -26,6 +26,17 @@ BACKUP_SUFFIX = CheetahWrapper.BACKUP_SUFFIX
 
 def warn(msg):
     sys.stderr.write(msg + '\n')
+
+def skipIf(cond, reason):
+    if not cond:
+        def _id(obj):
+            return obj
+        return _id
+
+    def decorator(obj):
+        return None
+    return decorator
+
 
 class CFBase(unittest.TestCase):
     """Base class for "cheetah compile" and "cheetah fill" unit tests.
@@ -149,11 +160,17 @@ Found %(result)r"""
                   test.
            out: None.
         """
-        # Use commands.getstatusoutput instead of os.system so
-        # that we can mimic ">/dev/null 2>/dev/null" even on 
-        # non-Unix platforms.
-        exit, output = commands.getstatusoutput(cmd)
-        status, signal = divmod(exit, 256)
+        subproc = subprocess.Popen(cmd,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT,
+                                   shell=True)
+        output = subproc.communicate()[0]
+        if subproc.returncode >= 0:
+            status = subproc.returncode
+            signal = 0
+        else:
+            status = 0
+            signal = -subproc.returncode
         if OUTPUT:
             if output.endswith("\n"):
                 output = output[:-1]
@@ -180,11 +197,17 @@ Found %(result)r"""
            in : cmd, string, the command to run.
            out: None.
         """
-        # Use commands.getstatusoutput instead of os.system so
-        # that we can mimic ">/dev/null 2>/dev/null" even on 
-        # non-Unix platforms.
-        exit, output = commands.getstatusoutput(cmd)
-        status, signal = divmod(exit, 256)
+        subproc = subprocess.Popen(cmd,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT,
+                                   shell=True)
+        output = subproc.communicate()[0]
+        if subproc.returncode >= 0:
+            status = subproc.returncode
+            signal = 0
+        else:
+            status = 0
+            signal = -subproc.returncode
         msg = "subcommand killed by signal %s: %s" % (signal, cmd)
         self.failUnlessEqual(signal, 0, msg) # Signal must be 0.
         msg = "subcommand exit status %s: %s" % (status, cmd)
@@ -238,6 +261,7 @@ class OneFileNoExtension(CFBase):
         self.checkFill("a.txt")
 
 
+@skipIf(sys.platform == "win32", "cmd.exe doesn't expand globs")
 class SplatTmpl(CFBase):
     def testCompile(self):
         self.go("cheetah compile *.tmpl")
@@ -291,6 +315,7 @@ class ThreeFilesWithSubdirectoriesNoExtension(CFBase):
         self.checkFill("child/grandkid/a.txt")
 
 
+@skipIf(sys.platform == "win32", "cmd.exe doesn't expand globs")
 class SplatTmplWithSubdirectories(CFBase):
     def testCompile(self):
         self.go("cheetah compile *.tmpl child/*.tmpl child/grandkid/*.tmpl")
@@ -326,6 +351,7 @@ class OneFileWithOdir(CFBase):
         self.checkFill("DEST/a.txt")
 
 
+@skipIf(sys.platform == "win32", "cmd.exe doesn't expand globs")
 class VarietyWithOdir(CFBase):
     def testCompile(self):
         self.go("cheetah compile --odir DEST a.tmpl child/a child/grandkid/*.tmpl")

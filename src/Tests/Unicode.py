@@ -24,8 +24,8 @@ class CommandLineTest(unittest.TestCase):
 
         wrap = CheetahWrapper.CheetahWrapper()
         wrap.main(['cheetah', 'compile', '--nobackup', sourcefile])
-        module_name = os.path.basename(sourcefile)
-        module = loadModule(module_name, ['/tmp'])
+        module_path, module_name = os.path.split(sourcefile)
+        module = loadModule(module_name, [module_path])
         template = getattr(module, module_name)
         return template
 
