@@ -173,7 +173,19 @@ class CheetahWrapper(object):
         pao("--parallel", action="store", type="int", dest="parallel", default=1, help='Compile/fill templates in parallel, e.g. --parallel=4')
         pao('--shbang', dest='shbang', default='#!/usr/bin/env python', help='Specify the shbang to place at the top of compiled templates, e.g. --shbang="#!/usr/bin/python2.6"')
 
-        self.opts, self.pathArgs = opts, files = self.parser.parse_args(args)
+        opts, files = self.parser.parse_args(args)
+        self.opts = opts
+        if sys.platform == "win32":
+            new_files = []
+            for spec in files:
+                file_list = glob.glob(spec)
+                if file_list:
+                    new_files.extend(file_list)
+                else:
+                    new_files.append(spec)
+            files = new_files
+        self.pathArgs = files
+
         D("""\
 cheetah compile %s
 Options are
