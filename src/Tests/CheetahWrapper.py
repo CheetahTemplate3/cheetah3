@@ -27,17 +27,6 @@ BACKUP_SUFFIX = CheetahWrapper.BACKUP_SUFFIX
 def warn(msg):
     sys.stderr.write(msg + '\n')
 
-def skipIf(cond, reason):
-    if not cond:
-        def _id(obj):
-            return obj
-        return _id
-
-    def decorator(obj):
-        return None
-    return decorator
-
-
 class CFBase(unittest.TestCase):
     """Base class for "cheetah compile" and "cheetah fill" unit tests.
     """
@@ -261,7 +250,6 @@ class OneFileNoExtension(CFBase):
         self.checkFill("a.txt")
 
 
-@skipIf(sys.platform == "win32", "cmd.exe doesn't expand globs")
 class SplatTmpl(CFBase):
     def testCompile(self):
         self.go("cheetah compile *.tmpl")
@@ -315,7 +303,6 @@ class ThreeFilesWithSubdirectoriesNoExtension(CFBase):
         self.checkFill("child/grandkid/a.txt")
 
 
-@skipIf(sys.platform == "win32", "cmd.exe doesn't expand globs")
 class SplatTmplWithSubdirectories(CFBase):
     def testCompile(self):
         self.go("cheetah compile *.tmpl child/*.tmpl child/grandkid/*.tmpl")
@@ -351,7 +338,6 @@ class OneFileWithOdir(CFBase):
         self.checkFill("DEST/a.txt")
 
 
-@skipIf(sys.platform == "win32", "cmd.exe doesn't expand globs")
 class VarietyWithOdir(CFBase):
     def testCompile(self):
         self.go("cheetah compile --odir DEST a.tmpl child/a child/grandkid/*.tmpl")
