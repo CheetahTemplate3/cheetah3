@@ -36,20 +36,14 @@ import os
 import os.path
 from distutils.core import Extension
 
-## we only assume the presence of a c compiler on Posix systems, NT people will
-#  have to enable this manually. 
-if os.name == 'posix':
-    ext_modules=[Extension("Cheetah._namemapper", 
-                            [os.path.join('src', 'c', '_namemapper.c')],
-                           ),
-                 Extension("Cheetah._verifytype", 
-                            [os.path.join('src', 'c', '_verifytype.c')]),
-                 Extension("Cheetah._filters", 
-                            [os.path.join('src', 'c', '_filters.c')]),
-                 ]
-else:
-    ext_modules=[]
-
+ext_modules=[Extension("Cheetah._namemapper", 
+                        [os.path.join('src', 'c', '_namemapper.c')],
+                       ),
+             Extension("Cheetah._verifytype", 
+                        [os.path.join('src', 'c', '_verifytype.c')]),
+             Extension("Cheetah._filters", 
+                        [os.path.join('src', 'c', '_filters.c')]),
+             ]
 
 ## Data Files and Scripts
 scripts = ['bin/cheetah-compile',
