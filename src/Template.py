@@ -58,7 +58,7 @@ from Cheetah import Filters                    # the output filters
 from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
 
 try:
-    from Cheetah._verifyType import *
+    from Cheetah._verifytype import *
 except ImportError:
     from Cheetah.Utils import VerifyType
     verifyType = VerifyType.VerifyType
