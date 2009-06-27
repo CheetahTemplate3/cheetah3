@@ -152,6 +152,58 @@ class FilterTest(PerformanceTest):
     def performanceSample(self):
         value = unicode(self.template)
 
+
+class LongCompileTest(PerformanceTest):
+    ''' Test the compilation on a sufficiently large template '''
+    def compile(self, template):
+        return Cheetah.Template.Template.compile(template, keepRefToGeneratedCode=False)
+
+    def performanceSample(self):
+        template = '''
+            #import sys
+            #import Cheetah.Template
+
+            #extends Cheetah.Template.Template
+
+            #def header()
+                <center><h2>This is my header</h2></center>
+            #end def
+            
+            #def footer()
+                #return "Huzzah"
+            #end def
+
+            #def scripts()
+                #pass
+            #end def
+
+            #def respond()
+                <html>
+                    <head>
+                        <title>${title}</title>
+                        
+                        $scripts()
+                    </head>
+                    <body>
+                        $header()
+
+                        This is just some stupid page!
+
+                        <br/>
+                        $footer()
+                    </body>
+                    </html>
+            #end def
+            
+        '''
+        template = self.compile(template)
+
+class LongCompile_CompilerSettingsTest(LongCompileTest):
+    def compile(self, template):
+        return Cheetah.Template.Template.compile(template, keepRefToGeneratedCode=False,
+            compilerSettings={'useStackFrames' : True, 'useAutocalling' : True})
+            
+
 if __name__ == '__main__':
     if '--debug' in sys.argv:
         DEBUG = True
