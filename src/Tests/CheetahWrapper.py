@@ -11,10 +11,14 @@ Besides unittest usage, recognizes the following command-line options:
      --output
         Show the output of each subcommand.  (Normally suppressed.)
 '''
-import os, shutil, sys, tempfile
-import unittest_local_copy as unittest
-
+import os
+import popen2
 import re                                     # Used by listTests.
+import shutil
+import sys
+import tempfile
+import unittest
+
 from optparse import OptionParser
 from Cheetah.CheetahWrapper import CheetahWrapper  # Used by NoBackup.
 
@@ -137,6 +141,38 @@ Found %(result)r"""
         msg = "backup file exists in spite of --nobackup: %s" % path
         self.failIf(exists, msg)
 
+
+    def assertWin32Subprocess(self, cmd):
+        _in, _out = os.popen4(cmd)
+        _in.close()
+        output = _out.read()
+        rc = _out.close()
+        if rc is None:
+            rc = 0
+        return rc, output
+
+    def assertPosixSubprocess(self, cmd):
+        process = popen2.Popen4(cmd)
+        process.tochild.close()
+        output = process.fromchild.read()
+        status = process.wait()
+        process.fromchild.close()
+        return status, output
+
+    def assertSubprocess(self, cmd, nonzero=False):
+        status, output = None, None
+        if sys.platform == 'win32':
+            status, output = self.assertWin32Subprocess(cmd)
+        else:
+            status, output = self.assertPosixSubprocess(cmd)
+
+        if not nonzero:
+            self.failUnlessEqual(status, 0, '''Subprocess exited with a non-zero status (%d)
+                            %s''' % (status, output))
+        else:
+            self.failIfEqual(status, 0, '''Subprocess exited with a zero status (%d)
+                            %s''' % (status, output))
+        return output 
     
     def go(self, cmd, expectedStatus=0, expectedOutputSubstring=None):
         """Run a "cheetah compile" or "cheetah fill" subcommand.
@@ -149,51 +185,12 @@ Found %(result)r"""
                   test.
            out: None.
         """
-        proc_stdin, proc_stdout = os.popen4(cmd)
-        proc_stdin.close()
-        output = proc_stdout.read()
-        status = proc_stdout.close()
-        if status == None:
-            status = 0
-        if OUTPUT:
-            if output.endswith("\n"):
-                output = output[:-1]
-            print
-            print "SUBCOMMAND:", cmd
-            print output
-            print
-        msg = "subcommand exit status %d: %s" % (status, cmd)
-        if status!=expectedStatus:
-            print output
-        self.failUnlessEqual(status, expectedStatus, msg)
+        output = self.assertSubprocess(cmd)
         if expectedOutputSubstring is not None:
             msg = "substring %r not found in subcommand output: %s" % \
                 (expectedOutputSubstring, cmd)
             substringTest = output.find(expectedOutputSubstring) != -1
             self.failUnless(substringTest, msg)
-
-
-    def goExpectError(self, cmd):
-        """Run a subcommand and expect it to fail.
-
-           in : cmd, string, the command to run.
-           out: None.
-        """
-        proc_stdin, proc_stdout = os.popen4(cmd)
-        proc_stdin.close()
-        output = proc_stdout.read()
-        status = proc_stdout.close()
-        if status == None:
-            status = 0
-        msg = "subcommand exit status %s: %s" % (status, cmd)
-        self.failIfEqual(status, 0, msg) # Status must *not* be 0.
-        if OUTPUT:
-            if output.endswith("\n"):
-                output = output[:-1]
-            print
-            print "SUBCOMMAND:", cmd
-            print output
-            print
 
 
 class CFIdirBase(CFBase):
@@ -420,13 +417,13 @@ class FlatRecurseCollision(CFBase):
     expectError = True
 
     def testCompile(self):
-        self.goExpectError("cheetah compile -R --flat")
+        self.assertSubprocess("cheetah compile -R --flat", nonzero=True)
 
     def testFill(self):
-        self.goExpectError("cheetah fill -R --flat")
+        self.assertSubprocess("cheetah fill -R --flat", nonzero=True)
 
     def testText(self):
-        self.goExpectError("cheetah fill -R --flat")
+        self.assertSubprocess("cheetah fill -R --flat", nonzero=True)
 
 
 class IdirRecurse(CFIdirBase):
@@ -471,13 +468,13 @@ class IdirFlatRecurseCollision(CFIdirBase):
     expectError = True
 
     def testCompile(self):
-        self.goExpectError("cheetah compile -R --flat --idir SRC")
+        self.assertSubprocess("cheetah compile -R --flat --idir SRC", nonzero=True)
 
     def testFill(self):
-        self.goExpectError("cheetah fill -R --flat --idir SRC")
+        self.assertSubprocess("cheetah fill -R --flat --idir SRC", nonzero=True)
 
     def testText(self):
-        self.goExpectError("cheetah fill -R --flat --idir SRC --oext txt")
+        self.assertSubprocess("cheetah fill -R --flat --idir SRC --oext txt", nonzero=True)
 
 
 class NoBackup(CFBase):
