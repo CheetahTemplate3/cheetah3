@@ -231,8 +231,9 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
             nextVal = PyMapping_GetItemString(currentVal, currentKey);
         } 
         else {
+          PyObject *exc;
           nextVal = PyObject_GetAttrString(currentVal, currentKey);
-          PyObject *exc = PyErr_Occurred();
+          exc = PyErr_Occurred();
           if (exc != NULL) {
             // if exception == AttributeError
             if (PyErr_ExceptionMatches(PyExc_AttributeError)) {
