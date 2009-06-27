@@ -326,7 +326,22 @@ class StaticMethodSupport(TemplateTest):
         except AttributeError, ex:
             self.fail(ex)
 
+class Useless(object):
+    def boink(self):
+        return [1, 2, 3]
 
+class MultipleInheritanceSupport(TemplateTest):
+    def runTest(self):
+        template = '''
+            #extends Template, Useless
+            #def foo()
+                #return [4,5] + $boink()
+            #end def
+        '''
+        template = Template.compile(template)
+        template = template()
+        result = template.foo()
+        print result
 
 
 ##################################################
