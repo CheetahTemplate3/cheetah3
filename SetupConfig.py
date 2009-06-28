@@ -36,13 +36,15 @@ import os
 import os.path
 from distutils.core import Extension
 
-ext_modules=[Extension("Cheetah._namemapper", 
-                        [os.path.join('src', 'c', '_namemapper.c')],
-                       ),
+ext_modules=[
+             Extension("Cheetah._namemapper", 
+                        [os.path.join('src', 'c', '_namemapper.c')]),
              Extension("Cheetah._verifytype", 
                         [os.path.join('src', 'c', '_verifytype.c')]),
              Extension("Cheetah._filters", 
                         [os.path.join('src', 'c', '_filters.c')]),
+             Extension('Cheetah._template',
+                        [os.path.join('src', 'c', '_template.c')]),
              ]
 
 ## Data Files and Scripts
