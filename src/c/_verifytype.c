@@ -4,7 +4,11 @@
  * (c) 2009, R. Tyler Ballance <tyler@slide.com>
  */
 #include <Python.h>
+#if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>
+#else
+typedef enum { false, true } bool;
+#endif
 
 #include "Cheetah.h"
 
@@ -32,11 +36,11 @@ static PyObject *py_verifytype(PyObject *self, PyObject *args, PyObject *kwargs)
 
     iterator = PyObject_GetIter(legalTypes);
     if (iterator == NULL) {
-        Py_RETURN_FALSE;
+        return NULL;
     }
 
     while (item = PyIter_Next(iterator)) {
-        if (argument->ob_type == item) {
+        if ((PyObject *)argument->ob_type == item) {
             rc = true;
             Py_DECREF(item);
             break;
@@ -55,8 +59,8 @@ static PyObject *py_verifytype(PyObject *self, PyObject *args, PyObject *kwargs)
 
 static PyObject *py_verifytypeclass(PyObject *self, PyObject *args, PyObject *kwargs) 
 {
-    PyObject *argument, *legalTypes, *klass, *classType;
-    PyObject *verifyTypeArgs, *verifyTypeKwargs;
+    PyObject *argument, *legalTypes, *klass;
+    PyObject *verifyTypeArgs, *v;
     char *arg_string, *types_string, *extra;
     bool rc = false;
 
@@ -69,10 +73,11 @@ static PyObject *py_verifytypeclass(PyObject *self, PyObject *args, PyObject *kw
 
     verifyTypeArgs = Py_BuildValue("OsOs", argument, arg_string, legalTypes, 
             types_string);
-    PyObject *v = py_verifytype(self, verifyTypeArgs, NULL);
+    v = py_verifytype(self, verifyTypeArgs, NULL);
 
-    if (PyErr_Occurred())
+    if (v == NULL)
         return NULL;
+    Py_DECREF(v);
 
     if (PyClass_Check(argument) && (!PyClass_IsSubclass(argument, klass)) ) {
         PyErr_SetObject(PyExc_TypeError, _errorMessage(arg_string,
@@ -86,8 +91,8 @@ static const char _verifytypedoc[] = "\
 \n\
 ";
 static struct PyMethodDef _verifytype_methods[] = {
-    {"verifyType", py_verifytype, METH_VARARGS | METH_KEYWORDS, NULL},
-    {"verifyTypeClass", py_verifytypeclass, METH_VARARGS | METH_KEYWORDS, NULL},
+    {"verifyType", (PyCFunction)py_verifytype, METH_VARARGS | METH_KEYWORDS, NULL},
+    {"verifyTypeClass", (PyCFunction)py_verifytypeclass, METH_VARARGS | METH_KEYWORDS, NULL},
     {NULL}
 };
 
