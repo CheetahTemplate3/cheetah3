@@ -19,8 +19,11 @@ static PyObject *py_valordefault(PyObject *self, PyObject *args, PyObject *kwarg
     if (!PyArg_ParseTuple(args, "OO", &value, &def))
         return NULL;
 
-    if (value == unspecified)
+    if (value == unspecified) {
+        Py_XINCREF(def);
         return def;
+    }
+    Py_XINCREF(value);
     return value;
 }
 
