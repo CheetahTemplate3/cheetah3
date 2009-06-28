@@ -33,9 +33,6 @@ from Cheetah.Parser import ParseError
 from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
 import unittest_local_copy as unittest
 
-class Unspecified(object):
-    pass
-
 majorVer, minorVer = sys.version_info[0], sys.version_info[1]
 versionTuple = (majorVer, minorVer)
 
@@ -144,9 +141,9 @@ Template output mismatch:
     def verify(self, input, expectedOutput,
                inputEncoding=None,
                outputEncoding=None,
-               convertEOLs=Unspecified):
+               convertEOLs=None):
         if self._EOLreplacement:
-            if convertEOLs is Unspecified:
+            if convertEOLs is None:
                 convertEOLs = self.convertEOLs
             if convertEOLs:
                 input = input.replace('\n', self._EOLreplacement)
