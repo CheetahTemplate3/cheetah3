@@ -72,6 +72,8 @@ from Cheetah.CacheStore import MemoryCacheStore, MemcachedCacheStore
 from Cheetah.CacheRegion import CacheRegion
 from Cheetah.Utils.WebInputMixin import _Converter, _lookup, NonNumericInputError
 
+from Cheetah.Unspecified import Unspecified
+
 # Decide whether to use the file modification time in file's cache key 
 __checkFileMtime = True
 def checkFileMtime(value):
@@ -125,10 +127,9 @@ _formUsedByWebInput = None
 try:
     from Cheetah._template import valOrDefault
 except ImportError:
-    raise
     # used in Template.compile()
     def valOrDefault(val, default):                
-        if val is not None:
+        if val is not Unspecified:
             return val
         return default
 
@@ -343,20 +344,20 @@ class Template(Servlet):
     def compile(klass, source=None, file=None,
                 returnAClass=True,
                 
-                compilerSettings=None,
-                compilerClass=None,
+                compilerSettings=Unspecified,
+                compilerClass=Unspecified,
                 moduleName=None,
-                className=None,
-                mainMethodName=None,
-                baseclass=None,
-                moduleGlobals=None,
-                cacheCompilationResults=None,
-                useCache=None,
-                preprocessors=None,
-                cacheModuleFilesForTracebacks=None,
-                cacheDirForModuleFiles=None,
+                className=Unspecified,
+                mainMethodName=Unspecified,
+                baseclass=Unspecified,
+                moduleGlobals=Unspecified,
+                cacheCompilationResults=Unspecified,
+                useCache=Unspecified,
+                preprocessors=Unspecified,
+                cacheModuleFilesForTracebacks=Unspecified,
+                cacheDirForModuleFiles=Unspecified,
                 commandlineopts=None,
-                keepRefToGeneratedCode=None,
+                keepRefToGeneratedCode=Unspecified,                
                 ):
         
         """
@@ -1033,7 +1034,7 @@ class Template(Servlet):
                  filtersLib=Filters,
                  errorCatcher=None,
                  
-                 compilerSettings=None, # control the behaviour of the compiler
+                 compilerSettings=Unspecified, # control the behaviour of the compiler
                  _globalSetVars=None, # used internally for #include'd templates
                  _preBuiltSearchList=None # used internally for #include'd templates
                  ):        
@@ -1166,7 +1167,7 @@ class Template(Servlet):
             vtc(errorCatcher, 'errorCatcher', (N,S,C,type), 'string, class or None',
                ErrorCatchers.ErrorCatcher,
                '(if class, must be subclass of Cheetah.ErrorCatchers.ErrorCatcher)')
-            if compilerSettings is not None:
+            if compilerSettings is not Unspecified:
                 vt(compilerSettings, 'compilerSettings', (D,), 'dictionary')
 
         except TypeError:
@@ -1332,7 +1333,7 @@ class Template(Servlet):
             
     ## utility functions ##   
 
-    def getVar(self, varName, default=None, autoCall=True):        
+    def getVar(self, varName, default=Unspecified, autoCall=True):        
         """Get a variable from the searchList.  If the variable can't be found
         in the searchList, it returns the default value if one was given, or
         raises NameMapper.NotFound.
@@ -1341,7 +1342,7 @@ class Template(Servlet):
         try:
             return valueFromSearchList(self.searchList(), varName.replace('$',''), autoCall)
         except NotFound:
-            if default is not None:
+            if default is not Unspecified:
                 return default
             else:
                 raise
@@ -1503,7 +1504,7 @@ class Template(Servlet):
         if self._CHEETAH_cacheStore is not None:
             self._CHEETAH__cacheStore = self._CHEETAH_cacheStore
         
-    def _compile(self, source=None, file=None, compilerSettings=None,
+    def _compile(self, source=None, file=None, compilerSettings=Unspecified,
                  moduleName=None, mainMethodName=None):
         """Compile the template. This method is automatically called by
         Template.__init__ it is provided with 'file' or 'source' args.
@@ -1511,7 +1512,7 @@ class Template(Servlet):
         USERS SHOULD *NEVER* CALL THIS METHOD THEMSELVES.  Use Template.compile
         instead.
         """
-        if compilerSettings is None:
+        if compilerSettings is Unspecified:
             compilerSettings = self._getCompilerSettings(source, file) or {}        
         mainMethodName = mainMethodName or self._CHEETAH_defaultMainMethodName
         self._fileMtime = None
