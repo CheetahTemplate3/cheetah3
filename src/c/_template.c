@@ -9,18 +9,18 @@
 extern "C" {
 #endif
 
-static PyObject *unspecifiedModule = NULL;
-static PyObject *unspecified = NULL;
-
 static PyObject *py_valordefault(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-    PyObject *value, *def, *res;
+    PyObject *value, *def;
 
     if (!PyArg_ParseTuple(args, "OO", &value, &def))
         return NULL;
 
-    if (value == unspecified)
+    if (value == Py_None) {
+        Py_XINCREF(def);
         return def;
+    }
+    Py_XINCREF(value);
     return value;
 }
 
@@ -36,12 +36,6 @@ PyMODINIT_FUNC init_template()
 {
     PyObject *module = Py_InitModule3("_template", _template_methods, 
             _template_doc);
-    unspecifiedModule = PyImport_ImportModule("Cheetah.Unspecified");
-    if ( (PyErr_Occurred()) || (!unspecifiedModule) )
-        return NULL;
-    unspecified = PyObject_GetAttrString(unspecifiedModule, "Unspecified");
-    if (PyErr_Occurred())
-        return NULL;
 }
 
 #ifdef __cplusplus

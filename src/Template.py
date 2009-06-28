@@ -122,11 +122,15 @@ def _genUniqueModuleName(baseModuleName):
 # This is only relavent to templates used as CGI scripts.
 _formUsedByWebInput = None
 
-# used in Template.compile()
-def valOrDefault(val, default):                
-    if val is not None:
-        return val
-    return default
+try:
+    from Cheetah._template import valOrDefault
+except ImportError:
+    raise
+    # used in Template.compile()
+    def valOrDefault(val, default):                
+        if val is not None:
+            return val
+        return default
 
 def updateLinecache(filename, src):
     import linecache
