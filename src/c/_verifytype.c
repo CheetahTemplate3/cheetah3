@@ -36,7 +36,7 @@ static PyObject *py_verifytype(PyObject *self, PyObject *args, PyObject *kwargs)
 
     iterator = PyObject_GetIter(legalTypes);
     if (iterator == NULL) {
-        Py_RETURN_FALSE;
+        return NULL;
     }
 
     while (item = PyIter_Next(iterator)) {
@@ -75,8 +75,9 @@ static PyObject *py_verifytypeclass(PyObject *self, PyObject *args, PyObject *kw
             types_string);
     v = py_verifytype(self, verifyTypeArgs, NULL);
 
-    if (PyErr_Occurred())
+    if (v == NULL)
         return NULL;
+    Py_DECREF(v);
 
     if (PyClass_Check(argument) && (!PyClass_IsSubclass(argument, klass)) ) {
         PyErr_SetObject(PyExc_TypeError, _errorMessage(arg_string,
