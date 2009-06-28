@@ -31,6 +31,7 @@ import traceback
 from Cheetah.SourceReader import SourceReader
 from Cheetah import Filters
 from Cheetah import ErrorCatchers
+from Cheetah.Unspecified import Unspecified
 from Cheetah.Macros.I18n import I18n
 
 # re tools
@@ -367,8 +368,8 @@ class _LowLevelParser(SourceReader):
     def setSettingsManager(self, settingsManager):
         self._settingsManager = settingsManager
         
-    def setting(self, key, default=None):
-        if default is None:
+    def setting(self, key, default=Unspecified):
+        if default is Unspecified:
             return self._settingsManager.setting(key)
         else:
             return self._settingsManager.setting(key, default=default)
@@ -880,7 +881,7 @@ class _LowLevelParser(SourceReader):
 
     def getCallArgString(self,
                          enclosures=[],  # list of tuples (char, pos), where char is ({ or [ 
-                         useNameMapper=None):
+                         useNameMapper=Unspecified):
 
         """ Get a method/function call argument string. 
 
@@ -888,10 +889,13 @@ class _LowLevelParser(SourceReader):
         """
 
         # @@TR: this settings mangling should be removed
-        if useNameMapper is not None:
+        if useNameMapper is not Unspecified:
             useNameMapper_orig = self.setting('useNameMapper')
             self.setSetting('useNameMapper', useNameMapper)
-        if not enclosures:
+        
+        if enclosures:
+            pass
+        else:
             if not self.peek() == '(':
                 raise ParseError(self, msg="Expected '('")
             startPos = self.pos()
@@ -953,7 +957,7 @@ class _LowLevelParser(SourceReader):
                 token = self.transformToken(token, beforeTokenPos)
                 addBit(token)
 
-        if useNameMapper is not None:
+        if useNameMapper is not Unspecified:
             self.setSetting('useNameMapper', useNameMapper_orig) # @@TR: see comment above
 
         return ''.join(argStringBits)
@@ -1049,7 +1053,7 @@ class _LowLevelParser(SourceReader):
                            enclosed=False, 
                            enclosures=None, # list of tuples (char, pos), where char is ({ or [ 
                            pyTokensToBreakAt=None, # only works if not enclosed
-                           useNameMapper=None,
+                           useNameMapper=Unspecified,
                            ):
 
         """ Get a Cheetah expression that includes $CheetahVars and break at
@@ -1057,7 +1061,7 @@ class _LowLevelParser(SourceReader):
         pyToken.
         """
 
-        if useNameMapper is not None:
+        if useNameMapper is not Unspecified:
             useNameMapper_orig = self.setting('useNameMapper')
             self.setSetting('useNameMapper', useNameMapper)
 
@@ -1147,7 +1151,7 @@ class _LowLevelParser(SourceReader):
                         if not self.atEnd() and self.peek() == '(':
                             exprBits.append(self.getCallArgString())                    
         ##
-        if useNameMapper is not None:
+        if useNameMapper is not Unspecified:                            
             self.setSetting('useNameMapper', useNameMapper_orig) # @@TR: see comment above
         return exprBits
 
@@ -1155,7 +1159,7 @@ class _LowLevelParser(SourceReader):
                       enclosed=False, 
                       enclosures=None, # list of tuples (char, pos), where # char is ({ or [
                       pyTokensToBreakAt=None,
-                      useNameMapper=None,
+                      useNameMapper=Unspecified,
                       ):
         """Returns the output of self.getExpressionParts() as a concatenated
         string rather than as a list.
