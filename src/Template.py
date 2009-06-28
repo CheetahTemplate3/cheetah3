@@ -25,11 +25,6 @@ try:
     from types import StringTypes
 except ImportError:
     StringTypes = (types.StringType,types.UnicodeType)
-try:
-    from types import BooleanType
-    boolTypeAvailable = True
-except ImportError:
-    boolTypeAvailable = False
     
 try:
     from threading import Lock
@@ -607,11 +602,11 @@ class Template(Servlet):
             N = types.NoneType; S = types.StringType; U = types.UnicodeType
             D = types.DictType; F = types.FileType
             C = types.ClassType;  M = types.ModuleType
-            I = types.IntType
+            I = types.IntType; B = types.BooleanType
 
-            if boolTypeAvailable:         
-                B = types.BooleanType
-            
+            IB = (I, B)
+            NS = (N, S)
+
             vt(source, 'source', (N,S,U), 'string or None')
             vt(file, 'file',(N,S,U,F), 'string, file-like object, or None')
 
@@ -622,12 +617,10 @@ class Template(Servlet):
 
             cacheCompilationResults = valOrDefault(
                 cacheCompilationResults, klass._CHEETAH_cacheCompilationResults)
-            if boolTypeAvailable:         
-                vt(cacheCompilationResults, 'cacheCompilationResults', (I,B), 'boolean')
+            vt(cacheCompilationResults, 'cacheCompilationResults', IB, 'boolean')
 
             useCache = valOrDefault(useCache, klass._CHEETAH_useCompilationCache)
-            if boolTypeAvailable:         
-                vt(cacheCompilationResults, 'cacheCompilationResults', (I,B), 'boolean')
+            vt(useCache, 'useCache', IB, 'boolean')
 
             compilerSettings = valOrDefault(
                 compilerSettings, klass._getCompilerSettings(source, file) or {})
@@ -638,10 +631,9 @@ class Template(Servlet):
 
             keepRefToGeneratedCode = valOrDefault(
                 keepRefToGeneratedCode, klass._CHEETAH_keepRefToGeneratedCode)
-            if boolTypeAvailable:         
-                vt(cacheCompilationResults, 'cacheCompilationResults', (I,B), 'boolean')
-        
-            vt(moduleName, 'moduleName', (N,S), 'string or None')
+            vt(keepRefToGeneratedCode, 'keepRefToGeneratedCode', IB, 'boolean')
+
+            vt(moduleName, 'moduleName', NS, 'string or None')
             __orig_file__ = None
             if not moduleName:
                 if file and type(file) in StringTypes:
@@ -649,27 +641,26 @@ class Template(Servlet):
                     __orig_file__ = file
                 else:
                     moduleName = klass._CHEETAH_defaultModuleNameForTemplates
-        
+
             className = valOrDefault(
                 className, klass._CHEETAH_defaultClassNameForTemplates)
-            vt(className, 'className', (N,S), 'string or None')
+            vt(className, 'className', NS, 'string or None')
             className = className or moduleName
 
             mainMethodName = valOrDefault(
                 mainMethodName, klass._CHEETAH_defaultMainMethodNameForTemplates)
-            vt(mainMethodName, 'mainMethodName', (N,S), 'string or None')
+            vt(mainMethodName, 'mainMethodName', NS, 'string or None')
 
             moduleGlobals = valOrDefault(
                 moduleGlobals, klass._CHEETAH_defaultModuleGlobalsForTemplates)
 
             cacheModuleFilesForTracebacks = valOrDefault(
                 cacheModuleFilesForTracebacks, klass._CHEETAH_cacheModuleFilesForTracebacks)
-            if boolTypeAvailable:
-                vt(cacheModuleFilesForTracebacks, 'cacheModuleFilesForTracebacks', (I,B), 'boolean')
-            
+            vt(cacheModuleFilesForTracebacks, 'cacheModuleFilesForTracebacks', IB, 'boolean')
+
             cacheDirForModuleFiles = valOrDefault(
                 cacheDirForModuleFiles, klass._CHEETAH_cacheDirForModuleFiles)
-            vt(cacheDirForModuleFiles, 'cacheDirForModuleFiles', (N,S), 'string or None')
+            vt(cacheDirForModuleFiles, 'cacheDirForModuleFiles', NS, 'string or None')
 
         except TypeError, reason:
             raise TypeError(reason)
