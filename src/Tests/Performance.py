@@ -187,7 +187,10 @@ class LongCompileTest(PerformanceTest):
                     <body>
                         $header()
 
-                        This is just some stupid page!
+                        #for $i in $xrange(10)
+                            This is just some stupid page!
+                            <br/>
+                        #end for
 
                         <br/>
                         $footer()
@@ -196,12 +199,18 @@ class LongCompileTest(PerformanceTest):
             #end def
             
         '''
-        template = self.compile(template)
+        return self.compile(template)
 
 class LongCompile_CompilerSettingsTest(LongCompileTest):
     def compile(self, template):
         return Cheetah.Template.Template.compile(template, keepRefToGeneratedCode=False,
             compilerSettings={'useStackFrames' : True, 'useAutocalling' : True})
+
+class LongCompileAndRun(LongCompileTest):
+    def performanceSample(self):
+        template = super(LongCompileAndRun, self).performanceSample()
+        template = template(searchList=[{'title' : 'foo'}])
+        template = template.respond()
             
 
 if __name__ == '__main__':
