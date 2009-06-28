@@ -14,7 +14,7 @@ static PyObject *unspecified = NULL;
 
 static PyObject *py_valordefault(PyObject *self, PyObject *args, PyObject *kwargs)
 {
-    PyObject *value, *def, *res;
+    PyObject *value, *def;
 
     if (!PyArg_ParseTuple(args, "OO", &value, &def))
         return NULL;
@@ -31,7 +31,7 @@ static const char _template_doc[] = "\
 \n\
 ";
 static struct PyMethodDef _template_methods[] = {
-    {"valOrDefault", py_valordefault, METH_VARARGS, NULL},
+    {"valOrDefault", (PyCFunction)py_valordefault, METH_VARARGS, NULL},
     {NULL}
 };
 
@@ -41,10 +41,10 @@ PyMODINIT_FUNC init_template()
             _template_doc);
     unspecifiedModule = PyImport_ImportModule("Cheetah.Unspecified");
     if ( (PyErr_Occurred()) || (!unspecifiedModule) )
-        return NULL;
+        return;
     unspecified = PyObject_GetAttrString(unspecifiedModule, "Unspecified");
     if (PyErr_Occurred())
-        return NULL;
+        return;
 }
 
 #ifdef __cplusplus
