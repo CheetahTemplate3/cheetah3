@@ -23,10 +23,7 @@ class Filter(object):
         """
         self.template = template
         
-    def filter(self, val,
-               encoding=None,
-               str=str, 
-               **kw):
+    def filter(self, val, encoding=None, str=str, **kw):
         '''
             Pass Unicode strings through unmolested, unless an encoding is specified.
         '''
