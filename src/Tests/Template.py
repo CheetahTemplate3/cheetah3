@@ -338,7 +338,9 @@ class MultipleInheritanceSupport(TemplateTest):
                 #return [4,5] + $boink()
             #end def
         '''
-        template = Template.compile(template)
+        template = Template.compile(template,
+                moduleGlobals={'Useless' : Useless},
+                compilerSettings={'autoImportForExtendsDirective' : False})
         template = template()
         result = template.foo()
         print result
