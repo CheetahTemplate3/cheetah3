@@ -1,6 +1,6 @@
 #-------Main Package Settings-----------#
 name = 'Cheetah'
-from src.Version import Version as version
+from cheetah.Version import Version as version
 maintainer = "R. Tyler Ballance"
 author = "Tavis Rudd"
 author_email = "cheetahtemplate-discuss@lists.sf.net"
@@ -29,7 +29,7 @@ classifiers = [line.strip() for line in '''\
   Topic :: Text Processing'''.splitlines() if not line.strip().startswith('#')]
 del line
 
-package_dir = {'Cheetah':'src'}
+package_dir = {'Cheetah':'cheetah'}
 
 import os
 import os.path
@@ -38,7 +38,7 @@ from distutils.core import Extension
 ## we only assume the presence of a c compiler on Posix systems, NT people will
 #  have to enable this manually. 
 if os.name == 'posix':
-    ext_modules=[Extension("Cheetah._namemapper", [os.path.join("src" ,"_namemapper.c")]
+    ext_modules=[Extension("Cheetah._namemapper", [os.path.join("cheetah" ,"_namemapper.c")]
                            )
                  ]
 else:
@@ -49,7 +49,7 @@ else:
 scripts = ['bin/cheetah-compile',
            'bin/cheetah',
            ]
-data_files = ['recursive: src *.tmpl *.txt LICENSE README TODO CHANGES',
+data_files = ['recursive: cheetah *.tmpl *.txt LICENSE README TODO CHANGES',
               ]
 if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
     try:
