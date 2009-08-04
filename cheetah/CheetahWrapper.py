@@ -614,6 +614,16 @@ be named according to the same rules as Python modules.""" % tup)
             f.close()
             
 
+# Called when invoked as `cheetah`
+def _cheetah():
+    CheetahWrapper().main()
+
+# Called when invoked as `cheetah-compile`
+def _cheetah_compile():
+    sys.argv.insert(1, "compile")
+    CheetahWrapper().main()
+
+
 ##################################################
 ## if run from the command line
 if __name__ == '__main__':  CheetahWrapper().main()

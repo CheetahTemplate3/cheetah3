@@ -57,6 +57,14 @@ if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
         install_requires = [
                 "Markdown >= 2.0.1",
         ]
+        # use 'entry_points' instead of 'scripts'
+        del scripts
+        entry_points = {
+            'console_scripts': [
+                'cheetah = Cheetah.CheetahWrapper:_cheetah',
+                'cheetah-compile = Cheetah.CheetahWrapper:_cheetah_compile',
+            ]
+        }
     except ImportError:
         print 'Not using setuptools, so we cannot install the Markdown dependency'
 
