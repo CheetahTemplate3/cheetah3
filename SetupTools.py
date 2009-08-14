@@ -19,7 +19,7 @@ from distutils.core import Command
 from distutils.command.install_data import install_data
 
 #imports from Cheetah ...
-from src.FileUtils import findFiles
+from cheetah.FileUtils import findFiles
 
 ##################################################
 ## CLASSES ##

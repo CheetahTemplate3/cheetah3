@@ -1,6 +1,6 @@
 #-------Main Package Settings-----------#
 name = 'Cheetah'
-from src.Version import Version as version
+from cheetah.Version import Version as version
 maintainer = "R. Tyler Ballance"
 author = "Tavis Rudd"
 author_email = "cheetahtemplate-discuss@lists.sf.net"
@@ -11,7 +11,6 @@ packages = ['Cheetah',
             'Cheetah.Tests',
             'Cheetah.Tools',
             'Cheetah.Utils',
-            'Cheetah.contrib',
             ]
 classifiers = [line.strip() for line in '''\
   #Development Status :: 4 - Beta
@@ -30,7 +29,7 @@ classifiers = [line.strip() for line in '''\
   Topic :: Text Processing'''.splitlines() if not line.strip().startswith('#')]
 del line
 
-package_dir = {'Cheetah':'src'}
+package_dir = {'Cheetah':'cheetah'}
 
 import os
 import os.path
@@ -52,10 +51,12 @@ ext_modules=[
 scripts = ['bin/cheetah-compile',
            'bin/cheetah',
            ]
+
 if sys.platform == "win32":
     scripts.append('bin/cheetah.bat')
-data_files = ['recursive: src *.tmpl *.txt LICENSE README TODO CHANGES',
-              ]
+
+data_files = ['recursive: src *.tmpl *.txt LICENSE README TODO CHANGES',]
+
 if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
     try:
         from setuptools import setup
