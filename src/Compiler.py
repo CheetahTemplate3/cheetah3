@@ -1739,38 +1739,40 @@ class ModuleCompiler(SettingsManager, GenUtils):
             #  - We also assume that the final . separates the classname from the
             #    module name.  This might break if people do something really fancy 
             #    with their dots and namespaces.
-            chunks = baseClassName.split('.')
-            if len(chunks)==1:
-                self._getActiveClassCompiler().setBaseClass(baseClassName)
-                if baseClassName not in self.importedVarNames():
-                    modName = baseClassName
-                    # we assume the class name to be the module name
-                    # and that it's not a builtin:
-                    importStatement = "from %s import %s" % (modName, baseClassName)
-                    self.addImportStatement(importStatement)
-                    self.addImportedVarNames( [baseClassName,] ) 
-            else:
-                needToAddImport = True
-                modName = chunks[0]
-                #print chunks, ':', self.importedVarNames()
-                for chunk in chunks[1:-1]:
-                    if modName in self.importedVarNames():
-                        needToAddImport = False
-                        finalBaseClassName = baseClassName.replace(modName+'.', '')
-                        self._getActiveClassCompiler().setBaseClass(finalBaseClassName)
-                        break
-                    else:
-                        modName += '.'+chunk                        
-                if needToAddImport:
-                    modName, finalClassName = '.'.join(chunks[:-1]), chunks[-1]                
-                    #if finalClassName != chunks[:-1][-1]:
-                    if finalClassName != chunks[-2]:
+            baseclasses = baseClassName.split(',')
+            for klass in baseclasses:
+                chunks = klass.split('.')
+                if len(chunks)==1:
+                    self._getActiveClassCompiler().setBaseClass(klass)
+                    if klass not in self.importedVarNames():
+                        modName = klass
                         # we assume the class name to be the module name
-                        modName = '.'.join(chunks)
-                    self._getActiveClassCompiler().setBaseClass(finalClassName)                        
-                    importStatement = "from %s import %s" % (modName, finalClassName)
-                    self.addImportStatement(importStatement)
-                    self.addImportedVarNames( [finalClassName,] ) 
+                        # and that it's not a builtin:
+                        importStatement = "from %s import %s" % (modName, klass)
+                        self.addImportStatement(importStatement)
+                        self.addImportedVarNames((klass,))
+                else:
+                    needToAddImport = True
+                    modName = chunks[0]
+                    #print chunks, ':', self.importedVarNames()
+                    for chunk in chunks[1:-1]:
+                        if modName in self.importedVarNames():
+                            needToAddImport = False
+                            finalBaseClassName = klass.replace(modName+'.', '')
+                            self._getActiveClassCompiler().setBaseClass(finalBaseClassName)
+                            break
+                        else:
+                            modName += '.'+chunk                        
+                    if needToAddImport:
+                        modName, finalClassName = '.'.join(chunks[:-1]), chunks[-1]                
+                        #if finalClassName != chunks[:-1][-1]:
+                        if finalClassName != chunks[-2]:
+                            # we assume the class name to be the module name
+                            modName = '.'.join(chunks)
+                        self._getActiveClassCompiler().setBaseClass(finalClassName)                        
+                        importStatement = "from %s import %s" % (modName, finalClassName)
+                        self.addImportStatement(importStatement)
+                        self.addImportedVarNames( [finalClassName,] ) 
             
     def setCompilerSetting(self, key, valueExpr):
         self.setSetting(key, eval(valueExpr) )
