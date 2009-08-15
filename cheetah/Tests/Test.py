@@ -21,7 +21,6 @@ import Template
 import CheetahWrapper
 import Regressions
 import Unicode
-import VerifyType
 
 suites = [
    unittest.findTestCases(SyntaxAndOutput),
@@ -29,7 +28,6 @@ suites = [
    unittest.findTestCases(Template),
    unittest.findTestCases(Regressions),
    unittest.findTestCases(Unicode),
-   unittest.findTestCases(VerifyType),
 ]
 
 if not sys.platform.startswith('java'):
