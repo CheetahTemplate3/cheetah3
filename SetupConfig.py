@@ -33,7 +33,6 @@ package_dir = {'Cheetah':'cheetah'}
 
 import os
 import os.path
-import sys
 from distutils.core import Extension
 
 ext_modules=[
@@ -51,9 +50,6 @@ ext_modules=[
 scripts = ['bin/cheetah-compile',
            'bin/cheetah',
            ]
-
-if sys.platform == "win32":
-    scripts.append('bin/cheetah.bat')
 
 data_files = ['recursive: src *.tmpl *.txt LICENSE README TODO CHANGES',]
 
