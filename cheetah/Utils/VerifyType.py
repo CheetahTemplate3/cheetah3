@@ -51,6 +51,7 @@ def VerifyType(arg, argname, legalTypes, ltd, errmsgExtra=''):
     if type(arg) not in legalTypes:
         m = _errmsg(argname, ltd, errmsgExtra)
         raise TypeError(m)
+    return True
 
 
 def VerifyTypeClass(arg, argname, legalTypes, ltd, klass, errmsgExtra=''):
@@ -71,6 +72,7 @@ def VerifyTypeClass(arg, argname, legalTypes, ltd, klass, errmsgExtra=''):
         # Must test for "is class type" to avoid TypeError from issubclass().
         m = _errmsg(argname, ltd, errmsgExtra)
         raise TypeError(m)
+    return True
 
 # @@MO: Commented until we determine whether it's useful.
 #def VerifyClass(arg, argname, klass, ltd):

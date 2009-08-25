@@ -33,24 +33,30 @@ package_dir = {'Cheetah':'cheetah'}
 
 import os
 import os.path
+import sys
 from distutils.core import Extension
 
-## we only assume the presence of a c compiler on Posix systems, NT people will
-#  have to enable this manually. 
-if os.name == 'posix':
-    ext_modules=[Extension("Cheetah._namemapper", [os.path.join("cheetah" ,"_namemapper.c")]
-                           )
-                 ]
-else:
-    ext_modules=[]
-
+ext_modules=[
+             Extension("Cheetah._namemapper", 
+                        [os.path.join('cheetah', 'c', '_namemapper.c')]),
+             Extension("Cheetah._verifytype", 
+                        [os.path.join('cheetah', 'c', '_verifytype.c')]),
+             Extension("Cheetah._filters", 
+                        [os.path.join('cheetah', 'c', '_filters.c')]),
+             Extension('Cheetah._template',
+                        [os.path.join('cheetah', 'c', '_template.c')]),
+             ]
 
 ## Data Files and Scripts
 scripts = ['bin/cheetah-compile',
            'bin/cheetah',
            ]
-data_files = ['recursive: cheetah *.tmpl *.txt LICENSE README TODO CHANGES',
-              ]
+
+if sys.platform == "win32":
+    scripts.append('bin/cheetah.bat')
+
+data_files = ['recursive: src *.tmpl *.txt LICENSE README TODO CHANGES',]
+
 if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
     try:
         from setuptools import setup

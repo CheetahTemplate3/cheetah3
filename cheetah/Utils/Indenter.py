@@ -1,5 +1,5 @@
-# $Id: Indenter.py,v 1.7 2006/01/08 01:09:30 tavis_rudd Exp $
-"""Indentation maker.
+"""
+Indentation maker.
 @@TR: this code is unsupported and largely undocumented ...
 
 This version is based directly on code by Robert Kuzelj
@@ -8,18 +8,7 @@ attributes have been renamed.  Indentation is output via
 $self._CHEETAH__indenter.indent() to prevent '_indenter' being looked up on the
 searchList and another one being found.  The directive syntax will
 soon be changed somewhat.
-
-Meta-Data
-================================================================================
-Author: Mike Orr <iron@mso.oz.net>
-License: This software is released for unlimited distribution under the
-         terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.7 $
-Start Date: 2001/11/07
-Last Revision Date: $Date: 2006/01/08 01:09:30 $
 """ 
-__author__ = "Mike Orr <iron@mso.oz.net>"
-__revision__ = "$Revision: 1.7 $"[11:-2]
 
 import re
 import sys
@@ -27,7 +16,7 @@ import sys
 def indentize(source):
     return IndentProcessor().process(source)
 
-class IndentProcessor:
+class IndentProcessor(object):
     """Preprocess #indent tags."""
     LINE_SEP = '\n'
     ARGS = "args"
@@ -88,15 +77,16 @@ class IndentProcessor:
 
         return self.LINE_SEP.join(result)
 
-class Indenter:
-    """A class that keeps track of the current indentation level.
+class Indenter(object):
+    """
+    A class that keeps track of the current indentation level.
     .indent() returns the appropriate amount of indentation.
     """
-    def __init__(self):
-        self.On = 1
-        self.Level = 0
-        self.Chars = " "*4
-        self.LevelStack = []
+    On = 1
+    Level = 0
+    Chars = '    '
+    LevelStack = []
+
     def on(self):
         self.On = 1
     def off(self):
@@ -129,6 +119,5 @@ class Indenter:
     def indent(self, _default=0):
         if self.On:
             return self.Chars * self.Level
-        else:
-            return " " * _default
+        return " " * _default
 
