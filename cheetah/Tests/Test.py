@@ -19,6 +19,7 @@ import SyntaxAndOutput
 import NameMapper
 import Template
 import CheetahWrapper
+import Cheps
 import Regressions
 import Unicode
 
@@ -28,6 +29,7 @@ suites = [
    unittest.findTestCases(Template),
    unittest.findTestCases(Regressions),
    unittest.findTestCases(Unicode),
+   unittest.findTestCases(Cheps),
 ]
 
 if not sys.platform.startswith('java'):
