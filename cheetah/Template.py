@@ -779,7 +779,7 @@ class Template(Servlet):
                     setattr(mod, baseclassName, baseclassValue)
                 ##
                 try:
-                    co = compile(generatedModuleCode.encode(outputEncoding), __file__, 'exec')
+                    co = compile(generatedModuleCode, __file__, 'exec')
                     exec co in mod.__dict__
                 except SyntaxError, e:
                     try:
