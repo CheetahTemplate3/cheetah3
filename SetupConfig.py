@@ -51,7 +51,7 @@ scripts = ['bin/cheetah-compile',
            'bin/cheetah',
            ]
 
-data_files = ['recursive: src *.tmpl *.txt LICENSE README TODO CHANGES',]
+data_files = ['recursive: cheetah *.tmpl *.txt LICENSE README TODO CHANGES',]
 
 if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
     try:
