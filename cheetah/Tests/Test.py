@@ -13,8 +13,6 @@ TODO
 import sys
 import unittest_local_copy as unittest
 
-
-
 import SyntaxAndOutput
 import NameMapper
 import Template
@@ -22,6 +20,7 @@ import CheetahWrapper
 import Cheps
 import Regressions
 import Unicode
+import VerifyType
 
 suites = [
    unittest.findTestCases(SyntaxAndOutput),
@@ -30,6 +29,7 @@ suites = [
    unittest.findTestCases(Regressions),
    unittest.findTestCases(Unicode),
    unittest.findTestCases(Cheps),
+   unittest.findTestCases(VerifyType),
 ]
 
 if not sys.platform.startswith('java'):
@@ -41,5 +41,5 @@ if __name__ == '__main__':
         import xmlrunner
         runner = xmlrunner.XMLTestRunner(filename='Cheetah-Tests.xml')
     
-    results = runner.run(unittest.TestSuite(suites))	
+    results = runner.run(unittest.TestSuite(suites))
 
