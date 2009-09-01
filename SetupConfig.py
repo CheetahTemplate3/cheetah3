@@ -1,18 +1,16 @@
 #-------Main Package Settings-----------#
-name = "Cheetah"
-from src.Version import Version as version
+name = 'Cheetah'
+from cheetah.Version import Version as version
 maintainer = "R. Tyler Ballance"
 author = "Tavis Rudd"
 author_email = "cheetahtemplate-discuss@lists.sf.net"
-url = "http://www.communitycheetah.org/"
+url = "http://www.cheetahtemplate.org/"
 packages = ['Cheetah',
             'Cheetah.Macros',            
             'Cheetah.Templates',
             'Cheetah.Tests',
             'Cheetah.Tools',
             'Cheetah.Utils',
-            'Cheetah.contrib',
-            'Cheetah.contrib.markdown',
             ]
 classifiers = [line.strip() for line in '''\
   #Development Status :: 4 - Beta
@@ -31,28 +29,47 @@ classifiers = [line.strip() for line in '''\
   Topic :: Text Processing'''.splitlines() if not line.strip().startswith('#')]
 del line
 
-package_dir = {'Cheetah':'src'}
+package_dir = {'Cheetah':'cheetah'}
 
 import os
 import os.path
 from distutils.core import Extension
 
-## we only assume the presence of a c compiler on Posix systems, NT people will
-#  have to enable this manually. 
-if os.name == 'posix':
-    ext_modules=[Extension("Cheetah._namemapper", [os.path.join("src" ,"_namemapper.c")]
-                           )
-                 ]
-else:
-    ext_modules=[]
-
+ext_modules=[
+             Extension("Cheetah._namemapper", 
+                        [os.path.join('cheetah', 'c', '_namemapper.c')]),
+             Extension("Cheetah._verifytype", 
+                        [os.path.join('cheetah', 'c', '_verifytype.c')]),
+             Extension("Cheetah._filters", 
+                        [os.path.join('cheetah', 'c', '_filters.c')]),
+             Extension('Cheetah._template',
+                        [os.path.join('cheetah', 'c', '_template.c')]),
+             ]
 
 ## Data Files and Scripts
 scripts = ['bin/cheetah-compile',
            'bin/cheetah',
            ]
-data_files = ['recursive: src *.tmpl *.txt LICENSE README TODO CHANGES',
-              ]
+
+data_files = ['recursive: src *.tmpl *.txt LICENSE README TODO CHANGES',]
+
+if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
+    try:
+        from setuptools import setup
+        install_requires = [
+                "Markdown >= 2.0.1",
+        ]
+        # use 'entry_points' instead of 'scripts'
+        del scripts
+        entry_points = {
+            'console_scripts': [
+                'cheetah = Cheetah.CheetahWrapper:_cheetah',
+                'cheetah-compile = Cheetah.CheetahWrapper:_cheetah_compile',
+            ]
+        }
+    except ImportError:
+        print 'Not using setuptools, so we cannot install the Markdown dependency'
+
 
 description = "Cheetah is a template engine and code generation tool."
 
@@ -65,7 +82,7 @@ used to generate C++ game code, Java, sql, form emails and even Python code.
 Documentation
 ================================================================================
 For a high-level introduction to Cheetah please refer to the User\'s Guide
-at http://www.communitycheetah.org/learn.html
+at http://www.cheetahtemplate.org/learn.html
 
 Mailing list
 ================================================================================
@@ -74,10 +91,10 @@ Subscribe at http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss
 
 Credits
 ================================================================================
-http://www.communitycheetah.org/credits.html
+http://www.cheetahtemplate.org/credits.html
 
 Recent Changes
 ================================================================================
-See http://www.communitycheetah.org/CHANGES.txt for full details
+See http://www.cheetahtemplate.org/CHANGES.txt for full details
 
 '''
