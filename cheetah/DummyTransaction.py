@@ -8,6 +8,7 @@ Warning: This may be deprecated in the future, please do not rely on any
 specific DummyTransaction or DummyResponse behavior
 '''
 
+import logging
 import types
 
 class DummyResponseFailure(Exception):
@@ -62,7 +63,7 @@ class DummyResponse(object):
             %s) 
             (%s)''' % (nonunicode, ex)
             chunks = [self.safeConvert(c) for c in chunks]
-            print message
+            logging.debug(message)
             return u''.join(chunks)
 
 
