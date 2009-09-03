@@ -119,15 +119,6 @@ def _genUniqueModuleName(baseModuleName):
 # This is only relavent to templates used as CGI scripts.
 _formUsedByWebInput = None
 
-try:
-    from Cheetah._template import valOrDefault
-except ImportError:
-    # used in Template.compile()
-    def valOrDefault(val, default):                
-        if val is not Unspecified:
-            return val
-        return default
-
 def updateLinecache(filename, src):
     import linecache
     size = len(src)
@@ -610,27 +601,31 @@ class Template(Servlet):
             vt(source, 'source', (N,S,U), 'string or None')
             vt(file, 'file',(N,S,U,F), 'string, file-like object, or None')
 
-            baseclass = valOrDefault(baseclass, klass._CHEETAH_defaultBaseclassForTemplates)
+            if baseclass is Unspecified:
+                baseclass = klass._CHEETAH_defaultBaseclassForTemplates
             if isinstance(baseclass, Template):
                 baseclass = baseclass.__class__
             vt(baseclass, 'baseclass', (N,S,C,type), 'string, class or None')
 
-            cacheCompilationResults = valOrDefault(
-                cacheCompilationResults, klass._CHEETAH_cacheCompilationResults)
+            if cacheCompilationResults is Unspecified:
+                cacheCompilationResults = klass._CHEETAH_cacheCompilationResults
             vt(cacheCompilationResults, 'cacheCompilationResults', IB, 'boolean')
 
-            useCache = valOrDefault(useCache, klass._CHEETAH_useCompilationCache)
+            if useCache is Unspecified:
+                useCache = klass._CHEETAH_useCompilationCache
             vt(useCache, 'useCache', IB, 'boolean')
 
-            compilerSettings = valOrDefault(
-                compilerSettings, klass._getCompilerSettings(source, file) or {})
+            if compilerSettings is Unspecified:
+                compilerSettings = klass._getCompilerSettings(source, file) or {}
             vt(compilerSettings, 'compilerSettings', (D,), 'dictionary')
 
-            compilerClass = valOrDefault(compilerClass, klass._getCompilerClass(source, file))
-            preprocessors = valOrDefault(preprocessors, klass._CHEETAH_preprocessors)
+            if compilerClass is Unspecified:
+                compilerClass = klass._getCompilerClass(source, file)
+            if preprocessors is Unspecified:
+                preprocessors = klass._CHEETAH_preprocessors
 
-            keepRefToGeneratedCode = valOrDefault(
-                keepRefToGeneratedCode, klass._CHEETAH_keepRefToGeneratedCode)
+            if keepRefToGeneratedCode is Unspecified:
+                keepRefToGeneratedCode = klass._CHEETAH_keepRefToGeneratedCode
             vt(keepRefToGeneratedCode, 'keepRefToGeneratedCode', IB, 'boolean')
 
             vt(moduleName, 'moduleName', NS, 'string or None')
@@ -642,24 +637,24 @@ class Template(Servlet):
                 else:
                     moduleName = klass._CHEETAH_defaultModuleNameForTemplates
 
-            className = valOrDefault(
-                className, klass._CHEETAH_defaultClassNameForTemplates)
+            if className is Unspecified:
+                className = klass._CHEETAH_defaultClassNameForTemplates
             vt(className, 'className', NS, 'string or None')
             className = className or moduleName
 
-            mainMethodName = valOrDefault(
-                mainMethodName, klass._CHEETAH_defaultMainMethodNameForTemplates)
+            if mainMethodName is Unspecified:
+                mainMethodName = klass._CHEETAH_defaultMainMethodNameForTemplates
             vt(mainMethodName, 'mainMethodName', NS, 'string or None')
 
-            moduleGlobals = valOrDefault(
-                moduleGlobals, klass._CHEETAH_defaultModuleGlobalsForTemplates)
+            if moduleGlobals is Unspecified:
+                moduleGlobals = klass._CHEETAH_defaultModuleGlobalsForTemplates
 
-            cacheModuleFilesForTracebacks = valOrDefault(
-                cacheModuleFilesForTracebacks, klass._CHEETAH_cacheModuleFilesForTracebacks)
+            if cacheModuleFilesForTracebacks is Unspecified:
+                cacheModuleFilesForTracebacks = klass._CHEETAH_cacheModuleFilesForTracebacks
             vt(cacheModuleFilesForTracebacks, 'cacheModuleFilesForTracebacks', IB, 'boolean')
 
-            cacheDirForModuleFiles = valOrDefault(
-                cacheDirForModuleFiles, klass._CHEETAH_cacheDirForModuleFiles)
+            if cacheDirForModuleFiles is Unspecified:
+                cacheDirForModuleFiles = klass._CHEETAH_cacheDirForModuleFiles
             vt(cacheDirForModuleFiles, 'cacheDirForModuleFiles', NS, 'string or None')
 
         except TypeError, reason:
