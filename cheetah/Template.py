@@ -52,13 +52,6 @@ from Cheetah import ErrorCatchers              # for placeholder tags
 from Cheetah import Filters                    # the output filters
 from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
 
-try:
-    from Cheetah._verifytype import *
-except ImportError:
-    from Cheetah.Utils import VerifyType
-    verifyType = VerifyType.VerifyType
-    verifyTypeClass = VerifyType.VerifyTypeClass
-
 from Cheetah.Utils.Misc import checkKeywords     # Used in Template.__init__
 from Cheetah.Utils.Indenter import Indenter      # Used in Template.__init__ and for
                                                  # placeholders
@@ -118,15 +111,6 @@ def _genUniqueModuleName(baseModuleName):
 # Cache of a cgi.FieldStorage() instance, maintained by .webInput().
 # This is only relavent to templates used as CGI scripts.
 _formUsedByWebInput = None
-
-try:
-    from Cheetah._template import valOrDefault
-except ImportError:
-    # used in Template.compile()
-    def valOrDefault(val, default):                
-        if val is not Unspecified:
-            return val
-        return default
 
 def updateLinecache(filename, src):
     import linecache
@@ -596,74 +580,96 @@ class Template(Servlet):
         """
         ##################################################           
         ## normalize and validate args 
-        try:
-            vt = verifyType
-            vtc = verifyTypeClass
-            N = types.NoneType; S = types.StringType; U = types.UnicodeType
-            D = types.DictType; F = types.FileType
-            C = types.ClassType;  M = types.ModuleType
-            I = types.IntType; B = types.BooleanType
+        N = types.NoneType; S = types.StringType; U = types.UnicodeType
+        D = types.DictType; F = types.FileType
+        C = types.ClassType;  M = types.ModuleType
+        I = types.IntType; B = types.BooleanType
+        errmsg = "arg '%s' must be %s"
 
-            IB = (I, B)
-            NS = (N, S)
+        t = type(source)
+        if not (t is N or t is S or t is U):
+            raise TypeError(errmsg % ('source', 'string or None'))
+        t = type(file)
+        if not (t is N or t is S or t is U or t is F):
+            raise TypeError(errmsg %
+                            ('file', 'string, file-like object, or None'))
 
-            vt(source, 'source', (N,S,U), 'string or None')
-            vt(file, 'file',(N,S,U,F), 'string, file-like object, or None')
+        if baseclass is Unspecified:
+            baseclass = klass._CHEETAH_defaultBaseclassForTemplates
+        if isinstance(baseclass, Template):
+            baseclass = baseclass.__class__
+        t = type(baseclass)
+        if not (t is N or t is S or t is C or t is type):
+            raise TypeError(errmsg % ('baseclass', 'string, class or None'))
 
-            baseclass = valOrDefault(baseclass, klass._CHEETAH_defaultBaseclassForTemplates)
-            if isinstance(baseclass, Template):
-                baseclass = baseclass.__class__
-            vt(baseclass, 'baseclass', (N,S,C,type), 'string, class or None')
+        if cacheCompilationResults is Unspecified:
+            cacheCompilationResults = klass._CHEETAH_cacheCompilationResults
+        t = type(cacheCompilationResults)
+        if not (t is I or t is B):
+            raise TypeError(errmsg % ('cacheCompilationResults', 'boolean'))
 
-            cacheCompilationResults = valOrDefault(
-                cacheCompilationResults, klass._CHEETAH_cacheCompilationResults)
-            vt(cacheCompilationResults, 'cacheCompilationResults', IB, 'boolean')
+        if useCache is Unspecified:
+            useCache = klass._CHEETAH_useCompilationCache
+        t = type(useCache)
+        if not (t is I or t is B):
+            raise TypeError(errmsg % ('useCache', 'boolean'))
 
-            useCache = valOrDefault(useCache, klass._CHEETAH_useCompilationCache)
-            vt(useCache, 'useCache', IB, 'boolean')
+        if compilerSettings is Unspecified:
+            compilerSettings = klass._getCompilerSettings(source, file) or {}
+        if type(compilerSettings) is not D:
+            raise TypeError(errmsg % ('compilerSettings', 'dictionary'))
 
-            compilerSettings = valOrDefault(
-                compilerSettings, klass._getCompilerSettings(source, file) or {})
-            vt(compilerSettings, 'compilerSettings', (D,), 'dictionary')
+        if compilerClass is Unspecified:
+            compilerClass = klass._getCompilerClass(source, file)
+        if preprocessors is Unspecified:
+            preprocessors = klass._CHEETAH_preprocessors
 
-            compilerClass = valOrDefault(compilerClass, klass._getCompilerClass(source, file))
-            preprocessors = valOrDefault(preprocessors, klass._CHEETAH_preprocessors)
+        if keepRefToGeneratedCode is Unspecified:
+            keepRefToGeneratedCode = klass._CHEETAH_keepRefToGeneratedCode
+        t = type(keepRefToGeneratedCode)
+        if not (t is I or t is B):
+            raise TypeError(errmsg % ('keepReftoGeneratedCode', 'boolean'))
 
-            keepRefToGeneratedCode = valOrDefault(
-                keepRefToGeneratedCode, klass._CHEETAH_keepRefToGeneratedCode)
-            vt(keepRefToGeneratedCode, 'keepRefToGeneratedCode', IB, 'boolean')
+        t = type(moduleName)
+        if not (t is N or t is S):
+            raise TypeError(errmsg % ('moduleName', 'string or None'))
+        __orig_file__ = None
+        if not moduleName:
+            if file and type(file) in StringTypes:
+                moduleName = convertTmplPathToModuleName(file)
+                __orig_file__ = file
+            else:
+                moduleName = klass._CHEETAH_defaultModuleNameForTemplates
 
-            vt(moduleName, 'moduleName', NS, 'string or None')
-            __orig_file__ = None
-            if not moduleName:
-                if file and type(file) in StringTypes:
-                    moduleName = convertTmplPathToModuleName(file)
-                    __orig_file__ = file
-                else:
-                    moduleName = klass._CHEETAH_defaultModuleNameForTemplates
+        if className is Unspecified:
+            className = klass._CHEETAH_defaultClassNameForTemplates
+        t = type(className)
+        if not (t is N or t is S):
+            raise TypeError(errmsg % ('className', 'string or None'))
+        className = className or moduleName
 
-            className = valOrDefault(
-                className, klass._CHEETAH_defaultClassNameForTemplates)
-            vt(className, 'className', NS, 'string or None')
-            className = className or moduleName
+        if mainMethodName is Unspecified:
+            mainMethodName = klass._CHEETAH_defaultMainMethodNameForTemplates
+        t = type(mainMethodName)
+        if not (t is N or t is S):
+            raise TypeError(errmsg % ('mainMethodName', 'string or None'))
 
-            mainMethodName = valOrDefault(
-                mainMethodName, klass._CHEETAH_defaultMainMethodNameForTemplates)
-            vt(mainMethodName, 'mainMethodName', NS, 'string or None')
+        if moduleGlobals is Unspecified:
+            moduleGlobals = klass._CHEETAH_defaultModuleGlobalsForTemplates
 
-            moduleGlobals = valOrDefault(
-                moduleGlobals, klass._CHEETAH_defaultModuleGlobalsForTemplates)
+        if cacheModuleFilesForTracebacks is Unspecified:
+            cacheModuleFilesForTracebacks = klass._CHEETAH_cacheModuleFilesForTracebacks
+        t = type(cacheModuleFilesForTracebacks)
+        if not (t is I or t is B):
+            raise TypeError(errmsg %
+                            ('cacheModuleFilesForTracebacks', 'boolean'))
 
-            cacheModuleFilesForTracebacks = valOrDefault(
-                cacheModuleFilesForTracebacks, klass._CHEETAH_cacheModuleFilesForTracebacks)
-            vt(cacheModuleFilesForTracebacks, 'cacheModuleFilesForTracebacks', IB, 'boolean')
-
-            cacheDirForModuleFiles = valOrDefault(
-                cacheDirForModuleFiles, klass._CHEETAH_cacheDirForModuleFiles)
-            vt(cacheDirForModuleFiles, 'cacheDirForModuleFiles', NS, 'string or None')
-
-        except TypeError, reason:
-            raise TypeError(reason)
+        if cacheDirForModuleFiles is Unspecified:
+            cacheDirForModuleFiles = klass._CHEETAH_cacheDirForModuleFiles
+        t = type(cacheDirForModuleFiles)
+        if not (t is N or t is S):
+            raise TypeError(errmsg %
+                            ('cacheDirForModuleFiles', 'string or None'))
 
         ##################################################           
         ## handle any preprocessors
@@ -1145,24 +1151,38 @@ class Template(Servlet):
         D = types.DictType;   F = types.FileType
         C = types.ClassType;  M = types.ModuleType
         N = types.NoneType
-        vt = verifyType
-        vtc = verifyTypeClass
-        try:
-            vt(source, 'source', (N,S,U), 'string or None')
-            vt(file, 'file', (N,S,U,F), 'string, file open for reading, or None')
-            vtc(filter, 'filter', (S,C,type), 'string or class', 
-                Filters.Filter,
-                '(if class, must be subclass of Cheetah.Filters.Filter)')
-            vt(filtersLib, 'filtersLib', (S,M), 'string or module',
-                '(if module, must contain subclasses of Cheetah.Filters.Filter)')
-            vtc(errorCatcher, 'errorCatcher', (N,S,C,type), 'string, class or None',
-               ErrorCatchers.ErrorCatcher,
-               '(if class, must be subclass of Cheetah.ErrorCatchers.ErrorCatcher)')
-            if compilerSettings is not Unspecified:
-                vt(compilerSettings, 'compilerSettings', (D,), 'dictionary')
+        errmsg = "arg '%s' must be %s"
+        errmsgextra = errmsg + "\n%s"
 
-        except TypeError:
-            raise
+        t = type(source)
+        if not (t is N or t is S or t is U):
+            raise TypeError(errmsg % ('source', 'string or None'))
+        t = type(file)
+        if not (t is N or t is S or t is U or t is F):
+            raise TypeError(errmsg %
+                            ('file', 'string, file open for reading, or None'))
+        t = type(filter)
+        if not (t is S or (t is C and issubclass(filter, Filters.Filter)) or
+                t is type):
+            raise TypeError(errmsgextra %
+                            ('filter', 'string or class',
+                             '(if class, must be subclass of Cheetah.Filters.Filter)'))
+        t = type(filtersLib)
+        if not (t is S or t is M):
+            raise TypeError(errmsgextra %
+                            ('filtersLib', 'string or module',
+                             '(if module, must contain subclasses of Cheetah.Filters.Filter)'))
+        t = type(errorCatcher)
+        if not (t is N or t is S or
+                (t is C and issubclass(errorCatcher, ErrorCatchers.ErrorCatcher)) or
+                t is type):
+            raise TypeError(errmsgextra %
+                            ('errorCatcher', 'string, class or None',
+                             '(if class, must be subclass of Cheetah.ErrorCatchers.ErrorCatcher)'))
+        if compilerSettings is not Unspecified:
+            if type(compilerSettings) is not D:
+                raise TypeError(errmsg %
+                                ('compilerSettings', 'dictionary'))
         
         if source is not None and file is not None:
             raise TypeError("you must supply either a source string or the" + 
