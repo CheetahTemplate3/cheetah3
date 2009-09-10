@@ -6,7 +6,6 @@ import types
 import os
 import os.path
 
-#import unittest_local_copy as unittest
 import unittest
 from Cheetah.NameMapper import NotFound, valueForKey, \
      valueForName, valueFromSearchList, valueFromFrame, valueFromFrameOrSearchList

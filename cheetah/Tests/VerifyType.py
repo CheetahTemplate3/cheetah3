@@ -1,3 +1,4 @@
+#!/usr/bin/env python 
 import unittest
 
 from Cheetah.Utils import VerifyType

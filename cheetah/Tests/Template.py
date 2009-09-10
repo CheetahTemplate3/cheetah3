@@ -7,7 +7,7 @@ import os
 import os.path
 import tempfile
 import shutil
-import unittest_local_copy as unittest
+import unittest
 from Cheetah.Template import Template
 
 majorVer, minorVer = sys.version_info[0], sys.version_info[1]
@@ -343,7 +343,7 @@ class MultipleInheritanceSupport(TemplateTest):
                 compilerSettings={'autoImportForExtendsDirective' : False})
         template = template()
         result = template.foo()
-        print result
+        assert result == [4, 5, 1, 2, 3], (result, 'Unexpected result')
 
 
 ##################################################

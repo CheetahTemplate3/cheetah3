@@ -3,10 +3,9 @@
 import Cheetah.NameMapper 
 import Cheetah.Template
 
-import pdb
 import sys
+import unittest
 
-import unittest_local_copy as unittest # This is just stupid
 
 majorVer, minorVer = sys.version_info[0], sys.version_info[1]
 versionTuple = (majorVer, minorVer)

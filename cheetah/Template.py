@@ -9,6 +9,7 @@ See the docstring in the Template class and the Users' Guide for more informatio
 import sys                        # used in the error handling code
 import re                         # used to define the internal delims regex
 import new                        # used to bind methods and create dummy modules
+import logging
 import string
 import os.path
 import time                       # used in the cache refresh code
@@ -1224,15 +1225,11 @@ class Template(Servlet):
                         warn = False
                     warn = False
                     if warn:
-                        print
-                        print ''' *** WARNING *** '''
-                        print ''' The following keys are members of the Template class and will result in NameMapper collisions! '''
-                        print '''  > %s ''' % ', '.join(list(intersection))
-                        print 
-                        print ''' Please change the key's name or use the compiler setting "prioritizeSearchListOverSelf=True" to prevent the NameMapper from using '''
-                        print ''' the Template member in place of your searchList variable '''
-                        print ''' *************** '''
-                        print 
+                        logging.info(''' The following keys are members of the Template class and will result in NameMapper collisions! ''')
+                        logging.info('''  > %s ''' % ', '.join(list(intersection)))
+                        logging.info(''' Please change the key's name or use the compiler setting "prioritizeSearchListOverSelf=True" to prevent the NameMapper from using ''')
+                        logging.info(''' the Template member in place of your searchList variable ''')
+                        
 
         self._initCheetahInstance(
             searchList=searchList, namespaces=namespaces,
