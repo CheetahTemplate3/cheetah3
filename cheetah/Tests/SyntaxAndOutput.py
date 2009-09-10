@@ -3198,29 +3198,30 @@ else:
     extraCompileKwArgsForDiffBaseclass = {'baseclass':object}
     
 
-for klass in [var for var in globals().values()
-              if type(var) == types.ClassType and issubclass(var, unittest.TestCase)]:
-    name = klass.__name__        
-    if hasattr(klass,'convertEOLs') and klass.convertEOLs:
-        win32Src = r"class %(name)s_Win32EOL(%(name)s): _EOLreplacement = '\r\n'"%locals()
-        macSrc = r"class %(name)s_MacEOL(%(name)s): _EOLreplacement = '\r'"%locals()
-        #print win32Src
-        #print macSrc
-        exec win32Src+'\n'
-        exec macSrc+'\n'
+def install_eols():
+    klasses = [v for v in globals().values() if isinstance(v, (types.ClassType, types.TypeType)) and issubclass(v, unittest.TestCase)]
+    print ('klasses', klasses)
+    for klass in klasses:
+        name = klass.__name__        
+        if hasattr(klass,'convertEOLs') and klass.convertEOLs:
+            win32Src = r"class %(name)s_Win32EOL(%(name)s): _EOLreplacement = '\r\n'"%locals()
+            macSrc = r"class %(name)s_MacEOL(%(name)s): _EOLreplacement = '\r'"%locals()
+            exec win32Src in globals() 
+            exec macSrc in globals()
 
-    if versionTuple >= (2,3):
-        src = r"class %(name)s_DiffBaseClass(%(name)s): "%locals()
-        src += " _extraCompileKwArgs = extraCompileKwArgsForDiffBaseclass"
-        exec src+'\n'
+        if versionTuple >= (2,3):
+            src = r"class %(name)s_DiffBaseClass(%(name)s): "%locals()
+            src += " _extraCompileKwArgs = extraCompileKwArgsForDiffBaseclass"
+            exec src in globals()
 
-    del name
-    del klass
+        del name
+        del klass
 
 ##################################################
 ## if run from the command line ##
         
 if __name__ == '__main__':
+    install_eols()
     unittest.main()
 
 # vim: shiftwidth=4 tabstop=4 expandtab

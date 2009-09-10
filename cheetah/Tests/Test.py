@@ -15,20 +15,24 @@ import unittest
 
 import SyntaxAndOutput
 import NameMapper
+import Filters
 import Template
-import CheetahWrapper
 import Cheps
 import Regressions
 import Unicode
 import VerifyType
+import CheetahWrapper
+
+SyntaxAndOutput.install_eols()
 
 suites = [
    unittest.findTestCases(SyntaxAndOutput),
    unittest.findTestCases(NameMapper),
+   unittest.findTestCases(Filters),
    unittest.findTestCases(Template),
+   #unittest.findTestCases(Cheps),
    unittest.findTestCases(Regressions),
    unittest.findTestCases(Unicode),
-   unittest.findTestCases(Cheps),
    unittest.findTestCases(VerifyType),
 ]
 
