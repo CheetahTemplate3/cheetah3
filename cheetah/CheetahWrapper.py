@@ -256,12 +256,14 @@ you do have write permission to and re-run the tests.""")
             os.remove(TEST_WRITE_FILENAME)
         # @@MO: End ugly kludge.
         from Cheetah.Tests import Test
-        import Cheetah.Tests.unittest_local_copy as unittest
-        del sys.argv[1:] # Prevent unittest from misinterpreting options.
-        sys.argv.extend(self.testOpts)
-        #unittest.main(testSuite=Test.testSuite)
-        #unittest.main(testSuite=Test.testSuite)
-        unittest.main(module=Test)
+        import unittest
+        verbosity = 1
+        if '-q' in self.testOpts:
+            verbosity = 0
+        if '-v' in self.testOpts:
+            verbosity = 2
+        runner = unittest.TextTestRunner(verbosity=verbosity)
+        runner.run(unittest.TestSuite(Test.suites))
         
     def version(self):
         print Version
