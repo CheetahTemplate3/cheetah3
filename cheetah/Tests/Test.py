@@ -11,7 +11,7 @@ TODO
 '''
 
 import sys
-import unittest_local_copy as unittest
+import unittest
 
 import SyntaxAndOutput
 import NameMapper

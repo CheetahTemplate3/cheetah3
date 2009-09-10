@@ -6,11 +6,9 @@ from Cheetah import CheetahWrapper
 from Cheetah import DummyTransaction
 import imp
 import os
-import pdb
-import random
 import sys
 import tempfile
-import unittest_local_copy as unittest # This is stupid
+import unittest
 
 class CommandLineTest(unittest.TestCase):
     def createAndCompile(self, source):

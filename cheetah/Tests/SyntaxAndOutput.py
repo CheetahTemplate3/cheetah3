@@ -23,15 +23,14 @@ from copy import deepcopy
 import os
 import os.path
 import new
-import pdb
 import warnings
+import unittest
 
 from Cheetah.NameMapper import NotFound
 from Cheetah.NameMapper import C_VERSION as NameMapper_C_VERSION
 from Cheetah.Template import Template
 from Cheetah.Parser import ParseError
 from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
-import unittest_local_copy as unittest
 
 class Unspecified(object):
     pass
