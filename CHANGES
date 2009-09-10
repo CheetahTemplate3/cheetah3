@@ -1,8 +1,16 @@
 
-2.2.2 (Unreleased)
+2.2.2 (September 10th, 2009)
   - Prevent _namemapper.c from segfaulting when PyImport_ImportModule fails for some reason (Bogdano Arendartchuk <debogdano@gmail.com>)
   - Removal of the contrib/markdown module (in favor of a setuptools dependency)
   - Default setup.py to use setuptools by default, failing that, fall back to distutils
+  - Improvements to setup.py to support building for Windows (thanks abbeyj!)
+  - Improvements to C-based NameMapper for Windows
+  - Fixes for a swath of unit tests on Windows
+  - Re-enabling the EOL tests (whoops)
+  - Fix for unicode/utf-8 dynamic compilation error (thanks mikeb!) (Test.Unicode.JBQ_UTF8_Test8)
+  - 0000010: [Templates] Failure to execute templates on Google App Engine (rtyler) 
+  - 0000026: [Compiler] Support multiple inheritance (rtyler) 
+
 
 2.2.1 (June 1st, 2009)
   - 0000020: [Templates] Builtin support for using Cheetah with Django (rtyler) 
