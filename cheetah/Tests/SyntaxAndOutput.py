@@ -3200,7 +3200,6 @@ else:
 
 def install_eols():
     klasses = [v for v in globals().values() if isinstance(v, (types.ClassType, types.TypeType)) and issubclass(v, unittest.TestCase)]
-    print ('klasses', klasses)
     for klass in klasses:
         name = klass.__name__        
         if hasattr(klass,'convertEOLs') and klass.convertEOLs:
