@@ -3,6 +3,7 @@ import os
 from os import listdir
 import os.path
 from os.path import exists, isdir, isfile, join, splitext
+import sys
 import types
 import glob
 import string
@@ -16,13 +17,45 @@ if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
         from distutils.core import setup
 
 from distutils.core import Command
+from distutils.command.build_ext import build_ext
 from distutils.command.install_data import install_data
+from distutils.errors import CCompilerError, DistutilsExecError, \
+    DistutilsPlatformError
 
 #imports from Cheetah ...
 from cheetah.FileUtils import findFiles
 
+if sys.platform == 'win32' and sys.version_info > (2, 6):
+   # 2.6's distutils.msvc9compiler can raise an IOError when failing to
+   # find the compiler
+   ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError,
+                 IOError)
+else:
+   ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError)
+
 ##################################################
 ## CLASSES ##
+
+class BuildFailed(Exception):
+    pass
+
+class mod_build_ext(build_ext):
+    """A modified version of the distutils build_ext command that raises an
+    exception when building of the extension fails.
+    """
+
+    def run(self):
+        try:
+            build_ext.run(self)
+        except DistutilsPlatformError, x:
+            raise BuildFailed(x)
+
+    def build_extension(self, ext):
+        try:
+            build_ext.build_extension(self, ext)
+        except ext_errors, x:
+            raise BuildFailed(x)
+
    
 class mod_install_data(install_data):
     """A modified version of the disutils install_data command that allows data
@@ -115,11 +148,24 @@ def run_setup(configurations):
 
     # Add setup extensions
     cmdclasses = {
+        'build_ext': mod_build_ext,
         'install_data': mod_install_data,
         }
 
     kws['cmdclass'] = cmdclasses
 
     # Invoke distutils setup
-    apply(setup, (), kws)
+    try:
+        apply(setup, (), kws)
+    except BuildFailed, x:
+        print "One or more C extensions failed to build."
+        print "Details: %s" % x
+        print "Retrying without C extensions enabled."
+
+        del kws['ext_modules']
+        apply(setup, (), kws)
+
+        print "One or more C extensions failed to build."
+        print "Performance enhancements will not be available."
+        print "Pure Python installation succeeded."
 
