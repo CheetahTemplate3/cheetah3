@@ -70,7 +70,7 @@ def perftest(max_num_pystones, current_pystone=None):
 
 class DynamicTemplatePerformanceTest(unittest.TestCase):
     loops = 10
-    @perftest(1200)
+    #@perftest(1200)
     def test_BasicDynamic(self):
         template = '''
             #def foo(arg1, arg2)
@@ -80,6 +80,7 @@ class DynamicTemplatePerformanceTest(unittest.TestCase):
         for i in xrange(self.loops):
             klass = Cheetah.Template.Template.compile(template)
             assert klass
+    test_BasicDynamic = perftest(1200)(test_BasicDynamic)
 
 class PerformanceTest(unittest.TestCase):
     iterations = 1000000
