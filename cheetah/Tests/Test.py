@@ -20,7 +20,6 @@ import Template
 import Cheps
 import Regressions
 import Unicode
-import VerifyType
 import CheetahWrapper
 
 SyntaxAndOutput.install_eols()
@@ -33,7 +32,6 @@ suites = [
    #unittest.findTestCases(Cheps),
    unittest.findTestCases(Regressions),
    unittest.findTestCases(Unicode),
-   unittest.findTestCases(VerifyType),
 ]
 
 if not sys.platform.startswith('java'):
