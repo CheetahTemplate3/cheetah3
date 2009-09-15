@@ -12,7 +12,6 @@ Besides unittest usage, recognizes the following command-line options:
         Show the output of each subcommand.  (Normally suppressed.)
 '''
 import os
-import popen2
 import re                                     # Used by listTests.
 import shutil
 import sys
@@ -22,6 +21,18 @@ import unittest
 from optparse import OptionParser
 from Cheetah.CheetahWrapper import CheetahWrapper  # Used by NoBackup.
 
+try:
+    from subprocess import Popen, PIPE, STDOUT
+    class Popen4(Popen):
+        def __init__(self, cmd, bufsize=-1):
+            super(Popen4, self).__init__(cmd, bufsize=bufsize,
+                                         shell=True, close_fds=True,
+                                         stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+            self.tochild = self.stdin
+            self.fromchild = self.stdout
+            self.childerr = self.stderr
+except ImportError:
+    from popen2 import Popen4
 
 DELETE = True # True to clean up after ourselves, False for debugging.
 OUTPUT = False # Normally False, True for debugging.
@@ -152,7 +163,7 @@ Found %(result)r"""
         return rc, output
 
     def assertPosixSubprocess(self, cmd):
-        process = popen2.Popen4(cmd)
+        process = Popen4(cmd)
         process.tochild.close()
         output = process.fromchild.read()
         status = process.wait()
