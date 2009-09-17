@@ -1,4 +1,7 @@
 
+2.3.0 (unreleased)
+  - 
+
 2.2.2 (September 10th, 2009)
   - Prevent _namemapper.c from segfaulting when PyImport_ImportModule fails for some reason (Bogdano Arendartchuk <debogdano@gmail.com>)
   - Removal of the contrib/markdown module (in favor of a setuptools dependency)
