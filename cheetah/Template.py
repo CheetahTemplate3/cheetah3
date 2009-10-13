@@ -1213,11 +1213,10 @@ class Template(Servlet):
         ##################################################           
         ## Setup instance state attributes used during the life of template
         ## post-compile
-        reserved_searchlist = dir(self)
         if searchList:
             for namespace in searchList:
                 if isinstance(namespace, dict):
-                    intersection = set(reserved_searchlist) & set(namespace.keys())
+                    intersection = Reserved_SearchList & set(namespace.keys())
                     warn = False
                     if intersection:
                         warn = True
@@ -1832,7 +1831,7 @@ class Template(Servlet):
         return dic
 
 T = Template   # Short and sweet for debugging at the >>> prompt.
-
+Reserved_SearchList = set(dir(Template))
 
 def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
 
