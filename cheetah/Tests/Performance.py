@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 
-import Cheetah.NameMapper 
-import Cheetah.Template
-
 import hotshot
 import hotshot.stats
 import os
@@ -11,6 +8,9 @@ import unittest
 
 from test import pystone
 import time
+
+import Cheetah.NameMapper 
+import Cheetah.Template
 
 # This can be turned on with the `--debug` flag when running the test
 # and will cause the tests to all just dump out how long they took
@@ -86,6 +86,7 @@ class DynamicTemplatePerformanceTest(unittest.TestCase):
 class PerformanceTest(unittest.TestCase):
     iterations = 100000
     display = False
+    save = False
 
     def runTest(self):
         self.prof = hotshot.Profile('%s.prof' % self.__class__.__name__)
@@ -100,9 +101,12 @@ class PerformanceTest(unittest.TestCase):
             print '>>> %s (%d iterations) ' % (self.__class__.__name__,
                     self.iterations)
             stats = hotshot.stats.load('%s.prof' % self.__class__.__name__)
-            stats.strip_dirs()
+            #stats.strip_dirs()
             stats.sort_stats('time', 'calls')
-            stats.print_stats(40)
+            stats.print_stats(50)
+
+        if not self.save:
+            os.unlink('%s.prof' % self.__class__.__name__)
 
 class DynamicMethodCompilationTest(PerformanceTest):
     def performanceSample(self):
