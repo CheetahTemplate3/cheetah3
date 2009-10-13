@@ -2,8 +2,9 @@
 
 import Cheetah.NameMapper 
 import Cheetah.Template
-from Cheetah.Utils import statprof
 
+import hotshot
+import hotshot.stats
 import os
 import sys
 import unittest
@@ -83,25 +84,25 @@ class DynamicTemplatePerformanceTest(unittest.TestCase):
     test_BasicDynamic = perftest(1200)(test_BasicDynamic)
 
 class PerformanceTest(unittest.TestCase):
-    iterations = 1000000
+    iterations = 100000
     display = False
-    def setUp(self):
-        super(PerformanceTest, self).setUp()
-        statprof.start()
 
     def runTest(self):
+        self.prof = hotshot.Profile('%s.prof' % self.__class__.__name__)
+        self.prof.start()
         for i in xrange(self.iterations):
             if hasattr(self, 'performanceSample'):
                 self.display = True
                 self.performanceSample()
-
-    def tearDown(self):
-        super(PerformanceTest, self).tearDown()
-        statprof.stop()
+        self.prof.stop()
+        self.prof.close()
         if self.display:
             print '>>> %s (%d iterations) ' % (self.__class__.__name__,
                     self.iterations)
-            statprof.display()
+            stats = hotshot.stats.load('%s.prof' % self.__class__.__name__)
+            stats.strip_dirs()
+            stats.sort_stats('time', 'calls')
+            stats.print_stats(40)
 
 class DynamicMethodCompilationTest(PerformanceTest):
     def performanceSample(self):
