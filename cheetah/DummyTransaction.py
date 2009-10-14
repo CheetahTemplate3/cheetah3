@@ -10,6 +10,11 @@ specific DummyTransaction or DummyResponse behavior
 
 import types
 
+try:
+    from cStringIO import StringIO
+except ImportError:
+    import StringIO
+
 class DummyResponseFailure(Exception):
     pass
 
@@ -20,24 +25,30 @@ class DummyResponse(object):
         servlet
     ''' 
     def __init__(self):
-        self._outputChunks = []
-
+        self._outputChunks = StringIO()
+       
     def flush(self):
         pass
         
     def write(self, value):
-        self._outputChunks.append(value)
+        self._outputChunks.write(value)
 
     def writeln(self, txt):
         write(txt)
         write('\n')
 
     def getvalue(self, outputChunks=None):
-        chunks = outputChunks or self._outputChunks
-        try: 
-            return ''.join(chunks)
+        #chunks = outputChunks or self._outputChunks
+        try:
+            if outputChunks is not None:
+                return ''.join(outputChunks)
+            else:
+                return self._outputChunks.getvalue()
         except UnicodeDecodeError, ex:
-            nonunicode = [c for c in chunks if not isinstance(c, unicode)]
+            #not sure about the best way to check for non-unicode in StringIO
+            nonunicode = ''
+            if outputChunks:
+                nonunicode = [c for c in outputChunks if not isinstance(c, unicode)]
             raise DummyResponseFailure('''Looks like you're trying to mix encoded strings with Unicode strings
             (most likely utf-8 encoded ones)
 
@@ -82,7 +93,7 @@ class TransformerResponse(DummyResponse):
             if isinstance(_filter, types.TypeType):
                 _filter = _filter()
             return _filter.filter(output)
-        return output
+         return output
 
 
 class TransformerTransaction(object):
