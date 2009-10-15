@@ -123,6 +123,23 @@ class DynamicMethodCompilationTest(PerformanceTest):
         template = template()
         value = template.testMethod()
 
+
+class BunchOfWriteCalls(PerformanceTest):
+    iterations = 1000
+    def performanceSample(self):
+        template = '''
+            #import sys
+            #import os
+            #for i in xrange(1000)
+                $i
+            #end for
+        '''
+        template = Cheetah.Template.Template.compile(template, 
+            keepRefToGeneratedCode=False)
+        template = template()
+        value = template.respond()
+        del value
+
 class DynamicSimpleCompilationTest(PerformanceTest):
     def performanceSample(self):
         template = '''
