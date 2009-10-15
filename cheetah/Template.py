@@ -95,6 +95,7 @@ def hashDict(d):
         hashedList.append((k,v))
     return hash(tuple(hashedList))
 
+
 ################################################################################
 ## MODULE GLOBALS AND CONSTANTS
 
@@ -579,19 +580,12 @@ class Template(Servlet):
                           preprocessors=[ dict(tokens='@ %', searchList=[...]) ] )
             
         """
-        ##################################################           
-        ## normalize and validate args 
-        N = types.NoneType; S = types.StringType; U = types.UnicodeType
-        D = types.DictType; F = types.FileType
-        C = types.ClassType;  M = types.ModuleType
-        I = types.IntType; B = types.BooleanType
         errmsg = "arg '%s' must be %s"
 
-        t = type(source)
-        if not (t is N or t is S or t is U):
+        if not isinstance(source, (types.NoneType, basestring)):
             raise TypeError(errmsg % ('source', 'string or None'))
-        t = type(file)
-        if not (t is N or t is S or t is U or t is F):
+
+        if not isinstance(file, (types.NoneType, basestring, types.FileType)):
             raise TypeError(errmsg %
                             ('file', 'string, file-like object, or None'))
 
@@ -599,25 +593,25 @@ class Template(Servlet):
             baseclass = klass._CHEETAH_defaultBaseclassForTemplates
         if isinstance(baseclass, Template):
             baseclass = baseclass.__class__
-        t = type(baseclass)
-        if not (t is N or t is S or t is C or t is type):
+
+        if not isinstance(baseclass, (types.NoneType, basestring, types.ClassType, types.TypeType)):
             raise TypeError(errmsg % ('baseclass', 'string, class or None'))
 
         if cacheCompilationResults is Unspecified:
             cacheCompilationResults = klass._CHEETAH_cacheCompilationResults
-        t = type(cacheCompilationResults)
-        if not (t is I or t is B):
+
+        if not isinstance(cacheCompilationResults, (int, bool)):
             raise TypeError(errmsg % ('cacheCompilationResults', 'boolean'))
 
         if useCache is Unspecified:
             useCache = klass._CHEETAH_useCompilationCache
-        t = type(useCache)
-        if not (t is I or t is B):
+
+        if not isinstance(useCache, (int, bool)):
             raise TypeError(errmsg % ('useCache', 'boolean'))
 
         if compilerSettings is Unspecified:
             compilerSettings = klass._getCompilerSettings(source, file) or {}
-        if type(compilerSettings) is not D:
+        if not isinstance(compilerSettings, dict):
             raise TypeError(errmsg % ('compilerSettings', 'dictionary'))
 
         if compilerClass is Unspecified:
@@ -627,16 +621,15 @@ class Template(Servlet):
 
         if keepRefToGeneratedCode is Unspecified:
             keepRefToGeneratedCode = klass._CHEETAH_keepRefToGeneratedCode
-        t = type(keepRefToGeneratedCode)
-        if not (t is I or t is B):
+
+        if not isinstance(keepRefToGeneratedCode, (int, bool)):
             raise TypeError(errmsg % ('keepReftoGeneratedCode', 'boolean'))
 
-        t = type(moduleName)
-        if not (t is N or t is S):
+        if not isinstance(moduleName, (types.NoneType, basestring)):
             raise TypeError(errmsg % ('moduleName', 'string or None'))
         __orig_file__ = None
         if not moduleName:
-            if file and type(file) in StringTypes:
+            if file and isinstance(file, basestring):
                 moduleName = convertTmplPathToModuleName(file)
                 __orig_file__ = file
             else:
@@ -644,15 +637,15 @@ class Template(Servlet):
 
         if className is Unspecified:
             className = klass._CHEETAH_defaultClassNameForTemplates
-        t = type(className)
-        if not (t is N or t is S):
+
+        if not isinstance(className, (types.NoneType, basestring)):
             raise TypeError(errmsg % ('className', 'string or None'))
         className = className or moduleName
 
         if mainMethodName is Unspecified:
             mainMethodName = klass._CHEETAH_defaultMainMethodNameForTemplates
-        t = type(mainMethodName)
-        if not (t is N or t is S):
+
+        if not isinstance(mainMethodName, (types.NoneType, basestring)):
             raise TypeError(errmsg % ('mainMethodName', 'string or None'))
 
         if moduleGlobals is Unspecified:
@@ -660,15 +653,15 @@ class Template(Servlet):
 
         if cacheModuleFilesForTracebacks is Unspecified:
             cacheModuleFilesForTracebacks = klass._CHEETAH_cacheModuleFilesForTracebacks
-        t = type(cacheModuleFilesForTracebacks)
-        if not (t is I or t is B):
+
+        if not isinstance(cacheModuleFilesForTracebacks, (int, bool)):
             raise TypeError(errmsg %
                             ('cacheModuleFilesForTracebacks', 'boolean'))
 
         if cacheDirForModuleFiles is Unspecified:
             cacheDirForModuleFiles = klass._CHEETAH_cacheDirForModuleFiles
-        t = type(cacheDirForModuleFiles)
-        if not (t is N or t is S):
+
+        if not isinstance(cacheDirForModuleFiles, (types.NoneType, basestring)):
             raise TypeError(errmsg %
                             ('cacheDirForModuleFiles', 'string or None'))
 
@@ -683,9 +676,9 @@ class Template(Servlet):
         baseclassValue = None
         baseclassName = None
         if baseclass:
-            if type(baseclass) in StringTypes:
+            if isinstance(baseclass, basestring):
                 baseclassName = baseclass
-            elif type(baseclass) in (ClassType, type):
+            elif isinstance(baseclass, (types.ClassType, types.TypeType)):
                 # @@TR: should soft-code this
                 baseclassName = 'CHEETAH_dynamicallyAssignedBaseClass_'+baseclass.__name__
                 baseclassValue = baseclass
@@ -1142,46 +1135,41 @@ class Template(Servlet):
 
           Do NOT mess with the args _globalSetVars or _preBuiltSearchList!
 
-        """
-        
-        ##################################################           
-        ## Verify argument keywords and types
 
-        S = types.StringType; U = types.UnicodeType
-        L = types.ListType;   T = types.TupleType
-        D = types.DictType;   F = types.FileType
-        C = types.ClassType;  M = types.ModuleType
-        N = types.NoneType
+        """
         errmsg = "arg '%s' must be %s"
         errmsgextra = errmsg + "\n%s"
 
-        t = type(source)
-        if not (t is N or t is S or t is U):
+        if not isinstance(source, (types.NoneType, basestring)):
             raise TypeError(errmsg % ('source', 'string or None'))
-        t = type(file)
-        if not (t is N or t is S or t is U or t is F):
+
+        if not isinstance(source, (types.NoneType, basestring, types.FileType)):
             raise TypeError(errmsg %
                             ('file', 'string, file open for reading, or None'))
-        t = type(filter)
-        if not (t is S or (t is C and issubclass(filter, Filters.Filter)) or
-                t is type):
+
+        if not isinstance(filter, (basestring, types.TypeType)) and not \
+                (isinstance(filter, types.ClassType) and issubclass(filter, Filters.Filter)):
             raise TypeError(errmsgextra %
                             ('filter', 'string or class',
                              '(if class, must be subclass of Cheetah.Filters.Filter)'))
-        t = type(filtersLib)
-        if not (t is S or t is M):
+        if not isinstance(filtersLib, (basestring, types.ModuleType)):
             raise TypeError(errmsgextra %
                             ('filtersLib', 'string or module',
                              '(if module, must contain subclasses of Cheetah.Filters.Filter)'))
-        t = type(errorCatcher)
-        if not (t is N or t is S or
-                (t is C and issubclass(errorCatcher, ErrorCatchers.ErrorCatcher)) or
-                t is type):
-            raise TypeError(errmsgextra %
+
+        if not errorCatcher is None:
+            err = True
+            if isinstance(errorCatcher, (basestring, types.TypeType)):
+                err = False
+            if isinstance(errorCatcher, types.ClassType) and \
+                    issubclass(errorCatcher, ErrorCatchers.ErrorCatcher): 
+                err = False
+            if err:
+                raise TypeError(errmsgextra %
                             ('errorCatcher', 'string, class or None',
                              '(if class, must be subclass of Cheetah.ErrorCatchers.ErrorCatcher)'))
         if compilerSettings is not Unspecified:
-            if type(compilerSettings) is not D:
+            if not isinstance(compilerSettings, types.DictType):
                 raise TypeError(errmsg %
                                 ('compilerSettings', 'dictionary'))
         
@@ -1216,7 +1204,7 @@ class Template(Servlet):
         if searchList:
             for namespace in searchList:
                 if isinstance(namespace, dict):
-                    intersection = Reserved_SearchList & set(namespace.keys())
+                    intersection = self.Reserved_SearchList & set(namespace.keys())
                     warn = False
                     if intersection:
                         warn = True
@@ -1525,7 +1513,7 @@ class Template(Servlet):
         self._fileMtime = None
         self._fileDirName = None
         self._fileBaseName = None
-        if file and type(file) in StringTypes:
+        if file and isinstance(file, basestring):
             file = self.serverSidePath(file)
             self._fileMtime = os.path.getmtime(file)
             self._fileDirName, self._fileBaseName = os.path.split(file)
@@ -1831,7 +1819,7 @@ class Template(Servlet):
         return dic
 
 T = Template   # Short and sweet for debugging at the >>> prompt.
-Reserved_SearchList = set(dir(Template))
+Template.Reserved_SearchList = set(dir(Template))
 
 def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
 
