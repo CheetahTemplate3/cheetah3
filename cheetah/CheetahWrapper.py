@@ -161,7 +161,8 @@ class CheetahWrapper(object):
         pao("--iext", action="store", dest="iext", default=".tmpl", help='File input extension (defaults: compile: .tmpl, fill: .tmpl)')
         pao("--oext", action="store", dest="oext", default=defaultOext, help='File output extension (defaults: compile: .py, fill: .html)')
         pao("-R", action="store_true", dest="recurse", default=False, help='Recurse through subdirectories looking for input files')
-        pao("--stdout", "-p", action="store_true", dest="stdout", default=False, help='Verbosely print informational messages to stdout')
+        pao("--stdout", "-p", action="store_true", dest="stdout", default=False, help='Send output to stdout instead of writing to a file')
+        pao("--quiet", action="store_false", dest="verbose", default=True, help='Do not print informational messages to stdout')
         pao("--debug", action="store_true", dest="debug", default=False, help='Print diagnostic/debug information to stderr')
         pao("--env", action="store_true", dest="env", default=False, help='Pass the environment into the search list')
         pao("--pickle", action="store", dest="pickle", default="", help='Unpickle FILE and pass it through in the search list')
@@ -222,7 +223,6 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
             unpickled = pickle.load(f)
             f.close()
             self.searchList.insert(0, unpickled)
-        opts.verbose = not opts.stdout
 
     ##################################################
     ## COMMAND METHODS
