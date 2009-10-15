@@ -58,7 +58,7 @@ class DummyResponse(object):
         except UnicodeDecodeError, ex:
             logging.debug('Trying to work around a UnicodeDecodeError in getvalue()')
             logging.debug('...perhaps you could fix "%s" while you\'re debugging')
-            return ''.join((self.safeConvert(c) for c in chunks))
+            return ''.join([self.safeConvert(c) for c in chunks])
 
     def writelines(self, *lines):
         ## not used
