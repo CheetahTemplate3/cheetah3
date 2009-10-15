@@ -31,7 +31,10 @@ class DummyResponse(object):
         pass
         
     def write(self, value):
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
         self._outputChunks.write(value)
+
 
     def writeln(self, txt):
         write(txt)
@@ -43,7 +46,7 @@ class DummyResponse(object):
             if outputChunks is not None:
                 return ''.join(outputChunks)
             else:
-                return self._outputChunks.getvalue()
+                return self._outputChunks.getvalue().decode('utf-8')
         except UnicodeDecodeError, ex:
             #not sure about the best way to check for non-unicode in StringIO
             nonunicode = ''
@@ -93,7 +96,7 @@ class TransformerResponse(DummyResponse):
             if isinstance(_filter, types.TypeType):
                 _filter = _filter()
             return _filter.filter(output)
-         return output
+        return output
 
 
 class TransformerTransaction(object):
