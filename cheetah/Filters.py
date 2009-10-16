@@ -29,40 +29,19 @@ class Filter(object):
         if val is None:
             return u''
         if isinstance(val, unicode):
-            if encoding:
-                return val.encode(encoding)
-            else:
-                return val
+            # ignore the encoding and return the unicode object
+            return val
         else:
             try:
-                return str(val)
-            except UnicodeEncodeError:
                 return unicode(val)
-        return u''
+            except UnicodeDecodeError:
+                # we could put more fallbacks here, but we'll just pass the str
+                # on and let DummyTransaction worry about it
+                return str(val)
 
 RawOrEncodedUnicode = Filter
 
-class EncodeUnicode(Filter):
-    def filter(self, val,
-               encoding='utf8',
-               str=str,
-               **kw):
-        """Encode Unicode strings, by default in UTF-8.
-
-        >>> import Cheetah.Template
-        >>> t = Cheetah.Template.Template('''
-        ... $myvar
-        ... ${myvar, encoding='utf16'}
-        ... ''', searchList=[{'myvar': u'Asni\xe8res'}],
-        ... filter='EncodeUnicode')
-        >>> print t
-        """
-        if isinstance(val, unicode):
-            return val
-        if val is None:
-            return ''
-        return str(val)
-
+EncodeUnicode = Filter
 
 class Markdown(EncodeUnicode):
     '''
