@@ -58,7 +58,7 @@ class EncodeUnicode(Filter):
         >>> print t
         """
         if isinstance(val, unicode):
-            return val.encode(encoding)
+            return val
         if val is None:
             return ''
         return str(val)

@@ -150,6 +150,22 @@ $someUnicodeString"""
         a = unicode(template).encode("utf-8")
         self.assertEquals("Bébé", a)
 
+class EncodeUnicodeCompatTest(unittest.TestCase):
+    """
+        Taken initially from Red Hat's bugzilla #529332
+        https://bugzilla.redhat.com/show_bug.cgi?id=529332
+    """
+    def runTest(self):
+        t = Template("""Foo ${var}""", filter='EncodeUnicode')
+        t.var = u"Text with some non-ascii characters: åäö"
+        
+        rc = t.respond()
+        assert isinstance(rc, unicode), ('Template.respond() should return unicode', rc)
+        
+        rc = str(t)
+        assert isinstance(rc, str), ('Template.__str__() should return a UTF-8 encoded string', rc)
+
+
 class Unicode_in_SearchList_Test(CommandLineTest):
     def test_BasicASCII(self):
         source = '''This is $adjective'''
