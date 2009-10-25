@@ -994,22 +994,45 @@ class Template(Servlet):
             mainMethName = getattr(concreteTemplateClass,mainMethNameAttr, None)
             if mainMethName:
                 def __str__(self): 
+                    rc = getattr(self, mainMethName)()
+                    if isinstance(rc, unicode):
+                        return rc.encode('utf-8')
+                    return rc
+                def __unicode__(self):
                     return getattr(self, mainMethName)()
             elif (hasattr(concreteTemplateClass, 'respond')
                   and concreteTemplateClass.respond!=Servlet.respond):
                 def __str__(self):
+                    rc = self.respond()
+                    if isinstance(rc, unicode):
+                        return rc.encode('utf-8')
+                    return rc
+                def __unicode__(self):
                     return self.respond()
             else:
                 def __str__(self):
+                    rc = None
+                    if hasattr(self, mainMethNameAttr):
+                        rc = getattr(self,mainMethNameAttr)()
+                    elif hasattr(self, 'respond'):
+                        rc = self.respond()
+                    else:
+                        rc = super(self.__class__, self).__str__()
+                    if isinstance(rc, unicode):
+                        return rc.encode('utf-8')
+                    return rc
+                def __unicode__(self):
                     if hasattr(self, mainMethNameAttr):
                         return getattr(self,mainMethNameAttr)()
                     elif hasattr(self, 'respond'):
                         return self.respond()
                     else:
-                        return super(self.__class__, self).__str__()
+                        return super(self.__class__, self).__unicode__()
                     
             __str__ = new.instancemethod(__str__, None, concreteTemplateClass)
+            __unicode__ = new.instancemethod(__unicode__, None, concreteTemplateClass)
             setattr(concreteTemplateClass, '__str__', __str__)
+            setattr(concreteTemplateClass, '__unicode__', __unicode__)
                 
     _addCheetahPlumbingCodeToClass = classmethod(_addCheetahPlumbingCodeToClass)
 

@@ -1,13 +1,15 @@
 
-2.4.0 (October 15th, 2009)
+2.4.0 (October 24th, 2009)
   - Fix a major performance regression in Template.__init__()
   - More graceful handling of unicode when calling .respond() to render a template
   - Minor code updates
+  - Update the default filter (thanks mikeb!)
 
-2.3.0 (October 15th, 2009) (loosely equivalent to 2.4.0)
+2.3.0 (October 24th, 2009) (loosely equivalent to 2.4.0)
   - Fix a major performance regression in Template.__init__()
   - More graceful handling of unicode when calling .respond() to render a template
   - Minor code updates
+  - Update the default filter (thanks mikeb!)
 
 2.2.2 (September 10th, 2009)
   - Prevent _namemapper.c from segfaulting when PyImport_ImportModule fails for some reason (Bogdano Arendartchuk <debogdano@gmail.com>)
