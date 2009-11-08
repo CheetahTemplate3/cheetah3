@@ -52,7 +52,7 @@ class CFBase(unittest.TestCase):
 
     def inform(self, message):
         if self.verbose:
-            print message
+            print(message)
 
     def setUp(self):
         """Create the top-level directories, subdirectories and .tmpl
@@ -520,7 +520,7 @@ def listTests(cheetahWrapperFile):
             break
         m = rx.search(lin)
         if m:
-            print m.group(1)
+            print(m.group(1))
     f.close()
 
 def main():

@@ -71,7 +71,7 @@ if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
                 ]
         }
     except ImportError:
-        print 'Not using setuptools, so we cannot install the Markdown dependency'
+        print('Not using setuptools, so we cannot install the Markdown dependency')
 
 
 description = "Cheetah is a template engine and code generation tool."

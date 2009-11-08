@@ -1,21 +1,12 @@
-# $Id: Parser.py,v 1.137 2008/03/10 05:25:13 tavis_rudd Exp $
-"""Parser classes for Cheetah's Compiler
+"""
+Parser classes for Cheetah's Compiler
 
 Classes:
   ParseError( Exception )
   _LowLevelParser( Cheetah.SourceReader.SourceReader ), basically a lexer
   _HighLevelParser( _LowLevelParser )
   Parser === _HighLevelParser (an alias)
-
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.137 $
-Start Date: 2001/08/01
-Last Revision Date: $Date: 2008/03/10 05:25:13 $
 """
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.137 $"[11:-2]
 
 import os
 import sys
@@ -1224,7 +1215,6 @@ class _LowLevelParser(SourceReader):
                 startPosIdx = 3
             else:
                 startPosIdx = 1
-            #print 'CHEETAH STRING', nextToken, theStr, startPosIdx
             self.setPos(beforeTokenPos+startPosIdx+1)
             outputExprs = []
             strConst = ''
@@ -1240,8 +1230,6 @@ class _LowLevelParser(SourceReader):
             self.setPos(endPos)
             if strConst:
                 outputExprs.append(repr(strConst))
-            #if not self.atEnd() and self.matches('.join('):
-            #    print 'DEBUG***'
             token = "''.join(["+','.join(outputExprs)+"])"
         return token
 
@@ -1854,13 +1842,11 @@ class _HighLevelParser(_LowLevelParser):
         try:
             self._compiler.setCompilerSetting(settingName, valueExpr)
         except:
-            out = sys.stderr
-            print >> out, 'An error occurred while processing the following #compiler directive.'
-            print >> out, '-'*80
-            print >> out, self[startPos:endPos]
-            print >> out, '-'*80
-            print >> out, 'Please check the syntax of these settings.'
-            print >> out, 'A full Python exception traceback follows.'
+            sys.stderr.write('An error occurred while processing the following #compiler directive.\n')
+            sys.stderr.write('----------------------------------------------------------------------\n')
+            sys.stderr.write('%s\n' % self[startPos:endPos])
+            sys.stderr.write('----------------------------------------------------------------------\n')
+            sys.stderr.write('Please check the syntax of these settings.\n\n')
             raise
 
 
@@ -1890,13 +1876,11 @@ class _HighLevelParser(_LowLevelParser):
         try:
             self._compiler.setCompilerSettings(keywords=keywords, settingsStr=settingsStr)
         except:
-            out = sys.stderr
-            print >> out, 'An error occurred while processing the following compiler settings.'
-            print >> out, '-'*80
-            print >> out, settingsStr.strip()
-            print >> out, '-'*80
-            print >> out, 'Please check the syntax of these settings.'
-            print >> out, 'A full Python exception traceback follows.'
+            sys.stderr.write('An error occurred while processing the following compiler settings.\n')
+            sys.stderr.write('----------------------------------------------------------------------\n')
+            sys.stderr.write('%s\n' % settingsStr.strip())
+            sys.stderr.write('----------------------------------------------------------------------\n')
+            sys.stderr.write('Please check the syntax of these settings.\n\n')
             raise
 
     def eatAttr(self):

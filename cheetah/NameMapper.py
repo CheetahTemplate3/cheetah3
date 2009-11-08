@@ -364,13 +364,13 @@ def example():
         }
     b = 'this is local b'
 
-    print valueForKey(a.dic,'subDict')
-    print valueForName(a, 'dic.item')
-    print valueForName(vars(), 'b')
-    print valueForName(__builtins__, 'dir')()
-    print valueForName(vars(), 'a.classVar')
-    print valueForName(vars(), 'a.dic.func', executeCallables=True)
-    print valueForName(vars(), 'a.method2.item1', executeCallables=True)
+    print(valueForKey(a.dic,'subDict'))
+    print(valueForName(a, 'dic.item'))
+    print(valueForName(vars(), 'b'))
+    print(valueForName(__builtins__, 'dir')())
+    print(valueForName(vars(), 'a.classVar'))
+    print(valueForName(vars(), 'a.dic.func', executeCallables=True))
+    print(valueForName(vars(), 'a.method2.item1', executeCallables=True))
 
 if __name__ == '__main__':
     example()

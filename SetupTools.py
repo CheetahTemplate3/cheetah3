@@ -158,14 +158,14 @@ def run_setup(configurations):
     try:
         apply(setup, (), kws)
     except BuildFailed, x:
-        print "One or more C extensions failed to build."
-        print "Details: %s" % x
-        print "Retrying without C extensions enabled."
+        print("One or more C extensions failed to build.")
+        print("Details: %s" % x)
+        print("Retrying without C extensions enabled.")
 
         del kws['ext_modules']
         apply(setup, (), kws)
 
-        print "One or more C extensions failed to build."
-        print "Performance enhancements will not be available."
-        print "Pure Python installation succeeded."
+        print("One or more C extensions failed to build.")
+        print("Performance enhancements will not be available.")
+        print("Pure Python installation succeeded.")
 

@@ -223,8 +223,8 @@ class DirOwner(Owner):
                     co = compile(open(py[0], 'r').read()+'\n', py[0], 'exec')
                     break
                 except SyntaxError, e:
-                    print "Invalid syntax in %s" % py[0]
-                    print e.args
+                    print("Invalid syntax in %s" % py[0])
+                    print(e.args)
                     raise
             elif pyc:
                 stuff = open(pyc[0], 'rb').read()

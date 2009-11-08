@@ -88,7 +88,7 @@ class _SkeletonPage(Template):
             if not self._stylesheets.has_key(identifier):
                 warning = '# the identifier ' + identifier + \
                           'was in stylesheetsOrder, but not in stylesheets'
-                print warning
+                print(warning)
                 stylesheetTagsTxt += warning
                 continue
                     

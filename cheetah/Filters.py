@@ -65,9 +65,9 @@ class Markdown(EncodeUnicode):
         try:
             import markdown
         except ImportError:
-            print '>>> Exception raised importing the "markdown" module'
-            print '>>> Are you sure you have the ElementTree module installed?'
-            print '          http://effbot.org/downloads/#elementtree'
+            print('>>> Exception raised importing the "markdown" module')
+            print('>>> Are you sure you have the ElementTree module installed?')
+            print('          http://effbot.org/downloads/#elementtree')
             raise
 
         encoded = super(Markdown, self).filter(value, **kwargs)
@@ -97,8 +97,8 @@ class CodeHighlighter(EncodeUnicode):
             from pygments import lexers
             from pygments import formatters
         except ImportError, ex:
-            print '<%s> - Failed to import pygments! (%s)' % (self.__class__.__name__, ex)
-            print '-- You may need to install it from: http://pygments.org'
+            print('<%s> - Failed to import pygments! (%s)' % (self.__class__.__name__, ex))
+            print('-- You may need to install it from: http://pygments.org')
             return encoded
 
         lexer = None
@@ -196,15 +196,15 @@ class StripSqueeze(Filter):
 def test():
     s1 = "abc <=> &"
     s2 = "   asdf  \n\t  1  2    3\n"
-    print "WebSafe INPUT:", `s1`
-    print "      WebSafe:", `WebSafe().filter(s1)`
+    print("WebSafe INPUT:", `s1`)
+    print("      WebSafe:", `WebSafe().filter(s1)`)
     
-    print
-    print " Strip INPUT:", `s2`
-    print "       Strip:", `Strip().filter(s2)`
-    print "StripSqueeze:", `StripSqueeze().filter(s2)`
+    print()
+    print(" Strip INPUT:", `s2`)
+    print("       Strip:", `Strip().filter(s2)`)
+    print("StripSqueeze:", `StripSqueeze().filter(s2)`)
 
-    print "Unicode:", `EncodeUnicode().filter(u'aoeu12345\u1234')`
+    print("Unicode:", `EncodeUnicode().filter(u'aoeu12345\u1234')`)
     
 if __name__ == "__main__":  
     test()

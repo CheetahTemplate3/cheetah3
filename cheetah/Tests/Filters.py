@@ -31,7 +31,7 @@ Header
             assert template == expected
         except Exception, ex:
             if ex.__class__.__name__ == 'MarkdownException' and majorVer == 2 and minorVer < 5:
-                print '>>> NOTE: Support for the Markdown filter will be broken for you. Markdown says: %s' % ex
+                print('>>> NOTE: Support for the Markdown filter will be broken for you. Markdown says: %s' % ex)
                 return
             raise
 

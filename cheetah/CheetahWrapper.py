@@ -195,14 +195,14 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
 
 
         if opts.print_settings:
-            print 
-            print '>> Available Cheetah compiler settings:'
+            print() 
+            print('>> Available Cheetah compiler settings:')
             from Cheetah.Compiler import _DEFAULT_COMPILER_SETTINGS
             listing = _DEFAULT_COMPILER_SETTINGS
             listing.sort(key=lambda l: l[0][0].lower())
 
             for l in listing:
-                print '\t%s (default: "%s")\t%s' % l
+                print('\t%s (default: "%s")\t%s' % l)
             sys.exit(0)
 
         #cleanup trailing path separators
@@ -266,7 +266,7 @@ you do have write permission to and re-run the tests.""")
         runner.run(unittest.TestSuite(Test.suites))
         
     def version(self):
-        print Version
+        print(Version)
 
     # If you add a command, also add it to the 'meths' variable in main().
     

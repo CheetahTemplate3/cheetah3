@@ -177,7 +177,6 @@ class Client:
         for i in range(Client._SERVER_RETRIES):
             server = self.buckets[serverhash % len(self.buckets)]
             if server.connect():
-                #print "(using server %s)" % server,
                 return server, key
             serverhash = hash(str(serverhash) + str(i))
         return None, None
@@ -555,10 +554,9 @@ def _doctest():
     return doctest.testmod(memcache, globs=globs)
 
 if __name__ == "__main__":
-    print "Testing docstrings..."
+    print("Testing docstrings...")
     _doctest()
-    print "Running tests:"
-    print
+    print("Running tests:")
     #servers = ["127.0.0.1:11211", "127.0.0.1:11212"]
     servers = ["127.0.0.1:11211"]
     mc = Client(servers, debug=1)
@@ -568,14 +566,14 @@ if __name__ == "__main__":
             return "%s (%s)" % (val, type(val))
         return "%s" % val
     def test_setget(key, val):
-        print "Testing set/get {'%s': %s} ..." % (to_s(key), to_s(val)),
+        print("Testing set/get {'%s': %s} ..." % (to_s(key), to_s(val)))
         mc.set(key, val)
         newval = mc.get(key)
         if newval == val:
-            print "OK"
+            print("OK")
             return 1
         else:
-            print "FAIL"
+            print("FAIL")
             return 0
 
     class FooStruct:
@@ -591,34 +589,33 @@ if __name__ == "__main__":
     test_setget("a_string", "some random string")
     test_setget("an_integer", 42)
     if test_setget("long", long(1<<30)):
-        print "Testing delete ...",
+        print("Testing delete ...")
         if mc.delete("long"):
-            print "OK"
+            print("OK")
         else:
-            print "FAIL"
-    print "Testing get_multi ...",
-    print mc.get_multi(["a_string", "an_integer"])
+            print("FAIL")
+    print("Testing get_multi ...")
+    print(mc.get_multi(["a_string", "an_integer"]))
 
-    print "Testing get(unknown value) ...",
-    print to_s(mc.get("unknown_value"))
+    print("Testing get(unknown value) ...")
+    print(to_s(mc.get("unknown_value")))
 
     f = FooStruct()
     test_setget("foostruct", f)
 
-    print "Testing incr ...",
+    print("Testing incr ...")
     x = mc.incr("an_integer", 1)
     if x == 43:
-        print "OK"
+        print("OK")
     else:
-        print "FAIL"
+        print("FAIL")
 
-    print "Testing decr ...",
+    print("Testing decr ...")
     x = mc.decr("an_integer", 1)
     if x == 42:
-        print "OK"
+        print("OK")
     else:
-        print "FAIL"
-
+        print("FAIL")
 
 
 # vim: ts=4 sw=4 et :

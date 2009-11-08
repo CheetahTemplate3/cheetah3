@@ -173,10 +173,10 @@ if __name__ == '__main__':
 		    ]
 
 	for url in ['/', '/services', '/services/products/widget', '/contact']:
-		print '<p>', '='*50
-		print '<br> %s: <br>\n' % url
+		print('<p>', '='*50)
+		print('<br> %s: <br>\n' % url)
 		n = Hierarchy(hierarchy, url, menuCSSClass='menu', crumbCSSClass='crumb',
 			      prefix='/here')
-		print n.menuList()
-		print '<p>', '-'*50
-		print n.crumbs()
+		print(n.menuList())
+		print('<p>', '-'*50)
+		print(n.crumbs())

@@ -29,7 +29,7 @@ class GetAttrTest(unittest.TestCase):
     def test_ValidException(self):
         o = CustomGetAttrClass()
         try:
-            print o.attr
+            print(o.attr)
         except GetAttrException, e:
             # expected
             return
