@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+
+import logging
+import os
+import os.path
+import subprocess
+import sys
+
+from optparse import OptionParser
+
+if os.getenv('DEBUG'):
+    logging.basicConfig(level=logging.DEBUG)
+
+def recursiverm(d):
+    for root, dirs, files in os.walk(d):
+        for f in files:
+            f = root + os.path.sep + f
+            logging.debug('Removing file: %s' % f)
+            os.unlink(f)
+
+def main():
+    op = OptionParser()
+    op.add_option('-c', '--clean', dest='clean', action='store_true',
+            help='Remove the contents of the build directory')
+    opts, args = op.parse_args()
+    if not args:
+        print('Specify a test script')
+        return
+
+
+    if opts.clean:
+        logging.debug('Removing build/')
+        recursiverm('build')
+
+    logging.debug('Building Cheetah')
+    rc = subprocess.call(('python', 'setup.py', 'build'))
+
+    if rc:
+        logging.debug('Build failed!')
+        return
+
+    logging.debug('Adjusting PATH and PYTHONPATH')
+    cwd = os.getcwd()
+
+    libdir = None
+    scriptdir = None
+
+    for sub in os.listdir('build'):
+        if sub.startswith('scripts'):
+            scriptdir = os.path.sep.join((cwd, 'build', sub))
+        if sub.startswith('lib'):
+            libdir = os.path.sep.join((cwd, 'build', sub))
+
+    newpath = '%s:%s' % (scriptdir, os.getenv('PATH'))
+    logging.debug('Setting PATH to: %s' % newpath)
+    os.putenv('PATH', newpath)
+    logging.debug('Setting PYTHONPATH to: %s' % libdir)
+    os.putenv('PYTHONPATH', libdir)
+
+    rc = subprocess.call( ['python',] + args )
+
+
+
+if __name__ == '__main__':
+    main()
+

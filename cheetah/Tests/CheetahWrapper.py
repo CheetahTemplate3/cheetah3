@@ -12,6 +12,8 @@ Besides unittest usage, recognizes the following command-line options:
         Show the output of each subcommand.  (Normally suppressed.)
 '''
 import os
+import os.path
+import pdb
 import re                                     # Used by listTests.
 import shutil
 import sys
@@ -24,10 +26,13 @@ from Cheetah.CheetahWrapper import CheetahWrapper  # Used by NoBackup.
 try:
     from subprocess import Popen, PIPE, STDOUT
     class Popen4(Popen):
-        def __init__(self, cmd, bufsize=-1):
-            super(Popen4, self).__init__(cmd, bufsize=bufsize,
-                                         shell=True, close_fds=True,
-                                         stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+        def __init__(self, cmd, bufsize=-1, shell=True, close_fds=True,
+                        stdin=PIPE, stdout=PIPE, stderr=STDOUT, **kwargs):
+
+            super(Popen4, self).__init__(cmd, bufsize=bufsize, shell=shell,
+                            close_fds=close_fds, stdin=stdin, stdout=stdout,
+                            stderr=stderr, **kwargs)
+
             self.tochild = self.stdin
             self.fromchild = self.stdout
             self.childerr = self.stderr
@@ -152,6 +157,17 @@ Found %(result)r"""
         msg = "backup file exists in spite of --nobackup: %s" % path
         self.failIf(exists, msg)
 
+    def locate_command(self, cmd):
+        paths = os.getenv('PATH')
+        if not paths:
+            return cmd
+        parts = cmd.split(' ')
+        paths = paths.split(':')
+        for p in paths:
+            p = p + os.path.sep + parts[0]
+            if os.path.isfile(p):
+                return ' '.join([p] + parts[1:])
+        return ' '.join(parts)
 
     def assertWin32Subprocess(self, cmd):
         _in, _out = os.popen4(cmd)
@@ -163,7 +179,8 @@ Found %(result)r"""
         return rc, output
 
     def assertPosixSubprocess(self, cmd):
-        process = Popen4(cmd)
+        cmd = self.locate_command(cmd)
+        process = Popen4(cmd, env=os.environ)
         process.tochild.close()
         output = process.fromchild.read()
         status = process.wait()
