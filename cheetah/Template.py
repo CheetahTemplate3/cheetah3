@@ -314,14 +314,15 @@ class Template(Servlet):
     _CHEETAH_cacheStore = None  
     _CHEETAH_cacheStoreIdPrefix = None  
 
+    @classmethod
     def _getCompilerClass(klass, source=None, file=None):
         return klass._CHEETAH_compilerClass
-    _getCompilerClass = classmethod(_getCompilerClass)
 
+    @classmethod
     def _getCompilerSettings(klass, source=None, file=None):
         return klass._CHEETAH_compilerSettings
-    _getCompilerSettings = classmethod(_getCompilerSettings)
     
+    @classmethod
     def compile(klass, source=None, file=None,
                 returnAClass=True,
                 
@@ -819,8 +820,8 @@ class Template(Servlet):
                 templateClass._CHEETAH_generatedModuleCode = generatedModuleCode                
      
             return templateClass
-    compile = classmethod(compile)
 
+    @classmethod
     def subclass(klass, *args, **kws):
         """Takes the same args as the .compile() classmethod and returns a
         template that is a subclass of the template this method is called from.
@@ -834,8 +835,8 @@ class Template(Servlet):
         else:
             templateAPIClass = Template
         return templateAPIClass.compile(*args, **kws)
-    subclass = classmethod(subclass)
 
+    @classmethod
     def _preprocessSource(klass, source, file, preprocessors):
         """Iterates through the .compile() classmethod's preprocessors argument
         and pipes the source code through each each preprocessor.
@@ -849,8 +850,8 @@ class Template(Servlet):
             preprocessor = klass._normalizePreprocessorArg(preprocessor)
             source, file = preprocessor.preprocess(source, file)
         return source, file
-    _preprocessSource = classmethod(_preprocessSource)
 
+    @classmethod
     def _normalizePreprocessorArg(klass, arg):
         """Used to convert the items in the .compile() classmethod's
         preprocessors argument into real source preprocessors.  This permits the
@@ -880,8 +881,8 @@ class Template(Servlet):
             settings = klass._normalizePreprocessorSettings(settings)
             return klass._CHEETAH_defaultPreprocessorClass(settings)
 
-    _normalizePreprocessorArg = classmethod(_normalizePreprocessorArg)
         
+    @classmethod
     def _normalizePreprocessorSettings(klass, settings):
         settings.keepRefToGeneratedCode = True
 
@@ -936,8 +937,8 @@ class Template(Servlet):
             directiveToken=settings.directiveToken
             )                            
         return settings
-    _normalizePreprocessorSettings = classmethod(_normalizePreprocessorSettings)
 
+    @classmethod
     def _updateSettingsWithPreprocessTokens(
         klass, compilerSettings, placeholderToken, directiveToken):
         
@@ -958,8 +959,8 @@ class Template(Servlet):
                     '*'+directiveToken)
             if 'EOLSlurpToken' not in compilerSettings:
                 compilerSettings['EOLSlurpToken'] = directiveToken
-    _updateSettingsWithPreprocessTokens = classmethod(_updateSettingsWithPreprocessTokens)
 
+    @classmethod
     def _addCheetahPlumbingCodeToClass(klass, concreteTemplateClass):
         """If concreteTemplateClass is not a subclass of Cheetah.Template, add
         the required cheetah methods and attributes to it.
@@ -1033,10 +1034,7 @@ class Template(Servlet):
             __unicode__ = new.instancemethod(__unicode__, None, concreteTemplateClass)
             setattr(concreteTemplateClass, '__str__', __str__)
             setattr(concreteTemplateClass, '__unicode__', __unicode__)
-                
-    _addCheetahPlumbingCodeToClass = classmethod(_addCheetahPlumbingCodeToClass)
 
-    ## end classmethods ##
 
     def __init__(self, source=None,
 
