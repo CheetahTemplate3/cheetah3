@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 import sys
+import unittest
 
 import Cheetah.Template
 import Cheetah.Filters
-
-import unittest_local_copy as unittest 
 
 majorVer, minorVer = sys.version_info[0], sys.version_info[1]
 versionTuple = (majorVer, minorVer)
@@ -29,6 +28,9 @@ Header
             template = Cheetah.Template.Template(template, searchList=[{'foo' : 'bar'}])
             template = str(template)
             assert template == expected
+        except ImportError, ex:
+            print('>>> We probably failed to import markdown, bummer %s' % ex)
+            return
         except Exception, ex:
             if ex.__class__.__name__ == 'MarkdownException' and majorVer == 2 and minorVer < 5:
                 print('>>> NOTE: Support for the Markdown filter will be broken for you. Markdown says: %s' % ex)

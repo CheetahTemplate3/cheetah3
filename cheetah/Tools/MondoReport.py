@@ -12,7 +12,7 @@ next.query.
 
 How about Report: .page(), .all(), .summary()?  Or PageBreaker.
 """
-import operator, types
+import operator
 try:
     from Cheetah.NameMapper import valueForKey as lookup_func
 except ImportError:
@@ -22,18 +22,13 @@ except ImportError:
         else:
             return obj[name] # Raises KeyError.
 
-########## CONSTANTS ##############################
-
-True, False = (1==1), (1==0)
-numericTypes = types.IntType, types.LongType, types.FloatType
-
 ########## PUBLIC GENERIC FUNCTIONS ##############################
 
 class NegativeError(ValueError):
     pass
 
 def isNumeric(v):
-    return type(v) in numericTypes
+    return isinstance(v, (int, float))
 
 def isNonNegative(v):
     ret = isNumeric(v)

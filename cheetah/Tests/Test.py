@@ -15,6 +15,7 @@ import unittest
 
 import SyntaxAndOutput
 import NameMapper
+import Misc
 import Filters
 import Template
 import Cheps
@@ -32,6 +33,7 @@ suites = [
    #unittest.findTestCases(Cheps),
    unittest.findTestCases(Regressions),
    unittest.findTestCases(Unicode),
+   unittest.findTestCases(Misc),
 ]
 
 if not sys.platform.startswith('java'):

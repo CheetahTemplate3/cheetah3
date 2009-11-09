@@ -45,7 +45,6 @@ More detailed documentation is available in the L{Client} class.
 import sys
 import socket
 import time
-import types
 try:
     import cPickle as pickle
 except ImportError:
@@ -168,7 +167,7 @@ class Client:
                 self.buckets.append(server)
 
     def _get_server(self, key):
-        if type(key) == types.TupleType:
+        if isinstance(key, tuple):
             serverhash = key[0]
             key = key[1]
         else:
@@ -301,7 +300,7 @@ class Client:
         self._statlog(cmd)
 
         flags = 0
-        if isinstance(val, types.StringTypes):
+        if isinstance(val, str):
             pass
         elif isinstance(val, int):
             flags |= Client._FLAG_INTEGER
@@ -343,7 +342,7 @@ class Client:
             value = self._recv_value(server, flags, rlen)
             server.expect("END")
         except (_Error, socket.error), msg:
-            if type(msg) is types.TupleType:
+            if isinstance(msg, tuple):
                 msg = msg[1]
             server.mark_dead(msg)
             return None
@@ -451,7 +450,7 @@ class _Host:
     _DEAD_RETRY = 30  # number of seconds before retrying a dead server.
 
     def __init__(self, host, debugfunc=None):
-        if isinstance(host, types.TupleType):
+        if isinstance(host, tuple):
             host = host[0]
             self.weight = host[1]
         else:
@@ -562,7 +561,7 @@ if __name__ == "__main__":
     mc = Client(servers, debug=1)
 
     def to_s(val):
-        if not isinstance(val, types.StringTypes):
+        if not isinstance(val, str):
             return "%s (%s)" % (val, type(val))
         return "%s" % val
     def test_setget(key, val):
