@@ -640,7 +640,7 @@ class Template(Servlet):
 
         if not isinstance(className, (types.NoneType, basestring)):
             raise TypeError(errmsg % ('className', 'string or None'))
-        className = className or moduleName
+        className = re.sub(r'^_+','', className or moduleName)
 
         if mainMethodName is Unspecified:
             mainMethodName = klass._CHEETAH_defaultMainMethodNameForTemplates
