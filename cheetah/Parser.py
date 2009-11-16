@@ -314,36 +314,33 @@ class CheetahVariable:
         self.cacheToken = cacheToken
         self.rawSource = rawSource
         
-class Placeholder(CheetahVariable): pass
+class Placeholder(CheetahVariable):
+    pass
 
-class ArgList:
+class ArgList(object):
     """Used by _LowLevelParser.getArgList()"""
 
     def __init__(self):
-        self.argNames = []
-        self.defVals = []
-        self.i = 0
+        self.arguments = []
+        self.defaults = []
+        self.count = 0
 
-    def addArgName(self, name):
-        self.argNames.append( name )
-        self.defVals.append( None )
+    def add_argument(self, name):
+        self.arguments.append(name)
+        self.defaults.append(None)
 
     def next(self):
-        self.i += 1
+        self.count += 1
 
-    def addToDefVal(self, token):
-        i = self.i
-        if self.defVals[i] == None:
-            self.defVals[i] = ''
-        self.defVals[i] += token
+    def add_default(self, token):
+        count = self.count
+        if self.defaults[count] is None:
+            self.defaults[count] = ''
+        self.defaults[count] += token
     
     def merge(self):
-        defVals = self.defVals
-        for i in range(len(defVals)):
-            if type(defVals[i]) == StringType:
-                defVals[i] = defVals[i].strip()
-                
-        return map(None, [i.strip() for i in self.argNames], defVals)
+        defaults = (isinstance(d, basestring) and d.strip() or None for d in self.defaults)
+        return list(map(None, (a.strip() for a in self.arguments), defaults))
     
     def __str__(self):
         return str(self.merge())
@@ -1034,7 +1031,7 @@ class _LowLevelParser(SourceReader):
                 break            
             elif c in " \t\f\r\n":
                 if onDefVal:
-                    argList.addToDefVal(c)
+                    argList.add_default(c)
                 self.advance()
             elif c == '=':
                 onDefVal = True
@@ -1046,7 +1043,7 @@ class _LowLevelParser(SourceReader):
             elif self.startswith(self.cheetahVarStartToken) and not onDefVal:
                 self.advance(len(self.cheetahVarStartToken))
             elif self.matchIdentifier() and not onDefVal:
-                argList.addArgName( self.getIdentifier() )
+                argList.add_argument( self.getIdentifier() )
             elif onDefVal:
                 if self.matchCheetahVarInExpressionStartToken():
                     token = self.getCheetahVar()
@@ -1060,7 +1057,7 @@ class _LowLevelParser(SourceReader):
                         self.rev()
                         token = self.getExpression(enclosed=True)
                     token = self.transformToken(token, beforeTokenPos)
-                argList.addToDefVal(token)
+                argList.add_default(token)
             elif c == '*' and not onDefVal:
                 varName = self.getc()
                 if self.peek() == '*':
@@ -1068,7 +1065,7 @@ class _LowLevelParser(SourceReader):
                 if not self.matchIdentifier():
                     raise ParseError(self)
                 varName += self.getIdentifier()
-                argList.addArgName(varName)
+                argList.add_argument(varName)
             else:
                 raise ParseError(self)
 

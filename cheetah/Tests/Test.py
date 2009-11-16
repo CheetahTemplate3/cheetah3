@@ -19,6 +19,7 @@ import Misc
 import Filters
 import Template
 import Cheps
+import Parser
 import Regressions
 import Unicode
 import CheetahWrapper
@@ -34,6 +35,7 @@ suites = [
    unittest.findTestCases(Regressions),
    unittest.findTestCases(Unicode),
    unittest.findTestCases(Misc),
+   unittest.findTestCases(Parser),
 ]
 
 if not sys.platform.startswith('java'):
