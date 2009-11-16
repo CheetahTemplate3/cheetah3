@@ -37,13 +37,13 @@ def escapeRegexChars(txt,
     
     """Return a txt with all special regular expressions chars escaped."""
     
-    return escapeRE.sub(r'\\\1' , txt)
+    return escapeRE.sub(r'\\\1', txt)
 
 def group(*choices): return '(' + '|'.join(choices) + ')'
 def nongroup(*choices): return '(?:' + '|'.join(choices) + ')'
 def namedGroup(name, *choices): return '(P:<' + name +'>' + '|'.join(choices) + ')'
-def any(*choices): return apply(group, choices) + '*'
-def maybe(*choices): return apply(group, choices) + '?'
+def any(*choices): return group(*choices) + '*'
+def maybe(*choices): return group(*choices) + '?'
 
 ##################################################
 ## CONSTANTS & GLOBALS ##
@@ -67,22 +67,22 @@ namechars = identchars + "0123456789"
 #operators
 powerOp = '**'
 unaryArithOps = ('+', '-', '~')
-binaryArithOps = ('+', '-', '/', '//','%')
-shiftOps = ('>>','<<')
-bitwiseOps = ('&','|','^')
+binaryArithOps = ('+', '-', '/', '//', '%')
+shiftOps = ('>>', '<<')
+bitwiseOps = ('&', '|', '^')
 assignOp = '='
-augAssignOps = ('+=','-=','/=','*=', '**=','^=','%=',
-          '>>=','<<=','&=','|=', )
+augAssignOps = ('+=', '-=', '/=', '*=', '**=', '^=', '%=',
+          '>>=', '<<=', '&=', '|=', )
 assignmentOps = (assignOp,) + augAssignOps
 
-compOps = ('<','>','==','!=','<=','>=', '<>', 'is', 'in',)
-booleanOps = ('and','or','not')
+compOps = ('<', '>', '==', '!=', '<=', '>=', '<>', 'is', 'in',)
+booleanOps = ('and', 'or', 'not')
 operators = (powerOp,) + unaryArithOps + binaryArithOps \
             + shiftOps + bitwiseOps + assignmentOps \
             + compOps + booleanOps
 
-delimeters = ('(',')','{','}','[',']',
-              ',','.',':',';','=','`') + augAssignOps
+delimeters = ('(', ')', '{', '}', '[', ']',
+              ',', '.', ':', ';', '=', '`') + augAssignOps
 
 
 keywords = ('and',       'del',       'for',       'is',        'raise',
@@ -131,7 +131,7 @@ for start, end in tripleQuotedStringPairs.items():
 WS = r'[ \f\t]*'  
 EOL = r'\r\n|\n|\r'
 EOLZ = EOL + r'|\Z'
-escCharLookBehind = nongroup(r'(?<=\A)',r'(?<!\\)')
+escCharLookBehind = nongroup(r'(?<=\A)', r'(?<!\\)')
 nameCharLookAhead = r'(?=[A-Za-z_])'
 identRE=re.compile(r'[a-zA-Z_][a-zA-Z_0-9]*')
 EOLre=re.compile(r'(?:\r\n|\r|\n)')
@@ -148,8 +148,8 @@ escapedNewlineRE = re.compile(r'(?<!\\)\\n')
 
 directiveNamesAndParsers = {
     # importing and inheritance
-    'import':None,
-    'from':None,
+    'import': None,
+    'from': None,
     'extends': 'eatExtends',
     'implements': 'eatImplements',
     'super': 'eatSuper',
@@ -162,7 +162,7 @@ directiveNamesAndParsers = {
     'filter': 'eatFilter',
     'echo': None,
     'silent': None,
-    'transform' : 'eatTransform',
+    'transform': 'eatTransform',
     
     'call': 'eatCall',
     'arg': 'eatCallArg',
@@ -226,7 +226,7 @@ endDirectiveNamesAndHandlers = {
     'call': None,               # has short-form
     'capture': None,            # has short-form
     'filter': None,
-    'errorCatcher':None,            
+    'errorCatcher': None,            
     'while': None,              # has short-form
     'for': None,                # has short-form
     'if': None,                 # has short-form
@@ -270,16 +270,16 @@ class ParseError(ValueError):
         ## get the surrounding lines
         lines = stream.splitlines()
         prevLines = []                  # (rowNum, content)
-        for i in range(1,4):
+        for i in range(1, 4):
             if row-1-i <=0:
                 break
-            prevLines.append( (row-i,lines[row-1-i]) )
+            prevLines.append( (row-i, lines[row-1-i]) )
 
         nextLines = []                  # (rowNum, content)
-        for i in range(1,4):
+        for i in range(1, 4):
             if not row-1+i < len(lines):
                 break
-            nextLines.append( (row+i,lines[row-1+i]) )
+            nextLines.append( (row+i, lines[row-1+i]) )
         nextLines.reverse()
         
         ## print the main message
@@ -930,7 +930,7 @@ class _LowLevelParser(SourceReader):
         argStringBits = ['(']
         addBit = argStringBits.append
 
-        while 1:
+        while True:
             if self.atEnd():
                 open = enclosures[-1][0]
                 close = closurePairsRev[open]
@@ -975,7 +975,7 @@ class _LowLevelParser(SourceReader):
             else:
                 beforeTokenPos = self.pos()
                 token = self.getPyToken()
-                if token in ('{','(','['):
+                if token in ('{', '(', '['):
                     self.rev()
                     token = self.getExpression(enclosed=True)
                 token = self.transformToken(token, beforeTokenPos)
@@ -1015,7 +1015,7 @@ class _LowLevelParser(SourceReader):
         useNameMapper_orig = self.setting('useNameMapper')
         self.setSetting('useNameMapper', useNameMapper)
 
-        while 1:
+        while True:
             if self.atEnd():
                 raise ParseError(
                     self, msg="EOF was reached before a matching ')'"+
@@ -1053,7 +1053,7 @@ class _LowLevelParser(SourceReader):
                 else:
                     beforeTokenPos = self.pos()
                     token = self.getPyToken()
-                    if token in ('{','(','['):
+                    if token in ('{', '(', '['):
                         self.rev()
                         token = self.getExpression(enclosed=True)
                     token = self.transformToken(token, beforeTokenPos)
@@ -1094,7 +1094,7 @@ class _LowLevelParser(SourceReader):
         
         srcLen = len(self)
         exprBits = []
-        while 1:
+        while True:
             if self.atEnd():
                 if enclosures:
                     open = enclosures[-1][0]
@@ -1303,8 +1303,8 @@ class _LowLevelParser(SourceReader):
                 expr = expr[:-1]
             rawPlaceholder=self[startPos: self.pos()]
             
-        expr = self._applyExpressionFilters(expr,'placeholder',
-                                            rawExpr=rawPlaceholder,startPos=startPos)
+        expr = self._applyExpressionFilters(expr, 'placeholder',
+                                            rawExpr=rawPlaceholder, startPos=startPos)
         for callback in self.setting('postparsePlaceholderHooks'):
             callback(parser=self)
 
@@ -1347,11 +1347,11 @@ class _HighLevelParser(_LowLevelParser):
     
     def _initDirectives(self):
         def normalizeParserVal(val):
-            if isinstance(val, (str,unicode)):
+            if isinstance(val, (str, unicode)):
                 handler = getattr(self, val)
             elif type(val) in (ClassType, TypeType):
                 handler = val(self)
-            elif callable(val):
+            elif hasattr(val, '__call__'):
                 handler = val
             elif val is None:
                 handler = val
@@ -1362,11 +1362,11 @@ class _HighLevelParser(_LowLevelParser):
         normalizeHandlerVal = normalizeParserVal
 
         _directiveNamesAndParsers = directiveNamesAndParsers.copy()
-        customNamesAndParsers = self.setting('directiveNamesAndParsers',{})
+        customNamesAndParsers = self.setting('directiveNamesAndParsers', {})
         _directiveNamesAndParsers.update(customNamesAndParsers)
 
         _endDirectiveNamesAndHandlers = endDirectiveNamesAndHandlers.copy()
-        customNamesAndHandlers = self.setting('endDirectiveNamesAndHandlers',{})
+        customNamesAndHandlers = self.setting('endDirectiveNamesAndHandlers', {})
         _endDirectiveNamesAndHandlers.update(customNamesAndHandlers)        
         
         self._directiveNamesAndParsers = {}
@@ -1381,21 +1381,21 @@ class _HighLevelParser(_LowLevelParser):
                 continue
             self._endDirectiveNamesAndHandlers[name] = normalizeHandlerVal(val)
         
-        self._closeableDirectives = ['def','block','closure','defmacro',
+        self._closeableDirectives = ['def', 'block', 'closure', 'defmacro',
                                      'call',
                                      'capture',
                                      'cache',
                                      'filter',
-                                     'if','unless',
-                                     'for','while','repeat',
+                                     'if', 'unless',
+                                     'for', 'while', 'repeat',
                                      'try',
                                      ]
-        for directiveName in self.setting('closeableDirectives',[]):
+        for directiveName in self.setting('closeableDirectives', []):
             self._closeableDirectives.append(directiveName)
 
 
 
-        macroDirectives = self.setting('macroDirectives',{})
+        macroDirectives = self.setting('macroDirectives', {})
         macroDirectives['i18n'] = I18n
 
 
@@ -1512,7 +1512,7 @@ class _HighLevelParser(_LowLevelParser):
         self.getMultiLineCommentStartToken()
         endPos = startPos = self.pos()
         level = 1
-        while 1:
+        while True:
             endPos = self.pos()
             if self.atEnd():
                 break
@@ -1579,8 +1579,8 @@ class _HighLevelParser(_LowLevelParser):
     del assert raise
     silent echo    
     import from'''.split()
-    _directiveHandlerNames = {'import':'addImportStatement',
-                              'from':'addImportStatement', }
+    _directiveHandlerNames = {'import': 'addImportStatement',
+                              'from': 'addImportStatement', }
     def eatDirective(self):
         directiveName = self.matchDirective()
         self._filterDisabledDirectives(directiveName)
@@ -1927,8 +1927,8 @@ class _HighLevelParser(_LowLevelParser):
         startPos = self.pos()
         methodName, rawSignature = self._eatDefOrBlock('block')
         self._compiler._blockMetaData[methodName] = {
-            'raw':rawSignature,
-            'lineCol':self.getRowCol(startPos),
+            'raw': rawSignature,
+            'lineCol': self.getRowCol(startPos),
             }
 
     def eatClosure(self):
@@ -1937,7 +1937,7 @@ class _HighLevelParser(_LowLevelParser):
         
     def _eatDefOrBlock(self, directiveName):
         # filtered 
-        assert directiveName in ('def','block','closure')
+        assert directiveName in ('def', 'block', 'closure')
         isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
         startPos = self.pos()
@@ -2230,15 +2230,15 @@ class _HighLevelParser(_LowLevelParser):
         else:
             argsList=[]
 
-        assert not self._directiveNamesAndParsers.has_key(macroName)
-        argsList.insert(0, ('src',None))
-        argsList.append(('parser','None'))
-        argsList.append(('macros','None'))
-        argsList.append(('compilerSettings','None'))
-        argsList.append(('isShortForm','None'))
-        argsList.append(('EOLCharsInShortForm','None'))        
-        argsList.append(('startPos','None'))
-        argsList.append(('endPos','None'))
+        assert macroName not in self._directiveNamesAndParsers
+        argsList.insert(0, ('src', None))
+        argsList.append(('parser', 'None'))
+        argsList.append(('macros', 'None'))
+        argsList.append(('compilerSettings', 'None'))
+        argsList.append(('isShortForm', 'None'))
+        argsList.append(('EOLCharsInShortForm', 'None'))        
+        argsList.append(('startPos', 'None'))
+        argsList.append(('endPos', 'None'))
         
         if self.matchColonForSingleLineShortFormDirective():
             self.advance() # skip over :
@@ -2254,8 +2254,8 @@ class _HighLevelParser(_LowLevelParser):
 
         #print argsList
         normalizedMacroSrc = ''.join(
-            ['%def callMacro('+','.join([defv and '%s=%s'%(n,defv) or n
-                                         for n,defv in argsList])
+            ['%def callMacro('+','.join([defv and '%s=%s'%(n, defv) or n
+                                         for n, defv in argsList])
              +')\n',
              macroSrc,
              '%end def'])
@@ -2266,9 +2266,9 @@ class _HighLevelParser(_LowLevelParser):
         compilerSettings = self.setting('compilerSettingsForDefMacro', default={})
         searchListForMacros = self.setting('searchListForDefMacro', default=[])
         searchListForMacros = list(searchListForMacros) # copy to avoid mutation bugs
-        searchListForMacros.append({'macros':self._macros,
-                                    'parser':self,
-                                    'compilerSettings':self.settings(),                                    
+        searchListForMacros.append({'macros': self._macros,
+                                    'parser': self,
+                                    'compilerSettings': self.settings(),                                    
                                     })
         
         templateAPIClass._updateSettingsWithPreprocessTokens(
@@ -2328,12 +2328,12 @@ class _HighLevelParser(_LowLevelParser):
         else:
             def getArgs(*pargs, **kws):
                 return pargs, kws
-            exec 'positionalArgs, kwArgs = getArgs(%(args)s)'%locals()
+            exec('positionalArgs, kwArgs = getArgs(%(args)s)'%locals())
 
-        assert not kwArgs.has_key('src')
+        assert 'src' not in kwArgs
         kwArgs['src'] = srcBlock
 
-        if type(macro)==new.instancemethod:
+        if isinstance(macro, new.instancemethod):
             co = macro.im_func.func_code
         elif (hasattr(macro, '__call__')
               and hasattr(macro.__call__, 'im_func')):

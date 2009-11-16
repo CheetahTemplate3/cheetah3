@@ -139,7 +139,6 @@ class Hierarchy:
             if self._inContents(item):
                 return True
         return False
-
 ##################################################
 ## from the command line
 

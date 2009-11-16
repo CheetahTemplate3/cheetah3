@@ -531,7 +531,7 @@ def listTests(cheetahWrapperFile):
     """
     rx = re.compile( R'self\.go\("(.*?)"\)' )
     f = open(cheetahWrapperFile)
-    while 1:
+    while True:
         lin = f.readline()
         if not lin:
             break

@@ -120,7 +120,7 @@ much as possible.
 """
 
 
-from __future__ import division
+
 
 try:
     import itimer

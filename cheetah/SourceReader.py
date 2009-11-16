@@ -160,7 +160,7 @@ class SourceReader:
         self._posTobookmarkMap[self._pos] = name
 
     def hasBookmark(self, name):
-        return self._bookmarks.has_key(name)
+        return name in self._bookmarks
     
     def gotoBookmark(self, name):
         if not self.hasBookmark(name):
@@ -247,7 +247,7 @@ class SourceReader:
         if pos == None:
             pos = self._pos
         src = self.src()
-        return max(src.rfind('\n',0,pos)+1, src.rfind('\r',0,pos)+1, 0)
+        return max(src.rfind('\n', 0, pos)+1, src.rfind('\r', 0, pos)+1, 0)
         
     def findEOL(self, pos=None, gobble=False):
         if pos == None:

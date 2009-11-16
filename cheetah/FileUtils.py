@@ -1,30 +1,14 @@
-# $Id: FileUtils.py,v 1.12 2005/11/02 22:26:07 tavis_rudd Exp $
-"""File utitilies for Python:
-
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>
-License: This software is released for unlimited distribution under the
-         terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.12 $
-Start Date: 2001/09/26
-Last Revision Date: $Date: 2005/11/02 22:26:07 $
-"""
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.12 $"[11:-2]
-
 
 from glob import glob
 import os
 from os import listdir
 import os.path
 import re
-from types import StringType
 from tempfile import mktemp
 
 def _escapeRegexChars(txt,
                      escapeRE=re.compile(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])')):
-    return escapeRE.sub(r'\\\1' , txt)
+    return escapeRE.sub(r'\\\1', txt)
 
 def findFiles(*args, **kw):
     """Recursively find all the files matching a glob pattern.
@@ -70,7 +54,7 @@ class FileFinder:
     
     def __init__(self, rootPath,
                  globPatterns=('*',),
-                 ignoreBasenames=('CVS','.svn'),
+                 ignoreBasenames=('CVS', '.svn'),
                  ignoreDirs=(),
                  ):
         
@@ -220,7 +204,7 @@ class _GenSubberFunc:
         return "def subber(m):\n\treturn ''.join([%s])\n" % (self.codeBody())
     
     def subberFunc(self):
-        exec self.code()
+        exec(self.code())
         return subber
 
 
@@ -238,11 +222,11 @@ class FindAndReplace:
                  recordResults=True):
 
         
-        if type(patternOrRE) == StringType:
+        if isinstance(patternOrRE, basestring):
             self._regex = re.compile(patternOrRE)
         else:
             self._regex = patternOrRE
-        if type(replacement) == StringType:
+        if isinstance(replacement, basestring):
             self._subber = _GenSubberFunc(replacement).subberFunc()
         else:
             self._subber = replacement
@@ -279,7 +263,7 @@ class FindAndReplace:
             
             self._currFile = file
             found = False
-            if locals().has_key('orig'):
+            if 'orig' in locals():
                 del orig
             if self._usePgrep:
                 if os.popen('pgrep "' + pattern + '" ' + file ).read():
@@ -289,23 +273,23 @@ class FindAndReplace:
                 if regex.search(orig):
                     found = True
             if found:
-                if not locals().has_key('orig'):
+                if 'orig' not in locals():
                     orig = open(file).read()
                 new = regex.sub(subber, orig)
                 open(file, 'w').write(new)
 
     def _subDispatcher(self, match):
         if self._recordResults:
-            if not self._results.has_key(self._currFile):
+            if self._currFile not in self._results:
                 res = self._results[self._currFile] = {}
                 res['count'] = 0
                 res['matches'] = []
             else:
                 res = self._results[self._currFile]
             res['count'] += 1
-            res['matches'].append({'contents':match.group(),
-                                   'start':match.start(),
-                                   'end':match.end(),
+            res['matches'].append({'contents': match.group(),
+                                   'start': match.start(),
+                                   'end': match.end(),
                                    }
                                    )
         return self._subber(match)
@@ -337,10 +321,10 @@ class SourceFileStats:
             commentLines += fileStats['commentLines']
             totalLines += fileStats['totalLines']
             
-        stats = {'codeLines':codeLines,
-                 'blankLines':blankLines,
-                 'commentLines':commentLines,
-                 'totalLines':totalLines,
+        stats = {'codeLines': codeLines,
+                 'blankLines': blankLines,
+                 'commentLines': commentLines,
+                 'totalLines': totalLines,
                  }
         return stats
         
@@ -364,10 +348,10 @@ class SourceFileStats:
             else:
                 codeLines += 1
 
-        stats = {'codeLines':codeLines,
-                 'blankLines':blankLines,
-                 'commentLines':commentLines,
-                 'totalLines':totalLines,
+        stats = {'codeLines': codeLines,
+                 'blankLines': blankLines,
+                 'commentLines': commentLines,
+                 'totalLines': totalLines,
                  }
         
         return stats

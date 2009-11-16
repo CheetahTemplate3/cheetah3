@@ -387,12 +387,11 @@ you do have write permission to and re-run the tests.""")
         isError = False
         dstSources = {}
         for b in bundles:
-            if dstSources.has_key(b.dst):
+            if b.dst in dstSources:
                 dstSources[b.dst].append(b.src)
             else:
                 dstSources[b.dst] = [b.src]
-        keys = dstSources.keys()
-        keys.sort()
+        keys = sorted(dstSources.keys())
         for dst in keys:
             sources = dstSources[dst]
             if len(sources) > 1:
@@ -537,7 +536,7 @@ you do have write permission to and re-run the tests.""")
             return kws
         if self.opts.compilerSettingsString:
             try:
-                exec 'settings = getkws(%s)'%self.opts.compilerSettingsString
+                exec('settings = getkws(%s)'%self.opts.compilerSettingsString)
             except:                
                 self.error("There's an error in your --settings option."
                           "It must be valid Python syntax.\n"

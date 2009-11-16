@@ -2,11 +2,11 @@ Version = '2.4.0'
 VersionTuple = (2, 4, 0, 'final', 0)
 
 MinCompatibleVersion = '2.0rc6'
-MinCompatibleVersionTuple = (2,0,0,'candidate',6)
+MinCompatibleVersionTuple = (2, 0, 0, 'candidate', 6)
 
 ####
 def convertVersionStringToTuple(s):
-    versionNum = [0,0,0]
+    versionNum = [0, 0, 0]
     releaseType = 'final'
     releaseTypeSubNum = 0
     if s.find('a')!=-1:
@@ -27,7 +27,7 @@ def convertVersionStringToTuple(s):
         versionNum += [0]
     releaseTypeSubNum = int(releaseTypeSubNum)
     
-    return tuple(versionNum+[releaseType,releaseTypeSubNum])
+    return tuple(versionNum+[releaseType, releaseTypeSubNum])
 
 
 if __name__ == '__main__':

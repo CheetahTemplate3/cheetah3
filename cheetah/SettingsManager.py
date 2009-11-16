@@ -34,8 +34,8 @@ def mergeNestedDictionaries(dict1, dict2, copy=False, deepcopy=False):
     elif deepcopy:
         dict1 = copyModule.deepcopy(dict1)
         
-    for key,val in dict2.iteritems():
-        if dict1.has_key(key) and isinstance(val, dict) and isinstance(dict1[key], dict):
+    for key, val in dict2.iteritems():
+        if key in dict1 and isinstance(val, dict) and isinstance(dict1[key], dict):
             dict1[key] = mergeNestedDictionaries(dict1[key], val)
         else:
             dict1[key] = val
@@ -104,11 +104,11 @@ class _SettingsCollector(object):
     def readSettingsFromPySrcStr(self, theString):
         """Return a dictionary of the settings in a Python src string."""
 
-        globalsDict = {'True':(1==1),
-                       'False':(0==1),
+        globalsDict = {'True': (1==1),
+                       'False': (0==1),
                        }
         newSettings = {'self':self}
-        exec (theString+os.linesep) in globalsDict, newSettings        
+        exec((theString+os.linesep), globalsDict, newSettings)        
         del newSettings['self']
         module = new.module('temp_settings_module')
         module.__dict__.update(newSettings)
@@ -154,7 +154,7 @@ class _SettingsCollector(object):
             newSettings[s] = {}
             for o in p.options(s):
                 if o != '__name__':
-                    newSettings[s][o] = p.get(s,o)
+                    newSettings[s][o] = p.get(s, o)
 
         ## loop through new settings -> deal with global settings, numbers,
         ## booleans and None ++ also deal with 'importSettings' commands
@@ -163,7 +163,7 @@ class _SettingsCollector(object):
             for key, val in subDict.items():
                 if convert:
                     if val.lower().startswith('python:'):
-                        subDict[key] = eval(val[7:],{},{})
+                        subDict[key] = eval(val[7:], {}, {})
                     if val.lower() == 'none':
                         subDict[key] = None
                     if val.lower() == 'true':
@@ -265,7 +265,7 @@ class SettingsManager(_SettingsCollector):
         
         newSettings = self.readSettingsFromPySrcStr(theString)
         self.updateSettings(newSettings,
-                            merge=newSettings.get('mergeSettings',merge) )
+                            merge=newSettings.get('mergeSettings', merge) )
         
     
     def updateSettingsFromConfigFileObj(self, inFile, convert=True, merge=True):
@@ -276,7 +276,7 @@ class SettingsManager(_SettingsCollector):
 
         newSettings = self.readSettingsFromConfigFileObj(inFile, convert=convert)
         self.updateSettings(newSettings,
-                            merge=newSettings.get('mergeSettings',merge))
+                            merge=newSettings.get('mergeSettings', merge))
 
     def updateSettingsFromConfigStr(self, configStr, convert=True, merge=True):
         """See the docstring for .updateSettingsFromConfigFile()
@@ -286,5 +286,5 @@ class SettingsManager(_SettingsCollector):
         inFile = StringIO(configStr)
         newSettings = self.readSettingsFromConfigFileObj(inFile, convert=convert)
         self.updateSettings(newSettings,
-                            merge=newSettings.get('mergeSettings',merge))
+                            merge=newSettings.get('mergeSettings', merge))
 

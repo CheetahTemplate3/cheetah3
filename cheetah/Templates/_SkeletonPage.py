@@ -46,8 +46,8 @@ class _SkeletonPage(Template):
     
     def __init__(self, *args, **KWs):
         Template.__init__(self, *args, **KWs)
-        self._metaTags = {'HTTP-EQUIV':{'keywords':'Cheetah',
-                                        'Content-Type':'text/html; charset=iso-8859-1',
+        self._metaTags = {'HTTP-EQUIV':{'keywords': 'Cheetah',
+                                        'Content-Type': 'text/html; charset=iso-8859-1',
                                         }, 
                     'NAME':{'generator':'Cheetah: The Python-Powered Template Engine'}
                     }
@@ -85,7 +85,7 @@ class _SkeletonPage(Template):
         
         stylesheetTagsTxt += '<style type="text/css"><!--\n'
         for identifier in self._stylesheetsOrder:
-            if not self._stylesheets.has_key(identifier):
+            if identifier not in self._stylesheets:
                 warning = '# the identifier ' + identifier + \
                           'was in stylesheetsOrder, but not in stylesheets'
                 print(warning)
@@ -117,7 +117,7 @@ class _SkeletonPage(Template):
         javascriptTagsTxt = []
         for key, details in self._javascriptTags.iteritems():
             if not isinstance(details, (list, tuple)):
-                details = ['',details]
+                details = ['', details]
                 
             javascriptTagsTxt += ['<script language="JavaScript', str(details[0]),
                                   '" type="text/javascript"><!--\n',
@@ -126,7 +126,7 @@ class _SkeletonPage(Template):
 
         for key, details in self._javascriptLibs.iteritems():
             if not isinstance(details, (list, tuple)):
-                details = ['',details]
+                details = ['', details]
 
             javascriptTagsTxt += ['<script language="JavaScript', str(details[0]),
                                   '" type="text/javascript" src="',
@@ -177,16 +177,16 @@ class _SkeletonPage(Template):
             return ''.join(['<img src="', src, '" height="', str(height),
                            '" alt="', alt, '" border="', str(border), '" />'])
         else:
-            return ''.join(['<img src="', src, '" alt="', alt, '" border="', str(border),'" />'])
+            return ''.join(['<img src="', src, '" alt="', alt, '" border="', str(border), '" />'])
 
 
     def currentYr(self):
         """Return a string representing the current yr."""
-        return time.strftime("%Y",time.localtime(time.time()))
+        return time.strftime("%Y", time.localtime(time.time()))
     
     def currentDate(self, formatString="%b %d, %Y"):
         """Return a string representing the current localtime."""
-        return time.strftime(formatString,time.localtime(time.time()))
+        return time.strftime(formatString, time.localtime(time.time()))
     
     def spacer(self, width=1,height=1):
         return '<img src="spacer.gif" width="%s" height="%s" alt="" />'% (str(width), str(height))
@@ -195,19 +195,19 @@ class _SkeletonPage(Template):
         """returns a string containing an HTML <tag> """
         tagTxt = ['<', tagName.lower()]
         for name, val in attributes.items():
-            tagTxt += [' ', name.lower(), '="', str(val),'"']
+            tagTxt += [' ', name.lower(), '="', str(val), '"']
         tagTxt.append('>')
         return ''.join(tagTxt)
     
     def formatMetaTags(self, metaTags):
         """format a dict of metaTag definitions into an HTML version"""
         metaTagsTxt = []
-        if metaTags.has_key('HTTP-EQUIV'):
+        if 'HTTP-EQUIV' in metaTags:
             for http_equiv, contents in metaTags['HTTP-EQUIV'].items():
                 metaTagsTxt += ['<meta http-equiv="', str(http_equiv), '" content="',
                                 str(contents), '" />\n']
                 
-        if metaTags.has_key('NAME'):
+        if 'NAME' in metaTags:
             for name, contents in metaTags['NAME'].items():
                 metaTagsTxt += ['<meta name="', str(name), '" content="', str(contents),
                                 '" />\n']

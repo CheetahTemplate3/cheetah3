@@ -25,7 +25,7 @@ from types import StringType, ClassType
 try:
     from types import StringTypes
 except ImportError:
-    StringTypes = (types.StringType,types.UnicodeType)
+    StringTypes = (types.StringType, types.UnicodeType)
     
 try:
     from threading import Lock
@@ -84,15 +84,14 @@ def hashList(l):
     return hash(tuple(hashedList))
 
 def hashDict(d):
-    items = d.items()
-    items.sort()
+    items = sorted(d.items())
     hashedList = []
     for k, v in items:
         if isinstance(v, dict):
             v = hashDict(v)
         elif isinstance(v, list):
             v = hashList(v)
-        hashedList.append((k,v))
+        hashedList.append((k, v))
     return hash(tuple(hashedList))
 
 
@@ -106,7 +105,7 @@ def _genUniqueModuleName(baseModuleName):
         finalName = baseModuleName
     else:
         finalName = ('cheetah_%s_%s_%s'%(baseModuleName,
-                                         str(time.time()).replace('.','_'),
+                                         str(time.time()).replace('.', '_'),
                                          str(randrange(10000, 99999))))
     return finalName
 
@@ -276,8 +275,8 @@ class Template(Servlet):
          '_getTemplateAPIClassForIncludeDirectiveCompilation',
          )
     _CHEETAH_requiredCheetahClassMethods = ('subclass',) 
-    _CHEETAH_requiredCheetahClassAttributes = ('cacheRegionClass','cacheStore',
-                                               'cacheStoreIdPrefix','cacheStoreClass')
+    _CHEETAH_requiredCheetahClassAttributes = ('cacheRegionClass', 'cacheStore',
+                                               'cacheStoreIdPrefix', 'cacheStoreClass')
 
     ## the following are used by .compile(). Most are documented in its docstring.
     _CHEETAH_cacheModuleFilesForTracebacks = False
@@ -781,7 +780,7 @@ class Template(Servlet):
                 ##
                 try:
                     co = compile(generatedModuleCode, __file__, 'exec')
-                    exec co in mod.__dict__
+                    exec(co, mod.__dict__)
                 except SyntaxError, e:
                     try:
                         parseError = genParserErrorFromPythonException(
@@ -860,7 +859,7 @@ class Template(Servlet):
         
         if hasattr(arg, 'preprocess'):
             return arg
-        elif callable(arg):
+        elif hasattr(arg, '__call__'):
             class WrapperPreprocessor:
                 def preprocess(self, source, file):
                     return arg(source, file)
@@ -903,7 +902,7 @@ class Template(Servlet):
             (settings.placeholderToken,
              settings.directiveToken) = normalizeTokens(settings.tokens)
             
-        if (not getattr(settings,'compilerSettings', None)
+        if (not getattr(settings, 'compilerSettings', None)
             and not getattr(settings, 'placeholderToken', None) ):
             
             raise TypeError(
@@ -992,7 +991,7 @@ class Template(Servlet):
             or concreteTemplateClass.__str__ is object.__str__):
             
             mainMethNameAttr = '_mainCheetahMethod_for_'+concreteTemplateClass.__name__
-            mainMethName = getattr(concreteTemplateClass,mainMethNameAttr, None)
+            mainMethName = getattr(concreteTemplateClass, mainMethNameAttr, None)
             if mainMethName:
                 def __str__(self): 
                     rc = getattr(self, mainMethName)()
@@ -1014,7 +1013,7 @@ class Template(Servlet):
                 def __str__(self):
                     rc = None
                     if hasattr(self, mainMethNameAttr):
-                        rc = getattr(self,mainMethNameAttr)()
+                        rc = getattr(self, mainMethNameAttr)()
                     elif hasattr(self, 'respond'):
                         rc = self.respond()
                     else:
@@ -1024,7 +1023,7 @@ class Template(Servlet):
                     return rc
                 def __unicode__(self):
                     if hasattr(self, mainMethNameAttr):
-                        return getattr(self,mainMethNameAttr)()
+                        return getattr(self, mainMethNameAttr)()
                     elif hasattr(self, 'respond'):
                         return self.respond()
                     else:
@@ -1356,7 +1355,7 @@ class Template(Servlet):
         """
         
         try:
-            return valueFromSearchList(self.searchList(), varName.replace('$',''), autoCall)
+            return valueFromSearchList(self.searchList(), varName.replace('$', ''), autoCall)
         except NotFound:
             if default is not Unspecified:
                 return default
@@ -1367,7 +1366,7 @@ class Template(Servlet):
         """Test if a variable name exists in the searchList.
         """
         try:
-            valueFromSearchList(self.searchList(), varName.replace('$',''), autoCall)
+            valueFromSearchList(self.searchList(), varName.replace('$', ''), autoCall)
             return True
         except NotFound:
             return False
@@ -1416,7 +1415,7 @@ class Template(Servlet):
         various protocols, as PHP allows with its 'URL fopen wrapper'
         """
         
-        fp = open(path,'r')
+        fp = open(path, 'r')
         output = fp.read()
         fp.close()
         return output
@@ -1500,7 +1499,7 @@ class Template(Servlet):
         if errorCatcher:
             if isinstance(errorCatcher, basestring):
                 errorCatcherClass = getattr(ErrorCatchers, errorCatcher)
-            elif type(errorCatcher) == ClassType:
+            elif isinstance(errorCatcher, ClassType):
                 errorCatcherClass = errorCatcher
 
             self._CHEETAH__errorCatcher = ec = errorCatcherClass(self)
@@ -1557,7 +1556,7 @@ class Template(Servlet):
         """Called at runtime to handle #include directives.
         """
         _includeID = srcArg            
-        if not self._CHEETAH__cheetahIncludes.has_key(_includeID):
+        if _includeID not in self._CHEETAH__cheetahIncludes:
             if not raw:
                 if includeFrom == 'file':
                     source = None
@@ -1575,7 +1574,7 @@ class Template(Servlet):
                 # Template class to be used for compilation so compilerSettings
                 # can be changed.
                 compiler = self._getTemplateAPIClassForIncludeDirectiveCompilation(source, file)
-                nestedTemplateClass = compiler.compile(source=source,file=file)
+                nestedTemplateClass = compiler.compile(source=source, file=file)
                 nestedTemplate = nestedTemplateClass(_preBuiltSearchList=self.searchList(),
                                                      _globalSetVars=self._CHEETAH__globalSetVars)
                 # Set the inner template filters to the initial filter of the
@@ -1817,8 +1816,8 @@ class Template(Servlet):
             raise TypeError("arg 'src' invalid")
         sources = source + 's'
         converters = {
-            ''     : _Converter('string', None, default,      default ),
-            'int'  : _Converter('int',     int, defaultInt,   badInt  ),
+            '': _Converter('string', None, default,      default ),
+            'int': _Converter('int',     int, defaultInt,   badInt  ),
             'float': _Converter('float', float, defaultFloat, badFloat),  }
         #pprint.pprint(locals());  return {}
         dic = {} # Destination.
@@ -1860,16 +1859,16 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
     lines = generatedPyCode.splitlines()
     
     prevLines = []                  # (i, content)
-    for i in range(1,4):
+    for i in range(1, 4):
         if pyLineno-i <=0:
             break
-        prevLines.append( (pyLineno+1-i,lines[pyLineno-i]) )
+        prevLines.append( (pyLineno+1-i, lines[pyLineno-i]) )
     
     nextLines = []                  # (i, content)
-    for i in range(1,4):
+    for i in range(1, 4):
         if not pyLineno+i < len(lines):
             break
-        nextLines.append( (pyLineno+i,lines[pyLineno+i]) )
+        nextLines.append( (pyLineno+i, lines[pyLineno+i]) )
     nextLines.reverse()
     report = 'Line|Python Code\n'
     report += '----|-------------------------------------------------------------\n'
@@ -1916,7 +1915,7 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
     
     message = '\n'.join(message)
     reader = SourceReader(source, filename=filename)
-    return ParseError(reader, message, lineno=lineno,col=col)
+    return ParseError(reader, message, lineno=lineno, col=col)
     
 
 # vim: shiftwidth=4 tabstop=4 expandtab

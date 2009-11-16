@@ -14,6 +14,13 @@ How about Report: .page(), .all(), .summary()?  Or PageBreaker.
 """
 import operator
 try:
+    from functools import reduce
+except ImportError:
+    # If functools doesn't exist, we must be on an old 
+    # enough version that has reduce() in builtins
+    pass
+
+try:
     from Cheetah.NameMapper import valueForKey as lookup_func
 except ImportError:
     def lookup_func(obj, name):
@@ -86,8 +93,7 @@ def mean(lis):
     return total / lis_len
 
 def median(lis):
-    lis = lis[:]
-    lis.sort()
+    lis = sorted(lis[:])
     return lis[int(len(lis)/2)]
 
 
@@ -164,7 +170,7 @@ class ValuesGetterMixin:
         else:
             ret = self._origList
         if criteria:
-            ret = filter(criteria, ret)
+            ret = list(filter(criteria, ret))
         return ret
 
 
@@ -266,7 +272,7 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
 
 
 
-    def _prevNextHelper(self, start,end,size,orphan,sequence):
+    def _prevNextHelper(self, start, end, size, orphan, sequence):
         """Copied from Zope's DT_InSV.py's "opt" function.
         """
         if size < 1:
@@ -299,7 +305,7 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
             try: sequence[end+orphan-1]
             except: end=len(sequence)
             # if l - end < orphan: end=l
-        return start,end,size
+        return start, end, size
 
 
 

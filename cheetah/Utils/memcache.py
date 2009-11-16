@@ -128,7 +128,7 @@ class Client:
             serverData = {}
             data.append(( name, serverData ))
             readline = s.readline
-            while 1:
+            while True:
                 line = readline()
                 if not line or line.strip() == 'END': break
                 stats = line.split(' ', 2)
@@ -148,7 +148,7 @@ class Client:
             sys.stderr.write("MemCached: %s\n" % str)
 
     def _statlog(self, func):
-        if not self.stats.has_key(func):
+        if func not in self.stats:
             self.stats[func] = 1
         else:
             self.stats[func] += 1
@@ -376,7 +376,7 @@ class Client:
             server, key = self._get_server(key)
             if not server:
                 continue
-            if not server_keys.has_key(server):
+            if server not in server_keys:
                 server_keys[server] = []
             server_keys[server].append(key)
 
@@ -515,7 +515,7 @@ class _Host:
     def readline(self):
         buffers = ''
         recv = self.socket.recv
-        while 1:
+        while True:
             data = recv(1)
             if not data:
                 self.mark_dead('Connection closed while reading from %s'

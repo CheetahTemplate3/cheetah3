@@ -44,7 +44,7 @@ class ClassMethods_compile(TemplateTest):
         assert str(t)=='1234'
 
     def test_moduleFileCaching(self):
-        if versionTuple < (2,3):
+        if versionTuple < (2, 3):
             return
         tmpDir = tempfile.mkdtemp()
         try:
@@ -220,9 +220,9 @@ class Preprocessors(TemplateTest):
         class TemplateSubclass(Template):
             pass
 
-        compilerSettings = {'cheetahVarStartToken':'@',
-                            'directiveStartToken':'%',
-                            'commentStartToken':'%%',
+        compilerSettings = {'cheetahVarStartToken': '@',
+                            'directiveStartToken': '%',
+                            'commentStartToken': '%%',
                             }
         
         for arg in ['@ %',

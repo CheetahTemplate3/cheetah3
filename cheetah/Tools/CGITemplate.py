@@ -68,7 +68,7 @@ class CGITemplate(Template):
     def isCgi(self):
         """Is this a CGI script?
         """
-        env = os.environ.has_key('REQUEST_METHOD') 
+        env = 'REQUEST_METHOD' in os.environ 
         wk = self._CHEETAH__isControlledByWebKit
         return env and not wk
 
