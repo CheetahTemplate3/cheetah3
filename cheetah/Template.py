@@ -723,6 +723,7 @@ class Template(Servlet):
                 #@@TR: should add some logging to this
                 pass
         outputEncoding = 'ascii'
+        compiler = None
         if useCache and cacheHash and cacheHash in klass._CHEETAH_compileCache:
             cacheItem = klass._CHEETAH_compileCache[cacheHash]
             generatedModuleCode = cacheItem.code
@@ -818,6 +819,9 @@ class Template(Servlet):
             if keepRefToGeneratedCode or cacheCompilationResults:
                 templateClass._CHEETAH_generatedModuleCode = generatedModuleCode                
      
+            # If we have a compiler object, let's set it to the compiler class
+            # to help the directive analyzer code
+            templateClass._CHEETAH_compilerClass = compiler or templateClass._CHEETAH_compilerClass
             return templateClass
 
     @classmethod

@@ -302,11 +302,14 @@ class ParseError(ValueError):
             
         return report
 
-class ForbiddenSyntax(ParseError): pass
-class ForbiddenExpression(ForbiddenSyntax): pass
-class ForbiddenDirective(ForbiddenSyntax): pass
+class ForbiddenSyntax(ParseError):
+    pass
+class ForbiddenExpression(ForbiddenSyntax):
+    pass
+class ForbiddenDirective(ForbiddenSyntax):
+    pass
 
-class CheetahVariable:
+class CheetahVariable(object):
     def __init__(self, nameChunks, useNameMapper=True, cacheToken=None,
                  rawSource=None):
         self.nameChunks = nameChunks
@@ -1321,7 +1324,7 @@ class _HighLevelParser(_LowLevelParser):
     Cheetah.Compiler.Compiler.
     """
     def __init__(self, src, filename=None, breakPoint=None, compiler=None):
-        _LowLevelParser.__init__(self, src, filename=filename, breakPoint=breakPoint)
+        super(_HighLevelParser, self).__init__(src, filename=filename, breakPoint=breakPoint)
         self.setSettingsManager(compiler)
         self._compiler = compiler
         self.setupState()
@@ -1342,7 +1345,7 @@ class _HighLevelParser(_LowLevelParser):
         self._macroDetails.clear()
 
     def configureParser(self):
-        _LowLevelParser.configureParser(self)
+        super(_HighLevelParser, self).configureParser()
         self._initDirectives()
     
     def _initDirectives(self):
