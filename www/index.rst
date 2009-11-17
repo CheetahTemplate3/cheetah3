@@ -34,6 +34,7 @@ Contents
    users_guide/index.rst
    documentation.rst
    roadmap.rst
+   dev_guide/index.rst
    chep.rst
 
 
