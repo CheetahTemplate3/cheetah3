@@ -1,13 +1,13 @@
 Downloading Cheetah
 ===================
 
-The most recent stable release of Cheetah **v2.2.1** which was released on
-June 1st, 2009.
+The most recent stable release of Cheetah **v2.4.0** which was released on
+Oct 24th, 2009.
 
-Download v2.2.1
+Download v2.4.0
 ^^^^^^^^^^^^^^^
-* `v2.2.1 tarball <http://github.com/cheetahtemplate/cheetah/tarball/v2.2.1>`_
-* `v2.2.1 zip <http://github.com/cheetahtemplate/cheetah/zipball/v2.2.1>`_
+* `v2.4.0 tarball <http://github.com/cheetahtemplate/cheetah/tarball/v2.4.0>`_
+* `v2.4.0 zip <http://github.com/cheetahtemplate/cheetah/zipball/v2.4.0>`_
 
 You can keep up to date with release candidates or other downloads of Cheetah by 
 visiting the `cheetahtemplate GitHub page <http://github.com/cheetahtemplate/cheetah/downloads>`_
