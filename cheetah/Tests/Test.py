@@ -23,6 +23,7 @@ import Parser
 import Regressions
 import Unicode
 import CheetahWrapper
+import Analyzer
 
 SyntaxAndOutput.install_eols()
 
@@ -36,6 +37,7 @@ suites = [
    unittest.findTestCases(Unicode),
    unittest.findTestCases(Misc),
    unittest.findTestCases(Parser),
+   unittest.findTestCases(Analyzer),
 ]
 
 if not sys.platform.startswith('java'):
