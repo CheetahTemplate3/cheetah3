@@ -292,6 +292,7 @@ class Template(Servlet):
     _CHEETAH_defaultMainMethodName = None
     _CHEETAH_compilerSettings = None
     _CHEETAH_compilerClass = Compiler
+    _CHEETAH_compilerInstance = None
     _CHEETAH_cacheCompilationResults = True
     _CHEETAH_useCompilationCache = True
     _CHEETAH_keepRefToGeneratedCode = True
@@ -821,7 +822,8 @@ class Template(Servlet):
      
             # If we have a compiler object, let's set it to the compiler class
             # to help the directive analyzer code
-            templateClass._CHEETAH_compilerClass = compiler or templateClass._CHEETAH_compilerClass
+            if compiler:
+                templateClass._CHEETAH_compilerInstance = compiler
             return templateClass
 
     @classmethod

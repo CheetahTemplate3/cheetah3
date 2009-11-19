@@ -32,7 +32,7 @@ class AnalysisCompiler(Compiler.ModuleCompiler):
 
 def analyze(source):
     klass = Template.Template.compile(source, compilerClass=AnalysisCompiler)
-    return klass._CHEETAH_compilerClass._parser.calls
+    return klass._CHEETAH_compilerInstance._parser.calls
 
 def main_file(f):
     fd = open(f, 'r')
