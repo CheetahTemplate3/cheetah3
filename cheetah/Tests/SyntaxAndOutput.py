@@ -1359,6 +1359,12 @@ class RawDirective(OutputTest):
         self.verify("#raw: $aFunc().\n$anInt",
                     "$aFunc().\n1")
 
+    def test6(self):
+        """ Escape characters in a #raw block """
+        self.verify( """#raw: This escape should be preserved: \\$unexpanded So should this one: \\#blah The string "\\012" should not disappear.""",
+                r"""This escape should be preserved: \$unexpanded So should this one: \#blah The string "\012" should not disappear.""")
+
+
 class BreakpointDirective(OutputTest):
     def test1(self):
         """#breakpoint part way through source code"""
