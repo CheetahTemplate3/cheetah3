@@ -510,6 +510,19 @@ class _LowLevelParser(SourceReader):
         endTokenEsc = escapeRegexChars(endToken)
         self.PSPEndTokenRE = cachedRegex(escCharLookBehind + endTokenEsc)
 
+    def _unescapeCheetahVars(self, theString):
+        """Unescape any escaped Cheetah \$vars in the string.
+        """
+        
+        token = self.setting('cheetahVarStartToken')
+        return theString.replace('\\' + token, token)
+
+    def _unescapeDirectives(self, theString):
+        """Unescape any escaped Cheetah directives in the string.
+        """
+        
+        token = self.setting('directiveStartToken')
+        return theString.replace('\\' + token, token)
 
     def isLineClearToStartToken(self, pos=None):
         return self.isLineClearToPos(pos)
@@ -1497,6 +1510,8 @@ class _HighLevelParser(_LowLevelParser):
             else:
                 self.advance()
         strConst = self.readTo(self.pos(), start=startPos)
+        strConst = self._unescapeCheetahVars(strConst)
+        strConst = self._unescapeDirectives(strConst)
         self._compiler.addStrConst(strConst)
         return match
 

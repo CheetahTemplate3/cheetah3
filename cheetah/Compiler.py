@@ -428,27 +428,12 @@ class MethodCompiler(GenUtils):
         else:
             self._pendingStrConstChunks = [strConst]
 
-    def _unescapeCheetahVars(self, theString):
-        """Unescape any escaped Cheetah \$vars in the string.
-        """
-        
-        token = self.setting('cheetahVarStartToken')
-        return theString.replace('\\' + token, token)
-
-    def _unescapeDirectives(self, theString):
-        """Unescape any escaped Cheetah \$vars in the string.
-        """
-        
-        token = self.setting('directiveStartToken')
-        return theString.replace('\\' + token, token)
-        
     def commitStrConst(self):
         """Add the code for outputting the pending strConst without chopping off
         any whitespace from it.
         """
         if self._pendingStrConstChunks:
-            strConst = self._unescapeCheetahVars(''.join(self._pendingStrConstChunks))
-            strConst = self._unescapeDirectives(strConst)
+            strConst = ''.join(self._pendingStrConstChunks)
             self._pendingStrConstChunks = []
             if not strConst:
                 return
