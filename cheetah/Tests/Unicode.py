@@ -194,5 +194,33 @@ class Unicode_in_SearchList_Test(CommandLineTest):
         assert template.respond()
 
 
+class InlineSpanishTest(unittest.TestCase):
+    def runTest(self):
+        template = '''
+#encoding utf-8
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Pagina del vendedor</title>
+  </head>
+  <body>
+    $header
+    <h2>Bienvenido $nombre.</h2>
+    <br /><br /><br />
+    <center>
+      Usted tiene $numpedidos_noconf <a href="">pedidós</a> sin confirmar.
+      <br /><br />
+      Bodega tiene fecha para $numpedidos_bodega <a href="">pedidos</a>.
+    </center>
+  </body>
+</html>
+        '''
+        template = Template(template, searchList=[{'header' : '',
+                        'nombre' : '', 'numpedidos_bodega' : '',
+                        'numpedidos_noconf' : ''}])
+        assert unicode(template)
+                        
+
 if __name__ == '__main__':
     unittest.main()
