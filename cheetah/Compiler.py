@@ -432,29 +432,31 @@ class MethodCompiler(GenUtils):
         """Add the code for outputting the pending strConst without chopping off
         any whitespace from it.
         """
-        if self._pendingStrConstChunks:
-            strConst = ''.join(self._pendingStrConstChunks)
-            self._pendingStrConstChunks = []
-            if not strConst:
-                return
-            else:
-                reprstr = repr(strConst).replace('\\012', '\n')
-                i = 0
-                out = []
-                if reprstr.startswith('u'):
-                    i = 1
-                    out = ['u']
-                body = escapedNewlineRE.sub('\n', reprstr[i+1:-1])
-                
-                if reprstr[i]=="'":
-                    out.append("'''")
-                    out.append(body)
-                    out.append("'''")
-                else:
-                    out.append('"""')
-                    out.append(body)
-                    out.append('"""')
-                self.addWriteChunk(''.join(out))
+        if not self._pendingStrConstChunks:
+            return
+
+        strConst = ''.join(self._pendingStrConstChunks)
+        self._pendingStrConstChunks = []
+        if not strConst:
+            return
+
+        reprstr = repr(strConst)
+        i = 0
+        out = []
+        if reprstr.startswith('u'):
+            i = 1
+            out = ['u']
+        body = escapedNewlineRE.sub('\\1\n', reprstr[i+1:-1])
+        
+        if reprstr[i]=="'":
+            out.append("'''")
+            out.append(body)
+            out.append("'''")
+        else:
+            out.append('"""')
+            out.append(body)
+            out.append('"""')
+        self.addWriteChunk(''.join(out))
 
     def handleWSBeforeDirective(self):
         """Truncate the pending strCont to the beginning of the current line.
