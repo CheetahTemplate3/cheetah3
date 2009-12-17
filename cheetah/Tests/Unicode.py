@@ -195,9 +195,9 @@ class Unicode_in_SearchList_Test(CommandLineTest):
 
 
 class InlineSpanishTest(unittest.TestCase):
-    def runTest(self):
-        template = '''
-#encoding utf-8
+    def setUp(self):
+        super(InlineSpanishTest, self).setUp()
+        self.template = '''
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -216,11 +216,22 @@ class InlineSpanishTest(unittest.TestCase):
   </body>
 </html>
         '''
+
+    def test_failure(self):
+        """ Test a template lacking a proper #encoding tag """
+        self.failUnlessRaises(UnicodeDecodeError, Template, self.template, searchList=[{'header' : '',
+                        'nombre' : '', 'numpedidos_bodega' : '',
+                        'numpedidos_noconf' : ''}])
+
+    def test_success(self):
+        """ Test a template with a proper #encoding tag """
+        template = '#encoding utf-8\n%s' % self.template
         template = Template(template, searchList=[{'header' : '',
                         'nombre' : '', 'numpedidos_bodega' : '',
                         'numpedidos_noconf' : ''}])
-        assert unicode(template)
-                        
+        self.assertTrue(unicode(template))
+
+
 
 if __name__ == '__main__':
     unittest.main()
