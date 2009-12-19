@@ -65,9 +65,9 @@ class Markdown(EncodeUnicode):
         try:
             import markdown
         except ImportError:
-            print '>>> Exception raised importing the "markdown" module'
-            print '>>> Are you sure you have the ElementTree module installed?'
-            print '          http://effbot.org/downloads/#elementtree'
+            print('>>> Exception raised importing the "markdown" module')
+            print('>>> Are you sure you have the ElementTree module installed?')
+            print('          http://effbot.org/downloads/#elementtree')
             raise
 
         encoded = super(Markdown, self).filter(value, **kwargs)
@@ -97,8 +97,8 @@ class CodeHighlighter(EncodeUnicode):
             from pygments import lexers
             from pygments import formatters
         except ImportError, ex:
-            print '<%s> - Failed to import pygments! (%s)' % (self.__class__.__name__, ex)
-            print '-- You may need to install it from: http://pygments.org'
+            print('<%s> - Failed to import pygments! (%s)' % (self.__class__.__name__, ex))
+            print('-- You may need to install it from: http://pygments.org')
             return encoded
 
         lexer = None
@@ -121,7 +121,7 @@ class MaxLen(Filter):
         """Replace None with '' and cut off at maxlen."""
         
         output = super(MaxLen, self).filter(val, **kw)
-        if kw.has_key('maxlen') and len(output) > kw['maxlen']:
+        if 'maxlen' in kw and len(output) > kw['maxlen']:
             return output[:kw['maxlen']]
         return output
 
@@ -135,7 +135,7 @@ class WebSafe(Filter):
         s = s.replace("<", "&lt;")
         s = s.replace(">", "&gt;")
         # Process the additional transformations if any.
-        if kw.has_key('also'):
+        if 'also' in kw:
             also = kw['also']
             entities = webSafeEntities   # Global variable.
             for k in also:
@@ -166,7 +166,7 @@ class Strip(Filter):
         s = super(Strip, self).filter(val, **kw)
         result = []
         start = 0   # The current line will be s[start:end].
-        while 1: # Loop through each line.
+        while True: # Loop through each line.
             end = s.find('\n', start)  # Find next newline.
             if end == -1:  # If no more newlines.
                 break
@@ -196,15 +196,15 @@ class StripSqueeze(Filter):
 def test():
     s1 = "abc <=> &"
     s2 = "   asdf  \n\t  1  2    3\n"
-    print "WebSafe INPUT:", `s1`
-    print "      WebSafe:", `WebSafe().filter(s1)`
+    print("WebSafe INPUT:", repr(s1))
+    print("      WebSafe:", repr(WebSafe().filter(s1)))
     
-    print
-    print " Strip INPUT:", `s2`
-    print "       Strip:", `Strip().filter(s2)`
-    print "StripSqueeze:", `StripSqueeze().filter(s2)`
+    print()
+    print(" Strip INPUT:", repr(s2))
+    print("       Strip:", repr(Strip().filter(s2)))
+    print("StripSqueeze:", repr(StripSqueeze().filter(s2)))
 
-    print "Unicode:", `EncodeUnicode().filter(u'aoeu12345\u1234')`
+    print("Unicode:", repr(EncodeUnicode().filter(u'aoeu12345\u1234')))
     
 if __name__ == "__main__":  
     test()

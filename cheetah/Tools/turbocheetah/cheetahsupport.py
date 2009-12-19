@@ -11,7 +11,7 @@ def _recompile_template(package, basename, tfile, classname):
     code = str(c)
     mod = imp.new_module(classname)
     ns = dict()
-    exec code in ns
+    exec(code, ns)
     tempclass = ns.get("GenTemplate",
                        ns.get('DynamicallyCompiledCheetahTemplate'))
     assert tempclass
@@ -38,7 +38,7 @@ class TurboCheetah:
 
         Template files must end in ".tmpl" and be in legitimate packages.
         """
-        given = len(filter(None, (template, template_string, template_file)))
+        given = len([_f for _f in (template, template_string, template_file) if _f])
         if given > 1:
             raise TypeError(
                 "You may give only one of template, template_string, and "
@@ -63,14 +63,14 @@ class TurboCheetah:
             package = classname[0:divider]
             basename = classname[divider+1:]
         else:
-            raise ValueError, "All templates must be in a package"
+            raise ValueError("All templates must be in a package")
 
         if not self.options.get("cheetah.precompiled", False):
             tfile = pkg_resources.resource_filename(package, 
                                                     "%s.%s" % 
                                                     (basename,
                                                     self.extension))
-            if ct.has_key(classname):
+            if classname in ct:
                 mtime = os.stat(tfile).st_mtime
                 if ct[classname] != mtime:
                     ct[classname] = mtime

@@ -21,7 +21,7 @@ class CommandLineTest(unittest.TestCase):
         fd.close()
 
         wrap = CheetahWrapper.CheetahWrapper()
-        wrap.main(['cheetah', 'compile', '--nobackup', sourcefile])
+        wrap.main(['cheetah', 'compile', '--quiet', '--nobackup', sourcefile])
         module_path, module_name = os.path.split(sourcefile)
         module = loadModule(module_name, [module_path])
         template = getattr(module, module_name)
@@ -192,6 +192,45 @@ class Unicode_in_SearchList_Test(CommandLineTest):
         assert template and issubclass(template, Template)
         template = template(searchList=[{'adjective' : utf8}])
         assert template.respond()
+
+
+class InlineSpanishTest(unittest.TestCase):
+    def setUp(self):
+        super(InlineSpanishTest, self).setUp()
+        self.template = '''
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Pagina del vendedor</title>
+  </head>
+  <body>
+    $header
+    <h2>Bienvenido $nombre.</h2>
+    <br /><br /><br />
+    <center>
+      Usted tiene $numpedidos_noconf <a href="">pedidós</a> sin confirmar.
+      <br /><br />
+      Bodega tiene fecha para $numpedidos_bodega <a href="">pedidos</a>.
+    </center>
+  </body>
+</html>
+        '''
+
+    def test_failure(self):
+        """ Test a template lacking a proper #encoding tag """
+        self.failUnlessRaises(UnicodeDecodeError, Template, self.template, searchList=[{'header' : '',
+                        'nombre' : '', 'numpedidos_bodega' : '',
+                        'numpedidos_noconf' : ''}])
+
+    def test_success(self):
+        """ Test a template with a proper #encoding tag """
+        template = '#encoding utf-8\n%s' % self.template
+        template = Template(template, searchList=[{'header' : '',
+                        'nombre' : '', 'numpedidos_bodega' : '',
+                        'numpedidos_noconf' : ''}])
+        self.assertTrue(unicode(template))
+
 
 
 if __name__ == '__main__':

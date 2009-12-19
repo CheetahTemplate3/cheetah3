@@ -67,37 +67,37 @@ def dummyFunc(arg="Scooby"):
     return arg
 
 defaultTestNameSpace = {
-    'aStr':'blarg',
-    'anInt':1,
-    'aFloat':1.5,
-    'aList': ['item0','item1','item2'],
-    'aDict': {'one':'item1',
-              'two':'item2',
-              'nestedDict':{1:'nestedItem1',
+    'aStr': 'blarg',
+    'anInt': 1,
+    'aFloat': 1.5,
+    'aList': ['item0', 'item1', 'item2'],
+    'aDict': {'one': 'item1',
+              'two': 'item2',
+              'nestedDict': {1:'nestedItem1',
                           'two':'nestedItem2'
                           },
-              'nestedFunc':dummyFunc,
+              'nestedFunc': dummyFunc,
               },
     'aFunc': dummyFunc,
     'anObj': DummyClass(),
     'aMeth': DummyClass().meth1,
     'aStrToBeIncluded': "$aStr $anInt",
-    'none' : None,  
-    'emptyString':'',
-    'numOne':1,
-    'numTwo':2,
-    'zero':0,
+    'none': None,  
+    'emptyString': '',
+    'numOne': 1,
+    'numTwo': 2,
+    'zero': 0,
     'tenDigits': 1234567890,
     'webSafeTest': 'abc <=> &',
     'strip1': '  \t   strippable whitespace   \t\t  \n',
     'strip2': '  \t   strippable whitespace   \t\t  ',
     'strip3': '  \t   strippable whitespace   \t\t\n1 2  3\n',
     
-    'blockToBeParsed':"""$numOne $numTwo""",
-    'includeBlock2':"""$numOne $numTwo $aSetVar""",
+    'blockToBeParsed': """$numOne $numTwo""",
+    'includeBlock2': """$numOne $numTwo $aSetVar""",
     
-    'includeFileName':'parseTest.txt',
-    'listOfLambdas':[lambda x: x, lambda x: x, lambda x: x,],
+    'includeFileName': 'parseTest.txt',
+    'listOfLambdas': [lambda x: x, lambda x: x, lambda x: x,],
     'list': [
     	{'index': 0, 'numOne': 1, 'numTwo': 2},
     	{'index': 1, 'numOne': 1, 'numTwo': 2},
@@ -105,7 +105,7 @@ defaultTestNameSpace = {
     'nameList': [('john', 'doe'), ('jane', 'smith')],
     'letterList': ['a', 'b', 'c'],
     '_': lambda x: 'Translated: ' + x,
-    'unicodeData':u'aoeu12345\u1234',
+    'unicodeData': u'aoeu12345\u1234',
     }
 
 
@@ -162,7 +162,8 @@ Template output mismatch:
                 **extraKwArgs
                 )
             moduleCode = templateClass._CHEETAH_generatedModuleCode
-            self.template = templateObj = templateClass(searchList=self.searchList())
+            searchList = self.searchList() or self._searchList
+            self.template = templateObj = templateClass(searchList=searchList)
         else:
             self.template = templateObj = Template(
                 input,
@@ -171,7 +172,7 @@ Template output mismatch:
                 )
             moduleCode = templateObj._CHEETAH_generatedModuleCode
         if self.DEBUGLEV >= 1:
-            print moduleCode
+            print(moduleCode)
         try:
             output = templateObj.respond() # rather than __str__, because of unicode
             assert output==expectedOutput, self._outputMismatchReport(output, expectedOutput)
@@ -185,9 +186,9 @@ Template output mismatch:
         if self._debugEOLReplacement and self._EOLreplacement:
             EOLrepl = self._EOLreplacement
             marker = '*EOL*'
-            return self.report % {'template': self._input.replace(EOLrepl,marker),
-                                  'expected': expectedOutput.replace(EOLrepl,marker),
-                                  'actual': output.replace(EOLrepl,marker),
+            return self.report % {'template': self._input.replace(EOLrepl, marker),
+                                  'expected': expectedOutput.replace(EOLrepl, marker),
+                                  'actual': output.replace(EOLrepl, marker),
                                   'end': '(end)'}
         else:
             return self.report % {'template': self._input,
@@ -237,7 +238,7 @@ class Backslashes(OutputTest):
     convertEOLs = False
 
     def setUp(self):
-        fp = open('backslashes.txt','w')
+        fp = open('backslashes.txt', 'w')
         fp.write(r'\ #LogFormat "%h %l %u %t \"%r\" %>s %b"' + '\n\n\n\n\n\n\n')
         fp.flush()
         fp.close
@@ -620,7 +621,7 @@ class Placeholders(OutputTest):
         tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
         assert str(tmpl({'names':names}))=='You '*len(names)
 
-        if versionTuple > (2,2):
+        if versionTuple > (2, 2):
             tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
             assert str(tmpl(names=names))=='You '*len(names)
 
@@ -1359,6 +1360,12 @@ class RawDirective(OutputTest):
         self.verify("#raw: $aFunc().\n$anInt",
                     "$aFunc().\n1")
 
+    def test6(self):
+        """ Escape characters in a #raw block """
+        self.verify( """#raw: This escape should be preserved: \\$unexpanded So should this one: \\#blah The string "\\012" should not disappear.""",
+                r"""This escape should be preserved: \$unexpanded So should this one: \#blah The string "\012" should not disappear.""")
+
+
 class BreakpointDirective(OutputTest):
     def test1(self):
         """#breakpoint part way through source code"""
@@ -1477,7 +1484,7 @@ class YieldDirective(OutputTest):
                )
 
 
-        for src in (src1,src2,src3):
+        for src in (src1, src2, src3):
             klass = Template.compile(src, keepRefToGeneratedCode=True)
             #print klass._CHEETAH_generatedModuleCode
             iter = klass().respond()
@@ -1487,7 +1494,7 @@ class YieldDirective(OutputTest):
 
         # @@TR: need to expand this to cover error conditions etc.
 
-if versionTuple < (2,3):
+if versionTuple < (2, 3):
     del YieldDirective
         
 class ForDirective(OutputTest):
@@ -1589,7 +1596,7 @@ class ForDirective(OutputTest):
         self.verify("#for $i in range(5): \n$i\n#end for",
                     "0\n1\n2\n3\n4\n")
 
-if versionTuple < (2,3):
+if versionTuple < (2, 3):
     del ForDirective.test12
 
 class RepeatDirective(OutputTest):
@@ -1826,7 +1833,7 @@ class DecoratorDirective(OutputTest):
                     "$testMeth",
                     "1234\n")
 
-if versionTuple < (2,4):
+if versionTuple < (2, 4):
     del DecoratorDirective
 
 class BlockDirective(OutputTest):
@@ -1941,7 +1948,7 @@ inner
 class IncludeDirective(OutputTest):
 
     def setUp(self):
-        fp = open('parseTest.txt','w')
+        fp = open('parseTest.txt', 'w')
         fp.write("$numOne $numTwo")
         fp.flush()
         fp.close
@@ -2338,6 +2345,8 @@ class UnlessDirective(OutputTest):
         self.verify("#unless 0: 1234\n"*2, "1234\n"*2)
         
 class PSP(OutputTest):
+    def searchList(self):
+        return None
     
     def test1(self):
         """simple <%= [int] %>"""
@@ -2375,6 +2384,19 @@ class PSP(OutputTest):
         """for loop in <% $%> and using <%=i%> plus extra text"""
         self.verify("""<% for i in range(5):
     i=i*2$%><%=i%>-<%end%>""", "0-2-4-6-8-")
+
+    def test10(self):
+        """ Using getVar and write within a PSP """
+        self._searchList = [{'me' : 1}]
+        template = '''This is my template
+<%
+me = self.getVar('me')
+if isinstance(me, int):
+    write('Bork')
+else:
+    write('Nork')
+%>'''
+        self.verify(template, 'This is my template\nBork')
 
 
 class WhileDirective(OutputTest):
@@ -3192,26 +3214,26 @@ public class X
 ##################################################
 ## CREATE CONVERTED EOL VERSIONS OF THE TEST CASES
 
-if OutputTest._useNewStyleCompilation and versionTuple >= (2,3):
+if OutputTest._useNewStyleCompilation and versionTuple >= (2, 3):
     extraCompileKwArgsForDiffBaseclass = {'baseclass':dict}
 else:
     extraCompileKwArgsForDiffBaseclass = {'baseclass':object}
     
 
 def install_eols():
-    klasses = [v for v in globals().values() if isinstance(v, (types.ClassType, types.TypeType)) and issubclass(v, unittest.TestCase)]
+    klasses = [v for v in globals().values() if isinstance(v, type) and issubclass(v, unittest.TestCase)]
     for klass in klasses:
         name = klass.__name__        
-        if hasattr(klass,'convertEOLs') and klass.convertEOLs:
+        if hasattr(klass, 'convertEOLs') and klass.convertEOLs:
             win32Src = r"class %(name)s_Win32EOL(%(name)s): _EOLreplacement = '\r\n'"%locals()
             macSrc = r"class %(name)s_MacEOL(%(name)s): _EOLreplacement = '\r'"%locals()
-            exec win32Src in globals() 
-            exec macSrc in globals()
+            exec(win32Src, globals()) 
+            exec(macSrc, globals())
 
-        if versionTuple >= (2,3):
+        if versionTuple >= (2, 3):
             src = r"class %(name)s_DiffBaseClass(%(name)s): "%locals()
             src += " _extraCompileKwArgs = extraCompileKwArgsForDiffBaseclass"
-            exec src in globals()
+            exec(src, globals())
 
         del name
         del klass

@@ -120,7 +120,7 @@ much as possible.
 """
 
 
-from __future__ import division
+
 
 try:
     import itimer
@@ -277,15 +277,15 @@ class CallStats(object):
         self.cum_secs_per_call = None
 
     def display(self):
-        print '%6.2f %9.2f %9.2f  %s' % (self.pcnt_time_in_proc,
+        print('%6.2f %9.2f %9.2f  %s' % (self.pcnt_time_in_proc,
                                          self.cum_secs_in_proc,
                                          self.self_secs_in_proc,
-                                         self.name)
+                                         self.name))
 
 
 def display():
     if state.sample_count == 0:
-        print 'No samples recorded.'
+        print('No samples recorded.')
         return
 
     l = [CallStats(x) for x in call_data.itervalues()]
@@ -293,12 +293,12 @@ def display():
     l.sort(reverse=True)
     l = [x[2] for x in l]
 
-    print '%5.5s %10.10s   %7.7s  %-8.8s' % ('%  ', 'cumulative', 'self', '')
-    print '%5.5s  %9.9s  %8.8s  %-8.8s' % ("time", "seconds", "seconds", "name")
+    print('%5.5s %10.10s   %7.7s  %-8.8s' % ('%  ', 'cumulative', 'self', ''))
+    print('%5.5s  %9.9s  %8.8s  %-8.8s' % ("time", "seconds", "seconds", "name"))
 
     for x in l:
         x.display()
 
-    print '---'
-    print 'Sample count: %d' % state.sample_count
-    print 'Total time: %f seconds' % state.accumulated_time
+    print('---')
+    print('Sample count: %d' % state.sample_count)
+    print('Total time: %f seconds' % state.accumulated_time)

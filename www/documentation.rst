@@ -1,8 +1,6 @@
-User Documentation
+Cheetah Recipes
 ==================
 
-Simple Recipes
---------------
 .. toctree::
    :maxdepth: 2
 

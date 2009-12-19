@@ -92,7 +92,7 @@ class TransformerResponse(DummyResponse):
         output = super(TransformerResponse, self).getvalue(**kwargs)
         if self._filter:
             _filter = self._filter
-            if isinstance(_filter, types.TypeType):
+            if isinstance(_filter, type):
                 _filter = _filter()
             return _filter.filter(output)
         return output

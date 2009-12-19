@@ -1,6 +1,5 @@
-# $Id: ImportManager.py,v 1.6 2007/04/03 01:56:24 tavis_rudd Exp $
-
-"""Provides an emulator/replacement for Python's standard import system.
+"""
+Provides an emulator/replacement for Python's standard import system.
 
 @@TR: Be warned that Import Hooks are in the deepest, darkest corner of Python's
 jungle.  If you need to start hacking with this, be prepared to get lost for a
@@ -18,36 +17,13 @@ This is a hacked/documented version of Gordon McMillan's iu.py. I have:
 
   - reorganized the code layout to enhance readability
 
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>  based on Gordon McMillan's iu.py
-License: This software is released for unlimited distribution under the
-         terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.6 $
-Start Date: 2001/03/30
-Last Revision Date: $Date: 2007/04/03 01:56:24 $
 """ 
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.6 $"[11:-2]
-
-##################################################
-## DEPENDENCIES
 
 import sys
 import imp
 import marshal
 
-##################################################
-## CONSTANTS & GLOBALS
-
-try:
-    True,False
-except NameError:
-    True, False = (1==1),(1==0)
-
 _installed = False
-
-STRINGTYPE = type('')
 
 # _globalOwnerTypes is defined at the bottom of this file
 
@@ -85,7 +61,7 @@ def _os_bootstrap():
                 a = a + ':'
             return a + b
     else:
-        raise ImportError, 'no os specific module found'
+        raise ImportError('no os specific module found')
 
     if join is None:
         def join(a, b, sep=sep):
@@ -184,7 +160,7 @@ class DirOwner(Owner):
         if path == '':
             path = _os_getcwd()
         if not pathIsDir(path):
-            raise ValueError, "%s is not a directory" % path
+            raise ValueError("%s is not a directory" % path)
         Owner.__init__(self, path)
         
     def getmod(self, nm,
@@ -217,14 +193,14 @@ class DirOwner(Owner):
                 break
         if py is None and pyc is None:
             return None
-        while 1:
+        while True:
             if pyc is None or py and pyc[1][8] < py[1][8]:
                 try:
                     co = compile(open(py[0], 'r').read()+'\n', py[0], 'exec')
                     break
                 except SyntaxError, e:
-                    print "Invalid syntax in %s" % py[0]
-                    print e.args
+                    print("Invalid syntax in %s" % py[0])
+                    print(e.args)
                     raise
             elif pyc:
                 stuff = open(pyc[0], 'rb').read()
@@ -260,7 +236,7 @@ class BuiltinImportDirector(ImportDirector):
 
     def getmod(self, nm, isbuiltin=imp.is_builtin):
         if isbuiltin(nm):
-            mod = imp.load_module(nm, None, nm, ('','',imp.C_BUILTIN))
+            mod = imp.load_module(nm, None, nm, ('', '', imp.C_BUILTIN))
             return mod
         return None
 
@@ -273,7 +249,7 @@ class FrozenImportDirector(ImportDirector):
     def getmod(self, nm,
                isFrozen=imp.is_frozen, loadMod=imp.load_module):
         if isFrozen(nm):
-            mod = loadMod(nm, None, nm, ('','',imp.PY_FROZEN))
+            mod = loadMod(nm, None, nm, ('', '', imp.PY_FROZEN))
             if hasattr(mod, '__path__'):
                 mod.__importsub__ = lambda name, pname=nm, owner=self: owner.getmod(pname+'.'+name)
             return mod
@@ -345,7 +321,7 @@ class PathImportDirector(ImportDirector):
     def getmod(self, nm):
         mod = None
         for thing in self.path:
-            if type(thing) is STRINGTYPE:
+            if isinstance(thing, basestring):
                 owner = self._shadowPath.get(thing, -1)
                 if owner == -1:
                     owner = self._shadowPath[thing] = self._makeOwner(thing)
@@ -420,11 +396,11 @@ class ImportManager:
             importernm = globals.get('__name__', '')
             if importernm:
                 if hasattr(_sys_modules_get(importernm), '__path__'):
-                    contexts.insert(0,importernm)
+                    contexts.insert(0, importernm)
                 else:
                     pkgnm = packageName(importernm)
                     if pkgnm:
-                        contexts.insert(0,pkgnm)
+                        contexts.insert(0, pkgnm)
         # so contexts is [pkgnm, None] or just [None]
         # now break the name being imported up so we get:
         # a.b.c -> [a, b, c]
@@ -462,7 +438,7 @@ class ImportManager:
                 #print "importHook done with %s %s %s (case 1)" % (name, globals['__name__'], fromlist)
                 return sys.modules[nmparts[0]]
             del sys.modules[fqname]
-            raise ImportError, "No module named %s" % fqname
+            raise ImportError("No module named %s" % fqname)
         if fromlist is None: 
             #print "importHook done with %s %s %s (case 2)" % (name, globals['__name__'], fromlist)
             if context:
@@ -487,7 +463,7 @@ class ImportManager:
                     if self.threaded:
                         self._release()
                     if not mod:
-                        raise ImportError, "%s not found in %s" % (nm, ctx)
+                        raise ImportError("%s not found in %s" % (nm, ctx))
         #print "importHook done with %s %s %s (case 3)" % (name, globals['__name__'], fromlist)
         return bottommod
     
@@ -519,7 +495,7 @@ class ImportManager:
             if hasattr(mod, '__co__'):
                 co = mod.__co__
                 del mod.__co__
-                exec co in mod.__dict__
+                exec(co, mod.__dict__)
             if fqname == 'thread' and not self.threaded:
 ##                print "thread detected!"
                 self.setThreaded()

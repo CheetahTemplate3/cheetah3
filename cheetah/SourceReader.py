@@ -1,18 +1,5 @@
-# $Id: SourceReader.py,v 1.15 2007/04/03 01:57:42 tavis_rudd Exp $
 """SourceReader class for Cheetah's Parser and CodeGenerator
-
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>
-License: This software is released for unlimited distribution under the
-         terms of the MIT license.  See the LICENSE file.
-Version: $Revision: 1.15 $
-Start Date: 2001/09/19
-Last Revision Date: $Date: 2007/04/03 01:57:42 $
 """
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.15 $"[11:-2]
-
 import re
 import sys
 
@@ -23,7 +10,7 @@ ENCODINGsearch = re.compile("coding[=:]\s*([-\w.]+)").search
 class Error(Exception):
     pass
                                 
-class SourceReader:
+class SourceReader(object):
     def __init__(self, src, filename=None, breakPoint=None, encoding=None):
 
         ## @@TR 2005-01-17: the following comes from a patch Terrel Shumway
@@ -160,7 +147,7 @@ class SourceReader:
         self._posTobookmarkMap[self._pos] = name
 
     def hasBookmark(self, name):
-        return self._bookmarks.has_key(name)
+        return name in self._bookmarks
     
     def gotoBookmark(self, name):
         if not self.hasBookmark(name):
@@ -247,7 +234,7 @@ class SourceReader:
         if pos == None:
             pos = self._pos
         src = self.src()
-        return max(src.rfind('\n',0,pos)+1, src.rfind('\r',0,pos)+1, 0)
+        return max(src.rfind('\n', 0, pos)+1, src.rfind('\r', 0, pos)+1, 0)
         
     def findEOL(self, pos=None, gobble=False):
         if pos == None:

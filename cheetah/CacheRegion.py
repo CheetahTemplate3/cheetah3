@@ -128,7 +128,7 @@ class CacheRegion(object):
         """
         cacheItemID = md5(str(cacheItemID)).hexdigest()
         
-        if not self._cacheItems.has_key(cacheItemID):
+        if cacheItemID not in self._cacheItems:
             cacheItem = self._cacheItemClass(
                 cacheItemID=cacheItemID, cacheStore=self._wrappedCacheDataStore)
             self._cacheItems[cacheItemID] = cacheItem

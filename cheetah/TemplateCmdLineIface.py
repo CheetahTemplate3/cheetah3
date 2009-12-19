@@ -41,7 +41,7 @@ class CmdLineIface:
         """The main program controller."""
         
         self._processCmdLineArgs()
-        print self._template
+        print(self._template)
         
     def _processCmdLineArgs(self):
         try:
@@ -53,13 +53,13 @@ class CmdLineIface:
 
         except getopt.GetoptError, v:
             # print help information and exit:
-            print v
-            print self.usage()
+            print(v)
+            print(self.usage())
             sys.exit(2)
         
         for o, a in self._opts:
-            if o in ('-h','--help'):
-                print self.usage()
+            if o in ('-h', '--help'):
+                print(self.usage())
                 sys.exit()
             if o == '--env':
                 self._template.searchList().insert(0, os.environ)
@@ -100,8 +100,8 @@ and collect the output.  It can prepend the shell ENVIRONMENT or a pickled
 Python dictionary to the template's $placeholder searchList, overriding the
 defaults for the $placeholders.
 
-""" % {'scriptName':self._scriptName,
-       'Version':Version,
+""" % {'scriptName': self._scriptName,
+       'Version': Version,
        }
 
 # vim: shiftwidth=4 tabstop=4 expandtab

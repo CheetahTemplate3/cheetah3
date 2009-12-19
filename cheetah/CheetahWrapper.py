@@ -161,7 +161,8 @@ class CheetahWrapper(object):
         pao("--iext", action="store", dest="iext", default=".tmpl", help='File input extension (defaults: compile: .tmpl, fill: .tmpl)')
         pao("--oext", action="store", dest="oext", default=defaultOext, help='File output extension (defaults: compile: .py, fill: .html)')
         pao("-R", action="store_true", dest="recurse", default=False, help='Recurse through subdirectories looking for input files')
-        pao("--stdout", "-p", action="store_true", dest="stdout", default=False, help='Verbosely print informational messages to stdout')
+        pao("--stdout", "-p", action="store_true", dest="stdout", default=False, help='Send output to stdout instead of writing to a file')
+        pao("--quiet", action="store_false", dest="verbose", default=True, help='Do not print informational messages to stdout')
         pao("--debug", action="store_true", dest="debug", default=False, help='Print diagnostic/debug information to stderr')
         pao("--env", action="store_true", dest="env", default=False, help='Pass the environment into the search list')
         pao("--pickle", action="store", dest="pickle", default="", help='Unpickle FILE and pass it through in the search list')
@@ -194,14 +195,14 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
 
 
         if opts.print_settings:
-            print 
-            print '>> Available Cheetah compiler settings:'
+            print() 
+            print('>> Available Cheetah compiler settings:')
             from Cheetah.Compiler import _DEFAULT_COMPILER_SETTINGS
             listing = _DEFAULT_COMPILER_SETTINGS
             listing.sort(key=lambda l: l[0][0].lower())
 
             for l in listing:
-                print '\t%s (default: "%s")\t%s' % l
+                print('\t%s (default: "%s")\t%s' % l)
             sys.exit(0)
 
         #cleanup trailing path separators
@@ -222,7 +223,6 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
             unpickled = pickle.load(f)
             f.close()
             self.searchList.insert(0, unpickled)
-        opts.verbose = not opts.stdout
 
     ##################################################
     ## COMMAND METHODS
@@ -266,7 +266,7 @@ you do have write permission to and re-run the tests.""")
         runner.run(unittest.TestSuite(Test.suites))
         
     def version(self):
-        print Version
+        print(Version)
 
     # If you add a command, also add it to the 'meths' variable in main().
     
@@ -387,12 +387,11 @@ you do have write permission to and re-run the tests.""")
         isError = False
         dstSources = {}
         for b in bundles:
-            if dstSources.has_key(b.dst):
+            if b.dst in dstSources:
                 dstSources[b.dst].append(b.src)
             else:
                 dstSources[b.dst] = [b.src]
-        keys = dstSources.keys()
-        keys.sort()
+        keys = sorted(dstSources.keys())
         for dst in keys:
             sources = dstSources[dst]
             if len(sources) > 1:
@@ -537,7 +536,7 @@ you do have write permission to and re-run the tests.""")
             return kws
         if self.opts.compilerSettingsString:
             try:
-                exec 'settings = getkws(%s)'%self.opts.compilerSettingsString
+                exec('settings = getkws(%s)'%self.opts.compilerSettingsString)
             except:                
                 self.error("There's an error in your --settings option."
                           "It must be valid Python syntax.\n"

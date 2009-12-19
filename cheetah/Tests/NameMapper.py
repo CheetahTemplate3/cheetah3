@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import generators
+
 import sys
 import types
 import os
@@ -34,7 +34,7 @@ class DummyClass:
         
         x = 'A string'
         try:
-            for i in [1,2,3,4]:
+            for i in [1, 2, 3, 4]:
                 if x == 2:	
                     pass
                 
@@ -53,52 +53,52 @@ def funcThatRaises():
 
                  
 testNamespace = {
-    'aStr':'blarg',
-    'anInt':1,
-    'aFloat':1.5,
-    'aDict': {'one':'item1',
-              'two':'item2',
-              'nestedDict':{'one':'nestedItem1',
-                            'two':'nestedItem2',
-                            'funcThatRaises':funcThatRaises,
+    'aStr': 'blarg',
+    'anInt': 1,
+    'aFloat': 1.5,
+    'aDict': {'one': 'item1',
+              'two': 'item2',
+              'nestedDict': {'one': 'nestedItem1',
+                            'two': 'nestedItem2',
+                            'funcThatRaises': funcThatRaises,
                             'aClass': DummyClass,
                             },
-              'nestedFunc':dummyFunc,
+              'nestedFunc': dummyFunc,
               },
     'aClass': DummyClass,    
     'aFunc': dummyFunc,
     'anObj': DummyClass(),
     'aMeth': DummyClass().meth1,
-    'none' : None,  
-    'emptyString':'',
-    'funcThatRaises':funcThatRaises,
+    'none': None,  
+    'emptyString': '',
+    'funcThatRaises': funcThatRaises,
     }
     
-autoCallResults = {'aFunc':'Scooby',
-                   'aMeth':'doo',
+autoCallResults = {'aFunc': 'Scooby',
+                   'aMeth': 'doo',
                    }
 
 results = testNamespace.copy()
-results.update({'anObj.meth1':'doo',
-                'aDict.one':'item1',
-                'aDict.nestedDict':testNamespace['aDict']['nestedDict'],
-                'aDict.nestedDict.one':'nestedItem1',
-                'aDict.nestedDict.aClass':DummyClass,
-                'aDict.nestedFunc':'Scooby',
-                'aClass.classVar1':123,
-                'anObj.instanceVar1':123,
-                'anObj.meth3':'A string',
+results.update({'anObj.meth1': 'doo',
+                'aDict.one': 'item1',
+                'aDict.nestedDict': testNamespace['aDict']['nestedDict'],
+                'aDict.nestedDict.one': 'nestedItem1',
+                'aDict.nestedDict.aClass': DummyClass,
+                'aDict.nestedFunc': 'Scooby',
+                'aClass.classVar1': 123,
+                'anObj.instanceVar1': 123,
+                'anObj.meth3': 'A string',
                 })
 
 for k in testNamespace.keys():
     # put them in the globals for the valueFromFrame tests
-    exec '%s = testNamespace[k]'%k
+    exec('%s = testNamespace[k]'%k)
 
 ##################################################
 ## TEST BASE CLASSES
 
 class NameMapperTest(unittest.TestCase):
-    failureException = (NotFound,AssertionError)
+    failureException = (NotFound, AssertionError)
     _testNamespace = testNamespace
     _results = results
     
@@ -117,7 +117,7 @@ class NameMapperTest(unittest.TestCase):
 
     def check(self, name):
         got = self.get(name)
-        if autoCallResults.has_key(name):
+        if name in autoCallResults:
             expected = autoCallResults[name]
         else:
             expected = self._results[name]
@@ -317,7 +317,7 @@ class VFN(NameMapperTest):
 
         def test(self=self):
             self.get('anObj.methX')    
-        self.assertRaises(NotFound,test)
+        self.assertRaises(NotFound, test)
         
     def test44(self):
         """NotFound test in a loop"""
@@ -325,7 +325,7 @@ class VFN(NameMapperTest):
             self.get('anObj.methX')    
 
         for i in range(10):
-            self.assertRaises(NotFound,test)
+            self.assertRaises(NotFound, test)
             
     def test45(self):
         """Other exception from meth test"""
@@ -340,7 +340,7 @@ class VFN(NameMapperTest):
             self.get('anObj.meth2')    
 
         for i in range(10):
-            self.assertRaises(ValueError,test)
+            self.assertRaises(ValueError, test)
 
     def test47(self):
         """None in dict lookup"""
@@ -373,7 +373,7 @@ class VFN(NameMapperTest):
             self.get('funcThatRaises')    
 
         for i in range(10):
-            self.assertRaises(ValueError,test)
+            self.assertRaises(ValueError, test)
 
 
     def test53(self):
@@ -389,7 +389,7 @@ class VFN(NameMapperTest):
             self.get('aDict.nestedDict.funcThatRaises')    
 
         for i in range(10):
-            self.assertRaises(ValueError,test)
+            self.assertRaises(ValueError, test)
 
     def test55(self):
         """aDict.nestedDict.aClass in dict lookup"""
@@ -428,10 +428,10 @@ class VFS(VFN):
         if lng == 1:
             return [self.namespace()]
         elif lng == 2:
-            return [self.namespace(),{'dummy':1234}]
+            return [self.namespace(), {'dummy':1234}]
         elif lng == 3:
             # a tuple for kicks
-            return ({'dummy':1234}, self.namespace(),{'dummy':1234})
+            return ({'dummy':1234}, self.namespace(), {'dummy':1234})
         elif lng == 4:
             # a generator for more kicks
             return self.searchListGenerator()
@@ -439,7 +439,7 @@ class VFS(VFN):
     def searchListGenerator(self):
         class Test:
             pass
-        for i in [Test(),{'dummy':1234}, self.namespace(),{'dummy':1234}]:
+        for i in [Test(), {'dummy':1234}, self.namespace(), {'dummy':1234}]:
             yield i
   
     def get(self, name, autocall=True):

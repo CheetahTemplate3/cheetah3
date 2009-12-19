@@ -27,12 +27,14 @@ Contents
 ^^^^^^^^^
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    developers.rst
    download.rst
-   roadmap.rst
+   users_guide/index.rst
    documentation.rst
+   roadmap.rst
+   dev_guide/index.rst
    chep.rst
 
 

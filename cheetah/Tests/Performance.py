@@ -57,8 +57,8 @@ def perftest(max_num_pystones, current_pystone=None):
                     pystone_total_time = total_time / pystone_rate
                 global DEBUG
                 if DEBUG:
-                    print 'The test "%s" took: %s pystones' % (function.func_name,
-                        pystone_total_time)
+                    print('The test "%s" took: %s pystones' % (function.func_name,
+                        pystone_total_time))
                 else:
                     if pystone_total_time > (max_num_pystones + TOLERANCE):
                         raise DurationError((('Test too long (%.2f Ps, '
@@ -78,7 +78,7 @@ class DynamicTemplatePerformanceTest(unittest.TestCase):
                 #pass
             #end def
         '''
-        for i in xrange(self.loops):
+        for i in range(self.loops):
             klass = Cheetah.Template.Template.compile(template)
             assert klass
     test_BasicDynamic = perftest(1200)(test_BasicDynamic)
@@ -91,15 +91,15 @@ class PerformanceTest(unittest.TestCase):
     def runTest(self):
         self.prof = hotshot.Profile('%s.prof' % self.__class__.__name__)
         self.prof.start()
-        for i in xrange(self.iterations):
+        for i in range(self.iterations):
             if hasattr(self, 'performanceSample'):
                 self.display = True
                 self.performanceSample()
         self.prof.stop()
         self.prof.close()
         if self.display:
-            print '>>> %s (%d iterations) ' % (self.__class__.__name__,
-                    self.iterations)
+            print('>>> %s (%d iterations) ' % (self.__class__.__name__,
+                    self.iterations))
             stats = hotshot.stats.load('%s.prof' % self.__class__.__name__)
             #stats.strip_dirs()
             stats.sort_stats('time', 'calls')
@@ -130,7 +130,7 @@ class BunchOfWriteCalls(PerformanceTest):
         template = '''
             #import sys
             #import os
-            #for i in xrange(1000)
+            #for i in range(1000)
                 $i
             #end for
         '''
@@ -210,7 +210,7 @@ class LongCompileTest(PerformanceTest):
                     <body>
                         $header()
 
-                        #for $i in $xrange(10)
+                        #for $i in $range(10)
                             This is just some stupid page!
                             <br/>
                         #end for

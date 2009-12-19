@@ -77,8 +77,8 @@ class mod_install_data(install_data):
         data_files = self.get_inputs()
         
         for entry in data_files:
-            if type(entry) != types.StringType:
-                raise ValueError, 'The entries in "data_files" must be strings'
+            if not isinstance(entry, basestring):
+                raise ValueError('The entries in "data_files" must be strings')
             
             entry = string.join(string.split(entry, '/'), os.sep)
             # entry is a filename or glob pattern
@@ -137,13 +137,7 @@ def run_setup(configurations):
     for configuration in configurations:
         kws.update(vars(configuration))
     for name, value in kws.items():
-        if name[:1] == '_' or \
-           type(value) not in (types.StringType,
-                               types.ListType,
-                               types.TupleType,
-                               types.DictType,
-                               types.IntType,
-                               ):
+        if name[:1] == '_' or not isinstance(value, (basestring, list, tuple, dict, int)):
             del kws[name]
 
     # Add setup extensions
@@ -158,14 +152,14 @@ def run_setup(configurations):
     try:
         apply(setup, (), kws)
     except BuildFailed, x:
-        print "One or more C extensions failed to build."
-        print "Details: %s" % x
-        print "Retrying without C extensions enabled."
+        print("One or more C extensions failed to build.")
+        print("Details: %s" % x)
+        print("Retrying without C extensions enabled.")
 
         del kws['ext_modules']
         apply(setup, (), kws)
 
-        print "One or more C extensions failed to build."
-        print "Performance enhancements will not be available."
-        print "Pure Python installation succeeded."
+        print("One or more C extensions failed to build.")
+        print("Performance enhancements will not be available.")
+        print("Pure Python installation succeeded.")
 
