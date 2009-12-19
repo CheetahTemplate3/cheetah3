@@ -1,3 +1,12 @@
+2.4.1 (December 19th, 2009)
+  - --quiet flag added to `cheetah` to silence printing to stdout (abbeyj)
+  - Refactoring to minimize the amount of forked code for Python3 (rtyler)
+  - Template.compile() will no longer create class names with numerous leading
+    underscores (rtyler; reported by Kirill Uhanov)
+  - DirectiveAnalyzer (cheetah-analyze script) added to report directive usage in templates (rtyler)
+  - Older LaTeX docs converted to rst for Sphinx (rtyler)
+  - Prevent #raw blocks from evaluating $-placeholders and escaped strings (karmix0)
+  - New tests added to verify PSP behavior and other untested internals (rtyler)
 
 2.4.0 (October 15th, 2009)
   - Fix a major performance regression in Template.__init__()
