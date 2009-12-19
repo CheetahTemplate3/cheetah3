@@ -162,7 +162,8 @@ Template output mismatch:
                 **extraKwArgs
                 )
             moduleCode = templateClass._CHEETAH_generatedModuleCode
-            self.template = templateObj = templateClass(searchList=self.searchList())
+            searchList = self.searchList() or self._searchList
+            self.template = templateObj = templateClass(searchList=searchList)
         else:
             self.template = templateObj = Template(
                 input,
@@ -2344,6 +2345,8 @@ class UnlessDirective(OutputTest):
         self.verify("#unless 0: 1234\n"*2, "1234\n"*2)
         
 class PSP(OutputTest):
+    def searchList(self):
+        return None
     
     def test1(self):
         """simple <%= [int] %>"""
@@ -2381,6 +2384,19 @@ class PSP(OutputTest):
         """for loop in <% $%> and using <%=i%> plus extra text"""
         self.verify("""<% for i in range(5):
     i=i*2$%><%=i%>-<%end%>""", "0-2-4-6-8-")
+
+    def test10(self):
+        """ Using getVar and write within a PSP """
+        self._searchList = [{'me' : 1}]
+        template = '''This is my template
+<%
+me = self.getVar('me')
+if isinstance(me, int):
+    write('Bork')
+else:
+    write('Nork')
+%>'''
+        self.verify(template, 'This is my template\nBork')
 
 
 class WhileDirective(OutputTest):
