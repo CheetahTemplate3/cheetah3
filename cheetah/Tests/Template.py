@@ -345,6 +345,16 @@ class MultipleInheritanceSupport(TemplateTest):
         result = template.foo()
         assert result == [4, 5, 1, 2, 3], (result, 'Unexpected result')
 
+class SubclassSearchListTest(TemplateTest):
+    '''
+        Verify that if we subclass Template, we can still
+        use attributes on that subclass in the searchList
+    '''
+    def runTest(self):
+        class Sub(Template):
+            greeting = 'Hola'
+        tmpl = Sub('''When we meet, I say "${greeting}"''')
+        self.assertEquals(unicode(tmpl), 'When we meet, I say "Hola"')
 
 ##################################################
 ## if run from the command line ##
