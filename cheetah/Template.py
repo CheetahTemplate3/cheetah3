@@ -1549,6 +1549,18 @@ class Template(Servlet):
                                       mainMethodName=mainMethodName,
                                       compilerSettings=compilerSettings,
                                       keepRefToGeneratedCode=True)
+
+        if not self.__class__ == Template:
+            # Only propogate attributes if we're in a subclass of 
+            # Template
+            for k, v in self.__class__.__dict__.iteritems():
+                if not v or k.startswith('__'):
+                    continue
+                ## Propogate the class attributes to the instance 
+                ## since we're about to obliterate self.__class__
+                ## (see: cheetah.Tests.Tepmlate.SubclassSearchListTest)
+                setattr(self, k, v)
+
         self.__class__ = templateClass
         # must initialize it so instance attributes are accessible
         templateClass.__init__(self,
