@@ -1,13 +1,12 @@
 Downloading Cheetah
 ===================
 
-The most recent stable release of Cheetah **v2.4.0** which was released on
-Oct 24th, 2009.
+The most recent stable release of Cheetah **v2.4.1** which was released on
+Dec 19th, 2009.
 
-Download v2.4.0
+Download v2.4.1
 ^^^^^^^^^^^^^^^
-* `v2.4.0 tarball <http://github.com/cheetahtemplate/cheetah/tarball/v2.4.0>`_
-* `v2.4.0 zip <http://github.com/cheetahtemplate/cheetah/zipball/v2.4.0>`_
+* You can download a tarball of Cheetah v2.4.1 from the `Python Package Index <http://pypi.python.org/pypi/Cheetah/2.4.1>`_
 
 You can keep up to date with release candidates or other downloads of Cheetah by 
 visiting the `cheetahtemplate GitHub page <http://github.com/cheetahtemplate/cheetah/downloads>`_
