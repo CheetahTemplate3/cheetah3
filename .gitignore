@@ -2,5 +2,8 @@
 *.swp
 *.so
 www/*.html
+www/_build
 build
 *.py.bak
+Cheetah.egg-info/
+dist
