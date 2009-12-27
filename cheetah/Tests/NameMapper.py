@@ -98,7 +98,7 @@ for k in testNamespace.keys():
 ## TEST BASE CLASSES
 
 class NameMapperTest(unittest.TestCase):
-    failureException = (NotFound, AssertionError)
+    failureException = NotFound
     _testNamespace = testNamespace
     _results = results
     
