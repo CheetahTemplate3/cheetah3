@@ -1,5 +1,4 @@
-# $Id: NameMapper.py,v 1.32 2007/12/10 19:20:09 tavis_rudd Exp $
-
+#!/usr/bin/env python
 """This module supports Cheetah's optional NameMapper syntax.
 
 Overview
@@ -142,8 +141,6 @@ Last Revision Date: $Date: 2007/12/10 19:20:09 $
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
 __revision__ = "$Revision: 1.32 $"[11:-2]
-import types
-from types import StringType, InstanceType, ClassType, TypeType
 from pprint import pformat
 import inspect
 import pdb
