@@ -50,7 +50,6 @@
  */
 #define MAXCHUNKS 15		/* max num of nameChunks for the arrays */
 #define ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS 1
-#define INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS 0
 #define createNameCopyAndChunks() {\
     nameCopy = malloc(strlen(name) + 1);\
     tmpPntr1 = name; \

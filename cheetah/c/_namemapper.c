@@ -35,19 +35,7 @@ static PyObject* pprintMod_pformat; /* used for exception formatting */
 static void setNotFoundException(char *key, PyObject *namespace)
 {
     PyObject *exceptionStr = NULL;
-    PyObject *namespaceStr = NULL;
-    
-    if (INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS) {
-        namespaceStr = PyObject_CallFunctionObjArgs(pprintMod_pformat, 
-                                namespace, NULL);
-
-        exceptionStr = PyUnicode_FromFormat("cannot find \'%s\' in the namespace %S",
-                                namespaceStr);
-        Py_XDECREF(namespaceStr);
-    }
-    else {
-        exceptionStr = PyUnicode_FromFormat("cannot find \'%s\'", key);
-    }
+    exceptionStr = PyUnicode_FromFormat("cannot find \'%s\'", key);
     PyErr_SetObject(NotFound, exceptionStr);
     Py_XDECREF(exceptionStr);
 }
@@ -68,17 +56,10 @@ static int wrapInternalNotFoundException(char *fullName, PyObject *namespace)
         isAlreadyWrapped = PyObject_CallMethod(excValue, "find", "s", "while searching");
 
         if (isAlreadyWrapped != NULL) {
-            if (PyLong_AsLong(isAlreadyWrapped) == -1) {
-                /* only wrap once */
+            if (PyLong_AsLong(isAlreadyWrapped) == -1) { /* only wrap once */
                 PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " while searching for '"));
                 PyString_ConcatAndDel(&excValue, Py_BuildValue("s", fullName));
                 PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "'"));
-                if (INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS) {
-                    PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " in "));
-                    PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "the top-level namespace "));
-                    PyString_ConcatAndDel(&excValue, 
-                                    PyObject_CallFunctionObjArgs(pprintMod_pformat, namespace, NULL));
-                }
             }
             Py_DECREF(isAlreadyWrapped);
         }
