@@ -307,7 +307,7 @@ def hasName(obj, name):
     except NotFound:
         return False
 try:
-    from _namemapper import NotFound, valueForKey, valueForName, \
+    from Cheetah._namemapper import NotFound, valueForKey, valueForName, \
          valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
     # it is possible with Jython or Windows, for example, that _namemapper.c hasn't been compiled
     C_VERSION = True
