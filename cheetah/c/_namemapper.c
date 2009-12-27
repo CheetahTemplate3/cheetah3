@@ -43,6 +43,7 @@ static void setNotFoundException(char *key, PyObject *namespace)
 static int wrapInternalNotFoundException(char *fullName, PyObject *namespace)
 {
     PyObject *excType, *excValue, *excTraceback, *isAlreadyWrapped = NULL;
+    PyObject *newExcValue = NULL;
     if (!ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS) {
         return 0;
     } 
@@ -56,26 +57,29 @@ static int wrapInternalNotFoundException(char *fullName, PyObject *namespace)
         isAlreadyWrapped = PyObject_CallMethod(excValue, "find", "s", "while searching");
 
         if (isAlreadyWrapped != NULL) {
-            if (PyLong_AsLong(isAlreadyWrapped) == -1) { /* only wrap once */
-                PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " while searching for '"));
-                PyString_ConcatAndDel(&excValue, Py_BuildValue("s", fullName));
-                PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "'"));
+            if (PyLong_AsLong(isAlreadyWrapped) == -1) {
+                newExcValue = PyUnicode_FromFormat("%U while searching for \'%s\'",
+                        excValue, fullName);
             }
             Py_DECREF(isAlreadyWrapped);
         }
-        PyErr_Restore(excType, excValue, excTraceback);
+        else {
+           newExcValue = excValue; 
+        }
+        PyErr_Restore(excType, newExcValue, excTraceback);
         return -1;
     } 
     return 0;
 }
 
 
-static int 
-isInstanceOrClass(PyObject *nextVal) {
+static int isInstanceOrClass(PyObject *nextVal) {
+#ifndef IS_PYTHON3
     /* old style classes or instances */
     if((PyInstance_Check(nextVal)) || (PyClass_Check(nextVal))) {
         return 1;
     }
+#endif 
 
     if(PyObject_HasAttrString(nextVal, "__class__")) {
 	/* new style classes or instances */
@@ -432,12 +436,28 @@ static struct PyMethodDef namemapper_methods[] = {
 /* *************************************************************************** */
 /* Initialization function (import-time) */
 
+#ifdef IS_PYTHON3
+static struct PyModuleDef namemappermodule = {
+    PyModuleDef_HEAD_INIT,
+    "_namemapper",
+    NULL, /* docstring */
+    -1, 
+    namemapper_methods,
+    NULL,
+    NULL,
+    NULL,
+    NULL};
+
+PyMODINIT_FUNC PyInit__namemapper(void)
+{
+    PyObject *m = PyModule_Create(&namemappermodule);
+#else
 DL_EXPORT(void) init_namemapper(void)
 {
-    PyObject *m, *d, *pprintMod;
+    PyObject *m = Py_InitModule3("_namemapper", namemapper_methods, NULL);
+#endif 
 
-    /* create the module and add the functions */
-    m = Py_InitModule("_namemapper", namemapper_methods);
+    PyObject *d, *pprintMod;
 
     /* add symbolic constants to the module */
     d = PyModule_GetDict(m);
@@ -446,13 +466,22 @@ DL_EXPORT(void) init_namemapper(void)
     PyDict_SetItemString(d, "NotFound", NotFound);
     PyDict_SetItemString(d, "TooManyPeriodsInName", TooManyPeriods);
     pprintMod = PyImport_ImportModule("pprint");
-    if (!pprintMod)
+    if (!pprintMod) {
+#ifdef IS_PYTHON3
+        return NULL;
+#else
         return;
+#endif
+    }
     pprintMod_pformat = PyObject_GetAttrString(pprintMod, "pformat");
     Py_DECREF(pprintMod);
     /* check for errors */
-    if (PyErr_Occurred())
+    if (PyErr_Occurred()) {
         Py_FatalError("Can't initialize module _namemapper");
+    }
+#ifdef IS_PYTHON3
+    return m;
+#endif
 }
 
 #ifdef __cplusplus
