@@ -134,11 +134,16 @@ def run_setup(configurations):
     """
     # Build parameter dictionary
     kws = {}
+    newkws = {}
     for configuration in configurations:
         kws.update(vars(configuration))
     for name, value in kws.items():
-        if name[:1] == '_' or not isinstance(value, (basestring, list, tuple, dict, int)):
-            del kws[name]
+        if name[:1] == '_':
+            continue
+        if not isinstance(value, (basestring, list, tuple, dict, int)):
+            continue
+        newkws[name] = value
+    kws = newkws
 
     # Add setup extensions
     cmdclasses = {
