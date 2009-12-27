@@ -44,4 +44,36 @@
 
 #define PYARGS PyObject *self, PyObject *args, PyObject *kwargs
 
+
+/*
+ * _namemapper.c specific definitions 
+ */
+#define MAXCHUNKS 15		/* max num of nameChunks for the arrays */
+#define ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS 1
+#define INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS 0
+#define createNameCopyAndChunks() {\
+    nameCopy = malloc(strlen(name) + 1);\
+    tmpPntr1 = name; \
+    tmpPntr2 = nameCopy;\
+    while ((*tmpPntr2++ = *tmpPntr1++)); \
+        numChunks = getNameChunks(nameChunks, name, nameCopy); \
+    if (PyErr_Occurred()) { 	/* there might have been TooManyPeriods */\
+        free(nameCopy);\
+        return NULL;\
+    }\
+}
+
+#define checkForNameInNameSpaceAndReturnIfFound(namespace_decref) { \
+    if ( PyNamemapper_hasKey(nameSpace, nameChunks[0]) ) {\
+        theValue = PyNamemapper_valueForName(nameSpace, nameChunks, numChunks, executeCallables);\
+        if (namespace_decref) {\
+            Py_DECREF(nameSpace);\
+        }\
+        if (wrapInternalNotFoundException(name, nameSpace)) {\
+            theValue = NULL;\
+        }\
+        goto done;\
+    }\
+}
+
 #endif

@@ -26,46 +26,7 @@ extern "C" {
 static PyObject *NotFound;   /* locally-raised exception */
 static PyObject *TooManyPeriods;   /* locally-raised exception */
 static PyObject* pprintMod_pformat; /* used for exception formatting */
-#define MAXCHUNKS 15		/* max num of nameChunks for the arrays */
 
-#define ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS 1
-#define INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS 0
-
-# define createNameCopyAndChunks() {\
-  nameCopy = malloc(strlen(name) + 1);\
-  tmpPntr1 = name; \
-  tmpPntr2 = nameCopy;\
-  while ((*tmpPntr2++ = *tmpPntr1++)); \
-  numChunks = getNameChunks(nameChunks, name, nameCopy); \
-  if (PyErr_Occurred()) { 	/* there might have been TooManyPeriods */\
-    free(nameCopy);\
-    return NULL;\
-  }\
-}
-
-#define OLD_checkForNameInNameSpaceAndReturnIfFound() { \
-    if ( PyNamemapper_hasKey(nameSpace, nameChunks[0]) ) {\
-      theValue = PyNamemapper_valueForName(nameSpace, nameChunks, numChunks, executeCallables);\
-      free(nameCopy);\
-      if (wrapInternalNotFoundException(name, nameSpace)) {\
-	theValue = NULL;\
-      }\
-      return theValue;\
-    }\
-}
-
-#define checkForNameInNameSpaceAndReturnIfFound(namespace_decref) { \
-    if ( PyNamemapper_hasKey(nameSpace, nameChunks[0]) ) {\
-      theValue = PyNamemapper_valueForName(nameSpace, nameChunks, numChunks, executeCallables);\
-      if (namespace_decref) {\
-        Py_DECREF(nameSpace);\
-      }\
-      if (wrapInternalNotFoundException(name, nameSpace)) {\
-	theValue = NULL;\
-      }\
-      goto done;\
-    }\
-}
 
 /* *************************************************************************** */
 /* First the c versions of the functions */
@@ -107,7 +68,8 @@ static int wrapInternalNotFoundException(char *fullName, PyObject *namespace)
         isAlreadyWrapped = PyObject_CallMethod(excValue, "find", "s", "while searching");
 
         if (isAlreadyWrapped != NULL) {
-            if (PyInt_AsLong(isAlreadyWrapped)==-1) { /* only wrap once */
+            if (PyLong_AsLong(isAlreadyWrapped) == -1) {
+                /* only wrap once */
                 PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " while searching for '"));
                 PyString_ConcatAndDel(&excValue, Py_BuildValue("s", fullName));
                 PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "'"));
@@ -344,7 +306,7 @@ static PyObject *namemapper_valueFromSearchList(PYARGS)
         goto done;
     }
 
-    while ( (nameSpace = PyIter_Next(iterator)) ) {
+    while ((nameSpace = PyIter_Next(iterator))) {
         checkForNameInNameSpaceAndReturnIfFound(TRUE);
         Py_DECREF(nameSpace);
         if(PyErr_CheckSignals()) {
