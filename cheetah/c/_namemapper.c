@@ -12,9 +12,11 @@ Last Revision Date: $Date: 2007/12/10 18:25:20 $
 */
 
 /* *************************************************************************** */
-#include "Python.h"             /* Python header files */
+#include <Python.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include "cheetah.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,8 +27,6 @@ static PyObject *NotFound;   /* locally-raised exception */
 static PyObject *TooManyPeriods;   /* locally-raised exception */
 static PyObject* pprintMod_pformat; /* used for exception formatting */
 #define MAXCHUNKS 15		/* max num of nameChunks for the arrays */
-#define TRUE 1
-#define FALSE 0
 
 #define ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS 1
 #define INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS 0
@@ -71,54 +71,59 @@ static PyObject* pprintMod_pformat; /* used for exception formatting */
 /* First the c versions of the functions */
 /* *************************************************************************** */
 
-static void
-setNotFoundException(char *key, PyObject *namespace)
+static void setNotFoundException(char *key, PyObject *namespace)
 {
+    PyObject *exceptionStr = NULL;
+    PyObject *namespaceStr = NULL;
+    
+    if (INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS) {
+        namespaceStr = PyObject_CallFunctionObjArgs(pprintMod_pformat, 
+                                namespace, NULL);
 
-
-  PyObject *exceptionStr = NULL;
-  exceptionStr = Py_BuildValue("s","cannot find '");
-  PyString_ConcatAndDel(&exceptionStr, Py_BuildValue("s", key));
-  PyString_ConcatAndDel(&exceptionStr, Py_BuildValue("s", "'"));
-  if (INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS) {
-    PyString_ConcatAndDel(&exceptionStr, Py_BuildValue("s", " in the namespace "));
-    PyString_ConcatAndDel(&exceptionStr, 
-			  PyObject_CallFunctionObjArgs(pprintMod_pformat, namespace, NULL));
-  }
-  PyErr_SetObject(NotFound, exceptionStr);
-  Py_DECREF(exceptionStr);
+        exceptionStr = PyUnicode_FromFormat("cannot find \'%s\' in the namespace %S",
+                                namespaceStr);
+        Py_XDECREF(namespaceStr);
+    }
+    else {
+        exceptionStr = PyUnicode_FromFormat("cannot find \'%s\'", key);
+    }
+    PyErr_SetObject(NotFound, exceptionStr);
+    Py_XDECREF(exceptionStr);
 }
 
-static int
-wrapInternalNotFoundException(char *fullName, PyObject *namespace)
+static int wrapInternalNotFoundException(char *fullName, PyObject *namespace)
 {
-  PyObject *excType, *excValue, *excTraceback, *isAlreadyWrapped = NULL;
-  if (!ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS) {
-    return 0;
-  } 
-  if (PyErr_Occurred() && PyErr_GivenExceptionMatches(PyErr_Occurred(), NotFound)) {
-    PyErr_Fetch(&excType, &excValue, &excTraceback);
-    isAlreadyWrapped = PyObject_CallMethod(excValue, "find", "s", "while searching");
+    PyObject *excType, *excValue, *excTraceback, *isAlreadyWrapped = NULL;
+    if (!ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS) {
+        return 0;
+    } 
 
-    if (isAlreadyWrapped != NULL) {
-	if (PyInt_AsLong(isAlreadyWrapped)==-1) { /* only wrap once */
-	    PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " while searching for '"));
-	    PyString_ConcatAndDel(&excValue, Py_BuildValue("s", fullName));
-	    PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "'"));
-	    if (INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS) {
-		PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " in "));
-		PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "the top-level namespace "));
-		PyString_ConcatAndDel(&excValue, 
-				      PyObject_CallFunctionObjArgs(pprintMod_pformat, namespace, NULL));
-	    }
-	}
-	Py_DECREF(isAlreadyWrapped);
+    if (!PyErr_Occurred()) {
+        return 0;
     }
-    PyErr_Restore(excType, excValue, excTraceback);
-    return -1;
-  } else {
+
+    if (PyErr_GivenExceptionMatches(PyErr_Occurred(), NotFound)) {
+        PyErr_Fetch(&excType, &excValue, &excTraceback);
+        isAlreadyWrapped = PyObject_CallMethod(excValue, "find", "s", "while searching");
+
+        if (isAlreadyWrapped != NULL) {
+            if (PyInt_AsLong(isAlreadyWrapped)==-1) { /* only wrap once */
+                PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " while searching for '"));
+                PyString_ConcatAndDel(&excValue, Py_BuildValue("s", fullName));
+                PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "'"));
+                if (INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS) {
+                    PyString_ConcatAndDel(&excValue, Py_BuildValue("s", " in "));
+                    PyString_ConcatAndDel(&excValue, Py_BuildValue("s", "the top-level namespace "));
+                    PyString_ConcatAndDel(&excValue, 
+                                    PyObject_CallFunctionObjArgs(pprintMod_pformat, namespace, NULL));
+                }
+            }
+            Py_DECREF(isAlreadyWrapped);
+        }
+        PyErr_Restore(excType, excValue, excTraceback);
+        return -1;
+    } 
     return 0;
-  }
 }
 
 
@@ -151,60 +156,55 @@ isInstanceOrClass(PyObject *nextVal) {
 
 static int getNameChunks(char *nameChunks[], char *name, char *nameCopy) 
 {
-  char c;
-  char *currChunk;
-  int currChunkNum = 0;
-  
-  currChunk = nameCopy;
-  while ('\0' != (c = *nameCopy)){
+    char c;
+    char *currChunk;
+    int currChunkNum = 0;
+
+    currChunk = nameCopy;
+    while ('\0' != (c = *nameCopy)){
     if ('.' == c) {
-      if (currChunkNum >= (MAXCHUNKS-2)) { /* avoid overflowing nameChunks[] */
-	PyErr_SetString(TooManyPeriods, name); 
-	return 0;
-      }
+        if (currChunkNum >= (MAXCHUNKS-2)) { /* avoid overflowing nameChunks[] */
+            PyErr_SetString(TooManyPeriods, name); 
+            return 0;
+        }
 
-      *nameCopy ='\0';
-      nameChunks[currChunkNum++] = currChunk;
-      nameCopy++;
-      currChunk = nameCopy;
+        *nameCopy ='\0';
+        nameChunks[currChunkNum++] = currChunk;
+        nameCopy++;
+        currChunk = nameCopy;
     } else 
-      nameCopy++;
-  }
-  if (nameCopy > currChunk) {
-    nameChunks[currChunkNum++] = currChunk;
-  }
-  return currChunkNum;
+        nameCopy++;
+    }
+    if (nameCopy > currChunk) {
+        nameChunks[currChunkNum++] = currChunk;
+    }
+    return currChunkNum;
 }
 
 
-static int 
-PyNamemapper_hasKey(PyObject *obj, char *key)
+static int PyNamemapper_hasKey(PyObject *obj, char *key)
 {
-  if (PyMapping_Check(obj) && PyMapping_HasKeyString(obj, key)) {
-    return TRUE;
-  } else if (PyObject_HasAttrString(obj, key)) {
-    return TRUE;
-  } else {
+    if (PyMapping_Check(obj) && PyMapping_HasKeyString(obj, key)) {
+        return TRUE;
+    } else if (PyObject_HasAttrString(obj, key)) {
+        return TRUE;
+    }
     return FALSE;
-  }
 }
 
 
-static PyObject *
-PyNamemapper_valueForKey(PyObject *obj, char *key)
+static PyObject *PyNamemapper_valueForKey(PyObject *obj, char *key)
 {
-  PyObject *theValue = NULL;
+    PyObject *theValue = NULL;
 
-  if (PyMapping_Check(obj) && PyMapping_HasKeyString(obj, key)) {
-    theValue = PyMapping_GetItemString(obj, key);
-  } else if (PyObject_HasAttrString(obj, key)) {
-    theValue = PyObject_GetAttrString(obj, key);
-
-  } else {
-    setNotFoundException(key, obj);
-  }
-
-  return theValue;
+    if (PyMapping_Check(obj) && PyMapping_HasKeyString(obj, key)) {
+        theValue = PyMapping_GetItemString(obj, key);
+    } else if (PyObject_HasAttrString(obj, key)) {
+        theValue = PyObject_GetAttrString(obj, key);
+    } else {
+        setNotFoundException(key, obj);
+    }
+    return theValue;
 }
 
 static PyObject *
@@ -272,217 +272,205 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
 /* *************************************************************************** */
 
 
-static PyObject *
-namemapper_valueForKey(PyObject *self, PyObject *args)
+static PyObject *namemapper_valueForKey(PyObject *self, PyObject *args)
 {
-  PyObject *obj;
-  char *key;
+    PyObject *obj;
+    char *key;
 
-  if (!PyArg_ParseTuple(args, "Os", &obj, &key)) {
-    return NULL;
-  }
-
-  return PyNamemapper_valueForKey(obj, key);
-
-}
-
-static PyObject *
-namemapper_valueForName(PyObject *self, PyObject *args, PyObject *keywds)
-{
-
-
-  PyObject *obj;
-  char *name;
-  int executeCallables = 0;
-
-  char *nameCopy = NULL;
-  char *tmpPntr1 = NULL;
-  char *tmpPntr2 = NULL;
-  char *nameChunks[MAXCHUNKS];
-  int numChunks;
-
-  PyObject *theValue;
-
-  static char *kwlist[] = {"obj", "name", "executeCallables", NULL};
-
-  if (!PyArg_ParseTupleAndKeywords(args, keywds, "Os|i", kwlist,  &obj, &name, &executeCallables)) {
-    return NULL;
-  }
-
-  createNameCopyAndChunks();  
-
-  theValue = PyNamemapper_valueForName(obj, nameChunks, numChunks, executeCallables);
-  free(nameCopy);
-  if (wrapInternalNotFoundException(name, obj)) {
-    theValue = NULL;
-  }
-  return theValue;
-
-}
-
-static PyObject *
-namemapper_valueFromSearchList(PyObject *self, PyObject *args, PyObject *keywds)
-{
-
-  PyObject *searchList;
-  char *name;
-  int executeCallables = 0;
-
-  char *nameCopy = NULL;
-  char *tmpPntr1 = NULL;
-  char *tmpPntr2 = NULL;
-  char *nameChunks[MAXCHUNKS];
-  int numChunks;
-
-  PyObject *nameSpace = NULL;
-  PyObject *theValue = NULL;
-  PyObject *iterator = NULL;
-
-  static char *kwlist[] = {"searchList", "name", "executeCallables", NULL};
-
-  if (!PyArg_ParseTupleAndKeywords(args, keywds, "Os|i", kwlist,  &searchList, &name, 
-				   &executeCallables)) {
-    return NULL;
-  }
-
-  createNameCopyAndChunks();
-
-  iterator = PyObject_GetIter(searchList);
-  if (iterator == NULL) {
-    PyErr_SetString(PyExc_TypeError,"This searchList is not iterable!");
-    goto done;
-  }
-
-  while ( (nameSpace = PyIter_Next(iterator)) ) {
-    checkForNameInNameSpaceAndReturnIfFound(TRUE);
-    Py_DECREF(nameSpace);
-    if(PyErr_CheckSignals()) {
-      theValue = NULL;
-      goto done;
+    if (!PyArg_ParseTuple(args, "Os", &obj, &key)) {
+        return NULL;
     }
-  }
-  if (PyErr_Occurred()) {
-    theValue = NULL;
-    goto done;
-  }
 
-  setNotFoundException(nameChunks[0], searchList);
- done:
-  Py_XDECREF(iterator);
-  free(nameCopy);
-  return theValue;
+    return PyNamemapper_valueForKey(obj, key);
 }
 
-static PyObject *
-namemapper_valueFromFrameOrSearchList(PyObject *self, PyObject *args, PyObject *keywds)
+static PyObject *namemapper_valueForName(PYARGS)
 {
+    PyObject *obj;
+    char *name;
+    int executeCallables = 0;
 
-  /* python function args */
-  char *name;
-  int executeCallables = 0;
-  PyObject *searchList = NULL;
+    char *nameCopy = NULL;
+    char *tmpPntr1 = NULL;
+    char *tmpPntr2 = NULL;
+    char *nameChunks[MAXCHUNKS];
+    int numChunks;
 
-  /* locals */
-  char *nameCopy = NULL;
-  char *tmpPntr1 = NULL;
-  char *tmpPntr2 = NULL;
-  char *nameChunks[MAXCHUNKS];
-  int numChunks;
+    PyObject *theValue;
 
-  PyObject *nameSpace = NULL;
-  PyObject *theValue = NULL;
-  PyObject *excString = NULL;
-  PyObject *iterator = NULL;
+    static char *kwlist[] = {"obj", "name", "executeCallables", NULL};
 
-  static char *kwlist[] = {"searchList", "name", "executeCallables", NULL};
-
-  if (!PyArg_ParseTupleAndKeywords(args, keywds, "Os|i", kwlist,  &searchList, &name, 
-				   &executeCallables)) {
-    return NULL;
-  }
-
-  createNameCopyAndChunks();
-  
-  nameSpace = PyEval_GetLocals();
-  checkForNameInNameSpaceAndReturnIfFound(FALSE);  
-
-  iterator = PyObject_GetIter(searchList);
-  if (iterator == NULL) {
-    PyErr_SetString(PyExc_TypeError,"This searchList is not iterable!");
-    goto done;
-  }
-  while ( (nameSpace = PyIter_Next(iterator)) ) {
-    checkForNameInNameSpaceAndReturnIfFound(TRUE);
-    Py_DECREF(nameSpace);
-    if(PyErr_CheckSignals()) {
-      theValue = NULL;
-      goto done;
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Os|i", kwlist,  &obj, &name, &executeCallables)) {
+        return NULL;
     }
-  }
-  if (PyErr_Occurred()) {
-    theValue = NULL;
-    goto done;
-  }
 
-  nameSpace = PyEval_GetGlobals();
-  checkForNameInNameSpaceAndReturnIfFound(FALSE);
+    createNameCopyAndChunks();  
 
-  nameSpace = PyEval_GetBuiltins();
-  checkForNameInNameSpaceAndReturnIfFound(FALSE);
-
-  excString = Py_BuildValue("s", "[locals()]+searchList+[globals(), __builtins__]");
-  setNotFoundException(nameChunks[0], excString);
-  Py_DECREF(excString);
-
- done:
-  Py_XDECREF(iterator);
-  free(nameCopy);
-  return theValue;
+    theValue = PyNamemapper_valueForName(obj, nameChunks, numChunks, executeCallables);
+    free(nameCopy);
+    if (wrapInternalNotFoundException(name, obj)) {
+        theValue = NULL;
+    }
+    return theValue;
 }
 
-static PyObject *
-namemapper_valueFromFrame(PyObject *self, PyObject *args, PyObject *keywds)
+static PyObject *namemapper_valueFromSearchList(PYARGS)
 {
+    PyObject *searchList;
+    char *name;
+    int executeCallables = 0;
 
-  /* python function args */
-  char *name;
-  int executeCallables = 0;
+    char *nameCopy = NULL;
+    char *tmpPntr1 = NULL;
+    char *tmpPntr2 = NULL;
+    char *nameChunks[MAXCHUNKS];
+    int numChunks;
 
-  /* locals */
-  char *tmpPntr1 = NULL;
-  char *tmpPntr2 = NULL;
+    PyObject *nameSpace = NULL;
+    PyObject *theValue = NULL;
+    PyObject *iterator = NULL;
 
-  char *nameCopy = NULL;
-  char *nameChunks[MAXCHUNKS];
-  int numChunks;
+    static char *kwlist[] = {"searchList", "name", "executeCallables", NULL};
 
-  PyObject *nameSpace = NULL;
-  PyObject *theValue = NULL;
-  PyObject *excString = NULL;
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Os|i", kwlist, &searchList, &name, &executeCallables)) {
+        return NULL;
+    }
 
-  static char *kwlist[] = {"name", "executeCallables", NULL};
+    createNameCopyAndChunks();
 
-  if (!PyArg_ParseTupleAndKeywords(args, keywds, "s|i", kwlist, &name, &executeCallables)) {
-    return NULL;
-  }
+    iterator = PyObject_GetIter(searchList);
+    if (iterator == NULL) {
+        PyErr_SetString(PyExc_TypeError,"This searchList is not iterable!");
+        goto done;
+    }
 
-  createNameCopyAndChunks();
-  
-  nameSpace = PyEval_GetLocals();
-  checkForNameInNameSpaceAndReturnIfFound(FALSE);
-  
-  nameSpace = PyEval_GetGlobals();
-  checkForNameInNameSpaceAndReturnIfFound(FALSE);
+    while ( (nameSpace = PyIter_Next(iterator)) ) {
+        checkForNameInNameSpaceAndReturnIfFound(TRUE);
+        Py_DECREF(nameSpace);
+        if(PyErr_CheckSignals()) {
+        theValue = NULL;
+        goto done;
+        }
+    }
+    if (PyErr_Occurred()) {
+        theValue = NULL;
+        goto done;
+    }
 
-  nameSpace = PyEval_GetBuiltins();
-  checkForNameInNameSpaceAndReturnIfFound(FALSE);
+    setNotFoundException(nameChunks[0], searchList);
 
-  excString = Py_BuildValue("s", "[locals(), globals(), __builtins__]");
-  setNotFoundException(nameChunks[0], excString);
-  Py_DECREF(excString);
- done:
-  free(nameCopy);
-  return theValue;
+done:
+    Py_XDECREF(iterator);
+    free(nameCopy);
+    return theValue;
+}
+
+static PyObject *namemapper_valueFromFrameOrSearchList(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    /* python function args */
+    char *name;
+    int executeCallables = 0;
+    PyObject *searchList = NULL;
+
+    /* locals */
+    char *nameCopy = NULL;
+    char *tmpPntr1 = NULL;
+    char *tmpPntr2 = NULL;
+    char *nameChunks[MAXCHUNKS];
+    int numChunks;
+
+    PyObject *nameSpace = NULL;
+    PyObject *theValue = NULL;
+    PyObject *excString = NULL;
+    PyObject *iterator = NULL;
+
+    static char *kwlist[] = {"searchList", "name", "executeCallables", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "Os|i", kwlist,  &searchList, &name, 
+                    &executeCallables)) {
+        return NULL;
+    }
+
+    createNameCopyAndChunks();
+
+    nameSpace = PyEval_GetLocals();
+    checkForNameInNameSpaceAndReturnIfFound(FALSE);  
+
+    iterator = PyObject_GetIter(searchList);
+    if (iterator == NULL) {
+        PyErr_SetString(PyExc_TypeError,"This searchList is not iterable!");
+        goto done;
+    }
+    while ( (nameSpace = PyIter_Next(iterator)) ) {
+        checkForNameInNameSpaceAndReturnIfFound(TRUE);
+        Py_DECREF(nameSpace);
+        if(PyErr_CheckSignals()) {
+            theValue = NULL;
+            goto done;
+        }
+    }
+    if (PyErr_Occurred()) {
+        theValue = NULL;
+        goto done;
+    }
+
+    nameSpace = PyEval_GetGlobals();
+    checkForNameInNameSpaceAndReturnIfFound(FALSE);
+
+    nameSpace = PyEval_GetBuiltins();
+    checkForNameInNameSpaceAndReturnIfFound(FALSE);
+
+    excString = Py_BuildValue("s", "[locals()]+searchList+[globals(), __builtins__]");
+    setNotFoundException(nameChunks[0], excString);
+    Py_DECREF(excString);
+
+done:
+    Py_XDECREF(iterator);
+    free(nameCopy);
+    return theValue;
+}
+
+static PyObject *namemapper_valueFromFrame(PyObject *self, PyObject *args, PyObject *keywds)
+{
+    /* python function args */
+    char *name;
+    int executeCallables = 0;
+
+    /* locals */
+    char *tmpPntr1 = NULL;
+    char *tmpPntr2 = NULL;
+
+    char *nameCopy = NULL;
+    char *nameChunks[MAXCHUNKS];
+    int numChunks;
+
+    PyObject *nameSpace = NULL;
+    PyObject *theValue = NULL;
+    PyObject *excString = NULL;
+
+    static char *kwlist[] = {"name", "executeCallables", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "s|i", kwlist, &name, &executeCallables)) {
+        return NULL;
+    }
+
+    createNameCopyAndChunks();
+
+    nameSpace = PyEval_GetLocals();
+    checkForNameInNameSpaceAndReturnIfFound(FALSE);
+
+    nameSpace = PyEval_GetGlobals();
+    checkForNameInNameSpaceAndReturnIfFound(FALSE);
+
+    nameSpace = PyEval_GetBuiltins();
+    checkForNameInNameSpaceAndReturnIfFound(FALSE);
+
+    excString = Py_BuildValue("s", "[locals(), globals(), __builtins__]");
+    setNotFoundException(nameChunks[0], excString);
+    Py_DECREF(excString);
+done:
+    free(nameCopy);
+    return theValue;
 }
 
 /* *************************************************************************** */
@@ -501,28 +489,27 @@ static struct PyMethodDef namemapper_methods[] = {
 /* *************************************************************************** */
 /* Initialization function (import-time) */
 
-DL_EXPORT(void)
-init_namemapper(void)
+DL_EXPORT(void) init_namemapper(void)
 {
-  PyObject *m, *d, *pprintMod;
+    PyObject *m, *d, *pprintMod;
 
-  /* create the module and add the functions */
-  m = Py_InitModule("_namemapper", namemapper_methods);        /* registration hook */
-  
-  /* add symbolic constants to the module */
-  d = PyModule_GetDict(m);
-  NotFound = PyErr_NewException("NameMapper.NotFound",PyExc_LookupError,NULL);
-  TooManyPeriods = PyErr_NewException("NameMapper.TooManyPeriodsInName",NULL,NULL);
-  PyDict_SetItemString(d, "NotFound", NotFound);
-  PyDict_SetItemString(d, "TooManyPeriodsInName", TooManyPeriods);
-  pprintMod = PyImport_ImportModule("pprint");
-  if (!pprintMod)
+    /* create the module and add the functions */
+    m = Py_InitModule("_namemapper", namemapper_methods);
+
+    /* add symbolic constants to the module */
+    d = PyModule_GetDict(m);
+    NotFound = PyErr_NewException("NameMapper.NotFound",PyExc_LookupError,NULL);
+    TooManyPeriods = PyErr_NewException("NameMapper.TooManyPeriodsInName",NULL,NULL);
+    PyDict_SetItemString(d, "NotFound", NotFound);
+    PyDict_SetItemString(d, "TooManyPeriodsInName", TooManyPeriods);
+    pprintMod = PyImport_ImportModule("pprint");
+    if (!pprintMod)
         return;
-  pprintMod_pformat = PyObject_GetAttrString(pprintMod, "pformat");
-  Py_DECREF(pprintMod);
-  /* check for errors */
-  if (PyErr_Occurred())
-    Py_FatalError("Can't initialize module _namemapper");
+    pprintMod_pformat = PyObject_GetAttrString(pprintMod, "pformat");
+    Py_DECREF(pprintMod);
+    /* check for errors */
+    if (PyErr_Occurred())
+        Py_FatalError("Can't initialize module _namemapper");
 }
 
 #ifdef __cplusplus
