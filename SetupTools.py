@@ -155,14 +155,14 @@ def run_setup(configurations):
 
     # Invoke distutils setup
     try:
-        apply(setup, (), kws)
+        setup(**kws)
     except BuildFailed, x:
         print("One or more C extensions failed to build.")
         print("Details: %s" % x)
         print("Retrying without C extensions enabled.")
 
         del kws['ext_modules']
-        apply(setup, (), kws)
+        setup(**kws)
 
         print("One or more C extensions failed to build.")
         print("Performance enhancements will not be available.")
