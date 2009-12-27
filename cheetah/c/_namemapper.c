@@ -81,22 +81,31 @@ static int isInstanceOrClass(PyObject *nextVal) {
     }
 #endif 
 
-    if(PyObject_HasAttrString(nextVal, "__class__")) {
-	/* new style classes or instances */
-        if(PyType_Check(nextVal) || PyObject_HasAttrString(nextVal, "mro")) {
-            return 1;
-        }
-        if(PyObject_HasAttrString(nextVal, "im_func") 
-	   || PyObject_HasAttrString(nextVal, "func_code")
-	   || PyObject_HasAttrString(nextVal, "__self__")) {
-	    /* method, func, or builtin func */
-            return 0;
-	}
-        if ((!PyObject_HasAttrString(nextVal, "mro")) && PyObject_HasAttrString(nextVal, "__init__")) {
-	    /* instance */
-            return 1;
-        }
+    if (!PyObject_HasAttrString(nextVal, "__class__")) {
+        return 0;
     }
+
+    /* new style classes or instances */
+    if (PyType_Check(nextVal) || PyObject_HasAttrString(nextVal, "mro")) {
+        return 1;
+    }
+
+    if (strncmp(nextVal->ob_type->tp_name, "function", 9) == 0)
+        return 0;
+
+    /* method, func, or builtin func */
+    if (PyObject_HasAttrString(nextVal, "im_func") 
+        || PyObject_HasAttrString(nextVal, "func_code")
+        || PyObject_HasAttrString(nextVal, "__self__")) {
+        return 0;
+    }
+
+    /* instance */
+    if ((!PyObject_HasAttrString(nextVal, "mro")) &&
+            PyObject_HasAttrString(nextVal, "__init__")) {
+        return 1;
+    }
+
     return 0;
 }
 
@@ -154,10 +163,7 @@ static PyObject *PyNamemapper_valueForKey(PyObject *obj, char *key)
     return theValue;
 }
 
-static PyObject *
-PyNamemapper_valueForName(PyObject *obj, char *nameChunks[], 
-			  int numChunks, 
-			  int executeCallables)
+static PyObject *PyNamemapper_valueForName(PyObject *obj, char *nameChunks[], int numChunks, int executeCallables)
 {
     int i;
     char *currentKey;
@@ -196,14 +202,12 @@ PyNamemapper_valueForName(PyObject *obj, char *nameChunks[],
             Py_DECREF(currentVal);
         }
 
-        if (executeCallables && PyCallable_Check(nextVal) && (!isInstanceOrClass(nextVal)) ) {
-            //if (executeCallables && PyCallable_Check(nextVal) && (!PyInstance_Check(nextVal)) 
-            //&& (!PyClass_Check(nextVal)) && (!PyType_Check(nextVal)) ) {
+        if (executeCallables && PyCallable_Check(nextVal) && 
+                (isInstanceOrClass(nextVal) == 0) ) {
             if (!(currentVal = PyObject_CallObject(nextVal, NULL))) {
                 Py_DECREF(nextVal);
                 return NULL;
             }
-
             Py_DECREF(nextVal);
         } else {
             currentVal = nextVal;
