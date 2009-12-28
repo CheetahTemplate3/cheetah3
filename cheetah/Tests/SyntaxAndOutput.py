@@ -22,7 +22,6 @@ import re
 from copy import deepcopy
 import os
 import os.path
-import new
 import warnings
 import unittest
 

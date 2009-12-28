@@ -8,7 +8,6 @@ See the docstring in the Template class and the Users' Guide for more informatio
 ## DEPENDENCIES
 import sys                        # used in the error handling code
 import re                         # used to define the internal delims regex
-import new                        # used to bind methods and create dummy modules
 import logging
 import string
 import os.path
@@ -21,11 +20,6 @@ import traceback
 import pprint
 import cgi                # Used by .webInput() if the template is a CGI script.
 import types 
-from types import StringType, ClassType
-try:
-    from types import StringTypes
-except ImportError:
-    StringTypes = (types.StringType, types.UnicodeType)
     
 try:
     from threading import Lock
@@ -595,7 +589,7 @@ class Template(Servlet):
         if isinstance(baseclass, Template):
             baseclass = baseclass.__class__
 
-        if not isinstance(baseclass, (types.NoneType, basestring, types.ClassType, types.TypeType)):
+        if not isinstance(baseclass, (types.NoneType, basestring, type)):
             raise TypeError(errmsg % ('baseclass', 'string, class or None'))
 
         if cacheCompilationResults is Unspecified:
@@ -679,7 +673,7 @@ class Template(Servlet):
         if baseclass:
             if isinstance(baseclass, basestring):
                 baseclassName = baseclass
-            elif isinstance(baseclass, (types.ClassType, types.TypeType)):
+            elif isinstance(baseclass, type):
                 # @@TR: should soft-code this
                 baseclassName = 'CHEETAH_dynamicallyAssignedBaseClass_'+baseclass.__name__
                 baseclassValue = baseclass
@@ -768,7 +762,7 @@ class Template(Servlet):
                     open(__file__, 'w').write(generatedModuleCode)
                     # @@TR: should probably restrict the perms, etc.
 
-                mod = new.module(str(uniqueModuleName))
+                mod = types.ModuleType(str(uniqueModuleName))
                 if moduleGlobals:
                     for k, v in moduleGlobals.items():
                         setattr(mod, k, v)
@@ -978,8 +972,7 @@ class Template(Servlet):
         for methodname in klass._CHEETAH_requiredCheetahMethods:
             if not hasattr(concreteTemplateClass, methodname):
                 method = getattr(Template, methodname)
-                newMethod = new.instancemethod(method.im_func, None, concreteTemplateClass)
-                #print methodname, method
+                newMethod = types.MethodType(method.im_func, None, concreteTemplateClass)
                 setattr(concreteTemplateClass, methodname, newMethod)
 
         for classMethName in klass._CHEETAH_requiredCheetahClassMethods:
@@ -1035,8 +1028,8 @@ class Template(Servlet):
                     else:
                         return super(self.__class__, self).__unicode__()
                     
-            __str__ = new.instancemethod(__str__, None, concreteTemplateClass)
-            __unicode__ = new.instancemethod(__unicode__, None, concreteTemplateClass)
+            __str__ = types.MethodType(__str__, None, concreteTemplateClass)
+            __unicode__ = types.MethodType(__unicode__, None, concreteTemplateClass)
             setattr(concreteTemplateClass, '__str__', __str__)
             setattr(concreteTemplateClass, '__unicode__', __unicode__)
 
@@ -1174,7 +1167,7 @@ class Template(Servlet):
                             ('file', 'string, file open for reading, or None'))
 
         if not isinstance(filter, (basestring, types.TypeType)) and not \
-                (isinstance(filter, types.ClassType) and issubclass(filter, Filters.Filter)):
+                (isinstance(filter, type) and issubclass(filter, Filters.Filter)):
             raise TypeError(errmsgextra %
                             ('filter', 'string or class',
                              '(if class, must be subclass of Cheetah.Filters.Filter)'))
@@ -1187,7 +1180,7 @@ class Template(Servlet):
             err = True
             if isinstance(errorCatcher, (basestring, types.TypeType)):
                 err = False
-            if isinstance(errorCatcher, types.ClassType) and \
+            if isinstance(errorCatcher, type) and \
                     issubclass(errorCatcher, ErrorCatchers.ErrorCatcher): 
                 err = False
             if err:
@@ -1505,7 +1498,7 @@ class Template(Servlet):
         if errorCatcher:
             if isinstance(errorCatcher, basestring):
                 errorCatcherClass = getattr(ErrorCatchers, errorCatcher)
-            elif isinstance(errorCatcher, ClassType):
+            elif isinstance(errorCatcher, type):
                 errorCatcherClass = errorCatcher
 
             self._CHEETAH__errorCatcher = ec = errorCatcherClass(self)
@@ -1578,7 +1571,7 @@ class Template(Servlet):
             if not raw:
                 if includeFrom == 'file':
                     source = None
-                    if type(srcArg) in StringTypes:
+                    if isinstance(srcArg, basestring):
                         if hasattr(self, 'serverSidePath'):
                             file = path = self.serverSidePath(srcArg)
                         else:

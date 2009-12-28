@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Parser classes for Cheetah's Compiler
 
@@ -12,11 +13,10 @@ import os
 import sys
 import re
 from re import DOTALL, MULTILINE
-from types import StringType, ListType, TupleType, ClassType, TypeType
+import types
 import time
 from tokenize import pseudoprog
 import inspect
-import new
 import traceback
 
 from Cheetah.SourceReader import SourceReader
@@ -1365,7 +1365,7 @@ class _HighLevelParser(_LowLevelParser):
         def normalizeParserVal(val):
             if isinstance(val, (str, unicode)):
                 handler = getattr(self, val)
-            elif type(val) in (ClassType, TypeType):
+            elif isinstance(val, type):
                 handler = val(self)
             elif hasattr(val, '__call__'):
                 handler = val
@@ -1416,7 +1416,7 @@ class _HighLevelParser(_LowLevelParser):
 
 
         for macroName, callback in macroDirectives.items():
-            if type(callback) in (ClassType, TypeType):
+            if isinstance(callback, type):
                 callback = callback(parser=self)
             assert callback                
             self._macros[macroName] = callback
@@ -2351,7 +2351,7 @@ class _HighLevelParser(_LowLevelParser):
         assert 'src' not in kwArgs
         kwArgs['src'] = srcBlock
 
-        if isinstance(macro, new.instancemethod):
+        if isinstance(macro, types.MethodType):
             co = macro.im_func.func_code
         elif (hasattr(macro, '__call__')
               and hasattr(macro.__call__, 'im_func')):

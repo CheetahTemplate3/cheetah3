@@ -4,9 +4,7 @@ import copy as copyModule
 from ConfigParser import ConfigParser 
 import re
 from tokenize import Intnumber, Floatnumber, Number
-from types import *
 import types
-import new
 import time
 from StringIO import StringIO # not cStringIO because of unicode support
 import imp                 # used by SettingsManager.updateSettingsFromPySrcFile()
@@ -14,10 +12,6 @@ import imp                 # used by SettingsManager.updateSettingsFromPySrcFile
 
 numberRE = re.compile(Number)
 complexNumberRE = re.compile('[\(]*' +Number + r'[ \t]*\+[ \t]*' + Number + '[\)]*')
-
-convertableToStrTypes = (StringType, IntType, FloatType,
-                         LongType, ComplexType, NoneType,
-                         UnicodeType)
 
 ##################################################
 ## FUNCTIONS ##
@@ -110,7 +104,7 @@ class _SettingsCollector(object):
         newSettings = {'self':self}
         exec((theString+os.linesep), globalsDict, newSettings)        
         del newSettings['self']
-        module = new.module('temp_settings_module')
+        module = types.ModuleType('temp_settings_module')
         module.__dict__.update(newSettings)
         return self.readSettingsFromModule(module)
 
