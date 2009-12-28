@@ -16,8 +16,6 @@ delete(key)
 '''
 import time
 
-from Cheetah.Utils.memcache import Client as MemcachedClient
-
 class Error(Exception):
     pass
 
@@ -74,7 +72,7 @@ class MemcachedCacheStore(AbstractCacheStore):
     def __init__(self, servers=None, debug=False):
         if servers is None:
             servers = self.servers
-            
+        from memcache import Client as MemcachedClient
         self._client = MemcachedClient(servers, debug)
 
     def set(self, key, val, time=0):
