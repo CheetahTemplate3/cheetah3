@@ -30,6 +30,14 @@ except ImportError:
         def release(self): 
             pass
 
+filetype = None
+try:
+    # Python3 
+    import io
+    filetype = io.IOBase
+except ImportError:
+    filetype = types.FileType
+
 try:
     x = set()
 except NameError:
@@ -580,7 +588,7 @@ class Template(Servlet):
         if not isinstance(source, (types.NoneType, basestring)):
             raise TypeError(errmsg % ('source', 'string or None'))
 
-        if not isinstance(file, (types.NoneType, basestring, types.FileType)):
+        if not isinstance(file, (types.NoneType, basestring, filetype)):
             raise TypeError(errmsg %
                             ('file', 'string, file-like object, or None'))
 
@@ -1162,7 +1170,7 @@ class Template(Servlet):
         if not isinstance(source, (types.NoneType, basestring)):
             raise TypeError(errmsg % ('source', 'string or None'))
 
-        if not isinstance(source, (types.NoneType, basestring, types.FileType)):
+        if not isinstance(source, (types.NoneType, basestring, filetype)):
             raise TypeError(errmsg %
                             ('file', 'string, file open for reading, or None'))
 
