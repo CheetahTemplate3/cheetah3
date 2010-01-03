@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 import sys
 import types
 import os
@@ -11,7 +10,7 @@ from Cheetah.NameMapper import NotFound, valueForKey, \
      valueForName, valueFromSearchList, valueFromFrame, valueFromFrameOrSearchList
 
 
-class DummyClass:
+class DummyClass(object):
     classVar1 = 123
 
     def __init__(self):
@@ -516,6 +515,17 @@ class VFFSL_4(VFFSL):
 
 if sys.platform.startswith('java'):
     del VFF, VFFSL, VFFSL_2, VFFSL_3, VFFSL_4
+
+
+class MapBuiltins(unittest.TestCase):
+    def test_int(self):
+        from Cheetah.Template import Template
+        t = Template('''
+            #def intify(val)
+                #return $int(val)
+            #end def''', compilerSettings={'useStackFrames' : False})
+        self.assertEquals(5, t.intify('5'))
+
 
 
 ##################################################

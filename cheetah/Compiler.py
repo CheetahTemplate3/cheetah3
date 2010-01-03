@@ -266,7 +266,7 @@ class GenUtils(object):
                           + repr(defaultUseAC and useAC) + ')'
                           + remainder)
         else:
-            pythonCode = ('VFSL([locals()]+SL+[globals(), __builtin__],'
+            pythonCode = ('VFSL([locals()]+SL+[globals(), builtin],'
                           '"'+ name + '",'
                           + repr(defaultUseAC and useAC) + ')'
                           + remainder)
@@ -1615,7 +1615,10 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "import sys",
             "import os",
             "import os.path",
-            "import __builtin__",
+            'try:',
+            '    import builtins as builtin',
+            'except ImportError:',
+            '    import __builtin__ as builtin',
             "from os.path import getmtime, exists",
             "import time",
             "import types",
