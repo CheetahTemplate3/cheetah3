@@ -12,34 +12,8 @@ class Error(Exception):
                                 
 class SourceReader(object):
     def __init__(self, src, filename=None, breakPoint=None, encoding=None):
-
-        ## @@TR 2005-01-17: the following comes from a patch Terrel Shumway
-        ## contributed to add unicode support to the reading of Cheetah source
-        ## files with dynamically compiled templates. All the existing unit
-        ## tests pass but, it needs more testing and some test cases of its
-        ## own. My instinct is to move this up into the code that passes in the
-        ## src string rather than leaving it here.  As implemented here it
-        ## forces all src strings to unicode, which IMO is not what we want.
-        #  if encoding is None:
-        #      # peek at the encoding in the first two lines
-        #      m = EOLZre.search(src)
-        #      pos = m.end()
-        #      if pos<len(src):
-        #          m = EOLZre.search(src,pos)
-        #          pos = m.end()
-        #      m = ENCODINGsearch(src,0,pos)
-        #      if m:
-        #          encoding = m.group(1)
-        #      else:
-        #          encoding  = sys.getfilesystemencoding()
-        #  self._encoding = encoding
-        #  if type(src) is not unicode:
-        #      src = src.decode(encoding)
-        ## end of Terrel's patch
-
         self._src = src
         self._filename = filename
-
         self._srcLen = len(src)
         if breakPoint == None:
             self._breakPoint = self._srcLen
@@ -72,7 +46,10 @@ class SourceReader(object):
         return self._breakPoint
     
     def __getitem__(self, i):
-        self.checkPos(i)
+        if not isinstance(i, int):
+            self.checkPos(i.stop)
+        else:
+            self.checkPos(i)
         return self._src[i]
     
     def __getslice__(self, i, j):
@@ -80,7 +57,7 @@ class SourceReader(object):
         return self._src[i:j]
 
     def splitlines(self):
-        if not hasattr(self, '_srcLines'):                
+        if not hasattr(self, '_srcLines'):
             self._srcLines = self._src.splitlines()
         return self._srcLines
 
