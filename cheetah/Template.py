@@ -31,18 +31,19 @@ except ImportError:
             pass
 
 filetype = None
-try:
-    # Python3 
+
+if isinstance(sys.version_info, tuple):
+    # Python 2.xx
+    filetype = types.FileType
+    def createMethod(func, cls):
+        return types.MethodType(func, None, cls)
+else:
     import io
     filetype = io.IOBase
-except ImportError:
-    filetype = types.FileType
+    def createMethod(func, cls):
+        return types.MethodType(func, cls)
 
-try:
-    x = set()
-except NameError:
-    # Python 2.3 compatibility
-    from sets import Set as set
+
 
 from Cheetah.Version import convertVersionStringToTuple, MinCompatibleVersionTuple
 from Cheetah.Version import MinCompatibleVersion
@@ -980,7 +981,7 @@ class Template(Servlet):
         for methodname in klass._CHEETAH_requiredCheetahMethods:
             if not hasattr(concreteTemplateClass, methodname):
                 method = getattr(Template, methodname)
-                newMethod = types.MethodType(method.im_func, None, concreteTemplateClass)
+                newMethod = createMethod(method.im_func, concreteTemplateClass)
                 setattr(concreteTemplateClass, methodname, newMethod)
 
         for classMethName in klass._CHEETAH_requiredCheetahClassMethods:
@@ -1036,8 +1037,8 @@ class Template(Servlet):
                     else:
                         return super(self.__class__, self).__unicode__()
                     
-            __str__ = types.MethodType(__str__, None, concreteTemplateClass)
-            __unicode__ = types.MethodType(__unicode__, None, concreteTemplateClass)
+            __str__ = createMethod(__str__, concreteTemplateClass)
+            __unicode__ = createMethod(__unicode__, concreteTemplateClass)
             setattr(concreteTemplateClass, '__str__', __str__)
             setattr(concreteTemplateClass, '__unicode__', __unicode__)
 
