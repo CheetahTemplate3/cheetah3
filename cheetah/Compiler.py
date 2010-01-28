@@ -1556,7 +1556,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         
         else:
             unicodeMatch = unicodeDirectiveRE.search(source)
-            encodingMatch = encodingDirectiveRE.match(source)
+            encodingMatch = encodingDirectiveRE.search(source)
             if unicodeMatch:
                 if encodingMatch:
                     raise ParseError(

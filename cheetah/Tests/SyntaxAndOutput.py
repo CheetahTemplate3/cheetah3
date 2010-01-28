@@ -742,6 +742,12 @@ class EncodingDirective(OutputTest):
         self.verify("#encoding latin-1\nAndr\202",
                     u'Andr\202')
 
+    def test6(self):
+        '''Using #encoding on the second line'''
+        self.verify("""### Comments on the first line
+#encoding utf-8\n\xe1\x88\xb4""",
+                    u'\u1234', outputEncoding='utf8')
+
 class UnicodeDirective(OutputTest):
     def test1(self):
         """basic #unicode """
