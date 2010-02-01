@@ -179,7 +179,7 @@ def _wrapNotFoundException(exc, fullName, namespace):
         raise
 
 def _isInstanceOrClass(obj):
-    if type(obj) in (InstanceType, ClassType):
+    if isinstance(obj, type):
         # oldstyle
         return True
 
