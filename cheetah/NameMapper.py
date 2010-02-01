@@ -35,18 +35,18 @@ customer information:
 Using Cheetah's NameMapper syntax it could be any of the following:
 
    $self.customers()[$ID].address()['city']       (39 chars)
-   --OR--                                         
-   $customers()[$ID].address()['city']           
-   --OR--                                         
-   $customers()[$ID].address().city              
-   --OR--                                         
-   $customers()[$ID].address.city                
-   --OR--                                         
+   --OR--
+   $customers()[$ID].address()['city']
+   --OR--
+   $customers()[$ID].address().city
+   --OR--
    $customers()[$ID].address.city
    --OR--
-   $customers[$ID].address.city                   (27 chars)                   
-   
-   
+   $customers()[$ID].address.city
+   --OR--
+   $customers[$ID].address.city                   (27 chars)
+
+
 Which of these would you prefer to explain to the designers, who have no
 programming experience?  The last form is 15 characters shorter than the PSP
 and, conceptually, is far more accessible. With PHP or ASP, the code would be
@@ -79,7 +79,7 @@ AUTOCALLING (b,d)
 -----------------
 
 NameMapper automatically detects functions and methods in Cheetah $vars and calls
-them if the parentheses have been left off.  
+them if the parentheses have been left off.
 
 For example if 'a' is an object, 'b' is a method
   $a.b
@@ -96,7 +96,7 @@ autocalling can only be used with functions or methods that either have no
 arguments or have default values for all arguments.
 
 * NameMapper only autocalls functions and methods.  Classes and callable object instances
-will not be autocalled.  
+will not be autocalled.
 
 * Autocalling can be disabled using Cheetah's 'useAutocalling' setting.
 
@@ -128,22 +128,12 @@ difference in realistic usage scenarios.
 
 Cheetah uses the optimized C version (_namemapper.c) if it has
 been compiled or falls back to the Python version if not.
-
-Meta-Data
-================================================================================
-Authors: Tavis Rudd <tavis@damnsimple.com>,
-         Chuck Esterbrook <echuck@mindspring.com>
-Version: $Revision: 1.32 $
-Start Date: 2001/04/03
-Last Revision Date: $Date: 2007/12/10 19:20:09 $
 """
 
 __author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
              "\nChuck Esterbrook <echuck@mindspring.com>"
-__revision__ = "$Revision: 1.32 $"[11:-2]
 from pprint import pformat
 import inspect
-import pdb
 
 _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS = False
 _ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS = True
@@ -157,7 +147,7 @@ __all__ = ['NotFound',
            ]
 
 if not hasattr(inspect.imp, 'get_suffixes'):
-    # This is to fix broken behavior of the inspect module under the 
+    # This is to fix broken behavior of the inspect module under the
     # Google App Engine, see the following issue:
     # http://bugs.communitycheetah.org/view.php?id=10
     setattr(inspect.imp, 'get_suffixes', lambda: [('.py', 'U', 1)])
@@ -178,7 +168,7 @@ def _raiseNotFoundException(key, namespace):
 
 def _wrapNotFoundException(exc, fullName, namespace):
     if not _ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS:
-        raise 
+        raise
     else:
         excStr = exc.args[0]
         if excStr.find('while searching')==-1: # only wrap once!
@@ -205,7 +195,7 @@ def _isInstanceOrClass(obj):
             # instance
             return True
     return False
-    
+
 def hasKey(obj, key):
     """Determine if 'obj' has 'key' """
     if hasattr(obj, 'has_key') and key in obj:
@@ -234,7 +224,7 @@ def _valueForName(obj, name, executeCallables=False):
                 nextObj = getattr(obj, key)
             except AttributeError:
                 _raiseNotFoundException(key, obj)
-        
+
         if executeCallables and hasattr(nextObj, '__call__') and not _isInstanceOrClass(nextObj):
             obj = nextObj()
         else:
@@ -285,7 +275,7 @@ def valueFromFrame(name, executeCallables=False, frame=None):
     # @@TR consider implementing the C version the same way
     # at the moment it provides a seperate but mirror implementation
     # to valueFromFrameOrSearchList
-    try: 
+    try:
         if not frame:
             frame = inspect.stack()[1][0]
         return valueFromFrameOrSearchList(searchList=None,
