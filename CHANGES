@@ -1,3 +1,13 @@
+2.4.2 (February 8th, 2010)
+  - Fix issue where subclasses of Template failed to pick up attributes in the
+    searchlist
+  - Remove old/outdated bundled memcached python client
+  - Allow for #encoding directives to exist after a comment (i.e. not the first
+    line in a module)
+  - Remove support for WebWare servlets (which caused significant performance
+    slowdowns on Mac OS X)
+  - Old/stale code pruned in preparation for Python 3 support
+
 2.4.1 (December 19th, 2009)
   - --quiet flag added to `cheetah` to silence printing to stdout (abbeyj)
   - Refactoring to minimize the amount of forked code for Python3 (rtyler)
