@@ -63,6 +63,12 @@ class CFBase(unittest.TestCase):
         """Create the top-level directories, subdirectories and .tmpl
            files.
         """
+        self.cmd = self.locate_cheetah('cheetah')
+        pythonPath = os.getcwd()
+        if not os.environ.get('PYTHONPATH'):
+            os.environ['PYTHONPATH'] = pythonPath
+        else:
+            os.environ['PYTHONPATH'] = '%s:%s' % (os.environ['PYTHONPATH'], pythonPath)
         I = self.inform
         # Step 1: Create the scratch directory and chdir into it.
         self.scratchDir = scratchDir = tempfile.mktemp() 
@@ -79,7 +85,6 @@ class CFBase(unittest.TestCase):
             f = open(fil, 'w')
             f.write("Hello, world!\n")
             f.close()
-            
 
     def tearDown(self):
         os.chdir(self.origCwd)
@@ -157,17 +162,18 @@ Found %(result)r"""
         msg = "backup file exists in spite of --nobackup: %s" % path
         self.failIf(exists, msg)
 
-    def locate_command(self, cmd):
+    def locate_cheetah(self, cmd):
         paths = os.getenv('PATH')
         if not paths:
             return cmd
         parts = cmd.split(' ')
         paths = paths.split(':')
         for p in paths:
-            p = p + os.path.sep + parts[0]
+            p = os.path.join(p, cmd)
+            p = os.path.abspath(p)
             if os.path.isfile(p):
-                return ' '.join([p] + parts[1:])
-        return ' '.join(parts)
+                return p
+        return cmd
 
     def assertWin32Subprocess(self, cmd):
         _in, _out = os.popen4(cmd)
@@ -179,7 +185,7 @@ Found %(result)r"""
         return rc, output
 
     def assertPosixSubprocess(self, cmd):
-        cmd = self.locate_command(cmd)
+        cmd = cmd.replace('cheetah', self.cmd)
         process = Popen4(cmd, env=os.environ)
         process.tochild.close()
         output = process.fromchild.read()
