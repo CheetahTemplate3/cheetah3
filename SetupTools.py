@@ -159,6 +159,8 @@ def run_setup(configurations):
     except BuildFailed, x:
         print("One or more C extensions failed to build.")
         print("Details: %s" % x)
+        if os.environ.get('CHEETAH_C_EXTENSIONS_REQUIRED'):
+            raise x
         print("Retrying without C extensions enabled.")
 
         del kws['ext_modules']
