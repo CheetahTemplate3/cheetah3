@@ -1329,8 +1329,8 @@ class Template(Servlet):
         """
         
         if not cacheRegionId:
-            for key, cregion in self.getCacheRegions():
-                cregion.clear()
+            for cacheRegion in self.getCacheRegions().itervalues():
+                cacheRegion.clear()
         else:
             cregion = self._CHEETAH__cacheRegions.get(cacheRegionId)
             if not cregion:
