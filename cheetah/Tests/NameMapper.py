@@ -43,6 +43,10 @@ class DummyClass(object):
         except:
             raise
 
+class DummyClassGetAttrRaises(object):
+    def __getattr__(self, name):
+        raise ValueError
+
 
 def dummyFunc(arg="Scooby"):
     return arg
@@ -67,6 +71,7 @@ testNamespace = {
     'aClass': DummyClass,    
     'aFunc': dummyFunc,
     'anObj': DummyClass(),
+    'anObjThatRaises': DummyClassGetAttrRaises(),
     'aMeth': DummyClass().meth1,
     'none': None,  
     'emptyString': '',
@@ -418,6 +423,14 @@ class VFN(NameMapperTest):
 
         for i in range(10):
             self.get('aDict.nestedDict.funcThatRaises', False)    
+
+    def test61(self):
+        """Accessing attribute where __getattr__ raises shouldn't segfault if something follows it"""
+
+        def test(self=self):
+            self.get('anObjThatRaises.willraise.anything')
+        self.assertRaises(ValueError, test)
+
 
 class VFS(VFN):
     _searchListLength = 1

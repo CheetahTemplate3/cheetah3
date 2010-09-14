@@ -58,7 +58,8 @@ def main():
     os.putenv('PYTHONPATH', libdir)
 
     rc = subprocess.call( ['python',] + args )
-
+    if rc == -11:
+        logging.error('Segmentation fault in test process. Test failed.')
 
 
 if __name__ == '__main__':
