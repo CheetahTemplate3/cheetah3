@@ -1,5 +1,5 @@
-Version = '2.4.3'
-VersionTuple = (2, 4, 3, 'development', 0)
+Version = '2.4.4'
+VersionTuple = (2, 4, 4, 'development', 0)
 
 MinCompatibleVersion = '2.0rc6'
 MinCompatibleVersionTuple = (2, 0, 0, 'candidate', 6)
