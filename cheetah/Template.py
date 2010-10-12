@@ -32,7 +32,7 @@ except ImportError:
 
 filetype = None
 
-if isinstance(sys.version_info, tuple):
+if isinstance(sys.version_info[:], tuple):
     # Python 2.xx
     filetype = types.FileType
     def createMethod(func, cls):
