@@ -173,6 +173,7 @@ class CheetahWrapper(object):
         pao("--templateAPIClass", action="store", dest="templateClassName", default=None, help='Name of a subclass of Cheetah.Template.Template to use for compilation, e.g. MyTemplateClass')
         pao("--parallel", action="store", type="int", dest="parallel", default=1, help='Compile/fill templates in parallel, e.g. --parallel=4')
         pao('--shbang', dest='shbang', default='#!/usr/bin/env python', help='Specify the shbang to place at the top of compiled templates, e.g. --shbang="#!/usr/bin/python2.6"')
+        pao('--encoding', dest='encoding', default=None, help='Specify the encoding of source files (e.g. \'utf-8\' to force input files to be interpreted as UTF-8)')
 
         opts, files = self.parser.parse_args(args)
         self.opts = opts

@@ -18,6 +18,7 @@ import time
 import random
 import warnings
 import copy
+import codecs
 
 from Cheetah.Version import Version, VersionTuple
 from Cheetah.SettingsManager import SettingsManager
@@ -99,6 +100,7 @@ _DEFAULT_COMPILER_SETTINGS = [
     ('allowEmptySingleLineMethods', False, ''),
     ('allowNestedDefScopes', True, ''),
     ('allowPlaceholderFilterArgs', True, ''),
+    ('encoding', None, 'The encoding to read input files as (or None for ASCII)'),
 ]
 
 DEFAULT_COMPILER_SETTINGS = dict([(v[0], v[1]) for v in _DEFAULT_COMPILER_SETTINGS])
@@ -1530,7 +1532,13 @@ class ModuleCompiler(SettingsManager, GenUtils):
         if source and file:
             raise TypeError("Cannot compile from a source string AND file.")
         elif isinstance(file, basestring): # it's a filename.
-            f = open(file) # Raises IOError.
+            encoding = settings.get('encoding')
+            if encoding:
+                f = codecs.open(file, 'r', encoding=encoding)
+            else:
+                f = open(file, 'r') # if no encoding is specified, use the
+                                    # builtin open function, which will
+                                    # effectively read data as a bytestream
             source = f.read()
             f.close()
             self._filePath = file
