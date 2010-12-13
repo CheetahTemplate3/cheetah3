@@ -179,25 +179,36 @@ static PyObject *PyNamemapper_valueForName(PyObject *obj, char *nameChunks[], in
             }
             return NULL;
         }
-        
+
         if (PyMapping_Check(currentVal) && PyMapping_HasKeyString(currentVal, currentKey)) {
             nextVal = PyMapping_GetItemString(currentVal, currentKey);
-        } 
+        }
+
         else {
-          PyObject *exc;
-          nextVal = PyObject_GetAttrString(currentVal, currentKey);
-          exc = PyErr_Occurred();
-          if (exc != NULL) {
-            // if exception == AttributeError, report our own exception
-            if (PyErr_ExceptionMatches(PyExc_AttributeError)) {
+            PyObject *exc;
+            nextVal = PyObject_GetAttrString(currentVal, currentKey);
+            exc = PyErr_Occurred();
+
+            if (exc != NULL) {
+                // if exception == AttributeError, report our own exception
+                if (PyErr_ExceptionMatches(PyExc_AttributeError)) {
+                    setNotFoundException(currentKey, currentVal);
+                }
+                // any exceptions results in failure
+                if (i > 0) {
+                    Py_DECREF(currentVal);
+                }
+                return NULL;
+            }
+
+            if (nextVal == NULL) {
                 setNotFoundException(currentKey, currentVal);
+                // any exceptions results in failure
+                if (i > 0) {
+                    Py_DECREF(currentVal);
+                }
+                return NULL;
             }
-            // any exceptions results in failure
-            if (i > 0) {
-                Py_DECREF(currentVal);
-            }
-            return NULL;
-          }
         }
         if (i > 0) {
             Py_DECREF(currentVal);
