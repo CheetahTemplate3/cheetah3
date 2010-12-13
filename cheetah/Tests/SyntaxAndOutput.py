@@ -848,17 +848,17 @@ class Placeholders_Calls(OutputTest):
     def test10(self):
         r"""func placeholder - with ('''\nstring\n''')"""
         self.verify("$aFunc('''\naoeu\n''')",
-                    "\naoeu\n")
+                    "\naoeu\n", convertEOLs=False)
 
     def test11(self):
         r"""func placeholder - with ('''\nstring'\n''')"""
         self.verify("$aFunc('''\naoeu'\n''')",
-                    "\naoeu'\n")
+                    "\naoeu'\n", convertEOLs=False)
 
     def test12(self):
         r'''func placeholder - with ("""\nstring\n""")'''
         self.verify('$aFunc("""\naoeu\n""")',
-                    "\naoeu\n")
+                    "\naoeu\n", convertEOLs=False)
 
     def test13(self):
         """func placeholder - with (string*int)"""
