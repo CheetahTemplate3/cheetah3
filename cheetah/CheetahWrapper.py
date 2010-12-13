@@ -232,7 +232,7 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
 
     def fill(self):
         from Cheetah.ImportHooks import install
-        install()        
+        install()
         self._compileOrFill()
 
     def help(self):
@@ -264,12 +264,13 @@ you do have write permission to and re-run the tests.""")
             verbosity = 2
         runner = unittest.TextTestRunner(verbosity=verbosity)
         runner.run(unittest.TestSuite(Test.suites))
-        
+        results = runner.run(unittest.TestSuite(Test.suites))
+        exit(int(not results.wasSuccessful()))
+
     def version(self):
         print(Version)
 
     # If you add a command, also add it to the 'meths' variable in main().
-    
     ##################################################
     ## LOGGING METHODS
 
