@@ -1476,8 +1476,12 @@ class ClassCompiler(GenUtils):
         return '\n\n'.join(methodDefs)
 
     def attributes(self):
-        attribs = [self.setting('indentationStep') + str(attrib)
-                      for attrib in self._generatedAttribs ]
+        try:
+            attribs = [self.setting('indentationStep') + str(attrib)
+                          for attrib in self._generatedAttribs ]
+        except UnicodeEncodeError:
+            attribs = [self.setting('indentationStep') + unicode(attrib)
+                          for attrib in self._generatedAttribs ]
         return '\n\n'.join(attribs)
   
 class AutoClassCompiler(ClassCompiler):
