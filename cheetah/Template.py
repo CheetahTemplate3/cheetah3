@@ -104,9 +104,8 @@ def hashDict(d):
 def _genUniqueModuleName(baseModuleName):
     """The calling code is responsible for concurrency locking.
     """
-    if baseModuleName not in sys.modules:
-        finalName = baseModuleName
-    else:
+    finalName = baseModuleName
+    while finalName in sys.modules:
         finalName = ('cheetah_%s_%s_%s'%(baseModuleName,
                                          str(time.time()).replace('.', '_'),
                                          str(randrange(10000, 99999))))
