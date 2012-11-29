@@ -1171,7 +1171,7 @@ class Template(Servlet):
         if not isinstance(source, (types.NoneType, basestring)):
             raise TypeError(errmsg % ('source', 'string or None'))
 
-        if not isinstance(source, (types.NoneType, basestring, filetype)):
+        if not isinstance(file, (types.NoneType, basestring, filetype)):
             raise TypeError(errmsg %
                             ('file', 'string, file open for reading, or None'))
 
