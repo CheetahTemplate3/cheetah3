@@ -103,7 +103,7 @@ class Hierarchy:
         
     def crumbLink(self, url, text):
         if url == self._currentURL or self._prefix + url == self._currentURL:
-            return '<B%s>%s</B>' % (text, self._crumbCSSClass)
+            return '<B%s>%s</B>' % (self._crumbCSSClass, text)
         else:
             return '<A HREF="%s%s"%s>%s</A>' % \
                    (self._prefix, url, self._crumbCSSClass, text)
