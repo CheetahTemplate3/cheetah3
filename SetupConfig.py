@@ -14,8 +14,8 @@ packages = ['Cheetah',
             'Cheetah.Tools',
             'Cheetah.Utils',
             ]
-classifiers = [line.strip() for line in '''\
-  #Development Status :: 4 - Beta
+classifiers = [line.strip() for line in
+'''#Development Status :: 4 - Beta
   Development Status :: 5 - Production/Stable
   Intended Audience :: Developers
   Intended Audience :: System Administrators
@@ -29,7 +29,9 @@ classifiers = [line.strip() for line in '''\
   Topic :: Software Development :: Libraries :: Python Modules
   Topic :: Software Development :: User Interfaces
   Topic :: Text Processing'''.splitlines() if not line.strip().startswith('#')]
-del line
+
+if sys.version_info.major == 2:
+  del line
 
 package_dir = {'Cheetah':'cheetah'}
 
