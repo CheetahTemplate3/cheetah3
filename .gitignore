@@ -7,3 +7,5 @@ build
 *.py.bak
 Cheetah.egg-info/
 dist
+.eggs/
+.tox/
