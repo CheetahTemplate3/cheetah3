@@ -14,7 +14,11 @@ import re
 from re import DOTALL, MULTILINE
 import types
 import time
-from tokenize import pseudoprog
+try:
+    from tokenize import pseudoprog
+except ImportError:
+    from tokenize import PseudoToken
+    pseudoprog = re.compile(PseudoToken)
 import inspect
 import traceback
 
