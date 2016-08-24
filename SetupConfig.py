@@ -6,6 +6,7 @@ from cheetah.Version import Version as version
 maintainer = "R. Tyler Ballance"
 author = "Tavis Rudd"
 author_email = "cheetahtemplate-discuss@lists.sf.net"
+license = "MIT"
 url = "http://www.cheetahtemplate.org/"
 packages = ['Cheetah',
             'Cheetah.Macros',            
