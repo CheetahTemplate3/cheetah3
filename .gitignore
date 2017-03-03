@@ -1,9 +1,9 @@
-*.pyc
+*.py[co]
+*.py.bak
 *.swp
 *.so
+Cheetah.egg-info/
+build
+dist
 www/*.html
 www/_build
-build
-*.py.bak
-Cheetah.egg-info/
-dist
