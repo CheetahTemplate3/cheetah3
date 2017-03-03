@@ -1,0 +1,2 @@
+3.0.0 (2017?)
+  - Stop supporting Python older than 2.5 (we need `except x as y`).
