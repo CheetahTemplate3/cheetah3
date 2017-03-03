@@ -24,6 +24,7 @@ from Cheetah import Filters
 from Cheetah import ErrorCatchers
 from Cheetah.Unspecified import Unspecified
 from Cheetah.Macros.I18n import I18n
+from .compat import string_type
 
 # re tools
 _regexCache = {}
@@ -342,7 +343,7 @@ class ArgList(object):
         self.defaults[count] += token
     
     def merge(self):
-        defaults = (isinstance(d, basestring) and d.strip() or None for d in self.defaults)
+        defaults = (isinstance(d, string_type) and d.strip() or None for d in self.defaults)
         return list(map(None, (a.strip() for a in self.arguments), defaults))
     
     def __str__(self):

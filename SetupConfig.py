@@ -1,5 +1,6 @@
 #-------Main Package Settings-----------#
 import sys
+from cheetah.compat import PY2
 
 name = 'Cheetah'
 from cheetah.Version import Version as version
@@ -33,8 +34,8 @@ classifiers = [line.strip() for line in '''\
   Topic :: Software Development :: User Interfaces
   Topic :: Text Processing'''.splitlines() if not line.strip().startswith('#')]
 
-if sys.version_info.major == 2:
-  del line
+if PY2:
+    del line
 
 package_dir = {'Cheetah':'cheetah'}
 

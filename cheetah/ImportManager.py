@@ -22,6 +22,7 @@ This is a hacked/documented version of Gordon McMillan's iu.py. I have:
 import sys
 import imp
 import marshal
+from .compat import string_type
 
 _installed = False
 
@@ -321,7 +322,7 @@ class PathImportDirector(ImportDirector):
     def getmod(self, nm):
         mod = None
         for thing in self.path:
-            if isinstance(thing, basestring):
+            if isinstance(thing, string_type):
                 owner = self._shadowPath.get(thing, -1)
                 if owner == -1:
                     owner = self._shadowPath[thing] = self._makeOwner(thing)

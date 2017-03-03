@@ -24,6 +24,7 @@ from distutils.errors import CCompilerError, DistutilsExecError, \
 
 #imports from Cheetah ...
 from cheetah.FileUtils import findFiles
+from cheetah.compat import string_type
 
 if sys.platform == 'win32' and sys.version_info > (2, 6):
    # 2.6's distutils.msvc9compiler can raise an IOError when failing to
@@ -77,7 +78,7 @@ class mod_install_data(install_data):
         data_files = self.get_inputs()
         
         for entry in data_files:
-            if not isinstance(entry, basestring):
+            if not isinstance(entry, string_type):
                 raise ValueError('The entries in "data_files" must be strings')
             
             entry = string.join(string.split(entry, '/'), os.sep)
@@ -140,7 +141,7 @@ def run_setup(configurations):
     for name, value in kws.items():
         if name[:1] == '_':
             continue
-        if not isinstance(value, (basestring, list, tuple, dict, int)):
+        if not isinstance(value, (string_type, list, tuple, dict, int)):
             continue
         newkws[name] = value
     kws = newkws

@@ -5,6 +5,7 @@ from os import listdir
 import os.path
 import re
 from tempfile import mktemp
+from .compat import string_type
 
 def _escapeRegexChars(txt,
                      escapeRE=re.compile(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])')):
@@ -222,11 +223,11 @@ class FindAndReplace:
                  recordResults=True):
 
         
-        if isinstance(patternOrRE, basestring):
+        if isinstance(patternOrRE, string_type):
             self._regex = re.compile(patternOrRE)
         else:
             self._regex = patternOrRE
-        if isinstance(replacement, basestring):
+        if isinstance(replacement, string_type):
             self._subber = _GenSubberFunc(replacement).subberFunc()
         else:
             self._subber = replacement

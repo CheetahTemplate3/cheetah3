@@ -65,6 +65,7 @@ from Cheetah.CacheRegion import CacheRegion
 from Cheetah.Utils.WebInputMixin import _Converter, _lookup, NonNumericInputError
 
 from Cheetah.Unspecified import Unspecified
+from .compat import string_type
 
 # Decide whether to use the file modification time in file's cache key 
 __checkFileMtime = True
@@ -585,10 +586,10 @@ class Template(Servlet):
         """
         errmsg = "arg '%s' must be %s"
 
-        if not isinstance(source, (types.NoneType, basestring)):
+        if not isinstance(source, (types.NoneType, string_type)):
             raise TypeError(errmsg % ('source', 'string or None'))
 
-        if not isinstance(file, (types.NoneType, basestring, filetype)):
+        if not isinstance(file, (types.NoneType, string_type, filetype)):
             raise TypeError(errmsg %
                             ('file', 'string, file-like object, or None'))
 
@@ -597,7 +598,7 @@ class Template(Servlet):
         if isinstance(baseclass, Template):
             baseclass = baseclass.__class__
 
-        if not isinstance(baseclass, (types.NoneType, basestring, type)):
+        if not isinstance(baseclass, (types.NoneType, string_type, type)):
             raise TypeError(errmsg % ('baseclass', 'string, class or None'))
 
         if cacheCompilationResults is Unspecified:
@@ -628,11 +629,11 @@ class Template(Servlet):
         if not isinstance(keepRefToGeneratedCode, (int, bool)):
             raise TypeError(errmsg % ('keepReftoGeneratedCode', 'boolean'))
 
-        if not isinstance(moduleName, (types.NoneType, basestring)):
+        if not isinstance(moduleName, (types.NoneType, string_type)):
             raise TypeError(errmsg % ('moduleName', 'string or None'))
         __orig_file__ = None
         if not moduleName:
-            if file and isinstance(file, basestring):
+            if file and isinstance(file, string_type):
                 moduleName = convertTmplPathToModuleName(file)
                 __orig_file__ = file
             else:
@@ -641,14 +642,14 @@ class Template(Servlet):
         if className is Unspecified:
             className = klass._CHEETAH_defaultClassNameForTemplates
 
-        if not isinstance(className, (types.NoneType, basestring)):
+        if not isinstance(className, (types.NoneType, string_type)):
             raise TypeError(errmsg % ('className', 'string or None'))
         className = re.sub(r'^_+([^0-9])',r'\1', className or moduleName)
 
         if mainMethodName is Unspecified:
             mainMethodName = klass._CHEETAH_defaultMainMethodNameForTemplates
 
-        if not isinstance(mainMethodName, (types.NoneType, basestring)):
+        if not isinstance(mainMethodName, (types.NoneType, string_type)):
             raise TypeError(errmsg % ('mainMethodName', 'string or None'))
 
         if moduleGlobals is Unspecified:
@@ -664,7 +665,7 @@ class Template(Servlet):
         if cacheDirForModuleFiles is Unspecified:
             cacheDirForModuleFiles = klass._CHEETAH_cacheDirForModuleFiles
 
-        if not isinstance(cacheDirForModuleFiles, (types.NoneType, basestring)):
+        if not isinstance(cacheDirForModuleFiles, (types.NoneType, string_type)):
             raise TypeError(errmsg %
                             ('cacheDirForModuleFiles', 'string or None'))
 
@@ -679,7 +680,7 @@ class Template(Servlet):
         baseclassValue = None
         baseclassName = None
         if baseclass:
-            if isinstance(baseclass, basestring):
+            if isinstance(baseclass, string_type):
                 baseclassName = baseclass
             elif isinstance(baseclass, type):
                 # @@TR: should soft-code this
@@ -689,7 +690,7 @@ class Template(Servlet):
 
         cacheHash = None
         cacheItem = None
-        if source or isinstance(file, basestring):
+        if source or isinstance(file, string_type):
             compilerSettingsHash = None
             if compilerSettings:
                 compilerSettingsHash = hashDict(compilerSettings)
@@ -1167,26 +1168,26 @@ class Template(Servlet):
         errmsg = "arg '%s' must be %s"
         errmsgextra = errmsg + "\n%s"
 
-        if not isinstance(source, (types.NoneType, basestring)):
+        if not isinstance(source, (types.NoneType, string_type)):
             raise TypeError(errmsg % ('source', 'string or None'))
 
-        if not isinstance(file, (types.NoneType, basestring, filetype)):
+        if not isinstance(file, (types.NoneType, string_type, filetype)):
             raise TypeError(errmsg %
                             ('file', 'string, file open for reading, or None'))
 
-        if not isinstance(filter, (basestring, types.TypeType)) and not \
+        if not isinstance(filter, (string_type, types.TypeType)) and not \
                 (isinstance(filter, type) and issubclass(filter, Filters.Filter)):
             raise TypeError(errmsgextra %
                             ('filter', 'string or class',
                              '(if class, must be subclass of Cheetah.Filters.Filter)'))
-        if not isinstance(filtersLib, (basestring, types.ModuleType)):
+        if not isinstance(filtersLib, (string_type, types.ModuleType)):
             raise TypeError(errmsgextra %
                             ('filtersLib', 'string or module',
                              '(if module, must contain subclasses of Cheetah.Filters.Filter)'))
 
         if not errorCatcher is None:
             err = True
-            if isinstance(errorCatcher, (basestring, types.TypeType)):
+            if isinstance(errorCatcher, (string_type, types.TypeType)):
                 err = False
             if isinstance(errorCatcher, type) and \
                     issubclass(errorCatcher, ErrorCatchers.ErrorCatcher): 
@@ -1493,7 +1494,7 @@ class Template(Servlet):
         # @@TR: consider allowing simple callables as the filter argument
         self._CHEETAH__filtersLib = filtersLib
         self._CHEETAH__filters = {}
-        if isinstance(filter, basestring):
+        if isinstance(filter, string_type):
             filterName = filter
             klass = getattr(self._CHEETAH__filtersLib, filterName)
         else:
@@ -1504,7 +1505,7 @@ class Template(Servlet):
 
         self._CHEETAH__errorCatchers = {}
         if errorCatcher:
-            if isinstance(errorCatcher, basestring):
+            if isinstance(errorCatcher, string_type):
                 errorCatcherClass = getattr(ErrorCatchers, errorCatcher)
             elif isinstance(errorCatcher, type):
                 errorCatcherClass = errorCatcher
@@ -1540,7 +1541,7 @@ class Template(Servlet):
         self._fileMtime = None
         self._fileDirName = None
         self._fileBaseName = None
-        if file and isinstance(file, basestring):
+        if file and isinstance(file, string_type):
             file = self.serverSidePath(file)
             self._fileMtime = os.path.getmtime(file)
             self._fileDirName, self._fileBaseName = os.path.split(file)
@@ -1579,7 +1580,7 @@ class Template(Servlet):
             if not raw:
                 if includeFrom == 'file':
                     source = None
-                    if isinstance(srcArg, basestring):
+                    if isinstance(srcArg, string_type):
                         if hasattr(self, 'serverSidePath'):
                             file = path = self.serverSidePath(srcArg)
                         else:

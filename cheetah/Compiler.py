@@ -28,6 +28,7 @@ from Cheetah import NameMapper
 from Cheetah.Parser import Parser, ParseError, specialVarRE, \
      STATIC_CACHE, REFRESH_CACHE, SET_LOCAL, SET_GLOBAL, SET_MODULE, \
      unicodeDirectiveRE, encodingDirectiveRE, escapedNewlineRE
+from .compat import string_type
 
 from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, valueFromFrameOrSearchList
 VFFSL=valueFromFrameOrSearchList
@@ -1535,7 +1536,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         
         if source and file:
             raise TypeError("Cannot compile from a source string AND file.")
-        elif isinstance(file, basestring): # it's a filename.
+        elif isinstance(file, string_type): # it's a filename.
             encoding = settings.get('encoding')
             if encoding:
                 f = codecs.open(file, 'r', encoding=encoding)
@@ -1556,7 +1557,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             self._fileDirName, self._fileBaseName = os.path.split(self._filePath)
             self._fileBaseNameRoot, self._fileBaseNameExt = os.path.splitext(self._fileBaseName)
 
-        if not isinstance(source, basestring):
+        if not isinstance(source, string_type):
             source = unicode(source)
             # by converting to string here we allow objects such as other Templates
             # to be passed in
