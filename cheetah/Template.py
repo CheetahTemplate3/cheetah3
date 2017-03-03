@@ -15,12 +15,14 @@ import time                       # used in the cache refresh code
 from random import randrange
 import imp
 import inspect
-import StringIO
+import io
 import traceback
 import pprint
 import cgi                # Used by .webInput() if the template is a CGI script.
 import types 
     
+from .compat import PY2, string_type
+
 try:
     from threading import Lock
 except ImportError:
@@ -30,15 +32,11 @@ except ImportError:
         def release(self): 
             pass
 
-filetype = None
-
-if isinstance(sys.version_info[:], tuple):
-    # Python 2.xx
-    filetype = types.FileType
+if PY2:
+    filetype = io.IOBase
     def createMethod(func, cls):
         return types.MethodType(func, None, cls)
 else:
-    import io
     filetype = io.IOBase
     def createMethod(func, cls):
         return types.MethodType(func, cls)
@@ -65,7 +63,6 @@ from Cheetah.CacheRegion import CacheRegion
 from Cheetah.Utils.WebInputMixin import _Converter, _lookup, NonNumericInputError
 
 from Cheetah.Unspecified import Unspecified
-from .compat import string_type
 
 # Decide whether to use the file modification time in file's cache key 
 __checkFileMtime = True
