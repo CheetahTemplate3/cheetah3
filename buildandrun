@@ -45,7 +45,10 @@ def main():
     libdir = None
     scriptdir = None
 
+    py_ver = '-' + '.'.join([str(v) for v in sys.version_info[:2]])
     for sub in os.listdir('build'):
+        if not sub.endswith(py_ver):
+            continue
         if sub.startswith('scripts'):
             scriptdir = os.path.sep.join((cwd, 'build', sub))
         if sub.startswith('lib'):
