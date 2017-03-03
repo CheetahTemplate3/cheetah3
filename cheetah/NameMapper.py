@@ -146,12 +146,6 @@ __all__ = ['NotFound',
            'valueFromFrame',
            ]
 
-if not hasattr(inspect.imp, 'get_suffixes'):
-    # This is to fix broken behavior of the inspect module under the
-    # Google App Engine, see the following issue:
-    # http://bugs.communitycheetah.org/view.php?id=10
-    setattr(inspect.imp, 'get_suffixes', lambda: [('.py', 'U', 1)])
-
 ## N.B. An attempt is made at the end of this module to import C versions of
 ## these functions.  If _namemapper.c has been compiled succesfully and the
 ## import goes smoothly, the Python versions defined here will be replaced with
