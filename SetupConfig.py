@@ -3,9 +3,10 @@ import sys
 
 name = 'Cheetah'
 from cheetah.Version import Version as version
-maintainer = "R. Tyler Ballance"
 author = "Tavis Rudd"
 author_email = "cheetahtemplate-discuss@lists.sf.net"
+maintainer = "Oleg Broytman"
+maintainer_email = "phd@phdru.name"
 url = "http://www.cheetahtemplate.org/"
 packages = ['Cheetah',
             'Cheetah.Macros',            
@@ -15,8 +16,7 @@ packages = ['Cheetah',
             'Cheetah.Utils',
             ]
 classifiers = [line.strip() for line in '''\
-  #Development Status :: 4 - Beta
-  Development Status :: 5 - Production/Stable
+  Development Status :: 2 - Pre-Alpha
   Intended Audience :: Developers
   Intended Audience :: System Administrators
   License :: OSI Approved :: MIT License
