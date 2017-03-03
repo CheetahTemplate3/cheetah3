@@ -785,7 +785,7 @@ class Template(Servlet):
                 try:
                     co = compile(generatedModuleCode, __file__, 'exec')
                     exec(co, mod.__dict__)
-                except SyntaxError, e:
+                except SyntaxError as e:
                     try:
                         parseError = genParserErrorFromPythonException(
                             source, file, generatedModuleCode, exception=e)
@@ -795,7 +795,7 @@ class Template(Servlet):
                         raise e
                     else:
                         raise parseError
-                except Exception, e:
+                except Exception as e:
                     updateLinecache(__file__, generatedModuleCode)
                     e.generatedModuleCode = generatedModuleCode
                     raise

@@ -30,7 +30,7 @@ class GetAttrTest(unittest.TestCase):
         o = CustomGetAttrClass()
         try:
             print(o.attr)
-        except GetAttrException, e:
+        except GetAttrException as e:
             # expected
             return
         except:

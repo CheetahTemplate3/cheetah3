@@ -305,7 +305,7 @@ class ClassMethodSupport(TemplateTest):
         try:
             rc = template.myClassMethod(foo='bar')
             assert rc == '$foo = bar', (rc, 'Template class method didn\'t return what I expected')
-        except AttributeError, ex:
+        except AttributeError as ex:
             self.fail(ex)
 
 class StaticMethodSupport(TemplateTest):
@@ -323,7 +323,7 @@ class StaticMethodSupport(TemplateTest):
         try:
             rc = template.myStaticMethod(foo='bar')
             assert rc == '$foo = bar', (rc, 'Template class method didn\'t return what I expected')
-        except AttributeError, ex:
+        except AttributeError as ex:
             self.fail(ex)
 
 class Useless(object):

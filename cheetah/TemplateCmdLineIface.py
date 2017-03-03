@@ -51,7 +51,7 @@ class CmdLineIface:
                                             'pickle=',
                                             ])
 
-        except getopt.GetoptError, v:
+        except getopt.GetoptError as v:
             # print help information and exit:
             print(v)
             print(self.usage())

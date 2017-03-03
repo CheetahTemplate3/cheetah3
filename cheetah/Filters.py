@@ -96,7 +96,7 @@ class CodeHighlighter(EncodeUnicode):
             from pygments import highlight
             from pygments import lexers
             from pygments import formatters
-        except ImportError, ex:
+        except ImportError as ex:
             print('<%s> - Failed to import pygments! (%s)' % (self.__class__.__name__, ex))
             print('-- You may need to install it from: http://pygments.org')
             return encoded

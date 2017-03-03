@@ -198,7 +198,7 @@ class DirOwner(Owner):
                 try:
                     co = compile(open(py[0], 'r').read()+'\n', py[0], 'exec')
                     break
-                except SyntaxError, e:
+                except SyntaxError as e:
                     print("Invalid syntax in %s" % py[0])
                     print(e.args)
                     raise

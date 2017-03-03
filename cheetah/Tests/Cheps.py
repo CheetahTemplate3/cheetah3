@@ -25,7 +25,7 @@ class Chep_2_Conditionalized_Import_Behavior(unittest.TestCase):
         '''
         try:
             template = Cheetah.Template.Template.compile(template)
-        except Cheetah.Parser.ParseError, ex:
+        except Cheetah.Parser.ParseError as ex:
             self.fail('Failed to properly generate code %s' % ex)
         template = template()
         rc = tepmlate.funky('abc def')

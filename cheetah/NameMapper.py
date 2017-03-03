@@ -234,7 +234,7 @@ def _valueForName(obj, name, executeCallables=False):
 def valueForName(obj, name, executeCallables=False):
     try:
         return _valueForName(obj, name, executeCallables)
-    except NotFound, e:
+    except NotFound as e:
         _wrapNotFoundException(e, fullName=name, namespace=obj)
 
 def valueFromSearchList(searchList, name, executeCallables=False):
@@ -258,7 +258,7 @@ def valueFromFrameOrSearchList(searchList, name, executeCallables=False,
     def __valueForName():
         try:
             return _valueForName(namespace, name, executeCallables=executeCallables)
-        except NotFound, e:
+        except NotFound as e:
             _wrapNotFoundException(e, fullName=name, namespace=searchList)
     try:
         if not frame:
