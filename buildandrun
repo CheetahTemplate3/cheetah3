@@ -33,7 +33,7 @@ def main():
         recursiverm('build')
 
     logging.debug('Building Cheetah')
-    rc = subprocess.call(('python', 'setup.py', 'build'))
+    rc = subprocess.call((sys.executable, 'setup.py', 'build'))
 
     if rc:
         logging.debug('Build failed!')
@@ -57,7 +57,7 @@ def main():
     logging.debug('Setting PYTHONPATH to: %s' % libdir)
     os.putenv('PYTHONPATH', libdir)
 
-    rc = subprocess.call( ['python',] + args )
+    rc = subprocess.call( [sys.executable] + args )
     if rc == -11:
         logging.error('Segmentation fault in test process. Test failed.')
 
