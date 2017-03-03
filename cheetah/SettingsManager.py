@@ -6,7 +6,10 @@ import re
 from tokenize import Intnumber, Floatnumber, Number
 import types
 import time
-from StringIO import StringIO # not cStringIO because of unicode support
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 import imp                 # used by SettingsManager.updateSettingsFromPySrcFile()
 
 

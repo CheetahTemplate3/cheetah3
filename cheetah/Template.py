@@ -16,6 +16,10 @@ from random import randrange
 import imp
 import inspect
 import io
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 import traceback
 import pprint
 import cgi                # Used by .webInput() if the template is a CGI script.
@@ -1864,7 +1868,7 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
     
     filename = isinstance(file, (str, unicode)) and file or None
 
-    sio = StringIO.StringIO()
+    sio = StringIO()
     traceback.print_exc(1, sio)
     formatedExc = sio.getvalue()
     
