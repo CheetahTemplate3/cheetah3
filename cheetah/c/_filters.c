@@ -5,7 +5,7 @@
  */
 #include <Python.h>
 
-#include "Cheetah.h"
+#include "_filters.h"
 
 #if __STDC_VERSION__ >= 199901L
 #include <stdbool.h>

@@ -16,7 +16,7 @@ Last Revision Date: $Date: 2007/12/10 18:25:20 $
 #include <string.h>
 #include <stdlib.h>
 
-#include "cheetah.h"
+#include "_namemapper.h"
 
 #ifdef __cplusplus
 extern "C" {
