@@ -17,4 +17,4 @@ Subscribe at
     http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss
 '''
 
-from Version import *
+from .Version import *

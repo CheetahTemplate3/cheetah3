@@ -47,13 +47,13 @@ class mod_build_ext(build_ext):
     def run(self):
         try:
             build_ext.run(self)
-        except DistutilsPlatformError, x:
+        except DistutilsPlatformError as x:
             raise BuildFailed(x)
 
     def build_extension(self, ext):
         try:
             build_ext.build_extension(self, ext)
-        except ext_errors, x:
+        except ext_errors as x:
             raise BuildFailed(x)
 
    
@@ -156,7 +156,7 @@ def run_setup(configurations):
     # Invoke distutils setup
     try:
         setup(**kws)
-    except BuildFailed, x:
+    except BuildFailed as x:
         print("One or more C extensions failed to build.")
         print("Details: %s" % x)
         if os.environ.get('CHEETAH_C_EXTENSIONS_REQUIRED'):
@@ -169,4 +169,3 @@ def run_setup(configurations):
         print("One or more C extensions failed to build.")
         print("Performance enhancements will not be available.")
         print("Pure Python installation succeeded.")
-

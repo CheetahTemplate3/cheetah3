@@ -32,7 +32,9 @@ classifiers = [line.strip() for line in '''\
   Topic :: Software Development :: Libraries :: Python Modules
   Topic :: Software Development :: User Interfaces
   Topic :: Text Processing'''.splitlines() if not line.strip().startswith('#')]
-del line
+
+if sys.version_info.major == 2:
+  del line
 
 package_dir = {'Cheetah':'cheetah'}
 
