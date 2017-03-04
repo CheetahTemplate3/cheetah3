@@ -347,7 +347,7 @@ class ArgList(object):
     
     def merge(self):
         defaults = (isinstance(d, string_type) and d.strip() or None for d in self.defaults)
-        return list(map(None, (a.strip() for a in self.arguments), defaults))
+        return list(zip((a.strip() for a in self.arguments), defaults))
     
     def __str__(self):
         return str(self.merge())
