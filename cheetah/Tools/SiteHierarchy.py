@@ -85,9 +85,9 @@ class Hierarchy:
                 break
         if len(path) == 1:
             return self.emptyCrumb()
-        return string.join(map(lambda x, self=self: self.crumbLink(x[0], x[1]),
-                               path), self.crumbSeperator()) + \
-                               self.crumbTerminator()
+        return self.crumbSeperator.join(
+            map(lambda x, self=self: self.crumbLink(x[0], x[1]), path)()) + \
+            self.crumbTerminator()
 
     ## Methods to control the Aesthetics
     #  - override these methods for your own look

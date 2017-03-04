@@ -81,7 +81,7 @@ class mod_install_data(install_data):
             if not isinstance(entry, string_type):
                 raise ValueError('The entries in "data_files" must be strings')
             
-            entry = string.join(string.split(entry, '/'), os.sep)
+            entry = os.sep.join(entry.split('/'))
             # entry is a filename or glob pattern
             if entry.startswith('recursive:'):
                 entry = entry[len('recursive:'):]
