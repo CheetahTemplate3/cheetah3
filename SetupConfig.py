@@ -4,6 +4,7 @@ from cheetah.compat import PY2
 
 name = 'Cheetah'
 from cheetah.Version import Version as version
+license = "MIT"
 author = "Tavis Rudd"
 author_email = "cheetahtemplate-discuss@lists.sf.net"
 maintainer = "Oleg Broytman"
