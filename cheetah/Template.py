@@ -1558,7 +1558,7 @@ class Template(Servlet):
         if not self.__class__ == Template:
             # Only propogate attributes if we're in a subclass of 
             # Template
-            for k, v in self.__class__.__dict__.iteritems():
+            for k, v in self.__class__.__dict__.items():
                 if not v or k.startswith('__'):
                     continue
                 ## Propogate the class attributes to the instance 

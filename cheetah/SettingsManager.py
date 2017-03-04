@@ -34,7 +34,7 @@ def mergeNestedDictionaries(dict1, dict2, copy=False, deepcopy=False):
     elif deepcopy:
         dict1 = copyModule.deepcopy(dict1)
         
-    for key, val in dict2.iteritems():
+    for key, val in dict2.items():
         if key in dict1 and isinstance(val, dict) and isinstance(dict1[key], dict):
             dict1[key] = mergeNestedDictionaries(dict1[key], val)
         else:
@@ -94,7 +94,7 @@ class _SettingsCollector(object):
         """
         S = {}
         attrs = vars(mod)
-        for k, v in attrs.iteritems():
+        for k, v in attrs.items():
             if (ignoreUnderscored and k.startswith('_')):
                 continue
             else:

@@ -115,7 +115,7 @@ class _SkeletonPage(Template):
         SRC filename rather than a code string."""
         
         javascriptTagsTxt = []
-        for key, details in self._javascriptTags.iteritems():
+        for key, details in self._javascriptTags.items():
             if not isinstance(details, (list, tuple)):
                 details = ['', details]
                 
@@ -124,7 +124,7 @@ class _SkeletonPage(Template):
                                   str(details[0]), '\n//--></script>\n']
 
 
-        for key, details in self._javascriptLibs.iteritems():
+        for key, details in self._javascriptLibs.items():
             if not isinstance(details, (list, tuple)):
                 details = ['', details]
 

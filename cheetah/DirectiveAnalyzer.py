@@ -61,7 +61,7 @@ def main_dir(opts):
     for series in results:
         if not series:
             continue
-        for k, v in series.iteritems():
+        for k, v in series.items():
             try:
                 totals[k] += v
             except KeyError:
