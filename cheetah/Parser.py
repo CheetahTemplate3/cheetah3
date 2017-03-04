@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Parser classes for Cheetah's Compiler
 
