@@ -1178,7 +1178,7 @@ class Template(Servlet):
             raise TypeError(errmsg %
                             ('file', 'string, file open for reading, or None'))
 
-        if not isinstance(filter, (string_type, types.TypeType)) and not \
+        if not isinstance(filter, (string_type, type)) and not \
                 (isinstance(filter, type) and issubclass(filter, Filters.Filter)):
             raise TypeError(errmsgextra %
                             ('filter', 'string or class',
@@ -1190,7 +1190,7 @@ class Template(Servlet):
 
         if not errorCatcher is None:
             err = True
-            if isinstance(errorCatcher, (string_type, types.TypeType)):
+            if isinstance(errorCatcher, (string_type, type)):
                 err = False
             if isinstance(errorCatcher, type) and \
                     issubclass(errorCatcher, ErrorCatchers.ErrorCatcher): 
