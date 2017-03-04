@@ -1,7 +1,10 @@
 import sys
 import os.path
 import copy as copyModule
-from ConfigParser import ConfigParser 
+try:
+    from ConfigParser import ConfigParser
+except ImportError:  # PY3
+    from configparser import ConfigParser
 import re
 from tokenize import Intnumber, Floatnumber, Number
 import types
