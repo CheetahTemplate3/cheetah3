@@ -94,8 +94,8 @@ static int isInstanceOrClass(PyObject *nextVal) {
         return 0;
 
     /* method, func, or builtin func */
-    if (PyObject_HasAttrString(nextVal, "im_func") 
-        || PyObject_HasAttrString(nextVal, "func_code")
+    if (PyObject_HasAttrString(nextVal, "__func__") 
+        || PyObject_HasAttrString(nextVal, "__code__")
         || PyObject_HasAttrString(nextVal, "__self__")) {
         return 0;
     }

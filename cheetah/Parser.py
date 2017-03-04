@@ -2352,12 +2352,12 @@ class _HighLevelParser(_LowLevelParser):
         kwArgs['src'] = srcBlock
 
         if isinstance(macro, types.MethodType):
-            co = macro.im_func.func_code
+            co = macro.__func__.__code__
         elif (hasattr(macro, '__call__')
-              and hasattr(macro.__call__, 'im_func')):
-            co = macro.__call__.im_func.func_code
+              and hasattr(macro.__call__, '__func__')):
+            co = macro.__call__.__func__.__code__
         else:
-            co = macro.func_code
+            co = macro.__code__
         availableKwArgs = inspect.getargs(co)[0]
         
         if 'parser' in availableKwArgs:

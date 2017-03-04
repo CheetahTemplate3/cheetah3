@@ -141,8 +141,8 @@ class CheetahWrapper(object):
             self.test, self.version)
         for meth in meths:
             methName = meth.__name__
-            # Or meth.im_func.func_name
-            # Or meth.func_name (Python >= 2.1 only, sometimes works on 2.0)
+            # Or meth.__func__.__name__
+            # Or meth.__name__
             methInitial = methName[0]
             if command in (methName, methInitial):
                 sys.argv[0] += (" " + methName)

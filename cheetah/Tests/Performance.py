@@ -58,7 +58,7 @@ def perftest(max_num_pystones, current_pystone=None):
                     pystone_total_time = total_time / pystone_rate
                 global DEBUG
                 if DEBUG:
-                    print('The test "%s" took: %s pystones' % (function.func_name,
+                    print('The test "%s" took: %s pystones' % (function.__name__,
                         pystone_total_time))
                 else:
                     if pystone_total_time > (max_num_pystones + TOLERANCE):

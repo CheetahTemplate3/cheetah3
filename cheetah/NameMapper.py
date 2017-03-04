@@ -182,7 +182,7 @@ def _isInstanceOrClass(obj):
         if hasattr(obj, 'mro'):
             # type/class
             return True
-        elif (hasattr(obj, 'im_func') or hasattr(obj, 'func_code') or hasattr(obj, '__self__')):
+        elif (hasattr(obj, '__func__') or hasattr(obj, '__code__') or hasattr(obj, '__self__')):
             # method, func, or builtin func
             return False
         elif hasattr(obj, '__init__'):

@@ -159,7 +159,7 @@ class TemplatePreprocessor(object):
         templateAPIClass = settings.templateAPIClass
         possibleKwArgs = [
             arg for arg in
-            inspect.getargs(templateAPIClass.compile.im_func.func_code)[0]
+            inspect.getargs(templateAPIClass.compile.__func__.__code__)[0]
             if arg not in ('klass', 'source', 'file',)]
 
         compileKwArgs = {}
@@ -984,13 +984,14 @@ class Template(Servlet):
         for methodname in klass._CHEETAH_requiredCheetahMethods:
             if not hasattr(concreteTemplateClass, methodname):
                 method = getattr(Template, methodname)
-                newMethod = createMethod(method.im_func, concreteTemplateClass)
+                newMethod = createMethod(
+                    getattr(method, '__func__', method), concreteTemplateClass)
                 setattr(concreteTemplateClass, methodname, newMethod)
 
         for classMethName in klass._CHEETAH_requiredCheetahClassMethods:
             if not hasattr(concreteTemplateClass, classMethName):
                 meth = getattr(klass, classMethName)
-                setattr(concreteTemplateClass, classMethName, classmethod(meth.im_func))
+                setattr(concreteTemplateClass, classMethName, classmethod(meth.__func__))
             
         for attrname in klass._CHEETAH_requiredCheetahClassAttributes:
             attrname = '_CHEETAH_'+attrname
