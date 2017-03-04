@@ -21,12 +21,6 @@ from Cheetah.Template import Template
 
 
 ##################################################
-## GLOBALS AND CONSTANTS ##
-
-True = (1==1)
-False = (0==1)
-
-##################################################
 ## CLASSES ##
         
 class _SkeletonPage(Template):
