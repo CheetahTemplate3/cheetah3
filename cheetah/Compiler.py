@@ -243,7 +243,7 @@ class GenUtils(object):
 
         Note, if the compiler setting useStackFrames=False (default is true)
         then
-          A` = VFSL([locals()]+SL+[globals(), __builtin__], name=A[0], executeCallables=(useAC and A[1]))A[2]
+          A` = VFSL([locals()]+SL+[globals(), builtin], name=A[0], executeCallables=(useAC and A[1]))A[2]
         This option allows Cheetah to be used with Psyco, which doesn't support
         stack frame introspection.
         """

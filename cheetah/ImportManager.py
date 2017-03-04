@@ -379,9 +379,12 @@ class ImportManager:
             self._get_ident = thread.get_ident
             
     def install(self):
-        import __builtin__
-        __builtin__.__import__ = self.importHook
-        __builtin__.reload = self.reloadHook
+        try:
+            import builtins as builtin
+        except ImportError:  # PY2
+            import __builtin__ as builtin
+        builtin.__import__ = self.importHook
+        builtin.reload = self.reloadHook
         
     def importHook(self, name, globals=None, locals=None, fromlist=None, level=-1):
         '''
