@@ -63,14 +63,7 @@ class Markdown(EncodeUnicode):
     '''
     def filter(self,  value, **kwargs):
         # This is a bit of a hack to allow outright embedding of the markdown module
-        try:
-            import markdown
-        except ImportError:
-            print('>>> Exception raised importing the "markdown" module')
-            print('>>> Are you sure you have the ElementTree module installed?')
-            print('          http://effbot.org/downloads/#elementtree')
-            raise
-
+        import markdown
         encoded = super(Markdown, self).filter(value, **kwargs)
         return markdown.markdown(encoded)
 
