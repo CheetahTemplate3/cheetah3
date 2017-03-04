@@ -63,6 +63,7 @@ def main():
     rc = subprocess.call( [sys.executable] + args )
     if rc == -11:
         logging.error('Segmentation fault in test process. Test failed.')
+    sys.exit(rc)
 
 
 if __name__ == '__main__':

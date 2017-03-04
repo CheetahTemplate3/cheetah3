@@ -44,10 +44,15 @@ if not sys.platform.startswith('java'):
     suites.append(unittest.findTestCases(CheetahWrapper))
 
 if __name__ == '__main__':
-    runner = unittest.TextTestRunner()
     if 'xml' in sys.argv:
         import xmlrunner
         runner = xmlrunner.XMLTestRunner(filename='Cheetah-Tests.xml')
+    else:
+        runner = unittest.TextTestRunner()
     
     results = runner.run(unittest.TestSuite(suites))
+    if results.wasSuccessful():
+        sys.exit(0)
+    else:
+        sys.exit(1)
 
