@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # -*- encoding: utf8 -*-
 
-from Cheetah.Template import Template
-from Cheetah import CheetahWrapper
-from Cheetah import DummyTransaction
 import imp
 import os
 import sys
 import tempfile
 import unittest
+from Cheetah.Template import Template
+from Cheetah import CheetahWrapper
+from Cheetah import DummyTransaction
+from Cheetah.compat import PY2, unicode
 
 class CommandLineTest(unittest.TestCase):
     def createAndCompile(self, source):
@@ -137,7 +138,9 @@ $someUnicodeString"""
 
         template = self.createAndCompile(source)()
 
-        a = unicode(template).encode("utf-8")
+        a = unicode(template)
+        if PY2:
+            a = a.encode("utf-8")
         self.assertEquals("Bébé", a)
 
     def testDynamicCompile(self):
@@ -147,7 +150,9 @@ $someUnicodeString"""
 
         template = Template(source = source)
 
-        a = unicode(template).encode("utf-8")
+        a = unicode(template)
+        if PY2:
+            a = a.encode("utf-8")
         self.assertEquals("Bébé", a)
 
 class EncodeUnicodeCompatTest(unittest.TestCase):

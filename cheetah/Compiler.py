@@ -28,7 +28,7 @@ from Cheetah import NameMapper
 from Cheetah.Parser import Parser, ParseError, specialVarRE, \
      STATIC_CACHE, REFRESH_CACHE, SET_LOCAL, SET_GLOBAL, SET_MODULE, \
      unicodeDirectiveRE, encodingDirectiveRE, escapedNewlineRE
-from .compat import string_type
+from .compat import string_type, unicode
 
 from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, valueFromFrameOrSearchList
 VFFSL=valueFromFrameOrSearchList
@@ -1643,6 +1643,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "from Cheetah.CacheRegion import CacheRegion",
             "import Cheetah.Filters as Filters",
             "import Cheetah.ErrorCatchers as ErrorCatchers",
+            "from Cheetah.compat import unicode",
             ]        
 
         self._importedVarNames = ['sys',

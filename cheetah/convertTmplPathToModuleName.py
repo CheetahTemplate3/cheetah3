@@ -1,5 +1,6 @@
 import os.path
 import string
+from .compat import unicode
 
 letters = None
 try:

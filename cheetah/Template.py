@@ -25,7 +25,7 @@ import pprint
 import cgi                # Used by .webInput() if the template is a CGI script.
 import types 
     
-from .compat import PY2, string_type
+from .compat import PY2, string_type, unicode
 
 try:
     from threading import Lock
@@ -1006,7 +1006,7 @@ class Template(Servlet):
             if mainMethName:
                 def __str__(self): 
                     rc = getattr(self, mainMethName)()
-                    if isinstance(rc, unicode):
+                    if PY2 and isinstance(rc, unicode):
                         return rc.encode('utf-8')
                     return rc
                 def __unicode__(self):
@@ -1015,7 +1015,7 @@ class Template(Servlet):
                   and concreteTemplateClass.respond!=Servlet.respond):
                 def __str__(self):
                     rc = self.respond()
-                    if isinstance(rc, unicode):
+                    if PY2 and isinstance(rc, unicode):
                         return rc.encode('utf-8')
                     return rc
                 def __unicode__(self):
@@ -1029,7 +1029,7 @@ class Template(Servlet):
                         rc = self.respond()
                     else:
                         rc = super(self.__class__, self).__str__()
-                    if isinstance(rc, unicode):
+                    if PY2 and isinstance(rc, unicode):
                         return rc.encode('utf-8')
                     return rc
                 def __unicode__(self):
@@ -1866,8 +1866,6 @@ Template.Reserved_SearchList = set(dir(Template))
 
 def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
 
-    #print dir(exception)
-    
     filename = isinstance(file, (str, unicode)) and file or None
 
     sio = StringIO()

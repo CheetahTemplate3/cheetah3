@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-import Cheetah.NameMapper 
-import Cheetah.Template
-
 import sys
 import unittest
+
+import Cheetah.NameMapper 
+import Cheetah.Template
+from Cheetah.compat import unicode
 
 
 majorVer, minorVer = sys.version_info[0], sys.version_info[1]

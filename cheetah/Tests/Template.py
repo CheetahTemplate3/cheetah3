@@ -9,6 +9,7 @@ import tempfile
 import shutil
 import unittest
 from Cheetah.Template import Template
+from Cheetah.compat import unicode
 
 majorVer, minorVer = sys.version_info[0], sys.version_info[1]
 versionTuple = (majorVer, minorVer)

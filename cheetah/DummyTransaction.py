@@ -10,6 +10,7 @@ specific DummyTransaction or DummyResponse behavior
 
 import logging
 import types
+from .compat import unicode
 
 class DummyResponseFailure(Exception):
     pass

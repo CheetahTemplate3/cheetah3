@@ -27,7 +27,7 @@ from Cheetah import Filters
 from Cheetah import ErrorCatchers
 from Cheetah.Unspecified import Unspecified
 from Cheetah.Macros.I18n import I18n
-from .compat import string_type
+from .compat import string_type, unicode
 
 # re tools
 _regexCache = {}

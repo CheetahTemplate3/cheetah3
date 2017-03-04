@@ -11,6 +11,7 @@ import time
 
 import Cheetah.NameMapper 
 import Cheetah.Template
+from Cheetah.compat import unicode
 
 # This can be turned on with the `--debug` flag when running the test
 # and will cause the tests to all just dump out how long they took
