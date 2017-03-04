@@ -1,16 +1,21 @@
 # Config file for automatic testing at travis-ci.org
 
 language: python
+
+# Use lightweight containers
 sudo: false
+
 env:
   - TOXENV=py27
   - TOXENV=py33
   - TOXENV=py34
   - TOXENV=pypy
+
 matrix:
   allow_failures:
     - env: TOXENV=py33
     - env: TOXENV=py34
+    - env: TOXENV=pypy
 
 install:
   - travis_retry pip install tox
