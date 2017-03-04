@@ -2,6 +2,8 @@
 *.py.bak
 *.swp
 *.so
+.eggs/
+.tox/
 Cheetah.egg-info/
 build
 dist
