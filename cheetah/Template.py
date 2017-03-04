@@ -68,6 +68,8 @@ from Cheetah.Utils.WebInputMixin import _Converter, _lookup, NonNumericInputErro
 
 from Cheetah.Unspecified import Unspecified
 
+NoneType = type(None)
+
 # Decide whether to use the file modification time in file's cache key 
 __checkFileMtime = True
 def checkFileMtime(value):
@@ -587,10 +589,10 @@ class Template(Servlet):
         """
         errmsg = "arg '%s' must be %s"
 
-        if not isinstance(source, (types.NoneType, string_type)):
+        if not isinstance(source, (NoneType, string_type)):
             raise TypeError(errmsg % ('source', 'string or None'))
 
-        if not isinstance(file, (types.NoneType, string_type, filetype)):
+        if not isinstance(file, (NoneType, string_type, filetype)):
             raise TypeError(errmsg %
                             ('file', 'string, file-like object, or None'))
 
@@ -599,7 +601,7 @@ class Template(Servlet):
         if isinstance(baseclass, Template):
             baseclass = baseclass.__class__
 
-        if not isinstance(baseclass, (types.NoneType, string_type, type)):
+        if not isinstance(baseclass, (NoneType, string_type, type)):
             raise TypeError(errmsg % ('baseclass', 'string, class or None'))
 
         if cacheCompilationResults is Unspecified:
@@ -630,7 +632,7 @@ class Template(Servlet):
         if not isinstance(keepRefToGeneratedCode, (int, bool)):
             raise TypeError(errmsg % ('keepReftoGeneratedCode', 'boolean'))
 
-        if not isinstance(moduleName, (types.NoneType, string_type)):
+        if not isinstance(moduleName, (NoneType, string_type)):
             raise TypeError(errmsg % ('moduleName', 'string or None'))
         __orig_file__ = None
         if not moduleName:
@@ -643,14 +645,14 @@ class Template(Servlet):
         if className is Unspecified:
             className = klass._CHEETAH_defaultClassNameForTemplates
 
-        if not isinstance(className, (types.NoneType, string_type)):
+        if not isinstance(className, (NoneType, string_type)):
             raise TypeError(errmsg % ('className', 'string or None'))
         className = re.sub(r'^_+([^0-9])',r'\1', className or moduleName)
 
         if mainMethodName is Unspecified:
             mainMethodName = klass._CHEETAH_defaultMainMethodNameForTemplates
 
-        if not isinstance(mainMethodName, (types.NoneType, string_type)):
+        if not isinstance(mainMethodName, (NoneType, string_type)):
             raise TypeError(errmsg % ('mainMethodName', 'string or None'))
 
         if moduleGlobals is Unspecified:
@@ -666,7 +668,7 @@ class Template(Servlet):
         if cacheDirForModuleFiles is Unspecified:
             cacheDirForModuleFiles = klass._CHEETAH_cacheDirForModuleFiles
 
-        if not isinstance(cacheDirForModuleFiles, (types.NoneType, string_type)):
+        if not isinstance(cacheDirForModuleFiles, (NoneType, string_type)):
             raise TypeError(errmsg %
                             ('cacheDirForModuleFiles', 'string or None'))
 
@@ -1169,10 +1171,10 @@ class Template(Servlet):
         errmsg = "arg '%s' must be %s"
         errmsgextra = errmsg + "\n%s"
 
-        if not isinstance(source, (types.NoneType, string_type)):
+        if not isinstance(source, (NoneType, string_type)):
             raise TypeError(errmsg % ('source', 'string or None'))
 
-        if not isinstance(file, (types.NoneType, string_type, filetype)):
+        if not isinstance(file, (NoneType, string_type, filetype)):
             raise TypeError(errmsg %
                             ('file', 'string, file open for reading, or None'))
 
