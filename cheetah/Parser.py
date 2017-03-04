@@ -2274,7 +2274,6 @@ class _HighLevelParser(_LowLevelParser):
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
             macroSrc = self._eatToThisEndDirective('defmacro')
 
-        #print argsList
         normalizedMacroSrc = ''.join(
             ['%def callMacro('+','.join([defv and '%s=%s'%(n, defv) or n
                                          for n, defv in argsList])
@@ -2297,10 +2296,7 @@ class _HighLevelParser(_LowLevelParser):
             compilerSettings, placeholderToken='@', directiveToken='%')
         macroTemplateClass = templateAPIClass.compile(source=normalizedMacroSrc,
                                                       compilerSettings=compilerSettings)
-        #print normalizedMacroSrc
         #t = macroTemplateClass()
-        #print t.callMacro('src')
-        #print t.generatedClassCode()
         
         class MacroDetails: pass
         macroDetails = MacroDetails()

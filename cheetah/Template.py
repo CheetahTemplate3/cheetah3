@@ -202,7 +202,7 @@ class Template(Servlet):
           optional arguments so there are many possible variations of this
           pattern.  One example is:
             tclass = Template.compile('hello $name from $caller', baseclass=dict)
-            print tclass(name='world', caller='me')
+            print(tclass(name='world', caller='me'))
           See the Template.compile() docstring for more details.  
 
        2) tmplInstance = Template(src)
@@ -237,8 +237,8 @@ class Template(Servlet):
         from Cheetah.Template import Template
         T1 = Template.compile('$meth1 #def meth1: this is meth1 in T1')
         T2 = Template.compile('#implements meth1\nthis is meth1 redefined in T2', baseclass=T1)
-        print T1, T1()
-        print T2, T2()
+        print(T1, T1())
+        print(T2, T2())
 
 
     Note about class and instance attribute names:
@@ -1077,7 +1077,7 @@ class Template(Servlet):
                  # or 
              t = Template(file='some/path', namespaces=namespaces)
   
-             print t
+             print(t)
              
         b) to create an instance of an existing, precompiled template class:
              ## i) first you need a reference to a compiled template class:
@@ -1096,7 +1096,7 @@ class Template(Servlet):
              t = tclass(namespaces=namespaces)
                  # or 
              t = tclass(namespaces=namespaces, filter='RawOrEncodedUnicode')
-             print t
+             print(t)
 
         Arguments:
           for usage pattern a)           
@@ -1123,7 +1123,7 @@ class Template(Servlet):
             want to pass positional args to that baseclass.  E.g.:
               dictTemplate = Template.compile('hello $name from $caller', baseclass=dict)
               tmplvars = dict(name='world', caller='me')
-              print dictTemplate(tmplvars)
+              print(dictTemplate(tmplvars))
             This usage requires all Cheetah args to be passed in as keyword args.
 
           optional args for both usage patterns:

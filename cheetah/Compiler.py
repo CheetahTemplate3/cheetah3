@@ -757,7 +757,6 @@ class MethodCompiler(GenUtils):
 
         self.addChunk('if (not _RECACHE_%(ID)s) and _cacheItem_%(ID)s.getRefreshTime():'%locals())
         self.indent()
-        #self.addChunk('print "DEBUG"+"-"*50')
         self.addChunk('try:')
         self.indent()
         self.addChunk('_output = _cacheItem_%(ID)s.renderOutput()'%locals())        
@@ -765,7 +764,6 @@ class MethodCompiler(GenUtils):
         self.addChunk('except KeyError:')
         self.indent()
         self.addChunk('_RECACHE_%(ID)s = True'%locals())
-        #self.addChunk('print "DEBUG"+"*"*50')
         self.dedent()                
         self.addChunk('else:')
         self.indent()
@@ -1758,7 +1756,6 @@ class ModuleCompiler(SettingsManager, GenUtils):
                 else:
                     needToAddImport = True
                     modName = chunks[0]
-                    #print chunks, ':', self.importedVarNames()
                     for chunk in chunks[1:-1]:
                         if modName in self.importedVarNames():
                             needToAddImport = False

@@ -37,7 +37,7 @@ def analyze(source):
 def main_file(f):
     fd = open(f, 'r')
     try:
-        print u'>>> Analyzing %s' % f
+        print(u'>>> Analyzing %s' % f)
         calls = analyze(fd.read())
         return calls
     finally:

@@ -390,7 +390,6 @@ class ImportManager:
             argument can be found here: http://www.python.org/doc/2.5.2/lib/built-in-funcs.html
         '''
         # first see if we could be importing a relative name
-        #print "importHook(%s, %s, locals, %s)" % (name, globals['__name__'], fromlist)
         _sys_modules_get = sys.modules.get
         contexts = [None]
         if globals:
@@ -412,7 +411,6 @@ class ImportManager:
             ctx = context
             for i in range(len(nmparts)):
                 nm = nmparts[i]
-                #print " importHook trying %s in %s" % (nm, ctx)
                 if ctx:
                     fqname = ctx + '.' + nm
                 else:
@@ -436,12 +434,10 @@ class ImportManager:
             
         if i<len(nmparts):
             if ctx and hasattr(sys.modules[ctx], nmparts[i]):
-                #print "importHook done with %s %s %s (case 1)" % (name, globals['__name__'], fromlist)
                 return sys.modules[nmparts[0]]
             del sys.modules[fqname]
             raise ImportError("No module named %s" % fqname)
         if fromlist is None: 
-            #print "importHook done with %s %s %s (case 2)" % (name, globals['__name__'], fromlist)
             if context:
                 return sys.modules[context+'.'+nmparts[0]]
             return sys.modules[nmparts[0]]
@@ -465,12 +461,10 @@ class ImportManager:
                         self._release()
                     if not mod:
                         raise ImportError("%s not found in %s" % (nm, ctx))
-        #print "importHook done with %s %s %s (case 3)" % (name, globals['__name__'], fromlist)
         return bottommod
     
     def doimport(self, nm, parentnm, fqname):
         # Not that nm is NEVER a dotted name at this point
-        #print "doimport(%s, %s, %s)" % (nm, parentnm, fqname)
         if parentnm:
             parent = sys.modules[parentnm]
             if hasattr(parent, '__path__'):
@@ -482,7 +476,6 @@ class ImportManager:
                 if mod:
                     setattr(parent, nm, mod)
             else:
-                #print "..parent not a package"
                 return None
         else:
             # now we're dealing with an absolute import
@@ -498,11 +491,9 @@ class ImportManager:
                 del mod.__co__
                 exec(co, mod.__dict__)
             if fqname == 'thread' and not self.threaded:
-##                print "thread detected!"
                 self.setThreaded()
         else:
             sys.modules[fqname] = None
-        #print "..found %s" % mod
         return mod
     
     def reloadHook(self, mod):
@@ -517,20 +508,16 @@ class ImportManager:
         if self.rlock.locked():
             if self.locker == self._get_ident():
                 self.lockcount = self.lockcount + 1
-##                print "_acquire incrementing lockcount to", self.lockcount
                 return
         self.rlock.acquire()
         self.locker = self._get_ident()
         self.lockcount = 0
-##        print "_acquire first time!"
         
     def _release(self):
         if self.lockcount:
             self.lockcount = self.lockcount - 1
-##            print "_release decrementing lockcount to", self.lockcount
         else:
             self.rlock.release()
-##            print "_release releasing lock!"
 
 
 ##################################################
