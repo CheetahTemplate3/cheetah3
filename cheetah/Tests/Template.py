@@ -11,9 +11,6 @@ import unittest
 from Cheetah.Template import Template
 from Cheetah.compat import unicode
 
-majorVer, minorVer = sys.version_info[0], sys.version_info[1]
-versionTuple = (majorVer, minorVer)
-
 class TemplateTest(unittest.TestCase):
     pass
 
@@ -45,8 +42,6 @@ class ClassMethods_compile(TemplateTest):
         assert str(t)=='1234'
 
     def test_moduleFileCaching(self):
-        if versionTuple < (2, 3):
-            return
         tmpDir = tempfile.mkdtemp()
         try:
             #print tmpDir
@@ -293,9 +288,6 @@ class TryExceptImportTest(TemplateTest):
 
 class ClassMethodSupport(TemplateTest):
     def test_BasicDecorator(self):
-        if sys.version_info[0] == 2 and sys.version_info[1] == 3:
-                print('This version of Python doesn\'t support decorators, skipping tests')
-                return
         template = '''
             #@classmethod
             #def myClassMethod()
@@ -311,9 +303,6 @@ class ClassMethodSupport(TemplateTest):
 
 class StaticMethodSupport(TemplateTest):
     def test_BasicDecorator(self):
-        if sys.version_info[0] == 2 and sys.version_info[1] == 3:
-                print('This version of Python doesn\'t support decorators, skipping tests')
-                return
         template = '''
             #@staticmethod
             #def myStaticMethod()

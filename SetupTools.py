@@ -26,7 +26,7 @@ from distutils.errors import CCompilerError, DistutilsExecError, \
 from cheetah.FileUtils import findFiles
 from cheetah.compat import string_type
 
-if sys.platform == 'win32' and sys.version_info > (2, 6):
+if sys.platform == 'win32':
    # 2.6's distutils.msvc9compiler can raise an IOError when failing to
    # find the compiler
    ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError,

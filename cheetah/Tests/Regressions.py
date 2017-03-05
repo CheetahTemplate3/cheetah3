@@ -8,13 +8,6 @@ import Cheetah.Template
 from Cheetah.compat import unicode
 
 
-majorVer, minorVer = sys.version_info[0], sys.version_info[1]
-versionTuple = (majorVer, minorVer)
-
-def isPython23():
-    ''' Python 2.3 is still supported by Cheetah, but doesn't support decorators '''
-    return majorVer == 2 and minorVer < 4
-
 class GetAttrException(Exception):
     pass
 
@@ -156,8 +149,6 @@ class Mantis_Issue_21_Regression_Test(unittest.TestCase):
         when using the NameMapper
     '''
     def runTest(self):
-        if isPython23():
-            return
         template = '''
             #@staticmethod
             #def testMethod()
@@ -181,8 +172,6 @@ class Mantis_Issue_22_Regression_Test(unittest.TestCase):
     def test_NoneFilter(self):
         # XXX: Disabling this test for now
         return
-        if isPython23():
-            return
         template = '''
             #@staticmethod
             #def testMethod()
@@ -198,8 +187,6 @@ class Mantis_Issue_22_Regression_Test(unittest.TestCase):
     def test_DefinedFilter(self):
         # XXX: Disabling this test for now
         return
-        if isPython23():
-            return
         template = '''
             #@staticmethod
             #def testMethod()

@@ -34,9 +34,6 @@ from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
 class Unspecified(object):
     pass
 
-majorVer, minorVer = sys.version_info[0], sys.version_info[1]
-versionTuple = (majorVer, minorVer)
-
 def testdecorator(func):
     return func
 
@@ -620,9 +617,8 @@ class Placeholders(OutputTest):
         tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
         assert str(tmpl({'names':names}))=='You '*len(names)
 
-        if versionTuple > (2, 2):
-            tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
-            assert str(tmpl(names=names))=='You '*len(names)
+        tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
+        assert str(tmpl(names=names))=='You '*len(names)
 
 class Placeholders_Vals(OutputTest):
     convertEOLs = False
@@ -1499,8 +1495,6 @@ class YieldDirective(OutputTest):
 
         # @@TR: need to expand this to cover error conditions etc.
 
-if versionTuple < (2, 3):
-    del YieldDirective
         
 class ForDirective(OutputTest):
 
@@ -1601,8 +1595,6 @@ class ForDirective(OutputTest):
         self.verify("#for $i in range(5): \n$i\n#end for",
                     "0\n1\n2\n3\n4\n")
 
-if versionTuple < (2, 3):
-    del ForDirective.test12
 
 class RepeatDirective(OutputTest):
 
@@ -1838,8 +1830,6 @@ class DecoratorDirective(OutputTest):
                     "$testMeth",
                     "1234\n")
 
-if versionTuple < (2, 4):
-    del DecoratorDirective
 
 class BlockDirective(OutputTest):
 
@@ -3219,7 +3209,7 @@ public class X
 ##################################################
 ## CREATE CONVERTED EOL VERSIONS OF THE TEST CASES
 
-if OutputTest._useNewStyleCompilation and versionTuple >= (2, 3):
+if OutputTest._useNewStyleCompilation:
     extraCompileKwArgsForDiffBaseclass = {'baseclass':dict}
 else:
     extraCompileKwArgsForDiffBaseclass = {'baseclass':object}
@@ -3235,10 +3225,9 @@ def install_eols():
             exec(win32Src, globals()) 
             exec(macSrc, globals())
 
-        if versionTuple >= (2, 3):
-            src = r"class %(name)s_DiffBaseClass(%(name)s): "%locals()
-            src += " _extraCompileKwArgs = extraCompileKwArgsForDiffBaseclass"
-            exec(src, globals())
+        src = r"class %(name)s_DiffBaseClass(%(name)s): "%locals()
+        src += " _extraCompileKwArgs = extraCompileKwArgsForDiffBaseclass"
+        exec(src, globals())
 
         del name
         del klass

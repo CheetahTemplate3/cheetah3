@@ -6,9 +6,6 @@ import unittest
 import Cheetah.Template
 import Cheetah.Filters
 
-majorVer, minorVer = sys.version_info[0], sys.version_info[1]
-versionTuple = (majorVer, minorVer)
-
 class BasicMarkdownFilterTest(unittest.TestCase):
     '''
         Test that our markdown filter works
@@ -32,9 +29,6 @@ Header
             print('>>> We probably failed to import markdown, bummer %s' % ex)
             return
         except Exception as ex:
-            if ex.__class__.__name__ == 'MarkdownException' and majorVer == 2 and minorVer < 5:
-                print('>>> NOTE: Support for the Markdown filter will be broken for you. Markdown says: %s' % ex)
-                return
             raise
 
 
