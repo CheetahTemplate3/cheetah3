@@ -4,19 +4,6 @@ class I18n(object):
     def __init__(self, parser):
         pass
 
-## junk I'm playing with to test the macro framework 
-#    def parseArgs(self, parser, startPos):
-#        parser.getWhiteSpace()
-#        args = parser.getExpression(useNameMapper=False,
-#                                    pyTokensToBreakAt=[':']).strip()
-#        return args
-#
-#    def convertArgStrToDict(self, args, parser=None, startPos=None):
-#        def getArgs(*pargs, **kws):
-#            return pargs, kws
-#        exec 'positionalArgs, kwArgs = getArgs(%(args)s)'%locals()
-#        return kwArgs
-
     def __call__(self,
                  src, # aka message,
                  plural=None,

@@ -2346,7 +2346,11 @@ class _HighLevelParser(_LowLevelParser):
         else:
             def getArgs(*pargs, **kws):
                 return pargs, kws
-            exec('positionalArgs, kwArgs = getArgs(%(args)s)'%locals())
+            ldict = locals()
+            exec('positionalArgs, kwArgs = getArgs(%(args)s)' % locals(),
+                  globals(), ldict)
+            kwArgs = ldict['kwArgs']
+
 
         assert 'src' not in kwArgs
         kwArgs['src'] = srcBlock

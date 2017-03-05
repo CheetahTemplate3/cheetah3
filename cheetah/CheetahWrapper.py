@@ -540,14 +540,18 @@ you do have write permission to and re-run the tests.""")
         def getkws(**kws):
             return kws
         if self.opts.compilerSettingsString:
+            ldict = locals()
             try:
-                exec('settings = getkws(%s)'%self.opts.compilerSettingsString)
+                exec('settings = getkws(%s)' % self.opts.compilerSettingsString,
+                     globals(), ldict)
             except:                
                 self.error("There's an error in your --settings option."
                           "It must be valid Python syntax.\n"
                           +"    --settings='%s'\n"%self.opts.compilerSettingsString
                           +"  %s: %s"%sys.exc_info()[:2] 
                           )
+            else:
+                settings = ldict['settings']
 
             validKeys = DEFAULT_COMPILER_SETTINGS.keys()
             if [k for k in settings.keys() if k not in validKeys]:
