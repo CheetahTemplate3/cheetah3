@@ -126,7 +126,7 @@ class CacheRegion(object):
             
             Returns a `CacheItem` instance.
         """
-        cacheItemID = md5(str(cacheItemID)).hexdigest()
+        cacheItemID = md5(str(cacheItemID).encode('ascii')).hexdigest()
         
         if cacheItemID not in self._cacheItems:
             cacheItem = self._cacheItemClass(
