@@ -160,6 +160,8 @@ class _SettingsCollector(object):
         ## booleans and None ++ also deal with 'importSettings' commands
 
         for sect, subDict in newSettings.items():
+            if not isinstance(subDict, dict):
+                continue
             for key, val in subDict.items():
                 if convert:
                     if val.lower().startswith('python:'):
