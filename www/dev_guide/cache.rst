@@ -56,7 +56,7 @@ The generated code, with line numbers:
      1  write('Cached variable:  ')
      2  ## START CACHE REGION: at line, col (1, 19) in the source.
      3  RECACHE = True
-     4  if not self._cacheData.has_key('19760169'):
+     4  if '19760169' not in self._cacheData:
      5      pass
      6  else:
      7      RECACHE = False
@@ -89,7 +89,7 @@ eliminated if line 8 was changed to
 
 ::
 
-    if not self._cacheData.has_key('19760169'):
+    if '19760169' not in self._cacheData:
 
 - but this model is expandable for some of the cache features we'll
 see below.
@@ -136,7 +136,7 @@ The generated code:
      1  write('Timed cache:  ')
      2  ## START CACHE REGION: at line, col (1, 15) in the source.
      3  RECACHE = True
-     4  if not self._cacheData.has_key('55048032'):
+     4  if '55048032' not in self._cacheData:
      5      self.__cache55048032__refreshTime = currentTime() + 30.0
      6  elif currentTime() > self.__cache55048032__refreshTime:
      7      self.__cache55048032__refreshTime = currentTime() + 30.0
@@ -261,7 +261,7 @@ The generated code:
 
      1  ## START CACHE REGION: at line, col (1, 1) in the source.
      2  RECACHE = True
-     3  if not self._cacheData.has_key('23711421'):
+     3  if '23711421' not in self._cacheData:
      4      pass
      5  else:
      6      RECACHE = False
@@ -308,7 +308,7 @@ first if-block:
 ::
 
     RECACHE = True
-    if not self._cacheData.has_key('13925129'):
+    if '13925129' not in self._cacheData:
         self._cacheIndex['cache1'] = '13925129'
         self.__cache13925129__refreshTime = currentTime() + 30.0
     elif currentTime() > self.__cache13925129__refreshTime:
@@ -350,7 +350,7 @@ The first if-block in the generated code:
 ::
 
     RECACHE = True
-    if not self._cacheData.has_key('36798144'):
+    if '36798144' not in self._cacheData:
         self._cacheIndex['cache1'] = '36798144'
     elif (VFS(SL,"isDBUpdated",1) or VFS(SL,"someOtherCondition",1)):
         RECACHE = True
@@ -384,7 +384,7 @@ The first if-block:
 ::
 
     RECACHE = True
-    if not self._cacheData.has_key('88939345'):
+    if '88939345' not in self._cacheData:
         self._cacheIndex['cache1'] = '88939345'
         self.__cache88939345__refreshTime = currentTime() + 1800.0
     elif currentTime() > self.__cache88939345__refreshTime:

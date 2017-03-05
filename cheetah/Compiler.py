@@ -908,7 +908,7 @@ class MethodCompiler(GenUtils):
     def setErrorCatcher(self, errorCatcherName):
         self.turnErrorCatcherOn()        
 
-        self.addChunk('if self._CHEETAH__errorCatchers.has_key("' + errorCatcherName + '"):')
+        self.addChunk('if ("' + errorCatcherName + '") in self._CHEETAH__errorCatchers:')
         self.indent()
         self.addChunk('self._CHEETAH__errorCatcher = self._CHEETAH__errorCatchers["' +
             errorCatcherName + '"]')
@@ -949,7 +949,7 @@ class MethodCompiler(GenUtils):
             else:
                 # is string representing the name of a builtin filter
                 self.addChunk('filterName = ' + repr(theFilter))
-                self.addChunk('if self._CHEETAH__filters.has_key("' + theFilter + '"):')
+                self.addChunk('if ("' + theFilter + '") in self._CHEETAH__filters:')
                 self.indent()
                 self.addChunk('_filter = self._CHEETAH__currentFilter = self._CHEETAH__filters[filterName]')
                 self.dedent()

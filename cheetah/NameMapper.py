@@ -192,7 +192,7 @@ def _isInstanceOrClass(obj):
 
 def hasKey(obj, key):
     """Determine if 'obj' has 'key' """
-    if hasattr(obj, 'has_key') and key in obj:
+    if hasattr(obj, '__contains__') and key in obj:
         return True
     elif hasattr(obj, key):
         return True
@@ -200,7 +200,7 @@ def hasKey(obj, key):
         return False
 
 def valueForKey(obj, key):
-    if hasattr(obj, 'has_key') and key in obj:
+    if hasattr(obj, '__contains__') and key in obj:
         return obj[key]
     elif hasattr(obj, key):
         return getattr(obj, key)
@@ -211,7 +211,7 @@ def _valueForName(obj, name, executeCallables=False):
     nameChunks=name.split('.')
     for i in range(len(nameChunks)):
         key = nameChunks[i]
-        if hasattr(obj, 'has_key') and key in obj:
+        if hasattr(obj, '__contains__') and key in obj:
             nextObj = obj[key]
         else:
             try:

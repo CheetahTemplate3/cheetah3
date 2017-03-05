@@ -271,7 +271,7 @@ The generated code:
      1  write(filter(VFS(SL,"ode",1))) # generated from '$ode' at line 2, col 1.
      2  write('\n')
      3  filterName = 'WebSafe'
-     4  if self._filters.has_key("WebSafe"):
+     4  if "WebSafe" in self._filters:
      5      filter = self._currentFilter = self._filters[filterName]
      6  else:
      7      filter = self._currentFilter = \
@@ -280,7 +280,7 @@ The generated code:
      9  write(filter(VFS(SL,"ode",1))) # generated from '$ode' at line 4, col 1.
     10  write('\n')
     11  filterName = 'MaxLen'
-    12  if self._filters.has_key("MaxLen"):
+    12  if "MaxLen" in self._filters:
     13      filter = self._currentFilter = self._filters[filterName]
     14  else:
     15      filter = self._currentFilter = \

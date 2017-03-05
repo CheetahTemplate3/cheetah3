@@ -212,7 +212,7 @@ class Mantis_Issue_22_Regression_Test(unittest.TestCase):
 
             _orig_filter_18517345 = _filter
             filterName = u'Filter'
-            if self._CHEETAH__filters.has_key("Filter"):
+            if "Filter" in self._CHEETAH__filters:
                 _filter = self._CHEETAH__currentFilter = self._CHEETAH__filters[filterName]
             else:
                 _filter = self._CHEETAH__currentFilter = \

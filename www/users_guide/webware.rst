@@ -509,10 +509,10 @@ From the method docstring:
         dic = self.webInput([], ['dayCheckboxes'])
         wantedDays = dic['dayCheckboxes'] # The days the user checked.
         for day, on in self.getAllValues():
-            if   not on and wantedDays.has_key(day):
+            if   not on and day in wantedDays:
                 self.TurnOn(day)
                 # ... Set a flag or insert a database record ...
-            elif on and not wantedDays.has_key(day):
+            elif on and day not in wantedDays:
                 self.TurnOff(day)
                 # ... Unset a flag or delete a database record ...
     

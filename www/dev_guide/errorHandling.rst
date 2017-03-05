@@ -165,14 +165,14 @@ The generated code:
 
 ::
 
-    if self._errorCatchers.has_key("Echo"):
+    if "Echo" in self._errorCatchers:
         self._errorCatcher = self._errorCatchers["Echo"]
     else:
         self._errorCatcher = self._errorCatchers["Echo"] = ErrorCatchers.Echo(self)
     write(filter(self.__errorCatcher1(localsDict=locals()))) 
         # generated from '$noValue' at line 2, col 1.
     write('\n')
-    if self._errorCatchers.has_key("BigEcho"):
+    if "BigEcho" in self._errorCatchers:
         self._errorCatcher = self._errorCatchers["BigEcho"]
     else:
         self._errorCatcher = self._errorCatchers["BigEcho"] = \
@@ -297,7 +297,7 @@ and several new methods:
                 return trans.response().getvalue()
             else:
                 return ""
-        if self._errorCatchers.has_key("ListErrors"):
+        if "ListErrors" in self._errorCatchers:
             self._errorCatcher = self._errorCatchers["ListErrors"]
         else:
             self._errorCatcher = self._errorCatchers["ListErrors"] = \
