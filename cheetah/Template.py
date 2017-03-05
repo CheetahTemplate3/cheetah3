@@ -43,7 +43,7 @@ if PY2:
 else:
     filetype = io.IOBase
     def createMethod(func, cls):
-        return types.MethodType(func, cls)
+        return func
 
 
 
