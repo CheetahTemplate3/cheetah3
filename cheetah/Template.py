@@ -1201,7 +1201,7 @@ class Template(Servlet):
                             ('errorCatcher', 'string, class or None',
                              '(if class, must be subclass of Cheetah.ErrorCatchers.ErrorCatcher)'))
         if compilerSettings is not Unspecified:
-            if not isinstance(compilerSettings, types.DictType):
+            if not isinstance(compilerSettings, dict):
                 raise TypeError(errmsg %
                                 ('compilerSettings', 'dictionary'))
         
