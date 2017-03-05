@@ -1574,14 +1574,15 @@ class ModuleCompiler(SettingsManager, GenUtils):
                         self, "#encoding and #unicode are mutually exclusive! "
                         "Use one or the other.")
                 source = unicodeDirectiveRE.sub('', source)
-                if isinstance(source, str):
+                if isinstance(source, bytes):
                     encoding = unicodeMatch.group(1) or 'ascii'
                     source = unicode(source, encoding)
             elif encodingMatch:
-                encodings = encodingMatch.groups()
-                if len(encodings):
-                    encoding = encodings[0]
-                    source = source.decode(encoding)
+                if isinstance(source, bytes):
+                    encodings = encodingMatch.groups()
+                    if len(encodings):
+                        encoding = encodings[0]
+                        source = source.decode(encoding)
             else:
                 source = unicode(source)
 
