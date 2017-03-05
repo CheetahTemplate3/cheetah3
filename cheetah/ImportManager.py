@@ -126,7 +126,7 @@ def pathIsDir(pathname):
         s = _os_stat(pathname)
     except OSError:
         return None
-    return (s[0] & 0170000) == 0040000
+    return (s[0] & 0o170000) == 0o040000
 
 def getDescr(fnm):
     ext = getPathExt(fnm)
