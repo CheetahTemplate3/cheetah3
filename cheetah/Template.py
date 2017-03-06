@@ -1009,6 +1009,8 @@ class Template(Servlet):
                     rc = getattr(self, mainMethName)()
                     if PY2 and isinstance(rc, unicode):
                         return rc.encode('utf-8')
+                    if not PY2 and isinstance(rc, bytes):
+                        return rc.decode('utf-8')
                     return rc
                 def __unicode__(self):
                     return getattr(self, mainMethName)()
@@ -1018,6 +1020,8 @@ class Template(Servlet):
                     rc = self.respond()
                     if PY2 and isinstance(rc, unicode):
                         return rc.encode('utf-8')
+                    if not PY2 and isinstance(rc, bytes):
+                        return rc.decode('utf-8')
                     return rc
                 def __unicode__(self):
                     return self.respond()
@@ -1032,6 +1036,8 @@ class Template(Servlet):
                         rc = super(self.__class__, self).__str__()
                     if PY2 and isinstance(rc, unicode):
                         return rc.encode('utf-8')
+                    if not PY2 and isinstance(rc, bytes):
+                        return rc.decode('utf-8')
                     return rc
                 def __unicode__(self):
                     if hasattr(self, mainMethNameAttr):
