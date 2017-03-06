@@ -15,7 +15,14 @@ Last Revision Date: $Date: 2007/10/02 01:22:04 $
 __author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <sluggoster@gmail.com>"
 __revision__ = "$Revision: 1.26 $"[11:-2]
 
-import getopt, glob, os, pprint, re, shutil, sys
+import codecs
+import getopt
+import glob
+import os
+import pprint
+import re
+import shutil
+import sys
 try:
     import cPickle as pickle
 except ImportError:  # PY3
@@ -619,7 +626,10 @@ be named according to the same rules as Python modules.""" % tup)
         if self.opts.stdout:
             sys.stdout.write(output)
         else:
-            f = open(dst, 'w')
+            encoding = self.opts.encoding
+            f = codecs.open(dst, 'w', encoding=encoding)
+            if encoding and isinstance(output, bytes):
+                output = output.decode(encoding)
             f.write(output)
             f.close()
             

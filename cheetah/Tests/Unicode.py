@@ -16,13 +16,18 @@ class CommandLineTest(unittest.TestCase):
         sourcefile = '-'
         while sourcefile.find('-') != -1:
             sourcefile = tempfile.mktemp()
-        
-        fd = open('%s.tmpl' % sourcefile, 'w')
+
+        if PY2:
+            fd = open('%s.tmpl' % sourcefile, 'w')
+        else:
+            fd = open('%s.tmpl' % sourcefile, 'w', encoding='utf-8')
         fd.write(source)
         fd.close()
 
         wrap = CheetahWrapper.CheetahWrapper()
-        wrap.main(['cheetah', 'compile', '--quiet', '--nobackup', sourcefile])
+        wrap.main(['cheetah', 'compile',
+                   '--encoding=utf-8', '--settings=encoding="utf-8"',
+                   '--quiet', '--nobackup', sourcefile])
         module_path, module_name = os.path.split(sourcefile)
         module = loadModule(module_name, [module_path])
         template = getattr(module, module_name)
