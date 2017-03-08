@@ -227,11 +227,12 @@ class InlineSpanishTest(unittest.TestCase):
 </html>
         '''
 
-    def test_failure(self):
-        """ Test a template lacking a proper #encoding tag """
-        self.failUnlessRaises(UnicodeDecodeError, Template, self.template, searchList=[{'header' : '',
-                        'nombre' : '', 'numpedidos_bodega' : '',
-                        'numpedidos_noconf' : ''}])
+    if PY2:  # In PY3 templates are already unicode
+        def test_failure(self):
+            """ Test a template lacking a proper #encoding tag """
+            self.failUnlessRaises(UnicodeDecodeError, Template, self.template, searchList=[{'header' : '',
+                            'nombre' : '', 'numpedidos_bodega' : '',
+                            'numpedidos_noconf' : ''}])
 
     def test_success(self):
         """ Test a template with a proper #encoding tag """

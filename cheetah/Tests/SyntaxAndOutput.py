@@ -30,6 +30,8 @@ from Cheetah.NameMapper import C_VERSION as NameMapper_C_VERSION
 from Cheetah.Template import Template
 from Cheetah.Parser import ParseError
 from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
+from Cheetah.compat import PY2
+
 
 class Unspecified(object):
     pass
@@ -727,12 +729,18 @@ class EncodingDirective(OutputTest):
 
     def test3(self):
         """basic #encoding """
-        self.verify("#encoding utf-8\n\xe1\x88\xb4",
+        source = b"#encoding utf-8\n\xe1\x88\xb4"
+        if not PY2:
+            source = source.decode('utf-8')
+        self.verify(source,
                     u'\u1234', outputEncoding='utf8')
 
     def test4(self):
         """basic #encoding """
-        self.verify("#encoding latin-1\n\xe1\x88\xb4",
+        source = b"#encoding latin-1\n\xe1\x88\xb4"
+        if not PY2:
+            source = source.decode('latin-1')
+        self.verify(source,
                     u"\xe1\x88\xb4")
 
     def test5(self):
@@ -742,8 +750,11 @@ class EncodingDirective(OutputTest):
 
     def test6(self):
         '''Using #encoding on the second line'''
-        self.verify("""### Comments on the first line
-#encoding utf-8\n\xe1\x88\xb4""",
+        source = b"""### Comments on the first line
+#encoding utf-8\n\xe1\x88\xb4"""
+        if not PY2:
+            source = source.decode('utf-8')
+        self.verify(source,
                     u'\u1234', outputEncoding='utf8')
 
 class UnicodeDirective(OutputTest):
