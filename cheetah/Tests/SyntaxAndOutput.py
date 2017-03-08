@@ -1019,13 +1019,13 @@ class NameMapper(OutputTest):
 
     def test19(self):
         """object method access, followed by complex slice"""
-        self.verify("$anObj.meth1[0: ((4/4*2)*2)/$anObj.meth1(2) ]",
+        self.verify("$anObj.meth1[0: ((4//4*2)*2)//$anObj.meth1(2) ]",
                     "do")
 
     def test20(self):
         """object method access, followed by a very complex slice
         If it can pass this one, it's safe to say it works!!"""
-        self.verify("$( anObj.meth1[0:\n (\n(4/4*2)*2)/$anObj.meth1(2)\n ] )",
+        self.verify("$( anObj.meth1[0:\n (\n(4//4*2)*2)//$anObj.meth1(2)\n ] )",
                     "do")
 
     def test21(self):
@@ -1219,7 +1219,7 @@ $x$y#slurp
 3#slurp
 #end call 3
 #set two = 2
-#call self.meth2 y=c"$(10/$two)"
+#call self.meth2 y=c"$(10//$two)"
 #arg x
 4#slurp
 #end call 4
@@ -1615,7 +1615,7 @@ class RepeatDirective(OutputTest):
 
     def test2(self):
         """#repeat with numeric expression"""
-        self.verify("#repeat 3*3/3\n1\n#end repeat",
+        self.verify("#repeat 3*3//3\n1\n#end repeat",
                     "1\n1\n1\n")
     
     def test3(self):
