@@ -3,19 +3,23 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Cheetah, the Python-Powered Template Engine
-===========================================
+Cheetah3, the Python-Powered Template Engine
+============================================
 
 Introduction
 ------------
-Cheetah is an `open source <https://github.com/rtyler/cheetah/tree>`_ template
-engine and code-generation tool written in `Python <http://python.org>`_. Cheetah
-can be used unto itself, or incorporated with other technologies and stacks regardless
+Cheetah3 is a free (BSD-style) and `open source
+<https://github.com/CheetahTemplate3/cheetah3>`_ template engine and
+code-generation tool written in `Python <http://python.org>`_. Cheetah can be
+used unto itself, or incorporated with other technologies and stacks regardless
 of whether they're written in Python or not. 
 
 At its core, Cheetah is a domain-specific language for markup generation and 
 templating which allows for full integration with existing Python code but also 
 offers extensions to traditional Python syntax to allow for easier text-generation.
+
+It's a fork of the `original <https://github.com/cheetahtemplate/cheetah>`_
+CheetahTemplate library.
 
 Talk Cheetah
 ^^^^^^^^^^^^

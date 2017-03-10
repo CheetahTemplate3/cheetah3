@@ -42,7 +42,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Cheetah'
+project = u'Cheetah3'
 copyright = u'2017, Oleg Broytman; 2009-2012, R. Tyler Croy; 2001-2008, The Cheetah Development Team.'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -109,7 +109,7 @@ html_theme_path = ['.']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = u'Cheetah - The Python-Powered Template Engine'
+html_title = u'Cheetah3 - The Python-Powered Template Engine'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
