@@ -22,7 +22,7 @@ the current release of Cheetah will go, it's common for a patch
 to be applied to maint and next at the same time.
 
 Anyone and everyone is encouraged to submit patches at any time, but as far 
-as bugs or feature requests go, we try to file those *first* in the `Cheetah Bug Tracker <http://bugs.cheetahtemplate.org>`_
+as bugs or feature requests go, we try to file those *first* in the `Cheetah3 Bug Tracker <https://github.com/CheetahTemplate3/cheetah3/issues>`_
 and then they can be organized into particular releases as is necessary.
 
 In addition to the bug tracker, Cheetah uses `Hudson <http://hudson-ci.org>`_ for 
@@ -36,7 +36,7 @@ Filing Bugs
 -----------
 No software is perfect, and unfortunately no bug report is either. If you've 
 found yourself faced with a bug in Cheetah, or just have a good idea for a 
-new feature, we kindly ask that you create an issue in the `Cheetah Bug Tracker <http://bugs.cheetahtemplate.org>`_.
+new feature, we kindly ask that you create an issue in the `Cheetah3 Bug Tracker <https://github.com/CheetahTemplate3/cheetah3/issues>`_.
 
 Some tips for filing a *useful* bug report, try to include the following:
 
