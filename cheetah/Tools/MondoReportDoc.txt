@@ -17,7 +17,7 @@ any kind of report.  The module consists of one main public class, and some
 generic functions you may find useful in other programs.  This file contains an
 overview, syntax reference and examples.  The module is designed both for
 standalone use and for integration with the Cheetah template system
-(http://www.cheetahtemplate.org/), so the examples are in both Python and
+(https://cheetahtemplate3.github.io/), so the examples are in both Python and
 Cheetah.  The main uses of MondoReport are: 
 
 (A) to iterate through a list.  In this sense MR is a for-loop enhancer,

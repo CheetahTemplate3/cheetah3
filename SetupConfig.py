@@ -9,7 +9,7 @@ author = "Tavis Rudd"
 author_email = "cheetahtemplate-discuss@lists.sf.net"
 maintainer = "Oleg Broytman"
 maintainer_email = "phd@phdru.name"
-url = "http://www.cheetahtemplate.org/"
+url = "https://cheetahtemplate3.github.io/"
 packages = ['Cheetah',
             'Cheetah.Macros',            
             'Cheetah.Templates',
@@ -92,7 +92,7 @@ used to generate C++ game code, Java, sql, form emails and even Python code.
 Documentation
 ================================================================================
 For a high-level introduction to Cheetah please refer to the User\'s Guide
-at http://www.cheetahtemplate.org/learn.html
+at https://cheetahtemplate3.github.io/users_guide/index.html
 
 Mailing list
 ================================================================================
@@ -101,10 +101,11 @@ Subscribe at http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss
 
 Credits
 ================================================================================
-http://www.cheetahtemplate.org/credits.html
+https://github.com/CheetahTemplate3/cheetah3/blob/master/LICENSE
 
 Recent Changes
 ================================================================================
-See http://www.cheetahtemplate.org/CHANGES.txt for full details
+See https://github.com/CheetahTemplate3/cheetah3/blob/master/CHANGES
+for full details
 
 '''

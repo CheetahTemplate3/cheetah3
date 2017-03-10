@@ -12,13 +12,13 @@ Cheetah Links
 (links.cheetah)
 
 Home Page
-    - http:www.CheetahTemplate.org/
+    - https://github.com/CheetahTemplate3/cheetah3
 
 On-line Documentation
-    - http:www.CheetahTemplate.org/learn.html
+    - https://cheetahtemplate3.github.io/
 
 SourceForge Project Page
-    - http:sf.net/projects/cheetahtemplate/
+    - http://sf.net/projects/cheetahtemplate/
 
 Mailing List Subscription Page
     -

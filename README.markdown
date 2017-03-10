@@ -10,7 +10,7 @@ It's a fork of the original CheetahTemplate library.
 Documentation
 ================================================================================
 For a high-level introduction to Cheetah please refer to the User\'s Guide
-at http://cheetahtemplate.org/learn.html
+at https://cheetahtemplate3.github.io/users_guide/index.html
 
 Mailing list
 ================================================================================
@@ -19,7 +19,7 @@ Subscribe at http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss
 
 Credits
 ================================================================================
-http://cheetahtemplate.org/credits.html
+https://github.com/CheetahTemplate3/cheetah3/blob/master/LICENSE
 
 Praise
 ================================================================================

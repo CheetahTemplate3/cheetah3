@@ -6,10 +6,10 @@ development is its principle use, but Cheetah is very flexible and is also being
 used to generate C++ game code, Java, sql, form emails and even Python code.
 
 Homepage
-    http://www.cheetahtemplate.org/
+    https://github.com/CheetahTemplate3/cheetah3
 
 Documentation
-    http://cheetahtemplate.org/learn.html
+    https://cheetahtemplate3.github.io/
 
 Mailing list
 cheetahtemplate-discuss@lists.sourceforge.net

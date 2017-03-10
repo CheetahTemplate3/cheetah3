@@ -86,9 +86,3 @@ up with the cheetah-discuss mailing list will know when changes
 occur that require modifying one's template, and since most people
 use point releases rather than CVS, they generally have a few
 week's warning about any significant changes.
-
-More detail on Cheetah's history and evolution, and why it is the
-way it is, can be found in our paper for the Python10 conference,
-http://www.cheetahtemplate.org/Py10.html.
-
-

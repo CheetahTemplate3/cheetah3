@@ -234,7 +234,7 @@ Where can I get news?
 ---------------------
 
 Cheetah releases can be obtained from the `Cheetah
-website <http://cheetahtemplate.org>`_
+website <https://cheetahtemplate3.github.io/>`_
 
 Cheetah discussions take place on the `mailing
 list <http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss>`_
