@@ -25,11 +25,13 @@ Anyone and everyone is encouraged to submit patches at any time, but as far
 as bugs or feature requests go, we try to file those *first* in the `Cheetah3 Bug Tracker <https://github.com/CheetahTemplate3/cheetah3/issues>`_
 and then they can be organized into particular releases as is necessary.
 
-In addition to the bug tracker, Cheetah uses `Hudson <http://hudson-ci.org>`_ for 
-automating builds and test runs on a number of platforms (see: `Cheetah's Hudson <http://hudson.cheetahtemplate.org>`_).
-Prior to the tarballing of
-a release, **all** tests must be passing before the **next** branch is merged down
-to the Git **master** branch where the release tarball will actually be created from.
+In addition to the bug tracker, Cheetah uses Travis CI for automating builds
+and test runs (see: `Cheetah at Travis
+<https://travis-ci.org/CheetahTemplate3/cheetah3>`_).
+
+Prior to the tarballing of a release, **all** tests must be passing before the
+**next** branch is merged down to the Git **master** branch where the release
+tarball will actually be created from.
 
 
 Filing Bugs
