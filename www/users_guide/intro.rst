@@ -236,11 +236,9 @@ Where can I get news?
 Cheetah releases can be obtained from the `Cheetah
 website <https://cheetahtemplate3.github.io/>`_
 
-Cheetah discussions take place on the `mailing
-list <http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss>`_
-
-If you encounter difficulties, or are unsure about how to do
-something, please post a detailed message to the list.
+If you encounter difficulties, or are unsure about how to do something, please
+post a detailed message to the `bug tracker
+<https://github.com/CheetahTemplate3/cheetah3/issues>`.
 
 How can I contribute?
 ---------------------

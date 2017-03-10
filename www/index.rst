@@ -23,9 +23,8 @@ CheetahTemplate library.
 
 Talk Cheetah
 ^^^^^^^^^^^^
-You can get involved and talk with Cheetah developers on the `Cheetah mailing list <http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss>`_
-(*cheetahtemplate-discuss@lists.sourceforge.net*) or on the **IRC** channel: 
-**#cheetah** on `Freenode <http://freenode.net/>`_
+You can get involved and talk with Cheetah developers on the `Cheetah3 issue
+tracker <https://github.com/CheetahTemplate3/cheetah3/issues>`_.
 
 Contents
 ^^^^^^^^^

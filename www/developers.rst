@@ -1,8 +1,10 @@
 Contributing to Cheetah
 =======================
 
-Cheetah is the work of many volunteers. If you use Cheetah, share your experiences, 
-tricks, customizations, and frustrations. Please join the `mailing list <http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss>`_
+Cheetah is the work of many volunteers. If you use Cheetah, share your
+experiences, tricks, customizations, and frustrations. Please visit
+https://github.com/CheetahTemplate3 and file bug reports, feature requests or
+pull requests.
 
 
 Getting the Code

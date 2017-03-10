@@ -6,7 +6,7 @@ Using Cheetah with Webware
 { Webware for Python} is a 'Python-Powered Internet Platform' that
 runs servlets in a manner similar to Java servlets. { WebKit} is
 the name of Webware's application server. For more details, please
-visit http://webware.sourceforge.net/.
+visit https://cito.github.io/w4py/.
 
 All comments below refer to the official version of Webware, the
 DamnSimple! offshoot at ?, and the now-abandoned

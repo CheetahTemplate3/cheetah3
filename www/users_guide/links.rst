@@ -11,30 +11,11 @@ Cheetah Links
 
 (links.cheetah)
 
-Home Page
+Home Page, issue tracker
     - https://github.com/CheetahTemplate3/cheetah3
 
 On-line Documentation
     - https://cheetahtemplate3.github.io/
-
-SourceForge Project Page
-    - http://sf.net/projects/cheetahtemplate/
-
-Mailing List Subscription Page
-    -
-    http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss
-
-Mailing List Archive @ Geocrawler
-    - http://www.geocrawler.com/lists/3/SourceForge/12986/0/
-
-Mailing List Archive @ Yahoo
-    - http://groups.yahoo.com/group/cheetah-archive/
-
-CVS Repository
-    - http://sourceforge.net/cvs/?group\_id=28961
-
-CVS-commits archive
-    - http://www.geocrawler.com/lists/3/SourceForge/13091/0/
 
 
 Third-party Cheetah Stuff
@@ -53,13 +34,13 @@ Webware Links
 (links.webware)
 
 Home Page
-    - http://webware.sf.net/
+    - https://cito.github.io/w4py/
 
 On-line Documentation
-    - http://webware.sf.net/Webware/Docs/
+    - https://webware.sf.net/Webware/Docs/
 
 SourceForge Project Page
-    - http://sf.net/projects/webware/
+    - https://sf.net/projects/webware/
 
 Mailing List Subscription Page
     - http://lists.sourceforge.net/lists/listinfo/webware-discuss
@@ -76,14 +57,8 @@ Home Page
 On-line Documentation
     - http://www.python.org/doc/
 
-SourceForge Project Page
-    - http://sf.net/projects/python/
-
-The Vaults of Parnassus: Python Resources
-    - http://www.vex.net/parnassus/
-
 Python Cookbook
-    - http://aspn.activestate.com/ASPN/Cookbook/Python
+    - https://code.activestate.com/recipes/langs/python/
 
 
 Other Useful Links
@@ -114,8 +89,8 @@ Other Template Systems
 
 (links.other.templateSystems)
 
-Chuck's "Templates" Summary Page
-    - http://webware.sf.net/Papers/Templates/
+Python Wiki
+    - https://wiki.python.org/moin/Templating
 
 
 Other Internet development frameworks

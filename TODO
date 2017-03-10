@@ -231,8 +231,8 @@ User-defined directives
 IF we decide to support user-defined directives someday, consider Spyce's
 interface.  Spyce uses a base class which provides generic services to
 custom "active tags".
-http://spyce.sourceforge.net/doc-tag.html
-http://spyce.sourceforge.net/doc-tag_new.html
+http://spyce.sourceforge.net/docs/doc-tag.html
+http://spyce.sourceforge.net/docs/doc-tag_new.html
 
 
 Test Suite

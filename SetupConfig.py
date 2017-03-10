@@ -6,7 +6,7 @@ name = 'Cheetah'
 from cheetah.Version import Version as version
 license = "MIT"
 author = "Tavis Rudd"
-author_email = "cheetahtemplate-discuss@lists.sf.net"
+author_email = "tavis@damnsimple.com"
 maintainer = "Oleg Broytman"
 maintainer_email = "phd@phdru.name"
 url = "https://cheetahtemplate3.github.io/"
@@ -93,11 +93,6 @@ Documentation
 ================================================================================
 For a high-level introduction to Cheetah please refer to the User\'s Guide
 at https://cheetahtemplate3.github.io/users_guide/index.html
-
-Mailing list
-================================================================================
-cheetahtemplate-discuss@lists.sourceforge.net
-Subscribe at http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss
 
 Credits
 ================================================================================

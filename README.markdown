@@ -12,11 +12,6 @@ Documentation
 For a high-level introduction to Cheetah please refer to the User\'s Guide
 at https://cheetahtemplate3.github.io/users_guide/index.html
 
-Mailing list
-================================================================================
-cheetahtemplate-discuss@lists.sourceforge.net
-Subscribe at http://lists.sourceforge.net/lists/listinfo/cheetahtemplate-discuss
-
 Credits
 ================================================================================
 https://github.com/CheetahTemplate3/cheetah3/blob/master/LICENSE
