@@ -3,15 +3,15 @@ Contributing to Cheetah
 
 Cheetah is the work of many volunteers. If you use Cheetah, share your
 experiences, tricks, customizations, and frustrations. Please visit
-https://github.com/CheetahTemplate3 and file bug reports, feature requests or
-pull requests.
+https://github.com/CheetahTemplate3/cheetah3 and file bug reports, feature
+requests or pull requests.
 
 
 Getting the Code
 ----------------
 The Cheetah source code is stored in a central **Git** repository
 hosted primarily by `GitHub <http://github.com>`_. The primary Git 
-repository can be found `here <http://github.com/cheetahtemplate/cheetah>`_.
+repository can be found `here <http://github.com/CheetahTemplate3/cheetah3>`_.
 
 
 Development Process
