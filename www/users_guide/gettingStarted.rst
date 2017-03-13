@@ -17,7 +17,7 @@ and should run anywhere Python runs.
 to a Python equivalent ({NameMapper.py}) if the C module is not
 available.
 
-Cheetah requires an additional module Markdown and its dependencies.
+Cheetah can use an additional module Markdown but it's not strictly required.
 
 Installation
 ------------
