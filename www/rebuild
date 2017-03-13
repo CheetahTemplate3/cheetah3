@@ -1,2 +1,4 @@
 #! /bin/sh
-PYTHONPATH=.. exec make html
+
+PYTHONPATH=.. make html &&
+exec rsync -ahP --del --exclude=.buildinfo --exclude=objects.inv _build/html .

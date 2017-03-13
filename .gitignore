@@ -8,4 +8,5 @@ CT3.egg-info/
 build
 dist
 www/*.html
-www/_build
+www/_build/
+www/html/
