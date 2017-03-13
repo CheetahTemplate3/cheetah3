@@ -8,10 +8,9 @@ Requirements
 
 (gettingStarted.requirements)
 
-Cheetah requires Python release 2.0 or greater, and has been tested
-with Python 2.0, 2.1 and 2.2. It is known to run on Linux, Windows
-NT/98/XP, FreeBSD and Solaris, and should run anywhere Python
-runs.
+Cheetah requires Python release 2.7 (there are plans to support 3.4+).
+It is known to run on Linux, Windows, FreeBSD and Solaris,
+and should run anywhere Python runs.
 
 99% of Cheetah is written in Python. There is one small C module
 ({\_namemapper.so}) for speed, but Cheetah automatically falls back
