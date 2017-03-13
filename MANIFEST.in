@@ -1,7 +1,7 @@
-include MANIFEST.in *.py *.cfg TODO CHANGES LICENSE README.markdown examples docs bin
-recursive-include cheetah *.py *.tmpl *.txt *.h
+global-include *.py *.rst *.txt
+include .travis.yml CHANGES CHANGES.old LICENSE MANIFEST.in README.markdown TODO tox.ini
+recursive-include cheetah *.tmpl *.h *.c
 recursive-include bin *
-recursive-include docs * 
-recursive-include examples *
-recursive-exclude cheetah *.pyc *~ *.aux
-recursive-exclude docs *~ *.aux
+include www/Makefile www/rebuild
+recursive-include www *.css *.html *.js *.gif *.png
+prune www/_build
