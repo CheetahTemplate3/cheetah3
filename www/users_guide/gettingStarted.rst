@@ -17,6 +17,8 @@ and should run anywhere Python runs.
 to a Python equivalent ({NameMapper.py}) if the C module is not
 available.
 
+Cheetah requires an additional module Markdown and its dependencies.
+
 Installation
 ------------
 
@@ -30,16 +32,21 @@ To install Cheetah in your system-wide Python library:
    command is normally 'su root'. On non-POSIX systems such as Windows
    NT, login as an administrator.
 
-#. Run {python setup.py install} at the command prompt.
+#. Run {pip install CT3} at the command prompt.
+
+#. Or download source code and run {python setup.py install}.
 
 #. The setup program will install the wrapper script { cheetah} to
    wherever it usually puts Python binaries ("/usr/bin/", "bin/" in
    the Python install directory, etc.)
 
+#. If you cannot login as as an administrator install Cheetah as user to your
+   own home directory: add option {--user} to commands: either
+   {pip install --user CT3} or {python setup.py install --user}.
 
 Cheetah's installation is managed by Python's Distribution
 Utilities ('distutils'). There are many options for customization.
-Type {"python setup.py help"} for more information.
+Type {python setup.py help} for more information.
 
 To install Cheetah in an alternate location - someplace outside
 Python's {site-packages/} directory, use one of these options:
