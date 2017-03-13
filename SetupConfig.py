@@ -2,7 +2,9 @@
 import sys
 from cheetah.compat import PY2
 
-name = 'Cheetah'
+# Cheetah3 has already been taken at PyPI,
+# CheetahTemplate3 seems to be too long.
+name = 'CT3'
 from cheetah.Version import Version as version
 license = "MIT"
 author = "Tavis Rudd"
@@ -83,11 +85,15 @@ if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
 
 description = "Cheetah is a template engine and code generation tool."
 
-long_description = '''Cheetah is an open source template engine and code generation tool.
+long_description = '''\
+Cheetah3 is a free (BSD-style) and open source template engine and code
+generation tool.
 
 It can be used standalone or combined with other tools and frameworks. Web
 development is its principle use, but Cheetah is very flexible and is also being
 used to generate C++ game code, Java, sql, form emails and even Python code.
+
+It's a fork of the original CheetahTemplate library.
 
 Documentation
 ================================================================================

@@ -4,7 +4,7 @@
 *.so
 .eggs/
 .tox/
-Cheetah.egg-info/
+CT3.egg-info/
 build
 dist
 www/*.html
