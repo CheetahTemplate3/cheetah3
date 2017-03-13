@@ -38,6 +38,7 @@ classifiers = [line.strip() for line in '''\
 
 if PY2:
     del line
+del PY2  # Hide it from setup()
 
 package_dir = {'Cheetah':'cheetah'}
 
