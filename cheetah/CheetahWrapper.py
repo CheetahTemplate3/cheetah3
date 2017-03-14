@@ -1,19 +1,3 @@
-# $Id: CheetahWrapper.py,v 1.26 2007/10/02 01:22:04 tavis_rudd Exp $
-"""Cheetah command-line interface.
-
-2002-09-03 MSO: Total rewrite.
-2002-09-04 MSO: Bugfix, compile command was using wrong output ext.
-2002-11-08 MSO: Another rewrite.
-
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com> and Mike Orr <sluggoster@gmail.com>>
-Version: $Revision: 1.26 $
-Start Date: 2001/03/30
-Last Revision Date: $Date: 2007/10/02 01:22:04 $
-"""
-__author__ = "Tavis Rudd <tavis@damnsimple.com> and Mike Orr <sluggoster@gmail.com>"
-__revision__ = "$Revision: 1.26 $"[11:-2]
 
 import codecs
 import getopt

@@ -1,15 +1,3 @@
-# $Id: ErrorCatchers.py,v 1.7 2005/01/03 19:59:07 tavis_rudd Exp $
-"""ErrorCatcher class for Cheetah Templates
-
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.7 $
-Start Date: 2001/08/01
-Last Revision Date: $Date: 2005/01/03 19:59:07 $
-"""
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.7 $"[11:-2]
 
 import time
 from Cheetah.NameMapper import NotFound

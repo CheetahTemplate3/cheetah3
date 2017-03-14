@@ -130,8 +130,6 @@ Cheetah uses the optimized C version (_namemapper.c) if it has
 been compiled or falls back to the Python version if not.
 """
 
-__author__ = "Tavis Rudd <tavis@damnsimple.com>," +\
-             "\nChuck Esterbrook <echuck@mindspring.com>"
 from pprint import pformat
 import inspect
 

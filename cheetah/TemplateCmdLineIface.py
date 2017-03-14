@@ -1,16 +1,3 @@
-# $Id: TemplateCmdLineIface.py,v 1.13 2006/01/10 20:34:35 tavis_rudd Exp $
-
-"""Provides a command line interface to compiled Cheetah template modules.
-
-Meta-Data
-================================================================================
-Author: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.13 $
-Start Date: 2001/12/06
-Last Revision Date: $Date: 2006/01/10 20:34:35 $
-"""
-__author__ = "Tavis Rudd <tavis@damnsimple.com>"
-__revision__ = "$Revision: 1.13 $"[11:-2]
 
 import sys
 import os
