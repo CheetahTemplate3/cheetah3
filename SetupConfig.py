@@ -99,6 +99,8 @@ at https://cheetahtemplate3.github.io/users_guide/index.html
 
 Credits
 ================================================================================
+https://cheetahtemplate3.github.io/authors.html
+
 https://github.com/CheetahTemplate3/cheetah3/blob/master/LICENSE
 
 Recent Changes

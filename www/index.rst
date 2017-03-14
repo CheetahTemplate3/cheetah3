@@ -32,6 +32,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   authors.rst
    developers.rst
    download.rst
    users_guide/index.rst
