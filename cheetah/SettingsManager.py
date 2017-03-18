@@ -14,6 +14,7 @@ try:
 except ImportError:
     from io import StringIO
 import imp                 # used by SettingsManager.updateSettingsFromPySrcFile()
+from Cheetah.compat import PY2
 
 
 numberRE = re.compile(Number)
@@ -143,7 +144,10 @@ class _SettingsCollector(object):
         """
         
         p = self._ConfigParserClass()
-        p.readfp(inFile)
+        if PY2:
+            p.readfp(inFile)
+        else:
+            p.read_file(inFile)
         sects = p.sections()
         newSettings = {}
 
@@ -159,10 +163,8 @@ class _SettingsCollector(object):
         ## loop through new settings -> deal with global settings, numbers,
         ## booleans and None ++ also deal with 'importSettings' commands
 
-        for sect, subDict in newSettings.items():
-            if not isinstance(subDict, dict):
-                continue
-            for key, val in subDict.items():
+        for sect, subDict in list(newSettings.items()):
+            for key, val in list(subDict.items()):
                 if convert:
                     if val.lower().startswith('python:'):
                         subDict[key] = eval(val[7:], {}, {})

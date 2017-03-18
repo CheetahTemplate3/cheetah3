@@ -212,7 +212,7 @@ def sample_stack_procs(frame):
     while frame:
         code_seen[frame.f_code] = True
         frame = frame.f_back
-    for code in code_seen.iterkeys():
+    for code in code_seen:
         get_call_data(code).cum_sample_count += 1
 
 def profile_signal_handler(signum, frame):
@@ -288,7 +288,7 @@ def display():
         print('No samples recorded.')
         return
 
-    l = [CallStats(x) for x in call_data.itervalues()]
+    l = [CallStats(x) for x in call_data.values()]
     l = [(x.self_secs_in_proc, x.cum_secs_in_proc, x) for x in l]
     l.sort(reverse=True)
     l = [x[2] for x in l]

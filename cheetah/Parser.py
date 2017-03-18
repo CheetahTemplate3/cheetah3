@@ -14,11 +14,6 @@ import re
 from re import DOTALL, MULTILINE
 import types
 import time
-try:
-    from tokenize import pseudoprog
-except ImportError:
-    from tokenize import PseudoToken
-    pseudoprog = re.compile(PseudoToken)
 import inspect
 import traceback
 
@@ -27,7 +22,13 @@ from Cheetah import Filters
 from Cheetah import ErrorCatchers
 from Cheetah.Unspecified import Unspecified
 from Cheetah.Macros.I18n import I18n
-from .compat import string_type, unicode
+from .compat import PY2, string_type, unicode
+if PY2:
+    from tokenize import pseudoprog
+else:
+    from tokenize import _compile, PseudoToken
+    pseudoprog = _compile(PseudoToken)
+    del _compile, PseudoToken
 
 # re tools
 _regexCache = {}
@@ -347,7 +348,12 @@ class ArgList(object):
     
     def merge(self):
         defaults = (isinstance(d, string_type) and d.strip() or None for d in self.defaults)
-        return list(zip((a.strip() for a in self.arguments), defaults))
+        arguments = (a.strip() for a in self.arguments)
+        if PY2:
+            return list(map(None, arguments, defaults))
+        else:
+            from itertools import zip_longest
+            return list(zip_longest(arguments, defaults))
     
     def __str__(self):
         return str(self.merge())
@@ -2345,11 +2351,8 @@ class _HighLevelParser(_LowLevelParser):
             kwArgs = macro.convertArgStrToDict(args, parser=self, startPos=startPos)
         else:
             def getArgs(*pargs, **kws):
-                return pargs, kws
-            ldict = locals()
-            exec('positionalArgs, kwArgs = getArgs(%(args)s)' % locals(),
-                  globals(), ldict)
-            kwArgs = ldict['kwArgs']
+                return kws
+            kwArgs = eval('getArgs(%(args)s)' % locals())
 
 
         assert 'src' not in kwArgs

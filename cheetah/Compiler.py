@@ -908,7 +908,7 @@ class MethodCompiler(GenUtils):
     def setErrorCatcher(self, errorCatcherName):
         self.turnErrorCatcherOn()        
 
-        self.addChunk('if ("' + errorCatcherName + '") in self._CHEETAH__errorCatchers:')
+        self.addChunk('if "' + errorCatcherName + '" in self._CHEETAH__errorCatchers:')
         self.indent()
         self.addChunk('self._CHEETAH__errorCatcher = self._CHEETAH__errorCatchers["' +
             errorCatcherName + '"]')
@@ -949,7 +949,7 @@ class MethodCompiler(GenUtils):
             else:
                 # is string representing the name of a builtin filter
                 self.addChunk('filterName = ' + repr(theFilter))
-                self.addChunk('if ("' + theFilter + '") in self._CHEETAH__filters:')
+                self.addChunk('if "' + theFilter + '" in self._CHEETAH__filters:')
                 self.indent()
                 self.addChunk('_filter = self._CHEETAH__currentFilter = self._CHEETAH__filters[filterName]')
                 self.dedent()
@@ -1377,7 +1377,7 @@ class ClassCompiler(GenUtils):
         catcherMeth.addChunk("return eval('''" + codeChunk +
                              "''', globals(), localsDict)")
         catcherMeth.dedent()
-        catcherMeth.addChunk('except self._CHEETAH__errorCatcher.exceptions(), e:')
+        catcherMeth.addChunk('except self._CHEETAH__errorCatcher.exceptions() as e:')
         catcherMeth.indent()        
         catcherMeth.addChunk("return self._CHEETAH__errorCatcher.warn(exc_val=e, code= " +
                              repr(codeChunk) + " , rawCode= " +
@@ -1576,13 +1576,15 @@ class ModuleCompiler(SettingsManager, GenUtils):
                 source = unicodeDirectiveRE.sub('', source)
                 if isinstance(source, bytes):
                     encoding = unicodeMatch.group(1) or 'ascii'
-                    source = unicode(source, encoding)
+                    source = source.decode(encoding)
             elif encodingMatch:
-                if isinstance(source, bytes):
-                    encodings = encodingMatch.groups()
-                    if len(encodings):
-                        encoding = encodings[0]
+                encodings = encodingMatch.groups()
+                if len(encodings):
+                    encoding = encodings[0]
+                    if isinstance(source, bytes):
                         source = source.decode(encoding)
+                    else:
+                        source = eval(repr(source).encode("ascii","backslashreplace").decode(encoding))
             else:
                 source = unicode(source)
 

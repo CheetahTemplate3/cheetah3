@@ -344,7 +344,7 @@ class SubclassSearchListTest(TemplateTest):
         class Sub(Template):
             greeting = 'Hola'
         tmpl = Sub('''When we meet, I say "${greeting}"''')
-        self.assertEquals(unicode(tmpl), 'When we meet, I say "Hola"')
+        self.assertEqual(unicode(tmpl), 'When we meet, I say "Hola"')
 
 ##################################################
 ## if run from the command line ##

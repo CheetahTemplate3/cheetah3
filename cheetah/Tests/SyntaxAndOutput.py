@@ -2534,7 +2534,7 @@ class AssertDirective(OutputTest):
         def test(self=self):
             self.verify("#set $x = 1234\n#assert $x == 999",
                         ""),
-        self.failUnlessRaises(AssertionError, test)
+        self.assertRaises(AssertionError, test)
         
     def test3(self):
         """simple #assert with WS
@@ -2552,7 +2552,7 @@ class RaiseDirective(OutputTest):
         def test(self=self):
             self.verify("#raise ValueError",
                         ""),
-        self.failUnlessRaises(ValueError, test)
+        self.assertRaises(ValueError, test)
                               
     def test2(self):
         """#raise ValueError in #if block
@@ -2562,7 +2562,7 @@ class RaiseDirective(OutputTest):
         def test(self=self):
             self.verify("#if 1\n#raise ValueError\n#end if\n",
                         "")
-        self.failUnlessRaises(ValueError, test)
+        self.assertRaises(ValueError, test)
 
 
     def test3(self):

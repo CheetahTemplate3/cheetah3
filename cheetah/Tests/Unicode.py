@@ -146,7 +146,7 @@ $someUnicodeString"""
         a = unicode(template)
         if PY2:
             a = a.encode("utf-8")
-        self.assertEquals("Bébé", a)
+        self.assertEqual("Bébé", a)
 
     def testDynamicCompile(self):
         source = """#encoding utf-8
@@ -158,7 +158,7 @@ $someUnicodeString"""
         a = unicode(template)
         if PY2:
             a = a.encode("utf-8")
-        self.assertEquals("Bébé", a)
+        self.assertEqual("Bébé", a)
 
 class EncodeUnicodeCompatTest(unittest.TestCase):
     """
@@ -230,7 +230,7 @@ class InlineSpanishTest(unittest.TestCase):
     if PY2:  # In PY3 templates are already unicode
         def test_failure(self):
             """ Test a template lacking a proper #encoding tag """
-            self.failUnlessRaises(UnicodeDecodeError, Template, self.template, searchList=[{'header' : '',
+            self.assertRaises(UnicodeDecodeError, Template, self.template, searchList=[{'header' : '',
                             'nombre' : '', 'numpedidos_bodega' : '',
                             'numpedidos_noconf' : ''}])
 

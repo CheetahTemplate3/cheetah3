@@ -279,7 +279,7 @@ class XMLTestRunnerTest(unittest.TestCase):
         """
         class TestTest(unittest.TestCase):
             def test_foo(self):
-                self.assert_(False)
+                self.assertTrue(False)
         self._try_test_run(TestTest, """<testsuite errors="0" failures="1" name="unittest.TestSuite" tests="1" time="0.000">
   <testcase classname="__main__.TestTest" name="test_foo" time="0.000">
     <failure type="exceptions.AssertionError">Foobar</failure>

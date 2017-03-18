@@ -12,7 +12,7 @@ class AnalyzerTests(unittest.TestCase):
         Hello ${foo}!
         '''
         calls = DirectiveAnalyzer.analyze(template)
-        self.assertEquals(1, calls.get('set'))
+        self.assertEqual(1, calls.get('set'))
 
     def test_compilersettings(self):
         template = '''
@@ -21,7 +21,7 @@ useNameMapper = False
 #end compiler-settings
         '''
         calls = DirectiveAnalyzer.analyze(template)
-        self.assertEquals(1, calls.get('compiler-settings'))
+        self.assertEqual(1, calls.get('compiler-settings'))
 
 
 if __name__ == '__main__':

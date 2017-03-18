@@ -11,6 +11,7 @@ Besides unittest usage, recognizes the following command-line options:
      --output
         Show the output of each subcommand.  (Normally suppressed.)
 '''
+
 import os
 import os.path
 import pdb
@@ -111,7 +112,7 @@ class CFBase(unittest.TestCase):
         path = os.path.abspath(path)
         exists = os.path.exists(path)
         msg = "destination file missing: %s" % path
-        self.failUnless(exists, msg)
+        self.assertTrue(exists, msg)
         f = open(path, 'r')
         result = f.read()
         f.close()
@@ -120,7 +121,7 @@ class CFBase(unittest.TestCase):
         else:
             success = result == expected
         msg = errmsg % locals()
-        self.failUnless(success, msg)
+        self.assertTrue(success, msg)
 
 
     def checkCompile(self, path):
@@ -148,11 +149,11 @@ Found %(result)r"""
         """
         exists = os.path.exists(path)
         msg = "destination subdirectory %s misssing" % path
-        self.failUnless(exists, msg)
+        self.assertTrue(exists, msg)
         initPath = os.path.join(path, "__init__.py")
         exists = os.path.exists(initPath)
         msg = "destination init file missing: %s" % initPath
-        self.failUnless(exists, msg)
+        self.assertTrue(exists, msg)
 
 
     def checkNoBackup(self, path):
@@ -160,7 +161,7 @@ Found %(result)r"""
         """
         exists = os.path.exists(path)
         msg = "backup file exists in spite of --nobackup: %s" % path
-        self.failIf(exists, msg)
+        self.assertFalse(exists, msg)
 
     def locate_cheetah(self, cmd):
         paths = os.getenv('PATH')
@@ -176,13 +177,22 @@ Found %(result)r"""
         return cmd
 
     def assertWin32Subprocess(self, cmd):
-        _in, _out = os.popen4(cmd)
-        _in.close()
-        output = _out.read()
-        rc = _out.close()
-        if rc is None:
-            rc = 0
-        return rc, output
+        try:
+            from subprocess import Popen, PIPE, STDOUT
+        except ImportError:
+            _in, _out = os.popen4(cmd)
+            _in.close()
+            output = _out.read()
+            status = _out.close()
+            if status is None:
+                status = 0
+        else:
+            process = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+            process.stdin.close()
+            output = process.stdout.read()
+            status = process.wait()
+            process.stdout.close()
+        return status, output
 
     def assertPosixSubprocess(self, cmd):
         cmd = cmd.replace('cheetah', self.cmd)
@@ -201,10 +211,10 @@ Found %(result)r"""
             status, output = self.assertPosixSubprocess(cmd)
 
         if not nonzero:
-            self.failUnlessEqual(status, 0, '''Subprocess exited with a non-zero status (%d)
+            self.assertEqual(status, 0, '''Subprocess exited with a non-zero status (%d)
                             %s''' % (status, output))
         else:
-            self.failIfEqual(status, 0, '''Subprocess exited with a zero status (%d)
+            self.assertNotEqual(status, 0, '''Subprocess exited with a zero status (%d)
                             %s''' % (status, output))
         return output 
     
@@ -224,7 +234,7 @@ Found %(result)r"""
             msg = "substring %r not found in subcommand output: %s" % \
                 (expectedOutputSubstring, cmd)
             substringTest = output.find(expectedOutputSubstring) != -1
-            self.failUnless(substringTest, msg)
+            self.assertTrue(substringTest, msg)
 
 
 class CFIdirBase(CFBase):

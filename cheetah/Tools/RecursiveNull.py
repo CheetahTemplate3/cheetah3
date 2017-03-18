@@ -5,6 +5,7 @@ $form.f1.anything["you"].might("use") will resolve to the empty string.
 
 This module was contributed by Ian Bicking.
 """
+import sys
 
 class RecursiveNull(object):
     def __getattr__(self, attr):
@@ -17,8 +18,12 @@ class RecursiveNull(object):
         return ''
     def __repr__(self):
         return ''
-    def __nonzero__(self):
-        return 0
+    if sys.version_info[0] >= 3:
+        def __bool__(self):
+            return 0
+    else:
+        def __nonzero__(self):
+            return 0
     def __eq__(self, x):
         if x:
             return False
@@ -26,3 +31,4 @@ class RecursiveNull(object):
     def __ne__(self, x):
         return x and True or False
 
+del sys

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
     Miscellaneous functions/objects used by Cheetah but also useful standalone.
 """ 
@@ -33,7 +32,7 @@ def checkKeywords(dic, legalKeywords, what='argument'):
     called by: Cheetah.Template.__init__()
     """
     # XXX legalKeywords could be a set when sets get added to Python.
-    for k in dic.keys(): # Can be dic.iterkeys() if Python >= 2.2.
+    for k in dic:
         if k not in legalKeywords: 
             raise TypeError("'%s' is not a valid %s" % (k, what))
 

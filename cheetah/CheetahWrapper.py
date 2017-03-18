@@ -320,8 +320,13 @@ you do have write permission to and re-run the tests.""")
             which = opts.idir and "idir" or "current"
             C("Drilling down recursively from %s directory.", which)
             sourceFiles = []
-            dir = os.path.join(self.opts.idir, os.curdir)
-            os.path.walk(dir, self._expandSourceFilesWalk, sourceFiles)
+            iext = opts.iext
+            idir = os.path.join(opts.idir, os.curdir)
+            for root, dirs, _files in os.walk(idir):
+                for _f in _files:
+                    _path = os.path.join(root, _f)
+                    if _path.endswith(iext) and os.path.isfile(_path):
+                        sourceFiles.append(_path)
         elif not files:
             usage(HELP_PAGE1, "Neither files nor -R specified!")
         else:
@@ -400,21 +405,6 @@ you do have write permission to and re-run the tests.""")
             sys.exit("%s aborted due to collisions" % what)
                 
 
-    def _expandSourceFilesWalk(self, arg, dir, files):
-        """Recursion extension for .expandSourceFiles().
-           This method is a callback for os.path.walk().
-           'arg' is a list to which successful paths will be appended.
-        """
-        iext = self.opts.iext
-        for f in files:
-            path = os.path.join(dir, f)
-            if   path.endswith(iext) and os.path.isfile(path):
-                arg.append(path)
-            elif os.path.islink(path) and os.path.isdir(path):
-                os.path.walk(path, self._expandSourceFilesWalk, arg)
-            # If is directory, do nothing; 'walk' will eventually get it.
-
-
     def _expandSourceFiles(self, files, recurse, addIextIfMissing):
         """Calculate source paths from 'files' by applying the 
            command-line options.
@@ -430,7 +420,11 @@ you do have write permission to and re-run the tests.""")
             pathWithExt = path + iext # May or may not be valid.
             if os.path.isdir(path):
                 if recurse:
-                    os.path.walk(path, self._expandSourceFilesWalk, files)
+                    for root, dirs, _files in os.walk(path):
+                        for _f in _files:
+                            _path = os.path.join(root, _f)
+                            if _path.endswith(iext) and os.path.isfile(_path):
+                                files.append(_path)
                 else:
                     raise Error("source file '%s' is a directory" % path)
             elif os.path.isfile(path):
@@ -531,21 +525,17 @@ you do have write permission to and re-run the tests.""")
         def getkws(**kws):
             return kws
         if self.opts.compilerSettingsString:
-            ldict = locals()
             try:
-                exec('settings = getkws(%s)' % self.opts.compilerSettingsString,
-                     globals(), ldict)
+                settings = eval('getkws(%s)'%self.opts.compilerSettingsString)
             except:                
                 self.error("There's an error in your --settings option."
                           "It must be valid Python syntax.\n"
                           +"    --settings='%s'\n"%self.opts.compilerSettingsString
                           +"  %s: %s"%sys.exc_info()[:2] 
                           )
-            else:
-                settings = ldict['settings']
 
-            validKeys = DEFAULT_COMPILER_SETTINGS.keys()
-            if [k for k in settings.keys() if k not in validKeys]:
+            validKeys = set(DEFAULT_COMPILER_SETTINGS.keys())
+            if [k for k in settings if k not in validKeys]:
                 self.error(
                     'The --setting "%s" is not a valid compiler setting name.'%k)
             

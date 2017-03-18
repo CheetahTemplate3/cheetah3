@@ -25,4 +25,5 @@ Contributions have been made by:
 * Lakshmi Vyasarajan <lakshmi.vyas at gmail.com>
 * Mika Eloranta <mel at ohmu.fi>
 * mikola <mikola at tut.by>
+* Adam Karpierz <python at python.pl>
 * Oleg Broytman <phd@phdru.name>

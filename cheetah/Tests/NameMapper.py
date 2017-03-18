@@ -537,7 +537,7 @@ class MapBuiltins(unittest.TestCase):
             #def intify(val)
                 #return $int(val)
             #end def''', compilerSettings={'useStackFrames' : False})
-        self.assertEquals(5, t.intify('5'))
+        self.assertEqual(5, t.intify('5'))
 
 
 

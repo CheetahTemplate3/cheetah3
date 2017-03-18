@@ -113,7 +113,7 @@ class CacheRegion(object):
         
     def clear(self):
         " drop all the caches stored in this cache region "
-        for cacheItemId in self._cacheItems.keys():
+        for cacheItemId in list(self._cacheItems.keys()):
             cacheItem = self._cacheItems[cacheItemId]
             cacheItem.clear()
             del self._cacheItems[cacheItemId]

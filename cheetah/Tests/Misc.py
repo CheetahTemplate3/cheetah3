@@ -12,7 +12,7 @@ class SettingsManagerTests(unittest.TestCase):
         expect = {'xyz': (10, 9), 'foo': 'bar', 'abc': {'a': 1, 'c': (3,), 'b': 2}}
 
         result = SettingsManager.mergeNestedDictionaries(left, right)
-        self.assertEquals(result, expect)
+        self.assertEqual(result, expect)
 
 
 if __name__ == '__main__':
