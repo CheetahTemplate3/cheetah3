@@ -1,7 +1,8 @@
 global-include *.py *.rst *.txt
-include .travis.yml CHANGES CHANGES.old LICENSE MANIFEST.in README.markdown TODO tox.ini
+include .travis.yml BUGS CHANGES CHANGES.old LICENSE MANIFEST.in
+include README.markdown TODO buildandrun tox.ini
 recursive-include cheetah *.tmpl *.h *.c
 recursive-include bin *
-include www/Makefile www/rebuild
+include www/Makefile www/make.bat www/rebuild
 recursive-include www *.css *.html *.js *.gif *.png
 prune www/_build
