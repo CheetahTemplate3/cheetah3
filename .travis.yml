@@ -1,9 +1,11 @@
 # Config file for automatic testing at travis-ci.org
 
-language: python
-
 # Use lightweight containers
 sudo: false
+
+language: python
+
+cache: pip
 
 env:
   - TOXENV=py27
