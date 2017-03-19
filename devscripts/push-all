@@ -1,0 +1,4 @@
+#! /bin/sh
+
+     git push --all  origin &&
+exec git push --tags origin

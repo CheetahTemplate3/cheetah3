@@ -1,0 +1,21 @@
+#! /bin/sh
+
+cd "`dirname \"$0\"`"/cheetah3 &&
+umask 022 &&
+chmod -R a+rX . &&
+
+../build-docs &&
+../set-commit-date.py &&
+
+python setup.py build &&
+python setup.py register sdist upload --sign &&
+
+for py in 2.7 3.4 3.5; do
+   find build -name '*.py[co]' -delete &&
+   python$py    -m compileall build &&
+   python$py -O -m compileall build &&
+   python$py setup.py bdist_egg upload --sign &&
+   python$py setup.py bdist_wheel upload --sign || exit 1
+done
+
+exec rm -rf build dist docs/html SQLObject.egg-info

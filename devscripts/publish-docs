@@ -1,0 +1,5 @@
+#! /bin/sh
+
+cd "`dirname \"$0\"`"/cheetah3-docs &&
+git archive --format=zip -o "$HOME"/tmp/cheetah3-docs.zip master &&
+exec git push origin master

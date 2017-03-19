@@ -1,0 +1,9 @@
+#! /bin/sh
+
+cd "`dirname \"$0\"`"/cheetah3 &&
+../build-docs &&
+rsync -ahP --del --exclude=.git --exclude=.nojekyll \
+   www/html/ ../cheetah3-docs/ &&
+
+cd ../cheetah3-docs &&
+exec git status
