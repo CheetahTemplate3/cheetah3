@@ -1,5 +1,4 @@
 #! /bin/sh
 
-cd "`dirname \"$0\"`"/cheetah3-docs &&
-git archive --format=zip -o "$HOME"/tmp/cheetah3-docs.zip master &&
+cd "`dirname \"$0\"`"/cheetahtemplate3.github.io &&
 exec git push origin master

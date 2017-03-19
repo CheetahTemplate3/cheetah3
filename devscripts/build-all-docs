@@ -3,7 +3,7 @@
 cd "`dirname \"$0\"`"/cheetah3 &&
 ../build-docs &&
 rsync -ahP --del --exclude=.git --exclude=.nojekyll \
-   www/html/ ../cheetah3-docs/ &&
+   www/html/ ../cheetahtemplate3.github.io/ &&
 
-cd ../cheetah3-docs &&
+cd ../cheetahtemplate3.github.io &&
 exec git status
