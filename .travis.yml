@@ -1,7 +1,7 @@
 # Config file for automatic testing at travis-ci.org
 
-# Use lightweight containers
-sudo: false
+# Prefer docker containers
+sudo: required
 
 language: python
 
@@ -11,12 +11,11 @@ env:
   - TOXENV=py27
   - TOXENV=py33
   - TOXENV=py34
+  - TOXENV=py35
   - TOXENV=pypy
 
 matrix:
   allow_failures:
-    - env: TOXENV=py33
-    - env: TOXENV=py34
     - env: TOXENV=pypy
 
 install:
