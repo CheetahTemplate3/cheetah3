@@ -16,6 +16,7 @@ from optparse import OptionParser
 from Cheetah.Version import Version
 from Cheetah.Template import Template, DEFAULT_COMPILER_SETTINGS
 from Cheetah.Utils.Misc import mkdirsWithPyInitFiles
+from Cheetah.compat import PY2
 
 optionDashesRE = re.compile(  R"^-{1,2}"  )
 moduleNameRE = re.compile(  R"^[a-zA-Z_][a-zA-Z_0-9]*$"  )
@@ -601,9 +602,14 @@ be named according to the same rules as Python modules.""" % tup)
             sys.stdout.write(output)
         else:
             encoding = self.opts.encoding
-            f = codecs.open(dst, 'w', encoding=encoding)
-            if encoding and isinstance(output, bytes):
-                output = output.decode(encoding)
+            if encoding:
+                if isinstance(output, bytes):
+                    output = output.decode(encoding)
+                f = codecs.open(dst, 'w', encoding=encoding)
+            else:
+                if not PY2 and isinstance(output, bytes):
+                    output = output.decode()
+                f = open(dst, 'w')
             f.write(output)
             f.close()
             
