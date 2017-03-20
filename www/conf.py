@@ -49,7 +49,7 @@ copyright = u'2017, Oleg Broytman; 2009-2012, R. Tyler Croy; 2001-2008, The Chee
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-from cheetah.Version import Version
+from Cheetah.Version import Version
 # The short X.Y version.
 version = '.'.join(Version.split('.')[:2])
 # The full version, including alpha/beta/rc tags.

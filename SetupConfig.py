@@ -1,11 +1,10 @@
 #-------Main Package Settings-----------#
 import sys
-from cheetah.compat import PY2
 
 # Cheetah3 has already been taken at PyPI,
 # CheetahTemplate3 seems to be too long.
 name = 'CT3'
-from cheetah.Version import Version as version
+from Cheetah.Version import Version as version
 license = "MIT"
 author = "Tavis Rudd"
 author_email = "tavis@damnsimple.com"
@@ -40,11 +39,10 @@ classifiers = [line.strip() for line in '''\
   Topic :: Software Development :: User Interfaces
   Topic :: Text Processing'''.splitlines() if not line.strip().startswith('#')]
 
+from Cheetah.compat import PY2
 if PY2:
     del line
 del PY2  # Hide it from setup()
-
-package_dir = {'Cheetah':'cheetah'}
 
 import os
 import os.path
@@ -52,13 +50,13 @@ from distutils.core import Extension
 
 ext_modules=[
              Extension("Cheetah._namemapper", 
-                        [os.path.join('cheetah', 'c', '_namemapper.c')]),
+                        [os.path.join('Cheetah', 'c', '_namemapper.c')]),
            #  Extension("Cheetah._verifytype", 
-           #             [os.path.join('cheetah', 'c', '_verifytype.c')]),
+           #             [os.path.join('Cheetah', 'c', '_verifytype.c')]),
            #  Extension("Cheetah._filters", 
-           #             [os.path.join('cheetah', 'c', '_filters.c')]),
+           #             [os.path.join('Cheetah', 'c', '_filters.c')]),
            #  Extension('Cheetah._template',
-           #             [os.path.join('cheetah', 'c', '_template.c')]),
+           #             [os.path.join('Cheetah', 'c', '_template.c')]),
              ]
 
 ## Data Files and Scripts
@@ -67,7 +65,7 @@ scripts = ('bin/cheetah-compile',
            'bin/cheetah-analyze',
         )
 
-data_files = ['recursive: cheetah *.tmpl *.txt LICENSE README TODO CHANGES',]
+data_files = ['recursive: Cheetah *.tmpl *.txt LICENSE README TODO CHANGES',]
 
 if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
     try:

@@ -23,8 +23,8 @@ from distutils.errors import CCompilerError, DistutilsExecError, \
     DistutilsPlatformError
 
 #imports from Cheetah ...
-from cheetah.FileUtils import findFiles
-from cheetah.compat import string_type
+from Cheetah.FileUtils import findFiles
+from Cheetah.compat import string_type
 
 if sys.platform == 'win32':
    # 2.6's distutils.msvc9compiler can raise an IOError when failing to
