@@ -5,7 +5,7 @@ from os import listdir
 import os.path
 import re
 from tempfile import mktemp
-from .compat import string_type
+from Cheetah.compat import string_type
 
 def _escapeRegexChars(txt,
                      escapeRE=re.compile(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])')):

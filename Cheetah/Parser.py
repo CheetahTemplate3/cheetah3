@@ -22,7 +22,7 @@ from Cheetah import Filters
 from Cheetah import ErrorCatchers
 from Cheetah.Unspecified import Unspecified
 from Cheetah.Macros.I18n import I18n
-from .compat import PY2, string_type, unicode
+from Cheetah.compat import PY2, string_type, unicode
 if PY2:
     from tokenize import pseudoprog
 else:

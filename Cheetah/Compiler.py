@@ -28,7 +28,7 @@ from Cheetah import NameMapper
 from Cheetah.Parser import Parser, ParseError, specialVarRE, \
      STATIC_CACHE, REFRESH_CACHE, SET_LOCAL, SET_GLOBAL, SET_MODULE, \
      unicodeDirectiveRE, encodingDirectiveRE, escapedNewlineRE
-from .compat import string_type, unicode
+from Cheetah.compat import string_type, unicode
 
 from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, valueFromFrameOrSearchList
 VFFSL=valueFromFrameOrSearchList

@@ -25,7 +25,7 @@ import pprint
 import cgi                # Used by .webInput() if the template is a CGI script.
 import types 
     
-from .compat import PY2, string_type, unicode
+from Cheetah.compat import PY2, string_type, unicode
 
 try:
     from threading import Lock
@@ -1446,7 +1446,7 @@ class Template(Servlet):
         Type 'python yourtemplate.py --help to see what it's capabable of.
         """
 
-        from .TemplateCmdLineIface import CmdLineIface
+        from Cheetah.TemplateCmdLineIface import CmdLineIface
         CmdLineIface(templateObj=self).run()
         
     ##################################################

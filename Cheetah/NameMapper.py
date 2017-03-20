@@ -132,7 +132,7 @@ been compiled or falls back to the Python version if not.
 
 from pprint import pformat
 import inspect
-from .compat import PY2
+from Cheetah.compat import PY2
 
 _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS = False
 _ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS = True

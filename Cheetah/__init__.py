@@ -12,4 +12,4 @@ Documentation
     https://cheetahtemplate3.github.io/
 '''
 
-from .Version import *
+from Cheetah.Version import *

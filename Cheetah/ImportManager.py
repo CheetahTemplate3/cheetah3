@@ -22,7 +22,7 @@ This is a hacked/documented version of Gordon McMillan's iu.py. I have:
 import sys
 import imp
 import marshal
-from .compat import string_type
+from Cheetah.compat import string_type
 
 _installed = False
 

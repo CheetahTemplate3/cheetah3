@@ -45,7 +45,7 @@ if not sys.platform.startswith('java'):
 
 if __name__ == '__main__':
     if 'xml' in sys.argv:
-        from . import xmlrunner
+        from Cheetah.Tests import xmlrunner
         runner = xmlrunner.XMLTestRunner(filename='Cheetah-Tests.xml')
     else:
         runner = unittest.TextTestRunner()

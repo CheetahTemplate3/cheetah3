@@ -2,7 +2,7 @@
 """
 import re
 import sys
-from .compat import unicode
+from Cheetah.compat import unicode
 
 EOLre = re.compile(r'[ \f\t]*(?:\r\n|\r|\n)')
 EOLZre = re.compile(r'(?:\r\n|\r|\n|\Z)')
