@@ -1,5 +1,5 @@
-Cheetah Template
-================
+Cheetah Template 3
+==================
 
 Cheetah3 is a free (BSD-style) and open source template engine and code
 generation tool.
