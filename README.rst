@@ -1,3 +1,6 @@
+Cheetah Template
+================
+
 Cheetah3 is a free (BSD-style) and open source template engine and code
 generation tool.
 
@@ -8,22 +11,25 @@ used to generate C++ game code, Java, sql, form emails and even Python code.
 It's a fork of the original CheetahTemplate library.
 
 Documentation
-================================================================================
-For a high-level introduction to Cheetah please refer to the User\'s Guide
+-------------
+
+For a high-level introduction to Cheetah please refer to the User's Guide
 at https://cheetahtemplate3.github.io/users_guide/index.html
 
 Credits
-================================================================================
+-------
+
 https://cheetahtemplate3.github.io/authors.html
 
 https://github.com/CheetahTemplate3/cheetah3/blob/master/LICENSE
 
 Praise
-================================================================================
-"I\'m enamored with Cheetah" - Sam Ruby, senior member of IBM Emerging
+------
+
+"I'm enamored with Cheetah" - Sam Ruby, senior member of IBM Emerging
 Technologies Group & director of Apache Software Foundation
 
-"Give Cheetah a try. You won\'t regret it. ... Cheetah is a truly powerful
+"Give Cheetah a try. You won't regret it. ... Cheetah is a truly powerful
 system. ... Cheetah is a serious contender for the 'best of breed' Python
 templating." - Alex Martelli
 
@@ -44,8 +50,8 @@ other templating systems" - Mike Meyer
 "Cheetah has successfully been introduced as a replacement for the overweight
 XSL Templates for code generation. Despite the power of XSL (and notably XPath
 expressions), code generation is better suited to Cheetah as templates are much
-easier to implement and manage." - The FEAR development team
-    (http://fear.sourceforge.net/docs/latest/guide/Build.html#id2550573)
+easier to implement and manage." - `The FEAR development team
+<http://fear.sourceforge.net/docs/latest/guide/Build.html#id2550573>`_.
 
-"I\'ve used Cheetah quite a bit and it\'s a very good package" - Kevin Dangoor,
+"I've used Cheetah quite a bit and it's a very good package" - Kevin Dangoor,
 lead developer of TurboGears.
