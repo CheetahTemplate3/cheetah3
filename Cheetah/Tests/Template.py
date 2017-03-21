@@ -316,24 +316,21 @@ class StaticMethodSupport(TemplateTest):
         except AttributeError as ex:
             self.fail(ex)
 
-class Useless(object):
-    def boink(self):
-        return [1, 2, 3]
 
 class MultipleInheritanceSupport(TemplateTest):
     def runTest(self):
         template = '''
-            #extends Template, Useless
+            #extends Cheetah.Tests.Boinker, Cheetah.Tests.Pinger
             #def foo()
                 #return [4,5] + $boink()
             #end def
         '''
-        template = Template.compile(template,
-                moduleGlobals={'Useless' : Useless},
-                compilerSettings={'autoImportForExtendsDirective' : False})
+
+        template = Template.compile(template)
         template = template()
         result = template.foo()
         assert result == [4, 5, 1, 2, 3], (result, 'Unexpected result')
+
 
 class SubclassSearchListTest(TemplateTest):
     '''
