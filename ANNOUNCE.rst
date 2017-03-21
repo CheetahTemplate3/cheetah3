@@ -22,8 +22,7 @@ I'm pleased to announce version 3.3.1, the first bugfix release of branch
 What's new in CheetahTemplate3
 ==============================
 
-
-Contributor for this release is Adam Karpierz.
+Contributors for this release are Adam Karpierz and Jonathan Ross Rogers.
 
 
 What is CheetahTemplate3

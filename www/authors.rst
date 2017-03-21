@@ -26,4 +26,5 @@ Contributions have been made by:
 * Mika Eloranta <mel at ohmu.fi>
 * mikola <mikola at tut.by>
 * Adam Karpierz <python at python.pl>
+* Jonathan Ross Rogers <jrogers at socialserve.com>
 * Oleg Broytman <phd@phdru.name>
