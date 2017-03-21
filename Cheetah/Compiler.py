@@ -1744,11 +1744,12 @@ class ModuleCompiler(SettingsManager, GenUtils):
             #  - We also assume that the final . separates the classname from the
             #    module name.  This might break if people do something really fancy 
             #    with their dots and namespaces.
-            baseclasses = baseClassName.split(',')
-            for klass in baseclasses:
+            baseclasses = []
+            for klass in baseClassName.split(','):
+                klass = klass.strip()
                 chunks = klass.split('.')
                 if len(chunks)==1:
-                    self._getActiveClassCompiler().setBaseClass(klass)
+                    baseclasses.append(klass)
                     if klass not in self.importedVarNames():
                         modName = klass
                         # we assume the class name to be the module name
@@ -1763,7 +1764,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
                         if modName in self.importedVarNames():
                             needToAddImport = False
                             finalBaseClassName = klass.replace(modName+'.', '')
-                            self._getActiveClassCompiler().setBaseClass(finalBaseClassName)
+                            baseclasses.append(finalBaseClassName)
                             break
                         else:
                             modName += '.'+chunk                        
@@ -1773,11 +1774,13 @@ class ModuleCompiler(SettingsManager, GenUtils):
                         if finalClassName != chunks[-2]:
                             # we assume the class name to be the module name
                             modName = '.'.join(chunks)
-                        self._getActiveClassCompiler().setBaseClass(finalClassName)                        
+                        baseclasses.append(finalClassName)
                         importStatement = "from %s import %s" % (modName, finalClassName)
                         self.addImportStatement(importStatement)
                         self.addImportedVarNames( [finalClassName,] ) 
-            
+
+            self._getActiveClassCompiler().setBaseClass(', '.join(baseclasses))
+
     def setCompilerSetting(self, key, valueExpr):
         self.setSetting(key, eval(valueExpr) )
         self._parser.configureParser()
