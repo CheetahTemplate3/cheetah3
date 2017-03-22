@@ -33,6 +33,7 @@ Contents
    :maxdepth: 2
 
    authors.rst
+   news.rst
    developers.rst
    download.rst
    users_guide/index.rst
