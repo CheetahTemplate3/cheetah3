@@ -6,6 +6,7 @@ cache region can be viewed as a dictionary (keyed by cacheRegionID)
 handling at least one cache item (the default one). It's possible to add
 cacheItems in a region by using the `varyBy` #cache directive parameter as
 in the following example::
+
    #def getArticle
       this is the article content.
    #end def

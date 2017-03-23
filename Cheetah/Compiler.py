@@ -206,22 +206,27 @@ class GenUtils(object):
         is False, otherwise it defaults to True. It is overridden by the global
         setting 'useAutocalling' if this setting is False.
 
-        EXAMPLE
-        ------------------------------------------------------------------------
-        if the raw Cheetah Var is
-          $a.b.c[1].d().x.y.z
+        EXAMPLE::
 
-        nameChunks is the list
-          [ ('a.b.c',True,'[1]'), # A
-            ('d',False,'()'),     # B
-            ('x.y.z',True,''),    # C
-          ]
+            if the raw Cheetah Var is
+              $a.b.c[1].d().x.y.z
 
-        When this method is fed the list above it returns
+            nameChunks is the list
+              [ ('a.b.c',True,'[1]'), # A
+                ('d',False,'()'),     # B
+                ('x.y.z',True,''),    # C
+              ]
+
+        When this method is fed the list above it returns::
+
           VFN(VFN(VFFSL(SL, 'a.b.c',True)[1], 'd',False)(), 'x.y.z',True)
-        which can be represented as
+
+        which can be represented as::
+
           VFN(B`, name=C[0], executeCallables=(useAC and C[1]))C[2]
-        where:
+
+        where::
+
           VFN = NameMapper.valueForName
           VFFSL = NameMapper.valueFromFrameOrSearchList
           VFSL = NameMapper.valueFromSearchList # optionally used instead of VFFSL
@@ -240,10 +245,11 @@ class GenUtils(object):
           B` = VFN(A`, name=B[0], executeCallables=(useAC and B[1]))B[2]
           A` = VFFSL(SL, name=A[0], executeCallables=(useAC and A[1]))A[2]
 
-
         Note, if the compiler setting useStackFrames=False (default is true)
-        then
+        then::
+
           A` = VFSL([locals()]+SL+[globals(), builtin], name=A[0], executeCallables=(useAC and A[1]))A[2]
+
         This option allows Cheetah to be used with Psyco, which doesn't support
         stack frame introspection.
         """

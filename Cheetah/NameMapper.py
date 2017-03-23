@@ -67,12 +67,15 @@ NameMapper allows access to items in a dictionary using the same dotted notation
 used to access object attributes in Python.  This aspect of NameMapper is known
 as 'Unified Dotted Notation'.
 
-For example, with Cheetah it is possible to write:
-   $customers()['kerr'].address()  --OR--  $customers().kerr.address()
+For example, with Cheetah it is possible to write::
+
+    $customers()['kerr'].address()  --OR--  $customers().kerr.address()
+
 where the second form is in NameMapper syntax.
 
-This only works with dictionary keys that are also valid python identifiers:
-  regex = '[a-zA-Z_][a-zA-Z_0-9]*'
+This only works with dictionary keys that are also valid python identifiers::
+
+    regex = '[a-zA-Z_][a-zA-Z_0-9]*'
 
 
 AUTOCALLING (b,d)
@@ -81,22 +84,28 @@ AUTOCALLING (b,d)
 NameMapper automatically detects functions and methods in Cheetah $vars and calls
 them if the parentheses have been left off.
 
-For example if 'a' is an object, 'b' is a method
+For example if 'a' is an object, 'b' is a method::
+
   $a.b
-is equivalent to
+
+is equivalent to::
+
   $a.b()
 
-If b returns a dictionary, then following variations are possible
+If b returns a dictionary, then following variations are possible::
+
   $a.b.c  --OR--  $a.b().c  --OR--  $a.b()['c']
+
 where 'c' is a key in the dictionary that a.b() returns.
 
 Further notes:
+
 * NameMapper autocalls the function or method without any arguments.  Thus
-autocalling can only be used with functions or methods that either have no
-arguments or have default values for all arguments.
+  autocalling can only be used with functions or methods that either have no
+  arguments or have default values for all arguments.
 
 * NameMapper only autocalls functions and methods.  Classes and callable object instances
-will not be autocalled.
+  will not be autocalled.
 
 * Autocalling can be disabled using Cheetah's 'useAutocalling' setting.
 
@@ -108,7 +117,7 @@ without needing to include 'self' in the variable names.  See the NAMESPACE
 CASCADING section below for details.
 
 NAMESPACE CASCADING (d)
---------------------
+-----------------------
 ...
 
 Implementation details

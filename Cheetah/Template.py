@@ -136,7 +136,7 @@ class TemplatePreprocessor(object):
 
     See the docstring for Template.compile
 
-    ** Preprocessors are an advanced topic **
+    \*\* Preprocessors are an advanced topic \*\*
     '''
 
     def __init__(self, settings):
@@ -192,7 +192,8 @@ class Template(Servlet):
     CherryPy, Quixote, etc.) provide plugins that handle Cheetah compilation for
     you.
 
-    There are several possible usage patterns:
+    There are several possible usage patterns::
+
        1) tclass = Template.compile(src)
           t1 = tclass() # or tclass(namespaces=[namespace,...])
           t2 = tclass() # or tclass(namespaces=[namespace2,...])
@@ -209,7 +210,7 @@ class Template(Servlet):
              # or Template(src, namespaces=[namespace,...])
           outputStr = str(tmplInstance) # or outputStr = tmplInstance.aMethodYouDefined(...args...)
 
-    Notes on the usage patterns:
+    Notes on the usage patterns::
 
        usage pattern 1)
           This is the most flexible, but it is slightly more verbose unless you
@@ -225,7 +226,8 @@ class Template(Servlet):
           namespace 'searchLists' with a single template source definition,
           you're better off with Template.compile (1).
 
-          Limitations (use pattern 1 instead):
+          Limitations (use pattern 1 instead)::
+
            - Templates compiled this way can only #extend subclasses of the
              new-style 'object' baseclass.  Cheetah.Template is a subclass of
              'object'.  You also can not #extend dict, list, or other builtin
@@ -233,23 +235,26 @@ class Template(Servlet):
            - If your template baseclass' __init__ constructor expects args there
              is currently no way to pass them in.
 
-    If you need to subclass a dynamically compiled Cheetah class, do something like this:
+    If you need to subclass a dynamically compiled Cheetah class, do something like this::
+
         from Cheetah.Template import Template
         T1 = Template.compile('$meth1 #def meth1: this is meth1 in T1')
-        T2 = Template.compile('#implements meth1\nthis is meth1 redefined in T2', baseclass=T1)
+        T2 = Template.compile('#implements meth1\\nthis is meth1 redefined in T2', baseclass=T1)
         print(T1, T1())
         print(T2, T2())
 
+    Note about class and instance attribute names::
 
-    Note about class and instance attribute names:
       Attributes used by Cheetah have a special prefix to avoid confusion with
       the attributes of the templates themselves or those of template
       baseclasses.
 
-      Class attributes which are used in class methods look like this:
+      Class attributes which are used in class methods look like this::
+
           klass._CHEETAH_useCompilationCache (_CHEETAH_xxx)
 
-      Instance attributes look like this:
+      Instance attributes look like this::
+
           klass._CHEETAH__globalSetVars (_CHEETAH__xxx with 2 underscores)
     '''
 
@@ -377,8 +382,10 @@ class Template(Servlet):
         source code or outputs Python code, you should check out the
         compilerSettings argument.
 
-        Arguments:
-          You must provide either a 'source' or 'file' arg, but not both:
+        Arguments::
+
+          You must provide either a 'source' or 'file' arg, but not both::
+
             - source (string or None)
             - file (string path, file-like object, or None)
 
@@ -386,6 +393,8 @@ class Template(Servlet):
           have defaults in attributes of the Template class which can be
           overridden in subclasses of this class.  Working with most of these is
           an advanced topic.
+
+          ::
 
             - returnAClass=True
               If false, return the generated module code rather than a class.
@@ -837,8 +846,8 @@ class Template(Servlet):
         """Takes the same args as the .compile() classmethod and returns a
         template that is a subclass of the template this method is called from.
 
-          T1 = Template.compile(' foo - $meth1 - bar\n#def meth1: this is T1.meth1')
-          T2 = T1.subclass('#implements meth1\n this is T2.meth1')
+        T1 = Template.compile('foo - $meth1 - bar\\n#def meth1: this is T1.meth1')
+        T2 = T1.subclass('#implements meth1\\n this is T2.meth1')
         """
         kws['baseclass'] = klass
         if isinstance(klass, Template):
@@ -1073,7 +1082,8 @@ class Template(Servlet):
         Read this docstring carefully as there are two distinct usage patterns.
         You should also read this class' main docstring.
 
-        a) to compile a new template:
+        a) to compile a new template::
+
              t = Template(source=aSourceString)
                  # or
              t = Template(file='some/path')
@@ -1087,8 +1097,10 @@ class Template(Servlet):
 
              print(t)
 
-        b) to create an instance of an existing, precompiled template class:
+        b) to create an instance of an existing, precompiled template class::
+
              ## i) first you need a reference to a compiled template class:
+
              tclass = Template.compile(source=src) # or just Template.compile(src)
                  # or
              tclass = Template.compile(file='some/path')
@@ -1106,7 +1118,8 @@ class Template(Servlet):
              t = tclass(namespaces=namespaces, filter='RawOrEncodedUnicode')
              print(t)
 
-        Arguments:
+        Arguments::
+
           for usage pattern a)
             If you are compiling a new template, you must provide either a
             'source' or 'file' arg, but not both:
@@ -1173,8 +1186,6 @@ class Template(Servlet):
                production systems.
 
           Do NOT mess with the args _globalSetVars or _preBuiltSearchList!
-
-
         """
         errmsg = "arg '%s' must be %s"
         errmsgextra = errmsg + "\n%s"
@@ -1397,7 +1408,6 @@ class Template(Servlet):
     def i18n(self, message,
              plural=None,
              n=None,
-
              id=None,
              domain=None,
              source=None,
@@ -1406,25 +1416,24 @@ class Template(Servlet):
              ):
         """This is just a stub at this time.
 
-       plural = the plural form of the message
-       n = a sized argument to distinguish between single and plural forms
+           ::
 
-           id = msgid in the translation catalog
-       domain = translation domain
-       source = source lang
-       target = a specific target lang
-       comment = a comment to the translation team
+               plural = the plural form of the message
+               n = a sized argument to distinguish between single and plural forms
+               id = msgid in the translation catalog
+               domain = translation domain
+               source = source lang
+               target = a specific target lang
+               comment = a comment to the translation team
 
         See the following for some ideas
         http://www.zope.org/DevHome/Wikis/DevSite/Projects/ComponentArchitecture/ZPTInternationalizationSupport
 
-        Other notes:
-        - There is no need to replicate the i18n:name attribute from plone / PTL,
-          as cheetah placeholders serve the same purpose
+        Other notes::
 
-
+          - There is no need to replicate the i18n:name attribute from plone / PTL,
+            as cheetah placeholders serve the same purpose
        """
-
         return message
 
     def getFileContents(self, path):
@@ -1543,7 +1552,7 @@ class Template(Servlet):
         """Compile the template. This method is automatically called by
         Template.__init__ it is provided with 'file' or 'source' args.
 
-        USERS SHOULD *NEVER* CALL THIS METHOD THEMSELVES.  Use Template.compile
+        USERS SHOULD \*NEVER\* CALL THIS METHOD THEMSELVES.  Use Template.compile
         instead.
         """
         if compilerSettings is Unspecified:
@@ -1651,14 +1660,14 @@ class Template(Servlet):
         servlet'.  If the CGI environment is not properly set up, Cheetah will
         act like there's no input.
 
-        The public method provided is:
+        The public method provided is::
 
           def webInput(self, names, namesMulti=(), default='', src='f',
             defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00, debug=False):
 
         This method places the specified GET/POST fields, cookies or session
         variables into a dictionary, which is both returned and put at the
-        beginning of the searchList.  It handles:
+        beginning of the searchList.  It handles::
 
             * single vs multiple values
             * conversion to integer or float for specified names
@@ -1671,7 +1680,7 @@ class Template(Servlet):
         value.
 
 
-        The simplest usage is:
+        The simplest usage is::
 
             #silent $webInput(['choice'])
             $choice
@@ -1681,33 +1690,34 @@ class Template(Servlet):
 
         Both these examples retrieves the GET/POST field 'choice' and print it.
         If you leave off the'#silent', all the values would be printed too.  But
-        a better way to preview the values is
+        a better way to preview the values is::
 
             #silent $webInput(['name'], $debug=1)
 
         because this pretty-prints all the values inside HTML <PRE> tags.
 
-        ** KLUDGE: 'debug' is supposed to insert into the template output, but it
+        \*\* KLUDGE: 'debug' is supposed to insert into the template output, but it
         wasn't working so I changed it to a'print' statement.  So the debugging
         output will appear wherever standard output is pointed, whether at the
-        terminal, in a Webware log file, or whatever. ***
+        terminal, in a Webware log file, or whatever. \*\*\*
 
         Since we didn't specify any coversions, the value is a string.  It's a
         'single' value because we specified it in 'names' rather than
-        'namesMulti'. Single values work like this:
+        'namesMulti'. Single values work like this::
 
             * If one value is found, take it.
             * If several values are found, choose one arbitrarily and ignore the rest.
             * If no values are found, use or raise the appropriate 'default*' value.
 
-        Multi values work like this:
+        Multi values work like this::
+
             * If one value is found, put it in a list.
             * If several values are found, leave them in a list.
             * If no values are found, use the empty list ([]).  The 'default*'
               arguments are *not* consulted in this case.
 
         Example: assume 'days' came from a set of checkboxes or a multiple combo
-        box on a form, and the user  chose'Monday', 'Tuesday' and 'Thursday'.
+        box on a form, and the user  chose'Monday', 'Tuesday' and 'Thursday'::
 
             #silent $webInput([], ['days'])
             The days you chose are: #slurp
@@ -1729,7 +1739,7 @@ class Template(Servlet):
         where missing/bad values *should* be blank/zero.  In those relatively
         few cases where you must distinguish between empty-string/zero on the
         one hand and missing/bad on the other, change the appropriate
-        'default*' and 'bad*' arguments to something like:
+        'default*' and 'bad*' arguments to something like::
 
             * None
             * another constant value
@@ -1749,6 +1759,8 @@ class Template(Servlet):
         off the days he unchecked, and leave on or off the days he didn't
         change.
 
+        ::
+
             dic = self.webInput([], ['dayCheckboxes'])
             wantedDays = dic['dayCheckboxes'] # The days the user checked.
             for day, on in self.getAllValues():
@@ -1760,7 +1772,8 @@ class Template(Servlet):
                     # ... Unset a flag or delete a database record ...
 
         'source' allows you to look up the variables from a number of different
-        sources:
+        sources::
+
             'f'   fields (CGI GET/POST parameters)
             'c'   cookies
             's'   session variables
@@ -1770,7 +1783,7 @@ class Template(Servlet):
         'default' argument is third and the numeric arguments are banished to
         the end.  But sometimes you want automatic number conversion, so that
         you can do numeric comparisions in your templates without having to
-        write a bunch of conversion/exception handling code.  Example:
+        write a bunch of conversion/exception handling code.  Example::
 
             #silent $webInput(['name', 'height:int'])
             $name is $height cm tall.
@@ -1811,14 +1824,14 @@ class Template(Servlet):
         cascading; e.g., 'vs' would look first in 'values' and then in session
         variables.
 
-        Meta-Data
-        ================================================================================
-        Author: Mike Orr <iron@mso.oz.net>
-        License: This software is released for unlimited distribution under the
-                 terms of the MIT license.  See the LICENSE file.
-        Version: $Revision: 1.186 $
-        Start Date: 2002/03/17
-        Last Revision Date: $Date: 2008/03/10 04:48:11 $
+        Meta-Data::
+
+            Author: Mike Orr <iron@mso.oz.net>
+            License: This software is released for unlimited distribution under the
+                     terms of the MIT license.  See the LICENSE file.
+            Version: 1.186
+            Start Date: 2002/03/17
+            Last Revision Date: 2008/03/10 04:48:11
         """
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit

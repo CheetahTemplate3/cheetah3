@@ -46,13 +46,16 @@ EncodeUnicode = Filter
 
 class Markdown(EncodeUnicode):
     '''
-        Markdown will change regular strings to Markdown
-            (http://daringfireball.net/projects/markdown/)
+        Markdown will change regular strings to `Markdown
+        <http://daringfireball.net/projects/markdown/>`_
 
-        Such that:
+        Such that::
+
             My Header
             =========
-        Becaomes:
+
+        Becomes::
+
             <h1>My Header</h1>
 
         and so on.
@@ -80,8 +83,10 @@ class CodeHighlighter(EncodeUnicode):
         highlighted, in a browser
 
         NOTE: I had an issue installing pygments on Linux/amd64/Python 2.6 dealing with
-        importing of pygments.lexers, I was able to correct the failure by adding:
+        importing of pygments.lexers, I was able to correct the failure by adding::
+
             raise ImportError
+
         to line 39 of pygments/plugin.py (since importing pkg_resources was causing issues)
     '''
     def filter(self, source, **kwargs):
@@ -148,7 +153,7 @@ class Strip(Filter):
     trailing whitespace on each line.  It does not strip newlines, so every
     input line corresponds to one output line, with its trailing newline intact.
 
-    We do not use val.split('\n') because that would squeeze out consecutive
+    We do not use val.split('\\n') because that would squeeze out consecutive
     blank lines.  Instead, we search for each newline individually.  This
     makes us unable to use the fast C .split method, but it makes the filter
     much more widely useful.
