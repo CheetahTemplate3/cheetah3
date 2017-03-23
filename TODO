@@ -151,10 +151,10 @@ Possible extensions:
   #indent -EXPR    ; subtract N from level (not very necessary)
   #indent balance BOOL ; require all indent changes in a #def/#block to be
                        ; popped before exiting the method.  (difficult to
-		       ; implement)
+                       ; implement)
   #indent implicitPop BOOL ; automatically pop indent changes within a 
                        ; #def/block when that method exits.  (difficult to
-		       ; implement)
+                       ; implement)
   #indent ??       ; a 3-way switch that combines unbalanced, balanced and
                    ; implicit pop.  (difficult to implement)
   #indent ??       ; smart stripping: strip input indentation according to

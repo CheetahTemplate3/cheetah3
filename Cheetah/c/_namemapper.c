@@ -173,7 +173,7 @@ static PyObject *PyNamemapper_valueForName(PyObject *obj, char *nameChunks[], in
     currentVal = obj;
     for (i=0; i < numChunks;i++) {
         currentKey = nameChunks[i];
-        if (PyErr_CheckSignals()) {	/* not sure if I really need to do this here, but what the hell */
+        if (PyErr_CheckSignals()) {     /* not sure if I really need to do this here, but what the hell */
             if (i>0) {
                 Py_DECREF(currentVal);
             }

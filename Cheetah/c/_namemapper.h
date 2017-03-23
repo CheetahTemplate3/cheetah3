@@ -48,7 +48,7 @@
 /*
  * _namemapper.c specific definitions 
  */
-#define MAXCHUNKS 15		/* max num of nameChunks for the arrays */
+#define MAXCHUNKS 15            /* max num of nameChunks for the arrays */
 #define ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS 1
 #define createNameCopyAndChunks() {\
     nameCopy = malloc(strlen(name) + 1);\
@@ -56,7 +56,7 @@
     tmpPntr2 = nameCopy;\
     while ((*tmpPntr2++ = *tmpPntr1++)); \
         numChunks = getNameChunks(nameChunks, name, nameCopy); \
-    if (PyErr_Occurred()) { 	/* there might have been TooManyPeriods */\
+    if (PyErr_Occurred()) {     /* there might have been TooManyPeriods */\
         free(nameCopy);\
         return NULL;\
     }\

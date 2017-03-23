@@ -97,8 +97,8 @@ defaultTestNameSpace = {
     'includeFileName': 'parseTest.txt',
     'listOfLambdas': [lambda x: x, lambda x: x, lambda x: x,],
     'list': [
-    	{'index': 0, 'numOne': 1, 'numTwo': 2},
-    	{'index': 1, 'numOne': 1, 'numTwo': 2},
+        {'index': 0, 'numOne': 1, 'numTwo': 2},
+        {'index': 1, 'numOne': 1, 'numTwo': 2},
         ],
     'nameList': [('john', 'doe'), ('jane', 'smith')],
     'letterList': ['a', 'b', 'c'],

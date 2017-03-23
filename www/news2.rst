@@ -293,17 +293,17 @@
 
          #if, #else, #elif, #unless,
          #for, #while, #repeat,  
-	 #try, #except, #finally, 
-	 #cache, #raw
- 	 #call, #capture
+         #try, #except, #finally, 
+         #cache, #raw
+         #call, #capture
 
       The #def and #block directives already had single-line versions::
 
           #if cond: foo
-	  #elif cond2: bar
-	  #else: blarg
-	  
-	  #for i, val in enumerate(vals): \$i-\$val
+          #elif cond2: bar
+          #else: blarg
+          
+          #for i, val in enumerate(vals): \$i-\$val
 
       Note that if you accidentally leave a colon at the end of one of these
       directives but nothing else follows it, aside from whitespace, the parser
@@ -316,9 +316,9 @@
       it for all three.  The following is not valid::
 
           #if cond: foo
-	  #elif cond2
-	     bar
-	  #else: blarg
+          #elif cond2
+             bar
+          #else: blarg
 
     - added support for \$!silentModePlaceholders. This is the same as quiet
       mode in Velocity: http://jakarta.apache.org/velocity/docs/user-guide.html#Quiet%20Reference%20Notation
@@ -415,8 +415,8 @@
       input source code that is provided during a macro call (see below)::
 
         #defmacro <macroname>[(argspec)]
- 	  <macrobody>
-	#end defmacro
+          <macrobody>
+        #end defmacro
 
       All of Cheetah's syntax is available for use inside macros, but the
       placeholderStartToken is @ instead of \$ and the
@@ -427,16 +427,16 @@
       Here are some examples::
 
         #defmacro addHeaderFooter
-	  header 
-	  @src 
-	  footer
-	#end defmacro
+          header 
+          @src 
+          footer
+        #end defmacro
 
         #defmacro addHeaderFooter(header='h', footer='f')
-	  @header 
-	  @src 
-	  @footer
-	#end defmacro
+          @header 
+          @src 
+          @footer
+        #end defmacro
 
       There is a single-line short form like for other directives::
 
@@ -447,8 +447,8 @@
       #call directive::
 
         #addHeaderFooter
-	  Source \$code to wrap
-	#end addHeaderFooter
+          Source \$code to wrap
+        #end addHeaderFooter
 
         #addHeaderFooter: Source \$code to wrap
 
@@ -464,12 +464,12 @@
 
       In Cheetah you'd write
         #defmacro inc: #set @src +=1
-	#inc: \$i
+        #inc: \$i
       which expands to 
         #set \$i += 1
       
         print Template("""\\
-	#defmacro inc: #set @src +=1
+        #defmacro inc: #set @src +=1
         #set i = 1
         #inc: \$i
         \$i""").strip()==2
@@ -480,32 +480,32 @@
       as::
 
         #call self.handleI18n
-	  Some \$var cheetah source
-	#end call
+          Some \$var cheetah source
+        #end call
 
       but has a simpler syntax::
 
-      	#i18n
-	  Some \$var cheetah source
-	#end i18n  
+        #i18n
+          Some \$var cheetah source
+        #end i18n  
 
-	## single-line short form:
-      	#i18n: Some \$var cheetah source
+        ## single-line short form:
+        #i18n: Some \$var cheetah source
 
       The method it calls, self.handleI18n, is just a stub at the moment, but it
       will soon be a wrapper around gettext.  It currently has one required
       positional argument `message`. I anticipate supporting the following
       optional arguments::
 
-      	   id = msgid in the translation catalog
-	   domain = translation domain
-	   source = source lang
-	   target = a specific target lang
-	   comment = a comment to the translation team
+           id = msgid in the translation catalog
+           domain = translation domain
+           source = source lang
+           target = a specific target lang
+           comment = a comment to the translation team
 
-	   plural = the plural form of the message
-	   n = a sized argument to distinguish between single and plural forms
-	   
+           plural = the plural form of the message
+           n = a sized argument to distinguish between single and plural forms
+           
       #i18n is executed at runtime, but it can also be used in conjunction with
       a Cheetah preprocessor or macro (see above) to support compile time
       translation of strings that don't have to deal with plural forms.
@@ -807,10 +807,10 @@
         
         templateClass = NiceTracebackTemplate.compile(src)
 
-	# or
+        # or
         templateClass = Template.compile(src,
            cacheModuleFilesForTracebacks=True, cacheDirForModuleFiles='/tmp/CheetahCacheDir')
-	
+        
 
       This only works with the new Template.compile(src) usage style!
 
@@ -1284,7 +1284,7 @@
         #compiler commentStartToken = '//'
         // a comment
         #compiler reset
-	// no longer a comment
+        // no longer a comment
   - fixed the bug that Edmund Lian found in .addSet() when useNameMapper = 0
     (TR)
   - fixed bug in comment creation using lineCol that Mike found (TR)

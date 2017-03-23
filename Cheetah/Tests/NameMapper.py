@@ -34,7 +34,7 @@ class DummyClass(object):
         x = 'A string'
         try:
             for i in [1, 2, 3, 4]:
-                if x == 2:	
+                if x == 2:      
                     pass
                 
                 if x == 'xx':

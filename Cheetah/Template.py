@@ -1406,14 +1406,14 @@ class Template(Servlet):
              ):
         """This is just a stub at this time.
 
-	   plural = the plural form of the message
-	   n = a sized argument to distinguish between single and plural forms           
+       plural = the plural form of the message
+       n = a sized argument to distinguish between single and plural forms           
 
-      	   id = msgid in the translation catalog
-	   domain = translation domain
-	   source = source lang
-	   target = a specific target lang
-	   comment = a comment to the translation team
+           id = msgid in the translation catalog
+       domain = translation domain
+       source = source lang
+       target = a specific target lang
+       comment = a comment to the translation team
 
         See the following for some ideas
         http://www.zope.org/DevHome/Wikis/DevSite/Projects/ComponentArchitecture/ZPTInternationalizationSupport
