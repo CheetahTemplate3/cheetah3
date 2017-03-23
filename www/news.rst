@@ -7,3 +7,8 @@ News
   - Update code to work with Python 3.3+. Tested with 3.3, 3.4 and 3.5.
   - Fix a bug in multiple inheritance (#extend Parent1, Parent2).
     Pull request by Jonathan Ross Rogers.
+
+
+`Older news`_
+
+.. _`Older news`: news2.html
