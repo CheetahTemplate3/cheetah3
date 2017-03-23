@@ -47,14 +47,14 @@ class Hierarchy:
             self._crumbCSSClass = ''
         self._prefix=prefix
 
-    
+
     ## Main output methods
-    
+
     def menuList(self, menuCSSClass=None):
         """An indented menu list"""
         if menuCSSClass:
             self._menuCSSClass = ' class="%s"' % menuCSSClass
-        
+
         stream = StringIO()
         for item in self._contents[1:]:
             self._menubarRecurse(item, 0, stream)
@@ -64,7 +64,7 @@ class Hierarchy:
         """The home>where>you>are crumbs"""
         if crumbCSSClass:
             self._crumbCSSClass = ' class="%s"' % crumbCSSClass
-        
+
         path = []
         pos = self._contents
         while True:
@@ -91,7 +91,7 @@ class Hierarchy:
 
     ## Methods to control the Aesthetics
     #  - override these methods for your own look
-        
+
     def menuLink(self, url, text, indent):
         if url == self._currentURL or self._prefix + url == self._currentURL:
             return '%s<B%s>%s</B> <BR>\n' % ('&nbsp;'*2*indent,
@@ -100,26 +100,26 @@ class Hierarchy:
             return '%s<A HREF="%s%s"%s>%s</A> <BR>\n' % \
                    ('&nbsp;'*2*indent, self._prefix, url,
                     self._menuCSSClass, text)
-        
+
     def crumbLink(self, url, text):
         if url == self._currentURL or self._prefix + url == self._currentURL:
             return '<B%s>%s</B>' % (self._crumbCSSClass, text)
         else:
             return '<A HREF="%s%s"%s>%s</A>' % \
                    (self._prefix, url, self._crumbCSSClass, text)
-        
+
     def crumbSeperator(self):
         return '&nbsp;&gt;&nbsp;'
-    
+
     def crumbTerminator(self):
         return ''
-    
+
     def emptyCrumb(self):
         """When you are at the homepage"""
         return ''
-                
+
     ## internal methods
-    
+
     def _menubarRecurse(self, contents, indent, stream):
         if isinstance(contents, tuple):
             url, text = contents

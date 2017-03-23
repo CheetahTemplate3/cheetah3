@@ -10,20 +10,20 @@ requests or pull requests.
 Getting the Code
 ----------------
 The Cheetah source code is stored in a central **Git** repository
-hosted primarily by `GitHub <http://github.com>`_. The primary Git 
+hosted primarily by `GitHub <http://github.com>`_. The primary Git
 repository can be found `here <http://github.com/CheetahTemplate3/cheetah3>`_.
 
 
 Development Process
 -------------------
-The typical development workflow for Cheetah revolves around 
-two primary branches **maint** and **next**. The **next** branch is where development 
-planned for the next release of Cheetah is. The **maint** branch 
-on the otherhand is where backported fixes and patches will be applied for 
-the current release of Cheetah will go, it's common for a patch 
+The typical development workflow for Cheetah revolves around
+two primary branches **maint** and **next**. The **next** branch is where development
+planned for the next release of Cheetah is. The **maint** branch
+on the otherhand is where backported fixes and patches will be applied for
+the current release of Cheetah will go, it's common for a patch
 to be applied to maint and next at the same time.
 
-Anyone and everyone is encouraged to submit patches at any time, but as far 
+Anyone and everyone is encouraged to submit patches at any time, but as far
 as bugs or feature requests go, we try to file those *first* in the `Cheetah3 Bug Tracker <https://github.com/CheetahTemplate3/cheetah3/issues>`_
 and then they can be organized into particular releases as is necessary.
 
@@ -38,8 +38,8 @@ tarball will actually be created from.
 
 Filing Bugs
 -----------
-No software is perfect, and unfortunately no bug report is either. If you've 
-found yourself faced with a bug in Cheetah, or just have a good idea for a 
+No software is perfect, and unfortunately no bug report is either. If you've
+found yourself faced with a bug in Cheetah, or just have a good idea for a
 new feature, we kindly ask that you create an issue in the `Cheetah3 Bug Tracker <https://github.com/CheetahTemplate3/cheetah3/issues>`_.
 
 Some tips for filing a *useful* bug report, try to include the following:

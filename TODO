@@ -32,7 +32,7 @@ TODO Items (many are just ideas. This is not an official roadmap!)
 
 - CheetahWrapper stuff: (MO)
   * "cheetah preview [options] [FILES]"  print template-specific portion of main
-    method(s) to stdout, with line numbers based on the .py template module.  
+    method(s) to stdout, with line numbers based on the .py template module.
     Make a Template method to do the same thing, a la .generatedModuleCode().
   * Refactor, make compile/fill/code routines callbacks using a bundle arg.
   * If an input file ends in a dot, intelligently add the input extension if
@@ -42,7 +42,7 @@ TODO Items (many are just ideas. This is not an official roadmap!)
 
 - Provide a utility to list the names of all placeholders in the template.
   Requested by Tracy Ruggles on Feb 21, 2003.
-   
+
 - 'errorCatcher None' to stop catching errors in the middle of a template.
 
 - Utils.WebInputMixin: factor out Cheetah-specific code so it can be used in
@@ -59,7 +59,7 @@ TODO Items (many are just ideas. This is not an official roadmap!)
 Debugging Tools (Dump Tools)
 ============================
 It would be nice to provide debugging tools for users who can't figure
-out why a certain placeholder value isn't found or is being overridden.  
+out why a certain placeholder value isn't found or is being overridden.
 My idea is to define $dumpSearchList() and $dumpSearchListFlat() in
 Template, which would print a stanza in the output showing all searchList
 variables and their values.  $dumpSearchList would group by searchList
@@ -86,10 +86,10 @@ perhaps we can base it on a generic module for dumping variables/values.
         Note that we cannot simply depend on str() and pprint, because
 we need to show instances as dictionaries.  Likewise, dir() and vars()
 may get us part of the distance, but only if they show methods and
-inherited attributes too.  
+inherited attributes too.
         These functions should print only top-level variables, not
 the subelements of collections.  I.e, if the first searchList element
-is a dictionary, show its keys/values, but do not expand any 
+is a dictionary, show its keys/values, but do not expand any
 subvalues if they are dictionaries too, unless the display tool happens
 to default to that.
 
@@ -112,12 +112,12 @@ returns the result.  The preceding example would create a function thus:
 ##doc-entry: and #*doc-entry: comments are appended to the function docstring.
         Finally, make this function accessible directly from the shell.
 If there are any non-option arguments on the command line, call the function
-instead of filling the template the normal way.  
+instead of filling the template the normal way.
         This would perhaps make more sense as arguments to .respond().  But
 .respond() has that pesky 'trans' argument that mustn't be interfered with,
-and other programs may assume .respond() takes only one argument.  Also, 
+and other programs may assume .respond() takes only one argument.  Also,
 when called via str(), str() cannot take arguments.
-        
+
 #indent
 ========================================================================
 The current indenter (which exists but is undocumented) is a kludge that has an
@@ -152,13 +152,13 @@ Possible extensions:
   #indent balance BOOL ; require all indent changes in a #def/#block to be
                        ; popped before exiting the method.  (difficult to
                        ; implement)
-  #indent implicitPop BOOL ; automatically pop indent changes within a 
+  #indent implicitPop BOOL ; automatically pop indent changes within a
                        ; #def/block when that method exits.  (difficult to
                        ; implement)
   #indent ??       ; a 3-way switch that combines unbalanced, balanced and
                    ; implicit pop.  (difficult to implement)
   #indent ??       ; smart stripping: strip input indentation according to
-                   ; nested directive level; e.g., 
+                   ; nested directive level; e.g.,
                    ; 01: #if foo=1
                    ; 02:     public int foo()
                    ; 03:     {
@@ -167,7 +167,7 @@ Possible extensions:
                    ; 06: #end if
                    ; With smart stripping, line 4 would be indented and the
                    ; others not.  With "on" or "strip" stripping, all lines
-                   ; 2-5 would be unindented.  With "off" stripping, 
+                   ; 2-5 would be unindented.  With "off" stripping,
                    ; lines 2-5 would not be stripped.
 
 There should be one indentation object per Template instance, shared by
@@ -246,7 +246,7 @@ Examples
   - SQL
   - LaTeX
   - form email
-- Template definitions in a database.  .py template modules in a 
+- Template definitions in a database.  .py template modules in a
   database?  Caching template classes and/or instances extracted from
   a database.
 - Pickled templates?

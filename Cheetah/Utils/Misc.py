@@ -1,6 +1,6 @@
 """
     Miscellaneous functions/objects used by Cheetah but also useful standalone.
-""" 
+"""
 import os          # Used in mkdirsWithPyInitFile.
 import sys         # Used in die.
 
@@ -33,7 +33,7 @@ def checkKeywords(dic, legalKeywords, what='argument'):
     """
     # XXX legalKeywords could be a set when sets get added to Python.
     for k in dic:
-        if k not in legalKeywords: 
+        if k not in legalKeywords:
             raise TypeError("'%s' is not a valid %s" % (k, what))
 
 
@@ -52,7 +52,7 @@ def mkdirsWithPyInitFiles(path):
     """Same as os.makedirs (mkdir 'path' and all missing parent directories)
        but also puts a Python '__init__.py' file in every directory it
        creates.  Does nothing (without creating an '__init__.py' file) if the
-       directory already exists.  
+       directory already exists.
     """
     dir, fil = os.path.split(path)
     if dir and not os.path.exists(dir):

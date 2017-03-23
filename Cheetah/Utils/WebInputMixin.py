@@ -1,6 +1,6 @@
 """Provides helpers for Template.webInput(), a method for importing web
 transaction variables in bulk.  See the docstring of webInput for full details.
-""" 
+"""
 
 from Cheetah.Utils.Misc import useOrRaise
 
@@ -30,8 +30,8 @@ def _lookup(name, func, multi, converters):
     single vs multi values according to the comments in the source.
     """
     # Step 1 -- split off the conversion suffix from 'name'; e.g. "height:int".
-    # If there's no colon, the suffix is "".  'longName' is the name with the 
-    # suffix, 'shortName' is without.    
+    # If there's no colon, the suffix is "".  'longName' is the name with the
+    # suffix, 'shortName' is without.
     # XXX This implementation assumes "height:" means "height".
     colon = name.find(':')
     if colon != -1:
@@ -60,7 +60,7 @@ def _lookup(name, func, multi, converters):
     except KeyError:
         fmt = "'%s' is not a valid converter name in '%s'"
         tup = (ext, longName)
-        raise TypeError(fmt % tup)    
+        raise TypeError(fmt % tup)
 
     # Step 5 -- if there's a converter func, run it on each element.
     # If the converter raises an exception, use or raise 'converter.error'.

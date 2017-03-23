@@ -8,7 +8,7 @@ attributes have been renamed.  Indentation is output via
 $self._CHEETAH__indenter.indent() to prevent '_indenter' being looked up on the
 searchList and another one being found.  The directive syntax will
 soon be changed somewhat.
-""" 
+"""
 
 import re
 import sys
@@ -27,16 +27,16 @@ class IndentProcessor(object):
 
     INC = "++"
     DEC = "--"
-    
+
     SET = "="
     CHAR = "char"
-    
+
     ON = "on"
     OFF = "off"
 
     PUSH = "push"
     POP = "pop"
-    
+
     def process(self, _txt):
         result = []
 

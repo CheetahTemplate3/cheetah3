@@ -65,11 +65,11 @@ directive, which will be dealt with in more detail below.
 
 ::
 
-    #set $sep = '' 
-    #for $name in $names 
-    $sep$name 
-    #set $sep = ', ' 
-    #end for 
+    #set $sep = ''
+    #for $name in $names
+    $sep$name
+    #set $sep = ', '
+    #end for
 
 Although to just put a separator between strings, you don't need a
 for loop:
@@ -113,8 +113,8 @@ from 1 to 5, and that {$count} is 5.
     #set $step = $i + 1
     $step.  Counting from 1 to $count.
     #end for
-    
-    
+
+
     #for $i in $range(1, $count + 1)
     $i.  Counting from 1 to $count.
     #end for
@@ -177,7 +177,7 @@ Here are some examples:
 
     #if $size >= 1500
     It's big
-    #else if $size < 1500 and $size > 0 
+    #else if $size < 1500 and $size > 0
     It's small
     #else
     It's not there

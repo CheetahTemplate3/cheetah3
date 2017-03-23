@@ -16,7 +16,7 @@ import operator
 try:
     from functools import reduce
 except ImportError:
-    # If functools doesn't exist, we must be on an old 
+    # If functools doesn't exist, we must be on an old
     # enough version that has reduce() in builtins
     pass
 
@@ -82,7 +82,7 @@ def Roman(n):
 
 def sum(lis):
     return reduce(operator.add, lis, 0)
-    
+
 def mean(lis):
     """Always returns a floating-point number.
     """
@@ -99,13 +99,13 @@ def median(lis):
 
 def variance(lis):
     raise NotImplementedError()
-    
+
 def variance_n(lis):
     raise NotImplementedError()
-    
+
 def standardDeviation(lis):
     raise NotImplementedError()
-    
+
 def standardDeviation_n(lis):
     raise NotImplementedError()
 
@@ -181,13 +181,13 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
         record = origList[index] # Raises IndexError.
         IndexFormats.__init__(self, index, record)
         ValuesGetterMixin.__init__(self, origList)
-    
+
     def length(self):
         return len(self._origList)
 
     def first(self):
         return self._index == 0
-        
+
     def last(self):
         return self._index >= len(self._origList) - 1
 
@@ -257,10 +257,10 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
             length = self.length()
             start = self._index + length
             return PrevNextPage(self._origList, length, start)
-            
+
     def prevPages(self):
         raise NotImplementedError()
-        
+
     def nextPages(self):
         raise NotImplementedError()
 
@@ -314,7 +314,7 @@ class Summary(ValuesGetterMixin):
     """
     def __init__(self, origList):
         ValuesGetterMixin.__init__(self, origList)
-        
+
     def sum(self, field=None):
         lis = self._getValues(field, isNumeric)
         return sum(lis)
@@ -324,11 +324,11 @@ class Summary(ValuesGetterMixin):
     def count(self, field=None):
         lis = self._getValues(field, isNotNone)
         return len(lis)
-        
+
     def min(self, field=None):
         lis = self._getValues(field, isNotNone)
         return min(lis) # Python builtin function min.
-        
+
     def max(self, field=None):
         lis = self._getValues(field, isNotNone)
         return max(lis) # Python builtin function max.
@@ -364,7 +364,7 @@ class PrevNextPage:
         self.start = IndexFormats(start, origList[start])
         self.end = IndexFormats(end, origList[end])
         self.length = size
-        
+
 
 ########## MAIN PUBLIC CLASS ##############################
 class MondoReport:
@@ -402,8 +402,8 @@ class MondoReport:
     def all(self):
         origList_len = len(self._origList)
         return self.page(origList_len, 0, 0, 0)
-    
-    
+
+
     def summary(self):
         return self._SummaryClass(self._origList)
 
@@ -425,12 +425,12 @@ class MondoReport:
        exc: IndexError if 'page' or 'size' is < 1.  If 'origlist' is empty or
               'page' is too high, it returns an empty list rather than raising
               an error.
-        
+
         origlist_len = len(origlist)
         start = (page + base) * size
         end = min(start + size, origlist_len)
         ret = []
-        # widow, orphan calculation: adjust 'start' and 'end' up and down, 
+        # widow, orphan calculation: adjust 'start' and 'end' up and down,
         # Set 'widow', 'orphan', 'first_nonwidow', 'first_nonorphan' attributes.
         for i in range(start, end):
             o = origlist[i]

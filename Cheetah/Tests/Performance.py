@@ -9,7 +9,7 @@ import unittest
 from test import pystone
 import time
 
-import Cheetah.NameMapper 
+import Cheetah.NameMapper
 import Cheetah.Template
 from Cheetah.compat import unicode
 
@@ -20,7 +20,7 @@ DEBUG = False
 
 # TOLERANCE in Pystones
 kPS = 1000
-TOLERANCE = 0.5*kPS 
+TOLERANCE = 0.5*kPS
 
 class DurationError(AssertionError):
     pass
@@ -34,7 +34,7 @@ def _pystone_calibration():
 
 def perftest(max_num_pystones, current_pystone=None):
     '''
-        Performance test decorator based off the 'timedtest' 
+        Performance test decorator based off the 'timedtest'
         decorator found in this Active State recipe:
             http://code.activestate.com/recipes/440700/
     '''
@@ -119,7 +119,7 @@ class DynamicMethodCompilationTest(PerformanceTest):
                 #return $foo[0]
             #end def
         '''
-        template = Cheetah.Template.Template.compile(template, 
+        template = Cheetah.Template.Template.compile(template,
             keepRefToGeneratedCode=False)
         template = template()
         value = template.testMethod()
@@ -135,7 +135,7 @@ class BunchOfWriteCalls(PerformanceTest):
                 $i
             #end for
         '''
-        template = Cheetah.Template.Template.compile(template, 
+        template = Cheetah.Template.Template.compile(template,
             keepRefToGeneratedCode=False)
         template = template()
         value = template.respond()
@@ -152,7 +152,7 @@ class DynamicSimpleCompilationTest(PerformanceTest):
 
             Here's an array too: $foo
         '''
-        template = Cheetah.Template.Template.compile(template, 
+        template = Cheetah.Template.Template.compile(template,
             keepRefToGeneratedCode=False)
         template = template()
         template = unicode(template)
@@ -169,7 +169,7 @@ class FilterTest(PerformanceTest):
 
             $foo, $foo, $foo
         '''
-        template = Cheetah.Template.Template.compile(template, 
+        template = Cheetah.Template.Template.compile(template,
             keepRefToGeneratedCode=False)
         self.template = template()
 
@@ -192,7 +192,7 @@ class LongCompileTest(PerformanceTest):
             #def header()
                 <center><h2>This is my header</h2></center>
             #end def
-            
+
             #def footer()
                 #return "Huzzah"
             #end def
@@ -205,7 +205,7 @@ class LongCompileTest(PerformanceTest):
                 <html>
                     <head>
                         <title>${title}</title>
-                        
+
                         $scripts()
                     </head>
                     <body>
@@ -221,7 +221,7 @@ class LongCompileTest(PerformanceTest):
                     </body>
                     </html>
             #end def
-            
+
         '''
         return self.compile(template)
 
@@ -235,7 +235,7 @@ class LongCompileAndRun(LongCompileTest):
         template = super(LongCompileAndRun, self).performanceSample()
         template = template(searchList=[{'title' : 'foo'}])
         template = template.respond()
-            
+
 
 if __name__ == '__main__':
     if '--debug' in sys.argv:

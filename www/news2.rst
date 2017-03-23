@@ -39,25 +39,25 @@
   - Fixes for a swath of unit tests on Windows
   - Re-enabling the EOL tests (whoops)
   - Fix for unicode/utf-8 dynamic compilation error (thanks mikeb!) (Test.Unicode.JBQ_UTF8_Test8)
-  - 0000010: [Templates] Failure to execute templates on Google App Engine (rtyler) 
-  - 0000026: [Compiler] Support multiple inheritance (rtyler) 
+  - 0000010: [Templates] Failure to execute templates on Google App Engine (rtyler)
+  - 0000026: [Compiler] Support multiple inheritance (rtyler)
 
 
 2.2.1 (June 1st, 2009)
-  - 0000020: [Templates] Builtin support for using Cheetah with Django (rtyler) 
-  - 0000021: [Compiler] @static and @classmethod don't properly define the _filter local (rtyler) 
-  - 0000023: [Compiler] Update Template super calls to use super() (rtyler) 
+  - 0000020: [Templates] Builtin support for using Cheetah with Django (rtyler)
+  - 0000021: [Compiler] @static and @classmethod don't properly define the _filter local (rtyler)
+  - 0000023: [Compiler] Update Template super calls to use super() (rtyler)
   - Update all references to communitycheetah.org to point back at cheetahtemplate.org
 
 2.2.0 (May 17th, 2009)
   - Switch all internal representations of template code to unicode objects instead of str() objects
   - Convert unicode compiled template to an utf8 char buffer when writing to a file (Jean-Baptiste Quenot <jbq@caraldi.com>)
-  - 0000011: [Templates] Calling a function with arguments calls the function with None (rtyler) 
+  - 0000011: [Templates] Calling a function with arguments calls the function with None (rtyler)
   - 0000015: [Tests] Resolve test failures in 'next' branch (rtyler)
   - 0000019: [Templates] Properly warn when joining unicode and non-unicode objects in DummyTransaction (rtyler)
 
 2.1.2 (May 5, 2009)
-  - 0000006: [Templates] Support @staticmethod and @classmethod (rtyler) 
+  - 0000006: [Templates] Support @staticmethod and @classmethod (rtyler)
 
 2.1.1 (April 16, 2009)
   - Support __eq__() and __ne__() the way you might expect in src/Tools/RecursiveNull (patch suggested by Peter Warasin <peter@endian.com>)
@@ -86,7 +86,7 @@
     [TR]
   - made it possible to chain multiple decorators to a method #def [TR with
     patch from Graham Dennis]
-  - fixed a bug in _eatMultiLineDef that Graham Dennis reported. [TR] 
+  - fixed a bug in _eatMultiLineDef that Graham Dennis reported. [TR]
   - fixed 'module.__init__() argument 1 must be string, not unicode' bug in
     Template.py reported by Erwin Ambrosch [TR]
 
@@ -96,8 +96,8 @@
 
 2.0 (Oct 12, 2007)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
-  
-  - fixed exception handling issue in the C implemenation of NameMapper 
+
+  - fixed exception handling issue in the C implemenation of NameMapper
     [patch from Eric Huss]
 
   - fixed filtering of #included subtemplates
@@ -109,15 +109,15 @@
 
 2.0rc8 (April 11, 2007)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
-  Core Changes: [TR]      
-  
+  Core Changes: [TR]
+
     - added a '#unicode <encoding>' directive to indicate that the output of the
       template should be a unicode string even if the template source is a
       normal byte string.
-          
-          - #unicode and #encoding are mutually exclusive.  Use one or the other. 
+
+          - #unicode and #encoding are mutually exclusive.  Use one or the other.
           - #unicode must be on a line by itself.
-          - Strings in embedded code must be explictly marked as unicode if they 
+          - Strings in embedded code must be explictly marked as unicode if they
             contain non-ascii chars::
 
                 #unicode latin-1
@@ -126,7 +126,7 @@
 
             However, this works fine::
 
-                #unicode latin-1 
+                #unicode latin-1
                 blah blah <some non-ascii char> blah blah
 
     - fixed several unicode bugs in the compiler.
@@ -146,25 +146,25 @@
             ... child output
             #super  ## includes output of super(<CurrentClass>, self).foo()
             ... child output
-        #end def 
+        #end def
 
         #def bar(arg)
             ... child output
             #super(arg)  ## includes output of super(<CurrentClass>, self).bar(arg)
              ... child output
-        #end def 
+        #end def
     - added some unit tests for the new directives
 
 
 2.0rc7 (July 4, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
-  Core Changes: [TR]      
+  Core Changes: [TR]
 
     - extended the #implements directive so an arguments list can be declared in
       the same fashion as #def and #block.
     - made the parser raise ParseError when \$\*placeholder, \$\*5\*placeholder,
       \$(placeholder), etc. are found within expressions.  They are only valid in
-      top-level text. 
+      top-level text.
     - tweaked the parser so it's possible to place a comment on the same line as
       a directive without needing to explicitly close the directive first. This
       works regardless of whether or not you added a colon::
@@ -181,13 +181,13 @@
               self.verify("#if 1 ##comment \\n\$aStr\\n#end if\\n",
                           "blarg\\n")
 
-      Previously, that last test would have required an extra # to close the #if 
+      Previously, that last test would have required an extra # to close the #if
       directive before the comment directive started::
 
         self.verify("#if 1 ###comment \\n\$aStr\\n#end if\\n",
                     "blarg\\n")
-      
-      Code that makes use of explicit directive close tokens immediately followed by 
+
+      Code that makes use of explicit directive close tokens immediately followed by
       another directive will still work as expected:
       #if test##for i in range(10)# foo \$i#end for##end if
 
@@ -215,7 +215,7 @@
 
 2.0rc6 (Feb 4, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
-  Core Changes: [TR]      
+  Core Changes: [TR]
 
     - added a Cheetah version dependency check that raises an assertion if a
       template was compiled with a previous version of Cheetah whose templates
@@ -227,29 +227,29 @@
 
        File "/usr/lib/python2.4/site-packages/Cheetah/Template.py", line 792, in compile
             raise parseError
-        Cheetah.Parser.ParseError: 
-        
+        Cheetah.Parser.ParseError:
+
         Error in the Python code which Cheetah generated for this template:
         ================================================================================
-        
+
         invalid syntax (DynamicallyCompiledCheetahTemplate.py, line 86)
-        
+
         Line|Python Code
         ----|-------------------------------------------------------------
-        84  |        
+        84  |
         85  |        write('\\n\\n')
         86  |        for i an range(10): # generated from line 4, col 1
                             ^
         87  |            _v = i # '\$i' on line 5, col 3
         88  |            if _v is not None: write(_filter(_v, rawExpr='\$i')) # from line 5, col 3.
         89  |            write('\\n')
-        
+
         ================================================================================
-        
+
         Here is the corresponding Cheetah code:
-        
+
         Line 4, column 1
-        
+
         Line|Cheetah Code
         ----|-------------------------------------------------------------
         2   |#compiler useNameMapper=False
@@ -259,15 +259,15 @@
         5   |  \$i
         6   |#end for
         7   |
-       
+
 2.0rc5 (Feb 3, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
-  Core Changes: [TR]      
+  Core Changes: [TR]
 
     - fixed a memory leak in Template.compile(), reported by Andrea Arcangeli
     - simplified concurrency locking and compile caching in Template.compile()
 
-  The command line tool (CheetahWrapper.py): 
+  The command line tool (CheetahWrapper.py):
 
     - added new option --settings for supplying compiler settings
     - added new option --templateAPIClass to replace the environment var
@@ -275,25 +275,25 @@
 
 2.0rc4 (Jan 31, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
-  Core Changes: [TR]      
+  Core Changes: [TR]
 
-    - fixed a typo-bug in the compile hashing code in Template.compile() 
+    - fixed a typo-bug in the compile hashing code in Template.compile()
     - improved the macros framework and made it possible to implement macros in
       Python code so they can be shared between templates
     - more work on the #i18n directive.  It's now a macro directive.
     - added new Cheetah.Macros package
     - more tests
- 
+
 2.0rc3 (Jan 29, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
-  Core Changes: [TR]      
+  Core Changes: [TR]
 
     - added short-form single line versions of all directives that have an #end
       tag, except for #errorCatcher::
 
          #if, #else, #elif, #unless,
-         #for, #while, #repeat,  
-         #try, #except, #finally, 
+         #for, #while, #repeat,
+         #try, #except, #finally,
          #cache, #raw
          #call, #capture
 
@@ -302,7 +302,7 @@
           #if cond: foo
           #elif cond2: bar
           #else: blarg
-          
+
           #for i, val in enumerate(vals): \$i-\$val
 
       Note that if you accidentally leave a colon at the end of one of these
@@ -311,7 +311,7 @@
 
       The first leading space after the colon is discarded. Any additional
       spaces will be included in the output.
-      
+
       Also note, if you use the short form versions of #if/#else/#elif you must
       it for all three.  The following is not valid::
 
@@ -327,7 +327,7 @@
       function/method definition (i.e. #def or #block)::
 
         #from xxx import aDecorator
-        ...  
+        ...
         ...
         #@aDecorator
         #def func
@@ -396,7 +396,7 @@
       'directiveNamesAndParsers' and 'endDirectiveNamesAndHandlers'
     - added a compile-time macro facility to Cheetah. These macros are very
       similar to macros in Lisp:
-      http://www.apl.jhu.edu/~hall/Lisp-Notes/Macros.html.  
+      http://www.apl.jhu.edu/~hall/Lisp-Notes/Macros.html.
 
       As with Lisp macros, they take source code (Cheetah source) as input and
       return source code (again Cheetah source) as output. They are executed at
@@ -406,7 +406,7 @@
       The new #defmacro directive allows users to create macros inside the
       source of their templates.  Macros can also be provided via the compiler
       setting 'macroDirectives'. The 'macroDirectives' setting allows you to
-      share common macros between templates.  
+      share common macros between templates.
 
       The syntax for the opening tag of #defmacro is the same as for #def and
       #block.  It expects a macro name followed by an optional argument list in
@@ -427,14 +427,14 @@
       Here are some examples::
 
         #defmacro addHeaderFooter
-          header 
-          @src 
+          header
+          @src
           footer
         #end defmacro
 
         #defmacro addHeaderFooter(header='h', footer='f')
-          @header 
-          @src 
+          @header
+          @src
           @footer
         #end defmacro
 
@@ -442,7 +442,7 @@
 
         #defmacro addHeaderFooter: header @src footer
         #defmacro addHeaderFooter(header='h', footer='f'): @header @src @footer
-     
+
       The syntax for calling a macro is similar to the simplest usage of the
       #call directive::
 
@@ -458,16 +458,16 @@
         (defmacro inc (var)
            (list 'setq var (list '1+ var)))
       to define the macro `inc` and write
-        (inc x)  
-      which expands to 
+        (inc x)
+      which expands to
         (setq x (1+ x))
 
       In Cheetah you'd write
         #defmacro inc: #set @src +=1
         #inc: \$i
-      which expands to 
+      which expands to
         #set \$i += 1
-      
+
         print Template("""\\
         #defmacro inc: #set @src +=1
         #set i = 1
@@ -487,7 +487,7 @@
 
         #i18n
           Some \$var cheetah source
-        #end i18n  
+        #end i18n
 
         ## single-line short form:
         #i18n: Some \$var cheetah source
@@ -505,11 +505,11 @@
 
            plural = the plural form of the message
            n = a sized argument to distinguish between single and plural forms
-           
+
       #i18n is executed at runtime, but it can also be used in conjunction with
       a Cheetah preprocessor or macro (see above) to support compile time
       translation of strings that don't have to deal with plural forms.
-    - added Cheetah.Utils.htmlEncode and Cheetah.Utils.htmlDecode    
+    - added Cheetah.Utils.htmlEncode and Cheetah.Utils.htmlDecode
     - more docstring text
 
   Unit tests: [TR]
@@ -520,10 +520,10 @@
       baseclass other than `Template`. This ensures that all syntax & core
       features work with 2.0's support for arbitrary baseclasses.
     - added tests for all the new directives and the new single-line short forms
-  
+
 2.0rc2 (Jan 13th, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
-  Core Changes: [TR]      
+  Core Changes: [TR]
 
     - fixed some python 2.4isms that slipped in.  All the tests pass with Python
       2.2 now
@@ -532,7 +532,7 @@
       request.  The rather longwinded compiler setting
       gobbleWhitespaceAroundMultiLineComments can be used to go back to the old
       non-gobbling behaviour if needed.
-    - added #capture directive to complement the #call directive.  
+    - added #capture directive to complement the #call directive.
       #call executes a region of Cheetah code and passes its output into a function call
       #capture executes a region of Cheetah code and assigns its output to a variable
     - extended the compile caching code in Template.compile so it works with the
@@ -549,7 +549,7 @@
 
 2.0rc1 (Jan 10, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
-  Core Changes: [TR]    
+  Core Changes: [TR]
 
     - made it possible nest #filter directives
     - added lots more docstring content in the Template class
@@ -572,13 +572,13 @@
       # example 2, mixing a Cheetah method into a class definition::
 
             class Foo(dict):
-                def meth1(self): 
+                def meth1(self):
                     return 'foo'
-                def meth2(self): 
-                    return 'bar'        
-            Foo = Template.compile('#implements meth3\\nhello \$name from \$caller', 
+                def meth2(self):
+                    return 'bar'
+            Foo = Template.compile('#implements meth3\\nhello \$name from \$caller',
                                    baseclass=Foo)
-            print Foo(name='world', caller='me')  
+            print Foo(name='world', caller='me')
 
       A side-benefit is the possibility to use the same Cheetah source with
       several baseclass, as the baseclass is orthogonal to the source code,
@@ -589,15 +589,15 @@
     - fixed issue with buffering and use of #call when template is used as a
        webkit servlet
     - added Cheetah.Utils.htmlEncode and htmlDecode
-   
-  The command line tool (CheetahWrapper.py): 
+
+  The command line tool (CheetahWrapper.py):
 
     - changed insertion order for the --env and --pickle options so they match the
       commandline UI of the compiled template modules themselves [TR]
 
 2.0b5 (Jan 7, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
-  Core Changes: [TR]    
+  Core Changes: [TR]
 
     - made Cheetah.Template a new-style class by inserting 'object' into its'
       inheritance tree.  Templates can now use super(), properties and all the
@@ -636,13 +636,13 @@
 
   Unit tests: [TR]
 
-    - fixed format string bug in unittest_local_copy.py 
+    - fixed format string bug in unittest_local_copy.py
 
 2.0b4 (Jan 6, 2006)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   Core Changes: [TR]
 
-    - fixed up parsing of target lists in for loops. This was previously limited 
+    - fixed up parsing of target lists in for loops. This was previously limited
       to fairly simple target lists::
 
           #for (\$i, \$j) in [('aa','bb'),('cc','dd')]
@@ -656,7 +656,7 @@
           #end for"
 
     - refactored the class initialization process
-    - improved handling of target lists in #set directive. This was previously 
+    - improved handling of target lists in #set directive. This was previously
       limited to fairly simple target lists.
       #set i,j = [1,2] ... #set \$i,\$j = [1,2]
       #set (i,j) = [1,2] ... #set (\$i,\$j) = [1,2]
@@ -669,7 +669,7 @@
 
     - removed cheetah junk from docstrings and placed it all in comments or
       __moduleVars__. Per JJ's suggestion.
-  
+
     - made it possible to nest #cache directives to any level
     - made it possible to nest #call directives to any level
 
@@ -689,23 +689,23 @@
     - added #yield statement
     - added ability to create nested scopes/functions via nested #def statements
     - added new #call directive and related #arg directive, per Ian Bicking's
-      suggestion.        
+      suggestion.
     - added new expression syntax c"text \$placeholder text"
-        
+
         for those basic function calling cases where you just need to pass in a
         small bit of cheetah output as an argument::
-        
-            c'a string with \$placeholders', 
-            c'''a string with \$placeholders''', 
-            c"a string with \$placeholders", 
+
+            c'a string with \$placeholders',
+            c'''a string with \$placeholders''',
+            c"a string with \$placeholders",
             c"""a string with \$placeholders"""
-        
-        - They can't contain #directives, but accept any valid \$placeholder syntax 
-          except caching placeholders. Caching placeholders don't make any sense in 
+
+        - They can't contain #directives, but accept any valid \$placeholder syntax
+          except caching placeholders. Caching placeholders don't make any sense in
           this context.
         - They can be used \*any\* place where a python expression is expected.
         - They can be nested to any depth::
-        
+
             \$func(c'<li>\$var1-\$var2</li>')
             \$func(c'<li>\$var1-\$var2</li>', doSomething=True)
             \$func(content=c'<li>\$var1-\$var2</li>', doSomething=True)
@@ -726,12 +726,12 @@
     - improved generated docstring notes about cached vars
     - fixed silly bug related to """ in docstring comments and statements like
       this '#def foo: \$str("""foo""")'.  Reported by JJ.
-    - changed the handling of single-line defs so that 
-      '#def xxx:<just whitespace>\\n' will be treated as a multi-line #def.  
+    - changed the handling of single-line defs so that
+      '#def xxx:<just whitespace>\\n' will be treated as a multi-line #def.
       The same applies to #block.  There's a compiler setting to turn this off
       if you really need empty single-line #def:'s.
       JJ reported that this was causing great confusion with beginners.
-    - improved error message for unclosed directives, per Mike Orr's suggestion.  
+    - improved error message for unclosed directives, per Mike Orr's suggestion.
     - added optional support for passing the trans arg to methods via \*\*KWS rather
       than trans=None.  See the discussion on the mailing list Jan 4th (JJ's post) for
       details.  The purpose is to avoid a positional argument clash that
@@ -743,24 +743,24 @@
         You can also turn this new behaviour off by either manually including
         the trans arg in your method signature (see the example below) or by
         using the compiler setting 'useKWsDictArgForPassingTrans'=False::
-        
+
             #def manualOverride(arg1, trans=None)
               foo \$arg1
             #end def
 
-  ImportHooks: 
+  ImportHooks:
 
     - made the ImportHook more robust against compilation errors during import [TR]
 
   Install scripts: [TR]
 
-    - added optional support for pje's setuptools 
-    - added cheeseshop classifiers 
+    - added optional support for pje's setuptools
+    - added cheeseshop classifiers
     - removed out of date install instructions in __init__.py
 
   Servlet Base Class For Webkit: [TR]
 
-    - disabled assignment of self.application (was a webware hack)   
+    - disabled assignment of self.application (was a webware hack)
 
   Unit Tests: [TR]
 
@@ -771,7 +771,7 @@
 2.0b2 (Dec 30, 2005)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
 
-  Core Changes: 
+  Core Changes:
 
     - In previous versions of Cheetah tracebacks from exceptions that were raised
       inside dynamically compiled Cheetah templates were opaque because
@@ -804,13 +804,13 @@
         class NiceTracebackTemplate(Template):
             _CHEETAH_cacheModuleFilesForTracebacks = True
             _CHEETAH_cacheDirForModuleFiles = '/tmp/CheetahCacheDir' # change to a dirname
-        
+
         templateClass = NiceTracebackTemplate.compile(src)
 
         # or
         templateClass = Template.compile(src,
            cacheModuleFilesForTracebacks=True, cacheDirForModuleFiles='/tmp/CheetahCacheDir')
-        
+
 
       This only works with the new Template.compile(src) usage style!
 
@@ -822,7 +822,7 @@
 2.0b1 (Dec 29, 2005)
   !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
 
-  Core Changes: 
+  Core Changes:
 
     - enabled use of any expression in \${placeholders}. See the examples I posted to
       the email list on Dec 12th.  All use cases of the #echo directive can now
@@ -837,7 +837,7 @@
     - made it possible to create template classes dynamically, rather than just
       instances.  See the new classmethod Template.compile().  See my messages
       to the email list for more details. [TR]
-      
+
           klass = Template.compile(src)
     - made it easier to work with custom compiler settings, particularly from
       the command line tool.  You can now define a subclass of Template which
@@ -859,25 +859,25 @@
       code at compile time.  These hooks can be used to enable Cheetah template
       authoring by untrusted users. See my messages to the email list for more
       details. Note, it filters expressions at parse/compile time, unlike Python's
-      old rexec module which restricted the Python environment at runtime. [TR] 
-          
+      old rexec module which restricted the Python environment at runtime. [TR]
+
           # Here are the relevant compiler settings:
           # use lower case keys here!!
           'disabledDirectives':[], # list of directive keys, without the start token
           'enabledDirectives':[], # list of directive keys, without the start token
-      
-          'disabledDirectiveHooks':[], # callable(parser, directiveKey), 
+
+          'disabledDirectiveHooks':[], # callable(parser, directiveKey),
               # called when a disabled directive is found, prior to raising an exception
-      
+
           'preparseDirectiveHooks':[], # callable(parser, directiveKey)
           'postparseDirectiveHooks':[], # callable(parser, directiveKey)
-      
+
           'preparsePlaceholderHooks':[], # callable(parser)
           'postparsePlaceholderHooks':[], # callable(parser)
-      
-          'expressionFilterHooks':[], 
+
+          'expressionFilterHooks':[],
           # callable(parser, expr, exprType, rawExpr=None, startPos=None)
-          # exprType is the name of the directive, 'psp', or 'placeholder'. 
+          # exprType is the name of the directive, 'psp', or 'placeholder'.
           #all lowercase
     - added support for a short EOLSlurpToken to supplement the #slurp
       directive.  It's currently re.compile('#\\s\*\\n') (i.e # followed by
@@ -887,11 +887,11 @@
       setting 'EOLSlurpToken' controls this.  You can turn it off completely by
       setting 'EOLSlurpToken' to None. See the email list for more details. [TR]
     - added '_CHEETAH_' prefix to all instance attribute names in compiled
-      templates. This is related to the arbitrary baseclass change. [TR] 
+      templates. This is related to the arbitrary baseclass change. [TR]
     - shifted instance attribute setup to _initCheetahAttributes() method.  This
       is related to the arbitrary baseclass change. [TR]
     - made it possible to use full expressions in the #extends directive, rather
-      than just dotted names. This allows you to do things like this: 
+      than just dotted names. This allows you to do things like this:
 
       #from xx.TemplateRepository import getTemplateClass
       #extends getTemplateClass('someName')
@@ -905,14 +905,14 @@
       are enclosed within #if ... #end if. Reported by Marcin Gajda [TR]
     - tweak to remove needless write('') calls in generated code [TR]
 
-  The command line tool (CheetahWrapper.py): 
+  The command line tool (CheetahWrapper.py):
 
     - added code to cleanup trailing slashes on path arguments (code originally
       from Mike Orr) [TR]
     - turned on the ImportHooks by default for the 'cheetah fill' command. See the
       discussion on the email list [TR]
 
-  ImportHooks: 
+  ImportHooks:
 
     - fixed a name error bug in the ImportHooks [TR]
 
@@ -940,15 +940,15 @@
   See my email to the cheetahtemplate-discuss list on Sat. Nov. 12th for more
   details on these changes:
 
-  - faster list-based buffering in DummyTrans, rather than StringIO (my 
-    benchmarks showed it to be significantly faster.  collections.deque wasn't 
+  - faster list-based buffering in DummyTrans, rather than StringIO (my
+    benchmarks showed it to be significantly faster.  collections.deque wasn't
     any faster than a simple list.) [TR]
   - new CompilerSettings to tweak generated code: [TR]
     \* alwaysFilterNone: filter out None immediately, before the filter is called
     \* useFilters: allows you to turn them off completely and default to str()
     \* includeRawExprInFilterArgs: allows you to disable this behaviour
-    \* autoAssignDummyTransactionToSelf: off by default 
-  - and automatic \$trans finding without having to pass it as an arg to methods 
+    \* autoAssignDummyTransactionToSelf: off by default
+  - and automatic \$trans finding without having to pass it as an arg to methods
     based Jonathan Mark's suggestion.  If the template's self.transaction
     attribute has been set, each method of the template will use it when
     called. [TR]
@@ -1021,9 +1021,9 @@
     __getattr__ methods [TR]
   - Fix printf format bug in "cheetah c --debug", found by Terry MacDonald. [MO]
   - Disabled NameMapperDict test (in SyntaxAndOutput.py) because the
-    namemappers still have the dict-method bug.  (Reminder: don't use 
+    namemappers still have the dict-method bug.  (Reminder: don't use
     placehold names like \$update that match dict method names.) [MO]
-  - #repeat now uses a local variable of the form __i\$num which permits 
+  - #repeat now uses a local variable of the form __i\$num which permits
     nesting [JJ]
   - implemented a modified version of Bob and JJ's patch for better parser
     warnings about mismatched directives and #end directives [TR]
@@ -1059,14 +1059,14 @@
     and simpler to read/grok. I also removed all tracking of local
     variable names by the compiler. [TR]
   - other misc. refactorings [TR]
- 
+
 0.9.15 (Mar 25, 2003)
 
   - a minor tweak to the cleanup actions of one of the test cases [TR]
 
 0.9.15rc2 (Mar 23, 2003)
 
-  - Fixed a python version dependency bug related to Compiler.py's use of 
+  - Fixed a python version dependency bug related to Compiler.py's use of
     isinstance() [TR]
 
 0.9.15rc1 (Mar 21, 2003)
@@ -1075,7 +1075,7 @@
 
 0.9.15b1 (Mar 17, 2003)
 
-  - The Cheetah version of unittest now prints a blank line after each 
+  - The Cheetah version of unittest now prints a blank line after each
     traceback to separate them.  (MO)
   - .webInput() now saves the cgi.FieldStorage() instance in a global
     variable rather than recreating it each call.  That should allow the
@@ -1097,7 +1097,7 @@
     cases.  New options --flat and --nobackup; --stdout is now a synonym for
     -p.  See the "cheetah compile" section in the Users' Guide for details.
     Deleted Utils.dualglob: merged into CheetahWrapper.  (MO)
-  - .addToSearchList() and .prependToSearchList() are gone.  Instead of 
+  - .addToSearchList() and .prependToSearchList() are gone.  Instead of
     adding containers to the searchList after instantiation, pass all the
     containers you need to the constuctor, keep another reference somewhere
     to the containers, and modify the containers directly.  Generic libraries
@@ -1110,11 +1110,11 @@
     In the .filter() method, kw['rawExpr'] gives the entire placeholder name
     including subscripts and arguments, exactly as it appears in the template
     definition. (TR)
-  - Fix three bugs in "cheetah compile -R": (1) the generated class name 
+  - Fix three bugs in "cheetah compile -R": (1) the generated class name
     contained the subdirectory, (2) the destination path did not contain the
     subdirectory, (3) Cheetah failed to create the destination subdirectory
-    if missing.  All subdirectories created have an "__init__.py" file. 
-    "cheetah fill -R" does the same thing but does not create 
+    if missing.  All subdirectories created have an "__init__.py" file.
+    "cheetah fill -R" does the same thing but does not create
     "__init__.py". (MO)  NOTE: this is still buggy!
   - New directory "attic" in source contains code that has been abandoned
     for now but may come in handy someday. (MO)
@@ -1147,7 +1147,7 @@
     Cheetah except added "Cheetah.Utils.optik." prefix to intra-package
     imports.  Optik's copyright and license is in an appendix in the
     Cheetah Users' Guide.  (MO)
-  - rewrite of the "cheetah" and "cheetah-compile" commands. 
+  - rewrite of the "cheetah" and "cheetah-compile" commands.
     The command-line options have changed!  Removed CheetahCompile module
     removed and its test suite too; CheetahWrapper now takes its place. (MO)
   - Utils.dualglob: new module to recursively generate source+destination
@@ -1177,7 +1177,7 @@
   - added the #del directive, for using Python's del statement (TR)
   - I think I've fixed the problem with the searchList arg being discarded when a
     template is generated from a .tmpl file that #extends another template. This
-    bug was reported by Edmund on Aug 30th 
+    bug was reported by Edmund on Aug 30th
     (subject: "Bug? Was: Really basic searchList question") (TR)
 
 0.9.14 (July 14, 2002)
@@ -1218,7 +1218,7 @@
     template definition without having that indentation in the output, and
     allows you to set the output indentation per line independent of the
     indentation in the template definition.  This version uses Robert
-    Kuzelj's #indent syntax exactly.  In the next few days, 
+    Kuzelj's #indent syntax exactly.  In the next few days,
     Cheetah.Utils.Indenter will be refactored and
     \*\*\* THE #INDENT SYNTAX WILL CHANGE! \*\*\* (MO)
   - added the #return directive as requested by Robert Kulezj (TR)
@@ -1240,7 +1240,7 @@
         directiveEndToken = :
         commentStartToken = #
         #end compiler-settings
-        
+
         .for a in [1,2,3,4][2:3]:
         blag
         .end for
@@ -1257,10 +1257,10 @@
     used with WebKit via the inheritance approach and the containment approach
     (TR)
 
- 
+
 0.9.13b1 (May 1, 2002)
 
-  - Was going to import cStringIO instead of StringIO, but it made the 
+  - Was going to import cStringIO instead of StringIO, but it made the
     DummyTransaction.py unittest fail so I undid it.  Cheetah aims to provide
     Unicode support, which cStringIO does not provide. (TR/MO)
   - Utils.Misc.CheckKeywords(): prevent misspelled keyword arguments,
@@ -1314,14 +1314,14 @@
      -t for 'test', and an ASCII-art cheetah face in the help message. (MO)
    - CheetahCompile.py: fixed to recognize --help option and to show --help/-h
      in help message. (MO)
-   - CheetahCompile.py: 
+   - CheetahCompile.py:
      changed the order of the VERBOSE mode printouts, as per Mike's request (TR)
    - Template.py:
      fixed the #include'd template searchList sharing problem, as reported by
      Johannes (TR)
    - corrected namemapper translation bug in
      Compiler.GenUtils.genNameMapperVar() (TR)
-   - Utils.Misc.UseOrRaise(): convenience function to return a 
+   - Utils.Misc.UseOrRaise(): convenience function to return a
      value, or raise it if it's a subclass of Exception. (MO)
    - Utils.CGIImportMixin replaces Tools.WebwareMixin.  Servlet now
      subclasses it.  This adds the .cgiImport() method to all servlets, allowing
@@ -1384,7 +1384,7 @@
    - fixed bug with adding Python's __builtins__ to the local vars list (TR)
    - fixed bug with #echo (TR)
    - fixed bug that was preventing \${a, \$b=1234} from working like \${a, b=1234} (TR)
-   - fixed some bugs in Template.varExists and Template.getVar() 
+   - fixed some bugs in Template.varExists and Template.getVar()
      (TR - thanks to MH for spotting them)
    - made it possible to use filenames like 'spam-eggs.txt' that have invalid
      characters for module names with Template(): Template(file='spam-eggs.txt')
@@ -1409,22 +1409,22 @@
      Webware to be installed so it can access those shared classes. (TR)
    - extended the template module command line interface(TR/MO)
 
-0.9.9a6 (Nov 6, 2001) 
+0.9.9a6 (Nov 6, 2001)
 
    - fixed bug with quotations in longer constant string chunks (TR)
    - fixed another bug in the cheetah-compile script (TR)
    - fixed a bug in the file-update monitoring code that was resulting in
      infinite loops when used with Template sub-classes (TR)
-   - extended the #filter framework according to Mike's suggestions (TR)  
+   - extended the #filter framework according to Mike's suggestions (TR)
    - added test modules for cheetah-compile and the file-update monitoring code (TR)
    - extended the capabilities of cheetah-compile ... (IB)
    - updated the docs (MO)
 
-0.9.9a5 (October 31, 2001) 
+0.9.9a5 (October 31, 2001)
 
    - fixed a bug I created yesterday (TR)
 
-0.9.9a4 (October 30, 2001) 
+0.9.9a4 (October 30, 2001)
 
    - added #repeat (TR implementing Chuck's suggestion)
    - added #unless (TR implementing Mike's suggestion)
@@ -1432,14 +1432,14 @@
    - fixed a small bug in the cheetah-compile script, as reported by Ian on the
      list (TR)
 
-0.9.9a3 (October 12, 2001) 
+0.9.9a3 (October 12, 2001)
 
    - more in the Users Guide (TR)
    - renamed #attribute as #attr  (TR)
    - renamed #call as #silent (TR)
    - added #echo directive (TR)
- 
-0.9.9a2 (October 11, 2001) 
+
+0.9.9a2 (October 11, 2001)
 
    - updated the example site and the SkeletonPage framework (TR)
    - fixed some small bugs (TR)
@@ -1484,14 +1484,14 @@
   - Added -g (appendGen function argument), which compiles x.tmpl to xGen.py,
     with x.py being for non-generated Python code. Also changed option handling
     a little and added a comment to the top of compiled files. (IB + MO)
-  - finalized the #include syntax after a lengthy discussion on the list 
+  - finalized the #include syntax after a lengthy discussion on the list
     This is different from in 0.9.8a3 (TR):
 
-        #include <ARGS> <EXPR> 
+        #include <ARGS> <EXPR>
         ... uses the value of EXPR as the path of the file to include.
-        
-        #include <ARGS> source = <EXPR> 
-        ... includes the value of the EXPR 
+
+        #include <ARGS> source = <EXPR>
+        ... includes the value of the EXPR
 
     where <ARGS> is 'raw' or ''
   - re-implemented the output mechanism to use streaming via Webware's
@@ -1513,17 +1513,17 @@
     may be a list or any type that that Python's 'tuple' function accepts. (MO)
   - Template.__init__ new keyword arg 'file': this may be a filename or file
     object to read the Template Definition from.  If you use this, you must not
-    pass a Template Definition string also.  New instance variables 
+    pass a Template Definition string also.  New instance variables
     ._fileName and ._fileMtime are set if a filename was passed; otherwise they
     are None. (MO)
   - CodeGenerator new function 'varNotFound_KeyError': raises KeyError if a
     placeholder name is missing when filling the template.  Disabled by default.
     (MO)  NB - this change has been superceeded by 'errorCheckers'
   - Template.getUnknowns (new method): returns a list of Placeholder Names
-    missing in the Search List. (MO) - this change has been superceeded by 
+    missing in the Search List. (MO) - this change has been superceeded by
     'errorCheckers'
   - made changes to Template.py, CodeGenerator.py, PlaceholderProcessor.py,
-    and TagProcessor.py to enable customization of the placeholderStartToken so 
+    and TagProcessor.py to enable customization of the placeholderStartToken so
     it can be set to any character sequence, rather than just the default '\$'.
     This is configurable by the Template setting 'placeholderStartToken' (TR)
   - fixed a small bug in PlaceholderProcessor.processTag() that prevented
@@ -1551,7 +1551,7 @@
   - a major restructuring of the modules and internal API (TR)
   - made sure that all the #directives with start and end tags are
     implemented in such a way that they won't cause 'maximum recursion' limit
-    errors if their content block is long.  Simple regexes didn't cut it in these 
+    errors if their content block is long.  Simple regexes didn't cut it in these
     cases. (TR)
 
     - #macro
@@ -1562,17 +1562,17 @@
     - the parsing of the core tags (the state-dependent ones) after they have been
       translated to the internal delimiters
 
-  - made a Template.shutdown() method for cleaning up reference cycles before a 
+  - made a Template.shutdown() method for cleaning up reference cycles before a
     template object is deleted. (TR)
   - made the parsing and processing of #macros() more robust (TR)
   - implemented the file update checking mechanism (TR)
     NOTE, the syntax for the #include is now::
 
-        #include <ARGS> file = <EXPR> 
+        #include <ARGS> file = <EXPR>
         ... uses the value of EXPR as the path of the file to include.
 
-        #include <ARGS> <EXPR> 
-        ... includes the value of the EXPR 
+        #include <ARGS> <EXPR>
+        ... includes the value of the EXPR
 
     where <ARGS> is 'raw' or 'direct'
 
@@ -1593,13 +1593,13 @@
   - added a new command 'sdist_docs' to setup.py which rebuilds the docs
     when making a source distribution (TR)
   - changed the name of the ./Cheetah dir to ./src (TR)
-  - fixed a bug in one of the code filters that was preventing commas from 
+  - fixed a bug in one of the code filters that was preventing commas from
     being used between \$placeholders (TR)
   - generalized the line ending regex for single-line comments (TR)
   - corrected the spelling of 'Delimiters' throughout Cheetah (TR)
   - made insertLines in Utilities.py more robust (Chuck)
   - added key argument to raising some NotFound exceptions in NameMapper (Chuck)
-  - fixed strange bug involving missing templateObj parameter 
+  - fixed strange bug involving missing templateObj parameter
     in PlaceholderProcessor.py(Chuck)
   - expanded on the docs (Mike)
 
@@ -1626,7 +1626,7 @@
   - added a few bits to the docs (TR)
   - did some internal renaming so 'nameMapperTags' are referred as 'placeholderTags' (TR)
   - added the #slurp directive (TR)
-  
+
 0.9.2
 
   - got the PSP plugin working again.  It still need test cases. (TR)
@@ -1646,14 +1646,14 @@
   - fixed a bug in Tests.py that caused an error on the first run. (TR)
   - more docs (TR + MO)
   - ! all tests pass with Python 2.1 and 2.0 (TR)
-  
+
 0.8.4
 
   - changed the #directive end tags to #end if instead of #/if and #end (TR)
     macro instead of #/macro (TR)
   - more work on the User's Guide (TR)
   - fixed a bug in TScompile (TR)
-  
+
 0.8.3
 
   - fixed a problem with the regexs that caused \$vars and #directives at the (TR)
@@ -1667,7 +1667,7 @@
   - fixed several small bugs (TR)
   - added the #comment directive and removed the old <# multiline comment tag #> (TR)
   - changed the explicit directive closure to /# from ;# (TR)
-  
+
 0.7.6
 
   - several small bug fixes (TR)

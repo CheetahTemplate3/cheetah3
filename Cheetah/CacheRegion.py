@@ -35,7 +35,7 @@ class CacheItem(object):
         - refreshTime (timestamp or None) : last time the cache was refreshed
         - data (string) : the content of the cache
     '''
-    
+
     def __init__(self, cacheItemID, cacheStore):
         self._cacheItemID = cacheItemID
         self._cacheStore = cacheStore
@@ -44,7 +44,7 @@ class CacheItem(object):
 
     def hasExpired(self):
         return (self._expiryTime and time.time() > self._expiryTime)
-    
+
     def setExpiryTime(self, time):
         self._expiryTime = time
 
@@ -74,14 +74,14 @@ class _CacheDataStoreWrapper(object):
     def __init__(self, dataStore, keyPrefix):
         self._dataStore = dataStore
         self._keyPrefix = keyPrefix
-        
+
     def get(self, key):
         return self._dataStore.get(self._keyPrefix+key)
 
     def delete(self, key):
         self._dataStore.delete(self._keyPrefix+key)
 
-    def set(self, key, val, time=0):        
+    def set(self, key, val, time=0):
         self._dataStore.set(self._keyPrefix+key, val, time=time)
 
 class CacheRegion(object):
@@ -96,7 +96,7 @@ class CacheRegion(object):
     memcached API (http://www.danga.com/memcached).
     '''
     _cacheItemClass = CacheItem
-    
+
     def __init__(self, regionID, templateCacheIdPrefix='', cacheStore=None):
         self._isNew = True
         self._regionID = regionID
@@ -110,24 +110,24 @@ class CacheRegion(object):
 
     def isNew(self):
         return self._isNew
-        
+
     def clear(self):
         " drop all the caches stored in this cache region "
         for cacheItemId in list(self._cacheItems.keys()):
             cacheItem = self._cacheItems[cacheItemId]
             cacheItem.clear()
             del self._cacheItems[cacheItemId]
-        
+
     def getCacheItem(self, cacheItemID):
         """ Lazy access to a cacheItem
 
             Try to find a cache in the stored caches. If it doesn't
             exist, it's created.
-            
+
             Returns a `CacheItem` instance.
         """
         cacheItemID = md5(str(cacheItemID).encode('ascii')).hexdigest()
-        
+
         if cacheItemID not in self._cacheItems:
             cacheItem = self._cacheItemClass(
                 cacheItemID=cacheItemID, cacheStore=self._wrappedCacheDataStore)

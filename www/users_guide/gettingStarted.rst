@@ -53,7 +53,7 @@ Python's {site-packages/} directory, use one of these options:
 
 ::
 
-        python setup.py install --home /home/tavis 
+        python setup.py install --home /home/tavis
         python setup.py install --install-lib /home/tavis/lib/python
 
 Either way installs to /home/tavis/lib/python/Cheetah/ . Of course,
@@ -126,7 +126,7 @@ following at the command prompt:
 
 ::
 
-    cheetah test 
+    cheetah test
 
 The tests will run for about three minutes and print a
 success/failure message. If the tests pass, start Python in
@@ -192,14 +192,14 @@ input. The remaining lines are Python output.
     ... $contents
     ... ## this is a single-line Cheetah comment and won't appear in the output
     ... #* This is a multi-line comment and won't appear in the output
-    ...    blah, blah, blah 
+    ...    blah, blah, blah
     ... *#
     ... </BODY>
     ... </HTML>"""
     >>> nameSpace = {'title': 'Hello World Example', 'contents': 'Hello World!'}
     >>> t = Template(templateDef, searchList=[nameSpace])
     >>> print t
-     
+
     <HTML>
     <HEAD><TITLE>Hello World Example</TITLE></HEAD>
     <BODY>

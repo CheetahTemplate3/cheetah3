@@ -26,10 +26,10 @@ class CmdLineIface:
 
     def run(self):
         """The main program controller."""
-        
+
         self._processCmdLineArgs()
         print(self._template)
-        
+
     def _processCmdLineArgs(self):
         try:
             self._opts, self._args = getopt.getopt(
@@ -43,7 +43,7 @@ class CmdLineIface:
             print(v)
             print(self.usage())
             sys.exit(2)
-        
+
         for o, a in self._opts:
             if o in ('-h', '--help'):
                 print(self.usage())
@@ -70,13 +70,13 @@ Usage
 Options
 -------
   -h, --help                 Print this help information
-  
+
   --env                      Use shell ENVIRONMENT variables to fill the
                              $placeholders in the template.
-                             
+
   --pickle <file>            Use a variables from a dictionary stored in Python
                              pickle file to fill $placeholders in the template.
-                             If <file> is - stdin is used: 
+                             If <file> is - stdin is used:
                              '%(scriptName)s --pickle -'
 
 Description

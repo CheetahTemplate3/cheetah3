@@ -43,8 +43,8 @@ lines after the previous method definition, like so:
     ... lines ...
     #end def
     #*
-    
-    
+
+
        Description of method2.
        $arg1, string, a phrase.
     *#
@@ -72,13 +72,13 @@ the following prefixes:
            on it will produce MyTemplate.py, with a class MyTemplate in it,
            containing a method .respond().  This text will be in the .respond()
            method's docstring. *#
-    
+
     ##doc-method: This text will also be added to .respond()'s docstring
     #*doc-method: This text will also be added to .respond()'s docstring *#
-    
+
     ##doc-class: This text will be added to the MyTemplate class docstring
     #*doc-class: This text will be added to the MyTemplate class docstring *#
-    
+
     ##doc-module: This text will be added to the module docstring MyTemplate.py
     #*doc-module: This text will be added to the module docstring MyTemplate.py*#
 

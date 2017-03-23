@@ -37,7 +37,7 @@ static struct PyMethodDef _template_methods[] = {
 
 PyMODINIT_FUNC init_template()
 {
-    PyObject *module = Py_InitModule3("_template", _template_methods, 
+    PyObject *module = Py_InitModule3("_template", _template_methods,
             _template_doc);
     unspecifiedModule = PyImport_ImportModule("Cheetah.Unspecified");
     if ( (PyErr_Occurred()) || (!unspecifiedModule) )

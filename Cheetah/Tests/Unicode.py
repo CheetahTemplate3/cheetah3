@@ -168,10 +168,10 @@ class EncodeUnicodeCompatTest(unittest.TestCase):
     def runTest(self):
         t = Template("""Foo ${var}""", filter='EncodeUnicode')
         t.var = u"Text with some non-ascii characters: åäö"
-        
+
         rc = t.respond()
         assert isinstance(rc, unicode), ('Template.respond() should return unicode', rc)
-        
+
         rc = str(t)
         assert isinstance(rc, str), ('Template.__str__() should return a UTF-8 encoded string', rc)
 
@@ -190,7 +190,7 @@ class Unicode_in_SearchList_Test(CommandLineTest):
         source = '''This is $foo $adjective'''
         template = self.createAndCompile(source)
         assert template and issubclass(template, Template)
-        template = template(searchList=[{'foo' : 'bar', 
+        template = template(searchList=[{'foo' : 'bar',
             'adjective' : u'\u0e22\u0e34\u0e19\u0e14\u0e35\u0e15\u0e49\u0e2d\u0e19\u0e23\u0e31\u0e1a'}])
         assert template.respond()
 

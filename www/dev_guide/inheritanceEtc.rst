@@ -142,7 +142,7 @@ In the generated class:
 ::
 
     ## GENERATED ATTRIBUTES
-    
+
     namesList = ['Moe', 'Larry', 'Curly']
 
 #def
@@ -183,12 +183,12 @@ similar to the main method:
             VFN=valueForName,
             getmtime=getmtime,
             currentTime=time.time):
-    
-    
+
+
         """
         Generated from #def printArg($arg) at line 1, col 1.
         """
-    
+
         if not trans:
             trans = DummyTransaction()
             dummyTrans = True
@@ -196,17 +196,17 @@ similar to the main method:
         SL = self._searchList
         filter = self._currentFilter
         globalSetVars = self._globalSetVars
-        
+
         ########################################
         ## START - generated method body
-        
+
         write('The argument is ')
         write(filter(arg)) # generated from '$arg' at line 2, col 17.
         write('.\n')
-        
+
         ########################################
         ## END - generated method body
-        
+
         if dummyTrans:
             return trans.response().getvalue()
         else:

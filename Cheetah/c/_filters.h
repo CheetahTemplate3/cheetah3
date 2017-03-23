@@ -21,7 +21,7 @@ extern "C" {
 #ifndef Py_RETURN_FALSE
 #define Py_RETURN_FALSE Py_INCREF(Py_False);\
     return Py_False
-#endif 
+#endif
 #ifndef Py_RETURN_NONE
 #define Py_RETURN_NONE Py_INCREF(Py_None);\
     return Py_None
@@ -37,7 +37,7 @@ typedef struct {
 } PyFilter;
 
 /*
- * End Filter Module 
+ * End Filter Module
  */
 
 #ifdef __cplusplus

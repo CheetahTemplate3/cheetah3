@@ -183,7 +183,7 @@ Cheetah:
         <tr bgcolor="grey">
       <dtml-else>
         <tr>
-      </dtml-if>    
+      </dtml-if>
       <td>
       <a href="&dtml-absolute_url;"><dtml-var title_or_id></a>
       </td></tr>
@@ -350,8 +350,8 @@ Comparisions of various Smarty constructs:
     math: eval calculation and assign to variable  (same as #set)
     popup_init: library for popup windows  (no equivalent, user can write
          custom method outputting Javascript)
-    
-    
+
+
     Other commands:
     capture   (no equivalent, collects output into variable.  A Python
          program would create a StringIO instance, set sys.stdout to
@@ -374,8 +374,8 @@ Comparisions of various Smarty constructs:
     strip   (like the #sed tag which was never implemented.  Strips
          leading/trailing whitespace from lines, joins several lines
          together.)
-    
-    
+
+
     Variable modifiers:
     capitalize    ( $STRING.capitalize() )
     count_characters    (   $len(STRING)  )

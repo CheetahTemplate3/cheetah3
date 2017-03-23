@@ -12,10 +12,10 @@ Cheetah3 is a free (BSD-style) and `open source
 <https://github.com/CheetahTemplate3/cheetah3>`_ template engine and
 code-generation tool written in `Python <http://python.org>`_. Cheetah can be
 used unto itself, or incorporated with other technologies and stacks regardless
-of whether they're written in Python or not. 
+of whether they're written in Python or not.
 
-At its core, Cheetah is a domain-specific language for markup generation and 
-templating which allows for full integration with existing Python code but also 
+At its core, Cheetah is a domain-specific language for markup generation and
+templating which allows for full integration with existing Python code but also
 offers extensions to traditional Python syntax to allow for easier text-generation.
 
 It's a fork of the `original <https://github.com/cheetahtemplate/cheetah>`_
@@ -46,13 +46,13 @@ Contents
 Cheetah in a nutshell
 ---------------------
 Below is a simple example of some Cheetah code, as you can see it's practically
-Python. You can import, inherit and define methods just like in a regular Python 
+Python. You can import, inherit and define methods just like in a regular Python
 module, since that's what your Cheetah templates are compiled to :) ::
 
     #from Cheetah.Template import Template
     #extends Template
 
-    #set $people = [{'name' : 'Tom', 'mood' : 'Happy'}, {'name' : 'Dick', 
+    #set $people = [{'name' : 'Tom', 'mood' : 'Happy'}, {'name' : 'Dick',
                             'mood' : 'Sad'}, {'name' : 'Harry', 'mood' : 'Hairy'}]
 
     <strong>How are you feeling?</strong>
@@ -72,11 +72,11 @@ Why Cheetah?
 * It is fully documented and is supported by an active user community.
 * It can output/generate any text-based format.
 * Cheetah compiles templates into optimized, yet readable, Python code.
-* It blends the power and flexibility of Python with a simple template language that non-programmers can understand. 
-* It gives template authors full access to any Python data structure, module, function, object, or method in their templates. Meanwhile, it provides a way for administrators to selectively restrict access to Python when needed. 
-* Cheetah makes code reuse easy by providing an object-oriented interface to templates that is accessible from Python code or other Cheetah templates. One template can subclass another and selectively reimplement sections of it. Cheetah templates can be subclasses of any Python class and vice-versa. 
-* It provides a simple, yet powerful, caching mechanism that can dramatically improve the performance of a dynamic website. 
-* It encourages clean separation of content, graphic design, and program code. This leads to highly modular, flexible, and reusable site architectures, shorter development time, and HTML and program code that is easier to understand and maintain. It is particularly well suited for team efforts. 
+* It blends the power and flexibility of Python with a simple template language that non-programmers can understand.
+* It gives template authors full access to any Python data structure, module, function, object, or method in their templates. Meanwhile, it provides a way for administrators to selectively restrict access to Python when needed.
+* Cheetah makes code reuse easy by providing an object-oriented interface to templates that is accessible from Python code or other Cheetah templates. One template can subclass another and selectively reimplement sections of it. Cheetah templates can be subclasses of any Python class and vice-versa.
+* It provides a simple, yet powerful, caching mechanism that can dramatically improve the performance of a dynamic website.
+* It encourages clean separation of content, graphic design, and program code. This leads to highly modular, flexible, and reusable site architectures, shorter development time, and HTML and program code that is easier to understand and maintain. It is particularly well suited for team efforts.
 * Cheetah can be used to generate static html via its command-line tool.
 
 

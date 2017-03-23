@@ -223,7 +223,7 @@ Here's one way to organize your files for Webware+Cheetah.
     www/                         # Web root directory.
         site1.example.com/       # Site subdirectory.
             apache/              # Web server document root (for non-servlets).
-            www/                 # WebKit document root. 
+            www/                 # WebKit document root.
                index.py          # http://site1.example.com/
                index.tmpl        # Source for above.
                servlet2.py       # http://site1.example.com/servlet2
@@ -237,7 +237,7 @@ Here's one way to organize your files for Webware+Cheetah.
                AppServer         # Startup program (for standard Webware).
                Configs/          # Configuration directory (for standard Webware).
                    Application.config
-                                 # Configuration file (for standard Webware). 
+                                 # Configuration file (for standard Webware).
         site2.example.org/       # Another virtual host on this computer....
 
 Initializing your template-servlet with Python code
@@ -309,7 +309,7 @@ displaying and form processing is like this:
    (Or if it's a simple method, you can define it in a {#def}.) The
    method should:
 
-   
+
    #. Get the form input if any.
 
    #. If the input variable corresponding to the submit field is
@@ -359,7 +359,7 @@ To look up a CGI GET or POST parameter (with POST overriding):
 
 ::
 
-    $request.field('myField')     
+    $request.field('myField')
     self.request().field('myField')
 
 These will fail if Webware is not available, because {$request}
@@ -426,7 +426,7 @@ From the method docstring:
 
         def webInput(self, names, namesMulti=(), default='', src='f',
             defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00, debug=False):
-    
+
     This method places the specified GET/POST fields, cookies or session variables
     into a dictionary, which is both returned and put at the beginning of the
     searchList.  It handles:
@@ -434,62 +434,62 @@ From the method docstring:
         * conversion to integer or float for specified names
         * default values/exceptions for missing or bad values
         * printing a snapshot of all values retrieved for debugging
-    All the 'default*' and 'bad*' arguments have "use or raise" behavior, meaning 
+    All the 'default*' and 'bad*' arguments have "use or raise" behavior, meaning
     that if they're a subclass of Exception, they're raised.  If they're anything
-    else, that value is substituted for the missing/bad value.  
-    
+    else, that value is substituted for the missing/bad value.
+
     The simplest usage is:
-    
+
         #silent $webInput(['choice'])
         $choice
-    
+
         dic = self.webInput(['choice'])
         write(dic['choice'])
-    
+
     Both these examples retrieves the GET/POST field 'choice' and print it.  If you
     leave off the "#silent", all the values would be printed too.  But a better way
     to preview the values is
-    
+
         #silent $webInput(['name'], $debug=1)
-    
+
     because this pretty-prints all the values inside HTML <PRE> tags.
-    
+
     Since we didn't specify any coversions, the value is a string.  It's a "single"
     value because we specified it in 'names' rather than 'namesMulti'.  Single
     values work like this:
         * If one value is found, take it.
         * If several values are found, choose one arbitrarily and ignore the rest.
         * If no values are found, use or raise the appropriate 'default*' value.
-    
+
     Multi values work like this:
         * If one value is found, put it in a list.
         * If several values are found, leave them in a list.
-        * If no values are found, use the empty list ([]).  The 'default*' 
+        * If no values are found, use the empty list ([]).  The 'default*'
           arguments are *not* consulted in this case.
-    
+
     Example: assume 'days' came from a set of checkboxes or a multiple combo box
     on a form, and the user chose "Monday", "Tuesday" and "Thursday".
-    
+
         #silent $webInput([], ['days'])
         The days you chose are: #slurp
         #for $day in $days
         $day #slurp
         #end for
-    
+
         dic = self.webInput([], ['days'])
         write("The days you chose are: ")
         for day in dic['days']:
             write(day + " ")
-    
+
     Both these examples print:  "The days you chose are: Monday Tuesday Thursday".
-    
+
     By default, missing strings are replaced by "" and missing/bad numbers by zero.
     (A "bad number" means the converter raised an exception for it, usually because
     of non-numeric characters in the value.)  This mimics Perl/PHP behavior, and
     simplifies coding for many applications where missing/bad values *should* be
     blank/zero.  In those relatively few cases where you must distinguish between
     ""/zero on the one hand and missing/bad on the other, change the appropriate
-    'default*' and 'bad*' arguments to something like: 
+    'default*' and 'bad*' arguments to something like:
         * None
         * another constant value
         * $NonNumericInputError/self.NonNumericInputError
@@ -497,7 +497,7 @@ From the method docstring:
     (NonNumericInputError is defined in this class and is useful for
     distinguishing between bad input vs a TypeError/ValueError
     thrown for some other reason.)
-    
+
     Here's an example using multiple values to schedule newspaper deliveries.
     'checkboxes' comes from a form with checkboxes for all the days of the week.
     The days the user previously chose are preselected.  The user checks/unchecks
@@ -505,7 +505,7 @@ From the method docstring:
     checkboxes that were checked when Submit was pressed.  Our task now is to
     turn on the days the user checked, turn off the days he unchecked, and leave
     on or off the days he didn't change.
-    
+
         dic = self.webInput([], ['dayCheckboxes'])
         wantedDays = dic['dayCheckboxes'] # The days the user checked.
         for day, on in self.getAllValues():
@@ -515,20 +515,20 @@ From the method docstring:
             elif on and day not in wantedDays:
                 self.TurnOff(day)
                 # ... Unset a flag or delete a database record ...
-    
+
     'source' allows you to look up the variables from a number of different
     sources:
         'f'   fields (CGI GET/POST parameters)
         'c'   cookies
         's'   session variables
         'v'   "values", meaning fields or cookies
-    
+
     In many forms, you're dealing only with strings, which is why the
     'default' argument is third and the numeric arguments are banished to
     the end.  But sometimes you want automatic number conversion, so that
     you can do numeric comparisons in your templates without having to
     write a bunch of conversion/exception handling code.  Example:
-    
+
         #silent $webInput(['name', 'height:int'])
         $name is $height cm tall.
         #if $height >= 300
@@ -536,7 +536,7 @@ From the method docstring:
         #else
         Pshaw, you're short.
         #end if
-    
+
         dic = self.webInput(['name', 'height:int'])
         name = dic[name]
         height = dic[height]
@@ -545,22 +545,22 @@ From the method docstring:
             write("Wow, you're tall!")
         else:
             write("Pshaw, you're short.")
-    
+
     To convert a value to a number, suffix ":int" or ":float" to the name.  The
     method will search first for a "height:int" variable and then for a "height"
     variable.  (It will be called "height" in the final dictionary.)  If a numeric
     conversion fails, use or raise 'badInt' or 'badFloat'.  Missing values work
     the same way as for strings, except the default is 'defaultInt' or
     'defaultFloat' instead of 'default'.
-    
-    If a name represents an uploaded file, the entire file will be read into 
+
+    If a name represents an uploaded file, the entire file will be read into
     memory.  For more sophisticated file-upload handling, leave that name out of
     the list and do your own handling, or wait for Cheetah.Utils.UploadFileMixin.
-    
-    This mixin class works only in a subclass that also inherits from 
+
+    This mixin class works only in a subclass that also inherits from
     Webware's Servlet or HTTPServlet.  Otherwise you'll get an AttributeError
     on 'self.request'.
-    
+
     EXCEPTIONS: ValueError if 'source' is not one of the stated characters.
     TypeError if a conversion suffix is not ":int" or ":float".
 

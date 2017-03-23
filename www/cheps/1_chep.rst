@@ -15,10 +15,10 @@
 
 Abstract
 --------
-One can consider the basis for all CHEP documents to be 
-modeled after `PEP #1 <http://www.python.org/dev/peps/pep-0001/>`_, 
+One can consider the basis for all CHEP documents to be
+modeled after `PEP #1 <http://www.python.org/dev/peps/pep-0001/>`_,
 for this reason you should refer to `PEP #1 <http://www.python.org/dev/peps/pep-0001/>`_
-for the true CHEP "purpose and guidelines" instead of them being 
+for the true CHEP "purpose and guidelines" instead of them being
 enumerated here (and duplicated).
 
 Copyright

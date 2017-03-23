@@ -38,7 +38,7 @@ don't need the backslash.
         and $more_conditions:
     <H1>bla</H1>
     #end if
-    
+
     #if $country in ('Argentina', 'Uruguay', 'Peru', 'Colombia',
         'Costa Rica', 'Venezuela', 'Mexico')
     <H1>Hola, senorita!</H1>
@@ -54,7 +54,7 @@ Language Constructs - Summary
 
 #. Comments and documentation strings
 
-   
+
    #. {## single line}
 
    #. {#\* multi line \*#}
@@ -62,7 +62,7 @@ Language Constructs - Summary
 
 #. Generation, caching and filtering of output
 
-   
+
    #. plain text
 
    #. look up a value: {$placeholder}
@@ -96,7 +96,7 @@ Language Constructs - Summary
 
 #. Inheritance
 
-   
+
    #. set the base class to inherit from: {#extends}
 
    #. set the name of the main method to implement: {#implements}
@@ -105,7 +105,7 @@ Language Constructs - Summary
 
 #. Compile-time declaration
 
-   
+
    #. define class attributes: {#attr} ...
 
    #. define class methods: {#def} ... {#end def}
@@ -116,7 +116,7 @@ Language Constructs - Summary
 
 #. Run-time assignment
 
-   
+
    #. local vars: {#set} ...
 
    #. global vars: {#set global} ...
@@ -126,7 +126,7 @@ Language Constructs - Summary
 
 #. Flow control
 
-   
+
    #. {#if} ... {#else} ... {#else if} (aka {#elif}) ... {#end if}
 
    #. {#unless} ... {#end unless}
@@ -148,7 +148,7 @@ Language Constructs - Summary
 
 #. error/exception handling
 
-   
+
    #. {#assert}
 
    #. {#raise}
@@ -163,7 +163,7 @@ Language Constructs - Summary
 
 #. Instructions to the parser/compiler
 
-   
+
    #. {#breakpoint}
 
    #. {#compiler-settings} ... {#end compiler-settings}
@@ -171,7 +171,7 @@ Language Constructs - Summary
 
 #. Escape to pure Python code
 
-   
+
    #. evalute expression and print the output: {<%=} ... {%>}
 
    #. execute code and discard output: {<%} ... {%>}
@@ -179,7 +179,7 @@ Language Constructs - Summary
 
 #. Fine control over Cheetah-generated Python modules
 
-   
+
    #. set the source code encoding of compiled template modules:
       {#encoding}
 
@@ -202,9 +202,9 @@ Placeholder Syntax Rules
 
    ::
 
-       $var                                        
-       ${var}                                      
-       $var2.abc['def']('gh', $subplaceholder, 2)  
+       $var
+       ${var}
+       $var2.abc['def']('gh', $subplaceholder, 2)
        ${var2.abc['def']('gh', $subplaceholder, 2)}
 
    We recommend {$} in simple cases, and {${}} when followed directly
@@ -215,8 +215,8 @@ Placeholder Syntax Rules
 
    ::
 
-       $(var)                                      
-       $[var]                                      
+       $(var)
+       $[var]
        $(var2.abc['def']('gh', $subplaceholder, 2))
        $[var2.abc['def']('gh', $subplaceholder, 2)]
 
@@ -416,14 +416,14 @@ following:
 ::
 
        $self.customers()[$ID].address()['city']       (39 chars)
-       --OR--                                         
-       $customers()[$ID].address()['city']           
-       --OR--                                         
-       $customers()[$ID].address().city              
-       --OR--                                         
-       $customers()[$ID].address.city                
-       --OR--                                         
-       $customers[$ID].address.city                   (27 chars)                     
+       --OR--
+       $customers()[$ID].address()['city']
+       --OR--
+       $customers()[$ID].address().city
+       --OR--
+       $customers()[$ID].address.city
+       --OR--
+       $customers[$ID].address.city                   (27 chars)
 
 Which of these would you prefer to explain to the designers, who
 have no programming experience? The last form is 15 characters
@@ -530,7 +530,7 @@ it searches several namespaces in order:
 
 #. The { searchList}, consisting of:
 
-   
+
    #. {#set global} variables.
 
    #. The { searchList} containers you passed to the {Template}
@@ -665,22 +665,22 @@ character:
 ::
 
     """
-    foo #set $x = 2 
+    foo #set $x = 2
     bar
     """
-    outputs 
+    outputs
     """
     foo bar
     """
-    
-    while 
+
+    while
     """
     foo #set $x = 2 #
     bar
     """
-    outputs 
+    outputs
     """
-    foo 
+    foo
     bar
     """
 
@@ -691,25 +691,25 @@ preceeding whitespace:
 ::
 
     """
-    foo 
-       #set $x = 2 
+    foo
+       #set $x = 2
     bar
     """
-    outputs 
+    outputs
     """
     foo
     bar
     """
-    
-    while 
+
+    while
     """
-    foo 
+    foo
      - #set $x = 2
     bar
     """
-    outputs 
+    outputs
     """
-    foo 
+    foo
      - bar
     """
 
@@ -724,13 +724,13 @@ on one line, it can be hard to read.
 ::
 
     #if $a# #echo $a + 1# #end if
-          - There's a space between each directive, 
+          - There's a space between each directive,
             or two extra spaces total.
     #if $a##echo $a + 1##end if
           - No spaces, but you have to look closely
             to verify none of the ``##'' are comment markers.
     #if $a##echo $a + 1##end if     ### A comment.
-          - In ``###'', the first ``#'' ends the directive, 
+          - In ``###'', the first ``#'' ends the directive,
             the other two begin the comment.  (This also shows
         how you can add extra whitespace in the directive
         tag without affecting the output.)

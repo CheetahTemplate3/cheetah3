@@ -22,7 +22,7 @@ that can't be written as simple $placeholders.
 
 ::
 
-    Here is my #echo ', '.join(['silly']*5) # example 
+    Here is my #echo ', '.join(['silly']*5) # example
 
 This produces:
 
@@ -114,11 +114,11 @@ The default is minutes.
     <HTML>
     <HEAD><TITLE>$title</TITLE></HEAD>
     <BODY>
-    
+
     $var ${var}           ## dynamic - will be reinterpolated for each request
     $*var2 $*{var2}       ## static - will be interpolated only once at start-up
     $*5*var3 $*5*{var3}   ## timed refresh - will be updated every five minutes.
-    
+
     </BODY>
     </HTML>
 
@@ -191,18 +191,18 @@ very useful.) However, repeating an argument is undefined.
     This is a static cache.  It will not be refreshed.
     $a $b $c
     #end cache
-    
+
     #cache timer='30m', id='cache1'
     #for $cust in $customers
     $cust.name:
     $cust.street - $cust.city
     #end for
     #end cache
-    
+
     #cache id='sidebar', test=$isDBUpdated
     ... left sidebar HTML ...
     #end cache
-    
+
     #cache id='sidebar2', test=($isDBUpdated or $someOtherCondition)
     ... right sidebar HTML ...
     #end cache

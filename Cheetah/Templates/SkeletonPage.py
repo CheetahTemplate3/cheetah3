@@ -66,7 +66,7 @@ class SkeletonPage(_SkeletonPage):
             for k,v in KWs.items():
                 if k in allowedKWs: cheetahKWArgs[k] = v
             self._initCheetahInstance(**cheetahKWArgs)
-        
+
 
     def writeHeadTag(self, **KWS):
 
@@ -83,10 +83,10 @@ class SkeletonPage(_SkeletonPage):
         write = trans.response().write
         SL = self._CHEETAH__searchList
         _filter = self._CHEETAH__currentFilter
-        
+
         ########################################
         ## START - generated method body
-        
+
         write(u'''<head>
 <title>''')
         _v = VFSL([locals()]+SL+[globals(), builtin],"title",True) # u'$title' on line 24, col 8
@@ -95,23 +95,23 @@ class SkeletonPage(_SkeletonPage):
 ''')
         _v = VFSL([locals()]+SL+[globals(), builtin],"metaTags",True) # u'$metaTags' on line 25, col 1
         if _v is not None: write(_filter(_v, rawExpr=u'$metaTags')) # from line 25, col 1.
-        write(u''' 
+        write(u'''
 ''')
         _v = VFSL([locals()]+SL+[globals(), builtin],"stylesheetTags",True) # u'$stylesheetTags' on line 26, col 1
         if _v is not None: write(_filter(_v, rawExpr=u'$stylesheetTags')) # from line 26, col 1.
-        write(u''' 
+        write(u'''
 ''')
         _v = VFSL([locals()]+SL+[globals(), builtin],"javascriptTags",True) # u'$javascriptTags' on line 27, col 1
         if _v is not None: write(_filter(_v, rawExpr=u'$javascriptTags')) # from line 27, col 1.
         write(u'''
 </head>
 ''')
-        
+
         ########################################
         ## END - generated method body
-        
+
         return _dummyTrans and trans.response().getvalue() or ""
-        
+
 
     def writeBody(self, **KWS):
 
@@ -128,18 +128,18 @@ class SkeletonPage(_SkeletonPage):
         write = trans.response().write
         SL = self._CHEETAH__searchList
         _filter = self._CHEETAH__currentFilter
-        
+
         ########################################
         ## START - generated method body
-        
+
         write(u'''This skeleton page has no flesh. Its body needs to be implemented.
 ''')
-        
+
         ########################################
         ## END - generated method body
-        
+
         return _dummyTrans and trans.response().getvalue() or ""
-        
+
 
     def respond(self, trans=None):
 
@@ -155,11 +155,11 @@ class SkeletonPage(_SkeletonPage):
         write = trans.response().write
         SL = self._CHEETAH__searchList
         _filter = self._CHEETAH__currentFilter
-        
+
         ########################################
         ## START - generated method body
-        
-        
+
+
         ## START CACHE REGION: ID=header. line 6, col 1 in the source.
         _RECACHE_header = False
         _cacheRegion_header = self.getCacheRegion(regionID=u'header', cacheInfo={'type': 2, u'id': u'header'})
@@ -225,7 +225,7 @@ However, please do not copy any content or images without permission.
             del _cacheCollector_header
             del _orig_transheader
         ## END CACHE REGION: header
-        
+
         write(u'''
 ''')
         _v = VFSL([locals()]+SL+[globals(), builtin],"bodyTag",True) # u'$bodyTag' on line 34, col 1
@@ -241,12 +241,12 @@ However, please do not copy any content or images without permission.
 
 
 ''')
-        
+
         ########################################
         ## END - generated method body
-        
+
         return _dummyTrans and trans.response().getvalue() or ""
-        
+
     ##################################################
     ## CHEETAH GENERATED ATTRIBUTES
 

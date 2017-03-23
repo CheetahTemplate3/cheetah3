@@ -74,9 +74,9 @@ def main():
     op = OptionParser()
     op.add_option('-f', '--file', dest='file', default=None,
             help='Specify a single file to analyze')
-    op.add_option('-d', '--dir', dest='dir', default=None, 
+    op.add_option('-d', '--dir', dest='dir', default=None,
             help='Specify a directory of templates to analyze')
-    op.add_option('--suffix', default='tmpl', dest='suffix', 
+    op.add_option('--suffix', default='tmpl', dest='suffix',
             help='Specify a custom template file suffix for the -d option (default: "tmpl")')
     opts, args = op.parse_args()
 

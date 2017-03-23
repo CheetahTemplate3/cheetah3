@@ -20,7 +20,7 @@ from Cheetah.compat import PY2
 
 optionDashesRE = re.compile(  R"^-{1,2}"  )
 moduleNameRE = re.compile(  R"^[a-zA-Z_][a-zA-Z_0-9]*$"  )
-   
+
 def fprintfMessage(stream, format, *args):
     if format[-1:] == '^':
         format = format[:-1]
@@ -61,16 +61,16 @@ def usage(usageMessage, errorMessage="", out=sys.stderr):
         out.write("*** USAGE ERROR ***: %s\n" % errorMessage)
         exitStatus = 1
     sys.exit(exitStatus)
-             
+
 
 WRAPPER_TOP = """\
          __  ____________  __
          \ \/            \/ /
           \/    *   *     \/    CHEETAH %(Version)s Command-Line Tool
-           \      |       / 
+           \      |       /
             \  ==----==  /      by Tavis Rudd <tavis@damnsimple.com>
              \__________/       and Mike Orr <sluggoster@gmail.com>
-              
+
 """ % globals()
 
 
@@ -97,7 +97,7 @@ class CheetahWrapper(object):
     MAKE_BACKUPS = True
     BACKUP_SUFFIX = ".bak"
     _templateClass = None
-    _compilerSettings = None    
+    _compilerSettings = None
 
     def __init__(self):
         self.progName = None
@@ -138,7 +138,7 @@ class CheetahWrapper(object):
             methInitial = methName[0]
             if command in (methName, methInitial):
                 sys.argv[0] += (" " + methName)
-                # @@MO: I don't necessarily agree sys.argv[0] should be 
+                # @@MO: I don't necessarily agree sys.argv[0] should be
                 # modified.
                 meth()
                 return
@@ -191,7 +191,7 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
 
 
         if opts.print_settings:
-            print() 
+            print()
             print('>> Available Cheetah compiler settings:')
             from Cheetah.Compiler import _DEFAULT_COMPILER_SETTINGS
             listing = _DEFAULT_COMPILER_SETTINGS
@@ -285,14 +285,14 @@ you do have write permission to and re-run the tests.""")
         """
         if self.opts.debug:
             fprintfMessage(sys.stderr, format, *args)
-    
+
     def warn(self, format, *args):
         """Always print a warning message to stderr.
         """
         fprintfMessage(sys.stderr, format, *args)
 
     def error(self, format, *args):
-        """Always print a warning message to stderr and exit with an error code.        
+        """Always print a warning message to stderr and exit with an error code.
         """
         fprintfMessage(sys.stderr, format, *args)
         sys.exit(1)
@@ -308,13 +308,13 @@ you do have write permission to and re-run the tests.""")
             self.opts.iext = "." + iext
         if oext and not oext.startswith("."):
             self.opts.oext = "." + oext
-    
+
 
 
     def _compileOrFill(self):
         C, D, W = self.chatter, self.debug, self.warn
         opts, files = self.opts, self.pathArgs
-        if files == ["-"]: 
+        if files == ["-"]:
             self._compileOrFillStdin()
             return
         elif not files and opts.recurse:
@@ -404,16 +404,16 @@ you do have write permission to and re-run the tests.""")
         if isError:
             what = self.isCompile and "Compilation" or "Filling"
             sys.exit("%s aborted due to collisions" % what)
-                
+
 
     def _expandSourceFiles(self, files, recurse, addIextIfMissing):
-        """Calculate source paths from 'files' by applying the 
+        """Calculate source paths from 'files' by applying the
            command-line options.
         """
         C, D, W = self.chatter, self.debug, self.warn
         idir = self.opts.idir
         iext = self.opts.iext
-        files = [] 
+        files = []
         for f in self.pathArgs:
             oldFilesLen = len(files)
             D("Expanding %s", f)
@@ -430,7 +430,7 @@ you do have write permission to and re-run the tests.""")
                     raise Error("source file '%s' is a directory" % path)
             elif os.path.isfile(path):
                 files.append(path)
-            elif (addIextIfMissing and not path.endswith(iext) and 
+            elif (addIextIfMissing and not path.endswith(iext) and
                   os.path.isfile(pathWithExt)):
                 files.append(pathWithExt)
                 # Do not recurse directories discovered by iext appending.
@@ -500,11 +500,11 @@ you do have write permission to and re-run the tests.""")
             self.error('The value of option --templateAPIClass is invalid\n'
                        'It must be in the form "module:class", '
                        'e.g. "Cheetah.Template:Template"')
-            
+
         modname, classname = modname.split(':')
 
         C('using --templateAPIClass=%s:%s'%(modname, classname))
-        
+
         if p >= 0:
             mod = getattr(__import__(modname[:p], {}, {}, [modname[p+1:]]), modname[p+1:])
         else:
@@ -528,18 +528,18 @@ you do have write permission to and re-run the tests.""")
         if self.opts.compilerSettingsString:
             try:
                 settings = eval('getkws(%s)'%self.opts.compilerSettingsString)
-            except:                
+            except:
                 self.error("There's an error in your --settings option."
                           "It must be valid Python syntax.\n"
                           +"    --settings='%s'\n"%self.opts.compilerSettingsString
-                          +"  %s: %s"%sys.exc_info()[:2] 
+                          +"  %s: %s"%sys.exc_info()[:2]
                           )
 
             validKeys = set(DEFAULT_COMPILER_SETTINGS.keys())
             if [k for k in settings if k not in validKeys]:
                 self.error(
                     'The --setting "%s" is not a valid compiler setting name.'%k)
-            
+
             self._compilerSettings = settings
             return settings
         else:
@@ -590,7 +590,7 @@ be named according to the same rules as Python modules.""" % tup)
             #output = str(TemplateClass(file=src, searchList=self.searchList))
             tclass = TemplateClass.compile(file=src, compilerSettings=compilerSettings)
             output = str(tclass(searchList=self.searchList))
-            
+
         if bak:
             shutil.copyfile(dst, bak)
         if dstDir and not os.path.exists(dstDir):
@@ -612,7 +612,7 @@ be named according to the same rules as Python modules.""" % tup)
                 f = open(dst, 'w')
             f.write(output)
             f.close()
-            
+
 
 # Called when invoked as `cheetah`
 def _cheetah():

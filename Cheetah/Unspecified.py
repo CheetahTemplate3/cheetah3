@@ -3,7 +3,7 @@ try:
 except ImportError:
     class _Unspecified:
         def __repr__(self):
-            return 'Unspecified'        
+            return 'Unspecified'
         def __str__(self):
             return 'Unspecified'
     Unspecified = _Unspecified()

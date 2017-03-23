@@ -16,7 +16,7 @@ def test_normal():
     # Make sure one template can inherit from another:
     s = plugin.render(values, template='turbocheetah.tests.import_inherit')
     assert s.strip() == 'Inherited: import'
-    
+
 def test_path():
     plugin = TurboCheetah()
     plugin.search_path = [here]
@@ -63,4 +63,4 @@ def test_string():
     plugin.search_path = [here]
     s = plugin.render(values, template_string="#extends inherit_from\ns value")
     assert s.strip() == 'inherit: s value'
-    
+

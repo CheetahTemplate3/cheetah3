@@ -22,7 +22,7 @@ def _recompile_template(package, basename, tfile, classname):
 
 class TurboCheetah:
     extension = "tmpl"
-    
+
     def __init__(self, extra_vars_func=None, options=None):
         if options is None:
             options = dict()
@@ -30,7 +30,7 @@ class TurboCheetah:
         self.options = options
         self.compiledTemplates = {}
         self.search_path = []
-    
+
     def load_template(self, template=None,
                       template_string=None, template_file=None,
                       loadingSite=False):
@@ -66,8 +66,8 @@ class TurboCheetah:
             raise ValueError("All templates must be in a package")
 
         if not self.options.get("cheetah.precompiled", False):
-            tfile = pkg_resources.resource_filename(package, 
-                                                    "%s.%s" % 
+            tfile = pkg_resources.resource_filename(package,
+                                                    "%s.%s" %
                                                     (basename,
                                                     self.extension))
             if classname in ct:
@@ -75,13 +75,13 @@ class TurboCheetah:
                 if ct[classname] != mtime:
                     ct[classname] = mtime
                     del sys.modules[classname]
-                    mod = _recompile_template(package, basename, 
+                    mod = _recompile_template(package, basename,
                                               tfile, classname)
                 else:
                     mod = __import__(classname, dict(), dict(), [basename])
             else:
                 ct[classname] = os.stat(tfile).st_mtime
-                mod = _recompile_template(package, basename, 
+                mod = _recompile_template(package, basename,
                                           tfile, classname)
         else:
             mod = __import__(classname, dict(), dict(), [basename])

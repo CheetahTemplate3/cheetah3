@@ -4,7 +4,7 @@ Provides dummy Transaction and Response classes is used by Cheetah in place
 of real Webware transactions when the Template obj is not used directly as a
 Webware servlet.
 
-Warning: This may be deprecated in the future, please do not rely on any 
+Warning: This may be deprecated in the future, please do not rely on any
 specific DummyTransaction or DummyResponse behavior
 '''
 
@@ -20,7 +20,7 @@ class DummyResponse(object):
         A dummy Response class is used by Cheetah in place of real Webware
         Response objects when the Template obj is not used directly as a Webware
         servlet
-    ''' 
+    '''
     def __init__(self):
         self._outputChunks = []
 
@@ -64,7 +64,7 @@ class DummyResponse(object):
     def writelines(self, *lines):
         ## not used
         [self.writeln(ln) for ln in lines]
-        
+
 
 class DummyTransaction(object):
     '''

@@ -1,9 +1,9 @@
-(#3) Exposing of super() and self via Template searchList 
+(#3) Exposing of super() and self via Template searchList
 =========================================================
 
 
 :CHEP: 3
-:Title: Exposing of super() and self via Template searchList 
+:Title: Exposing of super() and self via Template searchList
 :Version: 1
 :Author: R Tyler Ballance <tyler at slide.com>
 :Status: Draft

@@ -8,7 +8,7 @@ class I18n(object):
                  src, # aka message,
                  plural=None,
                  n=None, # should be a string representing the name of the
-                          # '$var' rather than $var itself                   
+                          # '$var' rather than $var itself
                  id=None,
                  domain=None,
                  source=None,
@@ -27,7 +27,7 @@ class I18n(object):
         """This is just a stub at this time.
 
            plural = the plural form of the message
-           n = a sized argument to distinguish between single and plural forms           
+           n = a sized argument to distinguish between single and plural forms
 
            id = msgid in the translation catalog
            domain = translation domain
@@ -41,14 +41,14 @@ class I18n(object):
         Other notes:
         - There is no need to replicate the i18n:name attribute from plone / PTL,
           as cheetah placeholders serve the same purpose
-    
-    
+
+
        """
-        
+
         #print macros['i18n']
         src = _(src)
         if isShortForm and endPos<len(parser):
             return src+EOLCharsInShortForm
         else:
             return src
-        
+

@@ -1,6 +1,6 @@
 '''
     Filters for the #filter directive as well as #transform
-    
+
     #filter results in output filters Cheetah's $placeholders .
     #transform results in a filter on the entirety of the output
 '''
@@ -13,16 +13,16 @@ webSafeEntities = {' ': '&nbsp;', '"': '&quot;'}
 
 class Filter(object):
     """A baseclass for the Cheetah Filters."""
-    
+
     def __init__(self, template=None):
         """Setup a reference to the template that is using the filter instance.
         This reference isn't used by any of the standard filters, but is
         available to Filter subclasses, should they need it.
-        
+
         Subclasses should call this method.
         """
         self.template = template
-        
+
     def filter(self, val, encoding=None, str=str, **kw):
         '''
             Pass Unicode strings through unmolested, unless an encoding is specified.
@@ -57,7 +57,7 @@ class Markdown(EncodeUnicode):
 
         and so on.
 
-        Markdown is meant to be used with the #transform 
+        Markdown is meant to be used with the #transform
         tag, as it's usefulness with #filter is marginal at
         best
     '''
@@ -69,14 +69,14 @@ class Markdown(EncodeUnicode):
 
 class CodeHighlighter(EncodeUnicode):
     '''
-        The CodeHighlighter filter depends on the "pygments" module which you can 
+        The CodeHighlighter filter depends on the "pygments" module which you can
         download and install from: http://pygments.org
 
         What the CodeHighlighter assumes the string that it's receiving is source
         code and uses pygments.lexers.guess_lexer() to try to guess which parser
-        to use when highlighting it. 
+        to use when highlighting it.
 
-        CodeHighlighter will return the HTML and CSS to render the code block, syntax 
+        CodeHighlighter will return the HTML and CSS to render the code block, syntax
         highlighted, in a browser
 
         NOTE: I had an issue installing pygments on Linux/amd64/Python 2.6 dealing with
@@ -113,7 +113,7 @@ class CodeHighlighter(EncodeUnicode):
 class MaxLen(Filter):
     def filter(self, val, **kw):
         """Replace None with '' and cut off at maxlen."""
-        
+
         output = super(MaxLen, self).filter(val, **kw)
         if 'maxlen' in kw and len(output) > kw['maxlen']:
             return output[:kw['maxlen']]
@@ -183,24 +183,24 @@ class StripSqueeze(Filter):
         s = super(StripSqueeze, self).filter(val, **kw)
         s = s.split()
         return " ".join(s)
-    
+
 ##################################################
 ## MAIN ROUTINE -- testing
-    
+
 def test():
     s1 = "abc <=> &"
     s2 = "   asdf  \n\t  1  2    3\n"
     print("WebSafe INPUT:", repr(s1))
     print("      WebSafe:", repr(WebSafe().filter(s1)))
-    
+
     print()
     print(" Strip INPUT:", repr(s2))
     print("       Strip:", repr(Strip().filter(s2)))
     print("StripSqueeze:", repr(StripSqueeze().filter(s2)))
 
     print("Unicode:", repr(EncodeUnicode().filter(u'aoeu12345\u1234')))
-    
-if __name__ == "__main__":  
+
+if __name__ == "__main__":
     test()
-    
+
 # vim: shiftwidth=4 tabstop=4 expandtab

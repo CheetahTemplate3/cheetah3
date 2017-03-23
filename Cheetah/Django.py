@@ -2,11 +2,11 @@ import Cheetah.Template
 
 def render(template_file, **kwargs):
     '''
-        Cheetah.Django.render() takes the template filename 
-        (the filename should be a file in your Django 
+        Cheetah.Django.render() takes the template filename
+        (the filename should be a file in your Django
         TEMPLATE_DIRS)
 
-        Any additional keyword arguments are passed into the 
+        Any additional keyword arguments are passed into the
         template are propogated into the template's searchList
     '''
     import django.http

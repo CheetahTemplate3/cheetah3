@@ -36,7 +36,7 @@ Syntax:
     #compiler-settings
     key = value    (no quotes)
     #end compiler-settings
-    
+
     #compiler-settings reset
 
 The {#compiler-settings} directive overrides Cheetah's standard
@@ -66,11 +66,11 @@ Here are some examples of what you can do:
     #compiler-settings
     commentStartToken = //
     #end compiler-settings
-    
+
     // new style of comment
-    
+
     #compiler-settings reset
-    
+
     ## back to normal comments
 
 ::
@@ -79,10 +79,10 @@ Here are some examples of what you can do:
     #compiler-settings
     directiveStartToken = %
     #end compiler-settings
-    
+
     %slurp
     %compiler-settings reset
-    
+
     #slurp
 
 Here's a partial list of the settings you can change:
@@ -90,7 +90,7 @@ Here's a partial list of the settings you can change:
 
 #. syntax settings
 
-   
+
    #. cheetahVarStartToken
 
    #. commentStartToken
@@ -106,7 +106,7 @@ Here's a partial list of the settings you can change:
 
 #. code generation settings
 
-   
+
    #. commentOffset
 
    #. outputRowColComments

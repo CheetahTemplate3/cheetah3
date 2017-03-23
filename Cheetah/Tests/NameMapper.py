@@ -15,7 +15,7 @@ class DummyClass(object):
 
     def __init__(self):
         self.instanceVar1 = 123
-        
+
     def __str__(self):
         return 'object'
 
@@ -30,13 +30,13 @@ class DummyClass(object):
 
     def meth3(self):
         """Tests a bug that Jeff Johnson reported on Oct 1, 2001"""
-        
+
         x = 'A string'
         try:
             for i in [1, 2, 3, 4]:
-                if x == 2:      
+                if x == 2:
                     pass
-                
+
                 if x == 'xx':
                     pass
             return x
@@ -54,7 +54,7 @@ def dummyFunc(arg="Scooby"):
 def funcThatRaises():
     raise ValueError
 
-                 
+
 testNamespace = {
     'aStr': 'blarg',
     'anInt': 1,
@@ -68,16 +68,16 @@ testNamespace = {
                             },
               'nestedFunc': dummyFunc,
               },
-    'aClass': DummyClass,    
+    'aClass': DummyClass,
     'aFunc': dummyFunc,
     'anObj': DummyClass(),
     'anObjThatRaises': DummyClassGetAttrRaises(),
     'aMeth': DummyClass().meth1,
-    'none': None,  
+    'none': None,
     'emptyString': '',
     'funcThatRaises': funcThatRaises,
     }
-    
+
 autoCallResults = {'aFunc': 'Scooby',
                    'aMeth': 'doo',
                    }
@@ -105,7 +105,7 @@ class NameMapperTest(unittest.TestCase):
     failureException = NotFound
     _testNamespace = testNamespace
     _results = results
-    
+
     def namespace(self):
         return self._testNamespace
 
@@ -115,7 +115,7 @@ class NameMapperTest(unittest.TestCase):
     def VFS(self, searchList, name, autocall=True):
         return valueFromSearchList(searchList, name, autocall)
 
-    
+
     # alias to be overriden later
     get = VFN
 
@@ -126,7 +126,7 @@ class NameMapperTest(unittest.TestCase):
         else:
             expected = self._results[name]
         assert got == expected
-        
+
 
 ##################################################
 ## TEST CASE CLASSES
@@ -141,7 +141,7 @@ class VFN(NameMapperTest):
         """string in dict lookup in a loop"""
         for i in range(10):
             self.check('aStr')
-            
+
     def test3(self):
         """int in dict lookup"""
         self.check('anInt')
@@ -159,7 +159,7 @@ class VFN(NameMapperTest):
         """float in dict lookup in a loop"""
         for i in range(10):
             self.check('aFloat')
-          
+
     def test7(self):
         """class in dict lookup"""
         self.check('aClass')
@@ -168,7 +168,7 @@ class VFN(NameMapperTest):
         """class in dict lookup in a loop"""
         for i in range(10):
             self.check('aClass')
-            
+
     def test9(self):
         """aFunc in dict lookup"""
         self.check('aFunc')
@@ -270,7 +270,7 @@ class VFN(NameMapperTest):
         """aDict.nestedDict in dict lookup in a loop"""
         for i in range(10):
             self.check('aDict.nestedDict')
-            
+
     def test33(self):
         """aDict.nestedDict.one in dict lookup"""
         self.check('aDict.nestedDict.one')
@@ -279,7 +279,7 @@ class VFN(NameMapperTest):
         """aDict.nestedDict.one in dict lookup in a loop"""
         for i in range(10):
             self.check('aDict.nestedDict.one')
-            
+
     def test35(self):
         """aDict.nestedFunc in dict lookup"""
         self.check('aDict.nestedFunc')
@@ -320,28 +320,28 @@ class VFN(NameMapperTest):
         """NotFound test"""
 
         def test(self=self):
-            self.get('anObj.methX')    
+            self.get('anObj.methX')
         self.assertRaises(NotFound, test)
-        
+
     def test44(self):
         """NotFound test in a loop"""
         def test(self=self):
-            self.get('anObj.methX')    
+            self.get('anObj.methX')
 
         for i in range(10):
             self.assertRaises(NotFound, test)
-            
+
     def test45(self):
         """Other exception from meth test"""
 
         def test(self=self):
-            self.get('anObj.meth2')    
+            self.get('anObj.meth2')
         self.assertRaises(ValueError, test)
-        
+
     def test46(self):
         """Other exception from meth test in a loop"""
         def test(self=self):
-            self.get('anObj.meth2')    
+            self.get('anObj.meth2')
 
         for i in range(10):
             self.assertRaises(ValueError, test)
@@ -354,7 +354,7 @@ class VFN(NameMapperTest):
         """None in dict lookup in a loop"""
         for i in range(10):
             self.check('none')
-            
+
     def test49(self):
         """EmptyString in dict lookup"""
         self.check('emptyString')
@@ -368,13 +368,13 @@ class VFN(NameMapperTest):
         """Other exception from func test"""
 
         def test(self=self):
-            self.get('funcThatRaises')    
+            self.get('funcThatRaises')
         self.assertRaises(ValueError, test)
-        
+
     def test52(self):
         """Other exception from func test in a loop"""
         def test(self=self):
-            self.get('funcThatRaises')    
+            self.get('funcThatRaises')
 
         for i in range(10):
             self.assertRaises(ValueError, test)
@@ -384,13 +384,13 @@ class VFN(NameMapperTest):
         """Other exception from func test"""
 
         def test(self=self):
-            self.get('aDict.nestedDict.funcThatRaises')    
+            self.get('aDict.nestedDict.funcThatRaises')
         self.assertRaises(ValueError, test)
-        
+
     def test54(self):
         """Other exception from func test in a loop"""
         def test(self=self):
-            self.get('aDict.nestedDict.funcThatRaises')    
+            self.get('aDict.nestedDict.funcThatRaises')
 
         for i in range(10):
             self.assertRaises(ValueError, test)
@@ -416,13 +416,13 @@ class VFN(NameMapperTest):
     def test59(self):
         """Other exception from func test -- but without autocalling shouldn't raise"""
 
-        self.get('aDict.nestedDict.funcThatRaises', False)    
-        
+        self.get('aDict.nestedDict.funcThatRaises', False)
+
     def test60(self):
         """Other exception from func test in a loop -- but without autocalling shouldn't raise"""
 
         for i in range(10):
-            self.get('aDict.nestedDict.funcThatRaises', False)    
+            self.get('aDict.nestedDict.funcThatRaises', False)
 
     def test61(self):
         """Accessing attribute where __getattr__ raises shouldn't segfault if something follows it"""
@@ -434,7 +434,7 @@ class VFN(NameMapperTest):
 
 class VFS(VFN):
     _searchListLength = 1
-    
+
     def searchList(self):
         lng = self._searchListLength
         if lng == 1:
@@ -453,23 +453,23 @@ class VFS(VFN):
             pass
         for i in [Test(), {'dummy':1234}, self.namespace(), {'dummy':1234}]:
             yield i
-  
+
     def get(self, name, autocall=True):
         return self.VFS(self.searchList(), name, autocall)
-        
+
 class VFS_2namespaces(VFS):
     _searchListLength = 2
-    
+
 class VFS_3namespaces(VFS):
     _searchListLength = 3
 
 class VFS_4namespaces(VFS):
     _searchListLength = 4
-    
-class VFF(VFN): 
+
+class VFF(VFN):
     def get(self, name, autocall=True):
         ns = self._testNamespace
-        aStr = ns['aStr'] 
+        aStr = ns['aStr']
         aFloat = ns['aFloat']
         none = 'some'
         return valueFromFrame(name, autocall)
@@ -506,14 +506,14 @@ class VFFSL(VFS):
         ns['aStr'] = res['aStr'] = 'BLARG'
         ns['aFloat'] = res['aFloat'] = 0.1234
         res['none'] = 'some'
-        
+
         del ns['anInt'] # will be picked up by globals
-        
+
     def VFFSL(self, searchList, name, autocall=True):
         anInt = 1
         none = 'some'
         return valueFromFrameOrSearchList(searchList, name, autocall)
-    
+
     def get(self, name, autocall=True):
         return self.VFFSL(self.searchList(), name, autocall)
 
@@ -543,6 +543,6 @@ class MapBuiltins(unittest.TestCase):
 
 ##################################################
 ## if run from the command line ##
-        
+
 if __name__ == '__main__':
     unittest.main()

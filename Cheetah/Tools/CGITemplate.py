@@ -22,8 +22,8 @@ Cheetah.Utils.WebInputMixin (available in all templates without importing
 anything), use Python's 'cgi' module, or make your own arrangements.
 
 This class inherits from Cheetah.Template to make it usable in Cheetah's
-single-inheritance model.  
-""" 
+single-inheritance model.
+"""
 
 import os
 from Cheetah.Template import Template
@@ -33,7 +33,7 @@ class CGITemplate(Template):
 
        Any class that inherits this mixin must also inherit Cheetah.Servlet.
     """
-    
+
 
     def cgiHeaders(self):
         """Outputs the CGI headers if this is a CGI script.
@@ -55,10 +55,10 @@ class CGITemplate(Template):
     def isCgi(self):
         """Is this a CGI script?
         """
-        env = 'REQUEST_METHOD' in os.environ 
+        env = 'REQUEST_METHOD' in os.environ
         wk = self._CHEETAH__isControlledByWebKit
         return env and not wk
 
 
-    
+
 # vim: shiftwidth=4 tabstop=4 expandtab

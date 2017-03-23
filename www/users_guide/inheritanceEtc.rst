@@ -56,9 +56,9 @@ importing works like this:
 
 ::
 
-    #extends Superclass   
+    #extends Superclass
     ## Implicitly does '#from Superclass import Superclass'.
-    
+
     #extends Cheetah.Templates.SkeletonPage
     ## Implicitly does '#from Cheetah.Templates.SkeletonPage import SkeletonPage'.
 
@@ -115,7 +115,7 @@ bottommost superclass and end with the specific template-servlet:
     1.  SiteLogic.py (pure Python class containing methods for the site)
             from Cheetah.Template import Template
             class SiteLogic(Template):
-    
+
     2.  Site.tmpl/py  (template containing the general site framework;
                        this is the template that controls the output,
                        the one that contains "<HTML><HEAD>...", the one
@@ -123,19 +123,19 @@ bottommost superclass and end with the specific template-servlet:
             #from SiteLogic import SiteLogic
             #extends SiteLogic
             #implements respond
-    
+
     3.  SectionLogic.py  (pure Python class with helper code for the section)
             from Site import Site
             class SectionLogic(Site)
-    
+
     4.  Section.tmpl/py  (template with '#def' overrides etc. for the section)
             #from SectionLogic import SectionLogic
             #extends SectionLogic
-    
+
     5.  page1Logic.py  (pure Python class with helper code for the template-servlet)
             from Section import Section
             class indexLogic(Section):
-    
+
     6.  page1.tmpl/py  (template-servlet for a certain page on the site)
             #from page1Logic import page1Logic
             #extends page1Logic
@@ -281,7 +281,7 @@ You can also use the augmented assignment operators:
 ::
 
     ## Increment $a by 5.
-    #set $a += 5      
+    #set $a += 5
 
 By default, {#set} variables are not visible in method calls or
 include files unless you use the {global} attribute: {#set global
@@ -374,10 +374,10 @@ whenever the method is later called by a $placeholder.
 ::
 
     #def myMeth()
-    This is the text in my method 
+    This is the text in my method
     $a $b $c(123)  ## these placeholder names have been defined elsewhere
     #end def
-    
+
     ## and now use it...
     $myMeth()
 
@@ -386,10 +386,10 @@ The arglist and parentheses can be omitted:
 ::
 
     #def myMeth
-    This is the text in my method 
+    This is the text in my method
     $a $b $c(123)
     #end def
-    
+
     ## and now use it...
     $myMeth
 
@@ -399,10 +399,10 @@ just like in Python. Remember the {$} before variable names:
 ::
 
     #def myMeth($a, $b=1234)
-    This is the text in my method 
+    This is the text in my method
     $a - $b
     #end def
-    
+
     ## and now use it...
     $myMeth(1)
 
@@ -410,7 +410,7 @@ The output from this last example will be:
 
 ::
 
-    This is the text in my method 
+    This is the text in my method
     1 - 1234
 
 There is also a single line version of the {#def} directive. {
@@ -420,7 +420,7 @@ the method signature and body}:
 ::
 
     #attr $adj = 'trivial'
-    #def myMeth: This is the $adj method 
+    #def myMeth: This is the $adj method
     $myMeth
 
 Leading and trailing whitespace is stripped from the method. This
@@ -471,10 +471,10 @@ location of the reimplementation.
 ::
 
     #block testBlock
-    Text in the contents 
+    Text in the contents
     area of the block directive
     #if $testIt
-    $getFoo() 
+    $getFoo()
     #end if
     #end block testBlock
 
@@ -486,16 +486,16 @@ as you wish.
 ::
 
     #block outerBlock
-    Outer block contents 
-    
+    Outer block contents
+
     #block innerBlock1
-    inner block1 contents 
+    inner block1 contents
     #end block innerBlock1
-    
+
     #block innerBlock2
-    inner block2 contents 
+    inner block2 contents
     #end block innerBlock2
-    
+
     #end block outerBlock
 
 Note that the name of the block is optional for the {#end block}

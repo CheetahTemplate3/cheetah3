@@ -13,7 +13,7 @@ from distutils.core import setup
 if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
     try:
         from setuptools import setup
-    except ImportError:   
+    except ImportError:
         from distutils.core import setup
 
 from distutils.core import Command
@@ -57,7 +57,7 @@ class mod_build_ext(build_ext):
         except ext_errors as x:
             raise BuildFailed(x)
 
-   
+
 class mod_install_data(install_data):
     """A modified version of the disutils install_data command that allows data
     files to be included directly in the installed Python package tree.
@@ -76,11 +76,11 @@ class mod_install_data(install_data):
         if not self.dry_run:
             self.mkpath(self.install_dir)
         data_files = self.get_inputs()
-        
+
         for entry in data_files:
             if not isinstance(entry, string_type):
                 raise ValueError('The entries in "data_files" must be strings')
-            
+
             entry = os.sep.join(entry.split('/'))
             # entry is a filename or glob pattern
             if entry.startswith('recursive:'):
@@ -90,7 +90,7 @@ class mod_install_data(install_data):
                 filenames = findFiles(dir, globPatterns)
             else:
                 filenames = glob.glob(entry)
-            
+
             for filename in filenames:
                 ## generate the dstPath from the filename
                 # - deal with 'package_dir' translations
@@ -117,7 +117,7 @@ class mod_install_data(install_data):
                 else:
                     outfile = dstPath
                 self.outfiles.append(outfile)
-        
+
 ##################################################
 ## FUNCTIONS ##
 

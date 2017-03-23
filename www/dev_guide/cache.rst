@@ -72,7 +72,7 @@ The generated code, with line numbers:
     16      del cacheCollector
     17  write(self._cacheData['19760169'])
     18  ## END CACHE REGION
-        
+
     19  write('\n')
 
 That one little star generated a whole lotta code. First, instead
@@ -146,7 +146,7 @@ The generated code:
     11      orig_trans = trans
     12      trans = cacheCollector = DummyTransaction()
     13      write = cacheCollector.response().write
-    14      write(filter(VFS(SL,"voom",1))) # generated from '$*.5m*voom' at 
+    14      write(filter(VFS(SL,"voom",1))) # generated from '$*.5m*voom' at
                 # line 1, col 15.
     15      trans = orig_trans
     16      write = trans.response().write
@@ -154,7 +154,7 @@ The generated code:
     18      del cacheCollector
     19  write(self._cacheData['55048032'])
     20  ## END CACHE REGION
-        
+
     21  write('\n')
 
 This code is identical to the static cache example except for the
@@ -218,7 +218,7 @@ cache-refresh if-block:
 
 ::
 
-    write(filter(VFS(SL,"voom",1))) # generated from '$*.5m*{voom}' at line 1, 
+    write(filter(VFS(SL,"voom",1))) # generated from '$*.5m*{voom}' at line 1,
         #col 17.
 
 If you try to do it this way:
@@ -270,7 +270,7 @@ The generated code:
      9      trans = cacheCollector = DummyTransaction()
     10      write = cacheCollector.response().write
     11      write('This is a cached region.  ')
-    12      write(filter(VFS(SL,"voom",1))) # generated from '$voom' at line 2, 
+    12      write(filter(VFS(SL,"voom",1))) # generated from '$voom' at line 2,
                 # col 27.
     13      write('\n')
     14      trans = orig_trans

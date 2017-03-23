@@ -7,13 +7,13 @@ class Error(Exception):
 
 class ErrorCatcher:
     _exceptionsToCatch = (NotFound,)
-    
+
     def __init__(self, templateObj):
         pass
-    
+
     def exceptions(self):
         return self._exceptionsToCatch
-    
+
     def warn(self, exc_val, code, rawCode, lineCol):
         return rawCode
 ## make an alias
@@ -25,12 +25,12 @@ class BigEcho(ErrorCatcher):
 
 class KeyError(ErrorCatcher):
     def warn(self, exc_val, code, rawCode, lineCol):
-        raise KeyError("no '%s' in this Template Object's Search List" % rawCode) 
+        raise KeyError("no '%s' in this Template Object's Search List" % rawCode)
 
 class ListErrors(ErrorCatcher):
     """Accumulate a list of errors."""
     _timeFormat = "%c"
-    
+
     def __init__(self, templateObj):
         ErrorCatcher.__init__(self, templateObj)
         self._errors = []
@@ -42,7 +42,7 @@ class ListErrors(ErrorCatcher):
                                      time.localtime(time.time()))
         self._errors.append(dict)
         return rawCode
-    
+
     def listErrors(self):
         """Return the list of errors."""
         return self._errors

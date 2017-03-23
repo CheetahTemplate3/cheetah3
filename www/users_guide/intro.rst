@@ -89,7 +89,7 @@ Cheetah's design was guided by these principles:
    code separately, it should be easy to integrate them together into
    a website. In particular, it should be easy:
 
-   
+
    -  for **programmers** to create reusable components and functions
       that are accessible and understandable to designers.
 
@@ -140,7 +140,7 @@ basic syntax:
     <HTML>
     <HEAD><TITLE>$title</TITLE></HEAD>
     <BODY>
-    
+
     <TABLE>
     #for $client in $clients
     <TR>
@@ -149,7 +149,7 @@ basic syntax:
     </TR>
     #end for
     </TABLE>
-    
+
     </BODY>
     </HTML>
 
@@ -160,7 +160,7 @@ Compare this with PSP:
     <HTML>
     <HEAD><TITLE><%=title%></TITLE></HEAD>
     <BODY>
-    
+
     <TABLE>
     <% for client in clients: %>
     <TR>
@@ -169,7 +169,7 @@ Compare this with PSP:
     </TR>
     <%end%>
     </TABLE>
-    
+
     </BODY>
     </HTML>
 
@@ -186,9 +186,9 @@ itself again to display a **personalized** friendly greeting.
 
 ::
 
-    <HTML><HEAD><TITLE>My Template-Servlet</TITLE></HEAD><BODY>   
+    <HTML><HEAD><TITLE>My Template-Servlet</TITLE></HEAD><BODY>
     #set $name = $request.field('name', None)
-    #if $name  
+    #if $name
     Hello $name
     #else
     <FORM ACTION="" METHOD="GET">
@@ -208,7 +208,7 @@ To try it out for yourself on a Webware system:
    .py template module) in the same directory.
 
 #. In your web browser, go to ``test.py``, using whatever site and
-   directory is appropriate. 
+   directory is appropriate.
 
 At the first request, field 'name' will be blank (false) so the
 "#else" portion will execute and present a form. You type your name

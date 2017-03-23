@@ -50,7 +50,7 @@ The generated code:
 ::
 
             write('Here is my ')
-            ', '.join(['silly']*5) 
+            ', '.join(['silly']*5)
             write(' example\n')
 
 OK, it's not quite covert because that extra space gives it away,
@@ -176,11 +176,11 @@ The generated code:
 
 ::
 
-    write(self._includeCheetahSource(VFS(SL,"y",1), trans=trans, 
+    write(self._includeCheetahSource(VFS(SL,"y",1), trans=trans,
         includeFrom="str", raw=0, includeID="481020889808.74"))
-    write(self._includeCheetahSource(VFS(SL,"y",1), trans=trans, 
+    write(self._includeCheetahSource(VFS(SL,"y",1), trans=trans,
         includeFrom="str", raw=1, includeID="711020889808.75"))
-    write(self._includeCheetahSource("Bam!  Bam!", trans=trans, 
+    write(self._includeCheetahSource("Bam!  Bam!", trans=trans,
         includeFrom="str", raw=0, includeID="1001020889808.75"))
 
 Later in the generated class:
@@ -275,7 +275,7 @@ The generated code:
      5      filter = self._currentFilter = self._filters[filterName]
      6  else:
      7      filter = self._currentFilter = \
-     8                  self._filters[filterName] = getattr(self._filtersLib, 
+     8                  self._filters[filterName] = getattr(self._filtersLib,
                            filterName)(self).filter
      9  write(filter(VFS(SL,"ode",1))) # generated from '$ode' at line 4, col 1.
     10  write('\n')
@@ -284,13 +284,13 @@ The generated code:
     13      filter = self._currentFilter = self._filters[filterName]
     14  else:
     15      filter = self._currentFilter = \
-    16                  self._filters[filterName] = getattr(self._filtersLib, 
+    16                  self._filters[filterName] = getattr(self._filtersLib,
                            filterName)(self).filter
-    17  write(filter(VFS(SL,"ode",1), maxlen=13)) # generated from 
+    17  write(filter(VFS(SL,"ode",1), maxlen=13)) # generated from
             #'${ode, maxlen=13}' at line 6, col 1.
     18  write('\n')
     19  filter = self._initialFilter
-    20  write(filter(VFS(SL,"ode",1), maxlen=13)) # generated from 
+    20  write(filter(VFS(SL,"ode",1), maxlen=13)) # generated from
            #'${ode, maxlen=13}' at line 8, col 1.
     21  write('\n')
 

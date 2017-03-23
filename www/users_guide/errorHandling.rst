@@ -25,20 +25,20 @@ details. The following Cheetah code demonstrates their use:
     #except
       It failed
     #end try
-    
+
     #try
       #assert $x == $y
     #except AssertionError
       They're not the same!
     #end try
-    
+
     #try
       #raise ValueError
     #except ValueError
       #pass
     #end try
-    
-    
+
+
     #try
       $mightFail()
     #except ValueError
@@ -48,7 +48,7 @@ details. The following Cheetah code demonstrates their use:
     #else
       It didn't raise anything!
     #end try
-    
+
     #try
       $mightFail()
     #finally
@@ -86,13 +86,13 @@ ErrorCatchers:
 
     class ErrorCatcher:
         _exceptionsToCatch = (NameMapper.NotFound,)
-        
+
         def __init__(self, templateObj):
             pass
-        
+
         def exceptions(self):
             return self._exceptionsToCatch
-        
+
         def warn(self, exc_val, code, rawCode, lineCol):
             return rawCode
 

@@ -184,7 +184,7 @@ argument sequence is different than {super} uses.
     # Place this in a module SOMEWHERE.py .  Contributed by Edmund Lian.
     class CallbaseError(AttributeError):
         pass
-    
+
     def callbase(obj, base, methodname='__init__', args=(), kw={},
         raiseIfMissing=None):
         try: method = getattr(base, methodname)
@@ -485,20 +485,20 @@ InquiryTemplate itself depends on ErrorsTemplate.
 ::
 
     all:  inquiry  receive
-    
+
     .PHONY:  all  receive  inquiry  printsource
-    
+
     printsource:
             a2ps InquiryTemplate.tmpl ErrorsTemplate.tmpl
-    
+
     ErrorsTemplate.py:  ErrorsTemplate.tmpl
             cheetah compile ErrorsTemplate.tmpl
-    
+
     InquiryTemplate.py:  InquiryTemplate.tmpl ErrorsTemplate.py
             cheetah compile InquiryTemplate.tmpl
-    
+
     inquiry: InquiryTemplate.py  ErrorsTemplate.py
-    
+
     receive: ErrorsTemplate.py
 
 Now you can type {make} anytime and it will recompile all the
@@ -525,7 +525,7 @@ template instances should not be shared unless you either:
 
 -  Avoid thread-unsafe features:
 
-   
+
    -  Modifying searchList values or instance variables.
 
    -  Caching ({$\*var}, {#cache}, etc).

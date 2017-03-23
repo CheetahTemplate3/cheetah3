@@ -12,7 +12,7 @@ maintainer = "Oleg Broytman"
 maintainer_email = "phd@phdru.name"
 url = "https://cheetahtemplate3.github.io/"
 packages = ['Cheetah',
-            'Cheetah.Macros',            
+            'Cheetah.Macros',
             'Cheetah.Templates',
             'Cheetah.Tests',
             'Cheetah.Tools',
@@ -49,11 +49,11 @@ import os.path
 from distutils.core import Extension
 
 ext_modules=[
-             Extension("Cheetah._namemapper", 
+             Extension("Cheetah._namemapper",
                         [os.path.join('Cheetah', 'c', '_namemapper.c')]),
-           #  Extension("Cheetah._verifytype", 
+           #  Extension("Cheetah._verifytype",
            #             [os.path.join('Cheetah', 'c', '_verifytype.c')]),
-           #  Extension("Cheetah._filters", 
+           #  Extension("Cheetah._filters",
            #             [os.path.join('Cheetah', 'c', '_filters.c')]),
            #  Extension('Cheetah._template',
            #             [os.path.join('Cheetah', 'c', '_template.c')]),

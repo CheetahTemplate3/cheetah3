@@ -46,7 +46,7 @@ static int wrapInternalNotFoundException(char *fullName, PyObject *namespace)
     PyObject *newExcValue = NULL;
     if (!ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS) {
         return 0;
-    } 
+    }
 
     if (!PyErr_Occurred()) {
         return 0;
@@ -64,11 +64,11 @@ static int wrapInternalNotFoundException(char *fullName, PyObject *namespace)
             Py_DECREF(isAlreadyWrapped);
         }
         else {
-           newExcValue = excValue; 
+           newExcValue = excValue;
         }
         PyErr_Restore(excType, newExcValue, excTraceback);
         return -1;
-    } 
+    }
     return 0;
 }
 
@@ -79,7 +79,7 @@ static int isInstanceOrClass(PyObject *nextVal) {
     if((PyInstance_Check(nextVal)) || (PyClass_Check(nextVal))) {
         return 1;
     }
-#endif 
+#endif
 
     if (!PyObject_HasAttrString(nextVal, "__class__")) {
         return 0;
@@ -94,7 +94,7 @@ static int isInstanceOrClass(PyObject *nextVal) {
         return 0;
 
     /* method, func, or builtin func */
-    if (PyObject_HasAttrString(nextVal, "__func__") 
+    if (PyObject_HasAttrString(nextVal, "__func__")
         || PyObject_HasAttrString(nextVal, "__code__")
         || PyObject_HasAttrString(nextVal, "__self__")) {
         return 0;
@@ -110,7 +110,7 @@ static int isInstanceOrClass(PyObject *nextVal) {
 }
 
 
-static int getNameChunks(char *nameChunks[], char *name, char *nameCopy) 
+static int getNameChunks(char *nameChunks[], char *name, char *nameCopy)
 {
     char c;
     char *currChunk;
@@ -120,7 +120,7 @@ static int getNameChunks(char *nameChunks[], char *name, char *nameCopy)
     while ('\0' != (c = *nameCopy)){
     if ('.' == c) {
         if (currChunkNum >= (MAXCHUNKS-2)) { /* avoid overflowing nameChunks[] */
-            PyErr_SetString(TooManyPeriods, name); 
+            PyErr_SetString(TooManyPeriods, name);
             return 0;
         }
 
@@ -128,7 +128,7 @@ static int getNameChunks(char *nameChunks[], char *name, char *nameCopy)
         nameChunks[currChunkNum++] = currChunk;
         nameCopy++;
         currChunk = nameCopy;
-    } else 
+    } else
         nameCopy++;
     }
     if (nameCopy > currChunk) {
@@ -214,7 +214,7 @@ static PyObject *PyNamemapper_valueForName(PyObject *obj, char *nameChunks[], in
             Py_DECREF(currentVal);
         }
 
-        if (executeCallables && PyCallable_Check(nextVal) && 
+        if (executeCallables && PyCallable_Check(nextVal) &&
                 (isInstanceOrClass(nextVal) == 0) ) {
             if (!(currentVal = PyObject_CallObject(nextVal, NULL))) {
                 Py_DECREF(nextVal);
@@ -267,7 +267,7 @@ static PyObject *namemapper_valueForName(PYARGS)
         return NULL;
     }
 
-    createNameCopyAndChunks();  
+    createNameCopyAndChunks();
 
     theValue = PyNamemapper_valueForName(obj, nameChunks, numChunks, executeCallables);
     free(nameCopy);
@@ -349,7 +349,7 @@ static PyObject *namemapper_valueFromFrameOrSearchList(PyObject *self, PyObject 
 
     static char *kwlist[] = {"searchList", "name", "executeCallables", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, keywds, "Os|i", kwlist,  &searchList, &name, 
+    if (!PyArg_ParseTupleAndKeywords(args, keywds, "Os|i", kwlist,  &searchList, &name,
                     &executeCallables)) {
         return NULL;
     }
@@ -357,7 +357,7 @@ static PyObject *namemapper_valueFromFrameOrSearchList(PyObject *self, PyObject 
     createNameCopyAndChunks();
 
     nameSpace = PyEval_GetLocals();
-    checkForNameInNameSpaceAndReturnIfFound(FALSE);  
+    checkForNameInNameSpaceAndReturnIfFound(FALSE);
 
     iterator = PyObject_GetIter(searchList);
     if (iterator == NULL) {
@@ -457,7 +457,7 @@ static struct PyModuleDef namemappermodule = {
     PyModuleDef_HEAD_INIT,
     "_namemapper",
     NULL, /* docstring */
-    -1, 
+    -1,
     namemapper_methods,
     NULL,
     NULL,
@@ -471,7 +471,7 @@ PyMODINIT_FUNC PyInit__namemapper(void)
 DL_EXPORT(void) init_namemapper(void)
 {
     PyObject *m = Py_InitModule3("_namemapper", namemapper_methods, NULL);
-#endif 
+#endif
 
     PyObject *d, *pprintMod;
 

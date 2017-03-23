@@ -6,7 +6,7 @@ Overview
 This guide needs to really be filled out more
 
 .. toctree::
-    :maxdepth: 1 
+    :maxdepth: 1
 
     introduction.rst
     compiler.rst

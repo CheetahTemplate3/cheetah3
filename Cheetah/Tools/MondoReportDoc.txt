@@ -1,4 +1,4 @@
-MondoReport Documentation  
+MondoReport Documentation
 Version 0.01 alpha 24-Nov-2001.  iron@mso.oz.net or mso@oz.net.
 Copyright (c) 2001 Mike Orr.  License: same as Python or Cheetah.
 
@@ -18,7 +18,7 @@ generic functions you may find useful in other programs.  This file contains an
 overview, syntax reference and examples.  The module is designed both for
 standalone use and for integration with the Cheetah template system
 (https://cheetahtemplate3.github.io/), so the examples are in both Python and
-Cheetah.  The main uses of MondoReport are: 
+Cheetah.  The main uses of MondoReport are:
 
 (A) to iterate through a list.  In this sense MR is a for-loop enhancer,
 providing information that would be verbose to calculate otherwise.
@@ -125,7 +125,7 @@ prefer to do this:
 
     for (key, value), a, b in mr.page(20, 40):
         print key, "=>", value
-    
+
     #for ($key, $value), $a, $b in $mr.page(20, $start)
         $key =&gt; $value
     #end for
@@ -133,7 +133,7 @@ prefer to do this:
 * * * * *
 STATISTICS METHODS AND FIELD VALUES
 
-Certain methods below have an optional argument 'field'.  If specified, 
+Certain methods below have an optional argument 'field'.  If specified,
 MondoReport will look up that field in each affected record and use its value
 in the calculation.  MondoReport uses Cheetah's NameMapper if available,
 otherwise it uses a minimal NameMapper substitute that looks for an attribute
@@ -170,10 +170,10 @@ The record's position starting from 1.  This is always '.index() + 1'.
 
 The letter ("A", "B", "C") corresponding to .number().  Undefined if .number()
 > 26.  The current implementation just adds the offset to 'a' and returns
-whatever character it happens to be.  
+whatever character it happens to be.
 
 To make a less dumb implementation (e.g., "Z, AA, BB" or "Z, A1, B1"):
-1) Subclass BatchRecord and override the .Letter method. 
+1) Subclass BatchRecord and override the .Letter method.
 2) Subclass MondoReport and set the class variable .BatchRecordClass to your
 new improved class.
 
@@ -217,7 +217,7 @@ as 'r', but it's useful for previous/next batches.
 
     .size()
 
-The 'size' argument used when this BatchRecord was created.  
+The 'size' argument used when this BatchRecord was created.
 'a.size() == b.size()'.
 
     .first()
@@ -230,7 +230,7 @@ True if this is the last record.
 
     .firstValue(field=None)
 
-True if there is no previous record, or if the previous field/record has a 
+True if there is no previous record, or if the previous field/record has a
 different value.  Used for to print section headers.  For instance, if you
 are printing addresses by country, this will be true at the first occurrance
 of each country.  Or for indexes, you can have a non-printing field showing
@@ -277,7 +277,7 @@ pages.  [Not implemented yet.]
 With no arguments, returns the HTML query string with start value removed (so
 you can append a new start value in your hyperlink).  The query string is taken
 from the 'QUERY_STRING' environmental variable, or "" if missing.  (This is
-Webware compatible.)  
+Webware compatible.)
 
 With 'start' (an integer >= 0), returns the query string with an updated start
 value, normally for the next or previous batch.
@@ -291,7 +291,7 @@ Useful if you have another CGI parameter "start" that's used for something
 else.
 
 With 'attribs' (a dictionary), adds these attributes to the hyperlink.
-For instance, 'attribs={"target": "_blank"}'.  Ignored unless 'label' is 
+For instance, 'attribs={"target": "_blank"}'.  Ignored unless 'label' is
 specified too.
 
 This method assumes the start parameter is a GET variable, not a POST variable.
@@ -330,9 +330,9 @@ Number of records on that page.
 [Not implemented yet.]
 
 Similar to 'a.query()' and 'b.query()', but automatically calculates the start
-value for the appropriate page.  
+value for the appropriate page.
 
-For fancy HTML formatting, 'before' is prepended to the returned text and 
+For fancy HTML formatting, 'before' is prepended to the returned text and
 'after' is appended.  (There was an argument 'else_' for if there is no such
 batch, but it was removed because you can't even get to this method at all in
 that case.)
