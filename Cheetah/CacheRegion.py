@@ -1,4 +1,3 @@
-# $Id: CacheRegion.py,v 1.3 2006/01/28 04:19:30 tavis_rudd Exp $
 '''
 Cache holder classes for Cheetah:
 

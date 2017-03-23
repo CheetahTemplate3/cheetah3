@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# $Id: setup.py,v 1.15 2005/01/03 17:58:41 tavis_rudd Exp $
 import os
 
 try:

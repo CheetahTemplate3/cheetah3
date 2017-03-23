@@ -1,4 +1,3 @@
-# $Id: SiteHierarchy.py,v 1.1 2001/10/11 03:25:54 tavis_rudd Exp $
 """Create menus and crumbs from a site hierarchy.
 
 You define the site hierarchy as lists/tuples.  Each location in the hierarchy

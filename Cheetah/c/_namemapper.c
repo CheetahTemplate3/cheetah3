@@ -4,11 +4,10 @@ DocStrings in NameMapper for details on the purpose and interface of this
 module.
 
 ===============================================================================
-$Id: _namemapper.c,v 1.34 2007/12/10 18:25:20 tavis_rudd Exp $
 Authors: Tavis Rudd <tavis@damnsimple.com>
-Version: $Revision: 1.34 $
+Version: 1.34
 Start Date: 2001/08/07
-Last Revision Date: $Date: 2007/12/10 18:25:20 $
+Last Revision Date: 2007/12/10 18:25:20
 */
 
 /* *************************************************************************** */
