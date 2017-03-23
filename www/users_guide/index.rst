@@ -7,7 +7,6 @@ Cheetah User's Guide
     intro.rst
     glossary.rst
     gettingStarted.rst
-    howItWorks.rst
     language.rst
     comments.rst
     output.rst
