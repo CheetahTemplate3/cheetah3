@@ -18,6 +18,7 @@ Cheetah User's Guide
 
     tipsAndTricks.rst
     webware.rst
+    otherHtml.rst
     nonHtml.rst
     libraries.rst
     editors.rst
