@@ -1,5 +1,3 @@
-from turbocheetah import cheetahsupport
-
-TurboCheetah = cheetahsupport.TurboCheetah
+from .cheetahsupport import TurboCheetah
 
 __all__ = ["TurboCheetah"]

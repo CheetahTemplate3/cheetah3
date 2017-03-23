@@ -1,5 +1,5 @@
 import os
-from turbocheetah import TurboCheetah
+from ..cheetahsupport import TurboCheetah
 
 here = os.path.dirname(__file__)
 
