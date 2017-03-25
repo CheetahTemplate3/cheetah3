@@ -5,6 +5,9 @@ sudo: required
 
 language: python
 
+python:
+  - "3.6"
+
 cache: pip
 
 env:
@@ -12,6 +15,7 @@ env:
   - TOXENV=py33
   - TOXENV=py34
   - TOXENV=py35
+  - TOXENV=py36
   - TOXENV=pypy
 
 matrix:
