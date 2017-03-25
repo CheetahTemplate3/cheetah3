@@ -1,0 +1,20 @@
+#! /bin/sh
+
+if [ -z "$1" -o -n "$2" ]; then
+   echo "Usage: $0 new_tag" >&2
+   exit 1
+else
+   tag="$1"
+fi
+
+. `dirname $0`/split.sh &&
+split_tag $tag
+
+if [ $micro -eq 0 ]; then
+   git checkout master
+else
+   git checkout maint
+fi &&
+
+`git var GIT_EDITOR` ANNOUNCE.rst www/news.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py &&
+exec git commit --message="Release $tag" ANNOUNCE.rst www/news.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py

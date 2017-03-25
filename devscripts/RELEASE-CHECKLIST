@@ -1,0 +1,30 @@
+0. Run full test suite in all branches. Continue if all tests passed.
+
+1. Run ../prerelease $NEW_TAG.
+
+1a. The script checks out the release branch ('maint' for a bug-fix
+    release, 'master' for minor or major release) and calls editor; update
+    version, the list of contributors, the list of changes and download
+    URL in ANNOUNCE.rst; if it is a stable release - edit www/news.rst to
+    set release date. Edit Version.py and README.rst in the release branch
+    - fix versions. Edit section [egg_info] in setup.cfg - set if it is a
+    stable or development release. In SetupConfig.py edit "Development
+    Status" in trove classifiers; edit dev_tag or download URL: if a
+    non-stable version - append 'dev' and date stamp, for a stable version
+    remove 'dev' and date stamp). Commit. Verify. Null-merge upward.
+
+2. Run ../prerelease-tag $NEW_TAG. This checks out the release branch and
+   creates the new tag at the head of the release branch.
+
+3. Run ../release. This generates and uploads new archives to PyPI.
+
+4. Hide/show old releases at PyPI.
+
+5. Generate new docs using ./build-all-docs. Upload docs using
+   ./publish-docs.
+
+6. Run ../push-all in the development repository to push all branches
+   and tags to the public repositories.
+
+7. Send announcement to the Cheetah mailing list. For a stable release
+   send announcements to python and python-announce mailing lists.

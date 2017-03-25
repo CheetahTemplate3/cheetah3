@@ -5,12 +5,16 @@ import sys
 # CheetahTemplate3 seems to be too long.
 name = 'CT3'
 from Cheetah.Version import Version as version
+description = "Cheetah is a template engine and code generation tool"
 license = "MIT"
 author = "Tavis Rudd"
 author_email = "tavis@damnsimple.com"
 maintainer = "Oleg Broytman"
 maintainer_email = "phd@phdru.name"
 url = "https://cheetahtemplate3.github.io/"
+dev_tag = ""
+download_url = "https://pypi.python.org/pypi/%s/%s%s" % (name, version, dev_tag)
+del dev_tag
 packages = ['Cheetah',
             'Cheetah.Macros',
             'Cheetah.Templates',
@@ -81,8 +85,6 @@ if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
         }
     except ImportError:
         pass
-
-description = "Cheetah is a template engine and code generation tool."
 
 long_description = '''\
 Cheetah3 is a free (BSD-style) and open source template engine and code
