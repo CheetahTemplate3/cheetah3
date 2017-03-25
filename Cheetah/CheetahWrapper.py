@@ -599,6 +599,10 @@ be named according to the same rules as Python modules.""" % tup)
             else:
                 os.makedirs(dstDir)
         if self.opts.stdout:
+            if not PY2:
+                encoding = self.opts.encoding
+                if encoding and isinstance(output, bytes):
+                    output = output.decode(encoding)
             sys.stdout.write(output)
         else:
             encoding = self.opts.encoding
