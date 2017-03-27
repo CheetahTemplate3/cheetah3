@@ -9,7 +9,7 @@ Contributions have been made by:
 * Chuck Esterbrook <echuck at mindspring.com>
 * Shannon JJ Behrens <jjinux at gmail.com>
 * Ian Bicking <ian at ianbicking.org>
-* R. Tyler Croy <tyler at monkeypox.org>
+* \R. Tyler Croy <tyler at monkeypox.org>
 * James Abbatiello <abbeyj at gmail.com>
 * Jean-Baptiste Quenot <jbq at caraldi.com>
 * Marc Abramowitz <marc at marc-abramowitz.com>
