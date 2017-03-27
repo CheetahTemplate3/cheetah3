@@ -15,7 +15,7 @@ Home Page, issue tracker
     - https://github.com/CheetahTemplate3/cheetah3
 
 On-line Documentation
-    - https://cheetahtemplate3.github.io/
+    - http://cheetahtemplate.org/
 
 
 Third-party Cheetah Stuff

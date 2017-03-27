@@ -14,12 +14,12 @@ Documentation
 -------------
 
 For a high-level introduction to Cheetah please refer to the User's Guide
-at https://cheetahtemplate3.github.io/users_guide/index.html
+at http://cheetahtemplate.org/users_guide/index.html
 
 Credits
 -------
 
-https://cheetahtemplate3.github.io/authors.html
+http://cheetahtemplate.org/authors.html
 
 https://github.com/CheetahTemplate3/cheetah3/blob/master/LICENSE
 

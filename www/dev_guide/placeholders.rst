@@ -135,7 +135,7 @@ Let's add a few $placeholders to our template:
      83 # CHEETAH was developed by Tavis Rudd, Chuck Esterbrook, Ian Bicking
             # and Mike Orr;
      84 # with code, advice and input from many other volunteers.
-     85 # For more information visit https://cheetahtemplate3.github.io/
+     85 # For more information visit http://cheetahtemplate.org/
 
      86 ##################################################
      87 ## if run from command line:

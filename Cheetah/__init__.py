@@ -9,7 +9,7 @@ Homepage, issue tracker
     https://github.com/CheetahTemplate3/cheetah3
 
 Documentation
-    https://cheetahtemplate3.github.io/
+    http://cheetahtemplate.org/
 '''
 
 from Cheetah.Version import *

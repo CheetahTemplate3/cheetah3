@@ -35,7 +35,7 @@ Where is CheetahTemplate3
 =========================
 
 Site:
-https://cheetahtemplate3.github.io/
+http://cheetahtemplate.org/
 
 Development:
 https://github.com/CheetahTemplate3
