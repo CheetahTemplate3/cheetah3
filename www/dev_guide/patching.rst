@@ -84,7 +84,7 @@ The general procedure for modifying Cheetah is as follows:
    below.
 
 #. When {cheetah test} runs cleanly with your regression test
-   included, update the {CHANGES} file and check in your changes. If
+   included, update the {www/news.rst} file and check in your changes. If
    you made the changes in your installed copy of Cheetah, you'll have
    to copy them back into the CVS sandbox first. If you added any
    files that must be distributed, { be sure to} {cvs add} them before

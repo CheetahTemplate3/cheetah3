@@ -44,4 +44,4 @@ Download:
 https://pypi.python.org/pypi/CT3/3.0.0a0.dev20170110
 
 News and changes:
-https://github.com/CheetahTemplate3/cheetah3/blob/next/CHANGES
+http://cheetahtemplate.org/news.html

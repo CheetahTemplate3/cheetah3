@@ -69,7 +69,7 @@ scripts = ('bin/cheetah-compile',
            'bin/cheetah-analyze',
         )
 
-data_files = ['recursive: Cheetah *.tmpl *.txt LICENSE README TODO CHANGES',]
+data_files = ['recursive: Cheetah *.tmpl *.txt *.rst LICENSE README.rst TODO']
 
 if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
     try:
@@ -109,7 +109,6 @@ https://github.com/CheetahTemplate3/cheetah3/blob/master/LICENSE
 
 Recent Changes
 ================================================================================
-See https://github.com/CheetahTemplate3/cheetah3/blob/master/CHANGES
-for full details
+See http://cheetahtemplate.org/news.html for full details
 
 '''
