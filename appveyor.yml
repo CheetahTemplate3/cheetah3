@@ -1,0 +1,68 @@
+# Install and test Cheetah on windows
+# Heavily inspired by Oliver Grisel's appveyor-demo (https://github.com/ogrisel/python-appveyor-demo)
+version: 3.0.{build}
+
+# Match travis
+clone_depth: 50
+
+environment:
+  global:
+    # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
+    # /E:ON and /V:ON options are not enabled in the batch script intepreter
+    # See: http://stackoverflow.com/a/13751649/163740
+    CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\run_with_env.cmd"
+
+  matrix:
+    - PYTHON: "C:\\Python27"
+      PYTHON_VERSION: "2.7"
+      PYTHON_ARCH: "32"
+      TOX_ENV: "py27"
+    - PYTHON: "C:\\Python27-x64"
+      PYTHON_VERSION: "2.7"
+      PYTHON_ARCH: "64"
+      TOX_ENV: "py27"
+    - PYTHON: "C:\\Python33"
+      PYTHON_VERSION: "3.3"
+      PYTHON_ARCH: "32"
+      TOX_ENV: "py33"
+    - PYTHON: "C:\\Python33-x64"
+      PYTHON_VERSION: "3.3"
+      PYTHON_ARCH: "64"
+      TOX_ENV: "py33"
+    - PYTHON: "C:\\Python34"
+      PYTHON_VERSION: "3.4"
+      PYTHON_ARCH: "32"
+      TOX_ENV: "py34"
+    - PYTHON: "C:\\Python34-x64"
+      PYTHON_VERSION: "3.4"
+      PYTHON_ARCH: "64"
+      TOX_ENV: "py34"
+    - PYTHON: "C:\\Python35"
+      PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "32"
+      TOX_ENV: "py35"
+    - PYTHON: "C:\\Python35-x64"
+      PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "64"
+      TOX_ENV: "py35"
+    - PYTHON: "C:\\Python36"
+      PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "32"
+      TOX_ENV: "py36"
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "64"
+      TOX_ENV: "py36"
+
+install:
+  # Ensure we use the right python version
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - "python --version"
+  - "pip --version"
+  - "pip install tox"
+
+# No build step - _namemapper extension will be built under tox
+build: false
+
+test_script:
+  - "%CMD_IN_ENV% tox -e %TOX_ENV%"
