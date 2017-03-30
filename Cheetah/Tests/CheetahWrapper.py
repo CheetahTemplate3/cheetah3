@@ -65,11 +65,14 @@ class CFBase(unittest.TestCase):
            files.
         """
         self.cmd = self.locate_cheetah('cheetah')
-        pythonPath = os.getcwd()
+        cwd = os.getcwd()
         if not os.environ.get('PYTHONPATH'):
-            os.environ['PYTHONPATH'] = pythonPath
+            os.environ['PYTHONPATH'] = cwd
         else:
-            os.environ['PYTHONPATH'] = '%s:%s' % (os.environ['PYTHONPATH'], pythonPath)
+            pythonPath = os.environ['PYTHONPATH']
+            if (pythonPath != cwd) and \
+                    not pythonPath.endswith(':%s' % cwd):
+                os.environ['PYTHONPATH'] = '%s:%s' % (pythonPath, cwd)
         I = self.inform
         # Step 1: Create the scratch directory and chdir into it.
         self.scratchDir = scratchDir = tempfile.mktemp()
