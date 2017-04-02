@@ -10,7 +10,6 @@ chmod -R a+rX . &&
 python setup.py build_ext &&
 python setup.py build &&
 python setup.py sdist &&
-twine register dist/Cheetah3-"`python setup.py --version`".tar.gz &&
 
 for py in 2.7 3.4 3.5 3.6; do
    find build -name '*.py[co]' -delete &&
@@ -30,5 +29,6 @@ for py in 2.7 3.4 3.5 3.6; do
    fi || exit 1
 done
 
+twine register dist/Cheetah3-"`python setup.py --version`".tar.gz &&
 twine upload --sign dist/* &&
 exec rm -rf build dist docs/html SQLObject.egg-info
