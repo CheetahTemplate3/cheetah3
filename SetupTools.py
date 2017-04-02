@@ -1,13 +1,7 @@
-#!/usr/bin/env python
+from glob import glob
 import os
-from os import listdir
 import os.path
-from os.path import exists, isdir, isfile, join, splitext
 import sys
-import types
-import glob
-import string
-import traceback
 
 from distutils.core import setup
 if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
@@ -89,7 +83,7 @@ class mod_install_data(install_data):
                 globPatterns = entry.split()[1:]
                 filenames = findFiles(dir, globPatterns)
             else:
-                filenames = glob.glob(entry)
+                filenames = glob(entry)
 
             for filename in filenames:
                 ## generate the dstPath from the filename
