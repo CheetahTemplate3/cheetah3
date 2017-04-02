@@ -1,21 +1,25 @@
 Hello!
 
-I'm pleased to announce version 3.0.0a1, the first alpha of the upcoming
+I'm pleased to announce version 3.0.0a2, the second alpha of the upcoming
 release of branch 3.0 of CheetahTemplate3.
+
+I'm pleased to announce version 3.0.0b1, the first beta of the upcoming
+release of branch 3.0 of CheetahTemplate3.
+
+I'm pleased to announce version 3.0.0rc1, the first release candidate
+of the upcoming release of branch 3.0 of CheetahTemplate3.
+
+I'm pleased to announce version 3.0.0, the first stable release of branch
+3.0 of CheetahTemplate3.
+
+I'm pleased to announce version 3.3.1, the first bugfix release of branch
+3.0 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
 
 Contributors for this release are Adam Karpierz and Jonathan Ross Rogers.
-
-- !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
-- Stop supporting Python older than 2.7.
-- Update code to work with Python 3.3+. Tested with 3.3, 3.4, 3.5 and 3.6.
-- Run tests at Travis (Linux) and AppVeyor (w32) with Python 2.7, 3.3, 3.4,
-  3.5 and 3.6; x86 and x64.
-- Fix a bug in multiple inheritance (#extend Parent1, Parent2).
-  Pull request by Jonathan Ross Rogers.
 
 
 What is CheetahTemplate3
@@ -37,7 +41,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.python.org/pypi/Cheetah3/3.0.0a1
+https://pypi.python.org/pypi/Cheetah3/3.0.0a2.dev20170402
 
 News and changes:
 http://cheetahtemplate.org/news.html
