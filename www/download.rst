@@ -1,8 +1,8 @@
 Downloading Cheetah
 ===================
 
-* You can download wheels, eggs and tarballs of Cheetah from the `Python
-  Package Index <http://pypi.python.org/pypi/CT3>`_.
+You can download wheels, eggs and tarballs of Cheetah from the `Python
+Package Index <http://pypi.python.org/pypi/CT3>`_.
 
 You can keep up to date with release candidates or other downloads of
 Cheetah by visiting the `CheetahTemplate GitHub page
@@ -10,4 +10,5 @@ Cheetah by visiting the `CheetahTemplate GitHub page
 
 **Note to Windows users:** You should install the compiled version of
 Cheetah's NameMapper. It is dramatically faster than the pure Python
-version.
+version. Installing from wheels from PyPI is the simplest way to get the
+precompiled NameMapper extension.
