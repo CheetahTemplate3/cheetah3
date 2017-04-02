@@ -10,7 +10,7 @@ chmod -R a+rX . &&
 python setup.py build_ext &&
 python setup.py build &&
 python setup.py sdist &&
-twine register dist/CT3-"`python setup.py --version`".tar.gz &&
+twine register dist/Cheetah3-"`python setup.py --version`".tar.gz &&
 
 for py in 2.7 3.4 3.5 3.6; do
    find build -name '*.py[co]' -delete &&
@@ -22,7 +22,7 @@ for py in 2.7 3.4 3.5 3.6; do
    python$py setup.py bdist_wheel &&
    if [ "`echo $py | cut -c1`" -eq 3 ]; then
       cd dist &&
-      for f in CT3-*-linux_i686.whl; do
+      for f in Cheetah3-*-linux_i686.whl; do
          python$py -m auditwheel repair -w . $f &&
          rm $f
       done &&

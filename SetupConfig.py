@@ -3,7 +3,7 @@ import sys
 
 # Cheetah3 has already been taken at PyPI,
 # CheetahTemplate3 seems to be too long.
-name = 'CT3'
+name = 'Cheetah3'
 from Cheetah.Version import Version as version
 description = "Cheetah is a template engine and code generation tool"
 license = "MIT"
