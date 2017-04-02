@@ -5,7 +5,8 @@ News
   - !!!THIS RELEASE REQUIRES RECOMPILATION OF ALL COMPILED CHEETAH TEMPLATES!!!
   - Stop supporting Python older than 2.7.
   - Update code to work with Python 3.3+. Tested with 3.3, 3.4, 3.5 and 3.6.
-  - Run tests at Travis and AppVeyor with Python 2.7, 3.3, 3.4, 3.5 and 3.6.
+  - Run tests at Travis (Linux) and AppVeyor (w32) with Python 2.7, 3.3, 3.4,
+    3.5 and 3.6; x86 and x64.
   - Fix a bug in multiple inheritance (#extend Parent1, Parent2).
     Pull request by Jonathan Ross Rogers.
 
