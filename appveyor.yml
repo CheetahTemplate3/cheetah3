@@ -2,6 +2,9 @@
 # Heavily inspired by Oliver Grisel's appveyor-demo (https://github.com/ogrisel/python-appveyor-demo)
 version: '{branch}-{build}'
 
+cache:
+  - '%LOCALAPPDATA%\pip\Cache'
+
 # Match travis
 clone_depth: 50
 
