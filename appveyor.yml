@@ -61,6 +61,7 @@ install:
   # Ensure we use the right python version
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "python --version"
+  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
   - "pip --version"
   - "pip install tox"
 
