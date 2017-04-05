@@ -1,6 +1,6 @@
 # Install and test Cheetah on windows
 # Heavily inspired by Oliver Grisel's appveyor-demo (https://github.com/ogrisel/python-appveyor-demo)
-version: 3.0.{build}
+version: '{branch}-{build}'
 
 # Match travis
 clone_depth: 50
