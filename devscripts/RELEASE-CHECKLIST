@@ -25,14 +25,13 @@
    ./publish-docs.
 
 6. Run ../postrelease. The script checks out master and null-merge maint.
-   The script restores ANNOUNCE.rst from the previous commit (HEAD~).
-   It calls editor; update next version, remove the list of contributors
-   and the list of changes, edit download URL in ANNOUNCE.rst. Edit
-   www/news.rst - add new version. Edit Version.py and README.rst - fix
-   versions. Edit appveyor.yml - comment out wheel/msi building. Edit
-   section [egg_info] in setup.cfg. In SetupConfig.py edit "Development
-   Status" in trove classifiers; edit dev_tag or download URL. Commit.
-   Verify.
+   The script restores ANNOUNCE.rst and appveyor.yml from the previous
+   commit (HEAD~). It calls editor; update next version, remove the list
+   of contributors and the list of changes, edit download URL in
+   ANNOUNCE.rst. Edit www/news.rst - add new version. Edit Version.py and
+   README.rst - fix versions. Edit section [egg_info] in setup.cfg. In
+   SetupConfig.py edit "Development Status" in trove classifiers; edit
+   dev_tag or download URL. Commit. Verify.
 
 7. Run ../push-all in the development repository to push all branches
    and tags to the public repositories.
