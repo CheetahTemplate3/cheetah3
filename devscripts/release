@@ -21,7 +21,8 @@ for py in 2.7 3.4 3.5 3.6; do
    python$py setup.py bdist_wheel &&
    if [ "`echo $py | cut -c1`" -eq 3 ]; then
       cd dist &&
-      for f in Cheetah3-*-linux_i686.whl; do
+      v="`echo $py | sed 's/\.//'`"
+      for f in Cheetah3-*-cp$v-*-linux_i686.whl; do
          python$py -m auditwheel repair -w . $f &&
          rm $f
       done &&
@@ -31,4 +32,5 @@ done
 
 twine register dist/Cheetah3-"`python setup.py --version`".tar.gz &&
 twine upload --sign dist/* &&
+
 exec rm -rf build dist docs/html SQLObject.egg-info
