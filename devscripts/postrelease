@@ -1,7 +1,14 @@
 #! /bin/sh
 
-git checkout master &&
-git merge --strategy=ours maint &&
+tag="`python setup.py --version`" &&
+
+. `dirname $0`/split.sh &&
+split_tag $tag
+
+if [ $micro -eq 0 -a $state = final ]; then
+   git checkout master &&
+   git merge --strategy=ours maint
+fi &&
 
 git checkout HEAD~ ANNOUNCE.rst &&
 
