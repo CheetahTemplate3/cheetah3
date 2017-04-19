@@ -15,6 +15,7 @@ import unittest
 
 from Cheetah.Tests import SyntaxAndOutput
 from Cheetah.Tests import NameMapper
+from Cheetah.Tests import NameMapper_pure
 from Cheetah.Tests import Misc
 from Cheetah.Tests import Filters
 from Cheetah.Tests import Template
@@ -30,6 +31,7 @@ SyntaxAndOutput.install_eols()
 suites = [
    unittest.findTestCases(SyntaxAndOutput),
    unittest.findTestCases(NameMapper),
+   unittest.findTestCases(NameMapper_pure),
    unittest.findTestCases(Filters),
    unittest.findTestCases(Template),
    #unittest.findTestCases(Cheps),

@@ -9,6 +9,8 @@ News
     3.5 and 3.6; x86 and x64.
   - Fix a bug in multiple inheritance (#extend Parent1, Parent2).
     Pull request by Jonathan Ross Rogers.
+  - Fix bugs in pure-python NameMapper.py. Bugs reported by Noah Ingham,
+    patches by Adam Karpierz, tests by Oleg Broytman.
 
 
 `Older news`_

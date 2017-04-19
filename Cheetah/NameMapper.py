@@ -139,8 +139,9 @@ Cheetah uses the optimized C version (_namemapper.c) if it has
 been compiled or falls back to the Python version if not.
 """
 
-from pprint import pformat
+from collections import Mapping
 import inspect
+from pprint import pformat
 from Cheetah.compat import PY2
 
 _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS = False
@@ -205,7 +206,7 @@ def _isInstanceOrClass(obj):
 
 def hasKey(obj, key):
     """Determine if 'obj' has 'key' """
-    if hasattr(obj, '__contains__') and key in obj:
+    if isinstance(obj, Mapping) and key in obj:
         return True
     elif hasattr(obj, key):
         return True
@@ -213,7 +214,7 @@ def hasKey(obj, key):
         return False
 
 def valueForKey(obj, key):
-    if hasattr(obj, '__contains__') and key in obj:
+    if isinstance(obj, Mapping) and key in obj:
         return obj[key]
     elif hasattr(obj, key):
         return getattr(obj, key)
@@ -221,10 +222,9 @@ def valueForKey(obj, key):
         _raiseNotFoundException(key, obj)
 
 def _valueForName(obj, name, executeCallables=False):
-    nameChunks=name.split('.')
-    for i in range(len(nameChunks)):
-        key = nameChunks[i]
-        if hasattr(obj, '__contains__') and key in obj:
+    nameChunks = name.split('.')
+    for key in nameChunks:
+        if isinstance(obj, Mapping) and key in obj:
             nextObj = obj[key]
         else:
             try:
@@ -303,6 +303,7 @@ def hasName(obj, name):
         return True
     except NotFound:
         return False
+
 try:
     from Cheetah._namemapper import NotFound, valueForKey, valueForName, \
          valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
@@ -368,6 +369,3 @@ def example():
 
 if __name__ == '__main__':
     example()
-
-
-
