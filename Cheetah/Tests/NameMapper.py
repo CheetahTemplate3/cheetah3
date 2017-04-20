@@ -7,7 +7,8 @@ import os.path
 
 import unittest
 from Cheetah.NameMapper import NotFound, valueForKey, \
-     valueForName, valueFromSearchList, valueFromFrame, valueFromFrameOrSearchList
+     valueForName, valueFromSearchList, valueFromFrame, \
+     valueFromFrameOrSearchList
 
 
 class DummyClass(object):
