@@ -11,6 +11,7 @@ News
     Pull request by Jonathan Ross Rogers.
   - Fix bugs in pure-python NameMapper.py. Bugs reported by Noah Ingham,
     patches by Adam Karpierz, tests by Oleg Broytman.
+  - Fix a problem in Unicode tests - cleanup temporary files.
 
 
 `Older news`_

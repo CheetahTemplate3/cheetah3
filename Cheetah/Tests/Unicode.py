@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- encoding: utf8 -*-
 
+from glob import glob
 import imp
 import os
 import sys
+from shutil import rmtree
 import tempfile
 import unittest
 from Cheetah.Template import Template
@@ -31,6 +33,12 @@ class CommandLineTest(unittest.TestCase):
         module_path, module_name = os.path.split(sourcefile)
         module = loadModule(module_name, [module_path])
         template = getattr(module, module_name)
+        os.remove('%s.tmpl' % sourcefile)
+        for sourcefile_py in glob('%s.py*' % sourcefile):  # *.py[co]
+            os.remove(sourcefile_py)
+        __pycache__ = os.path.join(os.path.dirname(sourcefile), '__pycache__')
+        if os.path.exists(__pycache__):  # PY3
+            rmtree(__pycache__)
         return template
 
 class JBQ_UTF8_Test1(unittest.TestCase):
