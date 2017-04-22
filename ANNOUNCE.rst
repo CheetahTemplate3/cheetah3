@@ -1,25 +1,17 @@
 Hello!
 
-I'm pleased to announce version 3.0.0a2, the second alpha of the upcoming
-release of branch 3.0 of CheetahTemplate3.
-
 I'm pleased to announce version 3.0.0b1, the first beta of the upcoming
 release of branch 3.0 of CheetahTemplate3.
-
-I'm pleased to announce version 3.0.0rc1, the first release candidate
-of the upcoming release of branch 3.0 of CheetahTemplate3.
-
-I'm pleased to announce version 3.0.0, the first stable release of branch
-3.0 of CheetahTemplate3.
-
-I'm pleased to announce version 3.3.1, the first bugfix release of branch
-3.0 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
 
-Contributors for this release are Adam Karpierz and Jonathan Ross Rogers.
+Contributor for this release is Adam Karpierz.
+
+- Fix bugs in pure-python NameMapper.py. Bugs reported by Noah Ingham,
+  patches by Adam Karpierz, tests by Oleg Broytman.
+- Fix a problem in Unicode tests - cleanup temporary files.
 
 
 What is CheetahTemplate3
@@ -41,7 +33,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.python.org/pypi/Cheetah3/3.0.0a2.dev20170402
+https://pypi.python.org/pypi/Cheetah3/3.0.0b1
 
 News and changes:
 http://cheetahtemplate.org/news.html
