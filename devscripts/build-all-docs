@@ -1,9 +1,15 @@
 #! /bin/sh
 
-cd "`dirname \"$0\"`"/cheetah3 &&
+PROG_DIR="`dirname \"$0\"`" &&
+cd "$PROG_DIR" &&
+PROG_DIR="`pwd`" &&
+
+cd "$PROG_DIR"/cheetah3 &&
 ../build-docs &&
-rsync -ahP --del --exclude=.git --exclude=.nojekyll --exclude=CNAME \
+rsync -ahP --del --exclude=/.git --exclude=/.nojekyll \
+   --exclude=/CNAME --exclude=/robots.txt \
    www/html/ ../cheetahtemplate3.github.io/ &&
 
 cd ../cheetahtemplate3.github.io &&
+sitemap_gen.py --config="$PROG_DIR"/cheetahtemplate.org-sitemapconfig.xml &&
 exec git status
