@@ -7,6 +7,7 @@ chmod -R a+rX . &&
 set-commit-date.py &&
 ../build-docs &&
 
+if [ ! -d build ]; then mkdir build; fi &&
 python setup.py sdist &&
 
 for py in 2.7 3.4 3.5 3.6; do
