@@ -1,5 +1,5 @@
-Cheetah Template 3.0.0b3
-========================
+Cheetah Template 3.0.0rc1
+=========================
 
 Cheetah3 is a free (BSD-style) and open source template engine and code
 generation tool.
