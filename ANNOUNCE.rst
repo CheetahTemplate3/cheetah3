@@ -1,13 +1,16 @@
 Hello!
 
-I'm pleased to announce version 3.0.0rc1, the first release candidate
-of the upcoming release of branch 3.0 of CheetahTemplate3.
+I'm pleased to announce version 3.0.0, the first stable release of branch
+3.0 of CheetahTemplate3.
+
+I'm pleased to announce version 3.0.1, the first bugfix release of branch
+3.0 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
 
-Minor changes in the release process.
+Contributors for this release are Adam Karpierz and Jonathan Ross Rogers.
 
 
 What is CheetahTemplate3
@@ -29,7 +32,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.python.org/pypi/Cheetah3/3.0.0rc1
+https://pypi.python.org/pypi/Cheetah3/3.0.0
 
 News and changes:
 http://cheetahtemplate.org/news.html
