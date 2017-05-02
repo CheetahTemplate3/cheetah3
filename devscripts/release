@@ -18,7 +18,7 @@ for py in 2.7 3.4 3.5 3.6; do
    python$py setup.py bdist_egg &&
    python$py setup.py bdist_wheel &&
    cd dist &&
-   v="`echo $py | sed 's/\.//'`"
+   v="`echo $py | sed 's/\.//'`" &&
    for f in Cheetah3-*-cp$v-*-linux_i686.whl; do
       if [ $py = 2.7 ]; then
          python3.4 -m auditwheel repair -w . $f
@@ -28,7 +28,7 @@ for py in 2.7 3.4 3.5 3.6; do
       rm $f
    done &&
    cd ..
-done
+done &&
 
 twine register dist/Cheetah3-"`python setup.py --version`".tar.gz &&
 twine upload --sign dist/* &&
