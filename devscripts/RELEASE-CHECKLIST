@@ -15,7 +15,8 @@
     date stamp). Commit. Verify. Null-merge upward.
 
 2. Run ../prerelease-tag $NEW_TAG. This checks out the release branch and
-   creates the new tag at the head of the release branch.
+   creates the new tag at the head of the release branch. Push the branch
+   and the tag to start test/build.
 
 3. Run ../release. This generates and uploads new archives to PyPI.
 
