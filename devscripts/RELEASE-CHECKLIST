@@ -12,7 +12,7 @@
     release. In SetupConfig.py edit "Development Status" in trove
     classifiers; edit dev_tag or download URL: if a non-stable version -
     append 'dev' and date stamp, for a stable version remove 'dev' and
-    date stamp). Commit. Verify. Null-merge upward.
+    date stamp). Commit. Verify.
 
 2. Run ../prerelease-tag $NEW_TAG. This checks out the release branch and
    creates the new tag at the head of the release branch. Push the branch
@@ -32,7 +32,7 @@
    ANNOUNCE.rst. Edit www/news.rst - add new version. Edit Version.py and
    README.rst - fix versions. Edit section [egg_info] in setup.cfg. In
    SetupConfig.py edit "Development Status" in trove classifiers; edit
-   dev_tag or download URL. Commit. Verify.
+   dev_tag or download URL. Commit. Verify. Fast-forward next to master.
 
 7. Run ../push-all in the development repository to push all branches
    and tags to the public repositories.
