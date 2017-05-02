@@ -1,4 +1,4 @@
-Cheetah Template 3.0.0b2
+Cheetah Template 3.0.0b3
 ========================
 
 Cheetah3 is a free (BSD-style) and open source template engine and code
