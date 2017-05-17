@@ -1657,7 +1657,7 @@ class _HighLevelParser(_LowLevelParser):
                 self.setPos(pos)
 
         if not foundComment and self.matchDirectiveEndToken():
-                self.getDirectiveEndToken()
+            self.getDirectiveEndToken()
         elif isLineClearToStartToken and (not self.atEnd()) and self.peek() in '\r\n':
             # still gobble the EOL if a comment was found.
             self.readToEOL(gobble=True)

@@ -4,5 +4,5 @@ from Cheetah.Template import Template
 
 
 class Boinker(Template):
-        def boink(self):
-                return [1, 2, 3]
+    def boink(self):
+        return [1, 2, 3]

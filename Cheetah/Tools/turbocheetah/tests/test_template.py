@@ -63,4 +63,3 @@ def test_string():
     plugin.search_path = [here]
     s = plugin.render(values, template_string="#extends inherit_from\ns value")
     assert s.strip() == 'inherit: s value'
-

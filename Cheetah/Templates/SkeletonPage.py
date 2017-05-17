@@ -283,5 +283,3 @@ if not hasattr(SkeletonPage, '_initCheetahAttributes'):
 if __name__ == '__main__':
     from Cheetah.TemplateCmdLineIface import CmdLineIface
     CmdLineIface(templateObj=SkeletonPage()).run()
-
-

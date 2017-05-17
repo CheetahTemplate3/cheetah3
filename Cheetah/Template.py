@@ -1878,7 +1878,7 @@ class Template(Servlet):
         # 'dic = super(ThisClass, self).webInput(names, namesMulti, ...)'
         # and then the code below.
         if debug:
-           print("<PRE>\n" + pprint.pformat(dic) + "\n</PRE>\n\n")
+            print("<PRE>\n" + pprint.pformat(dic) + "\n</PRE>\n\n")
         self.searchList().insert(0, dic)
         return dic
 

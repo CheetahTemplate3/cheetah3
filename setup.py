@@ -10,7 +10,3 @@ import SetupTools
 import SetupConfig
 configurations = (SetupConfig,)
 SetupTools.run_setup( configurations )
-
-
-
-

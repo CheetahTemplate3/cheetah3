@@ -106,4 +106,3 @@ class TransformerTransaction(object):
         if self._response:
             return self._response
         return TransformerResponse()
-

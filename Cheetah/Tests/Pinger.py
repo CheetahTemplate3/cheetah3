@@ -4,5 +4,5 @@ from Cheetah.Template import Template
 
 
 class Pinger(Template):
-        def ping(self):
-                return 'pong'
+    def ping(self):
+        return 'pong'

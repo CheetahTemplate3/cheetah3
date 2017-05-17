@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+Minor features:
+
+  - Code cleanup: fix indentation.
+
 3.0.0 (2017-05-07)
 ------------------
 

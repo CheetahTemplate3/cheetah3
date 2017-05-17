@@ -46,5 +46,3 @@ class ListErrors(ErrorCatcher):
     def listErrors(self):
         """Return the list of errors."""
         return self._errors
-
-

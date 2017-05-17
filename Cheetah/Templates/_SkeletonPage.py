@@ -195,4 +195,3 @@ class _SkeletonPage(Template):
                 metaTagsTxt += ['<meta name="', str(name), '" content="', str(contents),
                                 '" />\n']
         return ''.join(metaTagsTxt)
-

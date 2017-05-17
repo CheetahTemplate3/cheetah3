@@ -17,4 +17,3 @@ class SettingsManagerTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

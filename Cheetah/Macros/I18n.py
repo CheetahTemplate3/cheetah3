@@ -51,4 +51,3 @@ class I18n(object):
             return src+EOLCharsInShortForm
         else:
             return src
-

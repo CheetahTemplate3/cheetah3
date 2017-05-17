@@ -120,4 +120,3 @@ class Indenter(object):
         if self.On:
             return self.Chars * self.Level
         return " " * _default
-

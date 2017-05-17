@@ -291,4 +291,3 @@ class SettingsManager(_SettingsCollector):
         newSettings = self.readSettingsFromConfigFileObj(inFile, convert=convert)
         self.updateSettings(newSettings,
                             merge=newSettings.get('mergeSettings', merge))
-
