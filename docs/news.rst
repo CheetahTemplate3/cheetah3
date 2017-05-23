@@ -8,6 +8,10 @@ Minor features:
 
   - Code cleanup: fix indentation.
 
+Documentation:
+
+  - Rename www directory to docs.
+
 3.0.0 (2017-05-07)
 ------------------
 

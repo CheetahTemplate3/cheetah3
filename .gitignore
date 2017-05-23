@@ -7,6 +7,6 @@
 Cheetah3.egg-info/
 build
 dist
-www/*.html
-www/_build/
-www/html/
+docs/*.html
+docs/_build/
+docs/html/

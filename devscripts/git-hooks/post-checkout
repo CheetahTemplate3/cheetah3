@@ -9,7 +9,7 @@ new_branch="$3"
 if [ "$new_branch" = 1 ]; then
    # if branch was changed - remove old bytecode files and outdated docs
    find . -name '*.py[co]' -delete &&
-   rm -rf www/html
+   rm -rf docs/html
 fi &&
 
 python    -m compileall -q -x '\.tox/.+' . &&

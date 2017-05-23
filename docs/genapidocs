@@ -2,4 +2,4 @@
 
 cd "`dirname $0`"/.. &&
 exec sphinx-apidoc --separate --module-first --suffix=rst --force \
-   --output-dir=www/api Cheetah
+   --output-dir=docs/api Cheetah

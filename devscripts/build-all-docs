@@ -8,7 +8,7 @@ cd "$PROG_DIR"/cheetah3 &&
 ../build-docs &&
 rsync -ahP --del --exclude=/.git --exclude=/.nojekyll \
    --exclude=/CNAME --exclude=/robots.txt \
-   www/html/ ../cheetahtemplate3.github.io/ &&
+   docs/html/ ../cheetahtemplate3.github.io/ &&
 
 cd ../cheetahtemplate3.github.io &&
 sitemap_gen.py --config="$PROG_DIR"/cheetahtemplate.org-sitemapconfig.xml &&
