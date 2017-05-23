@@ -36,3 +36,26 @@ https://pypi.python.org/pypi/Cheetah3/3.0.0
 
 News and changes:
 http://cheetahtemplate.org/news.html
+
+
+Example
+=======
+
+Below is a simple example of some Cheetah code, as you can see it's practically
+Python. You can import, inherit and define methods just like in a regular Python
+module, since that's what your Cheetah templates are compiled to :) ::
+
+    #from Cheetah.Template import Template
+    #extends Template
+
+    #set $people = [{'name' : 'Tom', 'mood' : 'Happy'}, {'name' : 'Dick',
+                            'mood' : 'Sad'}, {'name' : 'Harry', 'mood' : 'Hairy'}]
+
+    <strong>How are you feeling?</strong>
+    <ul>
+        #for $person in $people
+            <li>
+                $person['name'] is $person['mood']
+            </li>
+        #end for
+    </ul>
