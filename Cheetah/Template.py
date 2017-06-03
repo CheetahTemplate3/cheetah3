@@ -59,8 +59,7 @@ from Cheetah import Filters                    # the output filters
 from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
 
 from Cheetah.Utils.Misc import checkKeywords     # Used in Template.__init__
-from Cheetah.Utils.Indenter import Indenter      # Used in Template.__init__ and for
-                                                 # placeholders
+from Cheetah.Utils.Indenter import Indenter      # and for placeholders
 from Cheetah.NameMapper import NotFound, valueFromSearchList
 from Cheetah.CacheStore import MemoryCacheStore, MemcachedCacheStore
 from Cheetah.CacheRegion import CacheRegion

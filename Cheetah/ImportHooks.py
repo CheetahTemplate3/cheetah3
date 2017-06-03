@@ -92,8 +92,8 @@ class CheetahDirOwner(DirOwner):
         mod = types.ModuleType(name)
         mod.__file__ = co.co_filename
         if _cacheDir:
-            mod.__orig_file__ = tmplPath # @@TR: this is used in the WebKit
-                                         # filemonitoring code
+            # @@TR: this is used in the WebKit filemonitoring code
+            mod.__orig_file__ = tmplPath
         mod.__co__ = co
         return mod
 
