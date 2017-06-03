@@ -959,7 +959,7 @@ class Template(Servlet):
 
     @classmethod
     def _updateSettingsWithPreprocessTokens(
-        klass, compilerSettings, placeholderToken, directiveToken):
+            klass, compilerSettings, placeholderToken, directiveToken):
 
         if (placeholderToken and 'cheetahVarStartToken' not in compilerSettings):
             compilerSettings['cheetahVarStartToken'] = placeholderToken
@@ -1649,7 +1649,8 @@ class Template(Servlet):
 
     ## functions for using templates as CGI scripts
     def webInput(self, names, namesMulti=(), default='', src='f',
-        defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00, debug=False):
+                 defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00,
+                 debug=False):
         """Method for importing web transaction variables in bulk.
 
         This works for GET/POST fields both in Webware servlets and in CGI

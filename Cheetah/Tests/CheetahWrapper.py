@@ -101,7 +101,7 @@ class CFBase(unittest.TestCase):
 
 
     def _checkDestFileHelper(self, path, expected,
-        allowSurroundingText, errmsg):
+                             allowSurroundingText, errmsg):
         """Low-level helper to check a destination file.
 
            in : path, string, the destination path.

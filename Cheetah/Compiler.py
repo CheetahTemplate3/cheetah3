@@ -1737,7 +1737,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
             baseClassName = handler(compiler=self, baseClassName=baseClassName)
             self._getActiveClassCompiler().setBaseClass(baseClassName)
         elif (not self.setting('autoImportForExtendsDirective')
-            or baseClassName=='object' or baseClassName in self.importedVarNames()):
+                or baseClassName=='object'
+                or baseClassName in self.importedVarNames()):
             self._getActiveClassCompiler().setBaseClass(baseClassName)
             # no need to import
         else:
