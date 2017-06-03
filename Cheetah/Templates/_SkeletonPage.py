@@ -29,11 +29,15 @@ class _SkeletonPage(Template):
 
     def __init__(self, *args, **KWs):
         Template.__init__(self, *args, **KWs)
-        self._metaTags = {'HTTP-EQUIV':{'keywords': 'Cheetah',
-                                        'Content-Type': 'text/html; charset=iso-8859-1',
-                                        },
-                    'NAME':{'generator':'Cheetah: The Python-Powered Template Engine'}
-                    }
+        self._metaTags = {
+            'HTTP-EQUIV': {
+                'keywords': 'Cheetah',
+                'Content-Type': 'text/html; charset=iso-8859-1',
+                },
+                'NAME': {
+                    'generator':'Cheetah: The Python-Powered Template Engine'
+                }
+            }
         # metaTags = {'HTTP_EQUIV':{'test':1234}, 'NAME':{'test':1234,'test2':1234} }
         self._stylesheets = {}
         # stylesheets = {'.cssClassName':'stylesheetCode'}

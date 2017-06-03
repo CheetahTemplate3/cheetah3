@@ -36,7 +36,8 @@ class CmdLineIface:
                 self._cmdLineArgs, 'h', ['help',
                                             'env',
                                             'pickle=',
-                                            ])
+                                         ]
+                )
 
         except getopt.GetoptError as v:
             # print help information and exit:

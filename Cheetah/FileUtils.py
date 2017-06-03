@@ -292,7 +292,7 @@ class FindAndReplace:
                                    'start': match.start(),
                                    'end': match.end(),
                                    }
-                                   )
+                                  )
         return self._subber(match)
 
 

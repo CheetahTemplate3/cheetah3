@@ -530,10 +530,10 @@ you do have write permission to and re-run the tests.""")
                 settings = eval('getkws(%s)'%self.opts.compilerSettingsString)
             except:
                 self.error("There's an error in your --settings option."
-                          "It must be valid Python syntax.\n"
-                          +"    --settings='%s'\n"%self.opts.compilerSettingsString
-                          +"  %s: %s"%sys.exc_info()[:2]
-                          )
+                           "It must be valid Python syntax.\n"
+                           +"    --settings='%s'\n"%self.opts.compilerSettingsString
+                           +"  %s: %s"%sys.exc_info()[:2]
+                           )
 
             validKeys = set(DEFAULT_COMPILER_SETTINGS.keys())
             if [k for k in settings if k not in validKeys]:

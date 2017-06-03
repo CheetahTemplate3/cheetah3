@@ -23,7 +23,7 @@ class I18n(object):
                  EOLCharsInShortForm=None,
                  startPos=None,
                  endPos=None,
-             ):
+                 ):
         """This is just a stub at this time.
 
            plural = the plural form of the message
