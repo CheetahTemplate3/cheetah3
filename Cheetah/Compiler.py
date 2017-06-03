@@ -1375,9 +1375,9 @@ class ClassCompiler(GenUtils):
             initialMethodComment=('## CHEETAH: Generated from ' + rawCode +
                                   ' at line %s, col %s'%lineCol + '.')
             )
-        catcherMeth.setMethodSignature('def ' + methodName +
-                                       '(self, localsDict={})')
-                                        # is this use of localsDict right?
+        catcherMeth.setMethodSignature(
+            'def ' + methodName +
+            '(self, localsDict={})')  # is this use of localsDict right?
         catcherMeth.addChunk('try:')
         catcherMeth.indent()
         catcherMeth.addChunk("return eval('''" + codeChunk +
@@ -1545,9 +1545,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
             if encoding:
                 f = codecs.open(file, 'r', encoding=encoding)
             else:
-                f = open(file, 'r') # if no encoding is specified, use the
-                                    # builtin open function, which will
-                                    # effectively read data as a bytestream
+                # if no encoding is specified, use the builtin open function
+                f = open(file, 'r')
             source = f.read()
             f.close()
             self._filePath = file
