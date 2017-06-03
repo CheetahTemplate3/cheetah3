@@ -87,8 +87,6 @@ and collect the output.  It can prepend the shell ENVIRONMENT or a pickled
 Python dictionary to the template's $placeholder searchList, overriding the
 defaults for the $placeholders.
 
-""" % {'scriptName': self._scriptName,
-       'Version': Version,
-       }
+""" % {'scriptName': self._scriptName, 'Version': Version}
 
 # vim: shiftwidth=4 tabstop=4 expandtab

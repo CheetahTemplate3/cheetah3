@@ -2659,8 +2659,8 @@ class _HighLevelParser(_LowLevelParser):
     def assertEmptyOpenDirectivesStack(self):
         if self._openDirectivesStack:
             errorMsg = (
-                "Some #directives are missing their corresponding #end ___ tag: %s" %(
-                ', '.join(self._openDirectivesStack)))
+                "Some #directives are missing their corresponding #end ___ tag"
+                ": %s" % ', '.join(self._openDirectivesStack))
             raise ParseError(self, msg=errorMsg)
 
 ##################################################

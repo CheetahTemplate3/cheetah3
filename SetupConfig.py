@@ -85,7 +85,7 @@ if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
                     'cheetah = Cheetah.CheetahWrapper:_cheetah',
                     'cheetah-compile = Cheetah.CheetahWrapper:_cheetah_compile',
                 ]
-        }
+            }
     except ImportError:
         pass
 

@@ -1148,7 +1148,7 @@ $arg.upper()#slurp
 #call $meth
 $(1234+1) foo#slurp
 #end call''',
-        "1235 FOO")
+                    "1235 FOO")
 
     def test4(self):
         r"""#call with keyword #args"""
@@ -1162,7 +1162,7 @@ $(1234+1) foo#slurp
 #arg arg2
 UPPER#slurp
 #end call''',
-        "1235 FOO - upper")
+                    "1235 FOO - upper")
 
     def test5(self):
         r"""#call with single-line keyword #args """
@@ -1174,7 +1174,7 @@ $arg1.upper() - $arg2.lower()#slurp
 #arg arg1:$(1234+1) foo#slurp
 #arg arg2:UPPER#slurp
 #end call''',
-        "1235 FOO - upper")
+                    "1235 FOO - upper")
 
     def test6(self):
         """#call with python kwargs and cheetah output for the 1s positional
@@ -1187,7 +1187,7 @@ $arg1.upper() - $arg2.lower()#slurp
 #call self.meth arg2="UPPER"
 $(1234+1) foo#slurp
 #end call''',
-        "1235 FOO - upper")
+                    "1235 FOO - upper")
 
     def test7(self):
         """#call with python kwargs and #args"""
@@ -1198,7 +1198,7 @@ $arg1.upper() - $arg2.lower() - $arg3#slurp
 #call self.meth arg2="UPPER", arg3=999
 #arg arg1:$(1234+1) foo#slurp
 #end call''',
-        "1235 FOO - upper - 999")
+                    "1235 FOO - upper - 999")
 
     def test8(self):
         """#call with python kwargs and #args, and using a function to get the
@@ -1210,7 +1210,7 @@ $arg1.upper() - $arg2.lower() - $arg3#slurp
 #call getattr(self, "meth") arg2="UPPER", arg3=999
 #arg arg1:$(1234+1) foo#slurp
 #end call''',
-        "1235 FOO - upper - 999")
+                    "1235 FOO - upper - 999")
 
     def test9(self):
         """nested #call directives"""
@@ -1236,7 +1236,7 @@ $x$y#slurp
 #end call 4
 #end call 2
 #end call 1''',
-        "12345")
+                    "12345")
 
 
 
@@ -1262,7 +1262,7 @@ $(1234+1) foo#slurp
 #end capture
 $cap1#slurp
 ''',
-        "1235 foo")
+                    "1235 foo")
 
 
     def test2(self):
@@ -1276,7 +1276,7 @@ $(1234+1) $anInt $meth("foo")#slurp
 #end capture
 $cap1#slurp
 ''',
-        "1235 1 FOO")
+                    "1235 1 FOO")
 
 
 class SlurpDirective(OutputTest):
@@ -1415,23 +1415,25 @@ class StopDirective(OutputTest):
 
     def test4(self):
         """#stop in pos test block"""
-        self.verify("""$anInt
+        self.verify("""\
+$anInt
 #if 1
 inside the if block
 #stop
 #end if
 blarg""",
-        "1\ninside the if block\n")
+                    "1\ninside the if block\n")
 
     def test5(self):
         """#stop in neg test block"""
-        self.verify("""$anInt
+        self.verify("""\
+$anInt
 #if 0
 inside the if block
 #stop
 #end if
 blarg""",
-        "1\nblarg")
+                    "1\nblarg")
 
 
 class ReturnDirective(OutputTest):
@@ -2416,7 +2418,8 @@ class WhileDirective(OutputTest):
 class ContinueDirective(OutputTest):
     def test1(self):
         """#continue with a #while"""
-        self.verify("""#set $i = 0
+        self.verify("""\
+#set $i = 0
 #while $i < 5
 #if $i == 3
   #set $i += 1
@@ -2425,22 +2428,24 @@ class ContinueDirective(OutputTest):
 $i#slurp
 #set $i += 1
 #end while""",
-        "0124")
+                    "0124")
 
     def test2(self):
         """#continue with a #for"""
-        self.verify("""#for $i in range(5)
+        self.verify("""\
+#for $i in range(5)
 #if $i == 3
   #continue
 #end if
 $i#slurp
 #end for""",
-        "0124")
+                    "0124")
 
 class BreakDirective(OutputTest):
     def test1(self):
         """#break with a #while"""
-        self.verify("""#set $i = 0
+        self.verify("""\
+#set $i = 0
 #while $i < 5
 #if $i == 3
   #break
@@ -2448,17 +2453,18 @@ class BreakDirective(OutputTest):
 $i#slurp
 #set $i += 1
 #end while""",
-        "012")
+                    "012")
 
     def test2(self):
         """#break with a #for"""
-        self.verify("""#for $i in range(5)
+        self.verify("""\
+#for $i in range(5)
 #if $i == 3
   #break
 #end if
 $i#slurp
 #end for""",
-        "012")
+                    "012")
 
 
 class TryDirective(OutputTest):
@@ -2495,8 +2501,8 @@ class TryDirective(OutputTest):
     def test5(self):
         """nested #try / #except with #raise
         """
-        self.verify(
-"""#try
+        self.verify("""\
+#try
   #raise ValueError
 #except
   #try
@@ -2504,7 +2510,7 @@ class TryDirective(OutputTest):
   #except
 blarg
   #end try
-#end try""",
+#end try""",  # noqa
                     "blarg\n")
 
 class PassDirective(OutputTest):
@@ -3088,7 +3094,7 @@ $i""",
 #end defmacro
 #test: $i-foo
 #for i in range(3): $i""",
-  "0-foo\n1-foo\n2-foo\n3-foo\n4-foo\n5-foo\n6-foo\n7-foo\n8-foo\n9-foo\n012")
+                    "0-foo\n1-foo\n2-foo\n3-foo\n4-foo\n5-foo\n6-foo\n7-foo\n8-foo\n9-foo\n012")
 
 
         self.verify("""\
