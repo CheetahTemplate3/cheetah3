@@ -8,6 +8,7 @@ branches:
   only:
     - maint
     - master
+    - next
 skip_branch_with_pr: false
 skip_tags: true
 

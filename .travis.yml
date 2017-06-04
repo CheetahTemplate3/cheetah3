@@ -6,6 +6,7 @@ branches:
   only:
     - maint
     - master
+    - next
 
 # Prefer docker containers
 sudo: required
