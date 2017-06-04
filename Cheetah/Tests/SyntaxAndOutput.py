@@ -2080,7 +2080,7 @@ class SetDirective(OutputTest):
         self.verify(     """#set $testDict = {'one':'one1','two':'two2','three':'three3'}
 $testDict.one
 $testDict.two""",
-                         "one1\ntwo2")
+                    "one1\ntwo2")
 
     def test6(self):
         """#set with string, then used in #if block"""
@@ -2184,10 +2184,10 @@ class IfDirective(OutputTest):
                     "blarg\n")
 
         self.verify("#if 1: ##comment \n$aStr\n#end if\n",
-                        "blarg\n")
+                    "blarg\n")
 
         self.verify("#if 1 ##comment \n$aStr\n#end if\n",
-                        "blarg\n")
+                    "blarg\n")
 
         self.verify("#if 1##for i in range(10)#$i#end for##end if",
                     '0123456789')

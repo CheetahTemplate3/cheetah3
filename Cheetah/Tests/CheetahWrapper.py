@@ -28,7 +28,7 @@ try:
     from subprocess import Popen, PIPE, STDOUT
     class Popen4(Popen):
         def __init__(self, cmd, bufsize=-1, shell=True, close_fds=True,
-                        stdin=PIPE, stdout=PIPE, stderr=STDOUT, **kwargs):
+                     stdin=PIPE, stdout=PIPE, stderr=STDOUT, **kwargs):
 
             super(Popen4, self).__init__(cmd, bufsize=bufsize, shell=shell,
                             close_fds=close_fds, stdin=stdin, stdout=stdout,

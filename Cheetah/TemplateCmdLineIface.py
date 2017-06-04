@@ -33,10 +33,7 @@ class CmdLineIface:
     def _processCmdLineArgs(self):
         try:
             self._opts, self._args = getopt.getopt(
-                self._cmdLineArgs, 'h', ['help',
-                                            'env',
-                                            'pickle=',
-                                         ]
+                self._cmdLineArgs, 'h', ['help', 'env', 'pickle=']
                 )
 
         except getopt.GetoptError as v:

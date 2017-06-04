@@ -7,8 +7,9 @@ class I18n(object):
     def __call__(self,
                  src, # aka message,
                  plural=None,
-                 n=None, # should be a string representing the name of the
-                          # '$var' rather than $var itself
+                 # should be a string representing the name of the '$var'
+                 # rather than $var itself
+                 n=None,
                  id=None,
                  domain=None,
                  source=None,

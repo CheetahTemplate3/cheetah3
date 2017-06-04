@@ -1566,10 +1566,10 @@ class Template(Servlet):
             self._fileDirName, self._fileBaseName = os.path.split(file)
         self._filePath = file
         templateClass = self.compile(source, file,
-                                      moduleName=moduleName,
-                                      mainMethodName=mainMethodName,
-                                      compilerSettings=compilerSettings,
-                                      keepRefToGeneratedCode=True)
+                                     moduleName=moduleName,
+                                     mainMethodName=mainMethodName,
+                                     compilerSettings=compilerSettings,
+                                     keepRefToGeneratedCode=True)
 
         if not self.__class__ == Template:
             # Only propogate attributes if we're in a subclass of

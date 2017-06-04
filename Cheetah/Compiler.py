@@ -562,9 +562,9 @@ class MethodCompiler(GenUtils):
 
     def addInclude(self, sourceExpr, includeFrom, isRaw):
         self.addChunk('self._handleCheetahInclude(' + sourceExpr +
-                           ', trans=trans, ' +
-                           'includeFrom="' + includeFrom + '", raw=' +
-                           repr(isRaw) + ')')
+                      ', trans=trans, ' +
+                      'includeFrom="' + includeFrom + '", raw=' +
+                      repr(isRaw) + ')')
 
     def addWhile(self, expr, lineCol=None):
         self.addIndentingDirective(expr, lineCol=lineCol)
@@ -1214,7 +1214,7 @@ class ClassCompiler(GenUtils):
             if self.setting('setup__str__method'):
                 self._generatedAttribs.append('def __str__(self): return self.respond()')
         self.addAttribute('_mainCheetahMethod_for_' + self._className +
-                           '= ' + repr(self._mainMethodName) )
+                          ' = ' + repr(self._mainMethodName) )
 
     def _setupInitMethod(self):
         __init__ = self._spawnMethodCompiler('__init__',
@@ -1483,10 +1483,10 @@ class ClassCompiler(GenUtils):
     def attributes(self):
         try:
             attribs = [self.setting('indentationStep') + str(attrib)
-                          for attrib in self._generatedAttribs ]
+                       for attrib in self._generatedAttribs ]
         except UnicodeEncodeError:
             attribs = [self.setting('indentationStep') + unicode(attrib)
-                          for attrib in self._generatedAttribs ]
+                       for attrib in self._generatedAttribs ]
         return '\n\n'.join(attribs)
 
 class AutoClassCompiler(ClassCompiler):

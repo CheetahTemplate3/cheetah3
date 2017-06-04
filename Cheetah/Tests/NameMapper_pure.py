@@ -17,8 +17,8 @@ def setUpModule():
         del sys.modules['Cheetah.NameMapper']
     sys.modules['Cheetah._namemapper'] = None
     from Cheetah.NameMapper import NotFound, valueForKey, \
-         valueForName, valueFromSearchList, valueFromFrame, \
-         valueFromFrameOrSearchList
+        valueForName, valueFromSearchList, valueFromFrame, \
+        valueFromFrameOrSearchList
     from Cheetah.Tests import NameMapper
     for func in [
         NotFound, valueForKey, valueForName, valueFromSearchList,
