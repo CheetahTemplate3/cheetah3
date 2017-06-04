@@ -1214,9 +1214,10 @@ class Template(Servlet):
                     issubclass(errorCatcher, ErrorCatchers.ErrorCatcher):
                 err = False
             if err:
-                raise TypeError(errmsgextra %
-                            ('errorCatcher', 'string, class or None',
-                             '(if class, must be subclass of Cheetah.ErrorCatchers.ErrorCatcher)'))
+                raise TypeError(
+                    errmsgextra % ('errorCatcher', 'string, class or None',
+                                   '(if class, must be subclass of '
+                                   'Cheetah.ErrorCatchers.ErrorCatcher)'))
         if compilerSettings is not Unspecified:
             if not isinstance(compilerSettings, dict):
                 raise TypeError(errmsg %

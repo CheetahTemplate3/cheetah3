@@ -249,7 +249,7 @@ def valueFromSearchList(searchList, name, executeCallables=False):
     for namespace in searchList:
         if hasKey(namespace, key):
             return _valueForName(namespace, name,
-                                executeCallables=executeCallables)
+                                 executeCallables=executeCallables)
     _raiseNotFoundException(key, searchList)
 
 def _namespaces(callerFrame, searchList=None):

@@ -58,14 +58,13 @@ def perftest(max_num_pystones, current_pystone=None):
                     pystone_total_time = total_time / pystone_rate
                 global DEBUG
                 if DEBUG:
-                    print('The test "%s" took: %s pystones' % (function.__name__,
-                        pystone_total_time))
+                    print('The test "%s" took: %s pystones' % (
+                        function.__name__, pystone_total_time))
                 else:
                     if pystone_total_time > (max_num_pystones + TOLERANCE):
-                        raise DurationError((('Test too long (%.2f Ps, '
-                                        'need at most %.2f Ps)')
-                                        % (pystone_total_time,
-                                            max_num_pystones)))
+                        raise DurationError(
+                            'Test too long (%.2f Ps, need at most %.2f Ps)'
+                            % (pystone_total_time, max_num_pystones))
         return wrapper
     return _test
 
@@ -100,7 +99,7 @@ class PerformanceTest(unittest.TestCase):
         self.prof.close()
         if self.display:
             print('>>> %s (%d iterations) ' % (self.__class__.__name__,
-                    self.iterations))
+                                               self.iterations))
             stats = hotshot.stats.load('%s.prof' % self.__class__.__name__)
             #stats.strip_dirs()
             stats.sort_stats('time', 'calls')
@@ -119,8 +118,8 @@ class DynamicMethodCompilationTest(PerformanceTest):
                 #return $foo[0]
             #end def
         '''
-        template = Cheetah.Template.Template.compile(template,
-            keepRefToGeneratedCode=False)
+        template = Cheetah.Template.Template.compile(
+            template, keepRefToGeneratedCode=False)
         template = template()
         value = template.testMethod()
 
@@ -135,8 +134,8 @@ class BunchOfWriteCalls(PerformanceTest):
                 $i
             #end for
         '''
-        template = Cheetah.Template.Template.compile(template,
-            keepRefToGeneratedCode=False)
+        template = Cheetah.Template.Template.compile(
+            template, keepRefToGeneratedCode=False)
         template = template()
         value = template.respond()
         del value
@@ -152,8 +151,8 @@ class DynamicSimpleCompilationTest(PerformanceTest):
 
             Here's an array too: $foo
         '''
-        template = Cheetah.Template.Template.compile(template,
-            keepRefToGeneratedCode=False)
+        template = Cheetah.Template.Template.compile(
+            template, keepRefToGeneratedCode=False)
         template = template()
         template = unicode(template)
 
@@ -169,8 +168,8 @@ class FilterTest(PerformanceTest):
 
             $foo, $foo, $foo
         '''
-        template = Cheetah.Template.Template.compile(template,
-            keepRefToGeneratedCode=False)
+        template = Cheetah.Template.Template.compile(
+            template, keepRefToGeneratedCode=False)
         self.template = template()
 
     def performanceSample(self):
@@ -227,7 +226,8 @@ class LongCompileTest(PerformanceTest):
 
 class LongCompile_CompilerSettingsTest(LongCompileTest):
     def compile(self, template):
-        return Cheetah.Template.Template.compile(template, keepRefToGeneratedCode=False,
+        return Cheetah.Template.Template.compile(
+            template, keepRefToGeneratedCode=False,
             compilerSettings={'useStackFrames' : True, 'useAutocalling' : True})
 
 class LongCompileAndRun(LongCompileTest):

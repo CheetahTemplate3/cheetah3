@@ -130,7 +130,7 @@ class CheetahWrapper(object):
 
         # Step 2: Call the command
         meths = (self.compile, self.fill, self.help, self.options,
-            self.test, self.version)
+                 self.test, self.version)
         for meth in meths:
             methName = meth.__name__
             # Or meth.__func__.__name__

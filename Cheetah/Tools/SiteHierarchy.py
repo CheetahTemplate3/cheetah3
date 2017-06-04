@@ -94,7 +94,7 @@ class Hierarchy:
     def menuLink(self, url, text, indent):
         if url == self._currentURL or self._prefix + url == self._currentURL:
             return '%s<B%s>%s</B> <BR>\n' % ('&nbsp;'*2*indent,
-                             self._menuCSSClass, text)
+                                             self._menuCSSClass, text)
         else:
             return '%s<A HREF="%s%s"%s>%s</A> <BR>\n' % \
                    ('&nbsp;'*2*indent, self._prefix, url,
@@ -142,24 +142,25 @@ class Hierarchy:
 ## from the command line
 
 if __name__ == '__main__':
-    hierarchy = [('/', 'home'),
-            ('/about', 'About Us'),
-            [('/services', 'Services'),
-             [('/services/products', 'Products'),
-              ('/services/products/widget', 'The Widget'),
-              ('/services/products/wedge', 'The Wedge'),
-              ('/services/products/thimble', 'The Thimble'),
-              ],
-             ('/services/prices', 'Prices'),
-             ],
-            ('/contact', 'Contact Us'),
-            ]
+    hierarchy = [
+        ('/', 'home'),
+        ('/about', 'About Us'),
+        [('/services', 'Services'),
+         [('/services/products', 'Products'),
+          ('/services/products/widget', 'The Widget'),
+          ('/services/products/wedge', 'The Wedge'),
+          ('/services/products/thimble', 'The Thimble'),
+          ],
+         ('/services/prices', 'Prices'),
+         ],
+        ('/contact', 'Contact Us'),
+        ]
 
     for url in ['/', '/services', '/services/products/widget', '/contact']:
         print('<p>', '='*50)
         print('<br> %s: <br>\n' % url)
         n = Hierarchy(hierarchy, url, menuCSSClass='menu', crumbCSSClass='crumb',
-                  prefix='/here')
+                      prefix='/here')
         print(n.menuList())
         print('<p>', '-'*50)
         print(n.crumbs())

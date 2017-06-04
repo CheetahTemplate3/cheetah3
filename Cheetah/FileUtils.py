@@ -7,8 +7,8 @@ import re
 from tempfile import mktemp
 from Cheetah.compat import string_type
 
-def _escapeRegexChars(txt,
-                     escapeRE=re.compile(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])')):
+def _escapeRegexChars(
+        txt, escapeRE=re.compile(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])')):
     return escapeRE.sub(r'\\\1', txt)
 
 def findFiles(*args, **kw):

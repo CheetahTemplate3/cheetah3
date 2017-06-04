@@ -39,7 +39,8 @@ class _TestInfo(object):
         supplied stream.
 
         """
-        stream.write('  <testcase classname="%(class)s" name="%(method)s" time="%(time).4f">' % \
+        stream.write(
+            '  <testcase classname="%(class)s" name="%(method)s" time="%(time).4f">' % \
             {
                 "class": self._class,
                 "method": self._method,
@@ -55,8 +56,11 @@ class _TestInfo(object):
         """Print information from a failure or error to the supplied stream."""
         text = escape(str(error[1]))
         stream.write('\n')
-        stream.write('    <%s type="%s">%s\n' \
-            % (tagname, issubclass(error[0], Exception) and error[0].__name__ or str(error[0]), text))
+        stream.write(
+            '    <%s type="%s">%s\n' \
+            % (tagname,
+               issubclass(error[0], Exception) and
+               error[0].__name__ or str(error[0]), text))
         tb_stream = StringIO()
         traceback.print_tb(error[2], None, tb_stream)
         stream.write(escape(tb_stream.getvalue()))
@@ -129,13 +133,12 @@ class _XMLTestResult(unittest.TestResult):
 
         """
         stream.write('<testsuite errors="%(e)d" failures="%(f)d" ' % \
-            { "e": len(self.errors), "f": len(self.failures) })
-        stream.write('name="%(n)s" tests="%(t)d" time="%(time).3f">\n' % \
-            {
-                "n": self._test_name,
-                "t": self.testsRun,
-                "time": time_taken,
-            })
+                     {"e": len(self.errors), "f": len(self.failures)})
+        stream.write('name="%(n)s" tests="%(t)d" time="%(time).3f">\n' % {
+            "n": self._test_name,
+            "t": self.testsRun,
+            "time": time_taken,
+        })
         for info in self._tests:
             info.print_report(stream)
         stream.write('  <system-out><![CDATA[%s]]></system-out>\n' % out)
@@ -207,11 +210,11 @@ class XMLTestRunner(object):
     def _set_path(self, path):
         self._path = path
 
-    path = property(lambda self: self._path, _set_path, None,
-            """The path where the XML files are stored.
+    path = property(
+        lambda self: self._path, _set_path, None,
+        """The path where the XML files are stored
 
-            This property is ignored when the XML file is written to a file
-            stream.""")
+This property is ignored when the XML file is written to a file stream.""")
 
 
 class XMLTestRunnerTest(unittest.TestCase):

@@ -77,7 +77,7 @@ shiftOps = ('>>', '<<')
 bitwiseOps = ('&', '|', '^')
 assignOp = '='
 augAssignOps = ('+=', '-=', '/=', '*=', '**=', '^=', '%=',
-          '>>=', '<<=', '&=', '|=', )
+                '>>=', '<<=', '&=', '|=', )
 assignmentOps = (assignOp,) + augAssignOps
 
 compOps = ('<', '>', '==', '!=', '<=', '>=', '<>', 'is', 'in',)
@@ -493,9 +493,9 @@ class _LowLevelParser(SourceReader):
         endTokenEsc = escapeRegexChars(
             self.setting('multiLineCommentEndToken'))
         self.multiLineCommentTokenStartRE = cachedRegex(escCharLookBehind +
-                                                       startTokenEsc)
+                                                        startTokenEsc)
         self.multiLineCommentEndTokenRE = cachedRegex(escCharLookBehind +
-                                                     endTokenEsc)
+                                                      endTokenEsc)
 
     def _makeDirectiveREs(self):
         """Construct the regexs that are used in directive parsing."""

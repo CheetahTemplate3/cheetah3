@@ -30,9 +30,9 @@ try:
         def __init__(self, cmd, bufsize=-1, shell=True, close_fds=True,
                      stdin=PIPE, stdout=PIPE, stderr=STDOUT, **kwargs):
 
-            super(Popen4, self).__init__(cmd, bufsize=bufsize, shell=shell,
-                            close_fds=close_fds, stdin=stdin, stdout=stdout,
-                            stderr=stderr, **kwargs)
+            super(Popen4, self).__init__(
+                cmd, bufsize=bufsize, shell=shell, close_fds=close_fds,
+                stdin=stdin, stdout=stdout, stderr=stderr, **kwargs)
 
             self.tochild = self.stdin
             self.fromchild = self.stdout

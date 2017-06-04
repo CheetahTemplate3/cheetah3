@@ -130,15 +130,15 @@ class ClassMethods_compile(TemplateTest):
 
 
         klass2 = Template.compile(source='$foo',
-                                 className='unique58',
-                                 keepRefToGeneratedCode=True)
+                                  className='unique58',
+                                  keepRefToGeneratedCode=True)
         t = klass2(namespaces={'foo':1234})
         assert str(t)=='1234'
         assert t.generatedModuleCode()
 
         klass3 = Template.compile(source='$foo',
-                                 className='unique58',
-                                 keepRefToGeneratedCode=False)
+                                  className='unique58',
+                                  keepRefToGeneratedCode=False)
         t = klass3(namespaces={'foo':1234})
         assert str(t)=='1234'
         # still there as this class came from the cache

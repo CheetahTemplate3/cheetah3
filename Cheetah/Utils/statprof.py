@@ -219,8 +219,7 @@ def profile_signal_handler(signum, frame):
     if state.profile_level > 0:
         state.accumulate_time(clock())
         sample_stack_procs(frame)
-        itimer.setitimer(itimer.ITIMER_PROF,
-            state.sample_interval, 0.0)
+        itimer.setitimer(itimer.ITIMER_PROF, state.sample_interval, 0.0)
         state.last_start_time = clock()
 
 
@@ -238,7 +237,7 @@ def start():
         state.remaining_prof_time = None
         signal.signal(signal.SIGPROF, profile_signal_handler)
         itimer.setitimer(itimer.ITIMER_PROF,
-            rpt or state.sample_interval, 0.0)
+                         rpt or state.sample_interval, 0.0)
         state.gc_time_taken = 0 # dunno
 
 def stop():

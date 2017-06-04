@@ -69,7 +69,7 @@ class TurboCheetah:
             tfile = pkg_resources.resource_filename(package,
                                                     "%s.%s" %
                                                     (basename,
-                                                    self.extension))
+                                                     self.extension))
             if classname in ct:
                 mtime = os.stat(tfile).st_mtime
                 if ct[classname] != mtime:

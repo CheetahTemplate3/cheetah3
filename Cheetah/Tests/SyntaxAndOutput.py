@@ -597,8 +597,7 @@ class Placeholders(OutputTest):
         self.verify("$!aStr$!nonExistant$!*nonExistant$!{nonExistant}", "blarg")
 
         try:
-            self.verify("$!aStr$nonExistant",
-            "blarg")
+            self.verify("$!aStr$nonExistant", "blarg")
         except NotFound:
             pass
         else:
@@ -1376,8 +1375,9 @@ class RawDirective(OutputTest):
 
     def test6(self):
         """ Escape characters in a #raw block """
-        self.verify( """#raw: This escape should be preserved: \\$unexpanded So should this one: \\#blah The string "\\012" should not disappear.""",
-                r"""This escape should be preserved: \$unexpanded So should this one: \#blah The string "\012" should not disappear.""")
+        self.verify("""\
+#raw: This escape should be preserved: \\$unexpanded So should this one: \\#blah The string "\\012" should not disappear.""",
+                    r"""This escape should be preserved: \$unexpanded So should this one: \#blah The string "\012" should not disappear.""")
 
 
 class BreakpointDirective(OutputTest):
@@ -1426,8 +1426,7 @@ blarg""",
 
     def test5(self):
         """#stop in neg test block"""
-        self.verify("""\
-$anInt
+        self.verify("""$anInt
 #if 0
 inside the if block
 #stop
@@ -2418,8 +2417,7 @@ class WhileDirective(OutputTest):
 class ContinueDirective(OutputTest):
     def test1(self):
         """#continue with a #while"""
-        self.verify("""\
-#set $i = 0
+        self.verify("""#set $i = 0
 #while $i < 5
 #if $i == 3
   #set $i += 1
@@ -2432,8 +2430,7 @@ $i#slurp
 
     def test2(self):
         """#continue with a #for"""
-        self.verify("""\
-#for $i in range(5)
+        self.verify("""#for $i in range(5)
 #if $i == 3
   #continue
 #end if

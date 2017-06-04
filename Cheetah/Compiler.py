@@ -916,7 +916,8 @@ class MethodCompiler(GenUtils):
 
         self.addChunk('if "' + errorCatcherName + '" in self._CHEETAH__errorCatchers:')
         self.indent()
-        self.addChunk('self._CHEETAH__errorCatcher = self._CHEETAH__errorCatchers["' +
+        self.addChunk(
+            'self._CHEETAH__errorCatcher = self._CHEETAH__errorCatchers["' +
             errorCatcherName + '"]')
         self.dedent()
         self.addChunk('else:')
