@@ -17,6 +17,9 @@ Home Page, issue tracker
 On-line Documentation
     - http://cheetahtemplate.org/
 
+Questions can also be asked and answered on `StackOverflow
+<https://stackoverflow.com/questions/tagged/cheetah>`_.
+
 
 Third-party Cheetah Stuff
 -------------------------

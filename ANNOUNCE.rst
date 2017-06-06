@@ -37,6 +37,9 @@ https://pypi.python.org/pypi/Cheetah3/3.0.0
 News and changes:
 http://cheetahtemplate.org/news.html
 
+StackOverflow:
+https://stackoverflow.com/questions/tagged/cheetah
+
 
 Example
 =======
