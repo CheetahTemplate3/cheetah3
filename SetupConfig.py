@@ -58,12 +58,12 @@ from distutils.core import Extension
 ext_modules=[
              Extension("Cheetah._namemapper",
                        [os.path.join('Cheetah', 'c', '_namemapper.c')]),
-           #  Extension("Cheetah._verifytype",
-           #             [os.path.join('Cheetah', 'c', '_verifytype.c')]),
-           #  Extension("Cheetah._filters",
-           #             [os.path.join('Cheetah', 'c', '_filters.c')]),
-           #  Extension('Cheetah._template',
-           #             [os.path.join('Cheetah', 'c', '_template.c')]),
+             # Extension("Cheetah._verifytype",
+             #            [os.path.join('Cheetah', 'c', '_verifytype.c')]),
+             # Extension("Cheetah._filters",
+             #            [os.path.join('Cheetah', 'c', '_filters.c')]),
+             # Extension('Cheetah._template',
+             #            [os.path.join('Cheetah', 'c', '_template.c')]),
              ]
 
 ## Data Files and Scripts

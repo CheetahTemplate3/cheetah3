@@ -33,11 +33,11 @@ class _SkeletonPage(Template):
             'HTTP-EQUIV': {
                 'keywords': 'Cheetah',
                 'Content-Type': 'text/html; charset=iso-8859-1',
-                },
-                'NAME': {
+            },
+            'NAME': {
                     'generator':'Cheetah: The Python-Powered Template Engine'
-                }
             }
+        }
         # metaTags = {'HTTP_EQUIV':{'test':1234}, 'NAME':{'test':1234,'test2':1234} }
         self._stylesheets = {}
         # stylesheets = {'.cssClassName':'stylesheetCode'}
