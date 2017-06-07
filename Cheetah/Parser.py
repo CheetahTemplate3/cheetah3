@@ -1182,10 +1182,8 @@ class _LowLevelParser(SourceReader):
             else:
                 beforeTokenPos = self.pos()
                 token = self.getPyToken()
-                if (not enclosures
-                    and pyTokensToBreakAt
-                    and token in pyTokensToBreakAt):
-
+                if (not enclosures and pyTokensToBreakAt
+                        and token in pyTokensToBreakAt):
                     self.setPos(beforeTokenPos)
                     break
 

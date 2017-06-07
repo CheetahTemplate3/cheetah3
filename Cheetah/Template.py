@@ -818,10 +818,8 @@ class Template(Servlet):
 
             templateClass = getattr(mod, className)
 
-            if (cacheCompilationResults
-                and cacheHash
-                and cacheHash not in klass._CHEETAH_compileCache):
-
+            if (cacheCompilationResults and cacheHash
+                    and cacheHash not in klass._CHEETAH_compileCache):
                 cacheItem = CompileCacheItem()
                 cacheItem.cacheTime = cacheItem.lastCheckoutTime = time.time()
                 cacheItem.code = generatedModuleCode
@@ -923,8 +921,7 @@ class Template(Servlet):
              settings.directiveToken) = normalizeTokens(settings.tokens)
 
         if (not getattr(settings, 'compilerSettings', None)
-            and not getattr(settings, 'placeholderToken', None) ):
-
+                and not getattr(settings, 'placeholderToken', None) ):
             raise TypeError(
                 'Preprocessor requires either a "tokens" or a "compilerSettings" arg.'
                 ' Neither was provided.')
@@ -1008,8 +1005,7 @@ class Template(Servlet):
                 setattr(concreteTemplateClass, attrname, attrVal)
 
         if (not hasattr(concreteTemplateClass, '__str__')
-            or concreteTemplateClass.__str__ is object.__str__):
-
+                or concreteTemplateClass.__str__ is object.__str__):
             mainMethNameAttr = '_mainCheetahMethod_for_'+concreteTemplateClass.__name__
             mainMethName = getattr(concreteTemplateClass, mainMethNameAttr, None)
             if mainMethName:
