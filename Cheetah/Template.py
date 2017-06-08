@@ -921,7 +921,7 @@ class Template(Servlet):
              settings.directiveToken) = normalizeTokens(settings.tokens)
 
         if (not getattr(settings, 'compilerSettings', None)
-                and not getattr(settings, 'placeholderToken', None) ):
+                and not getattr(settings, 'placeholderToken', None)):
             raise TypeError(
                 'Preprocessor requires either a "tokens" or a "compilerSettings" arg.'
                 ' Neither was provided.')
@@ -1857,9 +1857,9 @@ class Template(Servlet):
             raise TypeError("arg 'src' invalid")
         sources = source + 's'
         converters = {
-            '': _Converter('string', None, default,      default ),
-            'int': _Converter('int',     int, defaultInt,   badInt  ),
-            'float': _Converter('float', float, defaultFloat, badFloat),  }
+            '': _Converter('string', None, default,      default),
+            'int': _Converter('int',     int, defaultInt,   badInt),
+            'float': _Converter('float', float, defaultFloat, badFloat),}
         #pprint.pprint(locals());  return {}
         dic = {} # Destination.
         for name in names:
@@ -1901,13 +1901,13 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
     for i in range(1, 4):
         if pyLineno-i <=0:
             break
-        prevLines.append((pyLineno+1-i, lines[pyLineno-i]) )
+        prevLines.append((pyLineno+1-i, lines[pyLineno-i]))
 
     nextLines = []                  # (i, content)
     for i in range(1, 4):
         if not pyLineno+i < len(lines):
             break
-        nextLines.append((pyLineno+i, lines[pyLineno+i]) )
+        nextLines.append((pyLineno+i, lines[pyLineno+i]))
     nextLines.reverse()
     report = 'Line|Python Code\n'
     report += '----|-------------------------------------------------------------\n'

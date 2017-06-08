@@ -368,7 +368,7 @@ class MethodCompiler(GenUtils):
             self.methodSignature(),
             '\n',
             self.docString(),
-            self.methodBody() )
+            self.methodBody())
         methodDef = ''.join(methodDefChunks)
         self._methodDef = methodDef
         return methodDef
@@ -380,7 +380,7 @@ class MethodCompiler(GenUtils):
         self._methodSignature = signature
 
     def methodBody(self):
-        return ''.join(self._methodBodyChunks )
+        return ''.join(self._methodBodyChunks)
 
     def docString(self):
         if not self._docStringLines:
@@ -526,7 +526,7 @@ class MethodCompiler(GenUtils):
             self.endCacheRegion()
 
     def addSilent(self, expr):
-        self.addChunk(expr )
+        self.addChunk(expr)
 
     def addEcho(self, expr, rawExpr=None):
         self.addFilteredChunk(expr, rawExpr=rawExpr)
@@ -580,9 +580,9 @@ class MethodCompiler(GenUtils):
     def addIndentingDirective(self, expr, lineCol=None):
         if expr and not expr[-1] == ':':
             expr = expr  + ':'
-        self.addChunk(expr )
+        self.addChunk(expr)
         if lineCol:
-            self.appendToPrevChunk(' # generated from line %s, col %s'%lineCol )
+            self.appendToPrevChunk(' # generated from line %s, col %s'%lineCol)
         self.indent()
 
     def addReIndentingDirective(self, expr, dedent=True, lineCol=None):
@@ -592,9 +592,9 @@ class MethodCompiler(GenUtils):
         if not expr[-1] == ':':
             expr = expr  + ':'
 
-        self.addChunk(expr )
+        self.addChunk(expr)
         if lineCol:
-            self.appendToPrevChunk(' # generated from line %s, col %s'%lineCol )
+            self.appendToPrevChunk(' # generated from line %s, col %s'%lineCol)
         self.indent()
 
     def addIf(self, expr, lineCol=None):
@@ -977,7 +977,7 @@ class AutoMethodCompiler(MethodCompiler):
 
     def _setupState(self):
         MethodCompiler._setupState(self)
-        self._argStringList = [("self", None) ]
+        self._argStringList = [("self", None)]
         self._streamingEnabled = True
         self._isClassMethod = None
         self._isStaticMethod = None
@@ -1095,7 +1095,7 @@ class AutoMethodCompiler(MethodCompiler):
         self.addChunk('return _dummyTrans and trans.response().getvalue() or ""')
 
     def addMethArg(self, name, defVal=None):
-        self._argStringList.append((name, defVal) )
+        self._argStringList.append((name, defVal))
 
     def methodSignature(self):
         argStringChunks = []
@@ -1215,7 +1215,7 @@ class ClassCompiler(GenUtils):
             if self.setting('setup__str__method'):
                 self._generatedAttribs.append('def __str__(self): return self.respond()')
         self.addAttribute('_mainCheetahMethod_for_' + self._className +
-                          ' = ' + repr(self._mainMethodName) )
+                          ' = ' + repr(self._mainMethodName))
 
     def _setupInitMethod(self):
         __init__ = self._spawnMethodCompiler('__init__',
@@ -1232,7 +1232,7 @@ class ClassCompiler(GenUtils):
         # @@TR: this stuff needs auditing for Cheetah 2.0
         # the first bit is added to init
         self.addChunkToInit('self._filePath = ' + repr(fileName))
-        self.addChunkToInit('self._fileMtime = ' + str(getmtime(fileName)) )
+        self.addChunkToInit('self._fileMtime = ' + str(getmtime(fileName)))
 
         # the rest is added to the main output method of the class ('mainMethod')
         self.addChunk('if exists(self._filePath) and ' +
@@ -1304,7 +1304,7 @@ class ClassCompiler(GenUtils):
     def _swallowMethodCompiler(self, methodCompiler, pos=None):
         methodCompiler.cleanupState()
         if pos==None:
-            self._finishedMethodsList.append(methodCompiler )
+            self._finishedMethodsList.append(methodCompiler)
         else:
             self._finishedMethodsList.insert(pos, methodCompiler)
         return methodCompiler
@@ -1484,10 +1484,10 @@ class ClassCompiler(GenUtils):
     def attributes(self):
         try:
             attribs = [self.setting('indentationStep') + str(attrib)
-                       for attrib in self._generatedAttribs ]
+                       for attrib in self._generatedAttribs]
         except UnicodeEncodeError:
             attribs = [self.setting('indentationStep') + unicode(attrib)
-                       for attrib in self._generatedAttribs ]
+                       for attrib in self._generatedAttribs]
         return '\n\n'.join(attribs)
 
 class AutoClassCompiler(ClassCompiler):
@@ -1705,7 +1705,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
     def _swallowClassCompiler(self, classCompiler):
         classCompiler.cleanupState()
-        self._finishedClassesList.append(classCompiler )
+        self._finishedClassesList.append(classCompiler)
         self._finishedClassIndex[classCompiler.className()] = classCompiler
         return classCompiler
 
@@ -1784,12 +1784,12 @@ class ModuleCompiler(SettingsManager, GenUtils):
                         baseclasses.append(finalClassName)
                         importStatement = "from %s import %s" % (modName, finalClassName)
                         self.addImportStatement(importStatement)
-                        self.addImportedVarNames([finalClassName,] )
+                        self.addImportedVarNames([finalClassName,])
 
             self._getActiveClassCompiler().setBaseClass(', '.join(baseclasses))
 
     def setCompilerSetting(self, key, valueExpr):
-        self.setSetting(key, eval(valueExpr) )
+        self.setSetting(key, eval(valueExpr))
         self._parser.configureParser()
 
     def setCompilerSettings(self, keywords, settingsStr):
@@ -1992,7 +1992,7 @@ if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
         theVars = self._specialVars
         keys = sorted(theVars.keys())
         for key in keys:
-            chunks.append(key + ' = ' + repr(theVars[key])  )
+            chunks.append(key + ' = ' + repr(theVars[key]))
         return '\n'.join(chunks)
 
     def importStatements(self):

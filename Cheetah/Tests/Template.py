@@ -248,8 +248,8 @@ class Preprocessors(TemplateTest):
         src = '\n'.join([ln.strip() for ln in src.splitlines()])
 
 
-        for arg in [{'tokens':'@ %', 'namespaces':{'a':99} },
-                    {'tokens':'@ %', 'namespaces':{'a':99} },
+        for arg in [{'tokens':'@ %', 'namespaces':{'a':99}},
+                    {'tokens':'@ %', 'namespaces':{'a':99}},
                     ]:
             klass = Template.compile(src, preprocessors=arg)
             t = klass()

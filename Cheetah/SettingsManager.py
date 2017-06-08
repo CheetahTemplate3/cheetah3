@@ -269,7 +269,7 @@ class SettingsManager(_SettingsCollector):
 
         newSettings = self.readSettingsFromPySrcStr(theString)
         self.updateSettings(newSettings,
-                            merge=newSettings.get('mergeSettings', merge) )
+                            merge=newSettings.get('mergeSettings', merge))
 
 
     def updateSettingsFromConfigFileObj(self, inFile, convert=True, merge=True):

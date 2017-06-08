@@ -103,9 +103,9 @@ class SourceReader(object):
     def checkPos(self, pos):
         if not pos <= self._breakPoint:
             raise Error("pos (" + str(pos) + ") is invalid: beyond the stream's end (" +
-                        str(self._breakPoint-1) + ")" )
+                        str(self._breakPoint-1) + ")")
         elif not pos >=0:
-            raise Error("pos (" + str(pos) + ") is invalid: less than 0" )
+            raise Error("pos (" + str(pos) + ") is invalid: less than 0")
 
     def breakPoint(self):
         return self._breakPoint
@@ -114,9 +114,9 @@ class SourceReader(object):
         if pos > self._srcLen:
             raise Error("New breakpoint (" + str(pos) +
                         ") is invalid: beyond the end of stream's source string (" +
-                        str(self._srcLen) + ")" )
+                        str(self._srcLen) + ")")
         elif not pos >= 0:
-            raise Error("New breakpoint (" + str(pos) + ") is invalid: less than 0" )
+            raise Error("New breakpoint (" + str(pos) + ") is invalid: less than 0")
 
         self._breakPoint = pos
 
@@ -133,7 +133,7 @@ class SourceReader(object):
         pos = self._bookmarks[name]
         if not self.validPos(pos):
             raise Error("Invalid bookmark (" + name + ', '+
-                        str(pos) + ") is invalid: pos is out of range" )
+                        str(pos) + ") is invalid: pos is out of range")
         self._pos = pos
 
     def atEnd(self):
@@ -195,7 +195,7 @@ class SourceReader(object):
     def find(self, it, pos=None):
         if pos == None:
             pos = self._pos
-        return self._src.find(it, pos )
+        return self._src.find(it, pos)
 
     def startswith(self, it, pos=None):
         if self.find(it, pos) == self.pos():

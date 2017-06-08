@@ -89,7 +89,7 @@ class mod_install_data(install_data):
                 ## generate the dstPath from the filename
                 # - deal with 'package_dir' translations
                 topDir, subPath = (filename.split(os.sep)[0],
-                                   os.sep.join(filename.split(os.sep)[1:] )
+                                   os.sep.join(filename.split(os.sep)[1:])
                                    )
 
                 package_dirDict = self.distribution.package_dir

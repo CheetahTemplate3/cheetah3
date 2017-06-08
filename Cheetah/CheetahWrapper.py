@@ -18,8 +18,8 @@ from Cheetah.Template import Template, DEFAULT_COMPILER_SETTINGS
 from Cheetah.Utils.Misc import mkdirsWithPyInitFiles
 from Cheetah.compat import PY2
 
-optionDashesRE = re.compile(R"^-{1,2}"  )
-moduleNameRE = re.compile(R"^[a-zA-Z_][a-zA-Z_0-9]*$"  )
+optionDashesRE = re.compile(R"^-{1,2}")
+moduleNameRE = re.compile(R"^[a-zA-Z_][a-zA-Z_0-9]*$")
 
 def fprintfMessage(stream, format, *args):
     if format[-1:] == '^':

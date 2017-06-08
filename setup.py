@@ -9,4 +9,4 @@ except:
 import SetupTools
 import SetupConfig
 configurations = (SetupConfig,)
-SetupTools.run_setup(configurations )
+SetupTools.run_setup(configurations)
