@@ -278,13 +278,13 @@ class ParseError(ValueError):
         for i in range(1, 4):
             if row-1-i <=0:
                 break
-            prevLines.append( (row-i, lines[row-1-i]) )
+            prevLines.append((row-i, lines[row-1-i]) )
 
         nextLines = []                  # (rowNum, content)
         for i in range(1, 4):
             if not row-1+i < len(lines):
                 break
-            nextLines.append( (row+i, lines[row-1+i]) )
+            nextLines.append((row+i, lines[row-1+i]) )
         nextLines.reverse()
 
         ## print the main message
@@ -688,7 +688,7 @@ class _LowLevelParser(SourceReader):
         match = self.matchOperator()
         if not match:
             raise ParseError(self, msg='Expected operator')
-        return self.readTo( match.end() )
+        return self.readTo(match.end() )
 
     def matchAssignmentOperator(self):
         match = self.matchPyToken()
@@ -700,7 +700,7 @@ class _LowLevelParser(SourceReader):
         match = self.matchAssignmentOperator()
         if not match:
             raise ParseError(self, msg='Expected assignment operator')
-        return self.readTo( match.end() )
+        return self.readTo(match.end() )
 
     def matchDirective(self):
         """Returns False or the name of the directive matched.
@@ -812,13 +812,13 @@ class _LowLevelParser(SourceReader):
         match = self.matchCheetahVarStartToken()
         if not match:
             raise ParseError(self, msg='Expected Cheetah $var start token')
-        return self.readTo( match.end() )
+        return self.readTo(match.end() )
 
 
     def getCacheToken(self):
         try:
             token = self.cacheTokenRE.match(self.src(), self.pos())
-            self.setPos( token.end() )
+            self.setPos(token.end() )
             return token.group()
         except:
             raise ParseError(self, msg='Expected cache token')
@@ -826,7 +826,7 @@ class _LowLevelParser(SourceReader):
     def getSilentPlaceholderToken(self):
         try:
             token = self.silentPlaceholderTokenRE.match(self.src(), self.pos())
-            self.setPos( token.end() )
+            self.setPos(token.end() )
             return token.group()
         except:
             raise ParseError(self, msg='Expected silent placeholder token')
@@ -849,9 +849,9 @@ class _LowLevelParser(SourceReader):
                 self.getCheetahVarStartToken()
                 self.getSilentPlaceholderToken()
                 self.getCacheToken()
-                varnames.append( self.getDottedName() )
+                varnames.append(self.getDottedName() )
             elif self.matchIdentifier():
-                varnames.append( self.getDottedName() )
+                varnames.append(self.getDottedName() )
             else:
                 break
         return varnames
@@ -920,11 +920,11 @@ class _LowLevelParser(SourceReader):
 
                 period = max(dottedName.rfind('.'), 0)
                 if period:
-                    chunks.append( (dottedName[:period], autoCall, '') )
+                    chunks.append((dottedName[:period], autoCall, '') )
                     dottedName = dottedName[period+1:]
                 if rest and rest[0]=='(':
                     autoCall = False
-            chunks.append( (dottedName, autoCall, rest) )
+            chunks.append((dottedName, autoCall, rest) )
 
         return chunks
 
@@ -992,9 +992,9 @@ class _LowLevelParser(SourceReader):
                         self.setPos(endPos)
 
                     ## finally
-                    addBit( codeFor1stToken + WS + nextToken )
+                    addBit(codeFor1stToken + WS + nextToken )
                 else:
-                    addBit( codeFor1stToken + WS)
+                    addBit(codeFor1stToken + WS)
             elif self.matchCheetahVarStart():
                 # it has syntax that is only valid at the top level
                 self._raiseErrorAboutInvalidCheetahVarSyntaxInExpr()
@@ -1069,7 +1069,7 @@ class _LowLevelParser(SourceReader):
             elif self.startswith(self.cheetahVarStartToken) and not onDefVal:
                 self.advance(len(self.cheetahVarStartToken))
             elif self.matchIdentifier() and not onDefVal:
-                argList.add_argument( self.getIdentifier() )
+                argList.add_argument(self.getIdentifier() )
             elif onDefVal:
                 if self.matchCheetahVarInExpressionStartToken():
                     token = self.getCheetahVar()
@@ -1135,7 +1135,7 @@ class _LowLevelParser(SourceReader):
             c = self.peek()
             if c in "{([":
                 exprBits.append(c)
-                enclosures.append( (c, self.pos()) )
+                enclosures.append((c, self.pos()) )
                 self.advance()
             elif enclosed and not enclosures:
                 break
@@ -1167,7 +1167,7 @@ class _LowLevelParser(SourceReader):
                 if not eolMatch:
                     self.advance()
                     raise ParseError(self, msg='Line ending expected')
-                self.setPos( eolMatch.end() )
+                self.setPos(eolMatch.end() )
             elif c in '\r\n':
                 if enclosures:
                     self.advance()
@@ -1297,7 +1297,7 @@ class _LowLevelParser(SourceReader):
         if self.peek() in '({[':
             pos = self.pos()
             enclosureOpenChar = self.getc()
-            enclosures = [ (enclosureOpenChar, pos) ]
+            enclosures = [(enclosureOpenChar, pos) ]
             self.getWhiteSpace()
         else:
             enclosures = []

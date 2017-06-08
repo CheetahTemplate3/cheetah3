@@ -548,7 +548,7 @@ def listTests(cheetahWrapperFile):
 
        XXX TODO: don't print test where expectError is true.
     """
-    rx = re.compile( R'self\.go\("(.*?)"\)' )
+    rx = re.compile(R'self\.go\("(.*?)"\)' )
     f = open(cheetahWrapperFile)
     while True:
         lin = f.readline()

@@ -92,7 +92,7 @@ class FileFinder:
                 fullPath = join(dir, baseName)
                 if isdir(fullPath):
                     if filterDir(baseName, fullPath):
-                        addDir( fullPath )
+                        addDir(fullPath )
 
     def filterDir(self, baseName, fullPath):
 
@@ -104,7 +104,7 @@ class FileFinder:
     def processDir(self, dir, glob=glob):
         extend = self._files.extend
         for pattern in self._globPatterns:
-            extend( glob(os.path.join(dir, pattern)) )
+            extend(glob(os.path.join(dir, pattern)) )
 
     def files(self):
         return self._files
@@ -188,10 +188,10 @@ class _GenSubberFunc:
         self.addChunk(repr(strConst))
 
     def eatBackref(self):
-        self.addChunk( 'm.group(' + self.getBackref() + ')' )
+        self.addChunk('m.group(' + self.getBackref() + ')' )
 
     def eatGroup(self):
-        self.addChunk( 'm.group("' + self.getGroup() + '")' )
+        self.addChunk('m.group("' + self.getGroup() + '")' )
 
     def addChunk(self, chunk):
         self._codeChunks.append(chunk)

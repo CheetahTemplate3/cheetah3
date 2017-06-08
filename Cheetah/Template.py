@@ -1901,13 +1901,13 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
     for i in range(1, 4):
         if pyLineno-i <=0:
             break
-        prevLines.append( (pyLineno+1-i, lines[pyLineno-i]) )
+        prevLines.append((pyLineno+1-i, lines[pyLineno-i]) )
 
     nextLines = []                  # (i, content)
     for i in range(1, 4):
         if not pyLineno+i < len(lines):
             break
-        nextLines.append( (pyLineno+i, lines[pyLineno+i]) )
+        nextLines.append((pyLineno+i, lines[pyLineno+i]) )
     nextLines.reverse()
     report = 'Line|Python Code\n'
     report += '----|-------------------------------------------------------------\n'

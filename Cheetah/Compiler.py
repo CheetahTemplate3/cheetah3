@@ -380,7 +380,7 @@ class MethodCompiler(GenUtils):
         self._methodSignature = signature
 
     def methodBody(self):
-        return ''.join( self._methodBodyChunks )
+        return ''.join(self._methodBodyChunks )
 
     def docString(self):
         if not self._docStringLines:
@@ -526,7 +526,7 @@ class MethodCompiler(GenUtils):
             self.endCacheRegion()
 
     def addSilent(self, expr):
-        self.addChunk( expr )
+        self.addChunk(expr )
 
     def addEcho(self, expr, rawExpr=None):
         self.addFilteredChunk(expr, rawExpr=rawExpr)
@@ -580,7 +580,7 @@ class MethodCompiler(GenUtils):
     def addIndentingDirective(self, expr, lineCol=None):
         if expr and not expr[-1] == ':':
             expr = expr  + ':'
-        self.addChunk( expr )
+        self.addChunk(expr )
         if lineCol:
             self.appendToPrevChunk(' # generated from line %s, col %s'%lineCol )
         self.indent()
@@ -592,7 +592,7 @@ class MethodCompiler(GenUtils):
         if not expr[-1] == ':':
             expr = expr  + ':'
 
-        self.addChunk( expr )
+        self.addChunk(expr )
         if lineCol:
             self.appendToPrevChunk(' # generated from line %s, col %s'%lineCol )
         self.indent()
@@ -977,7 +977,7 @@ class AutoMethodCompiler(MethodCompiler):
 
     def _setupState(self):
         MethodCompiler._setupState(self)
-        self._argStringList = [ ("self", None) ]
+        self._argStringList = [("self", None) ]
         self._streamingEnabled = True
         self._isClassMethod = None
         self._isStaticMethod = None
@@ -1095,7 +1095,7 @@ class AutoMethodCompiler(MethodCompiler):
         self.addChunk('return _dummyTrans and trans.response().getvalue() or ""')
 
     def addMethArg(self, name, defVal=None):
-        self._argStringList.append( (name, defVal) )
+        self._argStringList.append((name, defVal) )
 
     def methodSignature(self):
         argStringChunks = []
@@ -1304,7 +1304,7 @@ class ClassCompiler(GenUtils):
     def _swallowMethodCompiler(self, methodCompiler, pos=None):
         methodCompiler.cleanupState()
         if pos==None:
-            self._finishedMethodsList.append( methodCompiler )
+            self._finishedMethodsList.append(methodCompiler )
         else:
             self._finishedMethodsList.insert(pos, methodCompiler)
         return methodCompiler
@@ -1328,7 +1328,7 @@ class ClassCompiler(GenUtils):
         self._decoratorsForNextMethod.append(decoratorExpr)
 
     def addClassDocString(self, line):
-        self._classDocStringLines.append( line.replace('%', '%%'))
+        self._classDocStringLines.append(line.replace('%', '%%'))
 
     def addChunkToInit(self, chunk):
         self._initMethChunks.append(chunk)
@@ -1705,7 +1705,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
     def _swallowClassCompiler(self, classCompiler):
         classCompiler.cleanupState()
-        self._finishedClassesList.append( classCompiler )
+        self._finishedClassesList.append(classCompiler )
         self._finishedClassIndex[classCompiler.className()] = classCompiler
         return classCompiler
 
@@ -1784,7 +1784,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
                         baseclasses.append(finalClassName)
                         importStatement = "from %s import %s" % (modName, finalClassName)
                         self.addImportStatement(importStatement)
-                        self.addImportedVarNames( [finalClassName,] )
+                        self.addImportedVarNames([finalClassName,] )
 
             self._getActiveClassCompiler().setBaseClass(', '.join(baseclasses))
 

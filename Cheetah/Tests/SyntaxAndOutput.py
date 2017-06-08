@@ -2076,7 +2076,7 @@ class SetDirective(OutputTest):
 
     def test5(self):
         """#set with a dictionary"""
-        self.verify(     """#set $testDict = {'one':'one1','two':'two2','three':'three3'}
+        self.verify("""#set $testDict = {'one':'one1','two':'two2','three':'three3'}
 $testDict.one
 $testDict.two""",
                     "one1\ntwo2")

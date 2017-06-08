@@ -89,7 +89,7 @@ def mean(lis):
     lis_len = len(lis)
     if lis_len == 0:
         return 0.00 # Avoid ZeroDivisionError (not raised for floats anyway)
-    total = float( sum(lis) )
+    total = float(sum(lis) )
     return total / lis_len
 
 def median(lis):
@@ -384,7 +384,7 @@ class MondoReport:
         origList = self._origList
         origList_len = len(origList)
         start = max(0, start)
-        end = min( start + size, len(self._origList) )
+        end = min(start + size, len(self._origList) )
         mySlice = origList[start:end]
         ret = []
         for rel in range(size):
