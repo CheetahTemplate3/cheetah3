@@ -65,7 +65,7 @@ class mod_install_data(install_data):
             self.install_dir = installobj.install_lib
         install_data.finalize_options(self)
 
-    def run (self):
+    def run(self):
 
         if not self.dry_run:
             self.mkpath(self.install_dir)
