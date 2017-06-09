@@ -579,7 +579,7 @@ class MethodCompiler(GenUtils):
 
     def addIndentingDirective(self, expr, lineCol=None):
         if expr and not expr[-1] == ':':
-            expr = expr  + ':'
+            expr = expr + ':'
         self.addChunk(expr)
         if lineCol:
             self.appendToPrevChunk(' # generated from line %s, col %s'%lineCol)
@@ -590,7 +590,7 @@ class MethodCompiler(GenUtils):
         if dedent:
             self.dedent()
         if not expr[-1] == ':':
-            expr = expr  + ':'
+            expr = expr + ':'
 
         self.addChunk(expr)
         if lineCol:
