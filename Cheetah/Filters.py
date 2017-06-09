@@ -111,7 +111,7 @@ class CodeHighlighter(EncodeUnicode):
         css = formatter.get_style_defs('.code_highlighter')
         return '''<style type="text/css"><!--
                 %(css)s
-            --></style>%(source)s''' % {'css' : css, 'source' : encoded}
+            --></style>%(source)s''' % {'css': css, 'source': encoded}
 
 
 

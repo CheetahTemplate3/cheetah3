@@ -190,7 +190,7 @@ class Unicode_in_SearchList_Test(CommandLineTest):
 
         template = self.createAndCompile(source)
         assert template and issubclass(template, Template)
-        template = template(searchList=[{'adjective' : u'neat'}])
+        template = template(searchList=[{'adjective': u'neat'}])
         assert template.respond()
 
     def test_Thai(self):
@@ -200,8 +200,8 @@ class Unicode_in_SearchList_Test(CommandLineTest):
         assert template and issubclass(template, Template)
         template = template(
             searchList=[{
-                'foo' : 'bar',
-                'adjective' :
+                'foo': 'bar',
+                'adjective':
                     u'\u0e22\u0e34\u0e19\u0e14\u0e35\u0e15'
                     u'\u0e49\u0e2d\u0e19\u0e23\u0e31\u0e1a'
               }])
@@ -213,7 +213,7 @@ class Unicode_in_SearchList_Test(CommandLineTest):
         source = '''This is $adjective'''
         template = self.createAndCompile(source)
         assert template and issubclass(template, Template)
-        template = template(searchList=[{'adjective' : utf8}])
+        template = template(searchList=[{'adjective': utf8}])
         assert template.respond()
 
 
@@ -244,18 +244,18 @@ class InlineSpanishTest(unittest.TestCase):
         def test_failure(self):
             """ Test a template lacking a proper #encoding tag """
             self.assertRaises(UnicodeDecodeError, Template, self.template, 
-                              searchList=[{'header' : '',
-                                           'nombre' : '',
-                                           'numpedidos_bodega' : '',
-                                           'numpedidos_noconf' : ''}])
+                              searchList=[{'header': '',
+                                           'nombre': '',
+                                           'numpedidos_bodega': '',
+                                           'numpedidos_noconf': ''}])
 
     def test_success(self):
         """ Test a template with a proper #encoding tag """
         template = '#encoding utf-8\n%s' % self.template
-        template = Template(template, searchList=[{'header' : '',
-                                                   'nombre' : '',
-                                                   'numpedidos_bodega' : '',
-                                                   'numpedidos_noconf' : ''}])
+        template = Template(template, searchList=[{'header': '',
+                                                   'nombre': '',
+                                                   'numpedidos_bodega': '',
+                                                   'numpedidos_noconf': ''}])
         self.assertTrue(unicode(template))
 
 

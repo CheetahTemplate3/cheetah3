@@ -228,12 +228,12 @@ class LongCompile_CompilerSettingsTest(LongCompileTest):
     def compile(self, template):
         return Cheetah.Template.Template.compile(
             template, keepRefToGeneratedCode=False,
-            compilerSettings={'useStackFrames' : True, 'useAutocalling' : True})
+            compilerSettings={'useStackFrames': True, 'useAutocalling': True})
 
 class LongCompileAndRun(LongCompileTest):
     def performanceSample(self):
         template = super(LongCompileAndRun, self).performanceSample()
-        template = template(searchList=[{'title' : 'foo'}])
+        template = template(searchList=[{'title': 'foo'}])
         template = template.respond()
 
 

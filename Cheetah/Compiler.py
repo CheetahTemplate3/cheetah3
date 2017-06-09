@@ -1222,7 +1222,7 @@ class ClassCompiler(GenUtils):
                                              klass=self.methodCompilerClassForInit)
         __init__.setMethodSignature("def __init__(self, *args, **KWs)")
         __init__.addChunk('super(%s, self).__init__(*args, **KWs)' % self._className)
-        __init__.addChunk(_initMethod_initCheetah % {'className' : self._className})
+        __init__.addChunk(_initMethod_initCheetah % {'className': self._className})
         for chunk in self._initMethChunks:
             __init__.addChunk(chunk)
         __init__.cleanupState()

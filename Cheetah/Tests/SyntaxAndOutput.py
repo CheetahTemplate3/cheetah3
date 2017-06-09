@@ -2396,7 +2396,7 @@ class PSP(OutputTest):
 
     def test10(self):
         """ Using getVar and write within a PSP """
-        self._searchList = [{'me' : 1}]
+        self._searchList = [{'me': 1}]
         template = '''This is my template
 <%
 me = self.getVar('me')

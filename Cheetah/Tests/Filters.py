@@ -22,7 +22,7 @@ Header
         expected = '''<p>bar</p>
 <h1>Header</h1>'''
         try:
-            template = Cheetah.Template.Template(template, searchList=[{'foo' : 'bar'}])
+            template = Cheetah.Template.Template(template, searchList=[{'foo': 'bar'}])
             template = str(template)
             assert template == expected
         except ImportError as ex:
@@ -44,7 +44,7 @@ class BasicCodeHighlighterFilterTest(unittest.TestCase):
 def foo(self):
     return '$foo'
         '''
-        template = Cheetah.Template.Template(template, searchList=[{'foo' : 'bar'}])
+        template = Cheetah.Template.Template(template, searchList=[{'foo': 'bar'}])
         template = str(template)
         assert template, (template, 'We should have some content here...')
 
@@ -55,7 +55,7 @@ def foo(self):
 
 <html><head></head><body>$foo</body></html>
         '''
-        template = Cheetah.Template.Template(template, searchList=[{'foo' : 'bar'}])
+        template = Cheetah.Template.Template(template, searchList=[{'foo': 'bar'}])
         template = str(template)
         assert template, (template, 'We should have some content here...')
 
