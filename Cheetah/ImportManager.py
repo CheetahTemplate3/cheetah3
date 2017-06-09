@@ -167,7 +167,7 @@ class DirOwner(Owner):
     def getmod(self, nm,
                getsuffixes=imp.get_suffixes, loadco=marshal.loads, newmod=imp.new_module):
 
-        pth =  _os_path_join(self.path, nm)
+        pth = _os_path_join(self.path, nm)
 
         possibles = [(pth, 0, None)]
         if pathIsDir(pth):

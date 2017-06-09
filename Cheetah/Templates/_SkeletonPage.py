@@ -86,7 +86,7 @@ class _SkeletonPage(Template):
                 attribCode += str(k) + ': ' + str(v) + '; '
             attribCode = attribCode[:-2] # get rid of the last semicolon
 
-            cssCode = '\n' + identifier + ' {' +  attribCode + '}'
+            cssCode = '\n' + identifier + ' {' + attribCode + '}'
             stylesheetTagsTxt += cssCode
 
         stylesheetTagsTxt += '\n//--></style>\n'

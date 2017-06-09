@@ -55,7 +55,7 @@ class CheetahDirOwner(DirOwner):
                 return mod
 
             for ext in self.templateFileExtensions:
-                tmplPath =  os.path.join(self.path, name + ext)
+                tmplPath = os.path.join(self.path, name + ext)
                 if os.path.exists(tmplPath):
                     try:
                         return self._compile(name, tmplPath)

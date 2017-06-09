@@ -1949,15 +1949,16 @@ if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
     templateAPIClass._addCheetahPlumbingCodeToClass(%(mainClassName)s)
 
 %(footer)s
-""" %   {'header': self.moduleHeader(),
-         'docstring': self.moduleDocstring(),
-         'specialVars': self.specialVars(),
-         'imports': self.importStatements(),
-         'constants': self.moduleConstants(),
-         'classes': self.classDefs(),
-         'footer': self.moduleFooter(),
-         'mainClassName': self._mainClassName,
-         }
+""" % {
+            'header': self.moduleHeader(),
+            'docstring': self.moduleDocstring(),
+            'specialVars': self.specialVars(),
+            'imports': self.importStatements(),
+            'constants': self.moduleConstants(),
+            'classes': self.classDefs(),
+            'footer': self.moduleFooter(),
+            'mainClassName': self._mainClassName,
+            }
 
         self._moduleDef = moduleDef
         return moduleDef

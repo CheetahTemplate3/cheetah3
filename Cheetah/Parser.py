@@ -101,11 +101,11 @@ keywords = ('and',       'del',       'for',       'is',        'raise',
 single3 = "'''"
 double3 = '"""'
 
-tripleQuotedStringStarts =  ("'''", '"""',
-                             "r'''", 'r"""', "R'''", 'R"""',
-                             "u'''", 'u"""', "U'''", 'U"""',
-                             "ur'''", 'ur"""', "Ur'''", 'Ur"""',
-                             "uR'''", 'uR"""', "UR'''", 'UR"""')
+tripleQuotedStringStarts = ("'''", '"""',
+                            "r'''", 'r"""', "R'''", 'R"""',
+                            "u'''", 'u"""', "U'''", 'U"""',
+                            "ur'''", 'ur"""', "Ur'''", 'Ur"""',
+                            "uR'''", 'uR"""', "UR'''", 'UR"""')
 
 tripleQuotedStringPairs = {"'''": single3, '"""': double3,
                            "r'''": single3, 'r"""': double3,
@@ -418,14 +418,14 @@ class _LowLevelParser(SourceReader):
         """Setup the regexs for Cheetah $var parsing."""
 
         num = r'[0-9\.]+'
-        interval =   (r'(?P<interval>' +
-                      num + r's|' +
-                      num + r'm|' +
-                      num + r'h|' +
-                      num + r'd|' +
-                      num + r'w|' +
-                      num + ')'
-                      )
+        interval = (r'(?P<interval>' +
+                    num + r's|' +
+                    num + r'm|' +
+                    num + r'h|' +
+                    num + r'd|' +
+                    num + r'w|' +
+                    num + ')'
+                    )
 
         cacheToken = (r'(?:' +
                       r'(?P<REFRESH_CACHE>\*' + interval + '\*)'+
