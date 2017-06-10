@@ -493,8 +493,8 @@ class VFF(VFN):
         self.check('True')
         self.check('None')
         self.check('False')
-        assert self.get('eval', False)==eval
-        assert self.get('range', False)==range
+        assert self.get('eval', False) == eval
+        assert self.get('range', False) == range
 
 class VFFSL(VFS):
     _searchListLength = 1

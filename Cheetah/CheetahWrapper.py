@@ -531,8 +531,8 @@ you do have write permission to and re-run the tests.""")
             except:
                 self.error("There's an error in your --settings option."
                            "It must be valid Python syntax.\n"
-                           +"    --settings='%s'\n"%self.opts.compilerSettingsString
-                           +"  %s: %s"%sys.exc_info()[:2]
+                           + "    --settings='%s'\n" % self.opts.compilerSettingsString
+                           + "  %s: %s"%sys.exc_info()[:2]
                            )
 
             validKeys = set(DEFAULT_COMPILER_SETTINGS.keys())

@@ -18,7 +18,7 @@ from Cheetah.compat import PY2
 
 
 numberRE = re.compile(Number)
-complexNumberRE = re.compile('[\(]*' +Number + r'[ \t]*\+[ \t]*' + Number + '[\)]*')
+complexNumberRE = re.compile('[\(]*' + Number + r'[ \t]*\+[ \t]*' + Number + '[\)]*')
 
 ##################################################
 ## FUNCTIONS ##
@@ -105,8 +105,8 @@ class _SettingsCollector(object):
     def readSettingsFromPySrcStr(self, theString):
         """Return a dictionary of the settings in a Python src string."""
 
-        globalsDict = {'True': (1==1),
-                       'False': (0==1),
+        globalsDict = {'True': (1 == 1),
+                       'False': (0 == 1),
                        }
         newSettings = {'self':self}
         exec((theString+os.linesep), globalsDict, newSettings)

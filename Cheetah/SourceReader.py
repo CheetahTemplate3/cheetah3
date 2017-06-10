@@ -98,13 +98,13 @@ class SourceReader(object):
 
 
     def validPos(self, pos):
-        return pos <= self._breakPoint and pos >=0
+        return pos <= self._breakPoint and pos >= 0
 
     def checkPos(self, pos):
         if not pos <= self._breakPoint:
             raise Error("pos (" + str(pos) + ") is invalid: beyond the stream's end (" +
                         str(self._breakPoint-1) + ")")
-        elif not pos >=0:
+        elif not pos >= 0:
             raise Error("pos (" + str(pos) + ") is invalid: less than 0")
 
     def breakPoint(self):
@@ -132,7 +132,7 @@ class SourceReader(object):
             raise Error("Invalid bookmark (" + name + ") is invalid: does not exist")
         pos = self._bookmarks[name]
         if not self.validPos(pos):
-            raise Error("Invalid bookmark (" + name + ', '+
+            raise Error("Invalid bookmark (" + name + ', ' +
                         str(pos) + ") is invalid: pos is out of range")
         self._pos = pos
 
@@ -158,7 +158,7 @@ class SourceReader(object):
             raise Error('Already at beginning of stream')
 
         self._pos -= 1
-        if not c==None:
+        if not c == None:
             self._src[self._pos] = c
 
     def advance(self, offset=1):

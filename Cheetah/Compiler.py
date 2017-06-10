@@ -31,10 +31,10 @@ from Cheetah.Parser import Parser, ParseError, specialVarRE, \
 from Cheetah.compat import string_type, unicode
 
 from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, valueFromFrameOrSearchList
-VFFSL=valueFromFrameOrSearchList
-VFSL=valueFromSearchList
-VFN=valueForName
-currentTime=time.time
+VFFSL = valueFromFrameOrSearchList
+VFSL = valueFromSearchList
+VFN = valueForName
+currentTime = time.time
 
 class Error(Exception): pass
 
@@ -271,12 +271,12 @@ class GenUtils(object):
                 pythonCode = name+remainder
         elif self.setting('useStackFrames'):
             pythonCode = ('VFFSL(SL,'
-                          '"'+ name + '",'
+                          '"' + name + '",'
                           + repr(defaultUseAC and useAC) + ')'
                           + remainder)
         else:
             pythonCode = ('VFSL([locals()]+SL+[globals(), builtin],'
-                          '"'+ name + '",'
+                          '"' + name + '",'
                           + repr(defaultUseAC and useAC) + ')'
                           + remainder)
         ##
@@ -343,11 +343,11 @@ class MethodCompiler(GenUtils):
         return self._indent * self._indentLev
 
     def indent(self):
-        self._indentLev +=1
+        self._indentLev += 1
 
     def dedent(self):
         if self._indentLev:
-            self._indentLev -=1
+            self._indentLev -= 1
         else:
             raise Error('Attempt to dedent when the indentLev is 0')
 
@@ -414,7 +414,7 @@ class MethodCompiler(GenUtils):
             filterArgs += ', rawExpr=%s'%repr(rawExpr)
 
         if self.setting('alwaysFilterNone'):
-            if rawExpr and rawExpr.find('\n')==-1 and rawExpr.find('\r')==-1:
+            if rawExpr and rawExpr.find('\n') == -1 and rawExpr.find('\r') == -1:
                 self.addChunk("_v = %s # %r"%(chunk, rawExpr))
                 if lineCol:
                     self.appendToPrevChunk(' on line %s, col %s'%lineCol)
@@ -457,7 +457,7 @@ class MethodCompiler(GenUtils):
             out = ['u']
         body = escapedNewlineRE.sub('\\1\n', reprstr[i+1:-1])
 
-        if reprstr[i]=="'":
+        if reprstr[i] == "'":
             out.append("'''")
             out.append(body)
             out.append("'''")
@@ -539,14 +539,14 @@ class MethodCompiler(GenUtils):
             # we need to split the LVALUE to deal with globalSetVars
             splitPos1 = LVALUE.find('.')
             splitPos2 = LVALUE.find('[')
-            if splitPos1 > 0 and splitPos2==-1:
+            if splitPos1 > 0 and splitPos2 == -1:
                 splitPos = splitPos1
             elif splitPos1 > 0 and splitPos1 < max(splitPos2, 0):
                 splitPos = splitPos1
             else:
                 splitPos = splitPos2
 
-            if splitPos >0:
+            if splitPos > 0:
                 primary = LVALUE[:splitPos]
                 secondary = LVALUE[splitPos:]
             else:
@@ -734,8 +734,8 @@ class MethodCompiler(GenUtils):
         # @@TR: add this to a special class var as well
         self.addChunk('')
 
-        self.addChunk('## START CACHE REGION: ID='+ID+
-                      '. line %s, col %s'%lineCol + ' in the source.')
+        self.addChunk('## START CACHE REGION: ID=' + ID
+                      + '. line %s, col %s' % lineCol + ' in the source.')
 
         self.addChunk('_RECACHE_%(ID)s = False'%locals())
         self.addChunk('_cacheRegion_%(ID)s = self.getCacheRegion(regionID='%locals()
@@ -747,8 +747,8 @@ class MethodCompiler(GenUtils):
         self.addChunk('_RECACHE_%(ID)s = True'%locals())
         self.dedent()
 
-        self.addChunk('_cacheItem_%(ID)s = _cacheRegion_%(ID)s.getCacheItem('%locals()
-                      +varyBy+')')
+        self.addChunk('_cacheItem_%(ID)s = _cacheRegion_%(ID)s.getCacheItem(' % locals()
+                      + varyBy + ')')
 
         self.addChunk('if _cacheItem_%(ID)s.hasExpired():'%locals())
         self.indent()
@@ -816,10 +816,9 @@ class MethodCompiler(GenUtils):
         callDetails.usesKeywordArgs = False
         self._callRegionsStack.append((ID, callDetails)) # attrib of current methodCompiler
 
-        self.addChunk('## START %(regionTitle)s REGION: '%locals()
-                      +ID
-                      +' of '+functionName
-                      +' at line %s, col %s'%lineCol + ' in the source.')
+        self.addChunk('## START %(regionTitle)s REGION: ' % locals() + ID
+                      + ' of ' + functionName
+                      + ' at line %s, col %s' % lineCol + ' in the source.')
         self.addChunk('_orig_trans%(ID)s = trans'%locals())
         self.addChunk('_wasBuffering%(ID)s = self._CHEETAH__isBuffering'%locals())
         self.addChunk('self._CHEETAH__isBuffering = True')
@@ -873,10 +872,9 @@ class MethodCompiler(GenUtils):
             reset()
             self.addFilteredChunk('%(functionName)s(%(initialKwArgs)s**_callKws%(ID)s)'%locals())
             self.addChunk('del _callKws%(ID)s'%locals())
-        self.addChunk('## END %(regionTitle)s REGION: '%locals()
-                      +ID
-                      +' of '+functionName
-                      +' at line %s, col %s'%lineCol + ' in the source.')
+        self.addChunk('## END %(regionTitle)s REGION: ' % locals() + ID
+                      + ' of ' + functionName
+                      + ' at line %s, col %s' % lineCol + ' in the source.')
         self.addChunk('')
         self._callRegionsStack.pop() # attrib of current methodCompiler
 
@@ -891,9 +889,8 @@ class MethodCompiler(GenUtils):
         captureDetails.lineCol = lineCol
 
         self._captureRegionsStack.append((ID, captureDetails)) # attrib of current methodCompiler
-        self.addChunk('## START CAPTURE REGION: '+ID
-                      +' '+assignTo
-                      +' at line %s, col %s'%lineCol + ' in the source.')
+        self.addChunk('## START CAPTURE REGION: ' + ID + ' ' + assignTo
+                      + ' at line %s, col %s' % lineCol + ' in the source.')
         self.addChunk('_orig_trans%(ID)s = trans'%locals())
         self.addChunk('_wasBuffering%(ID)s = self._CHEETAH__isBuffering'%locals())
         self.addChunk('self._CHEETAH__isBuffering = True')
@@ -963,7 +960,7 @@ class MethodCompiler(GenUtils):
                 self.addChunk('else:')
                 self.indent()
                 self.addChunk('_filter = self._CHEETAH__currentFilter'
-                              +' = \\\n\t\t\tself._CHEETAH__filters[filterName] = '
+                              + ' = \\\n\t\t\tself._CHEETAH__filters[filterName] = '
                               + 'getattr(self._CHEETAH__filtersLib, filterName)(self).filter')
                 self.dedent()
 
@@ -984,8 +981,8 @@ class AutoMethodCompiler(MethodCompiler):
 
     def _useKWsDictArgForPassingTrans(self):
         alreadyHasTransArg = [argname for argname, defval in self._argStringList
-                              if argname=='trans']
-        return (self.methodName()!='respond'
+                              if argname == 'trans']
+        return (self.methodName() != 'respond'
                 and not alreadyHasTransArg
                 and self.setting('useKWsDictArgForPassingTrans'))
 
@@ -1077,13 +1074,13 @@ class AutoMethodCompiler(MethodCompiler):
             else:
                 self.addChunk('_filter = self._CHEETAH__currentFilter')
         self.addChunk('')
-        self.addChunk("#" *40)
+        self.addChunk("#"*40)
         self.addChunk('## START - generated method body')
         self.addChunk('')
 
     def _addAutoCleanupCode(self):
         self.addChunk('')
-        self.addChunk("#" *40)
+        self.addChunk("#"*40)
         self.addChunk('## END - generated method body')
         self.addChunk('')
 
@@ -1303,7 +1300,7 @@ class ClassCompiler(GenUtils):
 
     def _swallowMethodCompiler(self, methodCompiler, pos=None):
         methodCompiler.cleanupState()
-        if pos==None:
+        if pos == None:
             self._finishedMethodsList.append(methodCompiler)
         else:
             self._finishedMethodsList.insert(pos, methodCompiler)
@@ -1388,7 +1385,7 @@ class ClassCompiler(GenUtils):
         catcherMeth.indent()
         catcherMeth.addChunk("return self._CHEETAH__errorCatcher.warn(exc_val=e, code= " +
                              repr(codeChunk) + " , rawCode= " +
-                             repr(rawCode) + " , lineCol=" + str(lineCol) +")")
+                             repr(rawCode) + " , lineCol=" + str(lineCol) + ")")
 
         catcherMeth.cleanupState()
 
@@ -1738,7 +1735,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             baseClassName = handler(compiler=self, baseClassName=baseClassName)
             self._getActiveClassCompiler().setBaseClass(baseClassName)
         elif (not self.setting('autoImportForExtendsDirective')
-                or baseClassName=='object'
+                or baseClassName == 'object'
                 or baseClassName in self.importedVarNames()):
             self._getActiveClassCompiler().setBaseClass(baseClassName)
             # no need to import
@@ -1755,7 +1752,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             for klass in baseClassName.split(','):
                 klass = klass.strip()
                 chunks = klass.split('.')
-                if len(chunks)==1:
+                if len(chunks) == 1:
                     baseclasses.append(klass)
                     if klass not in self.importedVarNames():
                         modName = klass
@@ -1976,7 +1973,7 @@ if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
 
             header += (
                 '#' + ' '*offSet +
-                ('\n#'+ ' '*offSet).join(self._moduleHeaderLines) + '\n')
+                ('\n#' + ' '*offSet).join(self._moduleHeaderLines) + '\n')
 
         return header
 

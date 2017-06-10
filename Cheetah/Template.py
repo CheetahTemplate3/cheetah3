@@ -1019,7 +1019,7 @@ class Template(Servlet):
                 def __unicode__(self):
                     return getattr(self, mainMethName)()
             elif (hasattr(concreteTemplateClass, 'respond')
-                  and concreteTemplateClass.respond!=Servlet.respond):
+                  and concreteTemplateClass.respond != Servlet.respond):
                 def __str__(self):
                     rc = self.respond()
                     if PY2 and isinstance(rc, unicode):
@@ -1899,7 +1899,7 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
 
     prevLines = []                  # (i, content)
     for i in range(1, 4):
-        if pyLineno-i <=0:
+        if pyLineno-i <= 0:
             break
         prevLines.append((pyLineno+1-i, lines[pyLineno-i]))
 
@@ -1913,14 +1913,14 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
     report += '----|-------------------------------------------------------------\n'
     while prevLines:
         lineInfo = prevLines.pop()
-        report += "%(row)-4d|%(line)s\n"% {'row':lineInfo[0], 'line':lineInfo[1]}
+        report += "%(row)-4d|%(line)s\n" % {'row':lineInfo[0], 'line':lineInfo[1]}
 
     if hasattr(exception, 'offset'):
         report += ' '*(3+(exception.offset or 0)) + '^\n'
 
     while nextLines:
         lineInfo = nextLines.pop()
-        report += "%(row)-4d|%(line)s\n"% {'row':lineInfo[0], 'line':lineInfo[1]}
+        report += "%(row)-4d|%(line)s\n" % {'row':lineInfo[0], 'line':lineInfo[1]}
 
 
     message = [

@@ -55,7 +55,7 @@ import os
 import os.path
 from distutils.core import Extension
 
-ext_modules=[
+ext_modules = [
              Extension("Cheetah._namemapper",
                        [os.path.join('Cheetah', 'c', '_namemapper.c')]),
              # Extension("Cheetah._verifytype",

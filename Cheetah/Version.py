@@ -9,13 +9,13 @@ def convertVersionStringToTuple(s):
     versionNum = [0, 0, 0]
     releaseType = 'final'
     releaseTypeSubNum = 0
-    if s.find('a')!=-1:
+    if s.find('a') != -1:
         num, releaseTypeSubNum = s.split('a')
         releaseType = 'alpha'
-    elif s.find('b')!=-1:
+    elif s.find('b') != -1:
         num, releaseTypeSubNum = s.split('b')
         releaseType = 'beta'
-    elif s.find('rc')!=-1:
+    elif s.find('rc') != -1:
         num, releaseTypeSubNum = s.split('rc')
         releaseType = 'candidate'
     else:
@@ -23,7 +23,7 @@ def convertVersionStringToTuple(s):
     num = num.split('.')
     for i in range(len(num)):
         versionNum[i] = int(num[i])
-    if len(versionNum)<3:
+    if len(versionNum) < 3:
         versionNum += [0]
     releaseTypeSubNum = int(releaseTypeSubNum)
 

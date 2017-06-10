@@ -44,7 +44,7 @@ class Hierarchy:
             self._crumbCSSClass = ' class="%s"' % crumbCSSClass
         else:
             self._crumbCSSClass = ''
-        self._prefix=prefix
+        self._prefix = prefix
 
 
     ## Main output methods

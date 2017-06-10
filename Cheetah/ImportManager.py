@@ -435,7 +435,7 @@ class ImportManager:
             if i:
                 break
 
-        if i<len(nmparts):
+        if i < len(nmparts):
             if ctx and hasattr(sys.modules[ctx], nmparts[i]):
                 return sys.modules[nmparts[0]]
             del sys.modules[fqname]

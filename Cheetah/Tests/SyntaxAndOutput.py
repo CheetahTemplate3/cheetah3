@@ -175,7 +175,7 @@ Template output mismatch:
                 moduleCode.encode('ascii', 'backslashreplace').decode('ascii'))
         try:
             output = templateObj.respond() # rather than __str__, because of unicode
-            assert output==expectedOutput, self._outputMismatchReport(output, expectedOutput)
+            assert output == expectedOutput, self._outputMismatchReport(output, expectedOutput)
         finally:
             templateObj.shutdown()
 
@@ -609,19 +609,19 @@ class Placeholders(OutputTest):
         names = namesStr.split()
 
         tmpl = Template.compile('#for name in $names: $name ', baseclass=dict)
-        assert str(tmpl({'names':names})).strip()==namesStr
+        assert str(tmpl({'names':names})).strip() == namesStr
 
         tmpl = tmpl.subclass('#for name in $names: $*name ')
-        assert str(tmpl({'names':names}))=='You '*len(names)
+        assert str(tmpl({'names':names})) == 'You '*len(names)
 
         tmpl = tmpl.subclass('#for name in $names: $*1*name ')
-        assert str(tmpl({'names':names}))=='You '*len(names)
+        assert str(tmpl({'names':names})) == 'You '*len(names)
 
         tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
-        assert str(tmpl({'names':names}))=='You '*len(names)
+        assert str(tmpl({'names':names})) == 'You '*len(names)
 
         tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
-        assert str(tmpl(names=names))=='You '*len(names)
+        assert str(tmpl(names=names)) == 'You '*len(names)
 
 class Placeholders_Vals(OutputTest):
     convertEOLs = False
@@ -1504,7 +1504,7 @@ class YieldDirective(OutputTest):
             #print klass._CHEETAH_generatedModuleCode
             iter = klass().respond()
             output = [str(i) for i in iter]
-            assert ''.join(output)=='0123456789'
+            assert ''.join(output) == '0123456789'
             #print ''.join(output)
 
         # @@TR: need to expand this to cover error conditions etc.
@@ -1795,10 +1795,10 @@ class DefDirective(OutputTest):
     def test19(self):
         """#def that extends over two lines with arguments"""
         self.verify("#def $testMeth($arg=1234,\n"
-                    +"  $arg2=5678)\n"
-                    +"$arg $arg2\n"
-                    +"#end def\n"
-                    +"$testMeth",
+                    + "  $arg2=5678)\n"
+                    + "$arg $arg2\n"
+                    + "#end def\n"
+                    + "$testMeth",
                     "1234 5678\n")
 
 class DecoratorDirective(OutputTest):
@@ -1810,22 +1810,22 @@ class DecoratorDirective(OutputTest):
         self.verify("#@@TR: comment", "#@@TR: comment")
 
         self.verify("#from Cheetah.Tests.SyntaxAndOutput import testdecorator\n"
-                    +"#@testdecorator"
-                    +"\n#def $testMeth():1234\n$testMeth",
+                    + "#@testdecorator"
+                    + "\n#def $testMeth():1234\n$testMeth",
 
                     "1234")
 
         self.verify("#from Cheetah.Tests.SyntaxAndOutput import testdecorator\n"
-                    +"#@testdecorator"
-                    +"\n#block $testMeth():1234",
+                    + "#@testdecorator"
+                    + "\n#block $testMeth():1234",
 
                     "1234")
 
         try:
             self.verify(
                 "#from Cheetah.Tests.SyntaxAndOutput import testdecorator\n"
-                +"#@testdecorator\n sdf"
-                +"\n#def $testMeth():1234\n$testMeth",
+                + "#@testdecorator\n sdf"
+                + "\n#def $testMeth():1234\n$testMeth",
 
                 "1234")
         except ParseError:
@@ -1836,10 +1836,10 @@ class DecoratorDirective(OutputTest):
     def test2(self):
         """#def with multiple decorators"""
         self.verify("#from Cheetah.Tests.SyntaxAndOutput import testdecorator\n"
-                    +"#@testdecorator\n"
-                    +"#@testdecorator\n"
-                    +"#def testMeth\n"
-                    +"1234\n"
+                    + "#@testdecorator\n"
+                    + "#@testdecorator\n"
+                    + "#def testMeth\n"
+                    + "1234\n"
                     "#end def\n"
                     "$testMeth",
                     "1234\n")
@@ -2787,7 +2787,7 @@ class SuperDirective(OutputTest):
         expected = ('this is base foo          '
                     'This is child foo\nthis is base foo          '
                     'super-1234\n super-99')
-        assert str(tmpl2()).strip()==expected
+        assert str(tmpl2()).strip() == expected
 
 
 class ImportantExampleCases(OutputTest):
@@ -2802,7 +2802,7 @@ $sep$letter#slurp
                     "a, b, c")
 
 class FilterDirective(OutputTest):
-    convertEOLs=False
+    convertEOLs = False
 
     def _getCompilerSettings(self):
         return {'useFilterArgsInPlaceholders':True}
@@ -2973,7 +2973,7 @@ class MiscComplexSyntax(OutputTest):
 class CGI(OutputTest):
     """CGI scripts with(out) the CGI environment and with(out) GET variables.
     """
-    convertEOLs=False
+    convertEOLs = False
 
     def _beginCGI(self):
         os.environ['REQUEST_METHOD'] = "GET"
@@ -3134,7 +3134,7 @@ $i""",
 
 
 class Indenter(OutputTest):
-    convertEOLs=False
+    convertEOLs = False
 
     source = """
 public class X

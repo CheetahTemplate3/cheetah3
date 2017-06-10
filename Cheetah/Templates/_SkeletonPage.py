@@ -176,7 +176,7 @@ class _SkeletonPage(Template):
         return time.strftime(formatString, time.localtime(time.time()))
 
     def spacer(self, width=1,height=1):
-        return '<img src="spacer.gif" width="%s" height="%s" alt="" />'% (str(width), str(height))
+        return '<img src="spacer.gif" width="%s" height="%s" alt="" />' % (str(width), str(height))
 
     def formHTMLTag(self, tagName, attributes={}):
         """returns a string containing an HTML <tag> """

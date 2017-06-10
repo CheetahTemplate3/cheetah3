@@ -62,7 +62,7 @@ class CheetahDirOwner(DirOwner):
                     except:
                         # @@TR: log the error
                         exc_txt = traceback.format_exc()
-                        exc_txt ='  '+('  \n'.join(exc_txt.splitlines()))
+                        exc_txt = '  ' + ('  \n'.join(exc_txt.splitlines()))
                         raise ImportError(
                             'Error while compiling Cheetah module'
                             ' %(name)s, original traceback follows:\n%(exc_txt)s'%locals())
@@ -117,7 +117,7 @@ def install(templateFileExtensions=('.tmpl',)):
             ImportManager._globalOwnerTypes.insert(0, CheetahDirOwner)
             #ImportManager._globalOwnerTypes.append(CheetahDirOwner)
             global _manager
-            _manager=ImportManager.ImportManager()
+            _manager = ImportManager.ImportManager()
             _manager.setThreaded()
             _manager.install()
 
