@@ -12,6 +12,11 @@ Documentation:
 
   - Rename www directory to docs.
 
+Tests:
+
+  - Use remove-old-files.py from ppu to cleanup pip cache
+    at Travis and AppVeyor.
+
 3.0.0 (2017-05-07)
 ------------------
 

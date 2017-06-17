@@ -30,7 +30,10 @@ matrix:
     - env: TOXENV=pypy
 
 install:
-  - travis_retry pip install tox
+  - travis_retry pip install tox ppu
 
 script:
   - tox
+
+before_cache:
+  - remove-old-files.py -o 180 ~/.cache/pip
