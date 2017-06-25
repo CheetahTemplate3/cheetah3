@@ -503,7 +503,7 @@ you do have write permission to and re-run the tests.""")
 
         modname, classname = modname.split(':')
 
-        C('using --templateAPIClass=%s:%s'%(modname, classname))
+        C('using --templateAPIClass=%s:%s' % (modname, classname))
 
         if p >= 0:
             mod = getattr(__import__(modname[:p], {}, {}, [modname[p+1:]]), modname[p+1:])
@@ -527,18 +527,18 @@ you do have write permission to and re-run the tests.""")
             return kws
         if self.opts.compilerSettingsString:
             try:
-                settings = eval('getkws(%s)'%self.opts.compilerSettingsString)
+                settings = eval('getkws(%s)' % self.opts.compilerSettingsString)
             except:
                 self.error("There's an error in your --settings option."
                            "It must be valid Python syntax.\n"
                            + "    --settings='%s'\n" % self.opts.compilerSettingsString
-                           + "  %s: %s"%sys.exc_info()[:2]
+                           + "  %s: %s" % sys.exc_info()[:2]
                            )
 
             validKeys = set(DEFAULT_COMPILER_SETTINGS.keys())
             if [k for k in settings if k not in validKeys]:
                 self.error(
-                    'The --setting "%s" is not a valid compiler setting name.'%k)
+                    'The --setting "%s" is not a valid compiler setting name.' % k)
 
             self._compilerSettings = settings
             return settings

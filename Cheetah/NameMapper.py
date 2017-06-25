@@ -169,9 +169,9 @@ class NotFound(LookupError):
     pass
 
 def _raiseNotFoundException(key, namespace):
-    excString = "cannot find '%s'"%key
+    excString = "cannot find '%s'" % key
     if _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS:
-        excString += ' in the namespace %s'%pformat(namespace)
+        excString += ' in the namespace %s' % pformat(namespace)
     raise NotFound(excString)
 
 def _wrapNotFoundException(exc, fullName, namespace):
@@ -182,7 +182,7 @@ def _wrapNotFoundException(exc, fullName, namespace):
         if excStr.find('while searching') == -1: # only wrap once!
             excStr += " while searching for '%s'" % fullName
             if _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS:
-                excStr += ' in the namespace %s'%pformat(namespace)
+                excStr += ' in the namespace %s' % pformat(namespace)
             exc.args = (excStr,)
         raise
 

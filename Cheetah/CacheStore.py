@@ -45,12 +45,12 @@ class MemoryCacheStore(AbstractCacheStore):
 
     def add(self, key, val, time=0):
         if key in self._data:
-            raise Error('a value for key %r is already in the cache'%key)
+            raise Error('a value for key %r is already in the cache' % key)
         self._data[key] = (val, time)
 
     def replace(self, key, val, time=0):
         if key in self._data:
-            raise Error('a value for key %r is already in the cache'%key)
+            raise Error('a value for key %r is already in the cache' % key)
         self._data[key] = (val, time)
 
     def delete(self, key):
@@ -81,13 +81,13 @@ class MemcachedCacheStore(AbstractCacheStore):
     def add(self, key, val, time=0):
         res = self._client.add(key, val, time)
         if not res:
-            raise Error('a value for key %r is already in the cache'%key)
+            raise Error('a value for key %r is already in the cache' % key)
         self._data[key] = (val, time)
 
     def replace(self, key, val, time=0):
         res = self._client.replace(key, val, time)
         if not res:
-            raise Error('a value for key %r is already in the cache'%key)
+            raise Error('a value for key %r is already in the cache' % key)
         self._data[key] = (val, time)
 
     def delete(self, key):

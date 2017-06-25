@@ -411,25 +411,25 @@ class MethodCompiler(GenUtils):
         if filterArgs is None:
             filterArgs = ''
         if self.setting('includeRawExprInFilterArgs') and rawExpr:
-            filterArgs += ', rawExpr=%s'%repr(rawExpr)
+            filterArgs += ', rawExpr=%s' % repr(rawExpr)
 
         if self.setting('alwaysFilterNone'):
             if rawExpr and rawExpr.find('\n') == -1 and rawExpr.find('\r') == -1:
-                self.addChunk("_v = %s # %r"%(chunk, rawExpr))
+                self.addChunk("_v = %s # %r" % (chunk, rawExpr))
                 if lineCol:
-                    self.appendToPrevChunk(' on line %s, col %s'%lineCol)
+                    self.appendToPrevChunk(' on line %s, col %s' % lineCol)
             else:
-                self.addChunk("_v = %s"%chunk)
+                self.addChunk("_v = %s" % chunk)
 
             if self.setting('useFilters'):
-                self.addChunk("if _v is not None: write(_filter(_v%s))"%filterArgs)
+                self.addChunk("if _v is not None: write(_filter(_v%s))" % filterArgs)
             else:
                 self.addChunk("if _v is not None: write(str(_v))")
         else:
             if self.setting('useFilters'):
-                self.addChunk("write(_filter(%s%s))"%(chunk, filterArgs))
+                self.addChunk("write(_filter(%s%s))" % (chunk, filterArgs))
             else:
-                self.addChunk("write(str(%s))"%chunk)
+                self.addChunk("write(str(%s))" % chunk)
 
     def _appendToPrevStrConst(self, strConst):
         if self._pendingStrConstChunks:
@@ -582,7 +582,7 @@ class MethodCompiler(GenUtils):
             expr = expr + ':'
         self.addChunk(expr)
         if lineCol:
-            self.appendToPrevChunk(' # generated from line %s, col %s'%lineCol)
+            self.appendToPrevChunk(' # generated from line %s, col %s' % lineCol)
         self.indent()
 
     def addReIndentingDirective(self, expr, dedent=True, lineCol=None):
@@ -594,7 +594,7 @@ class MethodCompiler(GenUtils):
 
         self.addChunk(expr)
         if lineCol:
-            self.appendToPrevChunk(' # generated from line %s, col %s'%lineCol)
+            self.appendToPrevChunk(' # generated from line %s, col %s' % lineCol)
         self.indent()
 
     def addIf(self, expr, lineCol=None):
@@ -737,39 +737,39 @@ class MethodCompiler(GenUtils):
         self.addChunk('## START CACHE REGION: ID=' + ID
                       + '. line %s, col %s' % lineCol + ' in the source.')
 
-        self.addChunk('_RECACHE_%(ID)s = False'%locals())
-        self.addChunk('_cacheRegion_%(ID)s = self.getCacheRegion(regionID='%locals()
+        self.addChunk('_RECACHE_%(ID)s = False' % locals())
+        self.addChunk('_cacheRegion_%(ID)s = self.getCacheRegion(regionID=' % locals()
                       + repr(ID)
-                      + ', cacheInfo=%r'%cacheInfo
+                      + ', cacheInfo=%r' % cacheInfo
                       + ')')
-        self.addChunk('if _cacheRegion_%(ID)s.isNew():'%locals())
+        self.addChunk('if _cacheRegion_%(ID)s.isNew():' % locals())
         self.indent()
-        self.addChunk('_RECACHE_%(ID)s = True'%locals())
+        self.addChunk('_RECACHE_%(ID)s = True' % locals())
         self.dedent()
 
         self.addChunk('_cacheItem_%(ID)s = _cacheRegion_%(ID)s.getCacheItem(' % locals()
                       + varyBy + ')')
 
-        self.addChunk('if _cacheItem_%(ID)s.hasExpired():'%locals())
+        self.addChunk('if _cacheItem_%(ID)s.hasExpired():' % locals())
         self.indent()
-        self.addChunk('_RECACHE_%(ID)s = True'%locals())
+        self.addChunk('_RECACHE_%(ID)s = True' % locals())
         self.dedent()
 
         if test:
             self.addChunk('if ' + test + ':')
             self.indent()
-            self.addChunk('_RECACHE_%(ID)s = True'%locals())
+            self.addChunk('_RECACHE_%(ID)s = True' % locals())
             self.dedent()
 
-        self.addChunk('if (not _RECACHE_%(ID)s) and _cacheItem_%(ID)s.getRefreshTime():'%locals())
+        self.addChunk('if (not _RECACHE_%(ID)s) and _cacheItem_%(ID)s.getRefreshTime():' % locals())
         self.indent()
         self.addChunk('try:')
         self.indent()
-        self.addChunk('_output = _cacheItem_%(ID)s.renderOutput()'%locals())
+        self.addChunk('_output = _cacheItem_%(ID)s.renderOutput()' % locals())
         self.dedent()
         self.addChunk('except KeyError:')
         self.indent()
-        self.addChunk('_RECACHE_%(ID)s = True'%locals())
+        self.addChunk('_RECACHE_%(ID)s = True' % locals())
         self.dedent()
         self.addChunk('else:')
         self.indent()
@@ -779,25 +779,25 @@ class MethodCompiler(GenUtils):
 
         self.dedent()
 
-        self.addChunk('if _RECACHE_%(ID)s or not _cacheItem_%(ID)s.getRefreshTime():'%locals())
+        self.addChunk('if _RECACHE_%(ID)s or not _cacheItem_%(ID)s.getRefreshTime():' % locals())
         self.indent()
-        self.addChunk('_orig_trans%(ID)s = trans'%locals())
-        self.addChunk('trans = _cacheCollector_%(ID)s = DummyTransaction()'%locals())
-        self.addChunk('write = _cacheCollector_%(ID)s.response().write'%locals())
+        self.addChunk('_orig_trans%(ID)s = trans' % locals())
+        self.addChunk('trans = _cacheCollector_%(ID)s = DummyTransaction()' % locals())
+        self.addChunk('write = _cacheCollector_%(ID)s.response().write' % locals())
         if interval:
-            self.addChunk(("_cacheItem_%(ID)s.setExpiryTime(currentTime() +"%locals())
+            self.addChunk(("_cacheItem_%(ID)s.setExpiryTime(currentTime() +" % locals())
                           + str(interval) + ")")
 
     def endCacheRegion(self):
         ID = self._cacheRegionsStack.pop()
-        self.addChunk('trans = _orig_trans%(ID)s'%locals())
+        self.addChunk('trans = _orig_trans%(ID)s' % locals())
         self.addChunk('write = trans.response().write')
-        self.addChunk('_cacheData = _cacheCollector_%(ID)s.response().getvalue()'%locals())
-        self.addChunk('_cacheItem_%(ID)s.setData(_cacheData)'%locals())
+        self.addChunk('_cacheData = _cacheCollector_%(ID)s.response().getvalue()' % locals())
+        self.addChunk('_cacheItem_%(ID)s.setData(_cacheData)' % locals())
         self.addWriteChunk('_cacheData')
         self.addChunk('del _cacheData')
-        self.addChunk('del _cacheCollector_%(ID)s'%locals())
-        self.addChunk('del _orig_trans%(ID)s'%locals())
+        self.addChunk('del _cacheCollector_%(ID)s' % locals())
+        self.addChunk('del _orig_trans%(ID)s' % locals())
         self.dedent()
         self.addChunk('## END CACHE REGION: '+ID)
         self.addChunk('')
@@ -819,11 +819,11 @@ class MethodCompiler(GenUtils):
         self.addChunk('## START %(regionTitle)s REGION: ' % locals() + ID
                       + ' of ' + functionName
                       + ' at line %s, col %s' % lineCol + ' in the source.')
-        self.addChunk('_orig_trans%(ID)s = trans'%locals())
-        self.addChunk('_wasBuffering%(ID)s = self._CHEETAH__isBuffering'%locals())
+        self.addChunk('_orig_trans%(ID)s = trans' % locals())
+        self.addChunk('_wasBuffering%(ID)s = self._CHEETAH__isBuffering' % locals())
         self.addChunk('self._CHEETAH__isBuffering = True')
-        self.addChunk('trans = _callCollector%(ID)s = DummyTransaction()'%locals())
-        self.addChunk('write = _callCollector%(ID)s.response().write'%locals())
+        self.addChunk('trans = _callCollector%(ID)s = DummyTransaction()' % locals())
+        self.addChunk('write = _callCollector%(ID)s.response().write' % locals())
 
     def setCallArg(self, argName, lineCol):
         ID, callDetails = self._callRegionsStack[-1]
@@ -832,18 +832,18 @@ class MethodCompiler(GenUtils):
             self._endCallArg()
         else:
             callDetails.usesKeywordArgs = True
-            self.addChunk('_callKws%(ID)s = {}'%locals())
-            self.addChunk('_currentCallArgname%(ID)s = %(argName)r'%locals())
+            self.addChunk('_callKws%(ID)s = {}' % locals())
+            self.addChunk('_currentCallArgname%(ID)s = %(argName)r' % locals())
         callDetails.currentArgname = argName
 
     def _endCallArg(self):
         ID, callDetails = self._callRegionsStack[-1]
         currCallArg = callDetails.currentArgname
         self.addChunk(('_callKws%(ID)s[%(currCallArg)r] ='
-                       ' _callCollector%(ID)s.response().getvalue()')%locals())
-        self.addChunk('del _callCollector%(ID)s'%locals())
-        self.addChunk('trans = _callCollector%(ID)s = DummyTransaction()'%locals())
-        self.addChunk('write = _callCollector%(ID)s.response().write'%locals())
+                       ' _callCollector%(ID)s.response().getvalue()') % locals())
+        self.addChunk('del _callCollector%(ID)s' % locals())
+        self.addChunk('trans = _callCollector%(ID)s = DummyTransaction()' % locals())
+        self.addChunk('write = _callCollector%(ID)s.response().write' % locals())
 
     def endCallRegion(self, regionTitle='CALL'):
         ID, callDetails = self._callRegionsStack[-1]
@@ -851,27 +851,27 @@ class MethodCompiler(GenUtils):
             callDetails.functionName, callDetails.args, callDetails.lineCol)
 
         def reset(ID=ID):
-            self.addChunk('trans = _orig_trans%(ID)s'%locals())
+            self.addChunk('trans = _orig_trans%(ID)s' % locals())
             self.addChunk('write = trans.response().write')
-            self.addChunk('self._CHEETAH__isBuffering = _wasBuffering%(ID)s '%locals())
-            self.addChunk('del _wasBuffering%(ID)s'%locals())
-            self.addChunk('del _orig_trans%(ID)s'%locals())
+            self.addChunk('self._CHEETAH__isBuffering = _wasBuffering%(ID)s ' % locals())
+            self.addChunk('del _wasBuffering%(ID)s' % locals())
+            self.addChunk('del _orig_trans%(ID)s' % locals())
 
         if not callDetails.usesKeywordArgs:
             reset()
-            self.addChunk('_callArgVal%(ID)s = _callCollector%(ID)s.response().getvalue()'%locals())
-            self.addChunk('del _callCollector%(ID)s'%locals())
+            self.addChunk('_callArgVal%(ID)s = _callCollector%(ID)s.response().getvalue()' % locals())
+            self.addChunk('del _callCollector%(ID)s' % locals())
             if initialKwArgs:
                 initialKwArgs = ', '+initialKwArgs
-            self.addFilteredChunk('%(functionName)s(_callArgVal%(ID)s%(initialKwArgs)s)'%locals())
-            self.addChunk('del _callArgVal%(ID)s'%locals())
+            self.addFilteredChunk('%(functionName)s(_callArgVal%(ID)s%(initialKwArgs)s)' % locals())
+            self.addChunk('del _callArgVal%(ID)s' % locals())
         else:
             if initialKwArgs:
                 initialKwArgs = initialKwArgs+', '
             self._endCallArg()
             reset()
-            self.addFilteredChunk('%(functionName)s(%(initialKwArgs)s**_callKws%(ID)s)'%locals())
-            self.addChunk('del _callKws%(ID)s'%locals())
+            self.addFilteredChunk('%(functionName)s(%(initialKwArgs)s**_callKws%(ID)s)' % locals())
+            self.addChunk('del _callKws%(ID)s' % locals())
         self.addChunk('## END %(regionTitle)s REGION: ' % locals() + ID
                       + ' of ' + functionName
                       + ' at line %s, col %s' % lineCol + ' in the source.')
@@ -891,22 +891,22 @@ class MethodCompiler(GenUtils):
         self._captureRegionsStack.append((ID, captureDetails)) # attrib of current methodCompiler
         self.addChunk('## START CAPTURE REGION: ' + ID + ' ' + assignTo
                       + ' at line %s, col %s' % lineCol + ' in the source.')
-        self.addChunk('_orig_trans%(ID)s = trans'%locals())
-        self.addChunk('_wasBuffering%(ID)s = self._CHEETAH__isBuffering'%locals())
+        self.addChunk('_orig_trans%(ID)s = trans' % locals())
+        self.addChunk('_wasBuffering%(ID)s = self._CHEETAH__isBuffering' % locals())
         self.addChunk('self._CHEETAH__isBuffering = True')
-        self.addChunk('trans = _captureCollector%(ID)s = DummyTransaction()'%locals())
-        self.addChunk('write = _captureCollector%(ID)s.response().write'%locals())
+        self.addChunk('trans = _captureCollector%(ID)s = DummyTransaction()' % locals())
+        self.addChunk('write = _captureCollector%(ID)s.response().write' % locals())
 
     def endCaptureRegion(self):
         ID, captureDetails = self._captureRegionsStack.pop()
         assignTo, lineCol = (captureDetails.assignTo, captureDetails.lineCol)
-        self.addChunk('trans = _orig_trans%(ID)s'%locals())
+        self.addChunk('trans = _orig_trans%(ID)s' % locals())
         self.addChunk('write = trans.response().write')
-        self.addChunk('self._CHEETAH__isBuffering = _wasBuffering%(ID)s '%locals())
-        self.addChunk('%(assignTo)s = _captureCollector%(ID)s.response().getvalue()'%locals())
-        self.addChunk('del _orig_trans%(ID)s'%locals())
-        self.addChunk('del _captureCollector%(ID)s'%locals())
-        self.addChunk('del _wasBuffering%(ID)s'%locals())
+        self.addChunk('self._CHEETAH__isBuffering = _wasBuffering%(ID)s ' % locals())
+        self.addChunk('%(assignTo)s = _captureCollector%(ID)s.response().getvalue()' % locals())
+        self.addChunk('del _orig_trans%(ID)s' % locals())
+        self.addChunk('del _captureCollector%(ID)s' % locals())
+        self.addChunk('del _wasBuffering%(ID)s' % locals())
 
     def setErrorCatcher(self, errorCatcherName):
         self.turnErrorCatcherOn()
@@ -943,7 +943,7 @@ class MethodCompiler(GenUtils):
         filterDetails.isKlass = isKlass
         self._filterRegionsStack.append((ID, filterDetails)) # attrib of current methodCompiler
 
-        self.addChunk('_orig_filter%(ID)s = _filter'%locals())
+        self.addChunk('_orig_filter%(ID)s = _filter' % locals())
         if isKlass:
             self.addChunk('_filter = self._CHEETAH__currentFilter = ' + theFilter.strip() +
                           '(self).filter')
@@ -968,7 +968,7 @@ class MethodCompiler(GenUtils):
         ID, filterDetails = self._filterRegionsStack.pop()
         #self.addChunk('_filter = self._CHEETAH__initialFilter')
         #self.addChunk('_filter = _orig_filter%(ID)s'%locals())
-        self.addChunk('_filter = self._CHEETAH__currentFilter = _orig_filter%(ID)s'%locals())
+        self.addChunk('_filter = self._CHEETAH__currentFilter = _orig_filter%(ID)s' % locals())
 
 class AutoMethodCompiler(MethodCompiler):
 
@@ -1038,7 +1038,7 @@ class AutoMethodCompiler(MethodCompiler):
 
         if self._streamingEnabled and not self.isClassMethod() and not self.isStaticMethod():
             if self._useKWsDictArgForPassingTrans() and self._kwargsName:
-                self.addChunk('trans = %s.get("trans")'%self._kwargsName)
+                self.addChunk('trans = %s.get("trans")' % self._kwargsName)
             self.addChunk('if (not trans and not self._CHEETAH__isBuffering'
                           ' and not callable(self.transaction)):')
             self.indent()
@@ -1353,14 +1353,14 @@ class ClassCompiler(GenUtils):
         argString = ','.join(argStringChunks)
 
         self.addFilteredChunk(
-            'super(%(className)s, self).%(methodName)s(%(argString)s)'%locals())
+            'super(%(className)s, self).%(methodName)s(%(argString)s)' % locals())
 
     def addErrorCatcherCall(self, codeChunk, rawCode='', lineCol=''):
         if rawCode in self._placeholderToErrorCatcherMap:
             methodName = self._placeholderToErrorCatcherMap[rawCode]
             if not self.setting('outputRowColComments'):
                 self._methodsIndex[methodName].addMethDocString(
-                    'plus at line %s, col %s'%lineCol)
+                    'plus at line %s, col %s' % lineCol)
             return methodName
 
         self._errorCatcherCount += 1
@@ -1371,7 +1371,7 @@ class ClassCompiler(GenUtils):
             methodName,
             klass=MethodCompiler,
             initialMethodComment=('## CHEETAH: Generated from ' + rawCode +
-                                  ' at line %s, col %s'%lineCol + '.')
+                                  ' at line %s, col %s' % lineCol + '.')
             )
         catcherMeth.setMethodSignature(
             'def ' + methodName +
@@ -1903,15 +1903,15 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
     def wrapModuleDef(self):
         self.addSpecialVar('CHEETAH_docstring', self.setting('defDocStrMsg'))
-        self.addModuleGlobal('__CHEETAH_version__ = %r'%Version)
-        self.addModuleGlobal('__CHEETAH_versionTuple__ = %r'%(VersionTuple,))
+        self.addModuleGlobal('__CHEETAH_version__ = %r' % Version)
+        self.addModuleGlobal('__CHEETAH_versionTuple__ = %r' % (VersionTuple,))
         if self.setting('addTimestampsToCompilerOutput'):
-            self.addModuleGlobal('__CHEETAH_genTime__ = %r'%time.time())
-            self.addModuleGlobal('__CHEETAH_genTimestamp__ = %r'%self.timestamp())
+            self.addModuleGlobal('__CHEETAH_genTime__ = %r' % time.time())
+            self.addModuleGlobal('__CHEETAH_genTimestamp__ = %r' % self.timestamp())
         if self._filePath:
             timestamp = self.timestamp(self._fileMtime)
-            self.addModuleGlobal('__CHEETAH_src__ = %r'%self._filePath)
-            self.addModuleGlobal('__CHEETAH_srcLastModified__ = %r'%timestamp)
+            self.addModuleGlobal('__CHEETAH_src__ = %r' % self._filePath)
+            self.addModuleGlobal('__CHEETAH_srcLastModified__ = %r' % timestamp)
         else:
             self.addModuleGlobal('__CHEETAH_src__ = None')
             self.addModuleGlobal('__CHEETAH_srcLastModified__ = None')

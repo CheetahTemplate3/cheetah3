@@ -97,7 +97,7 @@ results.update({'anObj.meth1': 'doo',
 
 for k in testNamespace.keys():
     # put them in the globals for the valueFromFrame tests
-    exec('%s = testNamespace[k]'%k)
+    exec('%s = testNamespace[k]' % k)
 
 ##################################################
 ## TEST BASE CLASSES

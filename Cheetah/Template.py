@@ -109,9 +109,9 @@ def _genUniqueModuleName(baseModuleName):
     """
     finalName = baseModuleName
     while finalName in sys.modules:
-        finalName = ('cheetah_%s_%s_%s'%(baseModuleName,
-                                         str(time.time()).replace('.', '_'),
-                                         str(randrange(10000, 99999))))
+        finalName = ('cheetah_%s_%s_%s' % (baseModuleName,
+                                           str(time.time()).replace('.', '_'),
+                                           str(randrange(10000, 99999))))
     return finalName
 
 # Cache of a cgi.FieldStorage() instance, maintained by .webInput().
@@ -775,7 +775,7 @@ class Template(Servlet):
 
                 if cacheModuleFilesForTracebacks:
                     if not os.path.exists(cacheDirForModuleFiles):
-                        raise Exception('%s does not exist'%cacheDirForModuleFiles)
+                        raise Exception('%s does not exist' % cacheDirForModuleFiles)
 
                     __file__ = os.path.join(cacheDirForModuleFiles, __file__)
                     # @@TR: might want to assert that it doesn't already exist
@@ -914,7 +914,7 @@ class Template(Servlet):
             elif isinstance(tokens, (list, tuple)):
                 return tokens
             else:
-                raise PreprocessError('invalid tokens argument: %r'%tokens)
+                raise PreprocessError('invalid tokens argument: %r' % tokens)
 
         if hasattr(settings, 'tokens'):
             (settings.placeholderToken,
@@ -1237,7 +1237,7 @@ class Template(Servlet):
                 if compiledVersionTuple < MinCompatibleVersionTuple:
                     raise AssertionError(
                      'This template was compiled with Cheetah version'
-                     ' %s. Templates compiled before version %s must be recompiled.'%(
+                     ' %s. Templates compiled before version %s must be recompiled.' % (
                         compiledVersion, MinCompatibleVersion))
             except AssertionError:
                 raise

@@ -328,7 +328,7 @@ class NonTokens(OutputTest):
     def test6(self):
         """1 dollar sign followed by EOL Slurp Token"""
         if DEFAULT_COMPILER_SETTINGS['EOLSlurpToken']:
-            self.verify("\n$%s\n"%DEFAULT_COMPILER_SETTINGS['EOLSlurpToken'],
+            self.verify("\n$%s\n" % DEFAULT_COMPILER_SETTINGS['EOLSlurpToken'],
                         "\n$")
         else:
             self.verify("\n$#\n",
@@ -659,7 +659,7 @@ class Placeholders_Vals(OutputTest):
     def test8(self):
         """True, False
         """
-        self.verify("$True $False", "%s %s"%(repr(True), repr(False)))
+        self.verify("$True $False", "%s %s" % (repr(True), repr(False)))
 
     def test9(self):
         """$_
@@ -1314,31 +1314,31 @@ class EOLSlurpToken(OutputTest):
     _EOLSlurpToken = DEFAULT_COMPILER_SETTINGS['EOLSlurpToken']
     def test1(self):
         r"""#slurp with 1 \n """
-        self.verify("%s\n"%self._EOLSlurpToken,
+        self.verify("%s\n" % self._EOLSlurpToken,
                     "")
 
     def test2(self):
         r"""#slurp with 1 \n, leading whitespace
         Should gobble"""
-        self.verify("       %s\n"%self._EOLSlurpToken,
+        self.verify("       %s\n" % self._EOLSlurpToken,
                     "")
     def test3(self):
         r"""#slurp with 1 \n, leading content
         Shouldn't gobble"""
-        self.verify(" 1234 %s\n"%self._EOLSlurpToken,
+        self.verify(" 1234 %s\n" % self._EOLSlurpToken,
                     " 1234 ")
 
     def test4(self):
         r"""#slurp with WS then \n, leading content
         Shouldn't gobble"""
-        self.verify(" 1234 %s    \n"%self._EOLSlurpToken,
+        self.verify(" 1234 %s    \n" % self._EOLSlurpToken,
                     " 1234 ")
 
     def test5(self):
         r"""#slurp with garbage chars then \n, leading content
         Should NOT eat the garbage"""
-        self.verify(" 1234 %s garbage   \n"%self._EOLSlurpToken,
-                    " 1234 %s garbage   \n"%self._EOLSlurpToken)
+        self.verify(" 1234 %s garbage   \n" % self._EOLSlurpToken,
+                    " 1234 %s garbage   \n" % self._EOLSlurpToken)
 
 if not DEFAULT_COMPILER_SETTINGS['EOLSlurpToken']:
     del EOLSlurpToken
@@ -3236,12 +3236,12 @@ def install_eols():
     for klass in klasses:
         name = klass.__name__
         if hasattr(klass, 'convertEOLs') and klass.convertEOLs:
-            win32Src = r"class %(name)s_Win32EOL(%(name)s): _EOLreplacement = '\r\n'"%locals()
-            macSrc = r"class %(name)s_MacEOL(%(name)s): _EOLreplacement = '\r'"%locals()
+            win32Src = r"class %(name)s_Win32EOL(%(name)s): _EOLreplacement = '\r\n'" % locals()
+            macSrc = r"class %(name)s_MacEOL(%(name)s): _EOLreplacement = '\r'" % locals()
             exec(win32Src, globals())
             exec(macSrc, globals())
 
-        src = r"class %(name)s_DiffBaseClass(%(name)s): "%locals()
+        src = r"class %(name)s_DiffBaseClass(%(name)s): " % locals()
         src += " _extraCompileKwArgs = extraCompileKwArgsForDiffBaseclass"
         exec(src, globals())
 

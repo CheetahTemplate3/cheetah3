@@ -1380,7 +1380,7 @@ class _HighLevelParser(_LowLevelParser):
             elif val is None:
                 handler = val
             else:
-                raise Exception('Invalid parser/handler value %r for %s'%(val, name))
+                raise Exception('Invalid parser/handler value %r for %s' % (val, name))
             return handler
 
         normalizeHandlerVal = normalizeParserVal
@@ -1474,7 +1474,7 @@ class _HighLevelParser(_LowLevelParser):
                 and directiveName not in self.setting('enabledDirectives'))):
             for callback in self.setting('disabledDirectiveHooks'):
                 callback(parser=self, directiveName=directiveName)
-            raise ForbiddenDirective(self, msg='This %r directive is disabled'%directiveName)
+            raise ForbiddenDirective(self, msg='This %r directive is disabled' % directiveName)
 
     ## main parse loop
 
@@ -1858,7 +1858,7 @@ class _HighLevelParser(_LowLevelParser):
         # @@TR: it's unlikely that anyone apply filters would have left this
         # directive enabled:
         # @@TR: fix up filtering, regardless
-        self._applyExpressionFilters('%s=%r'%(settingName, valueExpr),
+        self._applyExpressionFilters('%s=%r' % (settingName, valueExpr),
                                      'compiler', startPos=startPos)
 
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
@@ -2279,7 +2279,7 @@ class _HighLevelParser(_LowLevelParser):
             macroSrc = self._eatToThisEndDirective('defmacro')
 
         normalizedMacroSrc = ''.join(
-            ['%def callMacro(' + ','.join([defv and '%s=%s'%(n, defv) or n
+            ['%def callMacro(' + ','.join([defv and '%s=%s' % (n, defv) or n
                                            for n, defv in argsList]) + ')\n',
              macroSrc,
              '%end def'])
