@@ -71,8 +71,8 @@ defaultTestNameSpace = {
     'aList': ['item0', 'item1', 'item2'],
     'aDict': {'one': 'item1',
               'two': 'item2',
-              'nestedDict': {1:'nestedItem1',
-                             'two':'nestedItem2'
+              'nestedDict': {1: 'nestedItem1',
+                             'two': 'nestedItem2'
                              },
               'nestedFunc': dummyFunc,
               },
@@ -95,7 +95,7 @@ defaultTestNameSpace = {
     'includeBlock2': """$numOne $numTwo $aSetVar""",
 
     'includeFileName': 'parseTest.txt',
-    'listOfLambdas': [lambda x: x, lambda x: x, lambda x: x,],
+    'listOfLambdas': [lambda x: x, lambda x: x, lambda x: x],
     'list': [
         {'index': 0, 'numOne': 1, 'numTwo': 2},
         {'index': 1, 'numOne': 1, 'numTwo': 2},
@@ -401,7 +401,7 @@ class Comments_MultiLine_NoGobble(OutputTest):
     """
 
     def _getCompilerSettings(self):
-        return {'gobbleWhitespaceAroundMultiLineComments':False}
+        return {'gobbleWhitespaceAroundMultiLineComments': False}
 
     def test1(self):
         """#* *# followed by WS
@@ -609,16 +609,16 @@ class Placeholders(OutputTest):
         names = namesStr.split()
 
         tmpl = Template.compile('#for name in $names: $name ', baseclass=dict)
-        assert str(tmpl({'names':names})).strip() == namesStr
+        assert str(tmpl({'names': names})).strip() == namesStr
 
         tmpl = tmpl.subclass('#for name in $names: $*name ')
-        assert str(tmpl({'names':names})) == 'You '*len(names)
+        assert str(tmpl({'names': names})) == 'You '*len(names)
 
         tmpl = tmpl.subclass('#for name in $names: $*1*name ')
-        assert str(tmpl({'names':names})) == 'You '*len(names)
+        assert str(tmpl({'names': names})) == 'You '*len(names)
 
         tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
-        assert str(tmpl({'names':names})) == 'You '*len(names)
+        assert str(tmpl({'names': names})) == 'You '*len(names)
 
         tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
         assert str(tmpl(names=names)) == 'You '*len(names)
@@ -2805,7 +2805,7 @@ class FilterDirective(OutputTest):
     convertEOLs = False
 
     def _getCompilerSettings(self):
-        return {'useFilterArgsInPlaceholders':True}
+        return {'useFilterArgsInPlaceholders': True}
 
     def test1(self):
         """#filter Filter
@@ -3047,7 +3047,7 @@ class CGI(OutputTest):
 
 class WhitespaceAfterDirectiveTokens(OutputTest):
     def _getCompilerSettings(self):
-        return {'allowWhitespaceAfterDirectiveStartToken':True}
+        return {'allowWhitespaceAfterDirectiveStartToken': True}
 
     def test1(self):
         self.verify("# for i in range(10): $i",
@@ -3064,8 +3064,7 @@ class DefmacroDirective(OutputTest):
         def aMacro(src):
             return '$aStr'
 
-        return {'macroDirectives':{'aMacro':aMacro
-                                   }}
+        return {'macroDirectives': {'aMacro': aMacro}}
 
     def test1(self):
         self.verify("""\
@@ -3205,7 +3204,7 @@ public class X
 
 """
     def _getCompilerSettings(self):
-        return {'useFilterArgsInPlaceholders':True}
+        return {'useFilterArgsInPlaceholders': True}
 
     def searchList(self):    # Inside Indenter class.
         class Method:
@@ -3226,9 +3225,9 @@ public class X
 ## CREATE CONVERTED EOL VERSIONS OF THE TEST CASES
 
 if OutputTest._useNewStyleCompilation:
-    extraCompileKwArgsForDiffBaseclass = {'baseclass':dict}
+    extraCompileKwArgsForDiffBaseclass = {'baseclass': dict}
 else:
-    extraCompileKwArgsForDiffBaseclass = {'baseclass':object}
+    extraCompileKwArgsForDiffBaseclass = {'baseclass': object}
 
 
 def install_eols():

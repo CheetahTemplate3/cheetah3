@@ -441,10 +441,10 @@ class VFS(VFN):
         if lng == 1:
             return [self.namespace()]
         elif lng == 2:
-            return [self.namespace(), {'dummy':1234}]
+            return [self.namespace(), {'dummy': 1234}]
         elif lng == 3:
             # a tuple for kicks
-            return ({'dummy':1234}, self.namespace(), {'dummy':1234})
+            return ({'dummy': 1234}, self.namespace(), {'dummy': 1234})
         elif lng == 4:
             # a generator for more kicks
             return self.searchListGenerator()
@@ -452,7 +452,7 @@ class VFS(VFN):
     def searchListGenerator(self):
         class Test:
             pass
-        for i in [Test(), {'dummy':1234}, self.namespace(), {'dummy':1234}]:
+        for i in [Test(), {'dummy': 1234}, self.namespace(), {'dummy': 1234}]:
             yield i
 
     def get(self, name, autocall=True):

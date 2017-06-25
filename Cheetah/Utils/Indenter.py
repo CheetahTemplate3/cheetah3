@@ -55,10 +55,10 @@ class IndentProcessor(object):
                     line = "#silent $self._CHEETAH__indenter.dec()"
                 elif args.startswith(self.SET):
                     level = int(args[1:])
-                    line = "#silent $self._CHEETAH__indenter.setLevel(%(level)d)" % {"level":level}
+                    line = "#silent $self._CHEETAH__indenter.setLevel(%(level)d)" % {"level": level}
                 elif args.startswith('chars'):
                     self.indentChars = eval(args.split('=')[1])
-                    line = "#silent $self._CHEETAH__indenter.setChars(%(level)d)" % {"level":level}
+                    line = "#silent $self._CHEETAH__indenter.setChars(%(level)d)" % {"level": level}
                 elif args.startswith(self.PUSH):
                     line = "#silent $self._CHEETAH__indenter.push()"
                 elif args.startswith(self.POP):
@@ -70,7 +70,7 @@ class IndentProcessor(object):
                     match = self.WHITESPACES.match(line)
                     if match:
                         size = len(match.group("ws").expandtabs(4))
-                        line = ("${self._CHEETAH__indenter.indent(%(size)d)}" % {"size":size}) + line.lstrip()
+                        line = ("${self._CHEETAH__indenter.indent(%(size)d)}" % {"size": size}) + line.lstrip()
                     else:
                         line = "${self._CHEETAH__indenter.indent(0)}" + line
             result.append(line)

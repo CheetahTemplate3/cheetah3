@@ -655,7 +655,7 @@ class Template(Servlet):
 
         if not isinstance(className, (NoneType, string_type)):
             raise TypeError(errmsg % ('className', 'string or None'))
-        className = re.sub(r'^_+([^0-9])',r'\1', className or moduleName)
+        className = re.sub(r'^_+([^0-9])', r'\1', className or moduleName)
 
         if mainMethodName is Unspecified:
             mainMethodName = klass._CHEETAH_defaultMainMethodNameForTemplates
@@ -1859,7 +1859,8 @@ class Template(Servlet):
         converters = {
             '': _Converter('string', None, default,      default),
             'int': _Converter('int',     int, defaultInt,   badInt),
-            'float': _Converter('float', float, defaultFloat, badFloat),}
+            'float': _Converter('float', float, defaultFloat, badFloat),
+        }
         #pprint.pprint(locals());  return {}
         dic = {} # Destination.
         for name in names:
@@ -1913,14 +1914,14 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
     report += '----|-------------------------------------------------------------\n'
     while prevLines:
         lineInfo = prevLines.pop()
-        report += "%(row)-4d|%(line)s\n" % {'row':lineInfo[0], 'line':lineInfo[1]}
+        report += "%(row)-4d|%(line)s\n" % {'row': lineInfo[0], 'line': lineInfo[1]}
 
     if hasattr(exception, 'offset'):
         report += ' '*(3+(exception.offset or 0)) + '^\n'
 
     while nextLines:
         lineInfo = nextLines.pop()
-        report += "%(row)-4d|%(line)s\n" % {'row':lineInfo[0], 'line':lineInfo[1]}
+        report += "%(row)-4d|%(line)s\n" % {'row': lineInfo[0], 'line': lineInfo[1]}
 
 
     message = [

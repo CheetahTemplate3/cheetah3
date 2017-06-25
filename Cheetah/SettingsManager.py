@@ -108,7 +108,7 @@ class _SettingsCollector(object):
         globalsDict = {'True': (1 == 1),
                        'False': (0 == 1),
                        }
-        newSettings = {'self':self}
+        newSettings = {'self': self}
         exec((theString+os.linesep), globalsDict, newSettings)
         del newSettings['self']
         module = types.ModuleType('temp_settings_module')

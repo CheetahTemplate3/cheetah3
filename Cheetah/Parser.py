@@ -118,8 +118,8 @@ tripleQuotedStringPairs = {"'''": single3, '"""': double3,
                            "UR'''": single3, 'UR"""': double3,
                            }
 
-closurePairs = {')':'(',']':'[','}':'{'}
-closurePairsRev = {'(':')','[':']','{':'}'}
+closurePairs = {')': '(', ']': '[', '}': '{'}
+closurePairsRev = {'(': ')', '[': ']', '{': '}'}
 
 ##################################################
 ## Regex chunks for the parser ##
@@ -294,13 +294,13 @@ class ParseError(ValueError):
         report += '----|-------------------------------------------------------------\n'
         while prevLines:
             lineInfo = prevLines.pop()
-            report += "%(row)-4d|%(line)s\n" % {'row':lineInfo[0], 'line':lineInfo[1]}
-        report += "%(row)-4d|%(line)s\n" % {'row':row, 'line':line}
+            report += "%(row)-4d|%(line)s\n" % {'row': lineInfo[0], 'line': lineInfo[1]}
+        report += "%(row)-4d|%(line)s\n" % {'row': row, 'line': line}
         report += ' '*5 + ' '*(col-1) + "^\n"
 
         while nextLines:
             lineInfo = nextLines.pop()
-            report += "%(row)-4d|%(line)s\n" % {'row':lineInfo[0], 'line':lineInfo[1]}
+            report += "%(row)-4d|%(line)s\n" % {'row': lineInfo[0], 'line': lineInfo[1]}
         ## add the extra msg
         if self.extMsg:
             report += self.extMsg + '\n'

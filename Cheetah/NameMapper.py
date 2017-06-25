@@ -329,11 +329,11 @@ class Mixin:
 def example():
     class A(Mixin):
         classVar = 'classVar val'
-        def method(self,arg='method 1 default arg'):
+        def method(self, arg='method 1 default arg'):
             return arg
 
         def method2(self, arg='meth 2 default arg'):
-            return {'item1':arg}
+            return {'item1': arg}
 
         def method3(self, arg='meth 3 default'):
             return arg
@@ -355,7 +355,7 @@ def example():
         'func': function,
         'method': a.method3,
         'item': 'itemval',
-        'subDict': {'nestedMethod':a.method3}
+        'subDict': {'nestedMethod': a.method3}
         }
     b = 'this is local b'
 

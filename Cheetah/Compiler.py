@@ -143,7 +143,7 @@ class GenUtils(object):
         return cacheInfo                # is empty if no cache
 
     def genCacheInfoFromArgList(self, argList):
-        cacheInfo = {'type':REFRESH_CACHE}
+        cacheInfo = {'type': REFRESH_CACHE}
         for key, val in argList:
             if val[0] in '"\'':
                 val = val[1:-1]
@@ -1471,7 +1471,7 @@ class ClassCompiler(GenUtils):
         docStr = ('%(ind)s"""\n%(ind)s' +
                   '\n%(ind)s'.join(self._classDocStringLines) +
                   '\n%(ind)s"""\n'
-                  ) % {'ind':ind}
+                  ) % {'ind': ind}
         return  docStr
 
     def methodDefs(self):
@@ -1587,7 +1587,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
                     if isinstance(source, bytes):
                         source = source.decode(encoding)
                     else:
-                        source = eval(repr(source).encode("ascii","backslashreplace").decode(encoding))
+                        source = eval(repr(source).encode("ascii", "backslashreplace").decode(encoding))
             else:
                 source = unicode(source)
 
@@ -1781,7 +1781,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
                         baseclasses.append(finalClassName)
                         importStatement = "from %s import %s" % (modName, finalClassName)
                         self.addImportStatement(importStatement)
-                        self.addImportedVarNames([finalClassName,])
+                        self.addImportedVarNames([finalClassName])
 
             self._getActiveClassCompiler().setBaseClass(', '.join(baseclasses))
 
@@ -2015,7 +2015,7 @@ if __name__ == '__main__':
     from Cheetah.TemplateCmdLineIface import CmdLineIface
     CmdLineIface(templateObj=%(className)s()).run()
 
-""" % {'className':self._mainClassName}
+""" % {'className': self._mainClassName}
 
 
 ##################################################

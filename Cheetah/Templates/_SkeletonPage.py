@@ -35,7 +35,7 @@ class _SkeletonPage(Template):
                 'Content-Type': 'text/html; charset=iso-8859-1',
             },
             'NAME': {
-                    'generator':'Cheetah: The Python-Powered Template Engine'
+                    'generator': 'Cheetah: The Python-Powered Template Engine'
             }
         }
         # metaTags = {'HTTP_EQUIV':{'test':1234}, 'NAME':{'test':1234,'test2':1234} }
@@ -175,7 +175,7 @@ class _SkeletonPage(Template):
         """Return a string representing the current localtime."""
         return time.strftime(formatString, time.localtime(time.time()))
 
-    def spacer(self, width=1,height=1):
+    def spacer(self, width=1, height=1):
         return '<img src="spacer.gif" width="%s" height="%s" alt="" />' % (str(width), str(height))
 
     def formHTMLTag(self, tagName, attributes={}):
