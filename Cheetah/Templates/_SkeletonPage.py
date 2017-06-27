@@ -19,7 +19,7 @@ class _SkeletonPage(Template):
               '"http://www.w3.org/TR/html4/loose.dtd">'
 
     # docType = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' + \
-    #'"http://www.w3.org/TR/xhtml1l/DTD/transitional.dtd">'
+    # '"http://www.w3.org/TR/xhtml1l/DTD/transitional.dtd">'
 
     title = ''
     siteDomainName = 'www.example.com'

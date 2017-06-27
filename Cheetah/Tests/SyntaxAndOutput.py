@@ -131,7 +131,7 @@ Template output mismatch:
     _searchList = [defaultTestNameSpace]
 
     _useNewStyleCompilation = True
-    #_useNewStyleCompilation = False
+    # _useNewStyleCompilation = False
 
     _extraCompileKwArgs = None
 
@@ -706,14 +706,14 @@ class UnicodeStrings(OutputTest):
     def test1(self):
         """unicode data in placeholder
         """
-        #self.verify(u"$unicodeData", defaultTestNameSpace['unicodeData'], outputEncoding='utf8')
+        # self.verify(u"$unicodeData", defaultTestNameSpace['unicodeData'], outputEncoding='utf8')
         self.verify(u"$unicodeData", defaultTestNameSpace['unicodeData'])
 
     def test2(self):
         """unicode data in body
         """
         self.verify(u"aoeu12345\u1234", u"aoeu12345\u1234")
-        #self.verify(u"#encoding utf8#aoeu12345\u1234", u"aoeu12345\u1234")
+        # self.verify(u"#encoding utf8#aoeu12345\u1234", u"aoeu12345\u1234")
 
 class EncodingDirective(OutputTest):
     def test1(self):
@@ -1048,7 +1048,7 @@ class NameMapper(OutputTest):
                     "110%")
 
 
-#class NameMapperDict(OutputTest):
+# class NameMapperDict(OutputTest):
 #
 #    _searchList = [{"update": "Yabba dabba doo!"}]
 #
@@ -1501,11 +1501,11 @@ class YieldDirective(OutputTest):
 
         for src in (src1, src2, src3):
             klass = Template.compile(src, keepRefToGeneratedCode=True)
-            #print klass._CHEETAH_generatedModuleCode
+            # print klass._CHEETAH_generatedModuleCode
             iter = klass().respond()
             output = [str(i) for i in iter]
             assert ''.join(output) == '0123456789'
-            #print ''.join(output)
+            # print ''.join(output)
 
         # @@TR: need to expand this to cover error conditions etc.
 
@@ -1652,7 +1652,7 @@ class RepeatDirective(OutputTest):
         self.verify("#repeat $numTwo: 1\n"*2,
                     "1\n1\n"*2)
 
-        #false single-line
+        # false single-line
         self.verify("#repeat 3:  \n1\n#end repeat",
                     "1\n1\n1\n")
 

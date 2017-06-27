@@ -115,7 +115,7 @@ def install(templateFileExtensions=('.tmpl',)):
             global __oldimport__
             __oldimport__ = builtin.__import__
             ImportManager._globalOwnerTypes.insert(0, CheetahDirOwner)
-            #ImportManager._globalOwnerTypes.append(CheetahDirOwner)
+            # ImportManager._globalOwnerTypes.append(CheetahDirOwner)
             global _manager
             _manager = ImportManager.ImportManager()
             _manager.setThreaded()

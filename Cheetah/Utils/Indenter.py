@@ -43,7 +43,7 @@ class IndentProcessor(object):
         for line in _txt.splitlines():
             match = self.INDENT_DIR.match(line)
             if match:
-                #is indention directive
+                # is indention directive
                 args = match.group(self.ARGS).strip()
                 if args == self.ON:
                     line = "#silent $self._CHEETAH__indenter.on()"
@@ -66,7 +66,7 @@ class IndentProcessor(object):
             else:
                 match = self.DIRECTIVE.match(line)
                 if not match:
-                    #is not another directive
+                    # is not another directive
                     match = self.WHITESPACES.match(line)
                     if match:
                         size = len(match.group("ws").expandtabs(4))

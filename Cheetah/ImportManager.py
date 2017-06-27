@@ -351,7 +351,7 @@ class PathImportDirector(ImportDirector):
         del self._building[path]
         return owner
 
-#=================ImportManager============================#
+# =================ImportManager============================#
 # The one-and-only ImportManager
 # ie, the builtin import
 

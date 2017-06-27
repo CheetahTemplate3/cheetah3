@@ -16,7 +16,7 @@ from distutils.command.install_data import install_data
 from distutils.errors import CCompilerError, DistutilsExecError, \
     DistutilsPlatformError
 
-#imports from Cheetah ...
+# imports from Cheetah ...
 from Cheetah.FileUtils import findFiles
 from Cheetah.compat import string_type
 
@@ -61,7 +61,7 @@ class mod_install_data(install_data):
 
         if self.install_dir is None:
             installobj = self.distribution.get_command_obj('install')
-            #self.install_dir = installobj.install_platlib
+            # self.install_dir = installobj.install_platlib
             self.install_dir = installobj.install_lib
         install_data.finalize_options(self)
 

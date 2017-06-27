@@ -71,7 +71,7 @@ def perftest(max_num_pystones, current_pystone=None):
 
 class DynamicTemplatePerformanceTest(unittest.TestCase):
     loops = 10
-    #@perftest(1200)
+    # @perftest(1200)
     def test_BasicDynamic(self):
         template = '''
             #def foo(arg1, arg2)
@@ -101,7 +101,7 @@ class PerformanceTest(unittest.TestCase):
             print('>>> %s (%d iterations) ' % (self.__class__.__name__,
                                                self.iterations))
             stats = hotshot.stats.load('%s.prof' % self.__class__.__name__)
-            #stats.strip_dirs()
+            # stats.strip_dirs()
             stats.sort_stats('time', 'calls')
             stats.print_stats(50)
 

@@ -46,7 +46,7 @@ class I18n(object):
 
        """
 
-        #print macros['i18n']
+        # print macros['i18n']
         src = _(src)
         if isShortForm and endPos < len(parser):
             return src+EOLCharsInShortForm

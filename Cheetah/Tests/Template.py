@@ -44,13 +44,13 @@ class ClassMethods_compile(TemplateTest):
     def test_moduleFileCaching(self):
         tmpDir = tempfile.mkdtemp()
         try:
-            #print tmpDir
+            # print tmpDir
             assert os.path.exists(tmpDir)
             klass = Template.compile(source='$foo',
                                      cacheModuleFilesForTracebacks=True,
                                      cacheDirForModuleFiles=tmpDir)
             mod = sys.modules[klass.__module__]
-            #print mod.__file__
+            # print mod.__file__
             assert os.path.exists(mod.__file__)
             assert os.path.dirname(mod.__file__) == tmpDir
         finally:
@@ -85,7 +85,7 @@ class ClassMethods_compile(TemplateTest):
                                  mainMethodName='testMeth')
         assert klass.__name__ == 'foo123'
         t = klass(namespaces={'foo': 1234})
-        #print t.generatedClassCode()
+        # print t.generatedClassCode()
         assert str(t) == '1234'
         assert t.testMeth() == '1234'
 
@@ -96,7 +96,7 @@ class ClassMethods_compile(TemplateTest):
                                  baseclass=dict)
         assert klass.__name__ == 'foo123'
         t = klass({'foo': 1234})
-        #print t.generatedClassCode()
+        # print t.generatedClassCode()
         assert str(t) == '1234'
         assert t.testMeth() == '1234'
 
@@ -265,7 +265,7 @@ class Preprocessors(TemplateTest):
         src = '\n'.join([ln.strip() for ln in src.splitlines()])
         klass = Template.compile(src, preprocessors='@ %', baseclass=dict)
         t = klass({'string': 'bit of text'})
-        #print str(t), repr(str(t))
+        # print str(t), repr(str(t))
         assert str(t) == ('This is a bit of text that needs translation\n'*2)[:-1]
 
 

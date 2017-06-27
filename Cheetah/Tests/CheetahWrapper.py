@@ -129,7 +129,7 @@ class CFBase(unittest.TestCase):
 
     def checkCompile(self, path):
         # Raw string to prevent "\n" from being converted to a newline.
-        #expected = R"write('Hello, world!\n')"
+        # expected = R"write('Hello, world!\n')"
         expected = "Hello, world!"  # might output a u'' string
         errmsg = """\
 destination file %(path)s doesn't contain expected substring:

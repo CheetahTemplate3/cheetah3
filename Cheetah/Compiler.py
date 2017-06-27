@@ -116,7 +116,7 @@ class GenUtils(object):
     """
 
     def genTimeInterval(self, timeString):
-        ##@@ TR: need to add some error handling here
+        # #@@ TR: need to add some error handling here
         if timeString[-1] == 's':
             interval = float(timeString[:-1])
         elif timeString[-1] == 'm':
@@ -573,7 +573,7 @@ class MethodCompiler(GenUtils):
         self.addIndentingDirective(expr, lineCol=lineCol)
 
     def addRepeat(self, expr, lineCol=None):
-        #the _repeatCount stuff here allows nesting of #repeat directives
+        # the _repeatCount stuff here allows nesting of #repeat directives
         self._repeatCount = getattr(self, "_repeatCount", -1) + 1
         self.addFor('for __i%s in range(%s)' % (self._repeatCount, expr), lineCol=lineCol)
 
@@ -966,8 +966,8 @@ class MethodCompiler(GenUtils):
 
     def closeFilterBlock(self):
         ID, filterDetails = self._filterRegionsStack.pop()
-        #self.addChunk('_filter = self._CHEETAH__initialFilter')
-        #self.addChunk('_filter = _orig_filter%(ID)s'%locals())
+        # self.addChunk('_filter = self._CHEETAH__initialFilter')
+        # self.addChunk('_filter = _orig_filter%(ID)s'%locals())
         self.addChunk('_filter = self._CHEETAH__currentFilter = _orig_filter%(ID)s' % locals())
 
 class AutoMethodCompiler(MethodCompiler):
@@ -1406,16 +1406,16 @@ class ClassCompiler(GenUtils):
             methCompiler.addStrConst(endMarker[0] + methodName + endMarker[1])
         self._swallowMethodCompiler(methCompiler)
 
-        #metaData = self._blockMetaData[methodName]
-        #rawDirective = metaData['raw']
-        #lineCol = metaData['lineCol']
+        # metaData = self._blockMetaData[methodName]
+        # rawDirective = metaData['raw']
+        # lineCol = metaData['lineCol']
 
         ## insert the code to call the block, caching if #cache directive is on
         codeChunk = 'self.' + methodName + '(trans=trans)'
         self.addChunk(codeChunk)
 
-        #self.appendToPrevChunk(' # generated from ' + repr(rawDirective) )
-        #if self.setting('outputRowColComments'):
+        # self.appendToPrevChunk(' # generated from ' + repr(rawDirective) )
+        # if self.setting('outputRowColComments'):
         #    self.appendToPrevChunk(' at line %s, col %s' % lineCol + '.')
 
 
@@ -1774,7 +1774,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
                             modName += '.'+chunk
                     if needToAddImport:
                         modName, finalClassName = '.'.join(chunks[:-1]), chunks[-1]
-                        #if finalClassName != chunks[:-1][-1]:
+                        # if finalClassName != chunks[:-1][-1]:
                         if finalClassName != chunks[-2]:
                             # we assume the class name to be the module name
                             modName = '.'.join(chunks)
@@ -1849,7 +1849,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             # we don't want to inadvertantly import the module at the top of the file either
             self._importStatements.append(impStatement)
 
-        #@@TR 2005-01-01: there's almost certainly a cleaner way to do this!
+        # @@TR 2005-01-01: there's almost certainly a cleaner way to do this!
         importVarNames = impStatement[impStatement.find('import') + len('import'):].split(',')
         importVarNames = [var.split()[-1] for var in importVarNames]  # handles aliases
         importVarNames = [var for var in importVarNames if not var == '*']

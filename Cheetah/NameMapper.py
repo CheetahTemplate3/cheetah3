@@ -293,7 +293,7 @@ def valueFromFrame(name, executeCallables=False, frame=None):
         del frame
 
 def hasName(obj, name):
-    #Not in the C version
+    # Not in the C version
     """Determine if 'obj' has the 'name' """
     key = name.split('.')[0]
     if not hasKey(obj, key):

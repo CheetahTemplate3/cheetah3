@@ -34,7 +34,7 @@ suites = [
    unittest.findTestCases(NameMapper_pure),
    unittest.findTestCases(Filters),
    unittest.findTestCases(Template),
-   #unittest.findTestCases(Cheps),
+   # unittest.findTestCases(Cheps),
    unittest.findTestCases(Regressions),
    unittest.findTestCases(Unicode),
    unittest.findTestCases(Misc),

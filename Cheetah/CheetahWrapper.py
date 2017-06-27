@@ -201,7 +201,7 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
                 print('\t%s (default: "%s")\t%s' % l)
             sys.exit(0)
 
-        #cleanup trailing path separators
+        # cleanup trailing path separators
         seps = [sep for sep in [os.sep, os.altsep] if sep]
         for attr in ['idir', 'odir']:
             for sep in seps:
@@ -587,7 +587,7 @@ be named according to the same rules as Python modules.""" % tup)
                                           compilerSettings=compilerSettings)
             output = pysrc
         else:
-            #output = str(TemplateClass(file=src, searchList=self.searchList))
+            # output = str(TemplateClass(file=src, searchList=self.searchList))
             tclass = TemplateClass.compile(file=src, compilerSettings=compilerSettings)
             output = str(tclass(searchList=self.searchList))
 

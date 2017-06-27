@@ -320,7 +320,7 @@ class Template(Servlet):
     NonNumericInputError = NonNumericInputError
     _CHEETAH_cacheRegionClass = CacheRegion
     _CHEETAH_cacheStoreClass = MemoryCacheStore
-    #_CHEETAH_cacheStoreClass = MemcachedCacheStore
+    # _CHEETAH_cacheStoreClass = MemcachedCacheStore
     _CHEETAH_cacheStore = None
     _CHEETAH_cacheStoreIdPrefix = None
 
@@ -735,7 +735,7 @@ class Template(Servlet):
                                       hash(cacheDirForModuleFiles),
                                       ]])
             except:
-                #@@TR: should add some logging to this
+                # @@TR: should add some logging to this
                 pass
         outputEncoding = 'ascii'
         compiler = None
@@ -1582,8 +1582,8 @@ class Template(Servlet):
         self.__class__ = templateClass
         # must initialize it so instance attributes are accessible
         templateClass.__init__(self,
-                               #_globalSetVars=self._CHEETAH__globalSetVars,
-                               #_preBuiltSearchList=self._CHEETAH__searchList
+                               # _globalSetVars=self._CHEETAH__globalSetVars,
+                               # _preBuiltSearchList=self._CHEETAH__searchList
                                )
         if not hasattr(self, 'transaction'):
             self.transaction = None
@@ -1861,7 +1861,7 @@ class Template(Servlet):
             'int': _Converter('int',     int, defaultInt,   badInt),
             'float': _Converter('float', float, defaultFloat, badFloat),
         }
-        #pprint.pprint(locals());  return {}
+        # pprint.pprint(locals());  return {}
         dic = {}  # Destination.
         for name in names:
             k, v = _lookup(name, func, False, converters)
@@ -1937,7 +1937,7 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
     if cheetahPosMatch:
         lineno = int(cheetahPosMatch.group(1))
         col = int(cheetahPosMatch.group(2))
-        #if hasattr(exception, 'offset'):
+        # if hasattr(exception, 'offset'):
         #    col = exception.offset
         message.append('\nHere is the corresponding Cheetah code:\n')
     else:

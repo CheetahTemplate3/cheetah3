@@ -64,12 +64,12 @@ SET_MODULE = 2
 ##################################################
 ## Tokens for the parser ##
 
-#generic
+# generic
 identchars = "abcdefghijklmnopqrstuvwxyz" \
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
 namechars = identchars + "0123456789"
 
-#operators
+# operators
 powerOp = '**'
 unaryArithOps = ('+', '-', '~')
 binaryArithOps = ('+', '-', '/', '//', '%')
@@ -244,7 +244,7 @@ endDirectiveNamesAndHandlers = {
 ## CLASSES ##
 
 # @@TR: SyntaxError doesn't call exception.__str__ for some reason!
-#class ParseError(SyntaxError):
+# class ParseError(SyntaxError):
 class ParseError(ValueError):
     def __init__(self, stream, msg='Invalid Syntax', extMsg='', lineno=None, col=None):
         self.stream = stream
@@ -467,7 +467,7 @@ class _LowLevelParser(SourceReader):
             escCharLookBehind +
             r'(?P<startToken>' + escapeRegexChars(self.setting('cheetahVarStartToken')) + ')' +
             r'(?P<cacheToken>' + cacheToken + ')' +
-            #r'\[[ \t\f]*'
+            # r'\[[ \t\f]*'
             r'(?:\{|\(|\[)[ \t\f]*'
             + r'(?=[^\)\}\]])'
             )
@@ -844,7 +844,7 @@ class _LowLevelParser(SourceReader):
                 self.advance()
             elif self.startswith('in ') or self.startswith('in\t'):
                 break
-            #elif self.matchCheetahVarStart():
+            # elif self.matchCheetahVarStart():
             elif self.matchCheetahVarInExpressionStartToken():
                 self.getCheetahVarStartToken()
                 self.getSilentPlaceholderToken()
@@ -1930,7 +1930,7 @@ class _HighLevelParser(_LowLevelParser):
         endOfFirstLinePos = self.findEOL()
         startPos = self.pos()
         self.getDirectiveStartToken()
-        #self.advance() # eat @
+        # self.advance() # eat @
         startPos = self.pos()
         decoratorExpr = self.getExpression()
         decoratorExpr = self._applyExpressionFilters(decoratorExpr, 'decorator', startPos=startPos)
@@ -2001,7 +2001,7 @@ class _HighLevelParser(_LowLevelParser):
                                    startPos=startPos,
                                    endPos=endOfFirstLinePos)
             if directiveName == 'def' and not isNestedDef:
-                #@@TR: must come before _eatRestOfDirectiveTag ... for some reason
+                # @@TR: must come before _eatRestOfDirectiveTag ... for some reason
                 self._compiler.closeDef()
             elif directiveName == 'block':
                 includeBlockMarkers()
@@ -2105,7 +2105,7 @@ class _HighLevelParser(_LowLevelParser):
             argsList = []
 
         # @@TR: need to split up filtering of the methodname and the args
-        #methodName = self._applyExpressionFilters(methodName, 'implements', startPos=startPos)
+        # methodName = self._applyExpressionFilters(methodName, 'implements', startPos=startPos)
         self._applyExpressionFilters(self[startPos:self.pos()], 'implements', startPos=startPos)
 
         self._compiler.setMainMethodName(methodName)
@@ -2132,7 +2132,7 @@ class _HighLevelParser(_LowLevelParser):
 
         self._applyExpressionFilters(self[startPos:self.pos()], 'super', startPos=startPos)
 
-        #parserComment = ('## CHEETAH: generated from ' + signature +
+        # parserComment = ('## CHEETAH: generated from ' + signature +
         #                 ' at line %s, col %s' % self.getRowCol(startPos)
         #                 + '.')
 
@@ -2299,7 +2299,7 @@ class _HighLevelParser(_LowLevelParser):
             compilerSettings, placeholderToken='@', directiveToken='%')
         macroTemplateClass = templateAPIClass.compile(source=normalizedMacroSrc,
                                                       compilerSettings=compilerSettings)
-        #t = macroTemplateClass()
+        # t = macroTemplateClass()
 
         class MacroDetails: pass
         macroDetails = MacroDetails()
@@ -2334,7 +2334,7 @@ class _HighLevelParser(_LowLevelParser):
             self.getWhiteSpace(max=1)
             srcBlock = self.readToEOL(gobble=False)
             EOLCharsInShortForm = self.readToEOL(gobble=True)
-            #self.readToEOL(gobble=False)
+            # self.readToEOL(gobble=False)
         else:
             isShortForm = False
             if self.peek() == ':':
@@ -2398,7 +2398,7 @@ class _HighLevelParser(_LowLevelParser):
         self.setPos(origPos)
 
 
-        #self._compiler.addRawText('end')
+        # self._compiler.addRawText('end')
 
     def eatCache(self):
         isLineClearToStartToken = self.isLineClearToStartToken()

@@ -1,4 +1,4 @@
-#-------Main Package Settings-----------#
+# -------Main Package Settings-----------#
 import sys
 
 # Cheetah3 has already been taken at PyPI,
