@@ -2041,7 +2041,7 @@ class _HighLevelParser(_LowLevelParser):
                        and len([name for name in self._openDirectivesStack if name == 'def']) > 1)
         if directiveName == 'block' or (directiveName == 'def' and not isNestedDef):
             self._compiler.startMethodDef(methodName, argsList, parserComment)
-        else:  #closure
+        else:  # closure
             self._useSearchList_orig = self.setting('useSearchList')
             self.setSetting('useSearchList', False)
             self._compiler.addClosure(methodName, argsList, parserComment)
@@ -2058,7 +2058,7 @@ class _HighLevelParser(_LowLevelParser):
                        and [name for name in self._openDirectivesStack if name == 'def'])
         if directiveName == 'block' or (directiveName == 'def' and not isNestedDef):
             self._compiler.startMethodDef(methodName, argsList, parserComment)
-        else:  #closure
+        else:  # closure
             # @@TR: temporary hack of useSearchList
             useSearchList_orig = self.setting('useSearchList')
             self.setSetting('useSearchList', False)

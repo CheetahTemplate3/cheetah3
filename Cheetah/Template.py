@@ -1602,7 +1602,7 @@ class Template(Servlet):
                         else:
                             file = path = os.path.normpath(srcArg)
                     else:
-                        file = srcArg  ## a file-like object
+                        file = srcArg  # # a file-like object
                 else:
                     source = srcArg
                     file = None

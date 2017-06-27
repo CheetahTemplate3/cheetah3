@@ -1341,7 +1341,7 @@ class ClassCompiler(GenUtils):
         self._generatedAttribs.append(attribExpr)
 
     def addSuper(self, argsList, parserComment=None):
-        className = self._className  #self._baseClass
+        className = self._className  # self._baseClass
         methodName = self._getActiveMethodCompiler().methodName()
 
         argStringChunks = []
@@ -1591,7 +1591,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             else:
                 source = unicode(source)
 
-        if source.find('#indent') != -1:  #@@TR: undocumented hack
+        if source.find('#indent') != -1:  # @@TR: undocumented hack
             source = indentize(source)
 
         self._parser = self.parserClass(source, filename=self._filePath, compiler=self)
@@ -1853,7 +1853,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         importVarNames = impStatement[impStatement.find('import') + len('import'):].split(',')
         importVarNames = [var.split()[-1] for var in importVarNames]  # handles aliases
         importVarNames = [var for var in importVarNames if not var == '*']
-        self.addImportedVarNames(importVarNames, raw_statement=impStatement)  #used by #extend for auto-imports
+        self.addImportedVarNames(importVarNames, raw_statement=impStatement)  # used by #extend for auto-imports
 
     def addAttribute(self, attribName, expr):
         self._getActiveClassCompiler().addAttribute(attribName + ' =' + expr)
