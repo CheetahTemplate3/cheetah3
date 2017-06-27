@@ -161,7 +161,7 @@ $someUnicodeString"""
 #set $someUnicodeString = u"Bébé"
 $someUnicodeString"""
 
-        template = Template(source = source)
+        template = Template(source=source)
 
         a = unicode(template)
         if PY2:

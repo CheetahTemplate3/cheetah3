@@ -1152,7 +1152,7 @@ class _LowLevelParser(SourceReader):
                     row, col = self.getRowCol()
                     self.setPos(enclosures[-1][1])
                     raise ParseError(
-                        self, msg= "A '" + c + "' was found at line " + str(row) +
+                        self, msg="A '" + c + "' was found at line " + str(row) +
                         ", col " + str(col) +
                         " before a matching '" + close +
                         "' was found\nfor the '" + open + "'")
