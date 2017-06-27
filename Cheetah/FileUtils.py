@@ -260,7 +260,7 @@ class FindAndReplace:
         pattern = self._pattern
         for file in self._files:
             if not os.path.isfile(file):
-                continue # skip dirs etc.
+                continue  # skip dirs etc.
 
             self._currFile = file
             found = False

@@ -130,7 +130,7 @@ class WebSafe(Filter):
     def filter(self, val, **kw):
         s = super(WebSafe, self).filter(val, **kw)
         # These substitutions are copied from cgi.escape().
-        s = s.replace("&", "&amp;") # Must be done first!
+        s = s.replace("&", "&amp;")  # Must be done first!
         s = s.replace("<", "&lt;")
         s = s.replace(">", "&gt;")
         # Process the additional transformations if any.
@@ -165,7 +165,7 @@ class Strip(Filter):
         s = super(Strip, self).filter(val, **kw)
         result = []
         start = 0   # The current line will be s[start:end].
-        while True: # Loop through each line.
+        while True:  # Loop through each line.
             end = s.find('\n', start)  # Find next newline.
             if end == -1:  # If no more newlines.
                 break

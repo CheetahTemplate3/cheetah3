@@ -235,7 +235,7 @@ class SourceReader(object):
     def matches(self, strOrRE):
         if isinstance(strOrRE, (str, unicode)):
             return self.startswith(strOrRE, pos=self.pos())
-        else: # assume an re object
+        else:  # assume an re object
             return strOrRE.match(self.src(), self.pos())
 
     def matchWhiteSpace(self, WSchars=' \f\t'):

@@ -40,8 +40,8 @@ try:
 except ImportError:
     from popen2 import Popen4
 
-DELETE = True # True to clean up after ourselves, False for debugging.
-OUTPUT = False # Normally False, True for debugging.
+DELETE = True  # True to clean up after ourselves, False for debugging.
+OUTPUT = False  # Normally False, True for debugging.
 
 BACKUP_SUFFIX = CheetahWrapper.BACKUP_SUFFIX
 
@@ -51,10 +51,10 @@ def warn(msg):
 class CFBase(unittest.TestCase):
     """Base class for "cheetah compile" and "cheetah fill" unit tests.
     """
-    srcDir = '' # Nonblank to create source directory.
-    subdirs = ('child', 'child/grandkid') # Delete in reverse order.
+    srcDir = ''  # Nonblank to create source directory.
+    subdirs = ('child', 'child/grandkid')  # Delete in reverse order.
     srcFiles = ('a.tmpl', 'child/a.tmpl', 'child/grandkid/a.tmpl')
-    expectError = False # Used by --list option.
+    expectError = False  # Used by --list option.
 
     def inform(self, message):
         if self.verbose:
@@ -93,7 +93,7 @@ class CFBase(unittest.TestCase):
     def tearDown(self):
         os.chdir(self.origCwd)
         if DELETE:
-            shutil.rmtree(self.scratchDir, True) # Ignore errors.
+            shutil.rmtree(self.scratchDir, True)  # Ignore errors.
             if os.path.exists(self.scratchDir):
                 warn("Warning: unable to delete scratch directory %s")
         else:
@@ -130,7 +130,7 @@ class CFBase(unittest.TestCase):
     def checkCompile(self, path):
         # Raw string to prevent "\n" from being converted to a newline.
         #expected = R"write('Hello, world!\n')"
-        expected = "Hello, world!" # might output a u'' string
+        expected = "Hello, world!"  # might output a u'' string
         errmsg = """\
 destination file %(path)s doesn't contain expected substring:
 %(expected)r"""
@@ -244,7 +244,7 @@ class CFIdirBase(CFBase):
     """Subclass for tests with --idir.
     """
     srcDir = 'SRC'
-    subdirs = ('SRC/child', 'SRC/child/grandkid') # Delete in reverse order.
+    subdirs = ('SRC/child', 'SRC/child/grandkid')  # Delete in reverse order.
     srcFiles = ('SRC/a.tmpl', 'SRC/child/a.tmpl', 'SRC/child/grandkid/a.tmpl')
 
 

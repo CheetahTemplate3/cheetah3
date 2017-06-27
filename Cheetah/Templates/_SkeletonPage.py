@@ -84,7 +84,7 @@ class _SkeletonPage(Template):
             attribCode = ''
             for k, v in attribsDict.items():
                 attribCode += str(k) + ': ' + str(v) + '; '
-            attribCode = attribCode[:-2] # get rid of the last semicolon
+            attribCode = attribCode[:-2]  # get rid of the last semicolon
 
             cssCode = '\n' + identifier + ' {' + attribCode + '}'
             stylesheetTagsTxt += cssCode

@@ -22,7 +22,7 @@ import codecs
 
 from Cheetah.Version import Version, VersionTuple
 from Cheetah.SettingsManager import SettingsManager
-from Cheetah.Utils.Indenter import indentize # an undocumented preprocessor
+from Cheetah.Utils.Indenter import indentize  # an undocumented preprocessor
 from Cheetah import ErrorCatchers
 from Cheetah import NameMapper
 from Cheetah.Parser import Parser, ParseError, specialVarRE, \
@@ -729,7 +729,7 @@ class MethodCompiler(GenUtils):
         if customID:
             ID = customID
         varyBy = cacheInfo.get('varyBy', repr(ID))
-        self._cacheRegionsStack.append(ID) # attrib of current methodCompiler
+        self._cacheRegionsStack.append(ID)  # attrib of current methodCompiler
 
         # @@TR: add this to a special class var as well
         self.addChunk('')
@@ -814,7 +814,7 @@ class MethodCompiler(GenUtils):
         callDetails.args = args
         callDetails.lineCol = lineCol
         callDetails.usesKeywordArgs = False
-        self._callRegionsStack.append((ID, callDetails)) # attrib of current methodCompiler
+        self._callRegionsStack.append((ID, callDetails))  # attrib of current methodCompiler
 
         self.addChunk('## START %(regionTitle)s REGION: ' % locals() + ID
                       + ' of ' + functionName
@@ -876,7 +876,7 @@ class MethodCompiler(GenUtils):
                       + ' of ' + functionName
                       + ' at line %s, col %s' % lineCol + ' in the source.')
         self.addChunk('')
-        self._callRegionsStack.pop() # attrib of current methodCompiler
+        self._callRegionsStack.pop()  # attrib of current methodCompiler
 
     def nextCaptureRegionID(self):
         return self.nextCacheID()
@@ -888,7 +888,7 @@ class MethodCompiler(GenUtils):
         captureDetails.assignTo = assignTo
         captureDetails.lineCol = lineCol
 
-        self._captureRegionsStack.append((ID, captureDetails)) # attrib of current methodCompiler
+        self._captureRegionsStack.append((ID, captureDetails))  # attrib of current methodCompiler
         self.addChunk('## START CAPTURE REGION: ' + ID + ' ' + assignTo
                       + ' at line %s, col %s' % lineCol + ' in the source.')
         self.addChunk('_orig_trans%(ID)s = trans' % locals())
@@ -941,7 +941,7 @@ class MethodCompiler(GenUtils):
         filterDetails.ID = ID = self.nextFilterRegionID()
         filterDetails.theFilter = theFilter
         filterDetails.isKlass = isKlass
-        self._filterRegionsStack.append((ID, filterDetails)) # attrib of current methodCompiler
+        self._filterRegionsStack.append((ID, filterDetails))  # attrib of current methodCompiler
 
         self.addChunk('_orig_filter%(ID)s = _filter' % locals())
         if isKlass:
@@ -1341,7 +1341,7 @@ class ClassCompiler(GenUtils):
         self._generatedAttribs.append(attribExpr)
 
     def addSuper(self, argsList, parserComment=None):
-        className = self._className #self._baseClass
+        className = self._className  #self._baseClass
         methodName = self._getActiveMethodCompiler().methodName()
 
         argStringChunks = []
@@ -1500,11 +1500,11 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
     def __init__(self, source=None, file=None,
                  moduleName='DynamicallyCompiledCheetahTemplate',
-                 mainClassName=None, # string
-                 mainMethodName=None, # string
-                 baseclassName=None, # string
-                 extraImportStatements=None, # list of strings
-                 settings=None # dict
+                 mainClassName=None,  # string
+                 mainMethodName=None,  # string
+                 baseclassName=None,  # string
+                 extraImportStatements=None,  # list of strings
+                 settings=None  # dict
                  ):
         super(ModuleCompiler, self).__init__()
         if settings:
@@ -1538,7 +1538,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
         if source and file:
             raise TypeError("Cannot compile from a source string AND file.")
-        elif isinstance(file, string_type): # it's a filename.
+        elif isinstance(file, string_type):  # it's a filename.
             encoding = settings.get('encoding')
             if encoding:
                 f = codecs.open(file, 'r', encoding=encoding)
@@ -1591,7 +1591,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             else:
                 source = unicode(source)
 
-        if source.find('#indent') != -1: #@@TR: undocumented hack
+        if source.find('#indent') != -1:  #@@TR: undocumented hack
             source = indentize(source)
 
         self._parser = self.parserClass(source, filename=self._filePath, compiler=self)
@@ -1851,9 +1851,9 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
         #@@TR 2005-01-01: there's almost certainly a cleaner way to do this!
         importVarNames = impStatement[impStatement.find('import') + len('import'):].split(',')
-        importVarNames = [var.split()[-1] for var in importVarNames] # handles aliases
+        importVarNames = [var.split()[-1] for var in importVarNames]  # handles aliases
         importVarNames = [var for var in importVarNames if not var == '*']
-        self.addImportedVarNames(importVarNames, raw_statement=impStatement) #used by #extend for auto-imports
+        self.addImportedVarNames(importVarNames, raw_statement=impStatement)  #used by #extend for auto-imports
 
     def addAttribute(self, attribName, expr):
         self._getActiveClassCompiler().addAttribute(attribName + ' =' + expr)

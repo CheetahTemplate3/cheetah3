@@ -146,8 +146,8 @@ class TemplatePreprocessor(object):
         it outputs
         """
         settings = self._settings
-        if not source: # @@TR: this needs improving
-            if isinstance(file, (str, unicode)): # it's a filename.
+        if not source:  # @@TR: this needs improving
+            if isinstance(file, (str, unicode)):  # it's a filename.
                 f = open(file)
                 source = f.read()
                 f.close()
@@ -290,15 +290,15 @@ class Template(Servlet):
 
     ## the following are used by .compile(). Most are documented in its docstring.
     _CHEETAH_cacheModuleFilesForTracebacks = False
-    _CHEETAH_cacheDirForModuleFiles = None # change to a dirname
+    _CHEETAH_cacheDirForModuleFiles = None  # change to a dirname
 
-    _CHEETAH_compileCache = dict() # cache store for compiled code and classes
+    _CHEETAH_compileCache = dict()  # cache store for compiled code and classes
     # To do something other than simple in-memory caching you can create an
     # alternative cache store. It just needs to support the basics of Python's
     # mapping/dict protocol. E.g.:
     #   class AdvCachingTemplate(Template):
     #       _CHEETAH_compileCache = MemoryOrFileCache()
-    _CHEETAH_compileLock = Lock() # used to prevent race conditions
+    _CHEETAH_compileLock = Lock()  # used to prevent race conditions
     _CHEETAH_defaultMainMethodName = None
     _CHEETAH_compilerSettings = None
     _CHEETAH_compilerClass = Compiler
@@ -771,7 +771,7 @@ class Template(Servlet):
             try:
                 klass._CHEETAH_compileLock.acquire()
                 uniqueModuleName = _genUniqueModuleName(moduleName)
-                __file__ = uniqueModuleName+'.py' # relative file path with no dir part
+                __file__ = uniqueModuleName+'.py'  # relative file path with no dir part
 
                 if cacheModuleFilesForTracebacks:
                     if not os.path.exists(cacheDirForModuleFiles):
@@ -910,7 +910,7 @@ class Template(Servlet):
 
         def normalizeTokens(tokens):
             if isinstance(tokens, str):
-                return tokens.split() # space delimited string e.g.'@ %'
+                return tokens.split()  # space delimited string e.g.'@ %'
             elif isinstance(tokens, (list, tuple)):
                 return tokens
             else:
@@ -1064,13 +1064,13 @@ class Template(Servlet):
                  # use either or.  They are aliases for the same thing.
 
                  file=None,
-                 filter='RawOrEncodedUnicode', # which filter from Cheetah.Filters
+                 filter='RawOrEncodedUnicode',  # which filter from Cheetah.Filters
                  filtersLib=Filters,
                  errorCatcher=None,
 
-                 compilerSettings=Unspecified, # control the behaviour of the compiler
-                 _globalSetVars=None, # used internally for #include'd templates
-                 _preBuiltSearchList=None # used internally for #include'd templates
+                 compilerSettings=Unspecified,  # control the behaviour of the compiler
+                 _globalSetVars=None,  # used internally for #include'd templates
+                 _preBuiltSearchList=None  # used internally for #include'd templates
                  ):
         """a) compiles a new template OR b) instantiates an existing template.
 
@@ -1353,9 +1353,9 @@ class Template(Servlet):
             cregion = self._CHEETAH__cacheRegions.get(cacheRegionId)
             if not cregion:
                 return
-            if not cacheItemId: # clear the desired region and all its cacheItems
+            if not cacheItemId:  # clear the desired region and all its cacheItems
                 cregion.clear()
-            else: # clear one specific cache of a specific region
+            else:  # clear one specific cache of a specific region
                 cache = cregion.getCacheItem(cacheItemId)
                 if cache:
                     cache.clear()
@@ -1460,7 +1460,7 @@ class Template(Servlet):
     def _initCheetahInstance(self,
                              searchList=None,
                              namespaces=None,
-                             filter='RawOrEncodedUnicode', # which filter from Cheetah.Filters
+                             filter='RawOrEncodedUnicode',  # which filter from Cheetah.Filters
                              filtersLib=Filters,
                              errorCatcher=None,
                              _globalSetVars=None,
@@ -1602,7 +1602,7 @@ class Template(Servlet):
                         else:
                             file = path = os.path.normpath(srcArg)
                     else:
-                        file = srcArg ## a file-like object
+                        file = srcArg  ## a file-like object
                 else:
                     source = srcArg
                     file = None
@@ -1862,7 +1862,7 @@ class Template(Servlet):
             'float': _Converter('float', float, defaultFloat, badFloat),
         }
         #pprint.pprint(locals());  return {}
-        dic = {} # Destination.
+        dic = {}  # Destination.
         for name in names:
             k, v = _lookup(name, func, False, converters)
             dic[k] = v

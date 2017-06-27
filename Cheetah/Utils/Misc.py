@@ -60,7 +60,7 @@ def mkdirsWithPyInitFiles(path):
     if not os.path.exists(path):
         os.mkdir(path)
         init = os.path.join(path, "__init__.py")
-        f = open(init, 'w') # Open and close to produce empty file.
+        f = open(init, 'w')  # Open and close to produce empty file.
         f.close()
 
 # vim: shiftwidth=4 tabstop=4 expandtab

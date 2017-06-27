@@ -174,7 +174,7 @@ Template output mismatch:
             print(
                 moduleCode.encode('ascii', 'backslashreplace').decode('ascii'))
         try:
-            output = templateObj.respond() # rather than __str__, because of unicode
+            output = templateObj.respond()  # rather than __str__, because of unicode
             assert output == expectedOutput, self._outputMismatchReport(output, expectedOutput)
         finally:
             templateObj.shutdown()

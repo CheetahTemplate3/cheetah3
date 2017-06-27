@@ -5,7 +5,7 @@ class I18n(object):
         pass
 
     def __call__(self,
-                 src, # aka message,
+                 src,  # aka message,
                  plural=None,
                  # should be a string representing the name of the '$var'
                  # rather than $var itself

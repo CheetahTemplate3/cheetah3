@@ -238,7 +238,7 @@ def start():
         signal.signal(signal.SIGPROF, profile_signal_handler)
         itimer.setitimer(itimer.ITIMER_PROF,
                          rpt or state.sample_interval, 0.0)
-        state.gc_time_taken = 0 # dunno
+        state.gc_time_taken = 0  # dunno
 
 def stop():
     state.profile_level -= 1
@@ -248,7 +248,7 @@ def stop():
         rpt = itimer.setitimer(itimer.ITIMER_PROF, 0.0, 0.0)
         signal.signal(signal.SIGPROF, signal.SIG_IGN)
         state.remaining_prof_time = rpt[0]
-        state.gc_time_taken = 0 # dunno
+        state.gc_time_taken = 0  # dunno
 
 def reset(frequency=None):
     assert state.profile_level == 0, "Can't reset() while statprof is running"

@@ -27,7 +27,7 @@ except ImportError:
         if hasattr(obj, name):
             return getattr(obj, name)
         else:
-            return obj[name] # Raises KeyError.
+            return obj[name]  # Raises KeyError.
 
 ########## PUBLIC GENERIC FUNCTIONS ##############################
 
@@ -46,7 +46,7 @@ def isNotNone(v):
     return v is not None
 
 def Roman(n):
-    n = int(n) # Raises TypeError.
+    n = int(n)  # Raises TypeError.
     if n < 1:
         raise ValueError("roman numeral for zero or negative undefined: " + n)
     roman = ''
@@ -88,7 +88,7 @@ def mean(lis):
     """
     lis_len = len(lis)
     if lis_len == 0:
-        return 0.00 # Avoid ZeroDivisionError (not raised for floats anyway)
+        return 0.00  # Avoid ZeroDivisionError (not raised for floats anyway)
     total = float(sum(lis))
     return total / lis_len
 
@@ -178,7 +178,7 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
     """The statistics that depend on the current record.
     """
     def __init__(self, origList, index):
-        record = origList[index] # Raises IndexError.
+        record = origList[index]  # Raises IndexError.
         IndexFormats.__init__(self, index, record)
         ValuesGetterMixin.__init__(self, origList)
 
@@ -192,7 +192,7 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
         return self._index >= len(self._origList) - 1
 
     def _firstOrLastValue(self, field, currentIndex, otherIndex):
-        currentValue = self._origList[currentIndex] # Raises IndexError.
+        currentValue = self._origList[currentIndex]  # Raises IndexError.
         try:
             otherValue = self._origList[otherIndex]
         except IndexError:
@@ -221,7 +221,7 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
         except NegativeError:
             return default
         total = sum(lis)
-        if total == 0.00: # Avoid ZeroDivisionError.
+        if total == 0.00:  # Avoid ZeroDivisionError.
             return default
         val = float(val)
         try:
@@ -233,11 +233,11 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
         else:
             percent = round(percent, decimals)
         if suffix:
-            return str(percent) + suffix # String.
+            return str(percent) + suffix  # String.
         else:
-            return percent # Numeric.
+            return percent  # Numeric.
 
-    def __call__(self): # Overrides IndexFormats.__call__
+    def __call__(self):  # Overrides IndexFormats.__call__
         """This instance is not callable, so we override the super method.
         """
         raise NotImplementedError()
@@ -327,11 +327,11 @@ class Summary(ValuesGetterMixin):
 
     def min(self, field=None):
         lis = self._getValues(field, isNotNone)
-        return min(lis) # Python builtin function min.
+        return min(lis)  # Python builtin function min.
 
     def max(self, field=None):
         lis = self._getValues(field, isNotNone)
-        return max(lis) # Python builtin function max.
+        return max(lis)  # Python builtin function max.
 
     def mean(self, field=None):
         """Always returns a floating point number.

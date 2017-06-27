@@ -508,7 +508,7 @@ class VFFSL(VFS):
         ns['aFloat'] = res['aFloat'] = 0.1234
         res['none'] = 'some'
 
-        del ns['anInt'] # will be picked up by globals
+        del ns['anInt']  # will be picked up by globals
 
     def VFFSL(self, searchList, name, autocall=True):
         anInt = 1

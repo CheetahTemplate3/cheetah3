@@ -158,7 +158,7 @@ class Mantis_Issue_21_Regression_Test(unittest.TestCase):
         '''
         template = Cheetah.Template.Template.compile(template)
         assert template
-        assert template.testMethod(output='bug') # raises a NameError: global name '_filter' is not defined
+        assert template.testMethod(output='bug')  # raises a NameError: global name '_filter' is not defined
 
 
 class Mantis_Issue_22_Regression_Test(unittest.TestCase):

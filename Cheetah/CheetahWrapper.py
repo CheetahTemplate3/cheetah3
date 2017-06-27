@@ -418,7 +418,7 @@ you do have write permission to and re-run the tests.""")
             oldFilesLen = len(files)
             D("Expanding %s", f)
             path = os.path.join(idir, f)
-            pathWithExt = path + iext # May or may not be valid.
+            pathWithExt = path + iext  # May or may not be valid.
             if os.path.isdir(path):
                 if recurse:
                     for root, dirs, _files in os.walk(path):
@@ -567,10 +567,10 @@ you do have write permission to and re-run the tests.""")
         basename = b.basename
         dstDir = os.path.dirname(dst)
         what = self.isCompile and "Compiling" or "Filling"
-        C("%s %s -> %s^", what, src, dst) # No trailing newline.
+        C("%s %s -> %s^", what, src, dst)  # No trailing newline.
         if os.path.exists(dst) and not self.opts.nobackup:
             bak = b.bak
-            C(" (backup %s)", bak) # On same line as previous message.
+            C(" (backup %s)", bak)  # On same line as previous message.
         else:
             bak = None
             C("")

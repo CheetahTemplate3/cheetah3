@@ -179,7 +179,7 @@ def _wrapNotFoundException(exc, fullName, namespace):
         raise
     else:
         excStr = exc.args[0]
-        if excStr.find('while searching') == -1: # only wrap once!
+        if excStr.find('while searching') == -1:  # only wrap once!
             excStr += " while searching for '%s'" % fullName
             if _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS:
                 excStr += ' in the namespace %s' % pformat(namespace)
