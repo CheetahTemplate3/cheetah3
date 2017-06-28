@@ -14,7 +14,7 @@ TODO
 
 
 ##################################################
-## DEPENDENCIES ##
+# DEPENDENCIES ##
 
 import sys
 import types
@@ -108,7 +108,7 @@ defaultTestNameSpace = {
 
 
 ##################################################
-## TEST BASE CLASSES
+# TEST BASE CLASSES
 
 class OutputTest(unittest.TestCase):
     report = '''
@@ -205,7 +205,7 @@ Template output mismatch:
             return self.template.generatedModuleCode()
 
 ##################################################
-## TEST CASE CLASSES
+# TEST CASE CLASSES
 
 class EmptyTemplate(OutputTest):
     convertEOLs = False
@@ -3222,7 +3222,7 @@ public class X
 
 
 ##################################################
-## CREATE CONVERTED EOL VERSIONS OF THE TEST CASES
+# CREATE CONVERTED EOL VERSIONS OF THE TEST CASES
 
 if OutputTest._useNewStyleCompilation:
     extraCompileKwArgsForDiffBaseclass = {'baseclass': dict}
@@ -3248,7 +3248,7 @@ def install_eols():
         del klass
 
 ##################################################
-## if run from the command line ##
+# if run from the command line ##
 
 if __name__ == '__main__':
     install_eols()

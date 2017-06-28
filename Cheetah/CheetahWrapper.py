@@ -48,7 +48,7 @@ class Bundle:
 
 
 ##################################################
-## USAGE FUNCTION & MESSAGES
+# USAGE FUNCTION & MESSAGES
 
 def usage(usageMessage, errorMessage="", out=sys.stderr):
     """Write help text, an optional error message, and abort the program.
@@ -91,7 +91,7 @@ Run "cheetah options" for the list of valid options.
 """
 
 ##################################################
-## CheetahWrapper CLASS
+# CheetahWrapper CLASS
 
 class CheetahWrapper(object):
     MAKE_BACKUPS = True
@@ -109,7 +109,7 @@ class CheetahWrapper(object):
         self.parser = None
 
     ##################################################
-    ## MAIN ROUTINE
+    # MAIN ROUTINE
 
     def main(self, argv=None):
         """The main program controller."""
@@ -221,7 +221,7 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
             self.searchList.insert(0, unpickled)
 
     ##################################################
-    ## COMMAND METHODS
+    # COMMAND METHODS
 
     def compile(self):
         self._compileOrFill()
@@ -268,7 +268,7 @@ you do have write permission to and re-run the tests.""")
 
     # If you add a command, also add it to the 'meths' variable in main().
     ##################################################
-    ## LOGGING METHODS
+    # LOGGING METHODS
 
     def chatter(self, format, *args):
         """Print a verbose message to stdout.  But don't if .opts.stdout is
@@ -298,7 +298,7 @@ you do have write permission to and re-run the tests.""")
         sys.exit(1)
 
     ##################################################
-    ## HELPER METHODS
+    # HELPER METHODS
 
 
     def _fixExts(self):
@@ -629,7 +629,7 @@ def _cheetah_compile():
 
 
 ##################################################
-## if run from the command line
+# if run from the command line
 if __name__ == '__main__':  CheetahWrapper().main()
 
 # vim: shiftwidth=4 tabstop=4 expandtab

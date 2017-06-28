@@ -5,7 +5,7 @@ See the docstring in the Template class and the Users' Guide for more informatio
 '''
 
 ################################################################################
-## DEPENDENCIES
+# DEPENDENCIES
 import sys                        # used in the error handling code
 import re                         # used to define the internal delims regex
 import logging
@@ -102,7 +102,7 @@ def hashDict(d):
 
 
 ################################################################################
-## MODULE GLOBALS AND CONSTANTS
+# MODULE GLOBALS AND CONSTANTS
 
 def _genUniqueModuleName(baseModuleName):
     """The calling code is responsible for concurrency locking.
@@ -288,7 +288,7 @@ class Template(Servlet):
     _CHEETAH_requiredCheetahClassAttributes = ('cacheRegionClass', 'cacheStore',
                                                'cacheStoreIdPrefix', 'cacheStoreClass')
 
-    ## the following are used by .compile(). Most are documented in its docstring.
+    # the following are used by .compile(). Most are documented in its docstring.
     _CHEETAH_cacheModuleFilesForTracebacks = False
     _CHEETAH_cacheDirForModuleFiles = None  # change to a dirname
 
@@ -315,7 +315,7 @@ class Template(Servlet):
     _CHEETAH_preprocessors = None
     _CHEETAH_defaultPreprocessorClass = TemplatePreprocessor
 
-    ## The following attributes are used by instance methods:
+    # The following attributes are used by instance methods:
     _CHEETAH_generatedModuleCode = None
     NonNumericInputError = NonNumericInputError
     _CHEETAH_cacheRegionClass = CacheRegion
@@ -681,13 +681,13 @@ class Template(Servlet):
                             ('cacheDirForModuleFiles', 'string or None'))
 
         ##################################################
-        ## handle any preprocessors
+        # handle any preprocessors
         if preprocessors:
             origSrc = source
             source, file = klass._preprocessSource(source, file, preprocessors)
 
         ##################################################
-        ## compilation, using cache if requested/possible
+        # compilation, using cache if requested/possible
         baseclassValue = None
         baseclassName = None
         if baseclass:
@@ -1224,11 +1224,11 @@ class Template(Servlet):
                             " 'file' keyword argument, but not both")
 
         ##################################################
-        ## Do superclass initialization.
+        # Do superclass initialization.
         super(Template, self).__init__()
 
         ##################################################
-        ## Do required version check
+        # Do required version check
         if not hasattr(self, '_CHEETAH_versionTuple'):
             try:
                 mod = sys.modules[self.__class__.__module__]
@@ -1245,8 +1245,8 @@ class Template(Servlet):
                 pass
 
         ##################################################
-        ## Setup instance state attributes used during the life of template
-        ## post-compile
+        # Setup instance state attributes used during the life of template
+        # post-compile
         if searchList:
             for namespace in searchList:
                 if isinstance(namespace, dict):
@@ -1272,7 +1272,7 @@ class Template(Servlet):
             _preBuiltSearchList=_preBuiltSearchList)
 
         ##################################################
-        ## Now, compile if we're meant to
+        # Now, compile if we're meant to
         if (source is not None) or (file is not None):
             self._compile(source, file, compilerSettings=compilerSettings)
 
@@ -1302,7 +1302,7 @@ class Template(Servlet):
         """
         return self._CHEETAH__errorCatcher
 
-    ## cache methods ##
+    # cache methods ##
     def _getCacheStore(self):
         if not self._CHEETAH__cacheStore:
             if self._CHEETAH_cacheStore is not None:
@@ -1360,7 +1360,7 @@ class Template(Servlet):
                 if cache:
                     cache.clear()
 
-    ## end cache methods ##
+    # end cache methods ##
 
     def shutdown(self):
         """Break reference cycles before discarding a servlet.
@@ -1372,7 +1372,7 @@ class Template(Servlet):
         self._CHEETAH__searchList = None
         self.__dict__ = {}
 
-    ## utility functions ##
+    # utility functions ##
 
     def getVar(self, varName, default=Unspecified, autoCall=True):
         """Get a variable from the searchList.  If the variable can't be found
@@ -1455,7 +1455,7 @@ class Template(Servlet):
         CmdLineIface(templateObj=self).run()
 
     ##################################################
-    ## internal methods -- not to be called by end-users
+    # internal methods -- not to be called by end-users
 
     def _initCheetahInstance(self,
                              searchList=None,
@@ -1574,9 +1574,9 @@ class Template(Servlet):
             for k, v in self.__class__.__dict__.items():
                 if not v or k.startswith('__'):
                     continue
-                ## Propogate the class attributes to the instance
-                ## since we're about to obliterate self.__class__
-                ## (see: cheetah.Tests.Tepmlate.SubclassSearchListTest)
+                # Propogate the class attributes to the instance
+                # since we're about to obliterate self.__class__
+                # (see: cheetah.Tests.Tepmlate.SubclassSearchListTest)
                 setattr(self, k, v)
 
         self.__class__ = templateClass
@@ -1644,7 +1644,7 @@ class Template(Servlet):
         else:
             return Template
 
-    ## functions for using templates as CGI scripts
+    # functions for using templates as CGI scripts
     def webInput(self, names, namesMulti=(), default='', src='f',
                  defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00,
                  debug=False):

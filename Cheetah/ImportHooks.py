@@ -30,7 +30,7 @@ from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
 _installed = False
 
 ##################################################
-## HELPER FUNCS
+# HELPER FUNCS
 
 _cacheDir = []
 def setCacheDir(cacheDir):
@@ -38,7 +38,7 @@ def setCacheDir(cacheDir):
     _cacheDir.append(cacheDir)
 
 ##################################################
-## CLASSES
+# CLASSES
 
 class CheetahDirOwner(DirOwner):
     _lock = RLock()
@@ -73,7 +73,7 @@ class CheetahDirOwner(DirOwner):
             self._releaseLock()
 
     def _compile(self, name, tmplPath):
-        ## @@ consider adding an ImportError raiser here
+        # @@ consider adding an ImportError raiser here
         code = str(Compiler(file=tmplPath, moduleName=name,
                             mainClassName=name))
         if _cacheDir:
@@ -82,7 +82,7 @@ class CheetahDirOwner(DirOwner):
             try:
                 open(__file__, 'w').write(code)
             except OSError:
-                ## @@ TR: need to add some error code here
+                # @@ TR: need to add some error code here
                 traceback.print_exc(file=sys.stderr)
                 __file__ = tmplPath
         else:
@@ -99,7 +99,7 @@ class CheetahDirOwner(DirOwner):
 
 
 ##################################################
-## FUNCTIONS
+# FUNCTIONS
 
 def install(templateFileExtensions=('.tmpl',)):
     """Install the Cheetah Import Hooks"""

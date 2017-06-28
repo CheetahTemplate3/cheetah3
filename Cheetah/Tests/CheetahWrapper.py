@@ -250,7 +250,7 @@ class CFIdirBase(CFBase):
 
 
 ##################################################
-## TEST CASE CLASSES
+# TEST CASE CLASSES
 
 class OneFile(CFBase):
     def testCompile(self):

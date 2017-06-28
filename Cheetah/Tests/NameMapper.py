@@ -100,7 +100,7 @@ for k in testNamespace.keys():
     exec('%s = testNamespace[k]' % k)
 
 ##################################################
-## TEST BASE CLASSES
+# TEST BASE CLASSES
 
 class NameMapperTest(unittest.TestCase):
     failureException = NotFound
@@ -130,7 +130,7 @@ class NameMapperTest(unittest.TestCase):
 
 
 ##################################################
-## TEST CASE CLASSES
+# TEST CASE CLASSES
 
 class VFN(NameMapperTest):
 
@@ -243,7 +243,7 @@ class VFN(NameMapperTest):
         for i in range(10):
             self.check('anObj.instanceVar1')
 
-    ## tests 22, 25, and 26 removed when the underscored lookup was removed
+    # tests 22, 25, and 26 removed when the underscored lookup was removed
 
     def test27(self):
         """anObj.meth1 in dict lookup"""
@@ -543,7 +543,7 @@ class MapBuiltins(unittest.TestCase):
 
 
 ##################################################
-## if run from the command line ##
+# if run from the command line ##
 
 if __name__ == '__main__':
     unittest.main()

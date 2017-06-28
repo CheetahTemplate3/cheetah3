@@ -29,7 +29,7 @@ else:
     ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError)
 
 ##################################################
-## CLASSES ##
+# CLASSES ##
 
 class BuildFailed(Exception):
     pass
@@ -86,7 +86,7 @@ class mod_install_data(install_data):
                 filenames = glob(entry)
 
             for filename in filenames:
-                ## generate the dstPath from the filename
+                # generate the dstPath from the filename
                 # - deal with 'package_dir' translations
                 topDir, subPath = (filename.split(os.sep)[0],
                                    os.sep.join(filename.split(os.sep)[1:])
@@ -103,7 +103,7 @@ class mod_install_data(install_data):
                     packageDir = topDir
                 dstPath = os.path.join(self.install_dir, packageDir, subPath)
 
-                ## add the file to the list of outfiles
+                # add the file to the list of outfiles
                 dstdir = os.path.split(dstPath)[0]
                 if not self.dry_run:
                     self.mkpath(dstdir)
@@ -113,7 +113,7 @@ class mod_install_data(install_data):
                 self.outfiles.append(outfile)
 
 ##################################################
-## FUNCTIONS ##
+# FUNCTIONS ##
 
 def run_setup(configurations):
     """ Run distutils setup.

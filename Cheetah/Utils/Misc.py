@@ -5,7 +5,7 @@ import os          # Used in mkdirsWithPyInitFile.
 import sys         # Used in die.
 
 ##################################################
-## MISCELLANEOUS FUNCTIONS
+# MISCELLANEOUS FUNCTIONS
 
 def die(reason):
     sys.stderr.write(reason + '\n')

@@ -66,7 +66,7 @@ ext_modules = [
              #            [os.path.join('Cheetah', 'c', '_template.c')]),
              ]
 
-## Data Files and Scripts
+# Data Files and Scripts
 scripts = ('bin/cheetah-compile',
            'bin/cheetah',
            'bin/cheetah-analyze',

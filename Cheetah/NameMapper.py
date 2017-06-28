@@ -160,10 +160,10 @@ if PY2 and not hasattr(inspect.imp, 'get_suffixes'):
     # Google App Engine
     setattr(inspect.imp, 'get_suffixes', lambda: [('.py', 'U', 1)])
 
-## N.B. An attempt is made at the end of this module to import C versions of
-## these functions.  If _namemapper.c has been compiled succesfully and the
-## import goes smoothly, the Python versions defined here will be replaced with
-## the C versions.
+# N.B. An attempt is made at the end of this module to import C versions of
+# these functions.  If _namemapper.c has been compiled succesfully and the
+# import goes smoothly, the Python versions defined here will be replaced with
+# the C versions.
 
 class NotFound(LookupError):
     pass
@@ -313,7 +313,7 @@ except:
     C_VERSION = False
 
 ##################################################
-## CLASSES
+# CLASSES
 
 class Mixin:
     """@@ document me"""
@@ -324,7 +324,7 @@ class Mixin:
         return valueForKey(self, key)
 
 ##################################################
-## if run from the command line ##
+# if run from the command line ##
 
 def example():
     class A(Mixin):

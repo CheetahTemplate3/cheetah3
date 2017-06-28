@@ -70,7 +70,7 @@ _DEFAULT_COMPILER_SETTINGS = [
     ('outputMethodsBeforeAttributes', True, ''),
     ('addTimestampsToCompilerOutput', True, ''),
 
-    ## Customizing the #extends directive
+    # Customizing the #extends directive
     ('autoImportForExtendsDirective', True, ''),
     ('handlerForExtendsDirective', None, ''),
 
@@ -289,7 +289,7 @@ class GenUtils(object):
         return pythonCode
 
 ##################################################
-## METHOD COMPILERS
+# METHOD COMPILERS
 
 class MethodCompiler(GenUtils):
     def __init__(self, methodName, classCompiler,
@@ -337,7 +337,7 @@ class MethodCompiler(GenUtils):
     def setMethodName(self, name):
         self._methodName = name
 
-    ## methods for managing indentation
+    # methods for managing indentation
 
     def indentation(self):
         return self._indent * self._indentLev
@@ -351,7 +351,7 @@ class MethodCompiler(GenUtils):
         else:
             raise Error('Attempt to dedent when the indentLev is 0')
 
-    ## methods for final code wrapping
+    # methods for final code wrapping
 
     def methodDef(self):
         if self._methodDef:
@@ -392,7 +392,7 @@ class MethodCompiler(GenUtils):
                   '\n' + ind + '"""\n')
         return  docStr
 
-    ## methods for adding code
+    # methods for adding code
     def addMethDocString(self, line):
         self._docStringLines.append(line.replace('%', '%%'))
 
@@ -1119,7 +1119,7 @@ class AutoMethodCompiler(MethodCompiler):
 
 
 ##################################################
-## CLASS COMPILERS
+# CLASS COMPILERS
 
 _initMethod_initCheetah = """\
 if not self._CHEETAH__instanceInitialized:
@@ -1254,19 +1254,19 @@ class ClassCompiler(GenUtils):
     def setMainMethodName(self, methodName):
         if methodName == self._mainMethodName:
             return
-        ## change the name in the methodCompiler and add new reference
+        # change the name in the methodCompiler and add new reference
         mainMethod = self._methodsIndex[self._mainMethodName]
         mainMethod.setMethodName(methodName)
         self._methodsIndex[methodName] = mainMethod
 
-        ## make sure that fileUpdate code still works properly:
+        # make sure that fileUpdate code still works properly:
         chunkToChange = ('write(self.' + self._mainMethodName + '(trans=trans))')
         chunks = mainMethod._methodBodyChunks
         if chunkToChange in chunks:
             for i in range(len(chunks)):
                 if chunks[i] == chunkToChange:
                     chunks[i] = ('write(self.' + methodName + '(trans=trans))')
-        ## get rid of the old reference and update self._mainMethodName
+        # get rid of the old reference and update self._mainMethodName
         del self._methodsIndex[self._mainMethodName]
         self._mainMethodName = methodName
 
@@ -1331,13 +1331,13 @@ class ClassCompiler(GenUtils):
         self._initMethChunks.append(chunk)
 
     def addAttribute(self, attribExpr):
-        ## first test to make sure that the user hasn't used any fancy Cheetah syntax
+        # first test to make sure that the user hasn't used any fancy Cheetah syntax
         #  (placeholders, directives, etc.) inside the expression
         if attribExpr.find('VFN(') != -1 or attribExpr.find('VFFSL(') != -1:
             raise ParseError(self,
                              'Invalid #attr directive.' +
                              ' It should only contain simple Python literals.')
-        ## now add the attribute
+        # now add the attribute
         self._generatedAttribs.append(attribExpr)
 
     def addSuper(self, argsList, parserComment=None):
@@ -1410,7 +1410,7 @@ class ClassCompiler(GenUtils):
         # rawDirective = metaData['raw']
         # lineCol = metaData['lineCol']
 
-        ## insert the code to call the block, caching if #cache directive is on
+        # insert the code to call the block, caching if #cache directive is on
         codeChunk = 'self.' + methodName + '(trans=trans)'
         self.addChunk(codeChunk)
 
@@ -1419,7 +1419,7 @@ class ClassCompiler(GenUtils):
         #    self.appendToPrevChunk(' at line %s, col %s' % lineCol + '.')
 
 
-    ## code wrapping methods
+    # code wrapping methods
 
     def classDef(self):
         if self._classDef:
@@ -1491,7 +1491,7 @@ class AutoClassCompiler(ClassCompiler):
     pass
 
 ##################################################
-## MODULE COMPILERS
+# MODULE COMPILERS
 
 class ModuleCompiler(SettingsManager, GenUtils):
 
@@ -1722,7 +1722,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         else:
             self._importedVarNames.extend(varNames)
 
-    ## methods for adding stuff to the module and class definitions
+    # methods for adding stuff to the module and class definitions
 
     def setBaseClass(self, baseClassName):
         if self._mainMethodNameArg:
@@ -1741,7 +1741,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             # no need to import
         else:
             ##################################################
-            ## If the #extends directive contains a classname or modulename that isn't
+            # If the #extends directive contains a classname or modulename that isn't
             #  in self.importedVarNames() already, we assume that we need to add
             #  an implied 'from ModName import ClassName' where ModName == ClassName.
             #  - This is the case in WebKit servlet modules.
@@ -1889,7 +1889,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         for line in comm.splitlines():
             addLine(line)
 
-    ## methods for module code wrapping
+    # methods for module code wrapping
 
     def getModuleCode(self):
         if not self._compiled:
@@ -2019,6 +2019,6 @@ if __name__ == '__main__':
 
 
 ##################################################
-## Make Compiler an alias for ModuleCompiler
+# Make Compiler an alias for ModuleCompiler
 
 Compiler = ModuleCompiler

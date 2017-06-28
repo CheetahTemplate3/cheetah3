@@ -51,7 +51,7 @@ def any(*choices): return group(*choices) + '*'
 def maybe(*choices): return group(*choices) + '?'
 
 ##################################################
-## CONSTANTS & GLOBALS ##
+# CONSTANTS & GLOBALS ##
 
 NO_CACHE = 0
 STATIC_CACHE = 1
@@ -62,7 +62,7 @@ SET_GLOBAL = 1
 SET_MODULE = 2
 
 ##################################################
-## Tokens for the parser ##
+# Tokens for the parser ##
 
 # generic
 identchars = "abcdefghijklmnopqrstuvwxyz" \
@@ -122,7 +122,7 @@ closurePairs = {')': '(', ']': '[', '}': '{'}
 closurePairsRev = {'(': ')', '[': ']', '{': '}'}
 
 ##################################################
-## Regex chunks for the parser ##
+# Regex chunks for the parser ##
 
 tripleQuotedStringREs = {}
 def makeTripleQuoteRe(start, end):
@@ -241,7 +241,7 @@ endDirectiveNamesAndHandlers = {
     }
 
 ##################################################
-## CLASSES ##
+# CLASSES ##
 
 # @@TR: SyntaxError doesn't call exception.__str__ for some reason!
 # class ParseError(SyntaxError):
@@ -272,7 +272,7 @@ class ParseError(ValueError):
         else:
             row, col, line = self.stream.getRowColLine()
 
-        ## get the surrounding lines
+        # get the surrounding lines
         lines = stream.splitlines()
         prevLines = []                  # (rowNum, content)
         for i in range(1, 4):
@@ -287,7 +287,7 @@ class ParseError(ValueError):
             nextLines.append((row+i, lines[row-1+i]))
         nextLines.reverse()
 
-        ## print the main message
+        # print the main message
         report += "\n\n%s\n" % self.msg
         report += "Line %i, column %i%s\n\n" % (row, col, f)
         report += 'Line|Cheetah Code\n'
@@ -301,7 +301,7 @@ class ParseError(ValueError):
         while nextLines:
             lineInfo = nextLines.pop()
             report += "%(row)-4d|%(line)s\n" % {'row': lineInfo[0], 'line': lineInfo[1]}
-        ## add the extra msg
+        # add the extra msg
         if self.extMsg:
             report += self.extMsg + '\n'
 
@@ -411,7 +411,7 @@ class _LowLevelParser(SourceReader):
             self.matchEOLSlurpToken,
             ]
 
-    ## regex setup ##
+    # regex setup ##
 
     def _makeCheetahVarREs(self):
 
@@ -991,7 +991,7 @@ class _LowLevelParser(SourceReader):
                         codeFor1stToken = self.getCheetahVar(plain=True)
                         self.setPos(endPos)
 
-                    ## finally
+                    # finally
                     addBit(codeFor1stToken + WS + nextToken)
                 else:
                     addBit(codeFor1stToken + WS)
@@ -1476,7 +1476,7 @@ class _HighLevelParser(_LowLevelParser):
                 callback(parser=self, directiveName=directiveName)
             raise ForbiddenDirective(self, msg='This %r directive is disabled' % directiveName)
 
-    ## main parse loop
+    # main parse loop
 
     def parse(self, breakPoint=None, assertEmptyStack=True):
         if breakPoint:
@@ -1506,7 +1506,7 @@ class _HighLevelParser(_LowLevelParser):
         if breakPoint:
             self.setBreakPoint(origBP)
 
-    ## non-directive eat methods
+    # non-directive eat methods
 
     def eatPlainText(self):
         startPos = self.pos()
@@ -1597,7 +1597,7 @@ class _HighLevelParser(_LowLevelParser):
         self._compiler.addPSP(pspString)
         self.getPSPEndToken()
 
-    ## generic directive eat methods
+    # generic directive eat methods
     _simpleIndentingDirectives = '''
     else elif for while repeat unless try except finally'''.split()
     _simpleExprDirectives = '''
@@ -1798,7 +1798,7 @@ class _HighLevelParser(_LowLevelParser):
             # @@TR: temporary hack of useSearchList
             self.setSetting('useSearchList', self._useSearchList_orig)
 
-    ## specific directive eat methods
+    # specific directive eat methods
 
     def eatBreakPoint(self):
         """Tells the parser to stop parsing at this point and completely ignore
@@ -2626,7 +2626,7 @@ class _HighLevelParser(_LowLevelParser):
             self.pushToOpenDirectivesStack('if')
             self._compiler.addIf(expr, lineCol=lineCol)
 
-    ## end directive handlers
+    # end directive handlers
     def handleEndDef(self):
         isNestedDef = (self.setting('allowNestedDefScopes')
                        and [name for name in self._openDirectivesStack if name == 'def'])
@@ -2661,5 +2661,5 @@ class _HighLevelParser(_LowLevelParser):
             raise ParseError(self, msg=errorMsg)
 
 ##################################################
-## Make an alias to export
+# Make an alias to export
 Parser = _HighLevelParser

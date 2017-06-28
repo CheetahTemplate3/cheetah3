@@ -344,7 +344,7 @@ class SubclassSearchListTest(TemplateTest):
         self.assertEqual(unicode(tmpl), 'When we meet, I say "Hola"')
 
 ##################################################
-## if run from the command line ##
+# if run from the command line ##
 
 if __name__ == '__main__':
     unittest.main()

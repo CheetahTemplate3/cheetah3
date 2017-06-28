@@ -7,7 +7,7 @@ from Cheetah.Utils.Misc import useOrRaise
 class NonNumericInputError(ValueError): pass
 
 ##################################################
-## PRIVATE FUNCTIONS AND CLASSES
+# PRIVATE FUNCTIONS AND CLASSES
 
 class _Converter:
     """A container object for info about type converters.

@@ -62,7 +62,7 @@ class DummyResponse(object):
             return ''.join((self.safeConvert(c) for c in chunks))
 
     def writelines(self, *lines):
-        ## not used
+        # not used
         [self.writeln(ln) for ln in lines]
 
 

@@ -31,7 +31,7 @@ _installed = False
 _os_stat = _os_path_join = _os_getcwd = _os_path_dirname = None
 
 ##################################################
-## FUNCTIONS
+# FUNCTIONS
 
 def _os_bootstrap():
     """Set up 'os' module replacement functions for use during import bootstrap."""
@@ -135,7 +135,7 @@ def getDescr(fnm):
             return (suffix, mode, typ)
 
 ##################################################
-## CLASSES
+# CLASSES
 
 class Owner:
 
@@ -265,7 +265,7 @@ class RegistryImportDirector(ImportDirector):
         self.map = {}
         try:
             import win32api
-            ## import win32con
+            # import win32con
         except ImportError:
             pass
         else:
@@ -505,7 +505,7 @@ class ImportManager:
         parentnm = packageName(fqnm)
         newmod = self.doimport(nm, parentnm, fqnm)
         mod.__dict__.update(newmod.__dict__)
-##        return newmod
+#        return newmod
 
     def _acquire(self):
         if self.rlock.locked():
@@ -524,7 +524,7 @@ class ImportManager:
 
 
 ##################################################
-## MORE CONSTANTS & GLOBALS
+# MORE CONSTANTS & GLOBALS
 
 _globalOwnerTypes = [
     DirOwner,

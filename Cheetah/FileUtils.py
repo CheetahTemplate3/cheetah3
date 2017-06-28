@@ -46,7 +46,7 @@ def replaceRegexInFiles(files, pattern, repl):
 
 
 ##################################################
-## CLASSES
+# CLASSES
 
 class FileFinder:
 
@@ -84,10 +84,10 @@ class FileFinder:
 
         while pendingDirs:
             dir = getDir()
-            ##  process this dir
+            #  process this dir
             processDir(dir)
 
-            ## and add sub-dirs
+            # and add sub-dirs
             for baseName in listdir(dir):
                 fullPath = join(dir, baseName)
                 if isdir(fullPath):
@@ -148,7 +148,7 @@ class _GenSubberFunc:
         else:
             return self._src[start:to]
 
-    ## match and get methods
+    # match and get methods
 
     def matchBackref(self):
         return self.backrefRE.match(self.src(), self.pos())
@@ -166,7 +166,7 @@ class _GenSubberFunc:
         self.setPos(m.end())
         return m.group(1)
 
-    ## main parse loop and the eat methods
+    # main parse loop and the eat methods
 
     def parse(self):
         while not self.atEnd():
@@ -196,7 +196,7 @@ class _GenSubberFunc:
     def addChunk(self, chunk):
         self._codeChunks.append(chunk)
 
-    ## code wrapping methods
+    # code wrapping methods
 
     def codeBody(self):
         return ', '.join(self._codeChunks)
@@ -237,10 +237,10 @@ class FindAndReplace:
         self._results = {}
         self._recordResults = recordResults
 
-        ## see if we should use pgrep to do the file matching
+        # see if we should use pgrep to do the file matching
         self._usePgrep = False
         if (os.popen3('pgrep')[2].read()).startswith('Usage:'):
-            ## now check to make sure pgrep understands the pattern
+            # now check to make sure pgrep understands the pattern
             tmpFile = mktemp()
             open(tmpFile, 'w').write('#')
             if not (os.popen3('pgrep "' + pattern + '" ' + tmpFile)[2].read()):

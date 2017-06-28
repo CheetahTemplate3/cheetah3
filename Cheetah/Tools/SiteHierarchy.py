@@ -14,7 +14,7 @@ There are methods you can override to customize the HTML output.
 """
 
 ##################################################
-## DEPENDENCIES
+# DEPENDENCIES
 import string
 try:
     from cStringIO import StringIO
@@ -22,7 +22,7 @@ except ImportError:
     from StringIO import StringIO
 
 ##################################################
-## CLASSES
+# CLASSES
 
 class Hierarchy:
     def __init__(self, hierarchy, currentURL, prefix='', menuCSSClass=None,
@@ -47,7 +47,7 @@ class Hierarchy:
         self._prefix = prefix
 
 
-    ## Main output methods
+    # Main output methods
 
     def menuList(self, menuCSSClass=None):
         """An indented menu list"""
@@ -67,8 +67,8 @@ class Hierarchy:
         path = []
         pos = self._contents
         while True:
-            ## This is not the fastest algorithm, I'm afraid.
-            ## But it probably won't be for a huge hierarchy anyway.
+            # This is not the fastest algorithm, I'm afraid.
+            # But it probably won't be for a huge hierarchy anyway.
             foundAny = False
             path.append(pos[0])
             for item in pos[1:]:
@@ -88,7 +88,7 @@ class Hierarchy:
             map(lambda x, self=self: self.crumbLink(x[0], x[1]), path)) + \
             self.crumbTerminator()
 
-    ## Methods to control the Aesthetics
+    # Methods to control the Aesthetics
     #  - override these methods for your own look
 
     def menuLink(self, url, text, indent):
@@ -117,7 +117,7 @@ class Hierarchy:
         """When you are at the homepage"""
         return ''
 
-    ## internal methods
+    # internal methods
 
     def _menubarRecurse(self, contents, indent, stream):
         if isinstance(contents, tuple):
@@ -139,7 +139,7 @@ class Hierarchy:
                 return True
         return False
 ##################################################
-## from the command line
+# from the command line
 
 if __name__ == '__main__':
     hierarchy = [

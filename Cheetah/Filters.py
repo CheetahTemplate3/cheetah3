@@ -190,7 +190,7 @@ class StripSqueeze(Filter):
         return " ".join(s)
 
 ##################################################
-## MAIN ROUTINE -- testing
+# MAIN ROUTINE -- testing
 
 def test():
     s1 = "abc <=> &"

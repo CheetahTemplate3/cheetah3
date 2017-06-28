@@ -21,7 +21,7 @@ numberRE = re.compile(Number)
 complexNumberRE = re.compile('[\(]*' + Number + r'[ \t]*\+[ \t]*' + Number + '[\)]*')
 
 ##################################################
-## FUNCTIONS ##
+# FUNCTIONS ##
 
 def mergeNestedDictionaries(dict1, dict2, copy=False, deepcopy=False):
     """Recursively merge the values of dict2 into dict1.
@@ -160,8 +160,8 @@ class _SettingsCollector(object):
                 if o != '__name__':
                     newSettings[s][o] = p.get(s, o)
 
-        ## loop through new settings -> deal with global settings, numbers,
-        ## booleans and None ++ also deal with 'importSettings' commands
+        # loop through new settings -> deal with global settings, numbers,
+        # booleans and None ++ also deal with 'importSettings' commands
 
         for sect, subDict in list(newSettings.items()):
             for key, val in list(subDict.items()):
@@ -177,7 +177,7 @@ class _SettingsCollector(object):
                     if stringIsNumber(val):
                         subDict[key] = convStringToNum(val)
 
-                ## now deal with any 'importSettings' commands
+                # now deal with any 'importSettings' commands
                 if key.lower() == 'importsettings':
                     if val.find(';') < 0:
                         importedSettings = self.readSettingsFromPySrcFile(val)
@@ -222,7 +222,7 @@ class SettingsManager(_SettingsCollector):
 
         pass
 
-    ## core post startup methods
+    # core post startup methods
 
     def setting(self, name, default=NoDefault):
         """Get a setting from self._settings, with or without a default value."""
@@ -262,7 +262,7 @@ class SettingsManager(_SettingsCollector):
             self._settings.update(newSettings)
 
 
-    ## source specific update methods
+    # source specific update methods
 
     def updateSettingsFromPySrcStr(self, theString, merge=True):
         """Update the settings from a code in a Python src string."""

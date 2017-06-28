@@ -29,7 +29,8 @@ except ImportError:
         else:
             return obj[name]  # Raises KeyError.
 
-########## PUBLIC GENERIC FUNCTIONS ##############################
+########################################
+# PUBLIC GENERIC FUNCTIONS
 
 class NegativeError(ValueError):
     pass
@@ -158,7 +159,8 @@ class IndexFormats:
 
 
 
-########## PRIVATE CLASSES ##############################
+########################################
+# PRIVATE CLASSES
 
 class ValuesGetterMixin:
     def __init__(self, origList):
@@ -366,7 +368,8 @@ class PrevNextPage:
         self.length = size
 
 
-########## MAIN PUBLIC CLASS ##############################
+########################################
+# MAIN PUBLIC CLASS
 class MondoReport:
     _RecordStatsClass = RecordStats
     _SummaryClass = Summary

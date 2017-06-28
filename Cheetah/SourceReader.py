@@ -24,7 +24,7 @@ class SourceReader(object):
         self._bookmarks = {}
         self._posTobookmarkMap = {}
 
-        ## collect some meta-information
+        # collect some meta-information
         self._EOLs = []
         pos = 0
         while pos < len(self):

@@ -1,23 +1,23 @@
-## statprof.py
-## Copyright (C) 2004,2005 Andy Wingo <wingo at pobox dot com>
-## Copyright (C) 2001 Rob Browning <rlb at defaultvalue dot org>
+# statprof.py
+# Copyright (C) 2004,2005 Andy Wingo <wingo at pobox dot com>
+# Copyright (C) 2001 Rob Browning <rlb at defaultvalue dot org>
 
-## This library is free software; you can redistribute it and/or
-## modify it under the terms of the GNU Lesser General Public
-## License as published by the Free Software Foundation; either
-## version 2.1 of the License, or (at your option) any later version.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
 ##
-## This library is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 ##
-## You should have received a copy of the GNU Lesser General Public
-## License along with this program; if not, contact:
+# You should have received a copy of the GNU Lesser General Public
+# License along with this program; if not, contact:
 ##
-## Free Software Foundation           Voice:  +1-617-542-5942
-## 59 Temple Place - Suite 330        Fax:    +1-617-542-2652
-## Boston, MA  02111-1307,  USA       gnu@gnu.org
+# Free Software Foundation           Voice:  +1-617-542-5942
+# 59 Temple Place - Suite 330        Fax:    +1-617-542-2652
+# Boston, MA  02111-1307,  USA       gnu@gnu.org
 
 """
 statprof is intended to be a fairly simple statistical profiler for
@@ -142,7 +142,7 @@ __all__ = ['start', 'stop', 'reset', 'display']
 
 
 ###########################################################################
-## Utils
+# Utils
 
 def clock():
     times = os.times()
@@ -150,7 +150,7 @@ def clock():
 
 
 ###########################################################################
-## Collection data structures
+# Collection data structures
 
 class ProfileState(object):
     def __init__(self, frequency=None):
@@ -185,7 +185,7 @@ class ProfileState(object):
 
 state = ProfileState()
 
-## call_data := { code object: CallData }
+# call_data := { code object: CallData }
 call_data = {}
 class CallData(object):
     def __init__(self, code):
@@ -202,7 +202,7 @@ def get_call_data(code):
 
 
 ###########################################################################
-## SIGPROF handler
+# SIGPROF handler
 
 def sample_stack_procs(frame):
     state.sample_count += 1
@@ -224,7 +224,7 @@ def profile_signal_handler(signum, frame):
 
 
 ###########################################################################
-## Profiling API
+# Profiling API
 
 def is_active():
     return state.profile_level > 0
@@ -257,7 +257,7 @@ def reset(frequency=None):
 
 
 ###########################################################################
-## Reporting API
+# Reporting API
 
 class CallStats(object):
     def __init__(self, call_data):

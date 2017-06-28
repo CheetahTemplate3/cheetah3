@@ -1,7 +1,7 @@
 """A baseclass for the SkeletonPage template"""
 
 ##################################################
-## DEPENDENCIES ##
+# DEPENDENCIES ##
 
 import time, types, os, sys
 
@@ -10,7 +10,7 @@ from Cheetah.Template import Template
 
 
 ##################################################
-## CLASSES ##
+# CLASSES ##
 
 class _SkeletonPage(Template):
     """A baseclass for the SkeletonPage template"""
