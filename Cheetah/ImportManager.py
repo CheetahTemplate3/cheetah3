@@ -54,6 +54,7 @@ def _os_bootstrap():
         from os2 import stat, getcwd
     elif 'mac' in names:
         from mac import stat, getcwd
+
         def join(a, b):
             if a == '':
                 return b

@@ -1433,6 +1433,7 @@ class ClassCompiler(GenUtils):
         classDefChunks = [self.classSignature(),
                           self.classDocstring(),
                           ]
+
         def addMethods():
             classDefChunks.extend([
                 ind + '#'*50,
@@ -1440,6 +1441,7 @@ class ClassCompiler(GenUtils):
                 '\n',
                 self.methodDefs(),
                 ])
+
         def addAttributes():
             classDefChunks.extend([
                 ind + '#'*50,

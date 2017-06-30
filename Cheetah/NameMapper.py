@@ -345,6 +345,7 @@ class Mixin:
 def example():
     class A(Mixin):
         classVar = 'classVar val'
+
         def method(self, arg='method 1 default arg'):
             return arg
 
@@ -359,6 +360,7 @@ def example():
 
     a = A()
     a.one = 'valueForOne'
+
     def function(whichOne='default'):
         values = {
             'default': 'default output',
