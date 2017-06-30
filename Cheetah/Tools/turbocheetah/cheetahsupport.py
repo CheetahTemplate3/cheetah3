@@ -1,6 +1,8 @@
 "Template support for Cheetah"
 
-import sys, os, imp
+import imp
+import os
+import sys
 
 from Cheetah import Compiler
 import pkg_resources
