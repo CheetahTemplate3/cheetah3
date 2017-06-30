@@ -72,6 +72,7 @@ def perftest(max_num_pystones, current_pystone=None):
 class DynamicTemplatePerformanceTest(unittest.TestCase):
     loops = 10
     # @perftest(1200)
+
     def test_BasicDynamic(self):
         template = '''
             #def foo(arg1, arg2)
@@ -126,6 +127,7 @@ class DynamicMethodCompilationTest(PerformanceTest):
 
 class BunchOfWriteCalls(PerformanceTest):
     iterations = 1000
+
     def performanceSample(self):
         template = '''
             #import sys
@@ -159,6 +161,7 @@ class DynamicSimpleCompilationTest(PerformanceTest):
 
 class FilterTest(PerformanceTest):
     template = None
+
     def setUp(self):
         super(FilterTest, self).setUp()
         template = '''

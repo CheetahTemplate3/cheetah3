@@ -26,6 +26,7 @@ from Cheetah.CheetahWrapper import CheetahWrapper  # Used by NoBackup.
 
 try:
     from subprocess import Popen, PIPE, STDOUT
+
     class Popen4(Popen):
         def __init__(self, cmd, bufsize=-1, shell=True, close_fds=True,
                      stdin=PIPE, stdout=PIPE, stderr=STDOUT, **kwargs):

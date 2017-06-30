@@ -1607,6 +1607,7 @@ class _HighLevelParser(_LowLevelParser):
     import from'''.split()
     _directiveHandlerNames = {'import': 'addImportStatement',
                               'from': 'addImportStatement', }
+
     def eatDirective(self):
         directiveName = self.matchDirective()
         self._filterDisabledDirectives(directiveName)

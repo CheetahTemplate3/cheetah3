@@ -10,12 +10,16 @@ import sys
 class RecursiveNull(object):
     def __getattr__(self, attr):
         return self
+
     def __getitem__(self, item):
         return self
+
     def __call__(self, *args, **kwargs):
         return self
+
     def __str__(self):
         return ''
+
     def __repr__(self):
         return ''
     if sys.version_info[0] >= 3:
@@ -24,10 +28,12 @@ class RecursiveNull(object):
     else:
         def __nonzero__(self):
             return 0
+
     def __eq__(self, x):
         if x:
             return False
         return True
+
     def __ne__(self, x):
         return x and True or False
 

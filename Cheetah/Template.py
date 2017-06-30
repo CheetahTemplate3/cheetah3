@@ -33,15 +33,18 @@ except ImportError:
     class Lock:
         def acquire(self):
             pass
+
         def release(self):
             pass
 
 if PY2:
     filetype = io.IOBase
+
     def createMethod(func, cls):
         return types.MethodType(func, None, cls)
 else:
     filetype = io.IOBase
+
     def createMethod(func, cls):
         return func
 

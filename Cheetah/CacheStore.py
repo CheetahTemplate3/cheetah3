@@ -69,6 +69,7 @@ class MemoryCacheStore(AbstractCacheStore):
 
 class MemcachedCacheStore(AbstractCacheStore):
     servers = ('127.0.0.1:11211')
+
     def __init__(self, servers=None, debug=False):
         if servers is None:
             servers = self.servers

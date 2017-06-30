@@ -41,6 +41,7 @@ def testdecorator(func):
 
 class DummyClass:
     _called = False
+
     def __str__(self):
         return 'object'
 
@@ -209,6 +210,7 @@ Template output mismatch:
 
 class EmptyTemplate(OutputTest):
     convertEOLs = False
+
     def test1(self):
         """an empty string for the template"""
 
@@ -320,6 +322,7 @@ class NonTokens(OutputTest):
         """1 dollar sign"""
         self.verify("$",
                     "$")
+
     def _X_test6(self):
         """1 dollar sign followed by hash"""
         self.verify("\n$#\n",
@@ -349,6 +352,7 @@ class Comments_SingleLine(OutputTest):
         """## followed by text then NEWLINE"""
         self.verify("## oeuao aoe uaoe \n",
                     "")
+
     def test4(self):
         """## gobbles leading WS"""
         self.verify("    ## oeuao aoe uaoe \n",
@@ -625,6 +629,7 @@ class Placeholders(OutputTest):
 
 class Placeholders_Vals(OutputTest):
     convertEOLs = False
+
     def test1(self):
         """string"""
         self.verify("$aStr", "blarg")
@@ -783,6 +788,7 @@ class UnicodeDirective(OutputTest):
 
 class Placeholders_Esc(OutputTest):
     convertEOLs = False
+
     def test1(self):
         """1 escaped placeholder"""
         self.verify("\$var",
@@ -844,6 +850,7 @@ class Placeholders_Calls(OutputTest):
         r"""func placeholder - with (\nint\n)"""
         self.verify("$aFunc(\n1234\n)",
                     "1234", convertEOLs=False)
+
     def test8(self):
         """func placeholder - with (string)"""
         self.verify("$aFunc('aoeu')",
@@ -853,6 +860,7 @@ class Placeholders_Calls(OutputTest):
         """func placeholder - with ('''string''')"""
         self.verify("$aFunc('''aoeu''')",
                     "aoeu")
+
     def test10(self):
         r"""func placeholder - with ('''\nstring\n''')"""
         self.verify("$aFunc('''\naoeu\n''')",
@@ -907,6 +915,7 @@ class Placeholders_Calls(OutputTest):
         """deeply nested argstring, no enclosure + with WS"""
         self.verify("$aFunc(  $arg = $aMeth( $arg = $aFunc( 1 ) ) )",
                     "1")
+
     def test21(self):
         """deeply nested argstring, () enclosure + with WS"""
         self.verify("$(aFunc(  $arg = $aMeth( $arg = $aFunc( 1 ) ) ) )",
@@ -926,6 +935,7 @@ class Placeholders_Calls(OutputTest):
         """deeply nested argstring, () enclosure + *cache"""
         self.verify("$*(aFunc(  $arg = $aMeth( $arg = $aFunc( 1 ) ) ) )",
                     "1")
+
     def test25(self):
         """deeply nested argstring, () enclosure + *15*cache"""
         self.verify("$*15*(aFunc(  $arg = $aMeth( $arg = $aFunc( 1 ) ) ) )",
@@ -1312,6 +1322,7 @@ class SlurpDirective(OutputTest):
 
 class EOLSlurpToken(OutputTest):
     _EOLSlurpToken = DEFAULT_COMPILER_SETTINGS['EOLSlurpToken']
+
     def test1(self):
         r"""#slurp with 1 \n """
         self.verify("%s\n" % self._EOLSlurpToken,
@@ -1322,6 +1333,7 @@ class EOLSlurpToken(OutputTest):
         Should gobble"""
         self.verify("       %s\n" % self._EOLSlurpToken,
                     "")
+
     def test3(self):
         r"""#slurp with 1 \n, leading content
         Shouldn't gobble"""
@@ -1487,6 +1499,7 @@ aoeuoaeu
 
 class YieldDirective(OutputTest):
     convertEOLs = False
+
     def test1(self):
         """simple #yield """
 
@@ -2064,6 +2077,7 @@ class SetDirective(OutputTest):
         """simple #set with no WS between operands"""
         self.verify("#set       $testVar='blarg'",
                     "")
+
     def test3(self):
         """#set + use of var"""
         self.verify("#set $testVar = 'blarg'\n$testVar",
@@ -2201,6 +2215,7 @@ class IfDirective(OutputTest):
         """simple #if block, with WS"""
         self.verify("   #if 1\n$aStr\n  #end if  \n",
                     "blarg\n")
+
     def test3(self):
         """simple #if block, with WS and explicit closures"""
         self.verify("   #if 1#\n$aStr\n  #end if #--\n",
@@ -2215,10 +2230,12 @@ class IfDirective(OutputTest):
         """#if block using $zero"""
         self.verify("#if $zero\n$aStr\n#end if\n",
                     "")
+
     def test6(self):
         """#if block using $emptyString"""
         self.verify("#if $emptyString\n$aStr\n#end if\n",
                     "")
+
     def test7(self):
         """#if ... #else ... block using a $emptyString"""
         self.verify("#if $emptyString\n$anInt\n#else\n$anInt - $anInt\n#end if",
@@ -2368,6 +2385,7 @@ class PSP(OutputTest):
     def test3(self):
         """simple <%= None %>"""
         self.verify("<%= None %>", "")
+
     def test4(self):
         """simple <%= [string] %> + $anInt"""
         self.verify("<%= 'blarg' %>$anInt", "blarg1")
@@ -2977,6 +2995,7 @@ class CGI(OutputTest):
 
     def _beginCGI(self):
         os.environ['REQUEST_METHOD'] = "GET"
+
     def _endCGI(self):
         try:
             del os.environ['REQUEST_METHOD']
@@ -3203,6 +3222,7 @@ public class X
 
 
 """
+
     def _getCompilerSettings(self):
         return {'useFilterArgsInPlaceholders': True}
 

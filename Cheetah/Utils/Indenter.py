@@ -89,17 +89,22 @@ class Indenter(object):
 
     def on(self):
         self.On = 1
+
     def off(self):
         self.On = 0
+
     def inc(self):
         self.Level += 1
+
     def dec(self):
         """decrement can only be applied to values greater zero
             values below zero don't make any sense at all!"""
         if self.Level > 0:
             self.Level -= 1
+
     def push(self):
         self.LevelStack.append(self.Level)
+
     def pop(self):
         """the levestack can not become -1. any attempt to do so
            sets the level to 0!"""
@@ -107,6 +112,7 @@ class Indenter(object):
             self.Level = self.LevelStack.pop()
         else:
             self.Level = 0
+
     def setLevel(self, _level):
         """the leve can't be less than zero. any attempt to do so
            sets the level automatically to zero!"""
@@ -114,8 +120,10 @@ class Indenter(object):
             self.Level = 0
         else:
             self.Level = _level
+
     def setChar(self, _chars):
         self.Chars = _chars
+
     def indent(self, _default=0):
         if self.On:
             return self.Chars * self.Level
