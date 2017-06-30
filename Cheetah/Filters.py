@@ -41,6 +41,7 @@ class Filter(object):
                 # on and let DummyTransaction worry about it
                 return str(val)
 
+
 RawOrEncodedUnicode = Filter
 
 EncodeUnicode = Filter
@@ -209,6 +210,7 @@ def test():
     print("StripSqueeze:", repr(StripSqueeze().filter(s2)))
 
     print("Unicode:", repr(EncodeUnicode().filter(u'aoeu12345\u1234')))
+
 
 if __name__ == "__main__":
     test()

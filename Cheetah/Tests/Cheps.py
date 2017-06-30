@@ -36,5 +36,6 @@ class Chep_2_Conditionalized_Import_Behavior(unittest.TestCase):
         ''' Verify disabling of CHEP #2 works '''
         pass
 
+
 if __name__ == '__main__':
     unittest.main()

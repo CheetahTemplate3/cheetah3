@@ -379,6 +379,7 @@ class XMLTestProgram(unittest.TestProgram):
             self.testRunner = XMLTestRunner()
         unittest.TestProgram.runTests(self)
 
+
 main = XMLTestProgram
 
 

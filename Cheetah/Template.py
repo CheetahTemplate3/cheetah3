@@ -123,6 +123,7 @@ def _genUniqueModuleName(baseModuleName):
                                            str(randrange(10000, 99999))))
     return finalName
 
+
 # Cache of a cgi.FieldStorage() instance, maintained by .webInput().
 # This is only relavent to templates used as CGI scripts.
 _formUsedByWebInput = None
@@ -1886,6 +1887,7 @@ class Template(Servlet):
             print("<PRE>\n" + pprint.pformat(dic) + "\n</PRE>\n\n")
         self.searchList().insert(0, dic)
         return dic
+
 
 T = Template   # Short and sweet for debugging at the >>> prompt.
 Template.Reserved_SearchList = set(dir(Template))

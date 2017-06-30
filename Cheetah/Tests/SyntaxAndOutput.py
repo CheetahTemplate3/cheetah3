@@ -67,6 +67,7 @@ class DummyClass:
 def dummyFunc(arg="Scooby"):
     return arg
 
+
 defaultTestNameSpace = {
     'aStr': 'blarg',
     'anInt': 1,
@@ -1360,6 +1361,7 @@ class EOLSlurpToken(OutputTest):
         Should NOT eat the garbage"""
         self.verify(" 1234 %s garbage   \n" % self._EOLSlurpToken,
                     " 1234 %s garbage   \n" % self._EOLSlurpToken)
+
 
 if not DEFAULT_COMPILER_SETTINGS['EOLSlurpToken']:
     del EOLSlurpToken
@@ -2743,6 +2745,7 @@ $anInt//comment
 """,
                     "1\n1\n")
 
+
 if sys.platform.startswith('java'):
     del CompilerDirective
     del CompilerSettingsDirective
@@ -3270,6 +3273,7 @@ def install_eols():
 
 ##################################################
 # if run from the command line ##
+
 
 if __name__ == '__main__':
     install_eols()

@@ -535,6 +535,7 @@ class VFFSL_3(VFFSL):
 class VFFSL_4(VFFSL):
     _searchListLength = 4
 
+
 if sys.platform.startswith('java'):
     del VFF, VFFSL, VFFSL_2, VFFSL_3, VFFSL_4
 

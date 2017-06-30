@@ -39,5 +39,6 @@ class NameMapperTest(unittest.TestCase):
         from Cheetah.NameMapper import valueForName
         self.assertEqual(valueForName('upper', 'upper', True), 'UPPER')
 
+
 if __name__ == '__main__':
     unittest.main()

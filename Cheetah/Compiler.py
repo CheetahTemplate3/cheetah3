@@ -39,6 +39,7 @@ currentTime = time.time
 
 class Error(Exception): pass
 
+
 # Settings format: (key, default, docstring)
 _DEFAULT_COMPILER_SETTINGS = [
     ('useNameMapper', True, 'Enable NameMapper for dotted notation and searchList support'),

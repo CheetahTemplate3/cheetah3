@@ -414,6 +414,7 @@ class MondoReport:
     def summary(self):
         return self._SummaryClass(self._origList)
 
+
 """
 **********************************
     Return a pageful of records from a sequence, with statistics.

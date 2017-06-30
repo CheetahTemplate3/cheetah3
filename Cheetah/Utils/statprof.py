@@ -181,6 +181,7 @@ class ProfileState(object):
     def accumulate_time(self, stop_time):
         self.accumulated_time += stop_time - self.last_start_time
 
+
 state = ProfileState()
 
 # call_data := { code object: CallData }

@@ -38,4 +38,5 @@ class RecursiveNull(object):
     def __ne__(self, x):
         return x and True or False
 
+
 del sys

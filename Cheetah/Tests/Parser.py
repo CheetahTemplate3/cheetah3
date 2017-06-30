@@ -43,5 +43,6 @@ class ArgListTest(unittest.TestCase):
 
         self.assertEqual(expect, self.al.merge())
 
+
 if __name__ == '__main__':
     unittest.main()

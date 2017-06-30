@@ -18,6 +18,8 @@ class ErrorCatcher:
 
     def warn(self, exc_val, code, rawCode, lineCol):
         return rawCode
+
+
 # make an alias
 Echo = ErrorCatcher
 

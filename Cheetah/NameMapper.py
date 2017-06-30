@@ -317,6 +317,7 @@ def hasName(obj, name):
     except NotFound:
         return False
 
+
 try:
     from Cheetah._namemapper import NotFound, valueForKey, valueForName, \
          valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
@@ -381,6 +382,7 @@ def example():
     print(valueForName(vars(), 'a.classVar'))
     print(valueForName(vars(), 'a.dic.func', executeCallables=True))
     print(valueForName(vars(), 'a.method2.item1', executeCallables=True))
+
 
 if __name__ == '__main__':
     example()

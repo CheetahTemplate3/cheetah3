@@ -138,5 +138,6 @@ def uninstall():
             global _manager
             del _manager
 
+
 if __name__ == '__main__':
     install()

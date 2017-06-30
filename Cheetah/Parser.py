@@ -65,6 +65,7 @@ def maybe(*choices): return group(*choices) + '?'
 ##################################################
 # CONSTANTS & GLOBALS ##
 
+
 NO_CACHE = 0
 STATIC_CACHE = 1
 REFRESH_CACHE = 2
@@ -143,6 +144,7 @@ def makeTripleQuoteRe(start, end):
     start = escapeRegexChars(start)
     end = escapeRegexChars(end)
     return re.compile(r'(?:' + start + r').*?' + r'(?:' + end + r')', re.DOTALL)
+
 
 for start, end in tripleQuotedStringPairs.items():
     tripleQuotedStringREs[start] = makeTripleQuoteRe(start, end)
@@ -2663,6 +2665,7 @@ class _HighLevelParser(_LowLevelParser):
                 "Some #directives are missing their corresponding #end ___ tag"
                 ": %s" % ', '.join(self._openDirectivesStack))
             raise ParseError(self, msg=errorMsg)
+
 
 ##################################################
 # Make an alias to export

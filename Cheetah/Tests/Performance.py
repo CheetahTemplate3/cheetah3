@@ -26,6 +26,7 @@ TOLERANCE = 0.5*kPS
 class DurationError(AssertionError):
     pass
 
+
 _pystone_calibration_mark = None
 
 
