@@ -238,7 +238,6 @@ class SettingsManager(_SettingsCollector):
         else:
             return self._settings.get(name, default)
 
-
     def hasSetting(self, key):
         """True/False"""
         return key in self._settings
@@ -267,7 +266,6 @@ class SettingsManager(_SettingsCollector):
         else:
             self._settings.update(newSettings)
 
-
     # source specific update methods
 
     def updateSettingsFromPySrcStr(self, theString, merge=True):
@@ -276,7 +274,6 @@ class SettingsManager(_SettingsCollector):
         newSettings = self.readSettingsFromPySrcStr(theString)
         self.updateSettings(newSettings,
                             merge=newSettings.get('mergeSettings', merge))
-
 
     def updateSettingsFromConfigFileObj(self, inFile, convert=True, merge=True):
         """See the docstring for .updateSettingsFromConfigFile()

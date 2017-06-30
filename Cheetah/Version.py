@@ -40,7 +40,6 @@ if __name__ == '__main__':
     print(c('2.0'))
     print(c('2.0.2'))
 
-
     assert c('0.9.19b1') < c('0.9.19')
     assert c('0.9b1') < c('0.9.19')
 

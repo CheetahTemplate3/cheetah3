@@ -49,7 +49,6 @@ else:
         return func
 
 
-
 from Cheetah.Version import convertVersionStringToTuple, MinCompatibleVersionTuple
 from Cheetah.Version import MinCompatibleVersion
 # Base classes for Template
@@ -712,7 +711,6 @@ class Template(Servlet):
                 baseclassName = 'CHEETAH_dynamicallyAssignedBaseClass_'+baseclass.__name__
                 baseclassValue = baseclass
 
-
         cacheHash = None
         cacheItem = None
         if source or isinstance(file, string_type):
@@ -912,7 +910,6 @@ class Template(Servlet):
             settings = klass._normalizePreprocessorSettings(settings)
             return klass._CHEETAH_defaultPreprocessorClass(settings)
 
-
     @classmethod
     def _normalizePreprocessorSettings(klass, settings):
         settings.keepRefToGeneratedCode = True
@@ -1070,7 +1067,6 @@ class Template(Servlet):
             __unicode__ = createMethod(__unicode__, concreteTemplateClass)
             setattr(concreteTemplateClass, '__str__', __str__)
             setattr(concreteTemplateClass, '__unicode__', __unicode__)
-
 
     def __init__(self, source=None,
 
@@ -1276,7 +1272,6 @@ class Template(Servlet):
                         logging.info(''' Please change the key's name or use the compiler setting "prioritizeSearchListOverSelf=True" to prevent the NameMapper from using ''')
                         logging.info(''' the Template member in place of your searchList variable ''')
 
-
         self._initCheetahInstance(
             searchList=searchList, namespaces=namespaces,
             filter=filter, filtersLib=filtersLib,
@@ -1411,9 +1406,7 @@ class Template(Servlet):
         except NotFound:
             return False
 
-
     hasVar = varExists
-
 
     def i18n(self, message,
              plural=None,
@@ -1938,7 +1931,6 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
         lineInfo = nextLines.pop()
         report += "%(row)-4d|%(line)s\n" % {'row': lineInfo[0], 'line': lineInfo[1]}
 
-
     message = [
         "Error in the Python code which Cheetah generated for this template:",
         '='*80,
@@ -1966,7 +1958,6 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
             message.append('\nHere is the corresponding Cheetah code.')
             message.append('** I had to guess the line & column numbers,'
                            ' so they are probably incorrect:\n')
-
 
     message = '\n'.join(message)
     reader = SourceReader(source, filename=filename)

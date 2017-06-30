@@ -33,7 +33,6 @@ class _TestInfo(object):
         self._error = None
         self._failure = None
 
-
     def print_report(self, stream):
         """Print information about this test case in XML format to the
         supplied stream.

@@ -33,8 +33,6 @@ class ArgListTest(unittest.TestCase):
 
         self.assertEqual(expect, self.al.merge())
 
-
-
     def test_merge3(self):
         '''
             Testing the ArgList case results from SyntaxAndOutput.BlockDirective.test13

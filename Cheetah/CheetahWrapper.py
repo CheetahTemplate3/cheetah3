@@ -192,7 +192,6 @@ Options are
 %s
 Files are %s""", args, pprint.pformat(vars(opts)), files)
 
-
         if opts.print_settings:
             print()
             print('>> Available Cheetah compiler settings:')
@@ -281,7 +280,6 @@ you do have write permission to and re-run the tests.""")
             return
         fprintfMessage(sys.stdout, format, *args)
 
-
     def debug(self, format, *args):
         """Print a debugging message to stderr, but don't if .debug is
            false.
@@ -303,7 +301,6 @@ you do have write permission to and re-run the tests.""")
     ##################################################
     # HELPER METHODS
 
-
     def _fixExts(self):
         assert self.opts.oext, "oext is empty!"
         iext, oext = self.opts.iext, self.opts.oext
@@ -311,8 +308,6 @@ you do have write permission to and re-run the tests.""")
             self.opts.iext = "." + iext
         if oext and not oext.startswith("."):
             self.opts.oext = "." + oext
-
-
 
     def _compileOrFill(self):
         C, D, W = self.chatter, self.debug, self.warn
@@ -408,7 +403,6 @@ you do have write permission to and re-run the tests.""")
             what = self.isCompile and "Compilation" or "Filling"
             sys.exit("%s aborted due to collisions" % what)
 
-
     def _expandSourceFiles(self, files, recurse, addIextIfMissing):
         """Calculate source paths from 'files' by applying the
            command-line options.
@@ -444,7 +438,6 @@ you do have write permission to and re-run the tests.""")
             if len(files) > oldFilesLen:
                 D("  ... found %s", files[oldFilesLen:])
         return files
-
 
     def _getBundles(self, sourceFiles):
         flat = self.opts.flat
@@ -487,7 +480,6 @@ you do have write permission to and re-run the tests.""")
             bundles.append(b)
         return bundles
 
-
     def _getTemplateClass(self):
         C, D, W = self.chatter, self.debug, self.warn
         modname = None
@@ -520,7 +512,6 @@ you do have write permission to and re-run the tests.""")
         else:
             self.error('**Template class specified in option --templateAPIClass not found\n'
                        '**Falling back on Cheetah.Template:Template')
-
 
     def _getCompilerSettings(self):
         if self._compilerSettings:

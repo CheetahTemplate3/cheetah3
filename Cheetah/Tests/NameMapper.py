@@ -119,7 +119,6 @@ class NameMapperTest(unittest.TestCase):
     def VFS(self, searchList, name, autocall=True):
         return valueFromSearchList(searchList, name, autocall)
 
-
     # alias to be overriden later
     get = VFN
 
@@ -235,7 +234,6 @@ class VFN(NameMapperTest):
         """aClass.classVar1 in dict lookup in a loop"""
         for i in range(10):
             self.check('aClass.classVar1')
-
 
     def test23(self):
         """anObj.instanceVar1 in dict lookup"""
@@ -382,7 +380,6 @@ class VFN(NameMapperTest):
 
         for i in range(10):
             self.assertRaises(ValueError, test)
-
 
     def test53(self):
         """Other exception from func test"""
@@ -550,7 +547,6 @@ class MapBuiltins(unittest.TestCase):
                 #return $int(val)
             #end def''', compilerSettings={'useStackFrames': False})
         self.assertEqual(5, t.intify('5'))
-
 
 
 ##################################################

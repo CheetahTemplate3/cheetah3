@@ -110,7 +110,6 @@ class _SkeletonPage(Template):
                                   '" type="text/javascript"><!--\n',
                                   str(details[0]), '\n//--></script>\n']
 
-
         for key, details in self._javascriptLibs.items():
             if not isinstance(details, (list, tuple)):
                 details = ['', details]
@@ -124,7 +123,6 @@ class _SkeletonPage(Template):
         """Create a body tag from the entries in the dict bodyTagAttribs."""
         return self.formHTMLTag('body', self._bodyTagAttribs)
 
-
     def imgTag(self, src, alt='', width=None, height=None, border=0):
 
         """Dynamically generate an image tag.  Cheetah will try to convert the
@@ -133,7 +131,6 @@ class _SkeletonPage(Template):
         PIL or ImageMagick if available."""
 
         src = self.normalizePath(src)
-
 
         if not width or not height:
             try:                    # see if the dimensions can be calc'd with PIL
@@ -165,7 +162,6 @@ class _SkeletonPage(Template):
                            '" alt="', alt, '" border="', str(border), '" />'])
         else:
             return ''.join(['<img src="', src, '" alt="', alt, '" border="', str(border), '" />'])
-
 
     def currentYr(self):
         """Return a string representing the current yr."""

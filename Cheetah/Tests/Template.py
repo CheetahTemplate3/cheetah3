@@ -71,7 +71,6 @@ class ClassMethods_compile(TemplateTest):
         t = klass(namespaces={'foo': 1234})
         assert str(t) == '1234'
 
-
         klass = Template.compile(source='$foo',
                                  moduleName='foo1',
                                  className='foo2')
@@ -79,7 +78,6 @@ class ClassMethods_compile(TemplateTest):
         assert klass.__name__ == 'foo2'
         t = klass(namespaces={'foo': 1234})
         assert str(t) == '1234'
-
 
     def test_mainMethodNameArg(self):
         klass = Template.compile(source='$foo',
@@ -102,8 +100,6 @@ class ClassMethods_compile(TemplateTest):
         assert str(t) == '1234'
         assert t.testMeth() == '1234'
 
-
-
     def test_moduleGlobalsArg(self):
         klass = Template.compile(source='$foo',
                                  moduleGlobals={'foo': 1234})
@@ -120,7 +116,6 @@ class ClassMethods_compile(TemplateTest):
         t = klass3()
         assert str(t) == '1234'
 
-
     def test_keepRefToGeneratedCodeArg(self):
         klass = Template.compile(source='$foo',
                                  className='unique58',
@@ -129,7 +124,6 @@ class ClassMethods_compile(TemplateTest):
         t = klass(namespaces={'foo': 1234})
         assert str(t) == '1234'
         assert not t.generatedModuleCode()
-
 
         klass2 = Template.compile(source='$foo',
                                   className='unique58',
@@ -146,7 +140,6 @@ class ClassMethods_compile(TemplateTest):
         # still there as this class came from the cache
         assert t.generatedModuleCode()
 
-
     def test_compilationCache(self):
         klass = Template.compile(source='$foo',
                                  className='unique111',
@@ -154,7 +147,6 @@ class ClassMethods_compile(TemplateTest):
         t = klass(namespaces={'foo': 1234})
         assert str(t) == '1234'
         assert not klass._CHEETAH_isInCompilationCache
-
 
         # this time it will place it in the cache
         klass = Template.compile(source='$foo',
@@ -238,7 +230,6 @@ class Preprocessors(TemplateTest):
             klass = Template.compile(src, preprocessors=arg)
             assert str(klass()) == '120'
 
-
     def test_complexUsage(self):
         src = '''\
         %set foo = @a
@@ -249,15 +240,12 @@ class Preprocessors(TemplateTest):
         $func(lambda x:c"--$x--@a")'''
         src = '\n'.join([ln.strip() for ln in src.splitlines()])
 
-
         for arg in [{'tokens': '@ %', 'namespaces': {'a': 99}},
                     {'tokens': '@ %', 'namespaces': {'a': 99}},
                     ]:
             klass = Template.compile(src, preprocessors=arg)
             t = klass()
             assert str(t) == '990\n--***--99'
-
-
 
     def test_i18n(self):
         src = '''\

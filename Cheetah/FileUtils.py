@@ -227,7 +227,6 @@ class FindAndReplace:
     def __init__(self, files, patternOrRE, replacement,
                  recordResults=True):
 
-
         if isinstance(patternOrRE, string_type):
             self._regex = re.compile(patternOrRE)
         else:

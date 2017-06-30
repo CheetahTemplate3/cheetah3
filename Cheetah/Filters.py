@@ -117,7 +117,6 @@ class CodeHighlighter(EncodeUnicode):
             --></style>%(source)s''' % {'css': css, 'source': encoded}
 
 
-
 class MaxLen(Filter):
     def filter(self, val, **kw):
         """Replace None with '' and cut off at maxlen."""

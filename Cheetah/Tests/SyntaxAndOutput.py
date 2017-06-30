@@ -715,7 +715,6 @@ class PlaceholderStrings(OutputTest):
                     "BLARG1")
 
 
-
 class UnicodeStrings(OutputTest):
     def test1(self):
         """unicode data in placeholder
@@ -1118,7 +1117,6 @@ $aStr#slurp
 $foo$foo$foo$foo$foo""",
                     "1\n01234blarg"*5)
 
-
     def test5(self):
         r"""nested #cache blocks"""
         self.verify("""#slurp
@@ -1262,7 +1260,6 @@ $x$y#slurp
                     "12345")
 
 
-
 class I18nDirective(OutputTest):
     def test1(self):
         r"""simple #call """
@@ -1286,7 +1283,6 @@ $(1234+1) foo#slurp
 $cap1#slurp
 ''',
                     "1235 foo")
-
 
     def test2(self):
         r"""slightly more complex #capture"""
@@ -1331,7 +1327,6 @@ class SlurpDirective(OutputTest):
         Should eat the garbage"""
         self.verify(" 1234 #slurp garbage   \n",
                     " 1234 ")
-
 
 
 class EOLSlurpToken(OutputTest):
@@ -1526,7 +1521,6 @@ class YieldDirective(OutputTest):
                 "#for i in $iterator\n$i#end for"
                 )
 
-
         for src in (src1, src2, src3):
             klass = Template.compile(src, keepRefToGeneratedCode=True)
             # print klass._CHEETAH_generatedModuleCode
@@ -1553,7 +1547,6 @@ class ForDirective(OutputTest):
 
         self.verify("#for $i in range(5) ##comment\n$i\n#end for",
                     "0\n1\n2\n3\n4\n")
-
 
     def test2(self):
         """#for loop with WS in loop"""
@@ -1594,7 +1587,6 @@ class ForDirective(OutputTest):
         """test methods in for loops"""
         self.verify("#for $func in $listOfLambdas\n$func($anInt)\n#end for",
                     "1\n1\n1\n")
-
 
     def test10(self):
         """#for loop over list, using methods of the items"""
@@ -1774,7 +1766,6 @@ class DefDirective(OutputTest):
             "  #def testMeth($*args, $**KWs)   \n1234-$args-$KWs.a\n  #end def\n$testMeth(1,2, a=1)",
             "1234-(1, 2)-1\n")
 
-
     def test11(self):
         """single line #def with extra WS"""
         self.verify(
@@ -1903,7 +1894,6 @@ class BlockDirective(OutputTest):
         self.verify("  #block testBlock($a=999, $b=444)   \n1234-$a$b\n  #end block  ",
                     "1234-999444\n")
 
-
     def test5(self):
         """#block with 2 nested blocks
 
@@ -1922,7 +1912,6 @@ inner
 #end block testBlock
 """,
                     "this is a test block\nouter\ninner\n---\n")
-
 
     def test6(self):
         """single line #block """
@@ -2086,7 +2075,6 @@ class SetDirective(OutputTest):
                     "blarg")
         self.verify("#set testVar = 'blarg'\n$testVar",
                     "blarg")
-
 
         self.verify("#set testVar = 'blarg'##comment\n$testVar",
                     "blarg")
@@ -2304,7 +2292,6 @@ class IfDirective(OutputTest):
         self.verify("#if $emptyString\n$c\n#else if $numOne\n$numOne\n#else\n$c - $c\n#end if",
                     "1\n")
 
-
     def test13(self):
         """#if# ... #else # ... block using a $emptyString with """
         self.verify("#if $emptyString# $anInt#else#$anInt - $anInt#end if",
@@ -2329,7 +2316,6 @@ class IfDirective(OutputTest):
         """single-line #if:  """
         self.verify("#if 1: foo\n#if 0: bar\n#if 1: foo",
                     "foo\nfoo")
-
 
         self.verify("#if 1: foo\n#if 0: bar\n#if 1: foo",
                     "foo\nfoo")
@@ -2361,7 +2347,6 @@ class UnlessDirective(OutputTest):
 
         self.verify("#unless 1 ##comment\n 1234 \n#end unless",
                     "")
-
 
     def test2(self):
         """#unless 0"""
@@ -2526,7 +2511,6 @@ class TryDirective(OutputTest):
         self.verify("  #try  \n  #raise ValueError \n  #except \nblarg\n  #end try",
                     "blarg\n")
 
-
     def test4(self):
         """#try / #except with #raise + WS and leading text
 
@@ -2608,7 +2592,6 @@ class RaiseDirective(OutputTest):
                         "")
         self.assertRaises(ValueError, test)
 
-
     def test3(self):
         """#raise ValueError in #if block
 
@@ -2616,7 +2599,6 @@ class RaiseDirective(OutputTest):
         """
         self.verify("#if 0\n#raise ValueError\n#else\nblarg#end if\n",
                     "blarg\n")
-
 
 
 class ImportDirective(OutputTest):
@@ -2776,7 +2758,6 @@ class ExtendsDirective(OutputTest):
 $spacer()
 """,
                     '<img src="spacer.gif" width="1" height="1" alt="" />\n')
-
 
         self.verify("""#from Cheetah.Templates._SkeletonPage import _SkeletonPage
 #extends _SkeletonPage
@@ -3032,7 +3013,6 @@ class CGI(OutputTest):
             pass
     _guaranteeNoCGI = _endCGI
 
-
     def test1(self):
         """A regular template."""
         self._guaranteeNoCGI()
@@ -3041,7 +3021,6 @@ class CGI(OutputTest):
                  "$cgiHeaders#slurp\n" + \
                  "Hello, world!"
         self.verify(source, "Hello, world!")
-
 
     def test2(self):
         """A CGI script."""
@@ -3052,7 +3031,6 @@ class CGI(OutputTest):
                  "Hello, world!"
         self.verify(source, "Content-type: text/html\n\nHello, world!")
         self._endCGI()
-
 
     def test3(self):
         """A (pseudo) Webware servlet.
@@ -3076,7 +3054,6 @@ class CGI(OutputTest):
         self.verify(source, "Hello, world!")
         self._endCGI()
 
-
     def test4(self):
         """A CGI script with a GET variable."""
         self._beginCGI()
@@ -3092,7 +3069,6 @@ class CGI(OutputTest):
         self._endCGI()
 
 
-
 class WhitespaceAfterDirectiveTokens(OutputTest):
     def _getCompilerSettings(self):
         return {'allowWhitespaceAfterDirectiveStartToken': True}
@@ -3104,7 +3080,6 @@ class WhitespaceAfterDirectiveTokens(OutputTest):
                     "0123456789")
         self.verify("# for i in range(10)#$i#end for",
                     "0123456789")
-
 
 
 class DefmacroDirective(OutputTest):
@@ -3122,8 +3097,6 @@ class DefmacroDirective(OutputTest):
 $i""",
                     "2")
 
-
-
         self.verify("""\
 #defmacro test
 #for i in range(10): @src
@@ -3139,7 +3112,6 @@ $i""",
 #test: $i-foo
 #for i in range(3): $i""",
                     "0-foo\n1-foo\n2-foo\n3-foo\n4-foo\n5-foo\n6-foo\n7-foo\n8-foo\n9-foo\n012")
-
 
         self.verify("""\
 #defmacro test: #for i in range(10): @src

@@ -506,7 +506,6 @@ class _LowLevelParser(SourceReader):
         else:
             self.EOLSlurpRE = None
 
-
     def _makeCommentREs(self):
         """Construct the regex bits that are used in comment parsing."""
         startTokenEsc = escapeRegexChars(self.setting('commentStartToken'))
@@ -781,7 +780,6 @@ class _LowLevelParser(SourceReader):
             raise ParseError(self, msg='Invalid directive end token')
         return self.readTo(match.end())
 
-
     def matchColonForSingleLineShortFormDirective(self):
         if not self.atEnd() and self.peek() == ':':
             restOfLine = self[self.pos()+1:self.findEOL()]
@@ -839,7 +837,6 @@ class _LowLevelParser(SourceReader):
             raise ParseError(self, msg='Expected Cheetah $var start token')
         return self.readTo(match.end())
 
-
     def getCacheToken(self):
         try:
             token = self.cacheTokenRE.match(self.src(), self.pos())
@@ -855,8 +852,6 @@ class _LowLevelParser(SourceReader):
             return token.group()
         except:
             raise ParseError(self, msg='Expected silent placeholder token')
-
-
 
     def getTargetVarsList(self):
         varnames = []
@@ -952,7 +947,6 @@ class _LowLevelParser(SourceReader):
             chunks.append((dottedName, autoCall, rest))
 
         return chunks
-
 
     def getCallArgString(self,
                          enclosures=[],  # list of tuples (char, pos), where char is ({ or [
@@ -1120,7 +1114,6 @@ class _LowLevelParser(SourceReader):
             else:
                 raise ParseError(self)
 
-
         self.setSetting('useNameMapper', useNameMapper_orig)  # @@TR: see comment above
         return argList.merge()
 
@@ -1242,7 +1235,6 @@ class _LowLevelParser(SourceReader):
             pyTokensToBreakAt=pyTokensToBreakAt,
             useNameMapper=useNameMapper))
 
-
     def transformToken(self, token, beforeTokenPos):
         """Takes a token from the expression being parsed and performs and
         special transformations required by Cheetah.
@@ -1297,7 +1289,6 @@ class _LowLevelParser(SourceReader):
                 self,
                 msg='This form of $placeholder syntax is not valid here.')
 
-
     def getPlaceholder(self, allowCacheTokens=False, plain=False, returnEverything=False):
         # filtered
         for callback in self.setting('preparsePlaceholderHooks'):
@@ -1311,7 +1302,6 @@ class _LowLevelParser(SourceReader):
             isSilentPlaceholder = True
         else:
             isSilentPlaceholder = False
-
 
         if allowCacheTokens:
             cacheToken = self.getCacheToken()
@@ -1442,11 +1432,8 @@ class _HighLevelParser(_LowLevelParser):
         for directiveName in self.setting('closeableDirectives', []):
             self._closeableDirectives.append(directiveName)
 
-
-
         macroDirectives = self.setting('macroDirectives', {})
         macroDirectives['i18n'] = I18n
-
 
         for macroName, callback in macroDirectives.items():
             if isinstance(callback, type):
@@ -1725,7 +1712,6 @@ class _HighLevelParser(_LowLevelParser):
             self._compiler.handleWSBeforeDirective()
         return textEaten
 
-
     def eatSimpleExprDirective(self, directiveName, includeDirectiveNameInExpr=True):
         # filtered
         isLineClearToStartToken = self.isLineClearToStartToken()
@@ -1897,7 +1883,6 @@ class _HighLevelParser(_LowLevelParser):
             sys.stderr.write('----------------------------------------------------------------------\n')
             sys.stderr.write('Please check the syntax of these settings.\n\n')
             raise
-
 
     def eatCompilerSettings(self):
         # filtered
@@ -2261,7 +2246,6 @@ class _HighLevelParser(_LowLevelParser):
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self._compiler.addInclude(sourceExpr, includeFrom, isRaw)
 
-
     def eatDefMacro(self):
         # @@TR: not filtered yet
         isLineClearToStartToken = self.isLineClearToStartToken()
@@ -2309,7 +2293,6 @@ class _HighLevelParser(_LowLevelParser):
                                            for n, defv in argsList]) + ')\n',
              macroSrc,
              '%end def'])
-
 
         from Cheetah.Template import Template
         templateAPIClass = self.setting('templateAPIClassForDefMacro', default=Template)
@@ -2369,14 +2352,12 @@ class _HighLevelParser(_LowLevelParser):
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
             srcBlock = self._eatToThisEndDirective(macroName)
 
-
         if hasattr(macro, 'convertArgStrToDict'):
             kwArgs = macro.convertArgStrToDict(args, parser=self, startPos=startPos)
         else:
             def getArgs(*pargs, **kws):
                 return kws
             kwArgs = eval('getArgs(%(args)s)' % locals())
-
 
         assert 'src' not in kwArgs
         kwArgs['src'] = srcBlock
@@ -2422,7 +2403,6 @@ class _HighLevelParser(_LowLevelParser):
         self._src = origParseSrc
         self.setBreakPoint(origBreakPoint)
         self.setPos(origPos)
-
 
         # self._compiler.addRawText('end')
 
@@ -2563,7 +2543,6 @@ class _HighLevelParser(_LowLevelParser):
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         self._compiler.setTransform(transformer, isKlass)
 
-
     def eatErrorCatcher(self):
         isLineClearToStartToken = self.isLineClearToStartToken()
         endOfFirstLinePos = self.findEOL()
@@ -2604,7 +2583,6 @@ class _HighLevelParser(_LowLevelParser):
             self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
             self.pushToOpenDirectivesStack("capture")
             self._compiler.startCaptureRegion(assignTo=expr, lineCol=lineCol)
-
 
     def eatIf(self):
         # filtered

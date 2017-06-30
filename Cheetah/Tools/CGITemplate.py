@@ -35,7 +35,6 @@ class CGITemplate(Template):
        Any class that inherits this mixin must also inherit Cheetah.Servlet.
     """
 
-
     def cgiHeaders(self):
         """Outputs the CGI headers if this is a CGI script.
 
@@ -45,13 +44,10 @@ class CGITemplate(Template):
         if self.isCgi():
             return self.cgiHeadersHook()
 
-
-
     def cgiHeadersHook(self):
         """Override if you want to customize the CGI headers.
         """
         return "Content-type: text/html\n\n"
-
 
     def isCgi(self):
         """Is this a CGI script?
@@ -59,7 +55,6 @@ class CGITemplate(Template):
         env = 'REQUEST_METHOD' in os.environ
         wk = self._CHEETAH__isControlledByWebKit
         return env and not wk
-
 
 
 # vim: shiftwidth=4 tabstop=4 expandtab

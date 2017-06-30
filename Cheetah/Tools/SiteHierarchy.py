@@ -47,7 +47,6 @@ class Hierarchy:
             self._crumbCSSClass = ''
         self._prefix = prefix
 
-
     # Main output methods
 
     def menuList(self, menuCSSClass=None):

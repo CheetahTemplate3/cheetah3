@@ -108,7 +108,6 @@ _DEFAULT_COMPILER_SETTINGS = [
 DEFAULT_COMPILER_SETTINGS = dict([(v[0], v[1]) for v in _DEFAULT_COMPILER_SETTINGS])
 
 
-
 class GenUtils(object):
     """An abstract baseclass for the Compiler classes that provides methods that
     perform generic utility functions or generate pieces of output code from
@@ -327,7 +326,6 @@ class MethodCompiler(GenUtils):
         self._hasReturnStatement = False
         self._isGenerator = False
 
-
     def cleanupState(self):
         """Called by the containing class compiler instance
         """
@@ -477,8 +475,6 @@ class MethodCompiler(GenUtils):
             BOL = max(src.rfind('\n')+1, src.rfind('\r')+1, 0)
             if BOL < len(src):
                 self._pendingStrConstChunks[-1] = src[:BOL]
-
-
 
     def isErrorCatcherOn(self):
         return self._isErrorCatcherOn
@@ -672,7 +668,6 @@ class MethodCompiler(GenUtils):
             self.addChunk(
                 'raise TypeError("This method cannot be called with a trans arg")')
             self.dedent()
-
 
     def addPass(self, expr):
         self.addChunk(expr)
@@ -1279,7 +1274,6 @@ class ClassCompiler(GenUtils):
         for argName, defVal in argsList:
             mainMethodCompiler.addMethArg(argName, defVal)
 
-
     def _spawnMethodCompiler(self, methodName, klass=None,
                              initialMethodComment=None):
         if klass is None:
@@ -1422,7 +1416,6 @@ class ClassCompiler(GenUtils):
         # if self.setting('outputRowColComments'):
         #    self.appendToPrevChunk(' at line %s, col %s' % lineCol + '.')
 
-
     # code wrapping methods
 
     def classDef(self):
@@ -1463,7 +1456,6 @@ class ClassCompiler(GenUtils):
         classDef = '\n'.join(classDefChunks)
         self._classDef = classDef
         return classDef
-
 
     def classSignature(self):
         return "class %s(%s):" % (self.className(), self._baseClass)

@@ -269,6 +269,5 @@ class InlineSpanishTest(unittest.TestCase):
         self.assertTrue(unicode(template))
 
 
-
 if __name__ == '__main__':
     unittest.main()

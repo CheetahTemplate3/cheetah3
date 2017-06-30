@@ -98,7 +98,6 @@ class SourceReader(object):
         self.checkPos(pos)
         self._pos = pos
 
-
     def validPos(self, pos):
         return pos <= self._breakPoint and pos >= 0
 
@@ -184,7 +183,6 @@ class SourceReader(object):
         self._pos = to
         return self._src[start:to]
 
-
     def readToEOL(self, start=None, gobble=True):
         EOLmatch = EOLZre.search(self.src(), self.pos())
         if gobble:
@@ -192,7 +190,6 @@ class SourceReader(object):
         else:
             pos = EOLmatch.start()
         return self.readTo(to=pos, start=start)
-
 
     def find(self, it, pos=None):
         if pos == None:

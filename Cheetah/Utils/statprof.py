@@ -120,8 +120,6 @@ much as possible.
 """
 
 
-
-
 try:
     import itimer
 except ImportError:

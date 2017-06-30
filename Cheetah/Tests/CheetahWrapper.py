@@ -102,7 +102,6 @@ class CFBase(unittest.TestCase):
         else:
             warn("Warning: not deleting scratch directory %s" % self.scratchDir)
 
-
     def _checkDestFileHelper(self, path, expected,
                              allowSurroundingText, errmsg):
         """Low-level helper to check a destination file.
@@ -129,7 +128,6 @@ class CFBase(unittest.TestCase):
         msg = errmsg % locals()
         self.assertTrue(success, msg)
 
-
     def checkCompile(self, path):
         # Raw string to prevent "\n" from being converted to a newline.
         # expected = R"write('Hello, world!\n')"
@@ -139,7 +137,6 @@ destination file %(path)s doesn't contain expected substring:
 %(expected)r"""
         self._checkDestFileHelper(path, expected, True, errmsg)
 
-
     def checkFill(self, path):
         expected = "Hello, world!\n"
         errmsg = """\
@@ -147,7 +144,6 @@ destination file %(path)s contains wrong result.
 Expected %(expected)r
 Found %(result)r"""
         self._checkDestFileHelper(path, expected, False, errmsg)
-
 
     def checkSubdirPyInit(self, path):
         """Verify a destination subdirectory exists and contains an
@@ -160,7 +156,6 @@ Found %(result)r"""
         exists = os.path.exists(initPath)
         msg = "destination init file missing: %s" % initPath
         self.assertTrue(exists, msg)
-
 
     def checkNoBackup(self, path):
         """Verify 'path' does not exist.  (To check --nobackup.)
@@ -251,10 +246,8 @@ class CFIdirBase(CFBase):
     srcFiles = ('SRC/a.tmpl', 'SRC/child/a.tmpl', 'SRC/child/grandkid/a.tmpl')
 
 
-
 ##################################################
 # TEST CASE CLASSES
-
 
 
 class OneFile(CFBase):

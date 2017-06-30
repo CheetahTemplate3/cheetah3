@@ -121,7 +121,6 @@ def standardDeviation_n(lis):
     raise NotImplementedError()
 
 
-
 class IndexFormats:
     """Eight ways to display a subscript index.
        ("Fifty ways to leave your lover....")
@@ -168,10 +167,8 @@ class IndexFormats:
         return self._item
 
 
-
 ########################################
 # PRIVATE CLASSES
-
 
 
 class ValuesGetterMixin:
@@ -284,8 +281,6 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
     def summary(self):
         raise NotImplementedError()
 
-
-
     def _prevNextHelper(self, start, end, size, orphan, sequence):
         """Copied from Zope's DT_InSV.py's "opt" function.
         """
@@ -320,7 +315,6 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
             except: end = len(sequence)
             # if l - end < orphan: end=l
         return start, end, size
-
 
 
 class Summary(ValuesGetterMixin):
@@ -411,13 +405,11 @@ class MondoReport:
             ret.append(tup)
         return ret
 
-
     batch = page
 
     def all(self):
         origList_len = len(self._origList)
         return self.page(origList_len, 0, 0, 0)
-
 
     def summary(self):
         return self._SummaryClass(self._origList)

@@ -132,7 +132,6 @@ class Mantis_Issue_11_Regression_Test(unittest.TestCase):
         assert template
         self.assertRaises(AttributeError, template.respond)
 
-
     def test_FailingBehaviorWithSetting(self):
         import cgi
         template = Cheetah.Template.Template(
