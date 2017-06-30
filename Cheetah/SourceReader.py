@@ -239,7 +239,7 @@ class SourceReader(object):
             return strOrRE.match(self.src(), self.pos())
 
     def matchWhiteSpace(self, WSchars=' \f\t'):
-        return (not self.atEnd()) and  self.peek() in WSchars
+        return (not self.atEnd()) and self.peek() in WSchars
 
     def getWhiteSpace(self, max=None, WSchars=' \f\t'):
         if not self.matchWhiteSpace(WSchars):

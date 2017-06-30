@@ -49,7 +49,7 @@ def _lookup(name, func, multi, converters):
     # 'values' is a list of strings, a string or None.
 
     # Step 3 -- Coerce 'values' to a list of zero, one or more strings.
-    if   values is None:
+    if values is None:
         values = []
     elif isinstance(values, str):
         values = [values]
@@ -81,7 +81,7 @@ def _lookup(name, func, multi, converters):
     # as is.  If we're supposed to return a single value and the list is
     # empty, return or raise 'converter.default'.  Otherwise, return the
     # first element in the list and ignore any additional values.
-    if   multi:
+    if multi:
         return shortName, values
     if len(values) == 0:
         return shortName, useOrRaise(converter.default)

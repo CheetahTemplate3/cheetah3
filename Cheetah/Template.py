@@ -1832,7 +1832,7 @@ class Template(Servlet):
         """
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
-        if   isCgi and src in ('f', 'v'):
+        if isCgi and src in ('f', 'v'):
             global _formUsedByWebInput
             if _formUsedByWebInput is None:
                 _formUsedByWebInput = cgi.FieldStorage()

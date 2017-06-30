@@ -390,7 +390,7 @@ class MethodCompiler(GenUtils):
         docStr = (ind + '"""\n' + ind +
                   ('\n' + ind).join([ln.replace('"""', "'''") for ln in self._docStringLines]) +
                   '\n' + ind + '"""\n')
-        return  docStr
+        return docStr
 
     # methods for adding code
     def addMethDocString(self, line):
@@ -1472,7 +1472,7 @@ class ClassCompiler(GenUtils):
                   '\n%(ind)s'.join(self._classDocStringLines) +
                   '\n%(ind)s"""\n'
                   ) % {'ind': ind}
-        return  docStr
+        return docStr
 
     def methodDefs(self):
         methodDefs = [methGen.methodDef() for methGen in self._finishedMethods()]
