@@ -33,12 +33,15 @@ _installed = False
 # HELPER FUNCS
 
 _cacheDir = []
+
+
 def setCacheDir(cacheDir):
     global _cacheDir
     _cacheDir.append(cacheDir)
 
 ##################################################
 # CLASSES
+
 
 class CheetahDirOwner(DirOwner):
     _lock = RLock()
@@ -120,6 +123,7 @@ def install(templateFileExtensions=('.tmpl',)):
             _manager = ImportManager.ImportManager()
             _manager.setThreaded()
             _manager.install()
+
 
 def uninstall():
     """Uninstall the Cheetah Import Hooks"""

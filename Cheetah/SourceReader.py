@@ -8,8 +8,10 @@ EOLre = re.compile(r'[ \f\t]*(?:\r\n|\r|\n)')
 EOLZre = re.compile(r'(?:\r\n|\r|\n|\Z)')
 ENCODINGsearch = re.compile("coding[=:]\s*([-\w.]+)").search
 
+
 class Error(Exception):
     pass
+
 
 class SourceReader(object):
     def __init__(self, src, filename=None, breakPoint=None, encoding=None):

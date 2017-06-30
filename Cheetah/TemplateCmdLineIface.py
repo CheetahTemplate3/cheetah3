@@ -10,8 +10,10 @@ except ImportError:
 
 from Cheetah.Version import Version
 
+
 class Error(Exception):
     pass
+
 
 class CmdLineIface:
     """A command line interface to compiled Cheetah template modules."""

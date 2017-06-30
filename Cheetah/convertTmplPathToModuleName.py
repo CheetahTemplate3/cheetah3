@@ -14,6 +14,7 @@ for c in string.digits + letters:
 _pathNameTransChars = ''.join(l)
 del l, c
 
+
 def convertTmplPathToModuleName(tmplPath,
                                 _pathNameTransChars=_pathNameTransChars,
                                 splitdrive=os.path.splitdrive,

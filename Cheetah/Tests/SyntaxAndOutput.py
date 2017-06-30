@@ -36,8 +36,10 @@ from Cheetah.compat import PY2
 class Unspecified(object):
     pass
 
+
 def testdecorator(func):
     return func
+
 
 class DummyClass:
     _called = False
@@ -208,6 +210,7 @@ Template output mismatch:
 ##################################################
 # TEST CASE CLASSES
 
+
 class EmptyTemplate(OutputTest):
     convertEOLs = False
 
@@ -297,6 +300,7 @@ class Backslashes(OutputTest):
         self.verify(r"""#LogFormat '%h %l %u %t \"%r\" %>s %b'""" + '\n\n\n\n\n\n\n',
                     r"""#LogFormat '%h %l %u %t \"%r\" %>s %b'""" + '\n\n\n\n\n\n\n')
 
+
 class NonTokens(OutputTest):
     def test1(self):
         """dollar signs not in Cheetah $vars"""
@@ -336,6 +340,7 @@ class NonTokens(OutputTest):
         else:
             self.verify("\n$#\n",
                         "\n$#\n")
+
 
 class Comments_SingleLine(OutputTest):
     def test1(self):
@@ -435,6 +440,7 @@ class Comments_MultiLine_NoGobble(OutputTest):
         self.verify("   #* \nblarg\n *#   ",
                     "      ")
 
+
 class Comments_MultiLine(OutputTest):
     """
     Note: Multiline comments don't gobble whitespace!
@@ -511,6 +517,7 @@ class Comments_MultiLine(OutputTest):
         """
         self.verify("foo\nfoo bar #* \n\n#for $i in range(15) \n\n*#   \ntest",
                     "foo\nfoo bar \ntest")
+
 
 class Placeholders(OutputTest):
     def test1(self):
@@ -627,6 +634,7 @@ class Placeholders(OutputTest):
         tmpl = tmpl.subclass('#for name in $names: $*1*(name) ')
         assert str(tmpl(names=names)) == 'You '*len(names)
 
+
 class Placeholders_Vals(OutputTest):
     convertEOLs = False
 
@@ -670,6 +678,7 @@ class Placeholders_Vals(OutputTest):
         """$_
         """
         self.verify("$_('foo')", "Translated: foo")
+
 
 class PlaceholderStrings(OutputTest):
     def test1(self):
@@ -720,6 +729,7 @@ class UnicodeStrings(OutputTest):
         self.verify(u"aoeu12345\u1234", u"aoeu12345\u1234")
         # self.verify(u"#encoding utf8#aoeu12345\u1234", u"aoeu12345\u1234")
 
+
 class EncodingDirective(OutputTest):
     def test1(self):
         """basic #encoding """
@@ -761,6 +771,7 @@ class EncodingDirective(OutputTest):
         self.verify(source,
                     u'\u1234', outputEncoding='utf8')
 
+
 class UnicodeDirective(OutputTest):
     def test1(self):
         """basic #unicode """
@@ -785,6 +796,7 @@ class UnicodeDirective(OutputTest):
 
         self.verify("#encoding latin-1\n1234ü",
                     u"1234ü")
+
 
 class Placeholders_Esc(OutputTest):
     convertEOLs = False
@@ -945,6 +957,7 @@ class Placeholders_Calls(OutputTest):
         """a function call with the Python None kw."""
         self.verify("$aFunc(None)",
                     "")
+
 
 class NameMapper(OutputTest):
     def test1(self):
@@ -1130,6 +1143,7 @@ $foo$foo$foo$foo$foo""",
                     "#cache_foo")
         self.verify("#cached",
                     "#cached")
+
 
 class CallDirective(OutputTest):
 
@@ -1354,6 +1368,7 @@ class EOLSlurpToken(OutputTest):
 
 if not DEFAULT_COMPILER_SETTINGS['EOLSlurpToken']:
     del EOLSlurpToken
+
 
 class RawDirective(OutputTest):
     def test1(self):
@@ -1814,6 +1829,7 @@ class DefDirective(OutputTest):
                     + "$testMeth",
                     "1234 5678\n")
 
+
 class DecoratorDirective(OutputTest):
     def test1(self):
         """single line #def with decorator"""
@@ -1967,6 +1983,7 @@ inner
             """#block $testMeth: \nfoo\n#end block\ntest $testMeth-""",
             "foo\ntest foo\n-")
 
+
 class IncludeDirective(OutputTest):
 
     def setUp(self):
@@ -2059,6 +2076,7 @@ class SilentDirective(OutputTest):
         """simple #silent"""
         self.verify("#silent $anObj.callIt(99)\n$anObj.callArg",
                     "99")
+
 
 class SetDirective(OutputTest):
 
@@ -2327,6 +2345,7 @@ class IfDirective(OutputTest):
         self.verify("#if 0: foo\n#elif 0: bar\n#else: blarg\n",
                     "blarg\n")
 
+
 class UnlessDirective(OutputTest):
 
     def test1(self):
@@ -2369,6 +2388,7 @@ class UnlessDirective(OutputTest):
         self.verify("#unless 1: 1234", "")
         self.verify("#unless 0: 1234", "1234")
         self.verify("#unless 0: 1234\n"*2, "1234\n"*2)
+
 
 class PSP(OutputTest):
     def searchList(self):
@@ -2432,6 +2452,7 @@ class WhileDirective(OutputTest):
         self.verify("#set $i = 0\n#while $i < 5\n$i#slurp\n#set $i += 1\n#end while",
                     "01234")
 
+
 class ContinueDirective(OutputTest):
     def test1(self):
         """#continue with a #while"""
@@ -2455,6 +2476,7 @@ $i#slurp
 $i#slurp
 #end for""",
                     "0124")
+
 
 class BreakDirective(OutputTest):
     def test1(self):
@@ -2527,6 +2549,7 @@ blarg
   #end try
 #end try""",  # noqa
                     "blarg\n")
+
 
 class PassDirective(OutputTest):
     def test1(self):
@@ -2676,6 +2699,7 @@ $os.path.exists('.')""",
         self.verify("#from math import *\n$pow(1,2) $log10(10)",
                     "1.0 1.0")
 
+
 class CompilerDirective(OutputTest):
     def test1(self):
         """overriding the commentStartToken
@@ -2740,6 +2764,7 @@ $anInt//comment
 if sys.platform.startswith('java'):
     del CompilerDirective
     del CompilerSettingsDirective
+
 
 class ExtendsDirective(OutputTest):
 
@@ -2818,6 +2843,7 @@ $sep$letter#slurp
 #end for
 """,
                     "a, b, c")
+
 
 class FilterDirective(OutputTest):
     convertEOLs = False
@@ -2902,12 +2928,14 @@ class EchoDirective(OutputTest):
         self.verify("#echo 1234",
                     "1234")
 
+
 class SilentDirective(OutputTest):
     def test1(self):
         """#silent 1234
         """
         self.verify("#silent 1234",
                     "")
+
 
 class ErrorCatcherDirective(OutputTest):
     pass
@@ -2944,6 +2972,7 @@ class VarExists(OutputTest):               # Template.varExists()
         """
         self.verify("#if $varExists('$anInt')\n1234\n#else\n999#end if",
                     "1234\n")
+
 
 class GetVar(OutputTest):               # Template.getVar()
     def test1(self):

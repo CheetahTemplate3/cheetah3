@@ -5,6 +5,8 @@ MinCompatibleVersion = '3.0.0a1'
 MinCompatibleVersionTuple = (3, 0, 0, 'alpha', 1)
 
 ####
+
+
 def convertVersionStringToTuple(s):
     versionNum = [0, 0, 0]
     releaseType = 'final'

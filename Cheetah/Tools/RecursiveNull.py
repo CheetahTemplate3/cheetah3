@@ -7,6 +7,7 @@ This module was contributed by Ian Bicking.
 """
 import sys
 
+
 class RecursiveNull(object):
     def __getattr__(self, attr):
         return self

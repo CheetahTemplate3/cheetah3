@@ -11,9 +11,11 @@ from Cheetah.compat import unicode
 class GetAttrException(Exception):
     pass
 
+
 class CustomGetAttrClass(object):
     def __getattr__(self, name):
         raise GetAttrException('FAIL, %s' % name)
+
 
 class GetAttrTest(unittest.TestCase):
     '''
@@ -139,6 +141,7 @@ class Mantis_Issue_11_Regression_Test(unittest.TestCase):
             compilerSettings={'prioritizeSearchListOverSelf': True})
         assert template
         assert template.respond()
+
 
 class Mantis_Issue_21_Regression_Test(unittest.TestCase):
     '''

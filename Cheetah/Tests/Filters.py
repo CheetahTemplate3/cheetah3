@@ -6,6 +6,7 @@ import unittest
 import Cheetah.Template
 import Cheetah.Filters
 
+
 class BasicMarkdownFilterTest(unittest.TestCase):
     '''
         Test that our markdown filter works

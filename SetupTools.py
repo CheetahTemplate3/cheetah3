@@ -31,8 +31,10 @@ else:
 ##################################################
 # CLASSES ##
 
+
 class BuildFailed(Exception):
     pass
+
 
 class mod_build_ext(build_ext):
     """A modified version of the distutils build_ext command that raises an
@@ -114,6 +116,7 @@ class mod_install_data(install_data):
 
 ##################################################
 # FUNCTIONS ##
+
 
 def run_setup(configurations):
     """ Run distutils setup.

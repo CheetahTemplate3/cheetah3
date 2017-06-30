@@ -27,6 +27,7 @@ except ImportError:
 import time
 import Cheetah.CacheStore
 
+
 class CacheItem(object):
     '''
     A CacheItem is a container storing:
@@ -70,6 +71,7 @@ class CacheItem(object):
         self._cacheStore.delete(self._cacheItemID)
         self._refreshTime = None
 
+
 class _CacheDataStoreWrapper(object):
     def __init__(self, dataStore, keyPrefix):
         self._dataStore = dataStore
@@ -83,6 +85,7 @@ class _CacheDataStoreWrapper(object):
 
     def set(self, key, val, time=0):
         self._dataStore.set(self._keyPrefix+key, val, time=time)
+
 
 class CacheRegion(object):
     '''

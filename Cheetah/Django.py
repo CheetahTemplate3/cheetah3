@@ -1,5 +1,6 @@
 import Cheetah.Template
 
+
 def render(template_file, **kwargs):
     '''
         Cheetah.Django.render() takes the template filename

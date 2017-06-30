@@ -6,6 +6,7 @@
 
 from Cheetah.Utils.htmlEncode import htmlCodesReversed
 
+
 def htmlDecode(s, codes=htmlCodesReversed):
     """ Returns the ASCII decoded version of the given HTML string. This does
     NOT remove normal HTML tags like <p>. It is the inverse of htmlEncode()."""

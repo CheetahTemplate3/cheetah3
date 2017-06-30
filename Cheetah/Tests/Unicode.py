@@ -13,6 +13,7 @@ from Cheetah import CheetahWrapper
 from Cheetah import DummyTransaction
 from Cheetah.compat import PY2, unicode
 
+
 class CommandLineTest(unittest.TestCase):
     def createAndCompile(self, source):
         sourcefile = '-'
@@ -41,6 +42,7 @@ class CommandLineTest(unittest.TestCase):
             rmtree(__pycache__)
         return template
 
+
 class JBQ_UTF8_Test1(unittest.TestCase):
     def runTest(self):
         t = Template.compile(source="""Main file with |$v|
@@ -55,6 +57,7 @@ class JBQ_UTF8_Test1(unittest.TestCase):
         t.other.v = u'Unicode String'
 
         assert unicode(t())
+
 
 class JBQ_UTF8_Test2(unittest.TestCase):
     def runTest(self):
@@ -87,6 +90,7 @@ class JBQ_UTF8_Test3(unittest.TestCase):
 
         assert unicode(t())
 
+
 class JBQ_UTF8_Test4(unittest.TestCase):
     def runTest(self):
         t = Template.compile(source="""#encoding utf-8
@@ -96,6 +100,7 @@ class JBQ_UTF8_Test4(unittest.TestCase):
 
         assert unicode(t())
 
+
 class JBQ_UTF8_Test5(unittest.TestCase):
     def runTest(self):
         t = Template.compile(source="""#encoding utf-8
@@ -104,6 +109,7 @@ class JBQ_UTF8_Test5(unittest.TestCase):
         t.v = u'Unicode String'
 
         assert unicode(t())
+
 
 def loadModule(moduleName, path=None):
     if path:
@@ -121,6 +127,7 @@ def loadModule(moduleName, path=None):
                 fp.close()
     return mod
 
+
 class JBQ_UTF8_Test6(unittest.TestCase):
     def runTest(self):
         source = """#encoding utf-8
@@ -132,6 +139,7 @@ class JBQ_UTF8_Test6(unittest.TestCase):
 
         assert unicode(t())
 
+
 class JBQ_UTF8_Test7(CommandLineTest):
     def runTest(self):
         source = """#encoding utf-8
@@ -142,6 +150,7 @@ class JBQ_UTF8_Test7(CommandLineTest):
         template.v = u'Unicode String'
 
         assert unicode(template())
+
 
 class JBQ_UTF8_Test8(CommandLineTest):
     def testStaticCompile(self):
@@ -167,6 +176,7 @@ $someUnicodeString"""
         if PY2:
             a = a.encode("utf-8")
         self.assertEqual("Bébé", a)
+
 
 class EncodeUnicodeCompatTest(unittest.TestCase):
     """

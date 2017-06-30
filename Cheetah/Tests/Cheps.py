@@ -6,6 +6,7 @@ import Cheetah
 import Cheetah.Parser
 import Cheetah.Template
 
+
 class Chep_2_Conditionalized_Import_Behavior(unittest.TestCase):
     def test_ModuleLevelImport(self):
         ''' Verify module level (traditional) import behavior '''

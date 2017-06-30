@@ -8,6 +8,7 @@ values = {
     'one': 1,
     }
 
+
 def test_normal():
     plugin = TurboCheetah()
     # Make sure a simple test works:
@@ -16,6 +17,7 @@ def test_normal():
     # Make sure one template can inherit from another:
     s = plugin.render(values, template='turbocheetah.tests.import_inherit')
     assert s.strip() == 'Inherited: import'
+
 
 def test_path():
     plugin = TurboCheetah()
@@ -26,6 +28,7 @@ def test_path():
     # Make sure we pick up subdirectories:
     s = plugin.render(values, template_file='sub/master')
     assert s.strip() == 'sub1: 1'
+
 
 def test_search():
     plugin = TurboCheetah()
@@ -53,6 +56,7 @@ def test_search():
                           here]
     s = plugin.render(values, template_file='page_over')
     assert s.strip() == 'SUB: sub content'
+
 
 def test_string():
     # Make sure simple string evaluation works:

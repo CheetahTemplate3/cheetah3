@@ -7,9 +7,11 @@ import re
 from tempfile import mktemp
 from Cheetah.compat import string_type
 
+
 def _escapeRegexChars(
         txt, escapeRE=re.compile(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])')):
     return escapeRE.sub(r'\\\1', txt)
+
 
 def findFiles(*args, **kw):
     """Recursively find all the files matching a glob pattern.
@@ -18,6 +20,7 @@ def findFiles(*args, **kw):
     for details about the accepted arguments, etc."""
 
     return FileFinder(*args, **kw).files()
+
 
 def replaceStrInFiles(files, theStr, repl):
 
@@ -31,6 +34,7 @@ def replaceStrInFiles(files, theStr, repl):
 
     pattern = _escapeRegexChars(theStr)
     return FindAndReplace(files, pattern, repl).results()
+
 
 def replaceRegexInFiles(files, pattern, repl):
 
@@ -108,6 +112,7 @@ class FileFinder:
 
     def files(self):
         return self._files
+
 
 class _GenSubberFunc:
 

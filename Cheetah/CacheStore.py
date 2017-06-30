@@ -16,8 +16,10 @@ delete(key)
 '''
 import time
 
+
 class Error(Exception):
     pass
+
 
 class AbstractCacheStore(object):
 
@@ -35,6 +37,7 @@ class AbstractCacheStore(object):
 
     def get(self, key):
         raise NotImplementedError
+
 
 class MemoryCacheStore(AbstractCacheStore):
     def __init__(self):
@@ -66,6 +69,7 @@ class MemoryCacheStore(AbstractCacheStore):
 
     def clear(self):
         self._data.clear()
+
 
 class MemcachedCacheStore(AbstractCacheStore):
     servers = ('127.0.0.1:11211')

@@ -165,14 +165,17 @@ if PY2 and not hasattr(inspect.imp, 'get_suffixes'):
 # import goes smoothly, the Python versions defined here will be replaced with
 # the C versions.
 
+
 class NotFound(LookupError):
     pass
+
 
 def _raiseNotFoundException(key, namespace):
     excString = "cannot find '%s'" % key
     if _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS:
         excString += ' in the namespace %s' % pformat(namespace)
     raise NotFound(excString)
+
 
 def _wrapNotFoundException(exc, fullName, namespace):
     if not _ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS:
@@ -185,6 +188,7 @@ def _wrapNotFoundException(exc, fullName, namespace):
                 excStr += ' in the namespace %s' % pformat(namespace)
             exc.args = (excStr,)
         raise
+
 
 def _isInstanceOrClass(obj):
     if isinstance(obj, type):
@@ -204,6 +208,7 @@ def _isInstanceOrClass(obj):
             return True
     return False
 
+
 def hasKey(obj, key):
     """Determine if 'obj' has 'key' """
     if isinstance(obj, Mapping) and key in obj:
@@ -213,6 +218,7 @@ def hasKey(obj, key):
     else:
         return False
 
+
 def valueForKey(obj, key):
     if isinstance(obj, Mapping) and key in obj:
         return obj[key]
@@ -220,6 +226,7 @@ def valueForKey(obj, key):
         return getattr(obj, key)
     else:
         _raiseNotFoundException(key, obj)
+
 
 def _valueForName(obj, name, executeCallables=False):
     nameChunks = name.split('.')
@@ -238,11 +245,13 @@ def _valueForName(obj, name, executeCallables=False):
             obj = nextObj
     return obj
 
+
 def valueForName(obj, name, executeCallables=False):
     try:
         return _valueForName(obj, name, executeCallables)
     except NotFound as e:
         _wrapNotFoundException(e, fullName=name, namespace=obj)
+
 
 def valueFromSearchList(searchList, name, executeCallables=False):
     key = name.split('.')[0]
@@ -252,6 +261,7 @@ def valueFromSearchList(searchList, name, executeCallables=False):
                                  executeCallables=executeCallables)
     _raiseNotFoundException(key, searchList)
 
+
 def _namespaces(callerFrame, searchList=None):
     yield callerFrame.f_locals
     if searchList:
@@ -259,6 +269,7 @@ def _namespaces(callerFrame, searchList=None):
             yield namespace
     yield callerFrame.f_globals
     yield __builtins__
+
 
 def valueFromFrameOrSearchList(searchList, name, executeCallables=False,
                                frame=None):
@@ -278,6 +289,7 @@ def valueFromFrameOrSearchList(searchList, name, executeCallables=False,
     finally:
         del frame
 
+
 def valueFromFrame(name, executeCallables=False, frame=None):
     # @@TR consider implementing the C version the same way
     # at the moment it provides a seperate but mirror implementation
@@ -291,6 +303,7 @@ def valueFromFrame(name, executeCallables=False, frame=None):
                                           frame=frame)
     finally:
         del frame
+
 
 def hasName(obj, name):
     # Not in the C version
@@ -315,6 +328,7 @@ except:
 ##################################################
 # CLASSES
 
+
 class Mixin:
     """@@ document me"""
     def valueForName(self, name):
@@ -325,6 +339,7 @@ class Mixin:
 
 ##################################################
 # if run from the command line ##
+
 
 def example():
     class A(Mixin):

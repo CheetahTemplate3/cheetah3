@@ -68,9 +68,12 @@ class _TestInfo(object):
         stream.write('  ')
 
 # Module level functions since Python 2.3 doesn't grok decorators
+
+
 def create_success(test, time):
     """Create a _TestInfo instance for a successful test."""
     return _TestInfo(test, time)
+
 
 def create_failure(test, time, failure):
     """Create a _TestInfo instance for a failed test."""
@@ -78,11 +81,13 @@ def create_failure(test, time, failure):
     info._failure = failure
     return info
 
+
 def create_error(test, time, error):
     """Create a _TestInfo instance for an erroneous test."""
     info = _TestInfo(test, time)
     info._error = error
     return info
+
 
 class _XMLTestResult(unittest.TestResult):
 

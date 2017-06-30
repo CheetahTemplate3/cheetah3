@@ -32,10 +32,13 @@ else:
 
 # re tools
 _regexCache = {}
+
+
 def cachedRegex(pattern):
     if pattern not in _regexCache:
         _regexCache[pattern] = re.compile(pattern)
     return _regexCache[pattern]
+
 
 def escapeRegexChars(txt,
                      escapeRE=re.compile(r'([\$\^\*\+\.\?\{\}\[\]\(\)\|\\])')):
@@ -44,10 +47,19 @@ def escapeRegexChars(txt,
 
     return escapeRE.sub(r'\\\1', txt)
 
+
 def group(*choices): return '(' + '|'.join(choices) + ')'
+
+
 def nongroup(*choices): return '(?:' + '|'.join(choices) + ')'
+
+
 def namedGroup(name, *choices): return '(P:<' + name + '>' + '|'.join(choices) + ')'
+
+
 def any(*choices): return group(*choices) + '*'
+
+
 def maybe(*choices): return group(*choices) + '?'
 
 ##################################################
@@ -125,6 +137,8 @@ closurePairsRev = {'(': ')', '[': ']', '{': '}'}
 # Regex chunks for the parser ##
 
 tripleQuotedStringREs = {}
+
+
 def makeTripleQuoteRe(start, end):
     start = escapeRegexChars(start)
     end = escapeRegexChars(end)
@@ -245,6 +259,8 @@ endDirectiveNamesAndHandlers = {
 
 # @@TR: SyntaxError doesn't call exception.__str__ for some reason!
 # class ParseError(SyntaxError):
+
+
 class ParseError(ValueError):
     def __init__(self, stream, msg='Invalid Syntax', extMsg='', lineno=None, col=None):
         self.stream = stream
@@ -307,12 +323,18 @@ class ParseError(ValueError):
 
         return report
 
+
 class ForbiddenSyntax(ParseError):
     pass
+
+
 class ForbiddenExpression(ForbiddenSyntax):
     pass
+
+
 class ForbiddenDirective(ForbiddenSyntax):
     pass
+
 
 class CheetahVariable(object):
     def __init__(self, nameChunks, useNameMapper=True, cacheToken=None,
@@ -322,8 +344,10 @@ class CheetahVariable(object):
         self.cacheToken = cacheToken
         self.rawSource = rawSource
 
+
 class Placeholder(CheetahVariable):
     pass
+
 
 class ArgList(object):
     """Used by _LowLevelParser.getArgList()"""
@@ -357,6 +381,7 @@ class ArgList(object):
 
     def __str__(self):
         return str(self.merge())
+
 
 class _LowLevelParser(SourceReader):
     """This class implements the methods to match or extract ('get*') the basic

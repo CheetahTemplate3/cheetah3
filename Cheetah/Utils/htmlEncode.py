@@ -13,6 +13,7 @@ htmlCodes = [
 htmlCodesReversed = htmlCodes[:]
 htmlCodesReversed.reverse()
 
+
 def htmlEncode(s, codes=htmlCodes):
     """ Returns the HTML encoded version of the given string. This is useful to
     display a plain ASCII text string on a web page."""

@@ -12,8 +12,10 @@ import logging
 import types
 from Cheetah.compat import unicode
 
+
 class DummyResponseFailure(Exception):
     pass
+
 
 class DummyResponse(object):
     '''

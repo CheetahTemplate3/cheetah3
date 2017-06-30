@@ -7,9 +7,11 @@ import sys         # Used in die.
 ##################################################
 # MISCELLANEOUS FUNCTIONS
 
+
 def die(reason):
     sys.stderr.write(reason + '\n')
     sys.exit(1)
+
 
 def useOrRaise(thing, errmsg=''):
     """Raise 'thing' if it's a subclass of Exception.  Otherwise return it.

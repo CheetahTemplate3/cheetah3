@@ -28,6 +28,7 @@ single-inheritance model.
 import os
 from Cheetah.Template import Template
 
+
 class CGITemplate(Template):
     """Methods useful in CGI scripts.
 

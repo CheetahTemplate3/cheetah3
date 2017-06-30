@@ -187,6 +187,8 @@ state = ProfileState()
 
 # call_data := { code object: CallData }
 call_data = {}
+
+
 class CallData(object):
     def __init__(self, code):
         self.name = code.co_name
@@ -196,6 +198,7 @@ class CallData(object):
         self.cum_sample_count = 0
         self.self_sample_count = 0
         call_data[code] = self
+
 
 def get_call_data(code):
     return call_data.get(code, None) or CallData(code)
@@ -215,6 +218,7 @@ def sample_stack_procs(frame):
     for code in code_seen:
         get_call_data(code).cum_sample_count += 1
 
+
 def profile_signal_handler(signum, frame):
     if state.profile_level > 0:
         state.accumulate_time(clock())
@@ -229,6 +233,7 @@ def profile_signal_handler(signum, frame):
 def is_active():
     return state.profile_level > 0
 
+
 def start():
     state.profile_level += 1
     if state.profile_level == 1:
@@ -240,6 +245,7 @@ def start():
                          rpt or state.sample_interval, 0.0)
         state.gc_time_taken = 0  # dunno
 
+
 def stop():
     state.profile_level -= 1
     if state.profile_level == 0:
@@ -249,6 +255,7 @@ def stop():
         signal.signal(signal.SIGPROF, signal.SIG_IGN)
         state.remaining_prof_time = rpt[0]
         state.gc_time_taken = 0  # dunno
+
 
 def reset(frequency=None):
     assert state.profile_level == 0, "Can't reset() while statprof is running"

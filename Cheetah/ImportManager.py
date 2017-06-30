@@ -33,6 +33,7 @@ _os_stat = _os_path_join = _os_getcwd = _os_path_dirname = None
 ##################################################
 # FUNCTIONS
 
+
 def _os_bootstrap():
     """Set up 'os' module replacement functions for use during import bootstrap."""
 
@@ -95,6 +96,7 @@ def _os_bootstrap():
 
 _os_bootstrap()
 
+
 def packageName(s):
     for i in range(len(s)-1, -1, -1):
         if s[i] == '.':
@@ -102,6 +104,7 @@ def packageName(s):
     else:
         return ''
     return s[:i]
+
 
 def nameSplit(s):
     rslt = []
@@ -114,11 +117,13 @@ def nameSplit(s):
         rslt.append(s[i:])
     return rslt
 
+
 def getPathExt(fnm):
     for i in range(len(fnm)-1, -1, -1):
         if fnm[i] == '.':
             return fnm[i:]
     return ''
+
 
 def pathIsDir(pathname):
     "Local replacement for os.path.isdir()."
@@ -128,6 +133,7 @@ def pathIsDir(pathname):
         return None
     return (s[0] & 0o170000) == 0o040000
 
+
 def getDescr(fnm):
     ext = getPathExt(fnm)
     for (suffix, mode, typ) in imp.get_suffixes():
@@ -136,6 +142,7 @@ def getDescr(fnm):
 
 ##################################################
 # CLASSES
+
 
 class Owner:
 
@@ -154,6 +161,7 @@ class Owner:
 
     def getmod(self, nm):
         return None
+
 
 class DirOwner(Owner):
 
@@ -230,6 +238,7 @@ class ImportDirector(Owner):
 
     pass
 
+
 class BuiltinImportDirector(ImportDirector):
     """Directs imports of builtin modules"""
     def __init__(self):
@@ -240,6 +249,7 @@ class BuiltinImportDirector(ImportDirector):
             mod = imp.load_module(nm, None, nm, ('', '', imp.C_BUILTIN))
             return mod
         return None
+
 
 class FrozenImportDirector(ImportDirector):
     """Directs imports of frozen modules"""
@@ -300,6 +310,7 @@ class RegistryImportDirector(ImportDirector):
             return mod
         return None
 
+
 class PathImportDirector(ImportDirector):
     """Directs imports of modules stored on the filesystem."""
 
@@ -356,6 +367,7 @@ class PathImportDirector(ImportDirector):
 # ie, the builtin import
 
 UNTRIED = -1
+
 
 class ImportManager:
     # really the equivalent of builtin import

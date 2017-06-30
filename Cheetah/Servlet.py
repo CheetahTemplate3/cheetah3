@@ -6,6 +6,7 @@ Provides an abstract Servlet baseclass for Cheetah's Template class
 import sys
 import os.path
 
+
 class Servlet(object):
     """
         This class is an abstract baseclass for Cheetah.Template.Template.

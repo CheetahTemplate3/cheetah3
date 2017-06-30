@@ -1,5 +1,7 @@
 import gettext
 _ = gettext.gettext
+
+
 class I18n(object):
     def __init__(self, parser):
         pass

@@ -22,15 +22,19 @@ DEBUG = False
 kPS = 1000
 TOLERANCE = 0.5*kPS
 
+
 class DurationError(AssertionError):
     pass
 
 _pystone_calibration_mark = None
+
+
 def _pystone_calibration():
     global _pystone_calibration_mark
     if not _pystone_calibration_mark:
         _pystone_calibration_mark = pystone.pystones(loops=pystone.LOOPS)
     return _pystone_calibration_mark
+
 
 def perftest(max_num_pystones, current_pystone=None):
     '''
@@ -84,6 +88,7 @@ class DynamicTemplatePerformanceTest(unittest.TestCase):
             assert klass
     test_BasicDynamic = perftest(1200)(test_BasicDynamic)
 
+
 class PerformanceTest(unittest.TestCase):
     iterations = 100000
     display = False
@@ -108,6 +113,7 @@ class PerformanceTest(unittest.TestCase):
 
         if not self.save:
             os.unlink('%s.prof' % self.__class__.__name__)
+
 
 class DynamicMethodCompilationTest(PerformanceTest):
     def performanceSample(self):
@@ -141,6 +147,7 @@ class BunchOfWriteCalls(PerformanceTest):
         template = template()
         value = template.respond()
         del value
+
 
 class DynamicSimpleCompilationTest(PerformanceTest):
     def performanceSample(self):
@@ -227,11 +234,13 @@ class LongCompileTest(PerformanceTest):
         '''
         return self.compile(template)
 
+
 class LongCompile_CompilerSettingsTest(LongCompileTest):
     def compile(self, template):
         return Cheetah.Template.Template.compile(
             template, keepRefToGeneratedCode=False,
             compilerSettings={'useStackFrames': True, 'useAutocalling': True})
+
 
 class LongCompileAndRun(LongCompileTest):
     def performanceSample(self):

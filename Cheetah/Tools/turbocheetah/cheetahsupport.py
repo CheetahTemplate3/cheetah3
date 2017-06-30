@@ -5,6 +5,7 @@ import sys, os, imp
 from Cheetah import Compiler
 import pkg_resources
 
+
 def _recompile_template(package, basename, tfile, classname):
     tmpl = pkg_resources.resource_string(package, "%s.tmpl" % basename)
     c = Compiler.Compiler(source=tmpl, mainClassName='GenTemplate')
@@ -19,6 +20,7 @@ def _recompile_template(package, basename, tfile, classname):
     setattr(mod, basename, tempclass)
     sys.modules[classname] = mod
     return mod
+
 
 class TurboCheetah:
     extension = "tmpl"

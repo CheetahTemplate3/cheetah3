@@ -11,6 +11,7 @@ from Cheetah.compat import unicode
 # '<', '>' or '&' since those will have been done already.
 webSafeEntities = {' ': '&nbsp;', '"': '&quot;'}
 
+
 class Filter(object):
     """A baseclass for the Cheetah Filters."""
 
@@ -44,6 +45,7 @@ RawOrEncodedUnicode = Filter
 
 EncodeUnicode = Filter
 
+
 class Markdown(EncodeUnicode):
     '''
         Markdown will change regular strings to `Markdown
@@ -69,6 +71,7 @@ class Markdown(EncodeUnicode):
         import markdown
         encoded = super(Markdown, self).filter(value, **kwargs)
         return markdown.markdown(encoded)
+
 
 class CodeHighlighter(EncodeUnicode):
     '''
@@ -124,6 +127,7 @@ class MaxLen(Filter):
             return output[:kw['maxlen']]
         return output
 
+
 class WebSafe(Filter):
     """Escape HTML entities in $placeholders.
     """
@@ -178,6 +182,7 @@ class Strip(Filter):
         result.append(chunk)
         return "".join(result)
 
+
 class StripSqueeze(Filter):
     """Canonicalizes every chunk of whitespace to a single space.
 
@@ -191,6 +196,7 @@ class StripSqueeze(Filter):
 
 ##################################################
 # MAIN ROUTINE -- testing
+
 
 def test():
     s1 = "abc <=> &"

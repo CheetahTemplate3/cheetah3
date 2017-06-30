@@ -2,8 +2,10 @@
 import time
 from Cheetah.NameMapper import NotFound
 
+
 class Error(Exception):
     pass
+
 
 class ErrorCatcher:
     _exceptionsToCatch = (NotFound,)
@@ -19,13 +21,16 @@ class ErrorCatcher:
 # make an alias
 Echo = ErrorCatcher
 
+
 class BigEcho(ErrorCatcher):
     def warn(self, exc_val, code, rawCode, lineCol):
         return "="*15 + "&lt;" + rawCode + " could not be found&gt;" + "="*15
 
+
 class KeyError(ErrorCatcher):
     def warn(self, exc_val, code, rawCode, lineCol):
         raise KeyError("no '%s' in this Template Object's Search List" % rawCode)
+
 
 class ListErrors(ErrorCatcher):
     """Accumulate a list of errors."""

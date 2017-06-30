@@ -4,6 +4,7 @@ import unittest
 
 from Cheetah import Parser
 
+
 class ArgListTest(unittest.TestCase):
     def setUp(self):
         super(ArgListTest, self).setUp()

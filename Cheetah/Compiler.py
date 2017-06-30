@@ -36,6 +36,7 @@ VFSL = valueFromSearchList
 VFN = valueForName
 currentTime = time.time
 
+
 class Error(Exception): pass
 
 # Settings format: (key, default, docstring)
@@ -290,6 +291,7 @@ class GenUtils(object):
 
 ##################################################
 # METHOD COMPILERS
+
 
 class MethodCompiler(GenUtils):
     def __init__(self, methodName, classCompiler,
@@ -970,6 +972,7 @@ class MethodCompiler(GenUtils):
         # self.addChunk('_filter = _orig_filter%(ID)s'%locals())
         self.addChunk('_filter = self._CHEETAH__currentFilter = _orig_filter%(ID)s' % locals())
 
+
 class AutoMethodCompiler(MethodCompiler):
 
     def _setupState(self):
@@ -1129,6 +1132,7 @@ if not self._CHEETAH__instanceInitialized:
         if k in allowedKWs: cheetahKWArgs[k] = v
     self._initCheetahInstance(**cheetahKWArgs)
 """.replace('\n', '\n'+' '*8)
+
 
 class ClassCompiler(GenUtils):
     methodCompilerClass = AutoMethodCompiler
@@ -1487,11 +1491,13 @@ class ClassCompiler(GenUtils):
                        for attrib in self._generatedAttribs]
         return '\n\n'.join(attribs)
 
+
 class AutoClassCompiler(ClassCompiler):
     pass
 
 ##################################################
 # MODULE COMPILERS
+
 
 class ModuleCompiler(SettingsManager, GenUtils):
 

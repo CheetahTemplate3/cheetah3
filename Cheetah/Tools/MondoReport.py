@@ -32,19 +32,24 @@ except ImportError:
 ########################################
 # PUBLIC GENERIC FUNCTIONS
 
+
 class NegativeError(ValueError):
     pass
 
+
 def isNumeric(v):
     return isinstance(v, (int, float))
+
 
 def isNonNegative(v):
     ret = isNumeric(v)
     if ret and v < 0:
         raise NegativeError(v)
 
+
 def isNotNone(v):
     return v is not None
+
 
 def Roman(n):
     n = int(n)  # Raises TypeError.
@@ -84,6 +89,7 @@ def Roman(n):
 def sum(lis):
     return reduce(operator.add, lis, 0)
 
+
 def mean(lis):
     """Always returns a floating-point number.
     """
@@ -93,6 +99,7 @@ def mean(lis):
     total = float(sum(lis))
     return total / lis_len
 
+
 def median(lis):
     lis = sorted(lis[:])
     return lis[int(len(lis)/2)]
@@ -101,11 +108,14 @@ def median(lis):
 def variance(lis):
     raise NotImplementedError()
 
+
 def variance_n(lis):
     raise NotImplementedError()
 
+
 def standardDeviation(lis):
     raise NotImplementedError()
+
 
 def standardDeviation_n(lis):
     raise NotImplementedError()
@@ -161,6 +171,8 @@ class IndexFormats:
 
 ########################################
 # PRIVATE CLASSES
+
+
 
 class ValuesGetterMixin:
     def __init__(self, origList):

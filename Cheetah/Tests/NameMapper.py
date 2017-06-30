@@ -44,6 +44,7 @@ class DummyClass(object):
         except:
             raise
 
+
 class DummyClassGetAttrRaises(object):
     def __getattr__(self, name):
         raise ValueError
@@ -51,6 +52,7 @@ class DummyClassGetAttrRaises(object):
 
 def dummyFunc(arg="Scooby"):
     return arg
+
 
 def funcThatRaises():
     raise ValueError
@@ -101,6 +103,7 @@ for k in testNamespace.keys():
 
 ##################################################
 # TEST BASE CLASSES
+
 
 class NameMapperTest(unittest.TestCase):
     failureException = NotFound
@@ -458,14 +461,18 @@ class VFS(VFN):
     def get(self, name, autocall=True):
         return self.VFS(self.searchList(), name, autocall)
 
+
 class VFS_2namespaces(VFS):
     _searchListLength = 2
+
 
 class VFS_3namespaces(VFS):
     _searchListLength = 3
 
+
 class VFS_4namespaces(VFS):
     _searchListLength = 4
+
 
 class VFF(VFN):
     def get(self, name, autocall=True):
@@ -496,6 +503,7 @@ class VFF(VFN):
         assert self.get('eval', False) == eval
         assert self.get('range', False) == range
 
+
 class VFFSL(VFS):
     _searchListLength = 1
 
@@ -518,11 +526,14 @@ class VFFSL(VFS):
     def get(self, name, autocall=True):
         return self.VFFSL(self.searchList(), name, autocall)
 
+
 class VFFSL_2(VFFSL):
     _searchListLength = 2
 
+
 class VFFSL_3(VFFSL):
     _searchListLength = 3
+
 
 class VFFSL_4(VFFSL):
     _searchListLength = 4

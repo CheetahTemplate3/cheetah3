@@ -46,8 +46,10 @@ OUTPUT = False  # Normally False, True for debugging.
 
 BACKUP_SUFFIX = CheetahWrapper.BACKUP_SUFFIX
 
+
 def warn(msg):
     sys.stderr.write(msg + '\n')
+
 
 class CFBase(unittest.TestCase):
     """Base class for "cheetah compile" and "cheetah fill" unit tests.
@@ -253,6 +255,8 @@ class CFIdirBase(CFBase):
 ##################################################
 # TEST CASE CLASSES
 
+
+
 class OneFile(CFBase):
     def testCompile(self):
         self.go("cheetah compile a.tmpl")
@@ -293,6 +297,7 @@ class SplatTmpl(CFBase):
     def testText(self):
         self.go("cheetah fill --oext txt *.tmpl")
         self.checkFill("a.txt")
+
 
 class ThreeFilesWithSubdirectories(CFBase):
     def testCompile(self):
@@ -544,6 +549,7 @@ class NoBackup(CFBase):
         self.go("cheetah fill --nobackup --oext txt a.tmpl")
         self.checkNoBackup("a.txt" + BACKUP_SUFFIX)
 
+
 def listTests(cheetahWrapperFile):
     """cheetahWrapperFile, string, path of this script.
 
@@ -559,6 +565,7 @@ def listTests(cheetahWrapperFile):
         if m:
             print(m.group(1))
     f.close()
+
 
 def main():
     global DELETE, OUTPUT

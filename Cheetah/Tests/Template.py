@@ -11,8 +11,10 @@ import unittest
 from Cheetah.Template import Template
 from Cheetah.compat import unicode
 
+
 class TemplateTest(unittest.TestCase):
     pass
+
 
 class ClassMethods_compile(TemplateTest):
     """I am using the same Cheetah source for each test to root out clashes
@@ -286,6 +288,7 @@ class TryExceptImportTest(TemplateTest):
         klass = Template.compile(source=source, compilerSettings={'useLegacyImportMode': False})
         t = klass(namespaces={'foo': 1234})
 
+
 class ClassMethodSupport(TemplateTest):
     def test_BasicDecorator(self):
         template = '''
@@ -300,6 +303,7 @@ class ClassMethodSupport(TemplateTest):
             assert rc == '$foo = bar', (rc, 'Template class method didn\'t return what I expected')
         except AttributeError as ex:
             self.fail(ex)
+
 
 class StaticMethodSupport(TemplateTest):
     def test_BasicDecorator(self):

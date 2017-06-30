@@ -13,6 +13,7 @@ from Cheetah import Parser
 from Cheetah import Compiler
 from Cheetah import Template
 
+
 class Analyzer(Parser.Parser):
     def __init__(self, *args, **kwargs):
         self.calls = {}
@@ -26,6 +27,7 @@ class Analyzer(Parser.Parser):
             self.calls[directive] = 1
         super(Analyzer, self).eatDirective()
 
+
 class AnalysisCompiler(Compiler.ModuleCompiler):
     parserClass = Analyzer
 
@@ -33,6 +35,7 @@ class AnalysisCompiler(Compiler.ModuleCompiler):
 def analyze(source):
     klass = Template.Template.compile(source, compilerClass=AnalysisCompiler)
     return klass._CHEETAH_compilerInstance._parser.calls
+
 
 def main_file(f):
     fd = open(f, 'r')
@@ -51,9 +54,11 @@ def _find_templates(directory, suffix):
                 continue
             yield root + os.path.sep + f
 
+
 def _analyze_templates(iterable):
     for template in iterable:
         yield main_file(template)
+
 
 def main_dir(opts):
     results = _analyze_templates(_find_templates(opts.dir, opts.suffix))

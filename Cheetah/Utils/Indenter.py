@@ -13,8 +13,10 @@ soon be changed somewhat.
 import re
 import sys
 
+
 def indentize(source):
     return IndentProcessor().process(source)
+
 
 class IndentProcessor(object):
     """Preprocess #indent tags."""
@@ -76,6 +78,7 @@ class IndentProcessor(object):
             result.append(line)
 
         return self.LINE_SEP.join(result)
+
 
 class Indenter(object):
     """

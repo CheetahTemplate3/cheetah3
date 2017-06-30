@@ -74,13 +74,19 @@ NoneType = type(None)
 
 # Decide whether to use the file modification time in file's cache key
 __checkFileMtime = True
+
+
 def checkFileMtime(value):
     globals()['__checkFileMtime'] = value
 
+
 class Error(Exception):
     pass
+
+
 class PreprocessError(Error):
     pass
+
 
 def hashList(l):
     hashedList = []
@@ -91,6 +97,7 @@ def hashList(l):
             v = hashList(v)
         hashedList.append(v)
     return hash(tuple(hashedList))
+
 
 def hashDict(d):
     items = sorted(d.items())
@@ -121,6 +128,7 @@ def _genUniqueModuleName(baseModuleName):
 # This is only relavent to templates used as CGI scripts.
 _formUsedByWebInput = None
 
+
 def updateLinecache(filename, src):
     import linecache
     size = len(src)
@@ -129,8 +137,10 @@ def updateLinecache(filename, src):
     fullname = filename
     linecache.cache[filename] = size, mtime, lines, fullname
 
+
 class CompileCacheItem(object):
     pass
+
 
 class TemplatePreprocessor(object):
     '''
@@ -174,6 +184,7 @@ class TemplatePreprocessor(object):
         outputSource = settings.outputTransformer(tmplInstance)
         outputFile = None
         return outputSource, outputFile
+
 
 class Template(Servlet):
     '''
@@ -1885,6 +1896,7 @@ class Template(Servlet):
 
 T = Template   # Short and sweet for debugging at the >>> prompt.
 Template.Reserved_SearchList = set(dir(Template))
+
 
 def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
 

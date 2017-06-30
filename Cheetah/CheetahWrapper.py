@@ -21,6 +21,7 @@ from Cheetah.compat import PY2
 optionDashesRE = re.compile(R"^-{1,2}")
 moduleNameRE = re.compile(R"^[a-zA-Z_][a-zA-Z_0-9]*$")
 
+
 def fprintfMessage(stream, format, *args):
     if format[-1:] == '^':
         format = format[:-1]
@@ -31,6 +32,7 @@ def fprintfMessage(stream, format, *args):
     else:
         message = format
     stream.write(message)
+
 
 class Error(Exception):
     pass
@@ -92,6 +94,7 @@ Run "cheetah options" for the list of valid options.
 
 ##################################################
 # CheetahWrapper CLASS
+
 
 class CheetahWrapper(object):
     MAKE_BACKUPS = True
@@ -623,6 +626,8 @@ def _cheetah():
     CheetahWrapper().main()
 
 # Called when invoked as `cheetah-compile`
+
+
 def _cheetah_compile():
     sys.argv.insert(1, "compile")
     CheetahWrapper().main()

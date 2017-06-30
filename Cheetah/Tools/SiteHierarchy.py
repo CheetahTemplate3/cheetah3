@@ -24,6 +24,7 @@ except ImportError:
 ##################################################
 # CLASSES
 
+
 class Hierarchy:
     def __init__(self, hierarchy, currentURL, prefix='', menuCSSClass=None,
                  crumbCSSClass=None):

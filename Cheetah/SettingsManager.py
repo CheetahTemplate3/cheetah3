@@ -23,6 +23,7 @@ complexNumberRE = re.compile('[\(]*' + Number + r'[ \t]*\+[ \t]*' + Number + '[\
 ##################################################
 # FUNCTIONS ##
 
+
 def mergeNestedDictionaries(dict1, dict2, copy=False, deepcopy=False):
     """Recursively merge the values of dict2 into dict1.
 
@@ -42,6 +43,7 @@ def mergeNestedDictionaries(dict1, dict2, copy=False, deepcopy=False):
             dict1[key] = val
     return dict1
 
+
 def stringIsNumber(S):
     """Return True if theString represents a Python number, False otherwise.
     This also works for complex numbers and numbers with +/- in front."""
@@ -59,6 +61,7 @@ def stringIsNumber(S):
     else:
         return True
 
+
 def convStringToNum(theString):
     """Convert a string representation of a Python number to the Python version"""
 
@@ -70,8 +73,10 @@ def convStringToNum(theString):
 class Error(Exception):
     pass
 
+
 class NoDefault(object):
     pass
+
 
 class ConfigParserCaseSensitive(ConfigParser):
     """A case sensitive version of the standard Python ConfigParser."""
@@ -79,6 +84,7 @@ class ConfigParserCaseSensitive(ConfigParser):
     def optionxform(self, optionstr):
         """Don't change the case as is done in the default implemenation."""
         return optionstr
+
 
 class _SettingsCollector(object):
     """An abstract base class that provides the methods SettingsManager uses to
