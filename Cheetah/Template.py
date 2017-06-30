@@ -25,7 +25,23 @@ import pprint
 import cgi                # Used by .webInput() if the template is a CGI script.
 import types
 
+from Cheetah import ErrorCatchers              # for placeholder tags
+from Cheetah import Filters                    # the output filters
+from Cheetah.CacheRegion import CacheRegion
+from Cheetah.CacheStore import MemoryCacheStore, MemcachedCacheStore
+from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
+from Cheetah.NameMapper import NotFound, valueFromSearchList
+from Cheetah.Parser import ParseError, SourceReader
+# Base classes for Template
+from Cheetah.Servlet import Servlet
+from Cheetah.Unspecified import Unspecified
+from Cheetah.Utils.Indenter import Indenter      # and for placeholders
+from Cheetah.Utils.Misc import checkKeywords     # Used in Template.__init__
+from Cheetah.Utils.WebInputMixin import _Converter, _lookup, NonNumericInputError
+from Cheetah.Version import MinCompatibleVersion
+from Cheetah.Version import convertVersionStringToTuple, MinCompatibleVersionTuple
 from Cheetah.compat import PY2, string_type, unicode
+from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
 
 try:
     from threading import Lock
@@ -48,26 +64,6 @@ else:
     def createMethod(func, cls):
         return func
 
-
-from Cheetah.Version import convertVersionStringToTuple, MinCompatibleVersionTuple
-from Cheetah.Version import MinCompatibleVersion
-# Base classes for Template
-from Cheetah.Servlet import Servlet
-# More intra-package imports ...
-from Cheetah.Parser import ParseError, SourceReader
-from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
-from Cheetah import ErrorCatchers              # for placeholder tags
-from Cheetah import Filters                    # the output filters
-from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
-
-from Cheetah.Utils.Misc import checkKeywords     # Used in Template.__init__
-from Cheetah.Utils.Indenter import Indenter      # and for placeholders
-from Cheetah.NameMapper import NotFound, valueFromSearchList
-from Cheetah.CacheStore import MemoryCacheStore, MemcachedCacheStore
-from Cheetah.CacheRegion import CacheRegion
-from Cheetah.Utils.WebInputMixin import _Converter, _lookup, NonNumericInputError
-
-from Cheetah.Unspecified import Unspecified
 
 NoneType = type(None)
 

@@ -3,22 +3,21 @@ import os
 import os.path
 import sys
 
-from distutils.core import setup
-if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
-    try:
-        from setuptools import setup
-    except ImportError:
-        from distutils.core import setup
-
-from distutils.core import Command
 from distutils.command.build_ext import build_ext
 from distutils.command.install_data import install_data
+from distutils.core import Command, setup
 from distutils.errors import CCompilerError, DistutilsExecError, \
     DistutilsPlatformError
 
 # imports from Cheetah ...
 from Cheetah.FileUtils import findFiles
 from Cheetah.compat import string_type
+
+if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
+    try:
+        from setuptools import setup
+    except ImportError:
+        from distutils.core import setup
 
 if sys.platform == 'win32':
     # 2.6's distutils.msvc9compiler can raise an IOError when failing to

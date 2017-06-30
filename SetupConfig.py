@@ -1,10 +1,15 @@
 # -------Main Package Settings-----------#
+from distutils.core import Extension
+import os
+import os.path
 import sys
+
+from Cheetah.Version import Version as version
+from Cheetah.compat import PY2
 
 # Cheetah3 has already been taken at PyPI,
 # CheetahTemplate3 seems to be too long.
 name = 'Cheetah3'
-from Cheetah.Version import Version as version
 description = "Cheetah is a template engine and code generation tool"
 license = "MIT"
 author = "Tavis Rudd"
@@ -46,14 +51,9 @@ classifiers = [line.strip() for line in '''\
   Topic :: Software Development :: User Interfaces
   Topic :: Text Processing'''.splitlines() if not line.strip().startswith('#')]
 
-from Cheetah.compat import PY2
 if PY2:
     del line
 del PY2  # Hide it from setup()
-
-import os
-import os.path
-from distutils.core import Extension
 
 ext_modules = [
              Extension("Cheetah._namemapper",
