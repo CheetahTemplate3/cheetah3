@@ -403,9 +403,10 @@ class ImportManager:
 
     def importHook(self, name, globals=None, locals=None, fromlist=None, level=-1):
         '''
-            NOTE: Currently importHook will accept the keyword-argument "level"
-            but it will *NOT* use it (currently). Details about the "level" keyword
-            argument can be found here: http://www.python.org/doc/2.5.2/lib/built-in-funcs.html
+        NOTE: Currently importHook will accept the keyword-argument "level"
+        but it will *NOT* use it. Details about the "level" keyword
+        argument can be found here:
+        https://docs.python.org/2/library/functions.html#__import__
         '''
         # first see if we could be importing a relative name
         _sys_modules_get = sys.modules.get
