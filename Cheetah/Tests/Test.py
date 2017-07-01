@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-'''
+"""
 Core module of Cheetah's Unit-testing framework
 
 TODO
@@ -7,8 +7,9 @@ TODO
 # combo tests
 # negative test cases for expected exceptions
 # black-box vs clear-box testing
-# do some tests that run the Template for long enough to check that the refresh code works
-'''
+# do some tests that run the Template for long enough to check
+# that the refresh code works
+"""
 
 import sys
 import unittest

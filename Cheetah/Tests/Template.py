@@ -35,7 +35,8 @@ class ClassMethods_compile(TemplateTest):
         t = klass2({'foo': 1234})
         assert str(t) == '1234'
 
-        klass3 = Template.compile(source='#implements dummy\n$bar', baseclass=klass2)
+        klass3 = Template.compile(source='#implements dummy\n$bar',
+                                  baseclass=klass2)
         t = klass3({'foo': 1234})
         assert str(t) == '1234'
 
@@ -256,12 +257,15 @@ class Preprocessors(TemplateTest):
         klass = Template.compile(src, preprocessors='@ %', baseclass=dict)
         t = klass({'string': 'bit of text'})
         # print str(t), repr(str(t))
-        assert str(t) == ('This is a bit of text that needs translation\n'*2)[:-1]
+        assert str(t) == (
+            'This is a bit of text that needs translation\n'*2)[:-1]
 
 
 class TryExceptImportTest(TemplateTest):
     def test_FailCase(self):
-        ''' Test situation where an inline #import statement will get relocated '''
+        """
+        Test situation where an inline #import statement will get relocated
+        """
         source = '''
             #def myFunction()
                 Ahoy!
@@ -273,7 +277,8 @@ class TryExceptImportTest(TemplateTest):
             #end def
             '''
         # This should raise an IndentationError (if the bug exists)
-        klass = Template.compile(source=source, compilerSettings={'useLegacyImportMode': False})
+        klass = Template.compile(
+            source=source, compilerSettings={'useLegacyImportMode': False})
         t = klass(namespaces={'foo': 1234})
 
 
@@ -288,7 +293,8 @@ class ClassMethodSupport(TemplateTest):
         template = Template.compile(source=template)
         try:
             rc = template.myClassMethod(foo='bar')
-            assert rc == '$foo = bar', (rc, 'Template class method didn\'t return what I expected')
+            assert rc == '$foo = bar', \
+                (rc, 'Template class method didn\'t return what I expected')
         except AttributeError as ex:
             self.fail(ex)
 
@@ -304,7 +310,8 @@ class StaticMethodSupport(TemplateTest):
         template = Template.compile(source=template)
         try:
             rc = template.myStaticMethod(foo='bar')
-            assert rc == '$foo = bar', (rc, 'Template class method didn\'t return what I expected')
+            assert rc == '$foo = bar', \
+                (rc, 'Template class method didn\'t return what I expected')
         except AttributeError as ex:
             self.fail(ex)
 

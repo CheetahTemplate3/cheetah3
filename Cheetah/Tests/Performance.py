@@ -190,7 +190,8 @@ class FilterTest(PerformanceTest):
 class LongCompileTest(PerformanceTest):
     ''' Test the compilation on a sufficiently large template '''
     def compile(self, template):
-        return Cheetah.Template.Template.compile(template, keepRefToGeneratedCode=False)
+        return Cheetah.Template.Template.compile(
+            template, keepRefToGeneratedCode=False)
 
     def performanceSample(self):
         template = '''

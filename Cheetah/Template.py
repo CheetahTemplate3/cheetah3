@@ -1,10 +1,11 @@
 '''
-Provides the core API for Cheetah.
+Provides the core API for Cheetah
 
-See the docstring in the Template class and the Users' Guide for more information
+See the docstring in the Template class and the Users' Guide
+for more information.
 '''
 
-################################################################################
+###############################################################################
 # DEPENDENCIES
 import sys                        # used in the error handling code
 import re                         # used to define the internal delims regex
@@ -22,7 +23,7 @@ except ImportError:
     from io import StringIO
 import traceback
 import pprint
-import cgi                # Used by .webInput() if the template is a CGI script.
+import cgi  # Used by .webInput() if the template is a CGI script.
 import types
 
 from Cheetah import ErrorCatchers              # for placeholder tags
@@ -37,9 +38,11 @@ from Cheetah.Servlet import Servlet
 from Cheetah.Unspecified import Unspecified
 from Cheetah.Utils.Indenter import Indenter      # and for placeholders
 from Cheetah.Utils.Misc import checkKeywords     # Used in Template.__init__
-from Cheetah.Utils.WebInputMixin import _Converter, _lookup, NonNumericInputError
+from Cheetah.Utils.WebInputMixin import _Converter, _lookup, \
+    NonNumericInputError
 from Cheetah.Version import MinCompatibleVersion
-from Cheetah.Version import convertVersionStringToTuple, MinCompatibleVersionTuple
+from Cheetah.Version import convertVersionStringToTuple, \
+    MinCompatibleVersionTuple
 from Cheetah.compat import PY2, string_type, unicode
 from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
 
@@ -106,7 +109,7 @@ def hashDict(d):
     return hash(tuple(hashedList))
 
 
-################################################################################
+###############################################################################
 # MODULE GLOBALS AND CONSTANTS
 
 def _genUniqueModuleName(baseModuleName):
@@ -175,7 +178,8 @@ class TemplatePreprocessor(object):
             if hasattr(settings, arg):
                 compileKwArgs[arg] = getattr(settings, arg)
 
-        tmplClass = templateAPIClass.compile(source=source, file=file, **compileKwArgs)
+        tmplClass = templateAPIClass.compile(
+            source=source, file=file, **compileKwArgs)
         tmplInstance = tmplClass(**settings.templateInitArgs)
         outputSource = settings.outputTransformer(tmplInstance)
         outputFile = None
@@ -192,14 +196,14 @@ class Template(Servlet):
     Cheetah Users' Guide for non-programmers.  It also assumes you have read
     about Cheetah's syntax in the Users' Guide.
 
-    The following explains how to use Cheetah from within Python programs or via
-    the interpreter. If you statically compile your templates on the command
-    line using the 'cheetah' script, this is not relevant to you. Statically
-    compiled Cheetah template modules/classes (e.g. myTemplate.py:
-    MyTemplateClasss) are just like any other Python module or class. Also note,
-    most Python web frameworks (Webware, Aquarium, mod_python, Turbogears,
-    CherryPy, Quixote, etc.) provide plugins that handle Cheetah compilation for
-    you.
+    The following explains how to use Cheetah from within Python programs or
+    via the interpreter. If you statically compile your templates on the
+    command line using the 'cheetah' script, this is not relevant to you.
+    Statically compiled Cheetah template modules/classes (e.g. myTemplate.py:
+    MyTemplateClasss) are just like any other Python module or class. Also
+    note, most Python web frameworks (Webware, Aquarium, mod_python,
+    Turbogears, CherryPy, Quixote, etc.) provide plugins that handle Cheetah
+    compilation for you.
 
     There are several possible usage patterns::
 
@@ -211,13 +215,15 @@ class Template(Servlet):
           Template.compile provides a rich and very flexible API via its
           optional arguments so there are many possible variations of this
           pattern.  One example is:
-            tclass = Template.compile('hello $name from $caller', baseclass=dict)
+            tclass = Template.compile('hello $name from $caller',
+                                      baseclass=dict)
             print(tclass(name='world', caller='me'))
           See the Template.compile() docstring for more details.
 
        2) tmplInstance = Template(src)
              # or Template(src, namespaces=[namespace,...])
-          outputStr = str(tmplInstance) # or outputStr = tmplInstance.aMethodYouDefined(...args...)
+          outputStr = str(tmplInstance)
+          # or outputStr = tmplInstance.aMethodYouDefined(...args...)
 
     Notes on the usage patterns::
 
@@ -241,14 +247,16 @@ class Template(Servlet):
              new-style 'object' baseclass.  Cheetah.Template is a subclass of
              'object'.  You also can not #extend dict, list, or other builtin
              types.
-           - If your template baseclass' __init__ constructor expects args there
-             is currently no way to pass them in.
+           - If your template baseclass' __init__ constructor expects args
+             there is currently no way to pass them in.
 
-    If you need to subclass a dynamically compiled Cheetah class, do something like this::
+    If you need to subclass a dynamically compiled Cheetah class, do something
+    like this::
 
         from Cheetah.Template import Template
         T1 = Template.compile('$meth1 #def meth1: this is meth1 in T1')
-        T2 = Template.compile('#implements meth1\\nthis is meth1 redefined in T2', baseclass=T1)
+        T2 = Template.compile(
+            '#implements meth1\\nthis is meth1 redefined in T2', baseclass=T1)
         print(T1, T1())
         print(T2, T2())
 
@@ -295,10 +303,12 @@ class Template(Servlet):
          '_getTemplateAPIClassForIncludeDirectiveCompilation',
          )
     _CHEETAH_requiredCheetahClassMethods = ('subclass',)
-    _CHEETAH_requiredCheetahClassAttributes = ('cacheRegionClass', 'cacheStore',
-                                               'cacheStoreIdPrefix', 'cacheStoreClass')
+    _CHEETAH_requiredCheetahClassAttributes = (
+        'cacheRegionClass', 'cacheStore',
+        'cacheStoreIdPrefix', 'cacheStoreClass')
 
-    # the following are used by .compile(). Most are documented in its docstring.
+    # The following are used by .compile().
+    # Most are documented in its docstring.
     _CHEETAH_cacheModuleFilesForTracebacks = False
     _CHEETAH_cacheDirForModuleFiles = None  # change to a dirname
 
@@ -320,7 +330,8 @@ class Template(Servlet):
     _CHEETAH_defaultClassNameForTemplates = None
     # defaults to DEFAULT_COMPILER_SETTINGS['mainMethodName']:
     _CHEETAH_defaultMainMethodNameForTemplates = None
-    _CHEETAH_defaultModuleNameForTemplates = 'DynamicallyCompiledCheetahTemplate'
+    _CHEETAH_defaultModuleNameForTemplates = \
+        'DynamicallyCompiledCheetahTemplate'
     _CHEETAH_defaultModuleGlobalsForTemplates = None
     _CHEETAH_preprocessors = None
     _CHEETAH_defaultPreprocessorClass = TemplatePreprocessor
@@ -372,24 +383,24 @@ class Template(Servlet):
         Internally, this method a) parses the Cheetah source code and generates
         Python code defining a module with a single class in it, b) dynamically
         creates a module object with a unique name, c) execs the generated code
-        in that module's namespace then inserts the module into sys.modules, and
-        d) returns a reference to the generated class.  If you want to get the
-        generated python source code instead, pass the argument
+        in that module's namespace then inserts the module into sys.modules,
+        and d) returns a reference to the generated class.  If you want to get
+        the generated python source code instead, pass the argument
         returnAClass=False.
 
         It caches generated code and classes.  See the descriptions of the
         arguments'cacheCompilationResults' and 'useCache' for details. This
-        doesn't mean that templates will automatically recompile themselves when
-        the source file changes. Rather, if you call Template.compile(src) or
-        Template.compile(file=path) repeatedly it will attempt to return a
+        doesn't mean that templates will automatically recompile themselves
+        when the source file changes. Rather, if you call Template.compile(src)
+        or Template.compile(file=path) repeatedly it will attempt to return a
         cached class definition instead of recompiling.
 
         Hooks are provided template source preprocessing.  See the notes on the
         'preprocessors' arg.
 
-        If you are an advanced user and need to customize the way Cheetah parses
-        source code or outputs Python code, you should check out the
-        compilerSettings argument.
+        If you are an advanced user and need to customize the way Cheetah
+        parses source code or outputs Python code, you should check out
+        the compilerSettings argument.
 
         Arguments::
 
@@ -400,8 +411,8 @@ class Template(Servlet):
 
           The rest of the arguments are strictly optional. All but the first
           have defaults in attributes of the Template class which can be
-          overridden in subclasses of this class.  Working with most of these is
-          an advanced topic.
+          overridden in subclasses of this class.  Working with most of these
+          is an advanced topic.
 
           ::
 
@@ -427,18 +438,17 @@ class Template(Servlet):
                   Template._CHEETAH_defaultModuleNameForTemplates
                   ='DynamicallyCompiledCheetahTemplate'
 
-              What to name the generated Python module.  If the provided value is
-              None and a file arg was given, the moduleName is created from the
-              file path.  In all cases if the moduleName provided is already in
-              sys.modules it is passed through a filter that generates a unique
-              variant of the name.
-
+              What to name the generated Python module.  If the provided value
+              is None and a file arg was given, the moduleName is created from
+              the file path.  In all cases if the moduleName provided is
+              already in sys.modules it is passed through a filter that
+              generates a unique variant of the name.
 
             - className (a string)
               Default: Template._CHEETAH_defaultClassNameForTemplates=None
 
-              What to name the generated Python class.  If the provided value is
-              None, the moduleName is use as the class name.
+              What to name the generated Python class.  If the provided value
+              is None, the moduleName is use as the class name.
 
             - mainMethodName (a string)
               Default:
@@ -473,9 +483,9 @@ class Template(Servlet):
             - cacheCompilationResults (True/False)
               Default: Template._CHEETAH_cacheCompilationResults=True
 
-              Tells Cheetah to cache the generated code and classes so that they
-              can be reused if Template.compile() is called multiple times with
-              the same source and options.
+              Tells Cheetah to cache the generated code and classes so that
+              they can be reused if Template.compile() is called multiple times
+              with the same source and options.
 
             - useCache (True/False)
               Default: Template._CHEETAH_useCompilationCache=True
@@ -590,21 +600,24 @@ class Template(Servlet):
                   happen if you don't provide at least one):
                    - tokens: same as the single string described above. You can
                      also provide a tuple of 2 strings.
-                   - searchList: the searchList used for preprocess $placeholders
-                   - compilerSettings: used in the compilation of the intermediate
-                     template
+                   - searchList: the searchList used
+                     for preprocess $placeholders
+                   - compilerSettings: used in the compilation
+                     of the intermediate template
                    - templateAPIClass: an optional subclass of `Template`
                    - outputTransformer: a simple hook for passing in a callable
                      which can do further transformations of the preprocessor
                      output, or do something else like debug logging. The
                      default is str().
-                   + any keyword arguments to Template.compile which you want to
-                     provide for the compilation of the intermediate template.
+                   + any keyword arguments to Template.compile which you want
+                     to provide for the compilation
+                     of the intermediate template.
 
-                   klass = Template.compile(src,
-                          preprocessors=[ dict(tokens='@ %', searchList=[...]) ] )
+                   klass = Template.compile(
+                       src,
+                       preprocessors=[dict(tokens='@ %', searchList=[...])])
 
-        """
+        """  # noqa: E501
         errmsg = "arg '%s' must be %s"
 
         if not isinstance(source, (NoneType, string_type)):
@@ -677,7 +690,8 @@ class Template(Servlet):
             moduleGlobals = klass._CHEETAH_defaultModuleGlobalsForTemplates
 
         if cacheModuleFilesForTracebacks is Unspecified:
-            cacheModuleFilesForTracebacks = klass._CHEETAH_cacheModuleFilesForTracebacks
+            cacheModuleFilesForTracebacks = \
+                klass._CHEETAH_cacheModuleFilesForTracebacks
 
         if not isinstance(cacheModuleFilesForTracebacks, (int, bool)):
             raise TypeError(errmsg %
@@ -705,7 +719,9 @@ class Template(Servlet):
                 baseclassName = baseclass
             elif isinstance(baseclass, type):
                 # @@TR: should soft-code this
-                baseclassName = 'CHEETAH_dynamicallyAssignedBaseClass_'+baseclass.__name__
+                baseclassName = \
+                    'CHEETAH_dynamicallyAssignedBaseClass_' + \
+                    baseclass.__name__
                 baseclassValue = baseclass
 
         cacheHash = None
@@ -765,11 +781,13 @@ class Template(Servlet):
             outputEncoding = compiler.getModuleEncoding()
 
         if not returnAClass:
-            # This is a bit of a hackish solution to make sure we're setting the proper
-            # encoding on generated code that is destined to be written to a file
+            # This is a bit of a hackish solution to make sure
+            # we're setting the proper encoding on generated code
+            # that is destined to be written to a file.
             if not outputEncoding == 'ascii':
                 generatedModuleCode = generatedModuleCode.split('\n')
-                generatedModuleCode.insert(1, '# -*- coding: %s -*-' % outputEncoding)
+                generatedModuleCode.insert(
+                    1, '# -*- coding: %s -*-' % outputEncoding)
                 generatedModuleCode = '\n'.join(generatedModuleCode)
             return generatedModuleCode.encode(outputEncoding)
         else:
@@ -780,11 +798,13 @@ class Template(Servlet):
             try:
                 klass._CHEETAH_compileLock.acquire()
                 uniqueModuleName = _genUniqueModuleName(moduleName)
-                __file__ = uniqueModuleName+'.py'  # relative file path with no dir part
+                # relative file path with no dir part
+                __file__ = uniqueModuleName + '.py'
 
                 if cacheModuleFilesForTracebacks:
                     if not os.path.exists(cacheDirForModuleFiles):
-                        raise Exception('%s does not exist' % cacheDirForModuleFiles)
+                        raise Exception('%s does not exist'
+                                        % cacheDirForModuleFiles)
 
                     __file__ = os.path.join(cacheDirForModuleFiles, __file__)
                     # @@TR: might want to assert that it doesn't already exist
@@ -839,7 +859,8 @@ class Template(Servlet):
                 templateClass._CHEETAH_isInCompilationCache = False
 
             if keepRefToGeneratedCode or cacheCompilationResults:
-                templateClass._CHEETAH_generatedModuleCode = generatedModuleCode
+                templateClass._CHEETAH_generatedModuleCode = \
+                    generatedModuleCode
 
             # If we have a compiler object, let's set it to the compiler class
             # to help the directive analyzer code
@@ -852,7 +873,8 @@ class Template(Servlet):
         """Takes the same args as the .compile() classmethod and returns a
         template that is a subclass of the template this method is called from.
 
-        T1 = Template.compile('foo - $meth1 - bar\\n#def meth1: this is T1.meth1')
+        T1 = Template.compile(
+            'foo - $meth1 - bar\\n#def meth1: this is T1.meth1')
         T2 = T1.subclass('#implements meth1\\n this is T2.meth1')
         """
         kws['baseclass'] = klass
@@ -880,10 +902,10 @@ class Template(Servlet):
     @classmethod
     def _normalizePreprocessorArg(klass, arg):
         """Used to convert the items in the .compile() classmethod's
-        preprocessors argument into real source preprocessors.  This permits the
-        use of several shortcut forms for defining preprocessors.
+        preprocessors argument into real source preprocessors.
+        This permits the use of several shortcut forms
+        for defining preprocessors.
         """
-
         if hasattr(arg, 'preprocess'):
             return arg
         elif hasattr(arg, '__call__'):
@@ -931,13 +953,14 @@ class Template(Servlet):
         if (not getattr(settings, 'compilerSettings', None)
                 and not getattr(settings, 'placeholderToken', None)):
             raise TypeError(
-                'Preprocessor requires either a "tokens" or a "compilerSettings" arg.'
-                ' Neither was provided.')
+                'Preprocessor requires either a "tokens" '
+                'or a "compilerSettings" arg. Neither was provided.')
 
         if not hasattr(settings, 'templateInitArgs'):
             settings.templateInitArgs = {}
         if 'searchList' not in settings.templateInitArgs:
-            if not hasattr(settings, 'searchList') and hasattr(settings, 'namespaces'):
+            if not hasattr(settings, 'searchList') \
+                    and hasattr(settings, 'namespaces'):
                 settings.searchList = settings.namespaces
             elif not hasattr(settings, 'searchList'):
                 settings.searchList = []
@@ -966,7 +989,8 @@ class Template(Servlet):
     def _updateSettingsWithPreprocessTokens(
             klass, compilerSettings, placeholderToken, directiveToken):
 
-        if (placeholderToken and 'cheetahVarStartToken' not in compilerSettings):
+        if (placeholderToken and \
+                'cheetahVarStartToken' not in compilerSettings):
             compilerSettings['cheetahVarStartToken'] = placeholderToken
         if directiveToken:
             if 'directiveStartToken' not in compilerSettings:
@@ -1004,7 +1028,8 @@ class Template(Servlet):
         for classMethName in klass._CHEETAH_requiredCheetahClassMethods:
             if not hasattr(concreteTemplateClass, classMethName):
                 meth = getattr(klass, classMethName)
-                setattr(concreteTemplateClass, classMethName, classmethod(meth.__func__))
+                setattr(concreteTemplateClass, classMethName,
+                        classmethod(meth.__func__))
 
         for attrname in klass._CHEETAH_requiredCheetahClassAttributes:
             attrname = '_CHEETAH_'+attrname
@@ -1014,8 +1039,10 @@ class Template(Servlet):
 
         if (not hasattr(concreteTemplateClass, '__str__')
                 or concreteTemplateClass.__str__ is object.__str__):
-            mainMethNameAttr = '_mainCheetahMethod_for_'+concreteTemplateClass.__name__
-            mainMethName = getattr(concreteTemplateClass, mainMethNameAttr, None)
+            mainMethNameAttr = '_mainCheetahMethod_for_' \
+                + concreteTemplateClass.__name__
+            mainMethName = getattr(concreteTemplateClass,
+                                   mainMethNameAttr, None)
             if mainMethName:
                 def __str__(self):
                     rc = getattr(self, mainMethName)()
@@ -1074,13 +1101,17 @@ class Template(Servlet):
                  # use either or.  They are aliases for the same thing.
 
                  file=None,
-                 filter='RawOrEncodedUnicode',  # which filter from Cheetah.Filters
+                 # which filter from Cheetah.Filters
+                 filter='RawOrEncodedUnicode',
                  filtersLib=Filters,
                  errorCatcher=None,
 
-                 compilerSettings=Unspecified,  # control the behaviour of the compiler
-                 _globalSetVars=None,  # used internally for #include'd templates
-                 _preBuiltSearchList=None  # used internally for #include'd templates
+                 # control the behaviour of the compiler
+                 compilerSettings=Unspecified,
+                 # used internally for #include'd templates
+                 _globalSetVars=None,
+                 # used internally for #include'd templates
+                 _preBuiltSearchList=None
                  ):
         """a) compiles a new template OR b) instantiates an existing template.
 
@@ -1106,14 +1137,16 @@ class Template(Servlet):
 
              ## i) first you need a reference to a compiled template class:
 
-             tclass = Template.compile(source=src) # or just Template.compile(src)
+             tclass = Template.compile(source=src)
+             # or just Template.compile(src)
                  # or
              tclass = Template.compile(file='some/path')
                  # or
              tclass = Template.compile(file=someFileObject)
                  # or
-             # if you used the command line compiler or have Cheetah's ImportHooks
-             # installed your template class is also available via Python's
+             # if you used the command line compiler
+             # or have Cheetah's ImportHooks installed
+             # your template class is also available via Python's
              # standard import mechanism:
              from ACompileTemplate import AcompiledTemplate as tclass
 
@@ -1147,10 +1180,12 @@ class Template(Servlet):
             Do not use positional args with this usage pattern, unless your
             template subclasses something other than Cheetah.Template and you
             want to pass positional args to that baseclass.  E.g.:
-              dictTemplate = Template.compile('hello $name from $caller', baseclass=dict)
+              dictTemplate = Template.compile('hello $name from $caller',
+                                              baseclass=dict)
               tmplvars = dict(name='world', caller='me')
               print(dictTemplate(tmplvars))
-            This usage requires all Cheetah args to be passed in as keyword args.
+            This usage requires all Cheetah args to be passed in
+            as keyword args.
 
           optional args for both usage patterns:
 
@@ -1164,10 +1199,10 @@ class Template(Servlet):
               If you provide a single namespace instead of a list, Cheetah will
               automatically convert it into a list.
 
-              NOTE: Cheetah does NOT force you to use the namespaces search list
-              and related features.  It's on by default, but you can turn if off
-              using the compiler settings useSearchList=False or
-              useNameMapper=False.
+              NOTE: Cheetah does NOT force you to use the namespaces
+              search list and related features.  It's on by default,
+              but you can turn if off using the compiler settings
+              useSearchList=False or useNameMapper=False.
 
              - filter
                Default: 'EncodeUnicode'
@@ -1180,8 +1215,8 @@ class Template(Servlet):
              - filtersLib
                Default: Cheetah.Filters
 
-               A module containing subclasses of Cheetah.Filters.Filter. See the
-               Users' Guide for more details.
+               A module containing subclasses of Cheetah.Filters.Filter.
+               See the Users' Guide for more details.
 
              - errorCatcher
                Default: None
@@ -1202,15 +1237,18 @@ class Template(Servlet):
             raise TypeError(errmsg %
                             ('file', 'string, file open for reading, or None'))
 
-        if not isinstance(filter, (string_type, type)) and not \
-                (isinstance(filter, type) and issubclass(filter, Filters.Filter)):
+        if not isinstance(filter, (string_type, type)) \
+                and not (isinstance(filter, type) and
+                         issubclass(filter, Filters.Filter)):
             raise TypeError(errmsgextra %
                             ('filter', 'string or class',
-                             '(if class, must be subclass of Cheetah.Filters.Filter)'))
+                             '(if class, must be subclass '
+                             'of Cheetah.Filters.Filter)'))
         if not isinstance(filtersLib, (string_type, types.ModuleType)):
             raise TypeError(errmsgextra %
                             ('filtersLib', 'string or module',
-                             '(if module, must contain subclasses of Cheetah.Filters.Filter)'))
+                             '(if module, must contain subclasses '
+                             'of Cheetah.Filters.Filter)'))
 
         if not errorCatcher is None:
             err = True
@@ -1243,12 +1281,13 @@ class Template(Servlet):
             try:
                 mod = sys.modules[self.__class__.__module__]
                 compiledVersion = mod.__CHEETAH_version__
-                compiledVersionTuple = convertVersionStringToTuple(compiledVersion)
+                compiledVersionTuple = \
+                    convertVersionStringToTuple(compiledVersion)
                 if compiledVersionTuple < MinCompatibleVersionTuple:
                     raise AssertionError(
-                     'This template was compiled with Cheetah version'
-                     ' %s. Templates compiled before version %s must be recompiled.' % (
-                        compiledVersion, MinCompatibleVersion))
+                     'This template was compiled with Cheetah version %s.'
+                     'Templates compiled before version %s must be recompiled.'
+                     % (compiledVersion, MinCompatibleVersion))
             except AssertionError:
                 raise
             except:
@@ -1260,17 +1299,30 @@ class Template(Servlet):
         if searchList:
             for namespace in searchList:
                 if isinstance(namespace, dict):
-                    intersection = self.Reserved_SearchList & set(namespace.keys())
+                    intersection = self.Reserved_SearchList \
+                        & set(namespace.keys())
                     warn = False
                     if intersection:
                         warn = True
-                    if isinstance(compilerSettings, dict) and compilerSettings.get('prioritizeSearchListOverSelf'):
+                    if isinstance(compilerSettings, dict) and \
+                            compilerSettings.get(
+                                'prioritizeSearchListOverSelf'):
                         warn = False
                     if warn:
-                        logging.info(''' The following keys are members of the Template class and will result in NameMapper collisions! ''')
-                        logging.info('''  > %s ''' % ', '.join(list(intersection)))
-                        logging.info(''' Please change the key's name or use the compiler setting "prioritizeSearchListOverSelf=True" to prevent the NameMapper from using ''')
-                        logging.info(''' the Template member in place of your searchList variable ''')
+                        logging.info(
+                            ''' The following keys are members '''
+                            '''of the Template class and will result '''
+                            '''in NameMapper collisions! ''')
+                        logging.info(
+                            '''  > %s ''' % ', '.join(list(intersection)))
+                        logging.info(
+                            ''' Please change the key's name '''
+                            '''or use the compiler setting '''
+                            '''"prioritizeSearchListOverSelf=True" '''
+                            '''to prevent the NameMapper from using ''')
+                        logging.info(
+                            ''' the Template member in place of '''
+                            '''your searchList variable ''')
 
         self._initCheetahInstance(
             searchList=searchList, namespaces=namespaces,
@@ -1299,7 +1351,8 @@ class Template(Servlet):
 
         return self._CHEETAH_generatedModuleCode[
                     self._CHEETAH_generatedModuleCode.find('\nclass '):
-                    self._CHEETAH_generatedModuleCode.find('\n## END CLASS DEFINITION')]
+                    self._CHEETAH_generatedModuleCode.find(
+                        '\n## END CLASS DEFINITION')]
 
     def searchList(self):
         """Return a reference to the searchlist
@@ -1362,7 +1415,8 @@ class Template(Servlet):
             cregion = self._CHEETAH__cacheRegions.get(cacheRegionId)
             if not cregion:
                 return
-            if not cacheItemId:  # clear the desired region and all its cacheItems
+            if not cacheItemId:
+                # clear the desired region and all its cacheItems
                 cregion.clear()
             else:  # clear one specific cache of a specific region
                 cache = cregion.getCacheItem(cacheItemId)
@@ -1390,7 +1444,8 @@ class Template(Servlet):
         """
 
         try:
-            return valueFromSearchList(self.searchList(), varName.replace('$', ''), autoCall)
+            return valueFromSearchList(
+                self.searchList(), varName.replace('$', ''), autoCall)
         except NotFound:
             if default is not Unspecified:
                 return default
@@ -1401,7 +1456,8 @@ class Template(Servlet):
         """Test if a variable name exists in the searchList.
         """
         try:
-            valueFromSearchList(self.searchList(), varName.replace('$', ''), autoCall)
+            valueFromSearchList(self.searchList(),
+                                varName.replace('$', ''), autoCall)
             return True
         except NotFound:
             return False
@@ -1422,7 +1478,8 @@ class Template(Servlet):
            ::
 
                plural = the plural form of the message
-               n = a sized argument to distinguish between single and plural forms
+               n = a sized argument to distinguish
+                   between single and plural forms
                id = msgid in the translation catalog
                domain = translation domain
                source = source lang
@@ -1434,18 +1491,18 @@ class Template(Servlet):
 
         Other notes::
 
-          - There is no need to replicate the i18n:name attribute from plone / PTL,
-            as cheetah placeholders serve the same purpose
-       """
+          - There is no need to replicate the i18n:name attribute
+            from plone / PTL, as cheetah placeholders serve the same purpose.
+        """
         return message
 
     def getFileContents(self, path):
         """A hook for getting the contents of a file.  The default
-        implementation just uses the Python open() function to load local files.
-        This method could be reimplemented to allow reading of remote files via
-        various protocols, as PHP allows with its 'URL fopen wrapper'
+        implementation just uses the Python open() function
+        to load local files.  This method could be reimplemented
+        to allow reading of remote files via various protocols,
+        as PHP allows with its 'URL fopen wrapper'.
         """
-
         fp = open(path, 'r')
         output = fp.read()
         fp.close()
@@ -1467,7 +1524,8 @@ class Template(Servlet):
     def _initCheetahInstance(self,
                              searchList=None,
                              namespaces=None,
-                             filter='RawOrEncodedUnicode',  # which filter from Cheetah.Filters
+                             # which filter from Cheetah.Filters
+                             filter='RawOrEncodedUnicode',
                              filtersLib=Filters,
                              errorCatcher=None,
                              _globalSetVars=None,
@@ -1490,12 +1548,14 @@ class Template(Servlet):
             assert searchList is None, (
                 'Provide "namespaces" or "searchList", not both!')
             searchList = namespaces
-        if searchList is not None and not isinstance(searchList, (list, tuple)):
+        if searchList is not None \
+                and not isinstance(searchList, (list, tuple)):
             searchList = [searchList]
 
         self._CHEETAH__globalSetVars = {}
         if _globalSetVars is not None:
-            # this is intended to be used internally by Nested Templates in #include's
+            # this is intended to be used internally by Nested Templates
+            # in #include's
             self._CHEETAH__globalSetVars = _globalSetVars
 
         if _preBuiltSearchList is not None:
@@ -1506,8 +1566,10 @@ class Template(Servlet):
             # create our own searchList
             self._CHEETAH__searchList = [self._CHEETAH__globalSetVars, self]
             if searchList is not None:
-                if isinstance(compilerSettings, dict) and compilerSettings.get('prioritizeSearchListOverSelf'):
-                    self._CHEETAH__searchList = searchList + self._CHEETAH__searchList
+                if isinstance(compilerSettings, dict) and \
+                        compilerSettings.get('prioritizeSearchListOverSelf'):
+                    self._CHEETAH__searchList = searchList + \
+                        self._CHEETAH__searchList
                 else:
                     self._CHEETAH__searchList.extend(list(searchList))
         self._CHEETAH__cheetahIncludes = {}
@@ -1523,7 +1585,8 @@ class Template(Servlet):
         else:
             klass = filter
             filterName = klass.__name__
-        self._CHEETAH__currentFilter = self._CHEETAH__filters[filterName] = klass(self).filter
+        self._CHEETAH__currentFilter = self._CHEETAH__filters[filterName] = \
+            klass(self).filter
         self._CHEETAH__initialFilter = self._CHEETAH__currentFilter
 
         self._CHEETAH__errorCatchers = {}
@@ -1555,8 +1618,8 @@ class Template(Servlet):
         """Compile the template. This method is automatically called by
         Template.__init__ it is provided with 'file' or 'source' args.
 
-        USERS SHOULD \*NEVER\* CALL THIS METHOD THEMSELVES.  Use Template.compile
-        instead.
+        USERS SHOULD \*NEVER\* CALL THIS METHOD THEMSELVES.
+        Use Template.compile instead.
         """
         if compilerSettings is Unspecified:
             compilerSettings = self._getCompilerSettings(source, file) or {}
@@ -1595,7 +1658,8 @@ class Template(Servlet):
         if not hasattr(self, 'transaction'):
             self.transaction = None
 
-    def _handleCheetahInclude(self, srcArg, trans=None, includeFrom='file', raw=False):
+    def _handleCheetahInclude(self, srcArg, trans=None,
+                              includeFrom='file', raw=False):
         """Called at runtime to handle #include directives.
         """
         _includeID = srcArg
@@ -1616,21 +1680,28 @@ class Template(Servlet):
                 # @@TR: might want to provide some syntax for specifying the
                 # Template class to be used for compilation so compilerSettings
                 # can be changed.
-                compiler = self._getTemplateAPIClassForIncludeDirectiveCompilation(source, file)
-                nestedTemplateClass = compiler.compile(source=source, file=file)
-                nestedTemplate = nestedTemplateClass(_preBuiltSearchList=self.searchList(),
-                                                     _globalSetVars=self._CHEETAH__globalSetVars)
+                compiler = \
+                    self._getTemplateAPIClassForIncludeDirectiveCompilation(
+                        source, file)
+                nestedTemplateClass = compiler.compile(source=source,
+                                                       file=file)
+                nestedTemplate = nestedTemplateClass(
+                    _preBuiltSearchList=self.searchList(),
+                    _globalSetVars=self._CHEETAH__globalSetVars)
                 # Set the inner template filters to the initial filter of the
                 # outer template:
                 # this is the only really safe way to use
                 # filter='WebSafe'.
-                nestedTemplate._CHEETAH__initialFilter = self._CHEETAH__initialFilter
-                nestedTemplate._CHEETAH__currentFilter = self._CHEETAH__initialFilter
+                nestedTemplate._CHEETAH__initialFilter = \
+                    self._CHEETAH__initialFilter
+                nestedTemplate._CHEETAH__currentFilter = \
+                    self._CHEETAH__initialFilter
                 self._CHEETAH__cheetahIncludes[_includeID] = nestedTemplate
             else:
                 if includeFrom == 'file':
                     path = self.serverSidePath(srcArg)
-                    self._CHEETAH__cheetahIncludes[_includeID] = self.getFileContents(path)
+                    self._CHEETAH__cheetahIncludes[_includeID] = \
+                        self.getFileContents(path)
                 else:
                     self._CHEETAH__cheetahIncludes[_includeID] = srcArg
         ##
@@ -1658,16 +1729,17 @@ class Template(Servlet):
         """Method for importing web transaction variables in bulk.
 
         This works for GET/POST fields both in Webware servlets and in CGI
-        scripts, and for cookies and session variables in Webware servlets.  If
-        you try to read a cookie or session variable in a CGI script, you'll get
-        a RuntimeError.  'In a CGI script' here means 'not running as a Webware
-        servlet'.  If the CGI environment is not properly set up, Cheetah will
-        act like there's no input.
+        scripts, and for cookies and session variables in Webware servlets.
+        If you try to read a cookie or session variable in a CGI script,
+        you'll get a RuntimeError.  'In a CGI script' here means
+        'not running as a Webware servlet'.  If the CGI environment
+        is not properly set up, Cheetah will act like there's no input.
 
         The public method provided is::
 
           def webInput(self, names, namesMulti=(), default='', src='f',
-            defaultInt=0, defaultFloat=0.00, badInt=0, badFloat=0.00, debug=False):
+                       defaultInt=0, defaultFloat=0.00,
+                       badInt=0, badFloat=0.00, debug=False):
 
         This method places the specified GET/POST fields, cookies or session
         variables into a dictionary, which is both returned and put at the
@@ -1693,25 +1765,28 @@ class Template(Servlet):
             write(dic['choice'])
 
         Both these examples retrieves the GET/POST field 'choice' and print it.
-        If you leave off the'#silent', all the values would be printed too.  But
-        a better way to preview the values is::
+        If you leave off the'#silent', all the values would be printed too.
+        But a better way to preview the values is::
 
             #silent $webInput(['name'], $debug=1)
 
         because this pretty-prints all the values inside HTML <PRE> tags.
 
-        \*\* KLUDGE: 'debug' is supposed to insert into the template output, but it
-        wasn't working so I changed it to a'print' statement.  So the debugging
-        output will appear wherever standard output is pointed, whether at the
-        terminal, in a Webware log file, or whatever. \*\*\*
+        \*\*\* KLUDGE: 'debug' is supposed to insert into the template output,
+        but it wasn't working so I changed it to a'print' statement.
+        So the debugging output will appear wherever standard output
+        is pointed, whether at the terminal, in a Webware log file,
+        or whatever. \*\*\*
 
         Since we didn't specify any coversions, the value is a string.  It's a
         'single' value because we specified it in 'names' rather than
         'namesMulti'. Single values work like this::
 
             * If one value is found, take it.
-            * If several values are found, choose one arbitrarily and ignore the rest.
-            * If no values are found, use or raise the appropriate 'default*' value.
+            * If several values are found, choose one arbitrarily
+              and ignore the rest.
+            * If no values are found, use or raise
+              the appropriate 'default*' value.
 
         Multi values work like this::
 
@@ -1720,8 +1795,9 @@ class Template(Servlet):
             * If no values are found, use the empty list ([]).  The 'default*'
               arguments are *not* consulted in this case.
 
-        Example: assume 'days' came from a set of checkboxes or a multiple combo
-        box on a form, and the user  chose'Monday', 'Tuesday' and 'Thursday'::
+        Example: assume 'days' came from a set of checkboxes
+        or a multiple combo box on a form, and the user  chose'Monday',
+        'Tuesday' and 'Thursday'::
 
             #silent $webInput([], ['days'])
             The days you chose are: #slurp
@@ -1734,7 +1810,8 @@ class Template(Servlet):
             for day in dic['days']:
                 write(day + ' ')
 
-        Both these examples print:  'The days you chose are: Monday Tuesday Thursday'.
+        Both these examples print:  'The days you chose are:
+        Monday Tuesday Thursday'.
 
         By default, missing strings are replaced by '' and missing/bad numbers
         by zero.  (A'bad number' means the converter raised an exception for
@@ -1757,11 +1834,11 @@ class Template(Servlet):
         Here's an example using multiple values to schedule newspaper
         deliveries.  'checkboxes' comes from a form with checkboxes for all the
         days of the week.  The days the user previously chose are preselected.
-        The user checks/unchecks boxes as desired and presses Submit.  The value
-        of 'checkboxes' is a list of checkboxes that were checked when Submit
-        was pressed.  Our task now is to turn on the days the user checked, turn
-        off the days he unchecked, and leave on or off the days he didn't
-        change.
+        The user checks/unchecks boxes as desired and presses Submit.
+        The value of 'checkboxes' is a list of checkboxes that were checked
+        when Submit was pressed.  Our task now is to turn on the days
+        the user checked, turn off the days he unchecked, and leave on or off
+        the days he didn't change.
 
         ::
 
@@ -1807,16 +1884,17 @@ class Template(Servlet):
                 write('Pshaw, you're short.')
 
         To convert a value to a number, suffix ':int' or ':float' to the name.
-        The method will search first for a 'height:int' variable and then for a
-        'height' variable.  (It will be called 'height' in the final
-        dictionary.)  If a numeric conversion fails, use or raise 'badInt' or
-        'badFloat'.  Missing values work the same way as for strings, except the
-        default is 'defaultInt' or 'defaultFloat' instead of 'default'.
+        The method will search first for a 'height:int' variable
+        and then for a 'height' variable.  (It will be called 'height'
+        in the final dictionary.)  If a numeric conversion fails,
+        use or raise 'badInt' or 'badFloat'.  Missing values work the same way
+        as for strings, except the default is 'defaultInt'
+        or 'defaultFloat' instead of 'default'.
 
-        If a name represents an uploaded file, the entire file will be read into
-        memory.  For more sophistocated file-upload handling, leave that name
-        out of the list and do your own handling, or wait for
-        Cheetah.Utils.UploadFileMixin.
+        If a name represents an uploaded file, the entire file will be read
+        into memory.  For more sophistocated file-upload handling,
+        leave that name out of the list and do your own handling,
+        or wait for Cheetah.Utils.UploadFileMixin.
 
         This only in a subclass that also inherits from Webware's Servlet or
         HTTPServlet.  Otherwise you'll get an AttributeError on 'self.request'.
@@ -1831,8 +1909,8 @@ class Template(Servlet):
         Meta-Data::
 
             Author: Mike Orr <iron@mso.oz.net>
-            License: This software is released for unlimited distribution under the
-                     terms of the MIT license.  See the LICENSE file.
+            License: This software is released for unlimited distribution
+            under the terms of the MIT license.  See the LICENSE file.
             Version: 1.186
             Start Date: 2002/03/17
             Last Revision Date: 2008/03/10 04:48:11
@@ -1892,7 +1970,8 @@ T = Template   # Short and sweet for debugging at the >>> prompt.
 Template.Reserved_SearchList = set(dir(Template))
 
 
-def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
+def genParserErrorFromPythonException(source, file,
+                                      generatedPyCode, exception):
 
     filename = isinstance(file, (str, unicode)) and file or None
 
@@ -1903,7 +1982,8 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
     if hasattr(exception, 'lineno'):
         pyLineno = exception.lineno
     else:
-        pyLineno = int(re.search('[ \t]*File.*line (\d+)', formatedExc).group(1))
+        pyLineno = int(
+            re.search('[ \t]*File.*line (\d+)', formatedExc).group(1))
 
     lines = generatedPyCode.splitlines()
 
@@ -1920,17 +2000,20 @@ def genParserErrorFromPythonException(source, file, generatedPyCode, exception):
         nextLines.append((pyLineno+i, lines[pyLineno+i]))
     nextLines.reverse()
     report = 'Line|Python Code\n'
-    report += '----|-------------------------------------------------------------\n'
+    report += '----|--------------------------' \
+        '-----------------------------------\n'
     while prevLines:
         lineInfo = prevLines.pop()
-        report += "%(row)-4d|%(line)s\n" % {'row': lineInfo[0], 'line': lineInfo[1]}
+        report += "%(row)-4d|%(line)s\n" \
+            % {'row': lineInfo[0], 'line': lineInfo[1]}
 
     if hasattr(exception, 'offset'):
         report += ' '*(3+(exception.offset or 0)) + '^\n'
 
     while nextLines:
         lineInfo = nextLines.pop()
-        report += "%(row)-4d|%(line)s\n" % {'row': lineInfo[0], 'line': lineInfo[1]}
+        report += "%(row)-4d|%(line)s\n" \
+            % {'row': lineInfo[0], 'line': lineInfo[1]}
 
     message = [
         "Error in the Python code which Cheetah generated for this template:",

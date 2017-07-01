@@ -42,10 +42,8 @@ class I18n(object):
         http://www.zope.org/DevHome/Wikis/DevSite/Projects/ComponentArchitecture/ZPTInternationalizationSupport
 
         Other notes:
-        - There is no need to replicate the i18n:name attribute from plone / PTL,
-          as cheetah placeholders serve the same purpose
-
-
+        - There is no need to replicate the i18n:name attribute
+          from plone/PTL, as cheetah placeholders serve the same purpose.
        """
 
         # print macros['i18n']

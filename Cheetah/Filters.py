@@ -26,7 +26,8 @@ class Filter(object):
 
     def filter(self, val, encoding=None, str=str, **kw):
         '''
-            Pass Unicode strings through unmolested, unless an encoding is specified.
+        Pass Unicode strings through unmolested,
+        unless an encoding is specified.
         '''
         if val is None:
             return u''
@@ -68,7 +69,8 @@ class Markdown(EncodeUnicode):
         best
     '''
     def filter(self,  value, **kwargs):
-        # This is a bit of a hack to allow outright embedding of the markdown module
+        # This is a bit of a hack to allow outright embedding
+        # of the markdown module.
         import markdown
         encoded = super(Markdown, self).filter(value, **kwargs)
         return markdown.markdown(encoded)
@@ -76,22 +78,24 @@ class Markdown(EncodeUnicode):
 
 class CodeHighlighter(EncodeUnicode):
     '''
-        The CodeHighlighter filter depends on the "pygments" module which you can
-        download and install from: http://pygments.org
+    The CodeHighlighter filter depends on the "pygments" module
+    which you can download and install from: http://pygments.org/
 
-        What the CodeHighlighter assumes the string that it's receiving is source
-        code and uses pygments.lexers.guess_lexer() to try to guess which parser
-        to use when highlighting it.
+    What the CodeHighlighter assumes the string that it's receiving
+    is source code and uses pygments.lexers.guess_lexer() to try to guess
+    which parser to use when highlighting it.
 
-        CodeHighlighter will return the HTML and CSS to render the code block, syntax
-        highlighted, in a browser
+    CodeHighlighter will return the HTML and CSS to render the code block,
+    syntax highlighted, in a browser
 
-        NOTE: I had an issue installing pygments on Linux/amd64/Python 2.6 dealing with
-        importing of pygments.lexers, I was able to correct the failure by adding::
+    NOTE: I had an issue installing pygments on Linux/amd64/Python 2.6
+    dealing with importing of pygments.lexers. I was able to correct the
+    failure by adding::
 
-            raise ImportError
+        raise ImportError
 
-        to line 39 of pygments/plugin.py (since importing pkg_resources was causing issues)
+    to line 39 of pygments/plugin.py (since importing pkg_resources was
+    causing issues).
     '''
     def filter(self, source, **kwargs):
         encoded = super(CodeHighlighter, self).filter(source, **kwargs)
@@ -100,7 +104,8 @@ class CodeHighlighter(EncodeUnicode):
             from pygments import lexers
             from pygments import formatters
         except ImportError as ex:
-            print('<%s> - Failed to import pygments! (%s)' % (self.__class__.__name__, ex))
+            print('<%s> - Failed to import pygments! (%s)'
+                  % (self.__class__.__name__, ex))
             print('-- You may need to install it from: http://pygments.org')
             return encoded
 
@@ -155,7 +160,8 @@ class Strip(Filter):
 
     This filter goes through the value line by line, removing leading and
     trailing whitespace on each line.  It does not strip newlines, so every
-    input line corresponds to one output line, with its trailing newline intact.
+    input line corresponds to one output line, with its trailing newline
+    intact.
 
     We do not use val.split('\\n') because that would squeeze out consecutive
     blank lines.  Instead, we search for each newline individually.  This

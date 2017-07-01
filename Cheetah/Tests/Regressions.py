@@ -39,7 +39,8 @@ class GetAttrTest(unittest.TestCase):
                 $obj.attr
             #end def'''
 
-        template = Cheetah.Template.Template.compile(template, compilerSettings={}, keepRefToGeneratedCode=True)
+        template = Cheetah.Template.Template.compile(
+            template, compilerSettings={}, keepRefToGeneratedCode=True)
         template = template(searchList=[{'obj': CustomGetAttrClass()}])
         assert template, 'We should have a valid template object by now'
 
@@ -63,7 +64,9 @@ class InlineImportTest(unittest.TestCase):
                 #end if
             #end def
         '''
-        template = Cheetah.Template.Template.compile(template, compilerSettings={'useLegacyImportMode': False}, keepRefToGeneratedCode=True)
+        template = Cheetah.Template.Template.compile(
+            template, compilerSettings={'useLegacyImportMode': False},
+            keepRefToGeneratedCode=True)
         template = template(searchList=[{}])
 
         assert template, 'We should have a valid template object by now'
@@ -81,11 +84,14 @@ class InlineImportTest(unittest.TestCase):
 
             $invalidmodule.FOO
         '''
-        template = Cheetah.Template.Template.compile(template, compilerSettings={'useLegacyImportMode': False}, keepRefToGeneratedCode=True)
+        template = Cheetah.Template.Template.compile(
+            template, compilerSettings={'useLegacyImportMode': False},
+            keepRefToGeneratedCode=True)
         template = template(searchList=[{}])
 
         assert template, 'We should have a valid template object by now'
-        assert str(template), 'We weren\'t able to properly generate the result from the template'
+        assert str(template), \
+            "We weren't able to properly generate the result from the template"
 
     def test_ProperImportOfBadModule(self):
         template = '''
@@ -93,7 +99,10 @@ class InlineImportTest(unittest.TestCase):
 
             This should totally $fail
         '''
-        self.assertRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={'useLegacyImportMode': False}, keepRefToGeneratedCode=True)
+        self.assertRaises(
+            ImportError, Cheetah.Template.Template.compile,
+            template, compilerSettings={'useLegacyImportMode': False},
+            keepRefToGeneratedCode=True)
 
     def test_AutoImporting(self):
         template = '''
@@ -101,7 +110,8 @@ class InlineImportTest(unittest.TestCase):
 
             Boo!
         '''
-        self.assertRaises(ImportError, Cheetah.Template.Template.compile, template)
+        self.assertRaises(
+            ImportError, Cheetah.Template.Template.compile, template)
 
     def test_StuffBeforeImport_Legacy(self):
         template = '''
@@ -111,7 +121,10 @@ class InlineImportTest(unittest.TestCase):
 #extends Foo
 Bar
 '''
-        self.assertRaises(ImportError, Cheetah.Template.Template.compile, template, compilerSettings={'useLegacyImportMode': True}, keepRefToGeneratedCode=True)
+        self.assertRaises(
+            ImportError, Cheetah.Template.Template.compile,
+            template, compilerSettings={'useLegacyImportMode': True},
+            keepRefToGeneratedCode=True)
 
 
 class Mantis_Issue_11_Regression_Test(unittest.TestCase):
@@ -128,7 +141,9 @@ class Mantis_Issue_11_Regression_Test(unittest.TestCase):
     '''
     def test_FailingBehavior(self):
         import cgi
-        template = Cheetah.Template.Template("$escape($request)", searchList=[{'escape': cgi.escape, 'request': 'foobar'}])
+        template = Cheetah.Template.Template(
+            "$escape($request)",
+            searchList=[{'escape': cgi.escape, 'request': 'foobar'}])
         assert template
         self.assertRaises(AttributeError, template.respond)
 
@@ -160,7 +175,8 @@ class Mantis_Issue_21_Regression_Test(unittest.TestCase):
         '''
         template = Cheetah.Template.Template.compile(template)
         assert template
-        assert template.testMethod(output='bug')  # raises a NameError: global name '_filter' is not defined
+        # raises a NameError: global name '_filter' is not defined
+        assert template.testMethod(output='bug')
 
 
 class Mantis_Issue_22_Regression_Test(unittest.TestCase):
@@ -198,8 +214,8 @@ class Mantis_Issue_22_Regression_Test(unittest.TestCase):
                 #end filter
             #end def
         '''
-        # The generated code for the template's testMethod() should look something
-        # like this in the 'error' case:
+        # The generated code for the template's testMethod() should look
+        # something like this in the 'error' case:
         '''
         @staticmethod
         def testMethod(**KWS):
@@ -216,13 +232,16 @@ class Mantis_Issue_22_Regression_Test(unittest.TestCase):
             _orig_filter_18517345 = _filter
             filterName = u'Filter'
             if "Filter" in self._CHEETAH__filters:
-                _filter = self._CHEETAH__currentFilter = self._CHEETAH__filters[filterName]
+                _filter = self._CHEETAH__currentFilter = \
+                    self._CHEETAH__filters[filterName]
             else:
                 _filter = self._CHEETAH__currentFilter = \
-                            self._CHEETAH__filters[filterName] = getattr(self._CHEETAH__filtersLib, filterName)(self).filter
+                    self._CHEETAH__filters[filterName] = \
+                    getattr(self._CHEETAH__filtersLib, filterName)(self).filter
             write(u'                    This is my ')
             _v = VFFSL(SL,"output",True) # u'$output' on line 5, col 32
-            if _v is not None: write(_filter(_v, rawExpr=u'$output')) # from line 5, col 32.
+            # from line 5, col 32.
+            if _v is not None: write(_filter(_v, rawExpr=u'$output'))
 
             ########################################
             ## END - generated method body

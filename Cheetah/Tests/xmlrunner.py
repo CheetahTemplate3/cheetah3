@@ -39,8 +39,8 @@ class _TestInfo(object):
 
         """
         stream.write(
-            '  <testcase classname="%(class)s" name="%(method)s" time="%(time).4f">' % \
-            {
+            '  <testcase classname="%(class)s" name="%(method)s" '
+            'time="%(time).4f">' % {
                 "class": self._class,
                 "method": self._method,
                 "time": self._time,
@@ -244,8 +244,11 @@ class XMLTestRunnerTest(unittest.TestCase):
         got = re.sub(r'time="\d+\.\d+"', 'time="0.000"', got)
         # Likewise, replace all failure and error messages by a simple "Foobar"
         # string.
-        got = re.sub(r'(?s)<failure (.*?)>.*?</failure>', r'<failure \1>Foobar</failure>', got)
-        got = re.sub(r'(?s)<error (.*?)>.*?</error>', r'<error \1>Foobar</error>', got)
+        got = re.sub(
+            r'(?s)<failure (.*?)>.*?</failure>',
+            r'<failure \1>Foobar</failure>', got)
+        got = re.sub(
+            r'(?s)<error (.*?)>.*?</error>', r'<error \1>Foobar</error>', got)
 
         self.assertEqual(expected, got)
 
@@ -260,7 +263,7 @@ class XMLTestRunnerTest(unittest.TestCase):
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
-""")
+""")  # noqa
 
     def test_success(self):
         """Regression test: Check whether a test run with a successful test
@@ -275,7 +278,7 @@ class XMLTestRunnerTest(unittest.TestCase):
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
-""")
+""")  # noqa
 
     def test_failure(self):
         """Regression test: Check whether a test run with a failing test
@@ -292,7 +295,7 @@ class XMLTestRunnerTest(unittest.TestCase):
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
-""")
+""")  # noqa
 
     def test_error(self):
         """Regression test: Check whether a test run with a erroneous test
@@ -309,7 +312,7 @@ class XMLTestRunnerTest(unittest.TestCase):
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
-""")
+""")  # noqa
 
     def test_stdout_capture(self):
         """Regression test: Check whether a test run with output to stdout
@@ -325,7 +328,7 @@ class XMLTestRunnerTest(unittest.TestCase):
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
-""")
+""")  # noqa
 
     def test_stderr_capture(self):
         """Regression test: Check whether a test run with output to stderr
@@ -341,7 +344,7 @@ class XMLTestRunnerTest(unittest.TestCase):
   <system-err><![CDATA[Test
 ]]></system-err>
 </testsuite>
-""")
+""")  # noqa
 
     class NullStream(object):
         """A file-like object that discards everything written to it."""

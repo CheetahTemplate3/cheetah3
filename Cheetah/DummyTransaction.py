@@ -19,9 +19,9 @@ class DummyResponseFailure(Exception):
 
 class DummyResponse(object):
     '''
-        A dummy Response class is used by Cheetah in place of real Webware
-        Response objects when the Template obj is not used directly as a Webware
-        servlet
+    A dummy Response class is used by Cheetah in place of real Webware
+    Response objects when the Template obj is not used directly as a Webware
+    servlet
     '''
     def __init__(self):
         self._outputChunks = []
@@ -59,8 +59,10 @@ class DummyResponse(object):
         try:
             return u''.join(chunks)
         except UnicodeDecodeError as ex:
-            logging.debug('Trying to work around a UnicodeDecodeError in getvalue()')
-            logging.debug('...perhaps you could fix "%s" while you\'re debugging')
+            logging.debug(
+                'Trying to work around a UnicodeDecodeError in getvalue()')
+            logging.debug(
+                '...perhaps you could fix "%s" while you\'re debugging')
             return ''.join((self.safeConvert(c) for c in chunks))
 
     def writelines(self, *lines):

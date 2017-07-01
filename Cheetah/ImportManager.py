@@ -1,11 +1,10 @@
 """
 Provides an emulator/replacement for Python's standard import system.
 
-@@TR: Be warned that Import Hooks are in the deepest, darkest corner of Python's
-jungle.  If you need to start hacking with this, be prepared to get lost for a
-while. Also note, this module predates the newstyle import hooks in Python 2.3
-http://www.python.org/peps/pep-0302.html.
-
+@@TR: Be warned that Import Hooks are in the deepest, darkest corner of
+Python's jungle.  If you need to start hacking with this, be prepared to get
+lost for a while. Also note, this module predates the newstyle import hooks in
+Python 2.3 http://www.python.org/peps/pep-0302.html.
 
 This is a hacked/documented version of Gordon McMillan's iu.py. I have:
 
@@ -16,7 +15,6 @@ This is a hacked/documented version of Gordon McMillan's iu.py. I have:
   - standardized the variable naming scheme
 
   - reorganized the code layout to enhance readability
-
 """
 
 import sys
@@ -35,7 +33,9 @@ _os_stat = _os_path_join = _os_getcwd = _os_path_dirname = None
 
 
 def _os_bootstrap():
-    """Set up 'os' module replacement functions for use during import bootstrap."""
+    """
+    Set up 'os' module replacement functions for use during import bootstrap
+    """
 
     names = sys.builtin_module_names
 
@@ -152,7 +152,8 @@ class Owner:
     an Owner for each thing on sys.path There are owners for directories and
     .pyz files.  There could be owners for zip files, or even URLs.  A
     shadowpath (a dictionary mapping the names in sys.path to their owners) is
-    used so that sys.path (or a package's __path__) is still a bunch of strings,
+    used so that sys.path (or a package's __path__) is still a bunch of
+    strings.
     """
 
     def __init__(self, path):
@@ -174,8 +175,8 @@ class DirOwner(Owner):
             raise ValueError("%s is not a directory" % path)
         Owner.__init__(self, path)
 
-    def getmod(self, nm,
-               getsuffixes=imp.get_suffixes, loadco=marshal.loads, newmod=imp.new_module):
+    def getmod(self, nm, getsuffixes=imp.get_suffixes,
+               loadco=marshal.loads, newmod=imp.new_module):
 
         pth = _os_path_join(self.path, nm)
 
@@ -193,7 +194,8 @@ class DirOwner(Owner):
                 else:
                     if typ == imp.C_EXTENSION:
                         fp = open(attempt, 'rb')
-                        mod = imp.load_module(nm, fp, attempt, (ext, mode, typ))
+                        mod = imp.load_module(
+                            nm, fp, attempt, (ext, mode, typ))
                         mod.__file__ = attempt
                         return mod
                     elif typ == imp.PY_SOURCE:
@@ -264,7 +266,9 @@ class FrozenImportDirector(ImportDirector):
         if isFrozen(nm):
             mod = loadMod(nm, None, nm, ('', '', imp.PY_FROZEN))
             if hasattr(mod, '__path__'):
-                mod.__importsub__ = lambda name, pname=nm, owner=self: owner.getmod(pname+'.'+name)
+                mod.__importsub__ = \
+                    lambda name, pname=nm, owner=self: \
+                    owner.getmod(pname+'.'+name)
             return mod
         return None
 
@@ -287,14 +291,17 @@ class RegistryImportDirector(ImportDirector):
             subkey = r"Software\Python\PythonCore\%s\Modules" % sys.winver
             for root in (HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE):
                 try:
-                    hkey = win32api.RegOpenKeyEx(root, subkey, 0, KEY_ALL_ACCESS)
+                    hkey = win32api.RegOpenKeyEx(root, subkey,
+                                                 0, KEY_ALL_ACCESS)
                 except:
                     pass
                 else:
-                    numsubkeys, numvalues, lastmodified = win32api.RegQueryInfoKey(hkey)
+                    numsubkeys, numvalues, lastmodified = \
+                        win32api.RegQueryInfoKey(hkey)
                     for i in range(numsubkeys):
                         subkeyname = win32api.RegEnumKey(hkey, i)
-                        hskey = win32api.RegOpenKeyEx(hkey, subkeyname, 0, KEY_ALL_ACCESS)
+                        hskey = win32api.RegOpenKeyEx(hkey, subkeyname,
+                                                      0, KEY_ALL_ACCESS)
                         val = win32api.RegQueryValueEx(hskey, '')
                         desc = getDescr(val[0])
                         self.map[subkeyname] = (val[0], desc)
@@ -401,7 +408,8 @@ class ImportManager:
         builtin.__import__ = self.importHook
         builtin.reload = self.reloadHook
 
-    def importHook(self, name, globals=None, locals=None, fromlist=None, level=-1):
+    def importHook(self, name, globals=None, locals=None,
+                   fromlist=None, level=-1):
         '''
         NOTE: Currently importHook will accept the keyword-argument "level"
         but it will *NOT* use it. Details about the "level" keyword

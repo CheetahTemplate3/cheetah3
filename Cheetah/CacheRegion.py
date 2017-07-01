@@ -92,9 +92,9 @@ class CacheRegion(object):
     A `CacheRegion` stores some `CacheItem` instances.
 
     This implementation stores the data in the memory of the current process.
-    If you need a more advanced data store, create a cacheStore class that works
-    with Cheetah's CacheStore protocol and provide it as the cacheStore argument
-    to __init__.  For example you could use
+    If you need a more advanced data store, create a cacheStore class that
+    works with Cheetah's CacheStore protocol and provide it as the cacheStore
+    argument to __init__.  For example you could use
     Cheetah.CacheStore.MemcachedCacheStore, a wrapper around the Python
     memcached API (http://www.danga.com/memcached).
     '''
@@ -133,7 +133,8 @@ class CacheRegion(object):
 
         if cacheItemID not in self._cacheItems:
             cacheItem = self._cacheItemClass(
-                cacheItemID=cacheItemID, cacheStore=self._wrappedCacheDataStore)
+                cacheItemID=cacheItemID,
+                cacheStore=self._wrappedCacheDataStore)
             self._cacheItems[cacheItemID] = cacheItem
             self._isNew = False
         return self._cacheItems[cacheItemID]

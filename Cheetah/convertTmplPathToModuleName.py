@@ -22,5 +22,6 @@ def convertTmplPathToModuleName(tmplPath,
     try:
         moduleName = splitdrive(tmplPath)[1].translate(_pathNameTransChars)
     except (UnicodeError, TypeError):
-        moduleName = unicode(splitdrive(tmplPath)[1]).translate(unicode(_pathNameTransChars))
+        moduleName = unicode(splitdrive(tmplPath)[1])\
+            .translate(unicode(_pathNameTransChars))
     return moduleName

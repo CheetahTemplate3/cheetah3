@@ -82,7 +82,8 @@ def main():
     op.add_option('-d', '--dir', dest='dir', default=None,
                   help='Specify a directory of templates to analyze')
     op.add_option('--suffix', default='tmpl', dest='suffix',
-                  help='Specify a custom template file suffix for the -d option (default: "tmpl")')
+                  help='Specify a custom template file suffix '
+                  'for the -d option (default: "tmpl")')
     opts, args = op.parse_args()
 
     if not opts.file and not opts.dir:

@@ -188,10 +188,12 @@ class EncodeUnicodeCompatTest(unittest.TestCase):
         t.var = u"Text with some non-ascii characters: åäö"
 
         rc = t.respond()
-        assert isinstance(rc, unicode), ('Template.respond() should return unicode', rc)
+        assert isinstance(rc, unicode), \
+            ('Template.respond() should return unicode', rc)
 
         rc = str(t)
-        assert isinstance(rc, str), ('Template.__str__() should return a UTF-8 encoded string', rc)
+        assert isinstance(rc, str), \
+            ('Template.__str__() should return a UTF-8 encoded string', rc)
 
 
 class Unicode_in_SearchList_Test(CommandLineTest):
@@ -218,7 +220,9 @@ class Unicode_in_SearchList_Test(CommandLineTest):
         assert template.respond()
 
     def test_Thai_utf8(self):
-        utf8 = '\xe0\xb8\xa2\xe0\xb8\xb4\xe0\xb8\x99\xe0\xb8\x94\xe0\xb8\xb5\xe0\xb8\x95\xe0\xb9\x89\xe0\xb8\xad\xe0\xb8\x99\xe0\xb8\xa3\xe0\xb8\xb1\xe0\xb8\x9a'
+        utf8 = '\xe0\xb8\xa2\xe0\xb8\xb4\xe0\xb8\x99\xe0' \
+            '\xb8\x94\xe0\xb8\xb5\xe0\xb8\x95\xe0\xb9\x89\xe0' \
+            '\xb8\xad\xe0\xb8\x99\xe0\xb8\xa3\xe0\xb8\xb1\xe0\xb8\x9a'
 
         source = '''This is $adjective'''
         template = self.createAndCompile(source)
@@ -248,7 +252,7 @@ class InlineSpanishTest(unittest.TestCase):
     </center>
   </body>
 </html>
-        '''
+        '''  # noqa
 
     if PY2:  # In PY3 templates are already unicode
         def test_failure(self):

@@ -22,9 +22,9 @@ use information from your system on the client's website --AND-- they want to
 understand the display code and so they can maintian it themselves.
 
 You write a UI class with a 'customers' method that returns a dictionary of all
-the customer objects.  Each customer object has an 'address' method that returns
-the a dictionary with information about the customer's address.  The designers
-want to be able to access that information.
+the customer objects.  Each customer object has an 'address' method
+that returns the a dictionary with information about the customer's address.
+The designers want to be able to access that information.
 
 Using PSP, the display code for the website would look something like the
 following, assuming your servlet subclasses the class you created for managing
@@ -52,8 +52,9 @@ programming experience?  The last form is 15 characters shorter than the PSP
 and, conceptually, is far more accessible. With PHP or ASP, the code would be
 even messier than the PSP
 
-This is a rather extreme example and, of course, you could also just implement
-'$getCustomer($ID).city' and obey the Law of Demeter (search Google for more on that).
+This is a rather extreme example and, of course,
+you could also just implement '$getCustomer($ID).city'
+and obey the Law of Demeter (search Google for more on that).
 But good object orientated design isn't the point here.
 
 Details
@@ -63,9 +64,9 @@ The parenthesized letters below correspond to the aims in the second paragraph.
 DICTIONARY ACCESS (a)
 ---------------------
 
-NameMapper allows access to items in a dictionary using the same dotted notation
-used to access object attributes in Python.  This aspect of NameMapper is known
-as 'Unified Dotted Notation'.
+NameMapper allows access to items in a dictionary
+using the same dotted notation used to access object attributes in Python.
+This aspect of NameMapper is known as 'Unified Dotted Notation'.
 
 For example, with Cheetah it is possible to write::
 
@@ -81,8 +82,8 @@ This only works with dictionary keys that are also valid python identifiers::
 AUTOCALLING (b,d)
 -----------------
 
-NameMapper automatically detects functions and methods in Cheetah $vars and calls
-them if the parentheses have been left off.
+NameMapper automatically detects functions and methods in Cheetah $vars
+and calls them if the parentheses have been left off.
 
 For example if 'a' is an object, 'b' is a method::
 
@@ -104,8 +105,8 @@ Further notes:
   autocalling can only be used with functions or methods that either have no
   arguments or have default values for all arguments.
 
-* NameMapper only autocalls functions and methods.  Classes and callable object instances
-  will not be autocalled.
+* NameMapper only autocalls functions and methods.
+  Classes and callable object instances will not be autocalled.
 
 * Autocalling can be disabled using Cheetah's 'useAutocalling' setting.
 
@@ -200,7 +201,8 @@ def _isInstanceOrClass(obj):
         if hasattr(obj, 'mro'):
             # type/class
             return True
-        elif (hasattr(obj, '__func__') or hasattr(obj, '__code__') or hasattr(obj, '__self__')):
+        elif (hasattr(obj, '__func__') or hasattr(obj, '__code__') or \
+                hasattr(obj, '__self__')):
             # method, func, or builtin func
             return False
         elif hasattr(obj, '__init__'):
@@ -239,7 +241,8 @@ def _valueForName(obj, name, executeCallables=False):
             except AttributeError:
                 _raiseNotFoundException(key, obj)
 
-        if executeCallables and hasattr(nextObj, '__call__') and not _isInstanceOrClass(nextObj):
+        if executeCallables and hasattr(nextObj, '__call__') and \
+                not _isInstanceOrClass(nextObj):
             obj = nextObj()
         else:
             obj = nextObj
@@ -275,7 +278,8 @@ def valueFromFrameOrSearchList(searchList, name, executeCallables=False,
                                frame=None):
     def __valueForName():
         try:
-            return _valueForName(namespace, name, executeCallables=executeCallables)
+            return _valueForName(namespace, name,
+                                 executeCallables=executeCallables)
         except NotFound as e:
             _wrapNotFoundException(e, fullName=name, namespace=searchList)
     try:
@@ -321,9 +325,10 @@ def hasName(obj, name):
 try:
     from Cheetah._namemapper import NotFound, valueForKey, valueForName, \
          valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
-    # it is possible with Jython or Windows, for example, that _namemapper.c hasn't been compiled
     C_VERSION = True
 except:
+    # It is possible with PyPy, Jython or Windows, for example,
+    # that _namemapper.c hasn't been compiled.
     C_VERSION = False
 
 ##################################################

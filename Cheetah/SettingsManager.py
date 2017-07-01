@@ -13,12 +13,13 @@ try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-import imp                 # used by SettingsManager.updateSettingsFromPySrcFile()
+import imp  # used by SettingsManager.updateSettingsFromPySrcFile()
 from Cheetah.compat import PY2
 
 
 numberRE = re.compile(Number)
-complexNumberRE = re.compile('[\(]*' + Number + r'[ \t]*\+[ \t]*' + Number + '[\)]*')
+complexNumberRE = re.compile(
+    '[\(]*' + Number + r'[ \t]*\+[ \t]*' + Number + '[\)]*')
 
 ##################################################
 # FUNCTIONS ##
@@ -37,7 +38,8 @@ def mergeNestedDictionaries(dict1, dict2, copy=False, deepcopy=False):
         dict1 = copyModule.deepcopy(dict1)
 
     for key, val in dict2.items():
-        if key in dict1 and isinstance(val, dict) and isinstance(dict1[key], dict):
+        if key in dict1 and isinstance(val, dict) \
+                and isinstance(dict1[key], dict):
             dict1[key] = mergeNestedDictionaries(dict1[key], val)
         else:
             dict1[key] = val
@@ -63,8 +65,9 @@ def stringIsNumber(S):
 
 
 def convStringToNum(theString):
-    """Convert a string representation of a Python number to the Python version"""
-
+    """
+    Convert a string representation of a Python number to the Python version
+    """
     if not stringIsNumber(theString):
         raise Error(theString + ' cannot be converted to a Python number')
     return eval(theString, {}, {})
@@ -90,10 +93,9 @@ class _SettingsCollector(object):
     """An abstract base class that provides the methods SettingsManager uses to
     collect settings from config files and strings.
 
-    This class only collects settings it doesn't modify the _settings dictionary
-    of SettingsManager instances in any way.
+    This class only collects settings, it doesn't modify
+    the _settings dictionary of SettingsManager instances in any way.
     """
-
     _ConfigParserClass = ConfigParserCaseSensitive
 
     def readSettingsFromModule(self, mod, ignoreUnderscored=True):
@@ -141,9 +143,9 @@ class _SettingsCollector(object):
 
         * The string 'False' will be converted to a Python false value
 
-        * Any string starting with 'python:' will be treated as a Python literal
-          or expression that needs to be eval'd. This approach is useful for
-          declaring lists and dictionaries.
+        * Any string starting with 'python:' will be treated
+          as a Python literal or expression that needs to be eval'd.
+          This approach is useful for declaring lists and dictionaries.
 
         If a config section titled 'Globals' is present the options defined
         under it will be treated as top-level settings.
@@ -219,19 +221,21 @@ class SettingsManager(_SettingsCollector):
         return {}
 
     def _initializeSettings(self):
-        """A hook that allows for complex setting initialization sequences that
-        involve references to 'self' or other settings.  For example:
+        """A hook that allows for complex setting initialization sequences
+        that involve references to 'self' or other settings.  For example:
               self._settings['myCalcVal'] = self._settings['someVal'] * 15
-        This method should be called by the class' __init__() method when needed.
+        This method should be called by the class' __init__() method
+        when needed.
         The dummy implementation should be reimplemented by subclasses.
         """
-
         pass
 
     # core post startup methods
 
     def setting(self, name, default=NoDefault):
-        """Get a setting from self._settings, with or without a default value."""
+        """
+        Get a setting from self._settings, with or without a default value
+        """
 
         if default is NoDefault:
             return self._settings[name]
@@ -259,8 +263,9 @@ class SettingsManager(_SettingsCollector):
         return copyModule.deepcopy(self._settings)
 
     def updateSettings(self, newSettings, merge=True):
-        """Update the settings with a selective merge or a complete overwrite."""
-
+        """
+        Update the settings with a selective merge or a complete overwrite
+        """
         if merge:
             mergeNestedDictionaries(self._settings, newSettings)
         else:
@@ -275,13 +280,15 @@ class SettingsManager(_SettingsCollector):
         self.updateSettings(newSettings,
                             merge=newSettings.get('mergeSettings', merge))
 
-    def updateSettingsFromConfigFileObj(self, inFile, convert=True, merge=True):
+    def updateSettingsFromConfigFileObj(self, inFile,
+                                        convert=True, merge=True):
         """See the docstring for .updateSettingsFromConfigFile()
 
         The caller of this method is responsible for closing the inFile file
         object."""
 
-        newSettings = self.readSettingsFromConfigFileObj(inFile, convert=convert)
+        newSettings = self.readSettingsFromConfigFileObj(inFile,
+                                                         convert=convert)
         self.updateSettings(newSettings,
                             merge=newSettings.get('mergeSettings', merge))
 
@@ -291,6 +298,7 @@ class SettingsManager(_SettingsCollector):
 
         configStr = '[globals]\n' + configStr
         inFile = StringIO(configStr)
-        newSettings = self.readSettingsFromConfigFileObj(inFile, convert=convert)
+        newSettings = self.readSettingsFromConfigFileObj(inFile,
+                                                         convert=convert)
         self.updateSettings(newSettings,
                             merge=newSettings.get('mergeSettings', merge))

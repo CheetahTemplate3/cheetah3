@@ -410,24 +410,34 @@ class VFN(NameMapperTest):
         assert self.get('aDict.nestedDict.aClass', False) == DummyClass
 
     def test58(self):
-        """aDict.nestedDict.aClass in dict lookup in a loop - without autocalling"""
+        """
+        aDict.nestedDict.aClass in dict lookup in a loop - without
+        autocalling
+        """
+
         for i in range(10):
             assert self.get('aDict.nestedDict.aClass', False) == DummyClass
 
     def test59(self):
-        """Other exception from func test -- but without autocalling shouldn't raise"""
-
+        """
+        Other exception from func test -- but without autocalling shouldn't
+        raise
+        """
         self.get('aDict.nestedDict.funcThatRaises', False)
 
     def test60(self):
-        """Other exception from func test in a loop -- but without autocalling shouldn't raise"""
-
+        """
+        Other exception from func test in a loop -- but without autocalling
+        shouldn't raise
+        """
         for i in range(10):
             self.get('aDict.nestedDict.funcThatRaises', False)
 
     def test61(self):
-        """Accessing attribute where __getattr__ raises shouldn't segfault if something follows it"""
-
+        """
+        Accessing attribute where __getattr__ raises shouldn't segfault
+        if something follows it
+        """
         def test(self=self):
             self.get('anObjThatRaises.willraise.anything')
         self.assertRaises(ValueError, test)

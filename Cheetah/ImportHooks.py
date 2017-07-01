@@ -67,9 +67,9 @@ class CheetahDirOwner(DirOwner):
                         exc_txt = traceback.format_exc()
                         exc_txt = '  ' + ('  \n'.join(exc_txt.splitlines()))
                         raise ImportError(
-                            'Error while compiling Cheetah module'
-                            ' %(name)s, original traceback follows:\n%(exc_txt)s' % locals())
-            ##
+                            'Error while compiling Cheetah module '
+                            '%(name)s, original traceback follows:\n'
+                            '%(exc_txt)s' % locals())
             return None
 
         finally:
@@ -81,7 +81,8 @@ class CheetahDirOwner(DirOwner):
                             mainClassName=name))
         if _cacheDir:
             __file__ = os.path.join(_cacheDir[0],
-                                    convertTmplPathToModuleName(tmplPath)) + '.py'
+                                    convertTmplPathToModuleName(tmplPath)) \
+                       + '.py'
             try:
                 open(__file__, 'w').write(code)
             except OSError:

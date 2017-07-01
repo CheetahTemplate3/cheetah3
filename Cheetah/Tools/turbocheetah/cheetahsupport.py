@@ -42,7 +42,8 @@ class TurboCheetah:
 
         Template files must end in ".tmpl" and be in legitimate packages.
         """
-        given = len([_f for _f in (template, template_string, template_file) if _f])
+        given = len(
+            [_f for _f in (template, template_string, template_file) if _f])
         if given > 1:
             raise TypeError(
                 "You may give only one of template, template_string, and "

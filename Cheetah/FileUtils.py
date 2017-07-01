@@ -78,7 +78,7 @@ class FileFinder:
                     join=os.path.join,
                     ):
 
-        """Recursively walk through a directory tree and find matching files."""
+        """Recursively walk through a directory tree and find matching files"""
         processDir = self.processDir
         filterDir = self.filterDir
 

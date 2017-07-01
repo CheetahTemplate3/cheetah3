@@ -154,24 +154,52 @@ class CheetahWrapper(object):
         defaultOext = isCompile and ".py" or ".html"
         self.parser = OptionParser()
         pao = self.parser.add_option
-        pao("--idir", action="store", dest="idir", default='', help='Input directory (defaults to current directory)')
-        pao("--odir", action="store", dest="odir", default="", help='Output directory (defaults to current directory)')
-        pao("--iext", action="store", dest="iext", default=".tmpl", help='File input extension (defaults: compile: .tmpl, fill: .tmpl)')
-        pao("--oext", action="store", dest="oext", default=defaultOext, help='File output extension (defaults: compile: .py, fill: .html)')
-        pao("-R", action="store_true", dest="recurse", default=False, help='Recurse through subdirectories looking for input files')
-        pao("--stdout", "-p", action="store_true", dest="stdout", default=False, help='Send output to stdout instead of writing to a file')
-        pao("--quiet", action="store_false", dest="verbose", default=True, help='Do not print informational messages to stdout')
-        pao("--debug", action="store_true", dest="debug", default=False, help='Print diagnostic/debug information to stderr')
-        pao("--env", action="store_true", dest="env", default=False, help='Pass the environment into the search list')
-        pao("--pickle", action="store", dest="pickle", default="", help='Unpickle FILE and pass it through in the search list')
-        pao("--flat", action="store_true", dest="flat", default=False, help='Do not build destination subdirectories')
-        pao("--nobackup", action="store_true", dest="nobackup", default=False, help='Do not make backup files when generating new ones')
-        pao("--settings", action="store", dest="compilerSettingsString", default=None, help='String of compiler settings to pass through, e.g. --settings="useNameMapper=False,useFilters=False"')
-        pao('--print-settings', action='store_true', dest='print_settings', help='Print out the list of available compiler settings')
-        pao("--templateAPIClass", action="store", dest="templateClassName", default=None, help='Name of a subclass of Cheetah.Template.Template to use for compilation, e.g. MyTemplateClass')
-        pao("--parallel", action="store", type="int", dest="parallel", default=1, help='Compile/fill templates in parallel, e.g. --parallel=4')
-        pao('--shbang', dest='shbang', default='#!/usr/bin/env python', help='Specify the shbang to place at the top of compiled templates, e.g. --shbang="#!/usr/bin/python2.6"')
-        pao('--encoding', dest='encoding', default=None, help='Specify the encoding of source files (e.g. \'utf-8\' to force input files to be interpreted as UTF-8)')
+        pao("--idir", action="store", dest="idir", default='',
+            help='Input directory (defaults to current directory)')
+        pao("--odir", action="store", dest="odir", default="",
+            help='Output directory (defaults to current directory)')
+        pao("--iext", action="store", dest="iext", default=".tmpl",
+            help='File input extension '
+                 '(defaults: compile: .tmpl, fill: .tmpl)')
+        pao("--oext", action="store", dest="oext", default=defaultOext,
+            help='File output extension (defaults: compile: .py, fill: .html)')
+        pao("-R", action="store_true", dest="recurse", default=False,
+            help='Recurse through subdirectories looking for input files')
+        pao("--stdout", "-p", action="store_true", dest="stdout",
+            default=False,
+            help='Send output to stdout instead of writing to a file')
+        pao("--quiet", action="store_false", dest="verbose", default=True,
+            help='Do not print informational messages to stdout')
+        pao("--debug", action="store_true", dest="debug", default=False,
+            help='Print diagnostic/debug information to stderr')
+        pao("--env", action="store_true", dest="env", default=False,
+            help='Pass the environment into the search list')
+        pao("--pickle", action="store", dest="pickle", default="",
+            help='Unpickle FILE and pass it through in the search list')
+        pao("--flat", action="store_true", dest="flat", default=False,
+            help='Do not build destination subdirectories')
+        pao("--nobackup", action="store_true", dest="nobackup", default=False,
+            help='Do not make backup files when generating new ones')
+        pao("--settings", action="store", dest="compilerSettingsString",
+            default=None,
+            help='String of compiler settings to pass through, '
+                 'e.g. --settings="useNameMapper=False,useFilters=False"')
+        pao('--print-settings', action='store_true', dest='print_settings',
+            help='Print out the list of available compiler settings')
+        pao("--templateAPIClass", action="store", dest="templateClassName",
+            default=None,
+            help='Name of a subclass of Cheetah.Template.Template '
+                 'to use for compilation, e.g. MyTemplateClass')
+        pao("--parallel", action="store", type="int", dest="parallel",
+            default=1,
+            help='Compile/fill templates in parallel, e.g. --parallel=4')
+        pao('--shbang', dest='shbang', default='#!/usr/bin/env python',
+            help='Specify the shbang to place at the top '
+                 'of compiled templates, e.g. --shbang="#!/usr/bin/python2.6"')
+        pao('--encoding', dest='encoding', default=None,
+            help='Specify the encoding of source files '
+                 '(e.g. "utf-8" to force input files to be interpreted '
+                 'as UTF-8)')
 
         opts, files = self.parser.parse_args(args)
         self.opts = opts
@@ -373,7 +401,8 @@ you do have write permission to and re-run the tests.""")
                     bad_child_exit = child_exit
 
             if bad_child_exit:
-                sys.exit("Child process failed, exited with code %d" % bad_child_exit)
+                sys.exit("Child process failed, exited with code %d"
+                         % bad_child_exit)
 
         else:
             for b in bundles:
@@ -397,7 +426,8 @@ you do have write permission to and re-run the tests.""")
             if len(sources) > 1:
                 isError = True
                 sources.sort()
-                fmt = "Collision: multiple source files %s map to one destination file %s"
+                fmt = "Collision: multiple source files %s " \
+                      "map to one destination file %s"
                 W(fmt, sources, dst)
         if isError:
             what = self.isCompile and "Compilation" or "Filling"
@@ -501,7 +531,9 @@ you do have write permission to and re-run the tests.""")
         C('using --templateAPIClass=%s:%s' % (modname, classname))
 
         if p >= 0:
-            mod = getattr(__import__(modname[:p], {}, {}, [modname[p+1:]]), modname[p+1:])
+            mod = getattr(
+                __import__(modname[:p], {}, {}, [modname[p+1:]]),
+                modname[p+1:])
         else:
             mod = __import__(modname, {}, {}, [])
 
@@ -510,7 +542,8 @@ you do have write permission to and re-run the tests.""")
             self._templateClass = klass
             return klass
         else:
-            self.error('**Template class specified in option --templateAPIClass not found\n'
+            self.error('**Template class specified '
+                       'in option --templateAPIClass not found\n'
                        '**Falling back on Cheetah.Template:Template')
 
     def _getCompilerSettings(self):
@@ -521,18 +554,21 @@ you do have write permission to and re-run the tests.""")
             return kws
         if self.opts.compilerSettingsString:
             try:
-                settings = eval('getkws(%s)' % self.opts.compilerSettingsString)
+                settings = eval('getkws(%s)'
+                                % self.opts.compilerSettingsString)
             except:
                 self.error("There's an error in your --settings option."
                            "It must be valid Python syntax.\n"
-                           + "    --settings='%s'\n" % self.opts.compilerSettingsString
+                           + "    --settings='%s'\n"
+                           % self.opts.compilerSettingsString
                            + "  %s: %s" % sys.exc_info()[:2]
                            )
 
             validKeys = set(DEFAULT_COMPILER_SETTINGS.keys())
             if [k for k in settings if k not in validKeys]:
                 self.error(
-                    'The --setting "%s" is not a valid compiler setting name.' % k)
+                    'The --setting "%s" is not a valid compiler setting name.'
+                    % k)
 
             self._compilerSettings = settings
             return settings
@@ -548,7 +584,8 @@ you do have write permission to and re-run the tests.""")
                                           returnAClass=False)
             output = pysrc
         else:
-            output = str(TemplateClass(file=sys.stdin, compilerSettings=compilerSettings))
+            output = str(TemplateClass(file=sys.stdin,
+                                       compilerSettings=compilerSettings))
         sys.stdout.write(output)
 
     def _compileOrFillBundle(self, b):
@@ -582,7 +619,8 @@ be named according to the same rules as Python modules.""" % tup)
             output = pysrc
         else:
             # output = str(TemplateClass(file=src, searchList=self.searchList))
-            tclass = TemplateClass.compile(file=src, compilerSettings=compilerSettings)
+            tclass = TemplateClass.compile(file=src,
+                                           compilerSettings=compilerSettings)
             output = str(tclass(searchList=self.searchList))
 
         if bak:

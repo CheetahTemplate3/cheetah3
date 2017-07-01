@@ -18,11 +18,13 @@ from Cheetah.Template import Template
 class _SkeletonPage(Template):
     """A baseclass for the SkeletonPage template"""
 
-    docType = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" ' + \
-              '"http://www.w3.org/TR/html4/loose.dtd">'
+    docType = '<!DOCTYPE HTML PUBLIC ' \
+        '"-//W3C//DTD HTML 4.01 Transitional//EN" ' \
+        '"http://www.w3.org/TR/html4/loose.dtd">'
 
-    # docType = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' + \
-    # '"http://www.w3.org/TR/xhtml1l/DTD/transitional.dtd">'
+    # docType = '<!DOCTYPE HTML PUBLIC ' \
+    #     '"-//W3C//DTD XHTML 1.0 Transitional//EN" ' \
+    #     '"http://www.w3.org/TR/xhtml1l/DTD/transitional.dtd">'
 
     title = ''
     siteDomainName = 'www.example.com'
@@ -41,7 +43,10 @@ class _SkeletonPage(Template):
                     'generator': 'Cheetah: The Python-Powered Template Engine'
             }
         }
-        # metaTags = {'HTTP_EQUIV':{'test':1234}, 'NAME':{'test':1234,'test2':1234} }
+        # metaTags = {
+        #   'HTTP_EQUIV':{'test':1234},
+        #   'NAME':{'test':1234,'test2':1234}
+        # }
         self._stylesheets = {}
         # stylesheets = {'.cssClassName':'stylesheetCode'}
         self._stylesheetsOrder = []
@@ -68,7 +73,9 @@ class _SkeletonPage(Template):
 
         stylesheetTagsTxt = ''
         for title, src in self._stylesheetLibs.items():
-            stylesheetTagsTxt += '<link rel="stylesheet" type="text/css" href="' + str(src) + '" />\n'
+            stylesheetTagsTxt += \
+                '<link rel="stylesheet" type="text/css" href="' \
+                + str(src) + '" />\n'
 
         if not self._stylesheetsOrder:
             return stylesheetTagsTxt
@@ -98,18 +105,22 @@ class _SkeletonPage(Template):
 
     def javascriptTags(self):
         """Return a formatted version of the javascriptTags and
-        javascriptLibs dictionaries.  Each value in javascriptTags
-        should be a either a code string to include, or a list containing the
-        JavaScript version number and the code string. The keys can be anything.
-        The same applies for javascriptLibs, but the string should be the
-        SRC filename rather than a code string."""
+        javascriptLibs dictionaries
+
+        Each value in javascriptTags should be a either a code string
+        to include, or a list containing the JavaScript version number
+        and the code string. The keys can be anything. The same applies
+        for javascriptLibs, but the string should be the SRC filename
+        rather than a code string.
+        """
 
         javascriptTagsTxt = []
         for key, details in self._javascriptTags.items():
             if not isinstance(details, (list, tuple)):
                 details = ['', details]
 
-            javascriptTagsTxt += ['<script language="JavaScript', str(details[0]),
+            javascriptTagsTxt += ['<script language="JavaScript',
+                                  str(details[0]),
                                   '" type="text/javascript"><!--\n',
                                   str(details[0]), '\n//--></script>\n']
 
@@ -117,7 +128,8 @@ class _SkeletonPage(Template):
             if not isinstance(details, (list, tuple)):
                 details = ['', details]
 
-            javascriptTagsTxt += ['<script language="JavaScript', str(details[0]),
+            javascriptTagsTxt += ['<script language="JavaScript',
+                                  str(details[0]),
                                   '" type="text/javascript" src="',
                                   str(details[1]), '" />\n']
         return ''.join(javascriptTagsTxt)
@@ -127,16 +139,17 @@ class _SkeletonPage(Template):
         return self.formHTMLTag('body', self._bodyTagAttribs)
 
     def imgTag(self, src, alt='', width=None, height=None, border=0):
+        """Dynamically generate an image tag
 
-        """Dynamically generate an image tag.  Cheetah will try to convert the
-        src argument to a WebKit serverSidePath relative to the servlet's
-        location. If width and height aren't specified they are calculated using
-        PIL or ImageMagick if available."""
+        Cheetah will try to convert the src argument to a WebKit serverSidePath
+        relative to the servlet's location.  If width and height aren't
+        specified they are calculated using PIL or ImageMagick if available.
+        """
 
         src = self.normalizePath(src)
 
         if not width or not height:
-            try:                    # see if the dimensions can be calc'd with PIL
+            try:  # see if the dimensions can be calc'd with PIL
                 import Image
                 im = Image.open(src)
                 calcWidth, calcHeight = im.size
@@ -155,7 +168,8 @@ class _SkeletonPage(Template):
                     pass
 
         if width and height:
-            return ''.join(['<img src="', src, '" width="', str(width), '" height="', str(height),
+            return ''.join(['<img src="', src, '" width="',
+                            str(width), '" height="', str(height),
                            '" alt="', alt, '" border="', str(border), '" />'])
         elif width:
             return ''.join(['<img src="', src, '" width="', str(width),
@@ -164,7 +178,8 @@ class _SkeletonPage(Template):
             return ''.join(['<img src="', src, '" height="', str(height),
                            '" alt="', alt, '" border="', str(border), '" />'])
         else:
-            return ''.join(['<img src="', src, '" alt="', alt, '" border="', str(border), '" />'])
+            return ''.join(['<img src="', src, '" alt="', alt,
+                            '" border="', str(border), '" />'])
 
     def currentYr(self):
         """Return a string representing the current yr."""
@@ -175,7 +190,8 @@ class _SkeletonPage(Template):
         return time.strftime(formatString, time.localtime(time.time()))
 
     def spacer(self, width=1, height=1):
-        return '<img src="spacer.gif" width="%s" height="%s" alt="" />' % (str(width), str(height))
+        return '<img src="spacer.gif" width="%s" height="%s" alt="" />' \
+            % (str(width), str(height))
 
     def formHTMLTag(self, tagName, attributes={}):
         """returns a string containing an HTML <tag> """
@@ -190,11 +206,11 @@ class _SkeletonPage(Template):
         metaTagsTxt = []
         if 'HTTP-EQUIV' in metaTags:
             for http_equiv, contents in metaTags['HTTP-EQUIV'].items():
-                metaTagsTxt += ['<meta http-equiv="', str(http_equiv), '" content="',
-                                str(contents), '" />\n']
+                metaTagsTxt += ['<meta http-equiv="', str(http_equiv),
+                                '" content="', str(contents), '" />\n']
 
         if 'NAME' in metaTags:
             for name, contents in metaTags['NAME'].items():
-                metaTagsTxt += ['<meta name="', str(name), '" content="', str(contents),
-                                '" />\n']
+                metaTagsTxt += ['<meta name="', str(name), '" content="',
+                                str(contents), '" />\n']
         return ''.join(metaTagsTxt)

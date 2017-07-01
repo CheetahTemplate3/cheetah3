@@ -18,7 +18,8 @@ maintainer = "Oleg Broytman"
 maintainer_email = "phd@phdru.name"
 url = "http://cheetahtemplate.org/"
 dev_tag = ""
-download_url = "https://pypi.python.org/pypi/%s/%s%s" % (name, version, dev_tag)
+download_url = "https://pypi.python.org/pypi/%s/%s%s" \
+    % (name, version, dev_tag)
 del dev_tag
 keywords = ["template"]
 platform = "Any"
@@ -83,7 +84,8 @@ if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
             entry_points = {
                 'console_scripts': [
                     'cheetah = Cheetah.CheetahWrapper:_cheetah',
-                    'cheetah-compile = Cheetah.CheetahWrapper:_cheetah_compile',
+                    'cheetah-compile = '
+                    'Cheetah.CheetahWrapper:_cheetah_compile',
                 ]
             }
     except ImportError:
@@ -94,8 +96,9 @@ Cheetah3 is a free (BSD-style) and open source template engine and code
 generation tool.
 
 It can be used standalone or combined with other tools and frameworks. Web
-development is its principle use, but Cheetah is very flexible and is also being
-used to generate C++ game code, Java, sql, form emails and even Python code.
+development is its principle use, but Cheetah is very flexible and
+is also being used to generate C++ game code, Java, sql, form emails
+and even Python code.
 
 It's a fork of the original CheetahTemplate library.
 

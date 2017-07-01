@@ -100,7 +100,8 @@ class CFBase(unittest.TestCase):
             if os.path.exists(self.scratchDir):
                 warn("Warning: unable to delete scratch directory %s")
         else:
-            warn("Warning: not deleting scratch directory %s" % self.scratchDir)
+            warn("Warning: not deleting scratch directory %s"
+                 % self.scratchDir)
 
     def _checkDestFileHelper(self, path, expected,
                              allowSurroundingText, errmsg):
@@ -188,7 +189,8 @@ Found %(result)r"""
             if status is None:
                 status = 0
         else:
-            process = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+            process = Popen(cmd, shell=True,
+                            stdin=PIPE, stdout=PIPE, stderr=STDOUT)
             process.stdin.close()
             output = process.stdout.read()
             status = process.wait()
@@ -306,7 +308,8 @@ class ThreeFilesWithSubdirectories(CFBase):
         self.checkFill("child/grandkid/a.html")
 
     def testText(self):
-        self.go("cheetah fill --oext txt a.tmpl child/a.tmpl child/grandkid/a.tmpl")
+        self.go("cheetah fill --oext txt "
+                "a.tmpl child/a.tmpl child/grandkid/a.tmpl")
         self.checkFill("a.txt")
         self.checkFill("child/a.txt")
         self.checkFill("child/grandkid/a.txt")
@@ -346,7 +349,8 @@ class SplatTmplWithSubdirectories(CFBase):
         self.checkFill("child/grandkid/a.html")
 
     def testText(self):
-        self.go("cheetah fill --oext txt *.tmpl child/*.tmpl child/grandkid/*.tmpl")
+        self.go("cheetah fill --oext txt "
+                "*.tmpl child/*.tmpl child/grandkid/*.tmpl")
         self.checkFill("a.txt")
         self.checkFill("child/a.txt")
         self.checkFill("child/grandkid/a.txt")
@@ -369,7 +373,8 @@ class OneFileWithOdir(CFBase):
 
 class VarietyWithOdir(CFBase):
     def testCompile(self):
-        self.go("cheetah compile --odir DEST a.tmpl child/a child/grandkid/*.tmpl")
+        self.go("cheetah compile --odir DEST "
+                "a.tmpl child/a child/grandkid/*.tmpl")
         self.checkSubdirPyInit("DEST")
         self.checkSubdirPyInit("DEST/child")
         self.checkSubdirPyInit("DEST/child/grandkid")
@@ -378,13 +383,15 @@ class VarietyWithOdir(CFBase):
         self.checkCompile("DEST/child/grandkid/a.py")
 
     def testFill(self):
-        self.go("cheetah fill --odir DEST a.tmpl child/a child/grandkid/*.tmpl")
+        self.go("cheetah fill --odir DEST "
+                "a.tmpl child/a child/grandkid/*.tmpl")
         self.checkFill("DEST/a.html")
         self.checkFill("DEST/child/a.html")
         self.checkFill("DEST/child/grandkid/a.html")
 
     def testText(self):
-        self.go("cheetah fill --odir DEST --oext txt a.tmpl child/a child/grandkid/*.tmpl")
+        self.go("cheetah fill --odir DEST --oext txt "
+                "a.tmpl child/a child/grandkid/*.tmpl")
         self.checkFill("DEST/a.txt")
         self.checkFill("DEST/child/a.txt")
         self.checkFill("DEST/child/grandkid/a.txt")
@@ -514,13 +521,16 @@ class IdirFlatRecurseCollision(CFIdirBase):
     expectError = True
 
     def testCompile(self):
-        self.assertSubprocess("cheetah compile -R --flat --idir SRC", nonzero=True)
+        self.assertSubprocess(
+            "cheetah compile -R --flat --idir SRC", nonzero=True)
 
     def testFill(self):
-        self.assertSubprocess("cheetah fill -R --flat --idir SRC", nonzero=True)
+        self.assertSubprocess(
+            "cheetah fill -R --flat --idir SRC", nonzero=True)
 
     def testText(self):
-        self.assertSubprocess("cheetah fill -R --flat --idir SRC --oext txt", nonzero=True)
+        self.assertSubprocess(
+            "cheetah fill -R --flat --idir SRC --oext txt", nonzero=True)
 
 
 class NoBackup(CFBase):

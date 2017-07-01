@@ -2,7 +2,7 @@
 import os
 
 try:
-    os.remove('MANIFEST')               # to avoid those bloody out-of-date manifests!!
+    os.remove('MANIFEST')  # to avoid those bloody out-of-date manifests!!
 except:
     pass
 

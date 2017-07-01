@@ -221,7 +221,8 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
 
     # firstPage and lastPage not implemented.  Needed?
 
-    def percentOfTotal(self, field=None, suffix='%', default='N/A', decimals=2):
+    def percentOfTotal(self, field=None, suffix='%',
+                       default='N/A', decimals=2):
         rec = self._origList[self._index]
         if field:
             val = lookup_func(rec, field)
@@ -439,7 +440,8 @@ class MondoReport:
         end = min(start + size, origlist_len)
         ret = []
         # widow, orphan calculation: adjust 'start' and 'end' up and down,
-        # Set 'widow', 'orphan', 'first_nonwidow', 'first_nonorphan' attributes.
+        # set 'widow', 'orphan', 'first_nonwidow',
+        # 'first_nonorphan' attributes.
         for i in range(start, end):
             o = origlist[i]
             b = Batch(origlist, size, i)

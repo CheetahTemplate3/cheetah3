@@ -7,8 +7,8 @@ representing further depth to the hierarchy.  See the end of the file for an
 example hierarchy.
 
 Use Hierarchy(contents, currentURL), where contents is this hierarchy, and
-currentURL is the position you are currently in.  The menubar and crumbs methods
-give you the HTML output.
+currentURL is the position you are currently in.
+The menubar and crumbs methods give you the HTML output.
 
 There are methods you can override to customize the HTML output.
 """
@@ -160,8 +160,8 @@ if __name__ == '__main__':
     for url in ['/', '/services', '/services/products/widget', '/contact']:
         print('<p>', '='*50)
         print('<br> %s: <br>\n' % url)
-        n = Hierarchy(hierarchy, url, menuCSSClass='menu', crumbCSSClass='crumb',
-                      prefix='/here')
+        n = Hierarchy(hierarchy, url, menuCSSClass='menu',
+                      crumbCSSClass='crumb', prefix='/here')
         print(n.menuList())
         print('<p>', '-'*50)
         print(n.crumbs())

@@ -299,7 +299,8 @@ def display():
     l = [x[2] for x in l]
 
     print('%5.5s %10.10s   %7.7s  %-8.8s' % ('%  ', 'cumulative', 'self', ''))
-    print('%5.5s  %9.9s  %8.8s  %-8.8s' % ("time", "seconds", "seconds", "name"))
+    print('%5.5s  %9.9s  %8.8s  %-8.8s'
+          % ("time", "seconds", "seconds", "name"))
 
     for x in l:
         x.display()

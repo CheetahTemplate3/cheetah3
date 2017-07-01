@@ -31,7 +31,8 @@ class BigEcho(ErrorCatcher):
 
 class KeyError(ErrorCatcher):
     def warn(self, exc_val, code, rawCode, lineCol):
-        raise KeyError("no '%s' in this Template Object's Search List" % rawCode)
+        raise KeyError(
+            "no '%s' in this Template Object's Search List" % rawCode)
 
 
 class ListErrors(ErrorCatcher):

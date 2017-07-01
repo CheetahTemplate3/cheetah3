@@ -118,16 +118,15 @@ class mod_install_data(install_data):
 
 
 def run_setup(configurations):
-    """ Run distutils setup.
+    """Run distutils setup.
 
-        The parameters passed to setup() are extracted from the list of modules,
-        classes or instances given in configurations.
+    The parameters passed to setup() are extracted from the list of modules,
+    classes or instances given in configurations.
 
-        Names with leading underscore are removed from the parameters.
-        Parameters which are not strings, lists, tuples, or dicts are removed as
-        well.  Configurations which occur later in the configurations list
-        override settings of configurations earlier in the list.
-
+    Names with leading underscore are removed from the parameters.
+    Parameters which are not strings, lists, tuples, or dicts are removed as
+    well.  Configurations which occur later in the configurations list
+    override settings of configurations earlier in the list.
     """
     # Build parameter dictionary
     kws = {}

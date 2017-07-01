@@ -11,18 +11,20 @@ class ArgListTest(unittest.TestCase):
         self.al = Parser.ArgList()
 
     def test_merge1(self):
-        '''
-            Testing the ArgList case results from Template.Preprocessors.test_complexUsage
-        '''
+        """
+        Testing the ArgList case results from
+        Template.Preprocessors.test_complexUsage
+        """
         self.al.add_argument('arg')
         expect = [('arg', None)]
 
         self.assertEqual(expect, self.al.merge())
 
     def test_merge2(self):
-        '''
-            Testing the ArgList case results from SyntaxAndOutput.BlockDirective.test4
-        '''
+        """
+        Testing the ArgList case results from
+        SyntaxAndOutput.BlockDirective.test4
+        """
         self.al.add_argument('a')
         self.al.add_default('999')
         self.al.next()
@@ -34,9 +36,10 @@ class ArgListTest(unittest.TestCase):
         self.assertEqual(expect, self.al.merge())
 
     def test_merge3(self):
-        '''
-            Testing the ArgList case results from SyntaxAndOutput.BlockDirective.test13
-        '''
+        """
+        Testing the ArgList case results from
+        SyntaxAndOutput.BlockDirective.test13
+        """
         self.al.add_argument('arg')
         self.al.add_default("'This is my block'")
         expect = [('arg', "'This is my block'")]
