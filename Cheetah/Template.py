@@ -989,7 +989,7 @@ class Template(Servlet):
     def _updateSettingsWithPreprocessTokens(
             klass, compilerSettings, placeholderToken, directiveToken):
 
-        if (placeholderToken and \
+        if (placeholderToken and
                 'cheetahVarStartToken' not in compilerSettings):
             compilerSettings['cheetahVarStartToken'] = placeholderToken
         if directiveToken:

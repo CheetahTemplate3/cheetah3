@@ -56,7 +56,7 @@ class _TestInfo(object):
         text = escape(str(error[1]))
         stream.write('\n')
         stream.write(
-            '    <%s type="%s">%s\n' \
+            '    <%s type="%s">%s\n'
             % (tagname,
                issubclass(error[0], Exception) and
                error[0].__name__ or str(error[0]), text))
@@ -136,7 +136,7 @@ class _XMLTestResult(unittest.TestResult):
         output and standard error streams must be passed in.a
 
         """
-        stream.write('<testsuite errors="%(e)d" failures="%(f)d" ' % \
+        stream.write('<testsuite errors="%(e)d" failures="%(f)d" ' %
                      {"e": len(self.errors), "f": len(self.failures)})
         stream.write('name="%(n)s" tests="%(t)d" time="%(time).3f">\n' % {
             "n": self._test_name,
