@@ -31,7 +31,5 @@ for py in 2.7 3.4 3.5 3.6; do
    cd ..
 done &&
 
-twine register dist/Cheetah3-"`python setup.py --version`".tar.gz &&
 twine upload --sign dist/* &&
-
 exec rm -rf build dist docs/html Cheetah3.egg-info
