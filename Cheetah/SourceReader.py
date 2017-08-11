@@ -56,7 +56,8 @@ class SourceReader(object):
         return self._src[i]
 
     def __getslice__(self, i, j):
-        i = max(i, 0); j = max(j, 0)
+        i = max(i, 0)
+        j = max(j, 0)
         return self._src[i:j]
 
     def splitlines(self):
