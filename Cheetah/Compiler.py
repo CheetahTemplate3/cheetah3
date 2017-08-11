@@ -38,7 +38,8 @@ VFN = valueForName
 currentTime = time.time
 
 
-class Error(Exception): pass
+class Error(Exception):
+    pass
 
 
 # Settings format: (key, default, docstring)
@@ -950,7 +951,8 @@ class MethodCompiler(GenUtils):
         return self.nextCacheID()
 
     def startCaptureRegion(self, assignTo, lineCol):
-        class CaptureDetails: pass
+        class CaptureDetails:
+            pass
         captureDetails = CaptureDetails()
         captureDetails.ID = ID = self.nextCaptureRegionID()
         captureDetails.assignTo = assignTo

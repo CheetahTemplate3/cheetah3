@@ -288,32 +288,43 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
         if size < 1:
             if start > 0 and end > 0 and end >= start:
                 size = end + 1 - start
-            else: size = 7
+            else:
+                size = 7
 
         if start > 0:
 
-            try: sequence[start - 1]
-            except: start = len(sequence)
+            try:
+                sequence[start - 1]
+            except:
+                start = len(sequence)
             # if start > l: start=l
 
             if end > 0:
-                if end < start: end = start
+                if end < start:
+                    end = start
             else:
                 end = start + size - 1
-                try: sequence[end + orphan - 1]
-                except: end = len(sequence)
+                try:
+                    sequence[end + orphan - 1]
+                except:
+                    end = len(sequence)
                 # if l - end < orphan: end=l
         elif end > 0:
-            try: sequence[end - 1]
-            except: end = len(sequence)
+            try:
+                sequence[end - 1]
+            except:
+                end = len(sequence)
             # if end > l: end=l
             start = end + 1 - size
-            if start - 1 < orphan: start = 1
+            if start - 1 < orphan:
+                start = 1
         else:
             start = 1
             end = start+size-1
-            try: sequence[end+orphan-1]
-            except: end = len(sequence)
+            try:
+                sequence[end+orphan-1]
+            except:
+                end = len(sequence)
             # if l - end < orphan: end=l
         return start, end, size
 

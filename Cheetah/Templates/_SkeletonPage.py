@@ -154,15 +154,19 @@ class _SkeletonPage(Template):
                 im = Image.open(src)
                 calcWidth, calcHeight = im.size
                 del im
-                if not width: width = calcWidth
-                if not height: height = calcHeight
+                if not width:
+                    width = calcWidth
+                if not height:
+                    height = calcHeight
 
             except:
                 try:                # try imageMagick instead
                     calcWidth, calcHeight = os.popen(
                         'identify -format "%w,%h" ' + src).read().split(',')
-                    if not width: width = calcWidth
-                    if not height: height = calcHeight
+                    if not width:
+                        width = calcWidth
+                    if not height:
+                        height = calcHeight
 
                 except:
                     pass

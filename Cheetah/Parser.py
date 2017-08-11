@@ -2273,7 +2273,9 @@ class _HighLevelParser(_LowLevelParser):
         expr = self._applyExpressionFilters(expr, 'set', startPos=startPos)
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
 
-        class Components: pass  # used for 'set global'
+        # used for 'set global'
+        class Components:
+            pass
         exprComponents = Components()
         exprComponents.LVALUE = LVALUE
         exprComponents.OP = OP
@@ -2408,7 +2410,8 @@ class _HighLevelParser(_LowLevelParser):
             source=normalizedMacroSrc, compilerSettings=compilerSettings)
         # t = macroTemplateClass()
 
-        class MacroDetails: pass
+        class MacroDetails:
+            pass
         macroDetails = MacroDetails()
         macroDetails.macroSrc = macroSrc
         macroDetails.argsList = argsList

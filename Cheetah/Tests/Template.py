@@ -198,7 +198,8 @@ class Preprocessors(TemplateTest):
     def test_normalizePreprocessorArgVariants(self):
         src = '%set foo = 12\n%%comment\n$(@foo*10)'
 
-        class Settings1: tokens = '@ %'
+        class Settings1:
+            tokens = '@ %'
         Settings1 = Settings1()
 
         from Cheetah.Template import TemplatePreprocessor

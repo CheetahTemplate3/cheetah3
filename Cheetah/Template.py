@@ -972,7 +972,8 @@ class Template(Servlet):
             settings.outputTransformer = unicode
 
         if not hasattr(settings, 'templateAPIClass'):
-            class PreprocessTemplateAPIClass(klass): pass
+            class PreprocessTemplateAPIClass(klass):
+                pass
             settings.templateAPIClass = PreprocessTemplateAPIClass
 
         if not hasattr(settings, 'compilerSettings'):
@@ -1089,7 +1090,8 @@ class Template(Servlet):
                     else:
                         return super(self.__class__, self).__unicode__()
 
-            if not PY2: __str__ = __unicode__
+            if not PY2:
+                __str__ = __unicode__
             __str__ = createMethod(__str__, concreteTemplateClass)
             __unicode__ = createMethod(__unicode__, concreteTemplateClass)
             setattr(concreteTemplateClass, '__str__', __str__)

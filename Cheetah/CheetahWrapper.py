@@ -664,6 +664,5 @@ def _cheetah_compile():
 
 ##################################################
 # if run from the command line
-if __name__ == '__main__':  CheetahWrapper().main()
-
-# vim: shiftwidth=4 tabstop=4 expandtab
+if __name__ == '__main__':
+    CheetahWrapper().main()
