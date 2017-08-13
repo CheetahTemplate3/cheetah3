@@ -145,7 +145,7 @@ class _GenSubberFunc:
         self._pos += offset
 
     def readTo(self, to, start=None):
-        if start == None:
+        if start is None:
             start = self._pos
         self._pos = to
         if self.atEnd():

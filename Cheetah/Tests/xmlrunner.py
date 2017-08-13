@@ -45,9 +45,9 @@ class _TestInfo(object):
                 "method": self._method,
                 "time": self._time,
             })
-        if self._failure != None:
+        if self._failure is not None:
             self._print_error(stream, 'failure', self._failure)
-        if self._error != None:
+        if self._error is not None:
             self._print_error(stream, 'error', self._error)
         stream.write('</testcase>\n')
 
@@ -172,7 +172,7 @@ class XMLTestRunner(object):
         """Run the given test case or test suite."""
         class_ = test.__class__
         classname = class_.__module__ + "." + class_.__name__
-        if self._stream == None:
+        if self._stream is None:
             filename = "TEST-%s.xml" % classname
             if self._filename:
                 filename = self._filename
@@ -206,7 +206,7 @@ class XMLTestRunner(object):
 
         time_taken = time.time() - start_time
         result.print_report(stream, time_taken, out_s, err_s)
-        if self._stream == None:
+        if self._stream is None:
             stream.close()
 
         return result
