@@ -1252,7 +1252,7 @@ class Template(Servlet):
                              '(if module, must contain subclasses '
                              'of Cheetah.Filters.Filter)'))
 
-        if not errorCatcher is None:
+        if errorCatcher is not None:
             err = True
             if isinstance(errorCatcher, (string_type, type)):
                 err = False
