@@ -758,7 +758,7 @@ class _LowLevelParser(SourceReader):
 
         while not self.atEnd():
             c = self.getc()
-            if not c in directiveNameChars:
+            if c not in directiveNameChars:
                 break
             name += c
             if name == '@':
