@@ -10,11 +10,9 @@ for more information.
 import sys                        # used in the error handling code
 import re                         # used to define the internal delims regex
 import logging
-import string
 import os.path
 import time                       # used in the cache refresh code
 from random import randrange
-import imp
 import inspect
 import io
 try:
@@ -29,15 +27,14 @@ import types
 from Cheetah import ErrorCatchers              # for placeholder tags
 from Cheetah import Filters                    # the output filters
 from Cheetah.CacheRegion import CacheRegion
-from Cheetah.CacheStore import MemoryCacheStore, MemcachedCacheStore
-from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
+from Cheetah.CacheStore import MemoryCacheStore  # , MemcachedCacheStore
+from Cheetah.Compiler import Compiler
 from Cheetah.NameMapper import NotFound, valueFromSearchList
 from Cheetah.Parser import ParseError, SourceReader
 # Base classes for Template
 from Cheetah.Servlet import Servlet
 from Cheetah.Unspecified import Unspecified
 from Cheetah.Utils.Indenter import Indenter      # and for placeholders
-from Cheetah.Utils.Misc import checkKeywords     # Used in Template.__init__
 from Cheetah.Utils.WebInputMixin import _Converter, _lookup, \
     NonNumericInputError
 from Cheetah.Version import MinCompatibleVersion

@@ -11,9 +11,8 @@
 import sys
 import os
 import os.path
-from os.path import getmtime, exists
+from os.path import getmtime
 import re
-import types
 import time
 import random
 import warnings
@@ -23,14 +22,13 @@ import codecs
 from Cheetah.Version import Version, VersionTuple
 from Cheetah.SettingsManager import SettingsManager
 from Cheetah.Utils.Indenter import indentize  # an undocumented preprocessor
-from Cheetah import ErrorCatchers
 from Cheetah import NameMapper
 from Cheetah.Parser import Parser, ParseError, specialVarRE, \
-     STATIC_CACHE, REFRESH_CACHE, SET_LOCAL, SET_GLOBAL, SET_MODULE, \
+     STATIC_CACHE, REFRESH_CACHE, SET_GLOBAL, SET_MODULE, \
      unicodeDirectiveRE, encodingDirectiveRE, escapedNewlineRE
 from Cheetah.compat import string_type, unicode
 
-from Cheetah.NameMapper import NotFound, valueForName, valueFromSearchList, \
+from Cheetah.NameMapper import valueForName, valueFromSearchList, \
     valueFromFrameOrSearchList
 VFFSL = valueFromFrameOrSearchList
 VFSL = valueFromSearchList

@@ -4,7 +4,6 @@
     #filter results in output filters Cheetah's $placeholders .
     #transform results in a filter on the entirety of the output
 '''
-import sys
 from Cheetah.compat import unicode
 
 # Additional entities WebSafe knows how to transform.  No need to include

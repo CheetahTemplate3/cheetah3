@@ -1,7 +1,6 @@
 """SourceReader class for Cheetah's Parser and CodeGenerator
 """
 import re
-import sys
 from Cheetah.compat import unicode
 
 EOLre = re.compile(r'[ \f\t]*(?:\r\n|\r|\n)')

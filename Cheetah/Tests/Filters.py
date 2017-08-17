@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-import sys
 import unittest
-
 import Cheetah.Template
 import Cheetah.Filters
 

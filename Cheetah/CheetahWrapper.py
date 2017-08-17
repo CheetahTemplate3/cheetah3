@@ -1,6 +1,5 @@
 
 import codecs
-import getopt
 import glob
 import os
 import pprint
@@ -13,9 +12,10 @@ except ImportError:  # PY3
     import pickle as pickle
 from optparse import OptionParser
 
-from Cheetah.Version import Version
-from Cheetah.Template import Template, DEFAULT_COMPILER_SETTINGS
+from Cheetah.Compiler import DEFAULT_COMPILER_SETTINGS
+from Cheetah.Template import Template
 from Cheetah.Utils.Misc import mkdirsWithPyInitFiles
+from Cheetah.Version import Version
 from Cheetah.compat import PY2
 
 optionDashesRE = re.compile(R"^-{1,2}")

@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 
 import sys
-import types
-import os
-import os.path
-
 import unittest
-from Cheetah.NameMapper import NotFound, valueForKey, \
+
+from Cheetah.NameMapper import NotFound, \
      valueForName, valueFromSearchList, valueFromFrame, \
      valueFromFrameOrSearchList
 

@@ -16,20 +16,16 @@ TODO
 ##################################################
 # DEPENDENCIES ##
 
-import sys
-import types
-import re
-from copy import deepcopy
 import os
 import os.path
-import warnings
+import sys
 import unittest
+import warnings
 
 from Cheetah.NameMapper import NotFound
-from Cheetah.NameMapper import C_VERSION as NameMapper_C_VERSION
 from Cheetah.Template import Template
 from Cheetah.Parser import ParseError
-from Cheetah.Compiler import Compiler, DEFAULT_COMPILER_SETTINGS
+from Cheetah.Compiler import DEFAULT_COMPILER_SETTINGS
 from Cheetah.compat import PY2
 
 

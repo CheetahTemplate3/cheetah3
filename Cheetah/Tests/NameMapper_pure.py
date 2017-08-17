@@ -4,25 +4,25 @@ import sys
 import unittest
 
 try:
-    from Cheetah import _namemapper
+    from Cheetah import _namemapper  # noqa
 except ImportError:
     # _namemapper hasn't been compiled so Tests/NameMapper.py
     # tests pure-python NameMapper.py; no need to duplicate these tests.
     pass
 else:  # Test NameMapper tests without _namemapper extension.
-    from Cheetah.Tests.NameMapper import *
+    from Cheetah.Tests.NameMapper import *  # noqa
 
 
 def setUpModule():
     if 'Cheetah.NameMapper' in sys.modules:
         del sys.modules['Cheetah.NameMapper']
     sys.modules['Cheetah._namemapper'] = None
-    from Cheetah.NameMapper import NotFound, valueForKey, \
+    from Cheetah.NameMapper import NotFound, \
         valueForName, valueFromSearchList, valueFromFrame, \
         valueFromFrameOrSearchList
     from Cheetah.Tests import NameMapper
     for func in [
-        NotFound, valueForKey, valueForName, valueFromSearchList,
+        NotFound, valueForName, valueFromSearchList,
         valueFromFrame, valueFromFrameOrSearchList
     ]:
         setattr(NameMapper, func.__name__, func)

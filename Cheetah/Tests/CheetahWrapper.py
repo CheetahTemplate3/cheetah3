@@ -14,7 +14,6 @@ Besides unittest usage, recognizes the following command-line options:
 
 import os
 import os.path
-import pdb
 import re                                     # Used by listTests.
 import shutil
 import sys

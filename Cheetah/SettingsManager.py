@@ -1,4 +1,3 @@
-import sys
 import os.path
 import copy as copyModule
 try:
@@ -6,14 +5,12 @@ try:
 except ImportError:  # PY3
     from configparser import ConfigParser
 import re
-from tokenize import Intnumber, Floatnumber, Number
+from tokenize import Number
 import types
-import time
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-import imp  # used by SettingsManager.updateSettingsFromPySrcFile()
 from Cheetah.compat import PY2
 
 

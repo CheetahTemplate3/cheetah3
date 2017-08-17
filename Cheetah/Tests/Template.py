@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-import pdb
-import sys
-import types
 import os
 import os.path
-import tempfile
+import sys
 import shutil
+import tempfile
 import unittest
+
 from Cheetah.Template import Template
 from Cheetah.compat import unicode
 

@@ -3,7 +3,6 @@
 Provides an abstract Servlet baseclass for Cheetah's Template class
 '''
 
-import sys
 import os.path
 
 

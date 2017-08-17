@@ -11,7 +11,6 @@ soon be changed somewhat.
 """
 
 import re
-import sys
 
 
 def indentize(source):

@@ -20,7 +20,7 @@ from Cheetah.Tests import NameMapper_pure
 from Cheetah.Tests import Misc
 from Cheetah.Tests import Filters
 from Cheetah.Tests import Template
-from Cheetah.Tests import Cheps
+# from Cheetah.Tests import Cheps
 from Cheetah.Tests import Parser
 from Cheetah.Tests import Regressions
 from Cheetah.Tests import Unicode

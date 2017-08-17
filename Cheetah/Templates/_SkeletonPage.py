@@ -4,9 +4,7 @@
 # DEPENDENCIES ##
 
 import os
-import sys
 import time
-import types
 
 # intra-package imports ...
 from Cheetah.Template import Template

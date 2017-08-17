@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 
-import sys
 import unittest
-
 import Cheetah.NameMapper
 import Cheetah.Template
-from Cheetah.compat import unicode
+from Cheetah.compat import unicode  # noqa
 
 
 class GetAttrException(Exception):

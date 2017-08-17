@@ -8,18 +8,12 @@ Classes:
   Parser === _HighLevelParser (an alias)
 """
 
-import os
 import sys
 import re
-from re import DOTALL, MULTILINE
 import types
-import time
 import inspect
-import traceback
 
 from Cheetah.SourceReader import SourceReader
-from Cheetah import Filters
-from Cheetah import ErrorCatchers
 from Cheetah.Unspecified import Unspecified
 from Cheetah.Macros.I18n import I18n
 from Cheetah.compat import PY2, string_type, unicode

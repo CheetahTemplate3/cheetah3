@@ -13,4 +13,4 @@ Documentation
     http://cheetahtemplate.org/
 '''
 
-from Cheetah.Version import *
+from Cheetah.Version import *  # noqa

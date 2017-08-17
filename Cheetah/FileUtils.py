@@ -1,7 +1,6 @@
 
 from glob import glob
 import os
-from os import listdir
 import os.path
 import re
 from tempfile import mktemp

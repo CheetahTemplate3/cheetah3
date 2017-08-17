@@ -5,7 +5,7 @@ import sys
 
 from distutils.command.build_ext import build_ext
 from distutils.command.install_data import install_data
-from distutils.core import Command, setup
+from distutils.core import setup
 from distutils.errors import CCompilerError, DistutilsExecError, \
     DistutilsPlatformError
 

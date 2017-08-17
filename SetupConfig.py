@@ -22,7 +22,7 @@ download_url = "https://pypi.python.org/pypi/%s/%s%s" \
     % (name, version, dev_tag)
 del dev_tag
 keywords = ["template"]
-platform = "Any"
+platforms = "Any"
 packages = ['Cheetah',
             'Cheetah.Macros',
             'Cheetah.Templates',
@@ -77,7 +77,6 @@ data_files = ['recursive: Cheetah *.tmpl *.txt *.rst LICENSE README.rst TODO']
 
 if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
     try:
-        from setuptools import setup
         if sys.platform == 'win32':
             # use 'entry_points' instead of 'scripts'
             del scripts

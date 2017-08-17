@@ -9,7 +9,6 @@ specific DummyTransaction or DummyResponse behavior
 '''
 
 import logging
-import types
 from Cheetah.compat import unicode
 
 

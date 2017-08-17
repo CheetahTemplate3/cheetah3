@@ -10,7 +10,6 @@ import tempfile
 import unittest
 from Cheetah.Template import Template
 from Cheetah import CheetahWrapper
-from Cheetah import DummyTransaction
 from Cheetah.compat import PY2, unicode
 
 

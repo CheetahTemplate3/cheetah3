@@ -16,9 +16,7 @@ try:
     import builtins as builtin
 except ImportError:  # PY2
     import __builtin__ as builtin
-import imp
 from threading import RLock
-import string
 import traceback
 import types
 
@@ -111,10 +109,6 @@ def install(templateFileExtensions=('.tmpl',)):
     global _installed
     if not _installed:
         CheetahDirOwner.templateFileExtensions = templateFileExtensions
-        try:
-            import builtins as builtin
-        except ImportError:  # PY2
-            import __builtin__ as builtin
         if isinstance(builtin.__import__, types.BuiltinFunctionType):
             global __oldimport__
             __oldimport__ = builtin.__import__
@@ -130,10 +124,6 @@ def uninstall():
     """Uninstall the Cheetah Import Hooks"""
     global _installed
     if not _installed:
-        try:
-            import builtins as builtin
-        except ImportError:  # PY2
-            import __builtin__ as builtin
         if isinstance(builtin.__import__, types.MethodType):
             builtin.__import__ = __oldimport__
             global _manager

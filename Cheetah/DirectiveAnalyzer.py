@@ -3,12 +3,6 @@
 import os
 import pprint
 
-try:
-    from functools import reduce
-except ImportError:
-    # Assume we have reduce
-    pass
-
 from Cheetah import Parser
 from Cheetah import Compiler
 from Cheetah import Template
