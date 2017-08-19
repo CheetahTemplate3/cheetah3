@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 Provides some import hooks to allow Cheetah's .tmpl files to be imported
 directly like Python .py modules.
@@ -130,7 +128,3 @@ def uninstall():
             global _manager
             del _manager
             _installed = False
-
-
-if __name__ == '__main__':
-    install()
