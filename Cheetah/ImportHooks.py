@@ -118,16 +118,18 @@ def install(templateFileExtensions=('.tmpl',)):
             _manager = ImportManager.ImportManager()
             _manager.setThreaded()
             _manager.install()
+            _installed = True
 
 
 def uninstall():
     """Uninstall the Cheetah Import Hooks"""
     global _installed
-    if not _installed:
+    if _installed:
         if isinstance(builtin.__import__, types.MethodType):
             builtin.__import__ = __oldimport__
             global _manager
             del _manager
+            _installed = False
 
 
 if __name__ == '__main__':
