@@ -15,6 +15,8 @@ url = "http://cheetahtemplate.org/"
 dev_tag = ""
 download_url = "https://pypi.python.org/pypi/%s/%s%s" % (name, version, dev_tag)
 del dev_tag
+keywords = ["template"]
+platform = "Any"
 packages = ['Cheetah',
             'Cheetah.Macros',
             'Cheetah.Templates',
