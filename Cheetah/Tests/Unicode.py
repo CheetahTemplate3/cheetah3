@@ -256,7 +256,7 @@ class InlineSpanishTest(unittest.TestCase):
     if PY2:  # In PY3 templates are already unicode
         def test_failure(self):
             """ Test a template lacking a proper #encoding tag """
-            self.assertRaises(UnicodeDecodeError, Template, self.template, 
+            self.assertRaises(UnicodeDecodeError, Template, self.template,
                               searchList=[{'header': '',
                                            'nombre': '',
                                            'numpedidos_bodega': '',
