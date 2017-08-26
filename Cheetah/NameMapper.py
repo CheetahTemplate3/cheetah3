@@ -374,7 +374,7 @@ def example():
         'item': 'itemval',
         'subDict': {'nestedMethod': a.method3}
         }
-    b = 'this is local b'
+    # b = 'this is local b'
 
     print(valueForKey(a.dic, 'subDict'))
     print(valueForName(a, 'dic.item'))

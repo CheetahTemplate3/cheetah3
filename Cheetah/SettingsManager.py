@@ -189,7 +189,7 @@ class _SettingsCollector(object):
                     else:
                         path = val.split(';')[0]
                         rest = ''.join(val.split(';')[1:]).strip()
-                        parentDict = self.readSettingsFromPySrcFile(path)
+                        parentDict = self.readSettingsFromPySrcFile(path)  # noqa: E501,F841
                         importedSettings = eval('parentDict["' + rest + '"]')
 
                     subDict.update(mergeNestedDictionaries(subDict,

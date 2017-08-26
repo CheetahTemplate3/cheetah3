@@ -1321,7 +1321,7 @@ class _LowLevelParser(SourceReader):
 
         startPos = self.pos()
         lineCol = self.getRowCol(startPos)
-        startToken = self.getCheetahVarStartToken()
+        startToken = self.getCheetahVarStartToken()  # noqa: F841
         silentPlaceholderToken = self.getSilentPlaceholderToken()
         if silentPlaceholderToken:
             isSilentPlaceholder = True
@@ -2256,7 +2256,6 @@ class _HighLevelParser(_LowLevelParser):
             self.getWhiteSpace()
             style = SET_MODULE
 
-        startsWithDollar = self.matchCheetahVarStart()
         startPos = self.pos()
         LVALUE = self.getExpression(pyTokensToBreakAt=assignmentOps,
                                     useNameMapper=False).strip()

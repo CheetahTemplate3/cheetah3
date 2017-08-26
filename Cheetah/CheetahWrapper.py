@@ -122,7 +122,7 @@ class CheetahWrapper(object):
 
         # Step 1: Determine the command and arguments.
         try:
-            self.progName = progName = os.path.basename(argv[0])
+            self.progName = os.path.basename(argv[0])
             self.command = command = optionDashesRE.sub("", argv[1])
             if command == 'test':
                 self.testOpts = argv[2:]
@@ -149,7 +149,7 @@ class CheetahWrapper(object):
         usage(HELP_PAGE1, "unknown command '%s'" % command)
 
     def parseOpts(self, args):
-        C, D, W = self.chatter, self.debug, self.warn
+        D = self.debug
         self.isCompile = isCompile = self.command[0] == 'c'
         defaultOext = isCompile and ".py" or ".html"
         self.parser = OptionParser()
@@ -338,7 +338,7 @@ you do have write permission to and re-run the tests.""")
             self.opts.oext = "." + oext
 
     def _compileOrFill(self):
-        C, D, W = self.chatter, self.debug, self.warn
+        C, D = self.chatter, self.debug
         opts, files = self.opts, self.pathArgs
         if files == ["-"]:
             self._compileOrFillStdin()
@@ -412,7 +412,7 @@ you do have write permission to and re-run the tests.""")
         """Check for multiple source paths writing to the same destination
            path.
         """
-        C, D, W = self.chatter, self.debug, self.warn
+        W = self.warn
         isError = False
         dstSources = {}
         for b in bundles:
@@ -437,7 +437,7 @@ you do have write permission to and re-run the tests.""")
         """Calculate source paths from 'files' by applying the
            command-line options.
         """
-        C, D, W = self.chatter, self.debug, self.warn
+        D, W = self.debug, self.warn
         idir = self.opts.idir
         iext = self.opts.iext
         files = []
@@ -473,7 +473,6 @@ you do have write permission to and re-run the tests.""")
         flat = self.opts.flat
         idir = self.opts.idir
         iext = self.opts.iext
-        nobackup = self.opts.nobackup
         odir = self.opts.odir
         oext = self.opts.oext
         idirSlash = idir + os.sep
@@ -511,7 +510,7 @@ you do have write permission to and re-run the tests.""")
         return bundles
 
     def _getTemplateClass(self):
-        C, D, W = self.chatter, self.debug, self.warn
+        C = self.chatter
         modname = None
         if self._templateClass:
             return self._templateClass
@@ -589,12 +588,11 @@ you do have write permission to and re-run the tests.""")
         sys.stdout.write(output)
 
     def _compileOrFillBundle(self, b):
-        C, D, W = self.chatter, self.debug, self.warn
+        C = self.chatter
         TemplateClass = self._getTemplateClass()
         compilerSettings = self._getCompilerSettings()
         src = b.src
         dst = b.dst
-        base = b.base
         basename = b.basename
         dstDir = os.path.dirname(dst)
         what = self.isCompile and "Compiling" or "Filling"

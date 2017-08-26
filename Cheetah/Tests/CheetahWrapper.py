@@ -75,7 +75,6 @@ class CFBase(unittest.TestCase):
             if (pythonPath != cwd) and \
                     not pythonPath.endswith(':%s' % cwd):
                 os.environ['PYTHONPATH'] = '%s:%s' % (pythonPath, cwd)
-        I = self.inform
         # Step 1: Create the scratch directory and chdir into it.
         self.scratchDir = scratchDir = tempfile.mktemp()
         os.mkdir(scratchDir)
@@ -168,7 +167,6 @@ Found %(result)r"""
         paths = os.getenv('PATH')
         if not paths:
             return cmd
-        parts = cmd.split(' ')
         paths = paths.split(':')
         for p in paths:
             p = os.path.join(p, cmd)

@@ -6,7 +6,7 @@ Development (master)
 
 Minor features:
 
-  - Code cleanup: fix indentation.
+  - Code cleanup: fix code style to satisfy flake8 linter.
 
 Documentation:
 

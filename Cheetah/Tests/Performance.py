@@ -129,7 +129,7 @@ class DynamicMethodCompilationTest(PerformanceTest):
         template = Cheetah.Template.Template.compile(
             template, keepRefToGeneratedCode=False)
         template = template()
-        value = template.testMethod()
+        value = template.testMethod()  # noqa: F841
 
 
 class BunchOfWriteCalls(PerformanceTest):
@@ -184,7 +184,7 @@ class FilterTest(PerformanceTest):
         self.template = template()
 
     def performanceSample(self):
-        value = unicode(self.template)
+        value = unicode(self.template)  # noqa: F841
 
 
 class LongCompileTest(PerformanceTest):

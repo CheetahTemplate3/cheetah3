@@ -403,7 +403,6 @@ class MondoReport:
         if orphan != 0:
             raise NotImplementedError("non-zero orphan")
         origList = self._origList
-        origList_len = len(origList)
         start = max(0, start)
         end = min(start + size, len(self._origList))
         mySlice = origList[start:end]

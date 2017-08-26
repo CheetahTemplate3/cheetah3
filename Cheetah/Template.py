@@ -704,7 +704,6 @@ class Template(Servlet):
         ##################################################
         # handle any preprocessors
         if preprocessors:
-            origSrc = source
             source, file = klass._preprocessSource(source, file, preprocessors)
 
         ##################################################
@@ -1936,10 +1935,9 @@ class Template(Servlet):
         elif src == 'v':
             source, func = 'value',   self.request().value
         elif src == 's':
-            source, func = 'session', self.request().session().value
+            source, func = 'session', self.request().session().value  # noqa: E501,F841
         else:
             raise TypeError("arg 'src' invalid")
-        sources = source + 's'
         converters = {
             '': _Converter('string', None, default,      default),
             'int': _Converter('int',     int, defaultInt,   badInt),

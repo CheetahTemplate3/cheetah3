@@ -76,7 +76,7 @@ class SourceReader(object):
         if pos is None:
             pos = self._pos
         lineNum = self.lineNum(pos)
-        BOL, EOL = self._BOLs[lineNum], self._EOLs[lineNum]
+        BOL = self._BOLs[lineNum]
         return lineNum+1, pos-BOL+1
 
     def getRowColLine(self, pos=None):

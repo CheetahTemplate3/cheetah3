@@ -57,7 +57,7 @@ class DummyResponse(object):
         chunks = outputChunks or self._outputChunks
         try:
             return u''.join(chunks)
-        except UnicodeDecodeError as ex:
+        except UnicodeDecodeError:
             logging.debug(
                 'Trying to work around a UnicodeDecodeError in getvalue()')
             logging.debug(

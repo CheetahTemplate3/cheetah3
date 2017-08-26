@@ -481,9 +481,9 @@ class VFS_4namespaces(VFS):
 class VFF(VFN):
     def get(self, name, autocall=True):
         ns = self._testNamespace
-        aStr = ns['aStr']
-        aFloat = ns['aFloat']
-        none = 'some'
+        aStr = ns['aStr']  # noqa: F841
+        aFloat = ns['aFloat']  # noqa: F841
+        none = 'some'  # noqa: F841
         return valueFromFrame(name, autocall)
 
     def setUp(self):
@@ -523,8 +523,8 @@ class VFFSL(VFS):
         del ns['anInt']  # will be picked up by globals
 
     def VFFSL(self, searchList, name, autocall=True):
-        anInt = 1
-        none = 'some'
+        anInt = 1  # noqa: F841
+        none = 'some'  # noqa: F841
         return valueFromFrameOrSearchList(searchList, name, autocall)
 
     def get(self, name, autocall=True):

@@ -1917,9 +1917,6 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
     def setCompilerSettings(self, keywords, settingsStr):
         KWs = keywords
-        merge = True
-        if 'nomerge' in KWs:
-            merge = False
 
         if 'reset' in KWs:
             # @@TR: this is actually caught by the parser at the moment.

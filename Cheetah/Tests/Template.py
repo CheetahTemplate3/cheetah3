@@ -66,7 +66,6 @@ class ClassMethods_compile(TemplateTest):
 
     def test_moduleNameArg(self):
         klass = Template.compile(source='$foo', moduleName='foo99')
-        mod = sys.modules['foo99']
         assert klass.__name__ == 'foo99'
         t = klass(namespaces={'foo': 1234})
         assert str(t) == '1234'
@@ -74,7 +73,6 @@ class ClassMethods_compile(TemplateTest):
         klass = Template.compile(source='$foo',
                                  moduleName='foo1',
                                  className='foo2')
-        mod = sys.modules['foo1']
         assert klass.__name__ == 'foo2'
         t = klass(namespaces={'foo': 1234})
         assert str(t) == '1234'
@@ -279,7 +277,7 @@ class TryExceptImportTest(TemplateTest):
         # This should raise an IndentationError (if the bug exists)
         klass = Template.compile(
             source=source, compilerSettings={'useLegacyImportMode': False})
-        t = klass(namespaces={'foo': 1234})
+        t = klass(namespaces={'foo': 1234})  # noqa: F841
 
 
 class ClassMethodSupport(TemplateTest):
