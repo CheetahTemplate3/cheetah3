@@ -50,8 +50,8 @@ class DummyResponse(object):
         self._outputChunks.append(value)
 
     def writeln(self, txt):
-        write(txt)
-        write('\n')
+        self.write(txt)
+        self.write('\n')
 
     def getvalue(self, outputChunks=None):
         chunks = outputChunks or self._outputChunks

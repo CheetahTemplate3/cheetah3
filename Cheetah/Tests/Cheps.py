@@ -29,7 +29,7 @@ class Chep_2_Conditionalized_Import_Behavior(unittest.TestCase):
         except Cheetah.Parser.ParseError as ex:
             self.fail('Failed to properly generate code %s' % ex)
         template = template()
-        rc = tepmlate.funky('abc def')
+        rc = template.funky('abc def')
         assert rc == 'abc+def'
 
     def test_LegacyMode(self):

@@ -210,7 +210,7 @@ class _GenSubberFunc:
 
     def subberFunc(self):
         exec(self.code())
-        return subber
+        return subber  # noqa: F821 undefined name 'subber'
 
 
 class FindAndReplace:

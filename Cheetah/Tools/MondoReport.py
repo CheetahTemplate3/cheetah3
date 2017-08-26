@@ -366,16 +366,16 @@ class Summary(ValuesGetterMixin):
         return median(lis)
 
     def variance(self, field=None):
-        raiseNotImplementedError()
+        raise NotImplementedError()
 
     def variance_n(self, field=None):
-        raiseNotImplementedError()
+        raise NotImplementedError()
 
     def standardDeviation(self, field=None):
-        raiseNotImplementedError()
+        raise NotImplementedError()
 
     def standardDeviation_n(self, field=None):
-        raiseNotImplementedError()
+        raise NotImplementedError()
 
 
 class PrevNextPage:
