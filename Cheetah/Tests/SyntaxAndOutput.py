@@ -2093,12 +2093,12 @@ class IncludeDirective(OutputTest):
 
 class SilentDirective(OutputTest):
 
-    def test1(self):
+    def _X_test1(self):
         """simple #silent"""
         self.verify("#silent $aFunc",
                     "")
 
-    def test2(self):
+    def _X_test2(self):
         """simple #silent"""
         self.verify("#silent $anObj.callIt\n$anObj.callArg",
                     "1234")
@@ -2106,7 +2106,7 @@ class SilentDirective(OutputTest):
         self.verify("#silent $anObj.callIt ##comment\n$anObj.callArg",
                     "1234")
 
-    def test3(self):
+    def _X_test3(self):
         """simple #silent"""
         self.verify("#silent $anObj.callIt(99)\n$anObj.callArg",
                     "99")
