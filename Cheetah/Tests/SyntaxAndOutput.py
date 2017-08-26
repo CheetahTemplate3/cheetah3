@@ -510,14 +510,14 @@ class Comments_MultiLine(OutputTest):
         self.verify("foo\nfoo bar #* #for $i in range(15) *# foo\n",
                     "foo\nfoo bar  foo\n")
 
-    def test9(self):
+    def test10(self):
         """ text around #* *# containing #for directive and trailing whitespace
         which should be gobbled
         """
         self.verify("foo\nfoo bar #* #for $i in range(15) *#   \ntest",
                     "foo\nfoo bar \ntest")
 
-    def test10(self):
+    def test11(self):
         """
         Text around #* *# containing #for directive and newlines:
         trailing whitespace which should be gobbled.
@@ -2111,6 +2111,12 @@ class SilentDirective(OutputTest):
         self.verify("#silent $anObj.callIt(99)\n$anObj.callArg",
                     "99")
 
+    def test4(self):
+        """#silent 1234
+        """
+        self.verify("#silent 1234",
+                    "")
+
 
 class SetDirective(OutputTest):
 
@@ -2973,14 +2979,6 @@ class EchoDirective(OutputTest):
         """
         self.verify("#echo 1234",
                     "1234")
-
-
-class SilentDirective(OutputTest):
-    def test1(self):
-        """#silent 1234
-        """
-        self.verify("#silent 1234",
-                    "")
 
 
 class ErrorCatcherDirective(OutputTest):

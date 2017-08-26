@@ -1088,7 +1088,7 @@ class Template(Servlet):
                         return super(self.__class__, self).__unicode__()
 
             if not PY2:
-                __str__ = __unicode__
+                __str__ = __unicode__  # noqa: F811
             __str__ = createMethod(__str__, concreteTemplateClass)
             __unicode__ = createMethod(__unicode__, concreteTemplateClass)
             setattr(concreteTemplateClass, '__str__', __str__)

@@ -167,10 +167,6 @@ if PY2 and not hasattr(inspect.imp, 'get_suffixes'):
 # the C versions.
 
 
-class NotFound(LookupError):
-    pass
-
-
 def _raiseNotFoundException(key, namespace):
     excString = "cannot find '%s'" % key
     if _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS:
@@ -221,15 +217,6 @@ def hasKey(obj, key):
         return False
 
 
-def valueForKey(obj, key):
-    if isinstance(obj, Mapping) and key in obj:
-        return obj[key]
-    elif hasattr(obj, key):
-        return getattr(obj, key)
-    else:
-        _raiseNotFoundException(key, obj)
-
-
 def _valueForName(obj, name, executeCallables=False):
     nameChunks = name.split('.')
     for key in nameChunks:
@@ -249,22 +236,6 @@ def _valueForName(obj, name, executeCallables=False):
     return obj
 
 
-def valueForName(obj, name, executeCallables=False):
-    try:
-        return _valueForName(obj, name, executeCallables)
-    except NotFound as e:
-        _wrapNotFoundException(e, fullName=name, namespace=obj)
-
-
-def valueFromSearchList(searchList, name, executeCallables=False):
-    key = name.split('.')[0]
-    for namespace in searchList:
-        if hasKey(namespace, key):
-            return _valueForName(namespace, name,
-                                 executeCallables=executeCallables)
-    _raiseNotFoundException(key, searchList)
-
-
 def _namespaces(callerFrame, searchList=None):
     yield callerFrame.f_locals
     if searchList:
@@ -272,41 +243,6 @@ def _namespaces(callerFrame, searchList=None):
             yield namespace
     yield callerFrame.f_globals
     yield __builtins__
-
-
-def valueFromFrameOrSearchList(searchList, name, executeCallables=False,
-                               frame=None):
-    def __valueForName():
-        try:
-            return _valueForName(namespace, name,
-                                 executeCallables=executeCallables)
-        except NotFound as e:
-            _wrapNotFoundException(e, fullName=name, namespace=searchList)
-    try:
-        if not frame:
-            frame = inspect.stack()[1][0]
-        key = name.split('.')[0]
-        for namespace in _namespaces(frame, searchList):
-            if hasKey(namespace, key):
-                return __valueForName()
-        _raiseNotFoundException(key, searchList)
-    finally:
-        del frame
-
-
-def valueFromFrame(name, executeCallables=False, frame=None):
-    # @@TR consider implementing the C version the same way
-    # at the moment it provides a seperate but mirror implementation
-    # to valueFromFrameOrSearchList
-    try:
-        if not frame:
-            frame = inspect.stack()[1][0]
-        return valueFromFrameOrSearchList(searchList=None,
-                                          name=name,
-                                          executeCallables=executeCallables,
-                                          frame=frame)
-    finally:
-        del frame
 
 
 def hasName(obj, name):
@@ -327,9 +263,67 @@ try:
          valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
     C_VERSION = True
 except:
+    class NotFound(LookupError):
+        pass
+
+    def valueForKey(obj, key):
+        if isinstance(obj, Mapping) and key in obj:
+            return obj[key]
+        elif hasattr(obj, key):
+            return getattr(obj, key)
+        else:
+            _raiseNotFoundException(key, obj)
+
+    def valueForName(obj, name, executeCallables=False):
+        try:
+            return _valueForName(obj, name, executeCallables)
+        except NotFound as e:
+            _wrapNotFoundException(e, fullName=name, namespace=obj)
+
+    def valueFromSearchList(searchList, name, executeCallables=False):
+        key = name.split('.')[0]
+        for namespace in searchList:
+            if hasKey(namespace, key):
+                return _valueForName(namespace, name,
+                                     executeCallables=executeCallables)
+        _raiseNotFoundException(key, searchList)
+
+    def valueFromFrame(name, executeCallables=False, frame=None):
+        # @@TR consider implementing the C version the same way
+        # at the moment it provides a seperate but mirror implementation
+        # to valueFromFrameOrSearchList
+        try:
+            if not frame:
+                frame = inspect.stack()[1][0]
+            return valueFromFrameOrSearchList(
+                searchList=None, name=name,
+                executeCallables=executeCallables, frame=frame)
+        finally:
+            del frame
+
+    def valueFromFrameOrSearchList(searchList, name, executeCallables=False,
+                                   frame=None):
+        def __valueForName():
+            try:
+                return _valueForName(namespace, name,
+                                     executeCallables=executeCallables)
+            except NotFound as e:
+                _wrapNotFoundException(e, fullName=name, namespace=searchList)
+        try:
+            if not frame:
+                frame = inspect.stack()[1][0]
+            key = name.split('.')[0]
+            for namespace in _namespaces(frame, searchList):
+                if hasKey(namespace, key):
+                    return __valueForName()
+            _raiseNotFoundException(key, searchList)
+        finally:
+            del frame
+
     # It is possible with PyPy, Jython or Windows, for example,
     # that _namemapper.c hasn't been compiled.
     C_VERSION = False
+
 
 ##################################################
 # CLASSES

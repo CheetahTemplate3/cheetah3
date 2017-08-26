@@ -16,7 +16,6 @@ except ImportError:  # PY2
     import __builtin__ as builtin
 from threading import RLock
 import traceback
-import types
 
 from Cheetah import ImportManager
 from Cheetah.ImportManager import DirOwner

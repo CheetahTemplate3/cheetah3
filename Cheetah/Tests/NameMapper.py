@@ -214,20 +214,20 @@ class VFN(NameMapperTest):
         for i in range(10):
             self.check('aDict')
 
-    def test17(self):
+    def test19(self):
         """aDict in dict lookup"""
         self.check('aDict')
 
-    def test18(self):
+    def test20(self):
         """aDict in dict lookup in a loop"""
         for i in range(10):
             self.check('aDict')
 
-    def test19(self):
+    def test21(self):
         """aClass.classVar1 in dict lookup"""
         self.check('aClass.classVar1')
 
-    def test20(self):
+    def test22(self):
         """aClass.classVar1 in dict lookup in a loop"""
         for i in range(10):
             self.check('aClass.classVar1')

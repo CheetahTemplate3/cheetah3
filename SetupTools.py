@@ -15,9 +15,9 @@ from Cheetah.compat import string_type
 
 if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
     try:
-        from setuptools import setup
+        from setuptools import setup  # noqa: F811
     except ImportError:
-        from distutils.core import setup
+        pass
 
 if sys.platform == 'win32':
     # 2.6's distutils.msvc9compiler can raise an IOError when failing to
