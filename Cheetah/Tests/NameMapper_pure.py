@@ -9,8 +9,6 @@ except ImportError:
     # _namemapper hasn't been compiled so Tests/NameMapper.py
     # tests pure-python NameMapper.py; no need to duplicate these tests.
     pass
-else:  # Test NameMapper tests without _namemapper extension.
-    from Cheetah.Tests.NameMapper import *  # noqa
 
 
 def setUpModule():
