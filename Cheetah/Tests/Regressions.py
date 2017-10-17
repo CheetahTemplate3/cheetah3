@@ -27,7 +27,7 @@ class GetAttrTest(unittest.TestCase):
         except GetAttrException as e:
             # expected
             return
-        except:
+        except Exception as e:
             self.fail('Invalid exception raised: %s' % e)
         self.fail('Should have had an exception raised')
 

@@ -564,10 +564,12 @@ you do have write permission to and re-run the tests.""")
                            )
 
             validKeys = set(DEFAULT_COMPILER_SETTINGS.keys())
-            if [k for k in settings if k not in validKeys]:
-                self.error(
-                    'The --setting "%s" is not a valid compiler setting name.'
-                    % k)
+            for k in settings:
+                if k not in validKeys:
+                    self.error(
+                        'The --setting "%s" '
+                        'is not a valid compiler setting name.'
+                        % k)
 
             self._compilerSettings = settings
             return settings
