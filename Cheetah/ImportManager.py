@@ -189,7 +189,7 @@ class DirOwner(Owner):
                 attempt = pth+ext
                 try:
                     st = _os_stat(attempt)
-                except:
+                except Exception:
                     pass
                 else:
                     if typ == imp.C_EXTENSION:
@@ -293,7 +293,7 @@ class RegistryImportDirector(ImportDirector):
                 try:
                     hkey = win32api.RegOpenKeyEx(root, subkey,
                                                  0, KEY_ALL_ACCESS)
-                except:
+                except Exception:
                     pass
                 else:
                     numsubkeys, numvalues, lastmodified = \
@@ -364,7 +364,7 @@ class PathImportDirector(ImportDirector):
                 # this may cause an import, which may cause recursion
                 # hence the protection
                 owner = klass(path)
-            except:
+            except Exception:
                 pass
             else:
                 break

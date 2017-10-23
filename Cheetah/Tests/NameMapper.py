@@ -38,7 +38,7 @@ class DummyClass(object):
                 if x == 'xx':
                     pass
             return x
-        except:
+        except Exception:
             raise
 
 

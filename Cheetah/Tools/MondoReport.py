@@ -295,7 +295,7 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
 
             try:
                 sequence[start - 1]
-            except:
+            except Exception:
                 start = len(sequence)
             # if start > l: start=l
 
@@ -306,13 +306,13 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
                 end = start + size - 1
                 try:
                     sequence[end + orphan - 1]
-                except:
+                except Exception:
                     end = len(sequence)
                 # if l - end < orphan: end=l
         elif end > 0:
             try:
                 sequence[end - 1]
-            except:
+            except Exception:
                 end = len(sequence)
             # if end > l: end=l
             start = end + 1 - size
@@ -323,7 +323,7 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
             end = start+size-1
             try:
                 sequence[end+orphan-1]
-            except:
+            except Exception:
                 end = len(sequence)
             # if l - end < orphan: end=l
         return start, end, size

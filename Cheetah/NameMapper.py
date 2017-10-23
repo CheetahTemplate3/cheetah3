@@ -262,7 +262,7 @@ try:
     from Cheetah._namemapper import NotFound, valueForKey, valueForName, \
          valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
     C_VERSION = True
-except:
+except Exception:
     class NotFound(LookupError):
         pass
 

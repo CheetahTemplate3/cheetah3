@@ -57,7 +57,7 @@ class CheetahDirOwner(DirOwner):
                 if os.path.exists(tmplPath):
                     try:
                         return self._compile(name, tmplPath)
-                    except:
+                    except Exception:
                         # @@TR: log the error
                         exc_txt = traceback.format_exc()
                         exc_txt = '  ' + ('  \n'.join(exc_txt.splitlines()))

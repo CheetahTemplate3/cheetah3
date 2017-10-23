@@ -755,7 +755,7 @@ class Template(Servlet):
                                       moduleGlobalsHash,
                                       hash(cacheDirForModuleFiles),
                                       ]])
-            except:
+            except Exception:
                 # @@TR: should add some logging to this
                 pass
         outputEncoding = 'ascii'
@@ -826,7 +826,7 @@ class Template(Servlet):
                     try:
                         parseError = genParserErrorFromPythonException(
                             source, file, generatedModuleCode, exception=e)
-                    except:
+                    except Exception:
                         updateLinecache(__file__, generatedModuleCode)
                         e.generatedModuleCode = generatedModuleCode
                         raise e
@@ -1288,7 +1288,7 @@ class Template(Servlet):
                      % (compiledVersion, MinCompatibleVersion))
             except AssertionError:
                 raise
-            except:
+            except Exception:
                 pass
 
         ##################################################
@@ -1428,7 +1428,7 @@ class Template(Servlet):
         """
         try:
             Servlet.shutdown(self)
-        except:
+        except Exception:
             pass
         self._CHEETAH__searchList = None
         self.__dict__ = {}

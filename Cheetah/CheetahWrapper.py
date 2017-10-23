@@ -272,7 +272,7 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
         TEST_WRITE_FILENAME = 'cheetah_test_file_creation_ability.tmp'
         try:
             f = open(TEST_WRITE_FILENAME, 'w')
-        except:
+        except Exception:
             sys.exit("""\
 Cannot run the tests because you don't have write permission in the current
 directory.  The tests need to create temporary files.  Change to a directory
@@ -555,7 +555,7 @@ you do have write permission to and re-run the tests.""")
             try:
                 settings = eval('getkws(%s)'
                                 % self.opts.compilerSettingsString)
-            except:
+            except Exception:
                 self.error("There's an error in your --settings option."
                            "It must be valid Python syntax.\n"
                            + "    --settings='%s'\n"

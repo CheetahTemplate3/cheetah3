@@ -852,7 +852,7 @@ class _LowLevelParser(SourceReader):
             token = self.cacheTokenRE.match(self.src(), self.pos())
             self.setPos(token.end())
             return token.group()
-        except:
+        except Exception:
             raise ParseError(self, msg='Expected cache token')
 
     def getSilentPlaceholderToken(self):
@@ -860,7 +860,7 @@ class _LowLevelParser(SourceReader):
             token = self.silentPlaceholderTokenRE.match(self.src(), self.pos())
             self.setPos(token.end())
             return token.group()
-        except:
+        except Exception:
             raise ParseError(self, msg='Expected silent placeholder token')
 
     def getTargetVarsList(self):
@@ -1931,7 +1931,7 @@ class _HighLevelParser(_LowLevelParser):
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLine)
         try:
             self._compiler.setCompilerSetting(settingName, valueExpr)
-        except:
+        except Exception:
             sys.stderr.write(
                 'An error occurred while processing '
                 'the following #compiler directive.\n')
@@ -1971,7 +1971,7 @@ class _HighLevelParser(_LowLevelParser):
         try:
             self._compiler.setCompilerSettings(keywords=keywords,
                                                settingsStr=settingsStr)
-        except:
+        except Exception:
             sys.stderr.write(
                 'An error occurred while processing '
                 'the following compiler settings.\n')

@@ -157,7 +157,7 @@ class _SkeletonPage(Template):
                 if not height:
                     height = calcHeight
 
-            except:
+            except Exception:
                 try:                # try imageMagick instead
                     calcWidth, calcHeight = os.popen(
                         'identify -format "%w,%h" ' + src).read().split(',')
@@ -166,7 +166,7 @@ class _SkeletonPage(Template):
                     if not height:
                         height = calcHeight
 
-                except:
+                except Exception:
                     pass
 
         if width and height:
