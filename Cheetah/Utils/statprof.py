@@ -293,16 +293,16 @@ def display():
         print('No samples recorded.')
         return
 
-    l = [CallStats(x) for x in call_data.values()]
-    l = [(x.self_secs_in_proc, x.cum_secs_in_proc, x) for x in l]
-    l.sort(reverse=True)
-    l = [x[2] for x in l]
+    _l = [CallStats(x) for x in call_data.values()]
+    _l = [(x.self_secs_in_proc, x.cum_secs_in_proc, x) for x in _l]
+    _l.sort(reverse=True)
+    _l = [x[2] for x in _l]
 
     print('%5.5s %10.10s   %7.7s  %-8.8s' % ('%  ', 'cumulative', 'self', ''))
     print('%5.5s  %9.9s  %8.8s  %-8.8s'
           % ("time", "seconds", "seconds", "name"))
 
-    for x in l:
+    for x in _l:
         x.display()
 
     print('---')

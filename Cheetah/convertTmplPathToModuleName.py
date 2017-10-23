@@ -8,11 +8,11 @@ try:
 except AttributeError:
     letters = string.letters
 
-l = ['_'] * 256
+_l = ['_'] * 256
 for c in string.digits + letters:
-    l[ord(c)] = c
-_pathNameTransChars = ''.join(l)
-del l, c
+    _l[ord(c)] = c
+_pathNameTransChars = ''.join(_l)
+del _l, c
 
 
 def convertTmplPathToModuleName(tmplPath,
