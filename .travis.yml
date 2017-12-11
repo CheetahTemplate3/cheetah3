@@ -36,7 +36,7 @@ matrix:
     env: TOXENV=py34-flake8
 
 install:
-  - travis_retry pip install tox ppu
+  - travis_retry pip install --upgrade pip setuptools tox ppu
 
 script:
   - tox
