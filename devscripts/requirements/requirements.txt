@@ -1,0 +1,1 @@
+--install-option=-O2
