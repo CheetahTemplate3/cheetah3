@@ -1,5 +1,5 @@
-Cheetah.convertTmplPathToModuleName module
-==========================================
+Cheetah\.convertTmplPathToModuleName module
+===========================================
 
 .. automodule:: Cheetah.convertTmplPathToModuleName
     :members:

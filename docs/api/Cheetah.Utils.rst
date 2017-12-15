@@ -1,5 +1,5 @@
-Cheetah.Utils package
-=====================
+Cheetah\.Utils package
+======================
 
 .. automodule:: Cheetah.Utils
     :members:

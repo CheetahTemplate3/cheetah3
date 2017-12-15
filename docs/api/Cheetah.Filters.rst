@@ -1,5 +1,5 @@
-Cheetah.Filters module
-======================
+Cheetah\.Filters module
+=======================
 
 .. automodule:: Cheetah.Filters
     :members:

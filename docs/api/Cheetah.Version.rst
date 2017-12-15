@@ -1,5 +1,5 @@
-Cheetah.Version module
-======================
+Cheetah\.Version module
+=======================
 
 .. automodule:: Cheetah.Version
     :members:

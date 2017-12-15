@@ -1,5 +1,5 @@
-Cheetah.Tools.turbocheetah.tests.test_template module
-=====================================================
+Cheetah\.Tools\.turbocheetah\.tests\.test\_template module
+==========================================================
 
 .. automodule:: Cheetah.Tools.turbocheetah.tests.test_template
     :members:

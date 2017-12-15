@@ -1,5 +1,5 @@
-Cheetah.Tests.Analyzer module
-=============================
+Cheetah\.Tests\.Analyzer module
+===============================
 
 .. automodule:: Cheetah.Tests.Analyzer
     :members:

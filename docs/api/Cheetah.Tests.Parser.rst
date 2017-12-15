@@ -1,5 +1,5 @@
-Cheetah.Tests.Parser module
-===========================
+Cheetah\.Tests\.Parser module
+=============================
 
 .. automodule:: Cheetah.Tests.Parser
     :members:

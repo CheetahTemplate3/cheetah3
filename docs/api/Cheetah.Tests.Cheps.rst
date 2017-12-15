@@ -1,5 +1,5 @@
-Cheetah.Tests.Cheps module
-==========================
+Cheetah\.Tests\.Cheps module
+============================
 
 .. automodule:: Cheetah.Tests.Cheps
     :members:

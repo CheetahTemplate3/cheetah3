@@ -1,5 +1,5 @@
-Cheetah.Tools.RecursiveNull module
-==================================
+Cheetah\.Tools\.RecursiveNull module
+====================================
 
 .. automodule:: Cheetah.Tools.RecursiveNull
     :members:

@@ -1,5 +1,5 @@
-Cheetah.Tools.CGITemplate module
-================================
+Cheetah\.Tools\.CGITemplate module
+==================================
 
 .. automodule:: Cheetah.Tools.CGITemplate
     :members:

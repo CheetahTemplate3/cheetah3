@@ -1,5 +1,5 @@
-Cheetah.ImportHooks module
-==========================
+Cheetah\.ImportHooks module
+===========================
 
 .. automodule:: Cheetah.ImportHooks
     :members:

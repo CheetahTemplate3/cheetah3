@@ -1,5 +1,5 @@
-Cheetah.Tools.turbocheetah.tests package
-========================================
+Cheetah\.Tools\.turbocheetah\.tests package
+===========================================
 
 .. automodule:: Cheetah.Tools.turbocheetah.tests
     :members:

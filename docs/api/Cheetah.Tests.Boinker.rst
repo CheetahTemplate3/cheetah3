@@ -1,5 +1,5 @@
-Cheetah.Tests.Boinker module
-============================
+Cheetah\.Tests\.Boinker module
+==============================
 
 .. automodule:: Cheetah.Tests.Boinker
     :members:

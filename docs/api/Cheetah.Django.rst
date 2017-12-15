@@ -1,5 +1,5 @@
-Cheetah.Django module
-=====================
+Cheetah\.Django module
+======================
 
 .. automodule:: Cheetah.Django
     :members:

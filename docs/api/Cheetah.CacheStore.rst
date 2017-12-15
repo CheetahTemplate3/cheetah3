@@ -1,5 +1,5 @@
-Cheetah.CacheStore module
-=========================
+Cheetah\.CacheStore module
+==========================
 
 .. automodule:: Cheetah.CacheStore
     :members:

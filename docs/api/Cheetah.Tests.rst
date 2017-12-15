@@ -1,5 +1,5 @@
-Cheetah.Tests package
-=====================
+Cheetah\.Tests package
+======================
 
 .. automodule:: Cheetah.Tests
     :members:
@@ -18,6 +18,7 @@ Submodules
    Cheetah.Tests.Filters
    Cheetah.Tests.Misc
    Cheetah.Tests.NameMapper
+   Cheetah.Tests.NameMapper_pure
    Cheetah.Tests.Parser
    Cheetah.Tests.Performance
    Cheetah.Tests.Pinger

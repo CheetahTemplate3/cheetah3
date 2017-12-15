@@ -1,5 +1,5 @@
-Cheetah.Template module
-=======================
+Cheetah\.Template module
+========================
 
 .. automodule:: Cheetah.Template
     :members:

@@ -1,5 +1,5 @@
-Cheetah.Tests.CheetahWrapper module
-===================================
+Cheetah\.Tests\.CheetahWrapper module
+=====================================
 
 .. automodule:: Cheetah.Tests.CheetahWrapper
     :members:

@@ -1,5 +1,5 @@
-Cheetah.CheetahWrapper module
-=============================
+Cheetah\.CheetahWrapper module
+==============================
 
 .. automodule:: Cheetah.CheetahWrapper
     :members:

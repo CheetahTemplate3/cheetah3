@@ -1,5 +1,5 @@
-Cheetah.Tests.xmlrunner module
-==============================
+Cheetah\.Tests\.xmlrunner module
+================================
 
 .. automodule:: Cheetah.Tests.xmlrunner
     :members:

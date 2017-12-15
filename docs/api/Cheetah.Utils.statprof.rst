@@ -1,5 +1,5 @@
-Cheetah.Utils.statprof module
-=============================
+Cheetah\.Utils\.statprof module
+===============================
 
 .. automodule:: Cheetah.Utils.statprof
     :members:

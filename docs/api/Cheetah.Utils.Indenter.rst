@@ -1,5 +1,5 @@
-Cheetah.Utils.Indenter module
-=============================
+Cheetah\.Utils\.Indenter module
+===============================
 
 .. automodule:: Cheetah.Utils.Indenter
     :members:

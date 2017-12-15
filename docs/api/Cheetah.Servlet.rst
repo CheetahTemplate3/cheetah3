@@ -1,5 +1,5 @@
-Cheetah.Servlet module
-======================
+Cheetah\.Servlet module
+=======================
 
 .. automodule:: Cheetah.Servlet
     :members:

@@ -1,5 +1,5 @@
-Cheetah.SettingsManager module
-==============================
+Cheetah\.SettingsManager module
+===============================
 
 .. automodule:: Cheetah.SettingsManager
     :members:

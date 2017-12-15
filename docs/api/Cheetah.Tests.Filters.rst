@@ -1,5 +1,5 @@
-Cheetah.Tests.Filters module
-============================
+Cheetah\.Tests\.Filters module
+==============================
 
 .. automodule:: Cheetah.Tests.Filters
     :members:

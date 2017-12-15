@@ -1,5 +1,5 @@
-Cheetah.compat module
-=====================
+Cheetah\.compat module
+======================
 
 .. automodule:: Cheetah.compat
     :members:

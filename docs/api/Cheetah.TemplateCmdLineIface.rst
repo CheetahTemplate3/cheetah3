@@ -1,5 +1,5 @@
-Cheetah.TemplateCmdLineIface module
-===================================
+Cheetah\.TemplateCmdLineIface module
+====================================
 
 .. automodule:: Cheetah.TemplateCmdLineIface
     :members:

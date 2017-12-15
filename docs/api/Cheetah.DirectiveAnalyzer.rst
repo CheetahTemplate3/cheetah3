@@ -1,5 +1,5 @@
-Cheetah.DirectiveAnalyzer module
-================================
+Cheetah\.DirectiveAnalyzer module
+=================================
 
 .. automodule:: Cheetah.DirectiveAnalyzer
     :members:

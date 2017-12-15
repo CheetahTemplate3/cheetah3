@@ -1,5 +1,5 @@
-Cheetah.ImportManager module
-============================
+Cheetah\.ImportManager module
+=============================
 
 .. automodule:: Cheetah.ImportManager
     :members:

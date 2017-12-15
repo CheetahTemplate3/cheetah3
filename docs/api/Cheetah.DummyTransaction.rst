@@ -1,5 +1,5 @@
-Cheetah.DummyTransaction module
-===============================
+Cheetah\.DummyTransaction module
+================================
 
 .. automodule:: Cheetah.DummyTransaction
     :members:

@@ -1,5 +1,5 @@
-Cheetah.Templates.SkeletonPage module
-=====================================
+Cheetah\.Templates\.SkeletonPage module
+=======================================
 
 .. automodule:: Cheetah.Templates.SkeletonPage
     :members:

@@ -1,5 +1,5 @@
-Cheetah.Unspecified module
-==========================
+Cheetah\.Unspecified module
+===========================
 
 .. automodule:: Cheetah.Unspecified
     :members:

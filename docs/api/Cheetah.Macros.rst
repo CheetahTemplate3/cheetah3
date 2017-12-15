@@ -1,5 +1,5 @@
-Cheetah.Macros package
-======================
+Cheetah\.Macros package
+=======================
 
 .. automodule:: Cheetah.Macros
     :members:

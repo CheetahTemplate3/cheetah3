@@ -1,5 +1,5 @@
-Cheetah.NameMapper module
-=========================
+Cheetah\.NameMapper module
+==========================
 
 .. automodule:: Cheetah.NameMapper
     :members:

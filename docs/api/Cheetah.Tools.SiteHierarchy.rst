@@ -1,5 +1,5 @@
-Cheetah.Tools.SiteHierarchy module
-==================================
+Cheetah\.Tools\.SiteHierarchy module
+====================================
 
 .. automodule:: Cheetah.Tools.SiteHierarchy
     :members:

@@ -1,5 +1,5 @@
-Cheetah.Tools.MondoReport module
-================================
+Cheetah\.Tools\.MondoReport module
+==================================
 
 .. automodule:: Cheetah.Tools.MondoReport
     :members:

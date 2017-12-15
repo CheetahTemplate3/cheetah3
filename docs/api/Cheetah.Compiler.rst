@@ -1,5 +1,5 @@
-Cheetah.Compiler module
-=======================
+Cheetah\.Compiler module
+========================
 
 .. automodule:: Cheetah.Compiler
     :members:

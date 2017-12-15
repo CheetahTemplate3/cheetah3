@@ -1,5 +1,5 @@
-Cheetah.Tools.turbocheetah.cheetahsupport module
-================================================
+Cheetah\.Tools\.turbocheetah\.cheetahsupport module
+===================================================
 
 .. automodule:: Cheetah.Tools.turbocheetah.cheetahsupport
     :members:

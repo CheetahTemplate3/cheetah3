@@ -1,5 +1,5 @@
-Cheetah.FileUtils module
-========================
+Cheetah\.FileUtils module
+=========================
 
 .. automodule:: Cheetah.FileUtils
     :members:

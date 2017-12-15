@@ -1,5 +1,5 @@
-Cheetah.Tests.Test module
-=========================
+Cheetah\.Tests\.Test module
+===========================
 
 .. automodule:: Cheetah.Tests.Test
     :members:

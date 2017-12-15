@@ -1,5 +1,5 @@
-Cheetah.Tests.Performance module
-================================
+Cheetah\.Tests\.Performance module
+==================================
 
 .. automodule:: Cheetah.Tests.Performance
     :members:

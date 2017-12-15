@@ -1,5 +1,5 @@
-Cheetah.SourceReader module
-===========================
+Cheetah\.SourceReader module
+============================
 
 .. automodule:: Cheetah.SourceReader
     :members:

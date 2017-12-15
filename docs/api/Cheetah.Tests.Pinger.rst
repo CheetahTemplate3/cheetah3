@@ -1,5 +1,5 @@
-Cheetah.Tests.Pinger module
-===========================
+Cheetah\.Tests\.Pinger module
+=============================
 
 .. automodule:: Cheetah.Tests.Pinger
     :members:

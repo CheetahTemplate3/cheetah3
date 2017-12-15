@@ -1,5 +1,5 @@
-Cheetah.Utils.WebInputMixin module
-==================================
+Cheetah\.Utils\.WebInputMixin module
+====================================
 
 .. automodule:: Cheetah.Utils.WebInputMixin
     :members:

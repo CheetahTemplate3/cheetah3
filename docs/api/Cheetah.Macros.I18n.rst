@@ -1,5 +1,5 @@
-Cheetah.Macros.I18n module
-==========================
+Cheetah\.Macros\.I18n module
+============================
 
 .. automodule:: Cheetah.Macros.I18n
     :members:

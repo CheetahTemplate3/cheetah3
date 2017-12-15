@@ -1,5 +1,5 @@
-Cheetah.Tests.Unicode module
-============================
+Cheetah\.Tests\.Unicode module
+==============================
 
 .. automodule:: Cheetah.Tests.Unicode
     :members:

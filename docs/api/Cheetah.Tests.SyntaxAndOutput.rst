@@ -1,5 +1,5 @@
-Cheetah.Tests.SyntaxAndOutput module
-====================================
+Cheetah\.Tests\.SyntaxAndOutput module
+======================================
 
 .. automodule:: Cheetah.Tests.SyntaxAndOutput
     :members:

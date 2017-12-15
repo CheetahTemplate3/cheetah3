@@ -1,5 +1,5 @@
-Cheetah.Utils.htmlEncode module
-===============================
+Cheetah\.Utils\.htmlEncode module
+=================================
 
 .. automodule:: Cheetah.Utils.htmlEncode
     :members:

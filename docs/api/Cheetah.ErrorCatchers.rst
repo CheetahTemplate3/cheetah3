@@ -1,5 +1,5 @@
-Cheetah.ErrorCatchers module
-============================
+Cheetah\.ErrorCatchers module
+=============================
 
 .. automodule:: Cheetah.ErrorCatchers
     :members:

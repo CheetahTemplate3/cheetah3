@@ -1,5 +1,5 @@
-Cheetah.CacheRegion module
-==========================
+Cheetah\.CacheRegion module
+===========================
 
 .. automodule:: Cheetah.CacheRegion
     :members:
