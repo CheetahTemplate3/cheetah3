@@ -250,7 +250,7 @@ class Backslashes(OutputTest):
         fp.write(
             r'\ #LogFormat "%h %l %u %t \"%r\" %>s %b"' + '\n\n\n\n\n\n\n')
         fp.flush()
-        fp.close
+        fp.close()
 
     def tearDown(self):
         if os.path.exists('backslashes.txt'):
@@ -2024,7 +2024,7 @@ class IncludeDirective(OutputTest):
         fp = open('parseTest.txt', 'w')
         fp.write("$numOne $numTwo")
         fp.flush()
-        fp.close
+        fp.close()
 
     def tearDown(self):
         if os.path.exists('parseTest.txt'):
