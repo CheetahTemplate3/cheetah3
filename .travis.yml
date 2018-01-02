@@ -34,6 +34,8 @@ matrix:
     env: TOXENV=py27-flake8
   - python: "3.4"
     env: TOXENV=py34-flake8
+  - python: "pypy"
+    env: TOXENV=pypy
 
 install:
   - travis_retry pip install --upgrade pip setuptools tox ppu
