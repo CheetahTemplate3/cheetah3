@@ -27,4 +27,5 @@ Contributions have been made by:
 * mikola <mikola at tut.by>
 * Adam Karpierz <python at python.pl>
 * Jonathan Ross Rogers <jrogers at socialserve.com>
+* Mathias Stearn <redbeard0531 at gmail.com>
 * Oleg Broytman <phd@phdru.name>
