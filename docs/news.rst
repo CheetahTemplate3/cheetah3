@@ -18,6 +18,7 @@ Documentation:
 
 Tests:
 
+  - Run pypy tests at AppVeyor.
   - Use remove-old-files.py from ppu to cleanup pip cache
     at Travis and AppVeyor.
 

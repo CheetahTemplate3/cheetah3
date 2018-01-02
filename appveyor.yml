@@ -42,13 +42,20 @@ environment:
       PYTHON_VERSION: "3.6"
       PYTHON_ARCH: "64"
       PYTHON_HOME: "C:\\Python36-x64"
+    - TOXENV: "pypy"
+      PYTHON_VERSION: "2.7"
+      PYTHON_ARCH: "32"
+      PYTHON_HOME: "C:\\tools\\pypy\\pypy"
 
 install:
   # Ensure we use the right python version
   - "SET PATH=%PYTHON_HOME%;%PYTHON_HOME%\\Scripts;%PATH%"
   - "SET TOXPYTHON=%PYTHON_HOME%\\python.exe"
+  - if "%TOXENV%" == "pypy" devscripts\\CI\\appveyor_install_pypy.cmd
   - "python --version"
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
+  - if "%TOXENV%" == "pypy" SET TOXPYTHON=pypy.exe
+  - if "%TOXENV%" == "pypy" pypy --version
   - "pip --version"
   - "pip install --upgrade pip setuptools tox ppu"
 
