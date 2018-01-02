@@ -1035,7 +1035,7 @@ class Template(Servlet):
                 setattr(concreteTemplateClass, attrname, attrVal)
 
         if (not hasattr(concreteTemplateClass, '__str__')
-                or concreteTemplateClass.__str__ is object.__str__):
+                or concreteTemplateClass.__str__ == object.__str__):
             mainMethNameAttr = '_mainCheetahMethod_for_' \
                 + concreteTemplateClass.__name__
             mainMethName = getattr(concreteTemplateClass,
