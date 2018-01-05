@@ -36,6 +36,8 @@ classifiers = [line.strip() for line in '''\
   Intended Audience :: System Administrators
   License :: OSI Approved :: MIT License
   Operating System :: OS Independent
+  Programming Language :: Python :: Implementation :: CPython
+  Programming Language :: Python :: Implementation :: PyPy
   Programming Language :: Python
   Programming Language :: Python :: 2
   Programming Language :: Python :: 2.7
