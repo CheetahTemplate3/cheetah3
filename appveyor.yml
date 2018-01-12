@@ -14,6 +14,9 @@ skip_tags: false
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
+    # Cache chocolatey-installed packages (PyPy)
+  - C:\ProgramData\chocolatey\bin -> appveyor.yml, devscripts\CI\appveyor_install_pypy.cmd
+  - C:\ProgramData\chocolatey\lib -> appveyor.yml, devscripts\CI\appveyor_install_pypy.cmd
 
 # Match travis
 clone_depth: 50
