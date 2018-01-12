@@ -7,12 +7,11 @@
     version, the list of contributors, the list of changes and download
     URL in ANNOUNCE.rst; if it is a stable release - edit docs/news.rst to
     set release date. Edit Version.py and README.rst in the release branch
-    - fix versions. Edit appveyor.yml - uncomment wheel/msi building. Edit
-    section [egg_info] in setup.cfg - set if it is a stable or development
-    release. In SetupConfig.py edit "Development Status" in trove
-    classifiers; edit dev_tag or download URL: if a non-stable version -
-    append 'dev' and date stamp, for a stable version remove 'dev' and
-    date stamp). Commit. Verify.
+    - fix versions. Edit section [egg_info] in setup.cfg - set if it is
+    a stable or development release. In SetupConfig.py edit "Development
+    Status" in trove classifiers; edit dev_tag or download URL: if a
+    non-stable version - append 'dev' and date stamp, for a stable
+    version remove 'dev' and date stamp). Commit. Verify.
 
 2. Run ../prerelease-tag $NEW_TAG. This checks out the release branch and
    creates the new tag at the head of the release branch. Push the branch
@@ -26,13 +25,13 @@
    ./publish-docs.
 
 6. Run ../postrelease. The script checks out master and null-merge maint.
-   The script restores ANNOUNCE.rst and appveyor.yml from the previous
-   commit (HEAD~). It calls editor; update next version, remove the list
-   of contributors and the list of changes, edit download URL in
-   ANNOUNCE.rst. Edit docs/news.rst - add new version. Edit Version.py and
-   README.rst - fix versions. Edit section [egg_info] in setup.cfg. In
-   SetupConfig.py edit "Development Status" in trove classifiers; edit
-   dev_tag or download URL. Commit. Verify. Fast-forward next to master.
+   The script restores ANNOUNCE.rst from the previous commit (HEAD~). It
+   calls editor; update next version, remove the list of contributors
+   and the list of changes, edit download URL in ANNOUNCE.rst. Edit
+   docs/news.rst - add new version. Edit Version.py and README.rst - fix
+   versions. Edit section [egg_info] in setup.cfg. In SetupConfig.py
+   edit "Development Status" in trove classifiers; edit dev_tag or
+   download URL. Commit. Verify. Fast-forward next to master.
 
 7. Run ../push-all in the development repository to push all branches
    and tags to the public repositories.
