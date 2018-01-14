@@ -1,8 +1,3 @@
-- Change code generation so that Cheetah/Templates/SkeletonPage.py
-  passes flake8 tests.
-
-- Revive or recreate Django and Flask integration.
-
 - https://pypi.python.org/pypi/cibuildwheel or
   https://github.com/matthew-brett/multibuild or
   https://pypi.python.org/pypi/wheelhouse-uploader
