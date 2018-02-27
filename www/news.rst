@@ -1,6 +1,12 @@
 News
 ====
 
+3.0.1 (2018-02-27)
+
+Bug fixes:
+
+  - Fix a minor bug in Compiler.
+
 3.0.0 (2017-05-07)
 
 Major features:
