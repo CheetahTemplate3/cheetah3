@@ -1,15 +1,13 @@
 Hello!
 
-I'm pleased to announce version 3.0.1, the first bugfix release of branch
+I'm pleased to announce version 3.0.2, the second bugfix release of branch
 3.0 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
 
-Bug fixes:
-
-  - Fix a minor bug in Compiler.
+Contributors for this release are 
 
 
 What is CheetahTemplate3
@@ -31,7 +29,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.python.org/pypi/Cheetah3/3.0.1
+https://pypi.python.org/pypi/Cheetah3/3.0.2a0.dev
 
 News and changes:
 http://cheetahtemplate.org/news.html
