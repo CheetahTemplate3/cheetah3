@@ -1648,7 +1648,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
         if source and file:
             raise TypeError("Cannot compile from a source string AND file.")
         elif isinstance(file, string_type):  # it's a filename.
-            encoding = settings.get('encoding')
+            encoding = self.settings().get('encoding')
             if encoding:
                 f = codecs.open(file, 'r', encoding=encoding)
             else:

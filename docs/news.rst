@@ -22,6 +22,15 @@ Tests:
   - Use remove-old-files.py from ppu to cleanup pip cache
     at Travis and AppVeyor.
 
+
+3.0.1 (2018-02-27)
+------------------
+
+Bug fixes:
+
+  - Fix a minor bug in Compiler.
+
+
 3.0.0 (2017-05-07)
 ------------------
 
