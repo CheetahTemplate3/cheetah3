@@ -21,7 +21,7 @@ for py in 2.7 3.3 3.4 3.5 3.6; do
    cd dist &&
    v="`echo $py | sed 's/\.//'`" &&
    for f in Cheetah3-*-cp$v-*-linux_i686.whl; do
-      if [ $py = 2.7 ]; then
+      if [ $py = 2.7 -o $py = 3.3 ]; then
          python3.4 -m auditwheel repair -w . $f
       else
          python$py -m auditwheel repair -w . $f
