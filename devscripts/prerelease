@@ -16,5 +16,5 @@ else
    git checkout maint
 fi &&
 
-`git var GIT_EDITOR` ANNOUNCE.rst www/news.rst Cheetah/Version.py README.rst appveyor.yml setup.cfg SetupConfig.py &&
-exec git commit --message="Release $tag" ANNOUNCE.rst www/news.rst Cheetah/Version.py README.rst appveyor.yml setup.cfg SetupConfig.py
+`git var GIT_EDITOR` ANNOUNCE.rst www/news.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py &&
+exec git commit --message="Release $tag" ANNOUNCE.rst www/news.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py
