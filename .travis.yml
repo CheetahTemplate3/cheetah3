@@ -37,6 +37,8 @@ matrix:
   - python: "pypy"
     env: TOXENV=pypy
 
+  fast_finish: true
+
 install:
   - travis_retry pip install --upgrade pip setuptools tox ppu
 
