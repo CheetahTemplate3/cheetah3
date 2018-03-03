@@ -4,6 +4,9 @@ News
 Development (master)
 --------------------
 
+3.1.0 (2018-03-03)
+------------------
+
 Features:
 
   - Fix Cheetah to work with PyPy. Pull request by Mathias Stearn.

@@ -1,5 +1,5 @@
-Version = '3.0.0'
-VersionTuple = (3, 0, 0, 'final', 1)
+Version = '3.1.0'
+VersionTuple = (3, 1, 0, 'final', 1)
 
 MinCompatibleVersion = '3.0.0a1'
 MinCompatibleVersionTuple = (3, 0, 0, 'alpha', 1)
