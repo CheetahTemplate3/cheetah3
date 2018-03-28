@@ -1,5 +1,5 @@
 # -------Main Package Settings-----------#
-from distutils.core import Extension
+from setuptools import Extension
 import os
 import os.path
 import sys
@@ -77,20 +77,19 @@ scripts = ('bin/cheetah-compile',
 
 data_files = ['recursive: Cheetah *.tmpl *.txt *.rst LICENSE README.rst TODO']
 
-if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
-    try:
-        if sys.platform == 'win32':
-            # use 'entry_points' instead of 'scripts'
-            del scripts
-            entry_points = {
-                'console_scripts': [
-                    'cheetah = Cheetah.CheetahWrapper:_cheetah',
-                    'cheetah-compile = '
-                    'Cheetah.CheetahWrapper:_cheetah_compile',
-                ]
-            }
-    except ImportError:
-        pass
+try:
+    if sys.platform == 'win32':
+        # use 'entry_points' instead of 'scripts'
+        del scripts
+        entry_points = {
+            'console_scripts': [
+                'cheetah = Cheetah.CheetahWrapper:_cheetah',
+                'cheetah-compile = '
+                'Cheetah.CheetahWrapper:_cheetah_compile',
+            ]
+        }
+except ImportError:
+    pass
 
 long_description = '''\
 Cheetah3 is a free (BSD-style) and open source template engine and code

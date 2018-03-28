@@ -3,21 +3,15 @@ import os
 import os.path
 import sys
 
-from distutils.command.build_ext import build_ext
 from distutils.command.install_data import install_data
-from distutils.core import setup
 from distutils.errors import CCompilerError, DistutilsExecError, \
     DistutilsPlatformError
+from setuptools import setup
+from setuptools.command.build_ext import build_ext
 
 # imports from Cheetah ...
 from Cheetah.FileUtils import findFiles
 from Cheetah.compat import string_type
-
-if not os.getenv('CHEETAH_INSTALL_WITHOUT_SETUPTOOLS'):
-    try:
-        from setuptools import setup  # noqa: F811
-    except ImportError:
-        pass
 
 if sys.platform == 'win32':
     # 2.6's distutils.msvc9compiler can raise an IOError when failing to
@@ -36,7 +30,7 @@ class BuildFailed(Exception):
 
 
 class mod_build_ext(build_ext):
-    """A modified version of the distutils build_ext command that raises an
+    """A modified version of build_ext command that raises an
     exception when building of the extension fails.
     """
 
@@ -118,7 +112,7 @@ class mod_install_data(install_data):
 
 
 def run_setup(configurations):
-    """Run distutils setup.
+    """Run distutils/setuptools setup.
 
     The parameters passed to setup() are extracted from the list of modules,
     classes or instances given in configurations.
@@ -149,7 +143,6 @@ def run_setup(configurations):
 
     kws['cmdclass'] = cmdclasses
 
-    # Invoke distutils setup
     try:
         setup(**kws)
     except BuildFailed as x:
