@@ -127,3 +127,5 @@ Recent Changes
 See http://cheetahtemplate.org/news.html for full details
 
 '''
+
+long_description_content_type = "text/x-rst"
