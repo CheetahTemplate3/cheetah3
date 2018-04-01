@@ -83,8 +83,9 @@ install:
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
   - if "%TOXENV%" == "pypy" SET TOXPYTHON=pypy.exe
   - if "%TOXENV%" == "pypy" pypy --version
+  - "python -m pip install --upgrade pip setuptools"
+  - "pip install --upgrade tox ppu"
   - "pip --version"
-  - "pip install --upgrade pip setuptools tox ppu"
 
 # No build step - _namemapper extension will be built under tox
 build: false
