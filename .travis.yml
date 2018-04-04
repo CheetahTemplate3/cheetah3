@@ -40,7 +40,7 @@ matrix:
   fast_finish: true
 
 install:
-  - travis_retry pip install --upgrade pip setuptools tox ppu
+  - travis_retry pip install --upgrade pip setuptools "tox <= 2.9.1" ppu
 
 script:
   - tox
