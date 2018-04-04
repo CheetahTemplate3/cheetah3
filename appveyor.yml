@@ -96,7 +96,7 @@ test_script:
 after_test:
   # If tests are successful and we've tested a tag, create binary package
   - if "%APPVEYOR_REPO_TAG%" == "true" (
-      pip install wheel &&
+      pip install --upgrade wheel &&
       %CMD_IN_ENV% python setup.py bdist_wheel &&
       ls dist
     )
