@@ -32,7 +32,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.python.org/pypi/Cheetah3/3.2.0
+https://pypi.org/project/Cheetah3/3.2.0/
 
 News and changes:
 http://cheetahtemplate.org/news.html

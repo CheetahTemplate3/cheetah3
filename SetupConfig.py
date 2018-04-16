@@ -18,12 +18,12 @@ maintainer = "Oleg Broytman"
 maintainer_email = "phd@phdru.name"
 url = "http://cheetahtemplate.org/"
 dev_tag = ""
-download_url = "https://pypi.python.org/pypi/%s/%s%s" \
+download_url = "https://pypi.org/project/%s/%s%s" \
     % (name, version, dev_tag)
 project_urls = {
     'Homepage': 'http://cheetahtemplate.org/',
     'Documentation': 'http://cheetahtemplate.org/users_guide/index.html',
-    'Download': 'https://pypi.python.org/pypi/Cheetah3/%s/%s%s'
+    'Download': 'https://pypi.org/project/%s/%s%s/'
     % (name, version, dev_tag),
     'Github repo': 'https://github.com/CheetahTemplate3',
     'Issue tracker': 'https://github.com/CheetahTemplate3/cheetah3/issues',
