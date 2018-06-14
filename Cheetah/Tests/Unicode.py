@@ -8,6 +8,7 @@ import sys
 from shutil import rmtree
 import tempfile
 import unittest
+from Cheetah.Compiler import Compiler
 from Cheetah.Template import Template
 from Cheetah import CheetahWrapper
 from Cheetah.compat import PY2, unicode
@@ -270,6 +271,17 @@ class InlineSpanishTest(unittest.TestCase):
                                                    'numpedidos_bodega': '',
                                                    'numpedidos_noconf': ''}])
         self.assertTrue(unicode(template))
+
+
+class CompilerTest(unittest.TestCase):
+    def test_compiler_str(self):
+        """ Test Compiler.__str__ """
+        source = """#encoding utf-8
+#set $someUnicodeString = u"Bébé"
+$someUnicodeString"""
+        compiler = Compiler(source)
+        self.assertIsInstance(str(compiler), str)
+        self.assertEqual(compiler.getModuleEncoding(), 'utf-8')
 
 
 if __name__ == '__main__':

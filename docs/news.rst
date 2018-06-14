@@ -4,6 +4,18 @@ News
 Development (master)
 --------------------
 
+Minor features:
+
+  - Implement Compiler.__unicode__ under Python 2 and Compiler.__bytes__
+    under Python 3.
+
+Bug fixes:
+
+  - Fix a bug in Compiler.__str__: under Python 2 the method now always
+    returns str; it encodes unicode to str using encoding from the
+    compiled source. Under Python 3 the method decodes bytes to str.
+
+
 3.1.0 (2018-03-03)
 ------------------
 

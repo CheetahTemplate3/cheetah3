@@ -26,7 +26,7 @@ from Cheetah import NameMapper
 from Cheetah.Parser import Parser, ParseError, specialVarRE, \
      STATIC_CACHE, REFRESH_CACHE, SET_GLOBAL, SET_MODULE, \
      unicodeDirectiveRE, encodingDirectiveRE, escapedNewlineRE
-from Cheetah.compat import string_type, unicode
+from Cheetah.compat import PY2, string_type, unicode
 
 from Cheetah.NameMapper import valueForName, valueFromSearchList, \
     valueFromFrameOrSearchList
@@ -2027,7 +2027,24 @@ class ModuleCompiler(SettingsManager, GenUtils):
         else:
             return self.wrapModuleDef()
 
-    __str__ = getModuleCode
+    def __to_bytes(self):
+        code = self.getModuleCode()
+        if isinstance(code, bytes):
+            return code
+        return code.encode(self.getModuleEncoding())
+
+    def __to_unicode(self):
+        code = self.getModuleCode()
+        if isinstance(code, bytes):
+            return code.decode(self.getModuleEncoding())
+        return code
+
+    if PY2:
+        __str__ = __to_bytes
+        __unicode__ = __to_unicode
+    else:
+        __bytes__ = __to_bytes
+        __str__ = __to_unicode
 
     def wrapModuleDef(self):
         self.addSpecialVar('CHEETAH_docstring', self.setting('defDocStrMsg'))
