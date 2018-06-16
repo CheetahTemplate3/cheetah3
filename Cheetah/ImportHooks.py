@@ -9,6 +9,7 @@ To use these:
 
 import sys
 import os.path
+import py_compile
 import types
 try:
     import builtins as builtin
@@ -87,6 +88,11 @@ class CheetahDirOwner(DirOwner):
             # @@ TR: need to add some error code here
             traceback.print_exc(file=sys.stderr)
             __file__ = tmplPath
+        else:
+            try:
+                py_compile.compile(__file__)
+            except IOError:
+                pass
         co = compile(code+'\n', __file__, 'exec')
 
         mod = types.ModuleType(name)

@@ -17,9 +17,10 @@ This is a hacked/documented version of Gordon McMillan's iu.py. I have:
   - reorganized the code layout to enhance readability
 """
 
-import sys
 import imp
 import marshal
+import py_compile
+import sys
 from Cheetah.compat import string_type
 
 _installed = False
@@ -210,6 +211,11 @@ class DirOwner(Owner):
             if pyc is None or py and pyc[1][8] < py[1][8]:
                 try:
                     co = compile(open(py[0], 'r').read()+'\n', py[0], 'exec')
+                    try:
+                        py_compile.compile(py[0])
+                    except IOError:
+                        pass
+                    __file__ = py[0]
                     break
                 except SyntaxError as e:
                     print("Invalid syntax in %s" % py[0])
@@ -219,13 +225,14 @@ class DirOwner(Owner):
                 stuff = open(pyc[0], 'rb').read()
                 try:
                     co = loadco(stuff[8:])
+                    __file__ = pyc[0]
                     break
                 except (ValueError, EOFError):
                     pyc = None
             else:
                 return None
         mod = newmod(nm)
-        mod.__file__ = co.co_filename
+        mod.__file__ = __file__
         if ispkg:
             mod.__path__ = [pkgpth]
             subimporter = PathImportDirector(mod.__path__)
