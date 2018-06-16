@@ -7,6 +7,8 @@ Development (master)
 Features:
 
   - CheetahDirOwner caches compiled template in the template directory.
+  - CheetahDirOwner now silently ignores errors on compiled templates
+    writing. To get tracebacks set CheetahDirOwner.debuglevel = 1.
   - CheetahDirOwner and DirOwner byte-compile compiled templates
     to .pyc/.pyo. Errors on writing are silently ignored.
 

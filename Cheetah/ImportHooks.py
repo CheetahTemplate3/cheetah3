@@ -45,6 +45,7 @@ class CheetahDirOwner(DirOwner):
     _releaseLock = _lock.release
 
     templateFileExtensions = ('.tmpl',)
+    debuglevel = 0
 
     def getmod(self, name):
         self._acquireLock()
@@ -86,7 +87,8 @@ class CheetahDirOwner(DirOwner):
                 _py_file.write(code)
         except (IOError, OSError):
             # @@ TR: need to add some error code here
-            traceback.print_exc(file=sys.stderr)
+            if self.debuglevel > 0:
+                traceback.print_exc(file=sys.stderr)
             __file__ = tmplPath
         else:
             try:
