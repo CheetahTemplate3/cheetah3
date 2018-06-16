@@ -78,13 +78,14 @@ class CheetahDirOwner(DirOwner):
             __file__ = os.path.join(_cacheDir[0],
                                     convertTmplPathToModuleName(tmplPath)) \
                        + '.py'
-            try:
-                open(__file__, 'w').write(code)
-            except OSError:
-                # @@ TR: need to add some error code here
-                traceback.print_exc(file=sys.stderr)
-                __file__ = tmplPath
         else:
+            __file__ = os.path.splitext(tmplPath)[0] + '.py'
+        try:
+            with open(__file__, 'w') as _py_file:
+                _py_file.write(code)
+        except (IOError, OSError):
+            # @@ TR: need to add some error code here
+            traceback.print_exc(file=sys.stderr)
             __file__ = tmplPath
         co = compile(code+'\n', __file__, 'exec')
 

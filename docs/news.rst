@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+Features:
+
+  - CheetahDirOwner caches compiled template in the template directory.
+
 Minor features:
 
   - Implement Compiler.__unicode__ under Python 2 and Compiler.__bytes__
