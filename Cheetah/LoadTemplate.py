@@ -4,7 +4,7 @@ import sys
 from Cheetah.ImportHooks import CheetahDirOwner
 
 
-def loadTemplate(templatePath, debuglevel=0):
+def _loadTemplate(templatePath, debuglevel=0, load='module'):
     """Load template by full or relative path (including extension)
 
     Example: template = loadTemplate('views/index.tmpl')
@@ -44,4 +44,17 @@ def loadTemplate(templatePath, debuglevel=0):
     co = mod.__co__
     del mod.__co__
     exec(co, mod.__dict__)
-    return mod
+    if load == 'module':
+        return mod
+    elif load == 'class':
+        return getattr(mod, filename)
+    else:
+        raise ValueError("load must be module or class")
+
+
+def loadTemplateModule(templatePath, debuglevel=0):
+    return _loadTemplate(templatePath, debuglevel=0, load='module')
+
+
+def loadTemplateClass(templatePath, debuglevel=0):
+    return _loadTemplate(templatePath, debuglevel=0, load='class')

@@ -6,7 +6,7 @@ Development (master)
 
 Features:
 
-  - Implement LoadTemplate.loadTemplate to load template
+  - Implement LoadTemplate.loadTemplate{Module,Class} to load template
     from .py[co], .py or .tmpl.
   - CheetahDirOwner caches compiled template in the template directory.
   - CheetahDirOwner now silently ignores errors on compiled templates
