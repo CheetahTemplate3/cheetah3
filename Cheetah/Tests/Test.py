@@ -14,33 +14,33 @@ TODO
 import sys
 import unittest
 
-from Cheetah.Tests import SyntaxAndOutput
+from Cheetah.Tests import Analyzer
+from Cheetah.Tests import CheetahWrapper
+# from Cheetah.Tests import Cheps
+from Cheetah.Tests import Filters
+from Cheetah.Tests import Misc
 from Cheetah.Tests import NameMapper
 from Cheetah.Tests import NameMapper_pure
-from Cheetah.Tests import Misc
-from Cheetah.Tests import Filters
-from Cheetah.Tests import Template
-# from Cheetah.Tests import Cheps
 from Cheetah.Tests import Parser
 from Cheetah.Tests import Regressions
+from Cheetah.Tests import SyntaxAndOutput
+from Cheetah.Tests import Template
 from Cheetah.Tests import Unicode
-from Cheetah.Tests import CheetahWrapper
-from Cheetah.Tests import Analyzer
 
 SyntaxAndOutput.install_eols()
 
 suites = [
-   unittest.findTestCases(SyntaxAndOutput),
-   unittest.findTestCases(NameMapper),
-   unittest.findTestCases(NameMapper_pure),
-   unittest.findTestCases(Filters),
-   unittest.findTestCases(Template),
-   # unittest.findTestCases(Cheps),
-   unittest.findTestCases(Regressions),
-   unittest.findTestCases(Unicode),
-   unittest.findTestCases(Misc),
-   unittest.findTestCases(Parser),
    unittest.findTestCases(Analyzer),
+   # unittest.findTestCases(Cheps),
+   unittest.findTestCases(Filters),
+   unittest.findTestCases(Misc),
+   unittest.findTestCases(NameMapper),
+   unittest.findTestCases(Parser),
+   unittest.findTestCases(Regressions),
+   unittest.findTestCases(SyntaxAndOutput),
+   unittest.findTestCases(Template),
+   unittest.findTestCases(Unicode),
+   unittest.findTestCases(NameMapper_pure),
 ]
 
 if not sys.platform.startswith('java'):
