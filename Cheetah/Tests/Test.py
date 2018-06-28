@@ -19,6 +19,7 @@ from Cheetah.Tests import CheetahWrapper
 # from Cheetah.Tests import Cheps
 from Cheetah.Tests import Filters
 from Cheetah.Tests import ImportHooks
+from Cheetah.Tests import LoadTemplate
 from Cheetah.Tests import Misc
 from Cheetah.Tests import NameMapper
 from Cheetah.Tests import NameMapper_pure
@@ -35,6 +36,7 @@ suites = [
    # unittest.findTestCases(Cheps),
    unittest.findTestCases(Filters),
    unittest.findTestCases(ImportHooks),
+   unittest.findTestCases(LoadTemplate),
    unittest.findTestCases(Misc),
    unittest.findTestCases(NameMapper),
    unittest.findTestCases(Parser),

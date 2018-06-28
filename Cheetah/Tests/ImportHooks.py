@@ -39,7 +39,7 @@ class ImportHooksTest(unittest.TestCase):
     def setUp(self):
         _cleanup()
 
-    def test_1_CheetahDirOwner(self):
+    def test_CheetahDirOwner(self):
         templates = list(sorted(os.listdir(ImportHooksTemplatesDir)))
         self.assertListEqual(templates, ['index.tmpl', 'layout.tmpl'])
 
@@ -56,7 +56,7 @@ class ImportHooksTest(unittest.TestCase):
         cdo.getmod('layout')  # Compiled to layout.py and .pyc
         self.assertIn('layout.py', os.listdir(ImportHooksTemplatesDir))
 
-    def test_2_ImportHooks(self):
+    def test_ImportHooks(self):
         templates = os.listdir(ImportHooksTemplatesDir)
         self.assertNotIn('index.py', templates)
         self.assertNotIn('layout.py', templates)
