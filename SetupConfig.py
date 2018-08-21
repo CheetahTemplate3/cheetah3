@@ -51,7 +51,6 @@ classifiers = [line.strip() for line in '''\
   Programming Language :: Python :: 2
   Programming Language :: Python :: 2.7
   Programming Language :: Python :: 3
-  Programming Language :: Python :: 3.3
   Programming Language :: Python :: 3.4
   Programming Language :: Python :: 3.5
   Programming Language :: Python :: 3.6
@@ -129,3 +128,5 @@ See http://cheetahtemplate.org/news.html for full details
 '''
 
 long_description_content_type = "text/x-rst"
+
+python_requires = '>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*'

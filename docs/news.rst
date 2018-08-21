@@ -6,6 +6,7 @@ Development (master)
 
 Features:
 
+  - Dropped support for Python 3.3.
   - Implement LoadTemplate.loadTemplate{Module,Class} to load template
     from .py[co], .py or .tmpl.
   - CheetahDirOwner caches compiled template in the template directory.

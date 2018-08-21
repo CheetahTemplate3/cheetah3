@@ -10,7 +10,7 @@ set-commit-date.py &&
 if [ ! -d build ]; then mkdir build; fi &&
 python setup.py sdist &&
 
-for py in 2.7 3.3 3.4 3.5 3.6 3.7; do
+for py in 2.7 3.4 3.5 3.6 3.7; do
    find build -name '*.py[co]' -delete &&
    python$py setup.py build_ext &&
    python$py setup.py build --executable '/usr/bin/env python' &&
@@ -20,7 +20,7 @@ for py in 2.7 3.3 3.4 3.5 3.6 3.7; do
    cd dist &&
    v="`echo $py | sed 's/\.//'`" &&
    for f in Cheetah3-*-cp$v-*-linux_i686.whl; do
-      if [ $py = 2.7 -o $py = 3.3 ]; then
+      if [ $py = 2.7 ]; then
          python3.4 -m auditwheel repair -w . $f
       else
          python$py -m auditwheel repair -w . $f
