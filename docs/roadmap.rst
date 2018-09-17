@@ -1,11 +1,10 @@
 Cheetah Roadmap
 ===============
 
-Cheetah v3.0
-^^^^^^^^^^^^
-*in development*
+Cheetah v3
+^^^^^^^^^^
 
-Cheetah v3.0 is for support for Python 2.7 and Python 3.
+Cheetah v3 supports Python 2.7 and Python 3.
 
 
 Cheetah v2
