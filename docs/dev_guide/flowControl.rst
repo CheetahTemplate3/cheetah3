@@ -1,12 +1,10 @@
 Directives: Flow Control
 ========================
 
-(flowControl)
 
 #for
 ----
 
-(flowControl.for)
 
 The template:
 
@@ -33,7 +31,6 @@ The generated code:
 #repeat
 -------
 
-(flowControl.repeat)
 
 The template:
 
@@ -53,7 +50,6 @@ The output:
     My bonnie lies over the ocean
     O, bring back my bonnie to me!
 
-(OK, so the second line should be "sea" instead of "ocean".)
 
 The generated code:
 
@@ -69,7 +65,6 @@ for each instance of {repeat} in order to permit nesting.
 #while
 ------
 
-(flowControl.while)
 
 The template:
 
@@ -135,7 +130,6 @@ The generated code:
 #unless
 -------
 
-(flowControl.unless)
 
 The template:
 
@@ -167,7 +161,6 @@ calculating something different than it should.
 #break and #continue
 --------------------
 
-(flowControl.break)
 
 The template:
 
@@ -206,7 +199,6 @@ The generated code:
 #pass
 -----
 
-(flowControl.pass)
 
 The template:
 
@@ -247,7 +239,6 @@ The generated code:
 #stop
 -----
 
-(flowControl.stop)
 
 The template:
 
@@ -285,7 +276,6 @@ The generated code:
 #return
 -------
 
-(flowControl.return)
 
 The template:
 

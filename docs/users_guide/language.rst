@@ -4,7 +4,6 @@
 Language Overview
 =================
 
-(language)
 
 Cheetah's basic syntax was inspired by the Java-based template
 engines Velocity and WebMacro. It has two types of tags: {
@@ -49,7 +48,6 @@ don't need the backslash.
 Language Constructs - Summary
 -----------------------------
 
-(language.constructs)
 
 
 #. Comments and documentation strings
@@ -193,7 +191,6 @@ chapters.
 Placeholder Syntax Rules
 ------------------------
 
-(language.placeholders.syntax)
 
 
 -  Placeholders follow the same syntax rules as Python variables
@@ -282,7 +279,6 @@ These are not $placeholders but are treated as literal text:
 Where can you use placeholders?
 -------------------------------
 
-(language.placeholders.positions)
 
 There are three places you can use placeholders: top-level
 position, expression position and LVALUE position. Each has
@@ -329,7 +325,6 @@ The output of course is:
 Are all those dollar signs really necessary?
 --------------------------------------------
 
-(language.placeholders.dollar-signs)
 
 {$} is a "smart variable prefix". When Cheetah sees {$}, it
 determines both the variable's position and whether it's a
@@ -367,7 +362,6 @@ list comprehension: if you type {$x}, Cheetah will miscompile it.
 NameMapper Syntax
 -----------------
 
-(language.namemapper)
 
 One of our core aims for Cheetah was to make it easy for
 non-programmers to use. Therefore, Cheetah uses a simplified syntax
@@ -387,7 +381,6 @@ ever want to turn it off.
 Example
 ~~~~~~~
 
-(language.namemapper.example)
 
 Consider this scenario:
 
@@ -439,7 +432,6 @@ isn't the point of this example.
 Dictionary Access
 ~~~~~~~~~~~~~~~~~
 
-(language.namemapper.dict)
 
 NameMapper syntax allows access to dictionary items with the same
 dotted notation used to access object attributes in Python. This
@@ -458,7 +450,6 @@ Python identifiers.
 Autocalling
 ~~~~~~~~~~~
 
-(language.namemapper.autocalling)
 
 Cheetah automatically detects functions and methods in Cheetah
 $variables and calls them if the parentheses have been left off.
@@ -519,7 +510,6 @@ Further notes:
 Namespace cascading and the searchList
 --------------------------------------
 
-(language.searchList)
 
 When Cheetah maps a variable name in a template to a Python value,
 it searches several namespaces in order:
@@ -588,7 +578,6 @@ Cheetah namespaces.
 Missing Values
 --------------
 
-(language.namemapper.missing)
 
 If NameMapper can not find a Python value for a Cheetah variable
 name, it will raise the NameMapper.NotFound exception. You can use
@@ -605,7 +594,6 @@ raised.
 Directive Syntax Rules
 ----------------------
 
-(language.directives.syntax)
 
 Directive tags begin with a hash character (#) and are used for
 comments, loops, conditional blocks, includes, and all other

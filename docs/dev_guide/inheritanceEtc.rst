@@ -1,12 +1,10 @@
 Directives: Import, Inheritance, Declaration and Assignment
 ===========================================================
 
-(inheritanceEtc)
 
 #import and #from
 -----------------
 
-(inheritanceEtc.import)
 
 The template:
 
@@ -25,7 +23,6 @@ The generated module, at the bottom of the import section:
 #extends
 --------
 
-(inheritanceEtc.extends)
 
 The template:
 
@@ -49,7 +46,6 @@ The generated class:
 #implements
 -----------
 
-(inheritanceEtc.implements)
 
 The template:
 
@@ -67,7 +63,6 @@ In the generated class, the main method is {.doOutput} instead of
 #set and #set global
 --------------------
 
-(inheritanceEtc.set)
 
 The template:
 
@@ -104,7 +99,6 @@ very first namespace.)
 #del
 ----
 
-(inheritanceEtc.del)
 
 The template:
 
@@ -129,7 +123,6 @@ In the generated class:
 #attr
 -----
 
-(inheritanceEtc.attr)
 
 The template:
 
@@ -148,7 +141,6 @@ In the generated class:
 #def
 ----
 
-(inheritanceEtc.def)
 
 The template:
 
@@ -219,7 +211,6 @@ default values.
 #block
 ------
 
-(inheritanceEtc.block)
 
 The template:
 

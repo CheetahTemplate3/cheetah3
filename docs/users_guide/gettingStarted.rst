@@ -1,12 +1,10 @@
 Getting Started
 ===============
 
-(gettingStarted)
 
 Requirements
 ------------
 
-(gettingStarted.requirements)
 
 Cheetah requires Python release 2.7 (there are plans to support 3.4+).
 It is known to run on Linux, Windows, FreeBSD and Solaris,
@@ -22,7 +20,6 @@ Cheetah can use an additional module Markdown but it's not strictly required.
 Installation
 ------------
 
-(gettingStarted.install)
 
 To install Cheetah in your system-wide Python library:
 
@@ -63,7 +60,6 @@ Python to find Cheetah.
 Files
 -----
 
-(gettingstarted.files)
 
 If you do the systemwide install, all Cheetah modules are installed
 in the { site-packages/Cheetah/} subdirectory of your standard
@@ -77,7 +73,6 @@ bin directory: {cheetah} (section gettingStarted.cheetah) and
 Uninstalling
 ------------
 
-(gettingstarted.uninstalling)
 
 To uninstall Cheetah, merely delete the site-packages/Cheetah/
 directory. Then delete the "cheetah" and "cheetah-compile" commands
@@ -86,7 +81,6 @@ from whichever bin/ directory they were put in.
 The 'cheetah' command
 ---------------------
 
-(gettingStarted.cheetah)
 
 Cheetah comes with a utility {cheetah} that provides a command-line
 interface to various housekeeping tasks. The command's first
@@ -115,7 +109,6 @@ The depreciated {cheetah-compile} program does the same thing as
 Testing your installation
 -------------------------
 
-(gettingStarted.test)
 
 After installing Cheetah, you can run its self-test routine to
 verify it's working properly on your system. Change directory to
@@ -170,7 +163,6 @@ installation:
 Quickstart tutorial
 -------------------
 
-(gettingStarted.tutorial)
 
 This tutorial briefly introduces how to use Cheetah from the Python
 prompt. The following chapters will discuss other ways to use

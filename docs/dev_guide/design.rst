@@ -1,12 +1,10 @@
 Design Decisions and Tradeoffs
 ==============================
 
-(design)
 
 Delimiters
 ----------
 
-(design.Delimiters)
 
 One of the first decisions we encountered was which delimiter
 syntax to use. We decided to follow Velocity's {$placeholder} and
@@ -41,7 +39,6 @@ disappearing as bogus HTML tags do in browsers.
 Late binding
 ------------
 
-(design.lateBinding)
 
 One of Cheetah's unique features is the name mapper, which lets you
 write {$a.b} without worrying much about the type of {a} or {b}.
@@ -89,16 +86,13 @@ goals are unattainable due to performance considerations.
 Caching framework
 -----------------
 
-(design.cache)
 
 Webware compatibility and the transaction framework
 ---------------------------------------------------
 
-(design.webware)
 
 Single inheritance
 ------------------
 
-(design.singleInheritance)
 
 

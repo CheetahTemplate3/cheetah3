@@ -1,7 +1,6 @@
 Tips, Tricks and Troubleshooting
 ================================
 
-(tips)
 
 This chapter contains short stuff that doesn't fit anywhere else.
 
@@ -13,7 +12,6 @@ help, ask on the mailing list.
 Placeholder Tips
 ----------------
 
-(tips.placeholder)
 
 Here's how to do certain important lookups that may not be obvious.
 For each, we show first the Cheetah expression and then the Python
@@ -79,7 +77,6 @@ the searchList; instead, copy the needed variables into your own
 Diagnostic Output
 -----------------
 
-(tips.diagnostic)
 
 If you need send yourself some debugging output, you can use
 {#silent} to output it to standard error:
@@ -90,12 +87,10 @@ If you need send yourself some debugging output, you can use
     #silent $sys.stderr.write("Is 'unknown' in the searchList? " +
         $getVar("unknown", "No.") + "\n" )
 
-(Tip contributed by Greg Czajkowski.)
 
 When to use Python methods
 --------------------------
 
-(tips.pythonMethods)
 
 You always have a choice whether to code your methods as Cheetah
 {#def} methods or Python methods (the Python methods being located
@@ -139,7 +134,6 @@ to your Cheetah method, you'll have to do it another way.
 Calling superclass methods, and why you have to
 -----------------------------------------------
 
-(tips.callingSuperclassMethods)
 
 If your template or pure Python class overrides a standard method
 or attribute of {Template} or one of its base classes, you should
@@ -207,7 +201,6 @@ argument sequence is different than {super} uses.
 All methods
 -----------
 
-(tips.allMethods)
 
 Here is a list of all the standard methods and attributes that can
 be accessed from a placeholder. Some of them exist for you to call,
@@ -389,7 +382,6 @@ The same caveats about overriding these methods apply.
 Optimizing templates
 --------------------
 
-(tips.optimizing)
 
 Here are some things you can do to make your templates fill faster
 and user fewer CPU cycles. Before you put a lot of energy into
@@ -430,7 +422,6 @@ method, which is more wordy, and tedious.
 PSP-style tags
 --------------
 
-(tips.PSP)
 
 {<%= ... %>} and {<% ... %>} allow an escape to Python syntax
 inside the template. You do not need it to use Cheetah effectively,
@@ -470,7 +461,6 @@ it.
 Makefiles
 ---------
 
-(tips.Makefile)
 
 If your project has several templates and you get sick of typing
 "cheetah compile FILENAME.tmpl" all the time-much less remembering
@@ -514,7 +504,6 @@ doesn't produce an output file with the same name as the target.
 Using Cheetah in a Multi-Threaded Application
 ---------------------------------------------
 
-(tips.threads)
 
 Template classes may be shared freely between threads. However,
 template instances should not be shared unless you either:
@@ -562,7 +551,6 @@ operations listed above.
 Using Cheetah with gettext
 --------------------------
 
-(tips.gettext)
 
 { gettext} is a project for creating internationalized
 applications. For more details, visit

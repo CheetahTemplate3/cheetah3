@@ -1,7 +1,6 @@
 Using Cheetah with Webware
 ==========================
 
-(webware)
 
 { Webware for Python} is a 'Python-Powered Internet Platform' that
 runs servlets in a manner similar to Java servlets. { WebKit} is
@@ -24,7 +23,6 @@ to refer to the currently-running application server.
 Installing Cheetah on a Webware system
 --------------------------------------
 
-(webware.installing)
 
 Install Cheetah after you have installed Webware, following the
 instructions in chapter gettingStarted.
@@ -50,7 +48,6 @@ If Webware complains that it cannot find your servlet, make sure
 Containment vs Inheritance
 --------------------------
 
-(webware.background)
 
 Because Cheetah's core is flexible, there are many ways to
 integrate it with Webware servlets. There are two broad strategies:
@@ -91,7 +88,6 @@ Webware methods in the same object.
 The Containment Approach
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-(webware.containment)
 
 In the Containment approach, your servlet is not a template.
 Instead, it it makes its own arrangements to create and use
@@ -119,7 +115,6 @@ template class in a module global variable.
 The Inheritance Approach
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-(webware.inheritance)
 
 In the Inheritance approach, your template object doubles as as
 Webware servlet, thus these are sometimes called {
@@ -174,7 +169,6 @@ use redirects).
 Site frameworks
 ---------------
 
-(webware.siteFrameworks)
 
 Web sites are normally arranged hierarchically, with certain
 features common to every page on the site, other features common to
@@ -214,7 +208,6 @@ in this chapter, let us know.
 Directory structure
 -------------------
 
-(webware.directoryStructure)
 
 Here's one way to organize your files for Webware+Cheetah.
 
@@ -243,7 +236,6 @@ Here's one way to organize your files for Webware+Cheetah.
 Initializing your template-servlet with Python code
 ---------------------------------------------------
 
-(webware.calculations)
 
 If you need a place to initialize variables or do calculations for
 your template-servlet, you can put it in an {.awake()} method
@@ -264,7 +256,6 @@ section output.silent).
 Form processing
 ---------------
 
-(webware.form)
 
 There are many ways to display and process HTML forms with Cheetah.
 But basically, all form processing involves two steps.
@@ -350,7 +341,6 @@ yourself.
 Form input, cookies, session variables and web server variables
 ---------------------------------------------------------------
 
-(webware.input)
 
 General variable tips that also apply to servlets are in section
 tips.placeholder.
@@ -418,7 +408,6 @@ Other useful request goodies:
 .webInput()
 ~~~~~~~~~~~
 
-(webware.webInput)
 
 From the method docstring:
 
@@ -567,7 +556,6 @@ From the method docstring:
 More examples
 -------------
 
-(webware.examples)
 
 Example A - a standalone servlet
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -581,7 +569,6 @@ Example C - several servlets with a common template
 Other Tips
 ----------
 
-(webware.otherTips)
 
 If your servlet accesses external files (e.g., via an {#include}
 directive), remember that the current directory is not necessarily

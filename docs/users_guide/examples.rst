@@ -1,7 +1,6 @@
 Examples
 ========
 
-(examples)
 
 The Cheetah distribution comes with an 'examples' directory. Browse
 the files in this directory and its subdirectories for examples of

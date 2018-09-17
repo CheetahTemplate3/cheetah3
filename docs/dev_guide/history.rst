@@ -1,7 +1,6 @@
 History of Cheetah
 ==================
 
-(history)
 
 In Spring 2001, several members of the webware-discuss mailing list
 expressed the need for a template engine. Webware like Python is

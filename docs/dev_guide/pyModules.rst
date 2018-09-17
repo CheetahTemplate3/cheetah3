@@ -1,7 +1,6 @@
 .py Template Modules
 ====================
 
-(pyModules)
 
 This chapter examines the structure of a .py template module. The
 following few chapters will then show how each placeholder and
@@ -10,7 +9,6 @@ directive affects the generated Python code.
 An example
 ----------
 
-(pyModules.example)
 
 Our first template follows a long noble tradition in computer
 tutorials. It produces a familiar, friendly greeting. Here's the
@@ -170,7 +168,6 @@ The examples were generated from CVS versions of Cheetah between
 A walk through the example
 --------------------------
 
-(pyModules.walk)
 
 Lines 20-24 are the Cheetah-specific imports. Line 33 introduces
 our generated class, {x}, a subclass of {Template}. It's called x

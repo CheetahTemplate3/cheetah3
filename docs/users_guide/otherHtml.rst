@@ -1,7 +1,6 @@
 non-Webware HTML output
 =======================
 
-(otherHTML)
 
 Cheetah can be used with all types of HTML output, not just with
 Webware.
@@ -9,7 +8,6 @@ Webware.
 Static HTML Pages
 -----------------
 
-(otherHTML.static)
 
 Some sites like Linux Gazette (http://www.linuxgazette.com/)
 require completely static pages because they are mirrored on
@@ -28,7 +26,6 @@ encapsulate these steps.
 CGI scripts
 -----------
 
-(otherHTML)
 
 Unlike Webware servlets, which don't have to worry about the HTTP
 headers, CGI scripts must emit their own headers. To make a

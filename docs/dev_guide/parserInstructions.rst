@@ -1,12 +1,10 @@
 Directives: Parser Instructions
 ===============================
 
-(parserInstructions)
 
 #breakpoint
 -----------
 
-(parserInstructions.breakpoint)
 
 The template:
 
@@ -34,7 +32,6 @@ Nothing after the breakpoint was compiled.
 #compiler
 ---------
 
-(parserInstructions.compiler)
 
 The template:
 

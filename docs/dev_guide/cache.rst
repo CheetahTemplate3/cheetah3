@@ -1,12 +1,10 @@
 Caching placeholders and #cache
 ===============================
 
-(cache)
 
 Dynamic placeholder - no cache
 ------------------------------
 
-(cache.dynamic)
 
 The template:
 
@@ -34,7 +32,6 @@ Just what we expected, like any other dynamic placeholder.
 Static placeholder
 ------------------
 
-(cache.static)
 
 The template:
 
@@ -105,7 +102,6 @@ into the cache.
 Timed-refresh placeholder
 -------------------------
 
-(cache.timed)
 
 The template:
 
@@ -192,7 +188,6 @@ can you figure that out.
 Timed-refresh placeholder with braces
 -------------------------------------
 
-(cache.timed.braces)
 
 This example is the same but with the long placeholder syntax. It's
 here because it's a Cheetah FAQ whether to put the cache interval
@@ -239,7 +234,6 @@ text.
 #cache
 ------
 
-(cache.directive)
 
 The template:
 
@@ -286,7 +280,6 @@ text around the placeholder is inside the second if-block.
 #cache with timer and id
 ------------------------
 
-(cache.directive.timer)
 
 The template:
 
@@ -319,7 +312,6 @@ first if-block:
 #cache with test: expression and method conditions
 --------------------------------------------------
 
-(cache.directive.test)
 
 The template:
 
@@ -329,7 +321,6 @@ The template:
     This is a cached region.  $voom
     #end cache
 
-(Analysis postponed: bug in Cheetah produces invalid Python.)
 
 The template:
 

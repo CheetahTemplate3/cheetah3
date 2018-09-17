@@ -1,12 +1,10 @@
 Import, Inheritance, Declaration and Assignment
 ===============================================
 
-(inheritanceEtc)
 
 #import and #from directives
 ----------------------------
 
-(inheritanceEtc.import)
 
 Syntax:
 
@@ -36,7 +34,6 @@ After the above imports, {$math}, {$mathModule}, {$sin}, {$cos} and
 #extends
 --------
 
-(inheritanceEtc.extends)
 
 Syntax:
 
@@ -154,7 +151,6 @@ as in step 2 above. Read the next section to understand what
 #implements
 -----------
 
-(inheritanceEtc.implements)
 
 Syntax:
 
@@ -225,7 +221,6 @@ first} thing you should think is,
 #set
 ----
 
-(inheritanceEtc.set)
 
 Syntax:
 
@@ -292,7 +287,6 @@ prevent surprises.
 #del
 ----
 
-(inheritanceEtc.del)
 
 Syntax:
 
@@ -315,7 +309,6 @@ other type of variable.
 #attr
 -----
 
-(inheritanceEtc.attr)
 
 Syntax:
 
@@ -349,7 +342,6 @@ compiled into .py template modules):
 #def
 ----
 
-(inheritanceEtc.def)
 
 Syntax:
 
@@ -449,7 +441,6 @@ the subclass method that will be called.
 #block ... #end block
 ---------------------
 
-(inheritanceEtc.block)
 
 The {#block} directive allows you to mark a section of your
 template that can be selectively reimplemented in a subclass. It is

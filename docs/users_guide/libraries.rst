@@ -1,7 +1,6 @@
 Batteries included: templates and other libraries
 =================================================
 
-(libraries)
 
 Cheetah comes "batteries included" with libraries of templates,
 functions, classes and other objects you can use in your own
@@ -21,7 +20,6 @@ include something you want.
 ErrorCatchers
 -------------
 
-(libraries.ErrorCatchers)
 
 Module {Cheetah.ErrorCatchers} contains error-handling classes
 suitable for the {#errorCatcher} directive. These are debugging
@@ -32,7 +30,6 @@ catchers bundled with Cheetah.
 FileUtils
 ---------
 
-(libraries.FileUtils)
 
 Module {Cheetah.FileUtils} contains generic functions and classes
 for doing bulk search-and-replace on several files, and for finding
@@ -42,7 +39,6 @@ pattern.
 Filters
 -------
 
-(libraries.Filters)
 
 Module {Filters} contains filters suitable for the {#Filter}
 directive. See section output.filter for a description of the
@@ -51,7 +47,6 @@ filters bundled with Cheetah.
 SettingsManager
 ---------------
 
-(libraries.SettingsManager)
 
 The {SettingsManager} class in the {Cheetah.SettingsManager} module
 is a baseclass that provides facilities for managing application
@@ -92,7 +87,6 @@ applications. See the source code and docstrings in the file
 Templates
 ---------
 
-(libraries.templates)
 
 Package {Cheetah.Templates} contains stock templates that you can
 either use as is, or extend by using the {#def} directive to
@@ -103,7 +97,6 @@ libraries.templates.skeletonPage. (Contributed by Tavis Rudd.)
 Tools
 -----
 
-(libraries.Tools)
 
 Package {Cheetah.Tools} contains functions and classes contributed
 by third parties. Some are Cheetah-specific but others are generic
@@ -162,7 +155,6 @@ Current Tools include:
 Utils
 -----
 
-(libraries.Utils)
 
 Package {Cheetah.Utils} contains non-Cheetah-specific functions and
 classes that are imported by other Cheetah components. Many of
@@ -199,7 +191,6 @@ Current Utils include:
 Cheetah.Templates.SkeletonPage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-(libraries.templates.skeletonPage)
 
 A stock template class that may be useful for web developers is
 defined in the {Cheetah.Templates.SkeletonPage} module. The

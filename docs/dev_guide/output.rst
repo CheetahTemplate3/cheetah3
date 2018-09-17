@@ -1,12 +1,10 @@
 Directives: Output
 ==================
 
-(output)
 
 #echo
 -----
 
-(output.echo)
 
 The template:
 
@@ -31,7 +29,6 @@ The generated code:
 #silent
 -------
 
-(output.silent)
 
 The template:
 
@@ -59,7 +56,6 @@ but it almost succeeds.
 #raw
 ----
 
-(output.raw)
 
 The template:
 
@@ -96,7 +92,6 @@ a separate {write} call.
 #include
 --------
 
-(output.include)
 
 The main template:
 
@@ -127,7 +122,6 @@ The generated code:
 #include raw
 ~~~~~~~~~~~~
 
-(output.include.raw)
 
 The main template:
 
@@ -154,7 +148,6 @@ That last argument, {raw}, makes the difference.
 #include from a string or expression (eval)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-(output.include.expression)
 
 The template:
 
@@ -192,7 +185,6 @@ Later in the generated class:
 #slurp
 ------
 
-(output.slurp)
 
 The template:
 
@@ -235,7 +227,6 @@ in the template definition.
 #filter
 -------
 
-(output.filter)
 
 The template:
 

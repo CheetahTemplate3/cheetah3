@@ -1,12 +1,10 @@
 Directives: Error Handling
 ==========================
 
-(errorHandling)
 
 #try and #raise
 ---------------
 
-(errorHandling.try)
 
 The template:
 
@@ -67,7 +65,6 @@ The generated code:
 #assert
 -------
 
-(errorHandling.assert)
 
 The template:
 
@@ -101,12 +98,10 @@ The generated code:
 #errorCatcher
 -------------
 
-(errorHandling.errorCatcher)
 
 No error catcher
 ~~~~~~~~~~~~~~~~
 
-(errorHandling.errorCatcher.no)
 
 The template:
 
@@ -143,7 +138,6 @@ The generated code:
 Echo and BigEcho
 ~~~~~~~~~~~~~~~~
 
-(errorHandling.errorCatcher.echo)
 
 The template:
 
@@ -184,7 +178,6 @@ The generated code:
 ListErrors
 ~~~~~~~~~~
 
-(errorHandling.errorCatcher.listErrors)
 
 The template:
 

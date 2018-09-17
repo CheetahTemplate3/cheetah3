@@ -1,7 +1,6 @@
 Comments
 ========
 
-(comments)
 
 Comments are used to mark notes, explanations, and decorative text
 that should not appear in the output. Cheetah maintains the
@@ -55,7 +54,6 @@ lines after the previous method definition, like so:
 Docstring Comments
 ------------------
 
-(comments.docstring)
 
 Python modules, classes, and methods can be documented with inline
 'documentation strings' (aka 'docstrings'). Docstrings, unlike

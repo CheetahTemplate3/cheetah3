@@ -4,12 +4,10 @@
 Generating, Caching and Filtering Output
 ========================================
 
-(output)
 
 Output from complex expressions: #echo
 --------------------------------------
 
-(output.echo)
 
 Syntax:
 
@@ -33,7 +31,6 @@ This produces:
 Executing expressions without output: #silent
 ---------------------------------------------
 
-(output.silent)
 
 Syntax:
 
@@ -59,7 +56,6 @@ template.
 One-line #if
 ------------
 
-(output.oneLineIf)
 
 Syntax:
 
@@ -85,12 +81,10 @@ same line.
 Caching Output
 --------------
 
-(output.caching)
 
 Caching individual placeholders
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-(output.caching.placeholders)
 
 By default, the values of each $placeholder is retrieved and
 interpolated for every request. However, it's possible to cache the
@@ -139,7 +133,6 @@ cached regions, which will be described next.
 Caching entire regions
 ~~~~~~~~~~~~~~~~~~~~~~
 
-(output.caching.regions)
 
 Syntax:
 
@@ -218,7 +211,6 @@ varyByBrowser output caching keywords.
 #raw
 ----
 
-(output.raw)
 
 Syntax:
 
@@ -240,7 +232,6 @@ Cheetah doesn't know what a font is.
 #include
 --------
 
-(output.include)
 
 Syntax:
 
@@ -296,7 +287,6 @@ unbalanced constructs in include files.)
 #slurp
 ------
 
-(output.slurp)
 
 Syntax:
 
@@ -324,7 +314,6 @@ outputs:
 #indent
 -------
 
-(output.indent)
 
 This directive is not implemented yet. When/if it's completed, it
 will allow you to
@@ -351,7 +340,6 @@ the TODO file in the Cheetah source distribution.
 Ouput Filtering and #filter
 ---------------------------
 
-(output.filter)
 
 Syntax:
 

@@ -1,12 +1,10 @@
 Flow Control
 ============
 
-(flowControl)
 
 #for ... #end for
 -----------------
 
-(flowControl.for)
 
 Syntax:
 
@@ -81,7 +79,6 @@ for loop:
 #repeat ... #end repeat
 -----------------------
 
-(flowControl.repeat)
 
 Syntax:
 
@@ -127,7 +124,6 @@ uses a new local variable for every instance of {#repeat}.
 #while ... #end while
 ---------------------
 
-(flowControl.while)
 
 Syntax:
 
@@ -151,7 +147,6 @@ until the computer runs out of memory.
 #if ... #else if ... #else ... #end if
 --------------------------------------
 
-(flowControl.if)
 
 Syntax:
 
@@ -218,7 +213,6 @@ which is equivalent to Perl's and C's {?:} operator.
 #unless ... #end unless
 -----------------------
 
-(flowControl.unless)
 
 Syntax:
 
@@ -245,7 +239,6 @@ If you need those, use {#if} instead.
 #break and #continue
 --------------------
 
-(flowControl.break)
 
 Syntax:
 
@@ -284,7 +277,6 @@ In this example the loop will exit if it finds a name that equals
 #pass
 -----
 
-(flowControl.pass)
 
 Syntax:
 
@@ -313,7 +305,6 @@ The following example does nothing if only $A is true
 #stop
 -----
 
-(flowControl.stop)
 
 Syntax:
 
@@ -371,7 +362,6 @@ will print
 #return
 -------
 
-(flowControl.return)
 
 Syntax:
 

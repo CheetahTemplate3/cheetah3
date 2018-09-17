@@ -1,7 +1,6 @@
 Patching Cheetah
 ================
 
-(patching)
 
 How to commit changes to CVS or submit patches, how to run the test
 suite. Describe distutils and how the regression tests work.
@@ -9,7 +8,6 @@ suite. Describe distutils and how the regression tests work.
 File Requirements
 -----------------
 
-(patching.fileRequirements)
 
 The code{Template} class contains not only the Cheetah
 infrastructure, but also some convenience methods useful in all
@@ -37,7 +35,6 @@ imported that subsystem).
 Testing Changes and Building Regression Tests
 ---------------------------------------------
 
-(patching.testing)
 
 Cheetah ships with a regression test suite. To run the built-in
 tests, execute at the shell prompt:

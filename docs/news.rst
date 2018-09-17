@@ -7,7 +7,7 @@ Development (master)
 Features:
 
   - Dropped support for Python 3.3.
-  - Implement LoadTemplate.loadTemplate{Module,Class} to load template
+  - Implement LoadTemplate.loadTemplate{Module,Class} to load templates
     from .py[co], .py or .tmpl.
   - CheetahDirOwner caches compiled template in the template directory.
   - CheetahDirOwner now silently ignores errors on compiled templates
@@ -25,6 +25,10 @@ Bug fixes:
   - Fix a bug in Compiler.__str__: under Python 2 the method now always
     returns str; it encodes unicode to str using encoding from the
     compiled source. Under Python 3 the method decodes bytes to str.
+
+Documentation:
+
+  - Remove outdated section markers.
 
 
 3.1.0 (2018-03-03)

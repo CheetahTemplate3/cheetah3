@@ -1,7 +1,6 @@
 Files
 =====
 
-(files)
 
 This chapter will be an overview of the files in the Cheetah
 package, and how they interrelate in compiling and filling a

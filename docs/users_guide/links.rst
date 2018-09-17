@@ -1,7 +1,6 @@
 Useful Web Links
 ================
 
-(links)
 
 See the wiki for more links. (The wiki is also updated more often
 than this chapter is.)
@@ -9,7 +8,6 @@ than this chapter is.)
 Cheetah Links
 -------------
 
-(links.cheetah)
 
 Home Page, issue tracker
     - https://github.com/CheetahTemplate3/cheetah3
@@ -24,7 +22,6 @@ Questions can also be asked and answered on `StackOverflow
 Third-party Cheetah Stuff
 -------------------------
 
-(links.thirdParty)
 
 
 -  Steve Howell has written a photo viewer using Python.
@@ -34,7 +31,6 @@ Third-party Cheetah Stuff
 Webware Links
 -------------
 
-(links.webware)
 
 Home Page
     - https://cito.github.io/w4py/
@@ -52,7 +48,6 @@ Mailing List Subscription Page
 Python Links
 ------------
 
-(links.python)
 
 Home Page
     - http://www.python.org/
@@ -67,12 +62,10 @@ Python Cookbook
 Other Useful Links
 ------------------
 
-(links.other)
 
 Python Database Modules and Open Source Databases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-(links.database)
 
 Python Database Topic Guide
     - http://python.org/topics/database/
@@ -90,7 +83,6 @@ A comparison of PostgreSQL and MySQL
 Other Template Systems
 ~~~~~~~~~~~~~~~~~~~~~~
 
-(links.other.templateSystems)
 
 Python Wiki
     - https://wiki.python.org/moin/Templating
@@ -99,7 +91,6 @@ Python Wiki
 Other Internet development frameworks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-(links.internet)
 
 ZOPE (Z Object Publishing Environment)
     - http://zope.org/

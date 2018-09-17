@@ -1,7 +1,6 @@
 Safe Delegation
 ===============
 
-(safeDelegation)
 
 Safe delegation, as provided by Zope and Allaire's Spectra, is not
 implemented in Cheetah. The core aim has been to help developers

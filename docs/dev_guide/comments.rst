@@ -1,7 +1,6 @@
 Directives: Comments
 ====================
 
-(comments)
 
 The template:
 
@@ -38,7 +37,6 @@ The generated code:
 Docstring and header comments
 -----------------------------
 
-(comments.docstring)
 
 The template:
 

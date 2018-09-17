@@ -1,12 +1,10 @@
 Instructions to the Parser/Compiler
 ===================================
 
-(parserInstructions)
 
 #breakpoint
 -----------
 
-(parserInstructions.breakpoint)
 
 Syntax:
 
@@ -27,7 +25,6 @@ difference is that {#breakpoint} operates at compile time, while
 #compiler-settings
 ------------------
 
-(parserInstructions.compiler-settings)
 
 Syntax:
 

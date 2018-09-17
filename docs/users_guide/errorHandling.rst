@@ -1,7 +1,6 @@
 Error Handling
 ==============
 
-(errorHandling)
 
 There are two ways to handle runtime errors (exceptions) in
 Cheetah. The first is with the Cheetah directives that mirror
@@ -12,7 +11,6 @@ below.
 #try ... #except ... #end try, #finally, and #assert
 ----------------------------------------------------
 
-(errorHandling.directives)
 
 Cheetah's exception-handling directives are exact mirrors Python's
 exception-handling statements. See Python's documentation for
@@ -61,7 +59,6 @@ try-block, but can appear in nested try-blocks.
 #errorCatcher and ErrorCatcher objects
 --------------------------------------
 
-(errorHandling.errorCatcher)
 
 Syntax:
 

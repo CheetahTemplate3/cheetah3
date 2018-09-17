@@ -1,7 +1,6 @@
 Cheetah vs. Other Template Engines
 ==================================
 
-(comparisons)
 
 This appendix compares Cheetah with various other template/emdedded
 scripting languages and Internet development frameworks. As Cheetah
@@ -12,7 +11,6 @@ http://jakarta.apache.org/velocity/ymtd/ymtd.html.
 Which features are unique to Cheetah
 ------------------------------------
 
-(comparisons.unique)
 
 
 -  The { block framework} (section inheritanceEtc.block)
@@ -46,7 +44,6 @@ Which features are unique to Cheetah
 Cheetah vs. Velocity
 --------------------
 
-(comparisons.velocity)
 
 For a basic introduction to Velocity, visit
 http://jakarta.apache.org/velocity.
@@ -102,7 +99,6 @@ Cheetah, however, has a number of advantages over Velocity:
 Cheetah vs. WebMacro
 --------------------
 
-(comparisons.webmacro)
 
 For a basic introduction to WebMacro, visit http://webmacro.org.
 
@@ -114,7 +110,6 @@ http://jakarta.apache.org/velocity/differences.html.
 Cheetah vs. Zope's DTML
 -----------------------
 
-(comparisons.dtml)
 
 For a basic introduction to DTML, visit
 http://www.zope.org/Members/michel/ZB/DTML.dtml.
@@ -227,7 +222,6 @@ complete yet.
 Cheetah vs. Zope Page Templates
 -------------------------------
 
-(comparisons.zpt)
 
 For a basic introduction to Zope Page Templates, please visit
 http://www.zope.org/Documentation/Articles/ZPT2.
@@ -235,7 +229,6 @@ http://www.zope.org/Documentation/Articles/ZPT2.
 Cheetah vs. PHP's Smarty templates
 ----------------------------------
 
-(comparisons.smarty)
 
 PHP (http://www.php.net/) is one of the few scripting languages
 expressly designed for web servlets. However, it's also a
@@ -405,7 +398,6 @@ we want to write someday.
 Cheetah vs. PHPLib's Template class
 -----------------------------------
 
-(comparisons.php)
 
 PHPLib ((http://phplib.netuse.de/) is a collection of classes for
 various web objects (authentication, shopping cart, sessions, etc),
@@ -471,7 +463,6 @@ too. Differences from Cheetah:
 Cheetah vs. PSP, PHP, ASP, JSP, Embperl, etc.
 ---------------------------------------------
 
-(comparisons.pspEtc)
 
 Webware's PSP Component
     - http://webware.sourceforge.net/Webware/PSP/Docs/

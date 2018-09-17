@@ -1,12 +1,10 @@
 Placeholders
 ============
 
-(placeholders)
 
 Simple placeholders
 -------------------
 
-(placeholders.simple)
 
 Let's add a few $placeholders to our template:
 
@@ -181,7 +179,6 @@ outputs for true {and} expressions.)
 Complex placeholders
 --------------------
 
-(placeholders.complex)
 
 Placeholders can get far more complicated than that. This example
 shows what kind of code the various NameMapper features produce.

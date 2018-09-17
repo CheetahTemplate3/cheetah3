@@ -1,7 +1,6 @@
 Visual Editors
 ==============
 
-(visualEditors)
 
 This chapter is about maintaining Cheetah templates with visual
 editors, and the tradeoffs between making it friendly to both text
