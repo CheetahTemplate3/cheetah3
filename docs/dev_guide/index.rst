@@ -9,8 +9,6 @@ This guide needs to really be filled out more
     :maxdepth: 1
 
     introduction.rst
-    compiler.rst
-    parser.rst
     errorHandling.rst
     placeholders.rst
     patching.rst
@@ -19,12 +17,9 @@ This guide needs to really be filled out more
     safeDelegation.rst
     history.rst
     output.rst
-    files.rst
     cache.rst
-    bnf.rst
     pyModules.rst
     comments.rst
     parserInstructions.rst
-    template.rst
     inheritanceEtc.rst
 
