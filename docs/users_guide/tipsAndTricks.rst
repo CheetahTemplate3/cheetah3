@@ -458,6 +458,53 @@ Note that these are PSP-{ style} tags, not PSP tags. A Cheetah
 template is not a PSP document, and you can't use PSP commands in
 it.
 
+Calling one template from another
+---------------------------------
+
+Cheetah templates are really python modules in disguise. I.e., when
+Cheetah loads a template it compiles it to python code and then to byte
+code. Every template is compiled as a single class. The thing is,
+neither the source code nor byte code are saved to files automatically.
+
+There are a few ways to allow a user to import one template (python
+module!) from another.
+
+1. A user can compile templates to `*.py` files using `cheetah compile`
+command line program. Then import works at the Python level.
+
+To semi-automatically compile all templates after editing them one can
+use the following `Makefile` (GNU flavour)::
+
+	.SUFFIXES: # Clear the suffix list
+	.SUFFIXES: .py .tmpl
+
+	%.py: %.tmpl
+		cheetah compile --nobackup $<
+		python -m compile $@
+
+	templates = $(shell echo \*.tmpl)
+	modules = $(patsubst %.tmpl,%.py,$(templates))
+
+	.PHONY: all
+	all: $(modules)
+
+(Don't forget - makefiles require indent with tabs, not spaces.)
+
+2. Subvert Python import to make Cheetah import directly from `*.tmpl`
+files using `import hooks <../api/Cheetah.ImportHooks.html>`_.
+
+Example code::
+
+    from Cheetah import ImportHooks
+    ImportHooks.install()
+
+    import sys
+    sys.path.insert(0, 'path/to/template_dir')  # or sys.path.append
+
+ImportHooks try to import from `*.pyc`, `*.py` and `*.tmpl` - whatever
+is found first. ImportHooks automatically compile `*.tmpl` to `*.py` and
+`*.pyc`.
+
 Makefiles
 ---------
 

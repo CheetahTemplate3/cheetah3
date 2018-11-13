@@ -29,6 +29,8 @@ Bug fixes:
 Documentation:
 
   - Remove outdated section markers.
+  - Better documentation for ImportHooks.
+  - Add an example of a universal makefile.
 
 
 3.1.0 (2018-03-03)
