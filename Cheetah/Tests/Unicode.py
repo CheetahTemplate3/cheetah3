@@ -216,7 +216,7 @@ class Unicode_in_SearchList_Test(CommandLineTest):
                 'adjective':
                     u'\u0e22\u0e34\u0e19\u0e14\u0e35\u0e15'
                     u'\u0e49\u0e2d\u0e19\u0e23\u0e31\u0e1a'
-              }])
+            }])
         assert template.respond()
 
     def test_Thai_utf8(self):

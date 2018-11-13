@@ -32,19 +32,19 @@ from Cheetah.Tests import Unicode
 SyntaxAndOutput.install_eols()
 
 suites = [
-   unittest.findTestCases(Analyzer),
-   # unittest.findTestCases(Cheps),
-   unittest.findTestCases(Filters),
-   unittest.findTestCases(ImportHooks),
-   unittest.findTestCases(LoadTemplate),
-   unittest.findTestCases(Misc),
-   unittest.findTestCases(NameMapper),
-   unittest.findTestCases(Parser),
-   unittest.findTestCases(Regressions),
-   unittest.findTestCases(SyntaxAndOutput),
-   unittest.findTestCases(Template),
-   unittest.findTestCases(Unicode),
-   unittest.findTestCases(NameMapper_pure),
+    unittest.findTestCases(Analyzer),
+    # unittest.findTestCases(Cheps),
+    unittest.findTestCases(Filters),
+    unittest.findTestCases(ImportHooks),
+    unittest.findTestCases(LoadTemplate),
+    unittest.findTestCases(Misc),
+    unittest.findTestCases(NameMapper),
+    unittest.findTestCases(Parser),
+    unittest.findTestCases(Regressions),
+    unittest.findTestCases(SyntaxAndOutput),
+    unittest.findTestCases(Template),
+    unittest.findTestCases(Unicode),
+    unittest.findTestCases(NameMapper_pure),
 ]
 
 if not sys.platform.startswith('java'):

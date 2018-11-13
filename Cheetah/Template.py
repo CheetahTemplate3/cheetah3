@@ -1283,9 +1283,10 @@ class Template(Servlet):
                     convertVersionStringToTuple(compiledVersion)
                 if compiledVersionTuple < MinCompatibleVersionTuple:
                     raise AssertionError(
-                     'This template was compiled with Cheetah version %s.'
-                     'Templates compiled before version %s must be recompiled.'
-                     % (compiledVersion, MinCompatibleVersion))
+                        'This template was compiled with Cheetah version %s.'
+                        'Templates compiled before version %s '
+                        'must be recompiled.'
+                        % (compiledVersion, MinCompatibleVersion))
             except AssertionError:
                 raise
             except Exception:

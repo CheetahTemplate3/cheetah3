@@ -181,9 +181,9 @@ htmlhelp_basename = 'CheetahTemplateEnginedoc'
 # (source start file, target name, title,
 # author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'CheetahTemplateEngine.tex',
-   u'Cheetah Template Engine Documentation',
-   u'R. Tyler Ballance', 'manual'),
+    ('index', 'CheetahTemplateEngine.tex',
+     u'Cheetah Template Engine Documentation',
+     u'R. Tyler Ballance', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
