@@ -298,7 +298,7 @@ class Template(Servlet):
 
          '_handleCheetahInclude',
          '_getTemplateAPIClassForIncludeDirectiveCompilation',
-         )
+    )
     _CHEETAH_requiredCheetahClassMethods = ('subclass',)
     _CHEETAH_requiredCheetahClassAttributes = (
         'cacheRegionClass', 'cacheStore',
@@ -979,7 +979,7 @@ class Template(Servlet):
             compilerSettings=settings.compilerSettings,
             placeholderToken=settings.placeholderToken,
             directiveToken=settings.directiveToken
-            )
+        )
         return settings
 
     @classmethod
@@ -2021,7 +2021,7 @@ def genParserErrorFromPythonException(source, file,
         '',
         report,
         '='*80,
-        ]
+    ]
     cheetahPosMatch = re.search('line (\d+), col (\d+)', formatedExc)
     if cheetahPosMatch:
         lineno = int(cheetahPosMatch.group(1))

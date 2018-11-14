@@ -999,7 +999,7 @@ class MethodCompiler(GenUtils):
             'self._CHEETAH__errorCatcher = self._CHEETAH__errorCatchers["'
             + errorCatcherName + '"] = ErrorCatchers.'
             + errorCatcherName + '(self)'
-            )
+        )
         self.dedent()
 
     def nextFilterRegionID(self):
@@ -1476,7 +1476,7 @@ class ClassCompiler(GenUtils):
             klass=MethodCompiler,
             initialMethodComment=('## CHEETAH: Generated from ' + rawCode +
                                   ' at line %s, col %s' % lineCol + '.')
-            )
+        )
         catcherMeth.setMethodSignature(
             'def ' + methodName +
             '(self, localsDict={})')  # is this use of localsDict right?
@@ -1547,7 +1547,7 @@ class ClassCompiler(GenUtils):
                 ind + '## CHEETAH GENERATED METHODS',
                 '\n',
                 self.methodDefs(),
-                ])
+            ])
 
         def addAttributes():
             classDefChunks.extend([
@@ -1555,7 +1555,7 @@ class ClassCompiler(GenUtils):
                 ind + '## CHEETAH GENERATED ATTRIBUTES',
                 '\n',
                 self.attributes(),
-                ])
+            ])
         if self.setting('outputMethodsBeforeAttributes'):
             addMethods()
             addAttributes()
@@ -1769,7 +1769,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "import Cheetah.Filters as Filters",
             "import Cheetah.ErrorCatchers as ErrorCatchers",
             "from Cheetah.compat import unicode",
-            ]
+        ]
 
         self._importedVarNames = ['sys',
                                   'os',
@@ -1789,7 +1789,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "VFSL=valueFromSearchList",
             "VFN=valueForName",
             "currentTime=time.time",
-            ]
+        ]
 
     def compile(self):
         classCompiler = self._spawnClassCompiler(self._mainClassName)
@@ -2104,7 +2104,7 @@ if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
             'classes': self.classDefs(),
             'footer': self.moduleFooter(),
             'mainClassName': self._mainClassName,
-            }
+        }  # noqa
 
         self._moduleDef = moduleDef
         return moduleDef

@@ -99,12 +99,12 @@ defaultTestNameSpace = {
     'list': [
         {'index': 0, 'numOne': 1, 'numTwo': 2},
         {'index': 1, 'numOne': 1, 'numTwo': 2},
-        ],
+    ],
     'nameList': [('john', 'doe'), ('jane', 'smith')],
     'letterList': ['a', 'b', 'c'],
     '_': lambda x: 'Translated: ' + x,
     'unicodeData': u'aoeu12345\u1234',
-    }
+}
 
 
 ##################################################
@@ -159,7 +159,7 @@ Template output mismatch:
                 compilerSettings=self._getCompilerSettings(),
                 keepRefToGeneratedCode=True,
                 **extraKwArgs
-                )
+            )
             moduleCode = templateClass._CHEETAH_generatedModuleCode
             searchList = self.searchList() or self._searchList
             self.template = templateObj = templateClass(searchList=searchList)
@@ -168,7 +168,7 @@ Template output mismatch:
                 input,
                 searchList=self.searchList(),
                 compilerSettings=self._getCompilerSettings(),
-                )
+            )
             moduleCode = templateObj._CHEETAH_generatedModuleCode
         if self.DEBUGLEV >= 1:
             print("Module: %s" % templateObj.__module__)

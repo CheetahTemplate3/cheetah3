@@ -139,7 +139,7 @@ def run_setup(configurations):
     cmdclasses = {
         'build_ext': mod_build_ext,
         'install_data': mod_install_data,
-        }
+    }
 
     kws['cmdclass'] = cmdclasses
 

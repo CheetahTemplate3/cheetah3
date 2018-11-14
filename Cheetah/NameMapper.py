@@ -365,7 +365,7 @@ def example():
             'default': 'default output',
             'one': 'output option one',
             'two': 'output option two'
-            }
+        }
         return values[whichOne]
 
     a.dic = {
@@ -373,7 +373,7 @@ def example():
         'method': a.method3,
         'item': 'itemval',
         'subDict': {'nestedMethod': a.method3}
-        }
+    }
     # b = 'this is local b'
 
     print(valueForKey(a.dic, 'subDict'))

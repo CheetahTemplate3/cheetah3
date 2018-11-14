@@ -154,7 +154,7 @@ if __name__ == '__main__':
          ('/services/prices', 'Prices'),
          ],
         ('/contact', 'Contact Us'),
-        ]
+    ]
 
     for url in ['/', '/services', '/services/products/widget', '/contact']:
         print('<p>', '='*50)

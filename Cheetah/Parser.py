@@ -235,7 +235,7 @@ directiveNamesAndParsers = {
     'encoding': 'eatEncoding',
 
     'end': 'eatEndDirective',
-    }
+}
 
 endDirectiveNamesAndHandlers = {
     'def': 'handleEndDef',      # has short-form
@@ -252,7 +252,7 @@ endDirectiveNamesAndHandlers = {
     'try': None,                # has short-form
     'repeat': None,             # has short-form
     'unless': None,             # has short-form
-    }
+}
 
 ##################################################
 # CLASSES ##
@@ -439,7 +439,7 @@ class _LowLevelParser(SourceReader):
             self.matchDirective,
             self.matchPSPStartToken,
             self.matchEOLSlurpToken,
-            ]
+        ]
 
     # regex setup ##
 
@@ -486,12 +486,12 @@ class _LowLevelParser(SourceReader):
             escCharLookBehind +
             escapeRegexChars(self.setting('cheetahVarStartToken'))
             + validCharsLookAhead
-            )
+        )
 
         self.cheetahVarInExpressionStartTokenRE = cachedRegex(
             escapeRegexChars(self.setting('cheetahVarStartToken'))
             + r'(?=[A-Za-z_])'
-            )
+        )
 
         self.expressionPlaceholderStartRE = cachedRegex(
             escCharLookBehind + r'(?P<startToken>' +
@@ -505,7 +505,7 @@ class _LowLevelParser(SourceReader):
                 escapeRegexChars(self.setting('EOLSlurpToken'))
                 + r'[ \t\f]*'
                 + r'(?:'+EOL+')'
-                )
+            )
         else:
             self.EOLSlurpRE = None
 
@@ -2037,7 +2037,7 @@ class _HighLevelParser(_LowLevelParser):
         self._compiler._blockMetaData[methodName] = {
             'raw': rawSignature,
             'lineCol': self.getRowCol(startPos),
-            }
+        }
 
     def eatClosure(self):
         # filtered

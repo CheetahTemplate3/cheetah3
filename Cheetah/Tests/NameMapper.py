@@ -76,7 +76,7 @@ testNamespace = {
     'none': None,
     'emptyString': '',
     'funcThatRaises': funcThatRaises,
-    }
+}
 
 autoCallResults = {'aFunc': 'Scooby',
                    'aMeth': 'doo',
