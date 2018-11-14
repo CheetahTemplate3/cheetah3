@@ -38,7 +38,7 @@ class _SkeletonPage(Template):
                 'Content-Type': 'text/html; charset=iso-8859-1',
             },
             'NAME': {
-                    'generator': 'Cheetah: The Python-Powered Template Engine'
+                'generator': 'Cheetah: The Python-Powered Template Engine'
             }
         }
         # metaTags = {

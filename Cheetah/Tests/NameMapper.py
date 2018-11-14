@@ -4,8 +4,8 @@ import sys
 import unittest
 
 from Cheetah.NameMapper import NotFound, \
-     valueForName, valueFromSearchList, valueFromFrame, \
-     valueFromFrameOrSearchList
+    valueForName, valueFromSearchList, valueFromFrame, \
+    valueFromFrameOrSearchList
 
 
 class DummyClass(object):

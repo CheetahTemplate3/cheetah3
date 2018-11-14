@@ -24,8 +24,8 @@ from Cheetah.SettingsManager import SettingsManager
 from Cheetah.Utils.Indenter import indentize  # an undocumented preprocessor
 from Cheetah import NameMapper
 from Cheetah.Parser import Parser, ParseError, specialVarRE, \
-     STATIC_CACHE, REFRESH_CACHE, SET_GLOBAL, SET_MODULE, \
-     unicodeDirectiveRE, encodingDirectiveRE, escapedNewlineRE
+    STATIC_CACHE, REFRESH_CACHE, SET_GLOBAL, SET_MODULE, \
+    unicodeDirectiveRE, encodingDirectiveRE, escapedNewlineRE
 from Cheetah.compat import PY2, string_type, unicode
 
 from Cheetah.NameMapper import valueForName, valueFromSearchList, \

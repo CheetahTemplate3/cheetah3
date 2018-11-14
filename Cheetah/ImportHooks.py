@@ -77,9 +77,8 @@ class CheetahDirOwner(DirOwner):
         code = str(Compiler(file=tmplPath, moduleName=name,
                             mainClassName=name))
         if _cacheDir:
-            __file__ = os.path.join(_cacheDir[0],
-                                    convertTmplPathToModuleName(tmplPath)) \
-                       + '.py'
+            __file__ = os.path.join(
+                _cacheDir[0], convertTmplPathToModuleName(tmplPath)) + '.py'
         else:
             __file__ = os.path.splitext(tmplPath)[0] + '.py'
         try:

@@ -73,8 +73,7 @@ SET_MODULE = 2
 # Tokens for the parser ##
 
 # generic
-identchars = "abcdefghijklmnopqrstuvwxyz" \
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+identchars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
 namechars = identchars + "0123456789"
 
 # operators
@@ -91,8 +90,8 @@ assignmentOps = (assignOp,) + augAssignOps
 compOps = ('<', '>', '==', '!=', '<=', '>=', '<>', 'is', 'in',)
 booleanOps = ('and', 'or', 'not')
 operators = (powerOp,) + unaryArithOps + binaryArithOps \
-            + shiftOps + bitwiseOps + assignmentOps \
-            + compOps + booleanOps
+    + shiftOps + bitwiseOps + assignmentOps \
+    + compOps + booleanOps
 
 delimeters = ('(', ')', '{', '}', '[', ']',
               ',', '.', ':', ';', '=', '`') + augAssignOps
@@ -1936,12 +1935,12 @@ class _HighLevelParser(_LowLevelParser):
                 'An error occurred while processing '
                 'the following #compiler directive.\n')
             sys.stderr.write(
-                    '------------------------------------'
-                    '----------------------------------\n')
+                '------------------------------------'
+                '----------------------------------\n')
             sys.stderr.write('%s\n' % self[startPos:endPos])
             sys.stderr.write(
-                    '------------------------------------'
-                    '----------------------------------\n')
+                '------------------------------------'
+                '----------------------------------\n')
             sys.stderr.write('Please check the syntax of these settings.\n\n')
             raise
 
@@ -1976,8 +1975,8 @@ class _HighLevelParser(_LowLevelParser):
                 'An error occurred while processing '
                 'the following compiler settings.\n')
             sys.stderr.write(
-                    '------------------------------------'
-                    '----------------------------------\n')
+                '------------------------------------'
+                '----------------------------------\n')
             sys.stderr.write('%s\n' % settingsStr.strip())
             sys.stderr.write(
                 '------------------------------------'

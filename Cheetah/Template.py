@@ -274,30 +274,30 @@ class Template(Servlet):
 
     # this is used by ._addCheetahPlumbingCodeToClass()
     _CHEETAH_requiredCheetahMethods = (
-         '_initCheetahInstance',
-         'searchList',
-         'errorCatcher',
-         'getVar',
-         'varExists',
-         'getFileContents',
-         'i18n',
-         'runAsMainProgram',
-         'respond',
-         'shutdown',
-         'webInput',
-         'serverSidePath',
-         'generatedClassCode',
-         'generatedModuleCode',
+        '_initCheetahInstance',
+        'searchList',
+        'errorCatcher',
+        'getVar',
+        'varExists',
+        'getFileContents',
+        'i18n',
+        'runAsMainProgram',
+        'respond',
+        'shutdown',
+        'webInput',
+        'serverSidePath',
+        'generatedClassCode',
+        'generatedModuleCode',
 
-         '_getCacheStore',
-         '_getCacheStoreIdPrefix',
-         '_createCacheRegion',
-         'getCacheRegion',
-         'getCacheRegions',
-         'refreshCache',
+        '_getCacheStore',
+        '_getCacheStoreIdPrefix',
+        '_createCacheRegion',
+        'getCacheRegion',
+        'getCacheRegions',
+        'refreshCache',
 
-         '_handleCheetahInclude',
-         '_getTemplateAPIClassForIncludeDirectiveCompilation',
+        '_handleCheetahInclude',
+        '_getTemplateAPIClassForIncludeDirectiveCompilation',
     )
     _CHEETAH_requiredCheetahClassMethods = ('subclass',)
     _CHEETAH_requiredCheetahClassAttributes = (
@@ -1349,9 +1349,9 @@ class Template(Servlet):
         """
 
         return self._CHEETAH_generatedModuleCode[
-                    self._CHEETAH_generatedModuleCode.find('\nclass '):
-                    self._CHEETAH_generatedModuleCode.find(
-                        '\n## END CLASS DEFINITION')]
+            self._CHEETAH_generatedModuleCode.find('\nclass '):
+            self._CHEETAH_generatedModuleCode.find(
+                '\n## END CLASS DEFINITION')]
 
     def searchList(self):
         """Return a reference to the searchlist
