@@ -995,13 +995,13 @@ class Template(Servlet):
             if 'directiveEndToken' not in compilerSettings:
                 compilerSettings['directiveEndToken'] = directiveToken
             if 'commentStartToken' not in compilerSettings:
-                compilerSettings['commentStartToken'] = directiveToken*2
+                compilerSettings['commentStartToken'] = directiveToken*2  # noqa: E226 missing whitespace around operator
             if 'multiLineCommentStartToken' not in compilerSettings:
                 compilerSettings['multiLineCommentStartToken'] = (
-                    directiveToken+'*')
+                    directiveToken + '*')
             if 'multiLineCommentEndToken' not in compilerSettings:
                 compilerSettings['multiLineCommentEndToken'] = (
-                    '*'+directiveToken)
+                    '*' + directiveToken)
             if 'EOLSlurpToken' not in compilerSettings:
                 compilerSettings['EOLSlurpToken'] = directiveToken
 
@@ -1029,7 +1029,7 @@ class Template(Servlet):
                         classmethod(meth.__func__))
 
         for attrname in klass._CHEETAH_requiredCheetahClassAttributes:
-            attrname = '_CHEETAH_'+attrname
+            attrname = '_CHEETAH_' + attrname
             if not hasattr(concreteTemplateClass, attrname):
                 attrVal = getattr(klass, attrname)
                 setattr(concreteTemplateClass, attrname, attrVal)
@@ -1987,15 +1987,15 @@ def genParserErrorFromPythonException(source, file,
 
     prevLines = []                  # (i, content)
     for i in range(1, 4):
-        if pyLineno-i <= 0:
+        if pyLineno - i <= 0:
             break
-        prevLines.append((pyLineno+1-i, lines[pyLineno-i]))
+        prevLines.append((pyLineno + 1 - i, lines[pyLineno - i]))
 
     nextLines = []                  # (i, content)
     for i in range(1, 4):
-        if not pyLineno+i < len(lines):
+        if not pyLineno + i < len(lines):
             break
-        nextLines.append((pyLineno+i, lines[pyLineno+i]))
+        nextLines.append((pyLineno + i, lines[pyLineno + i]))
     nextLines.reverse()
     report = 'Line|Python Code\n'
     report += '----|--------------------------' \
@@ -2006,7 +2006,7 @@ def genParserErrorFromPythonException(source, file,
             % {'row': lineInfo[0], 'line': lineInfo[1]}
 
     if hasattr(exception, 'offset'):
-        report += ' '*(3+(exception.offset or 0)) + '^\n'
+        report += ' '*(3 + (exception.offset or 0)) + '^\n'  # noqa: E226 missing whitespace around operator
 
     while nextLines:
         lineInfo = nextLines.pop()
@@ -2015,12 +2015,12 @@ def genParserErrorFromPythonException(source, file,
 
     message = [
         "Error in the Python code which Cheetah generated for this template:",
-        '='*80,
+        '='*80,  # noqa: E226 missing whitespace around operator
         '',
         str(exception),
         '',
         report,
-        '='*80,
+        '='*80,  # noqa: E226 missing whitespace around operator
     ]
     cheetahPosMatch = re.search('line (\d+), col (\d+)', formatedExc)
     if cheetahPosMatch:
@@ -2033,7 +2033,7 @@ def genParserErrorFromPythonException(source, file,
         lineno = None
         col = None
         cheetahPosMatch = re.search('line (\d+), col (\d+)',
-                                    '\n'.join(lines[max(pyLineno-2, 0):]))
+                                    '\n'.join(lines[max(pyLineno - 2, 0):]))
         if cheetahPosMatch:
             lineno = int(cheetahPosMatch.group(1))
             col = int(cheetahPosMatch.group(2))

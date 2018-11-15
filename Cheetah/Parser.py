@@ -284,7 +284,7 @@ class ParseError(ValueError):
         if self.lineno:
             lineno = self.lineno
             row, col, line = (lineno, (self.col or 0),
-                              self.stream.splitlines()[lineno-1])
+                              self.stream.splitlines()[lineno - 1])
         else:
             row, col, line = self.stream.getRowColLine()
 
@@ -294,13 +294,13 @@ class ParseError(ValueError):
         for i in range(1, 4):
             if row - 1 - i <= 0:
                 break
-            prevLines.append((row-i, lines[row-1-i]))
+            prevLines.append((row - i, lines[row - 1 - i]))
 
         nextLines = []                  # (rowNum, content)
         for i in range(1, 4):
-            if not row-1+i < len(lines):
+            if not row - 1 + i < len(lines):
                 break
-            nextLines.append((row+i, lines[row-1+i]))
+            nextLines.append((row + i, lines[row - 1 + i]))
         nextLines.reverse()
 
         # print the main message
@@ -314,7 +314,7 @@ class ParseError(ValueError):
             report += "%(row)-4d|%(line)s\n" \
                 % {'row': lineInfo[0], 'line': lineInfo[1]}
         report += "%(row)-4d|%(line)s\n" % {'row': row, 'line': line}
-        report += ' '*5 + ' '*(col-1) + "^\n"
+        report += ' '*5 + ' '*(col - 1) + "^\n"  # noqa: E226 missing whitespace around operator
 
         while nextLines:
             lineInfo = nextLines.pop()
@@ -466,7 +466,7 @@ class _LowLevelParser(SourceReader):
         self.cacheTokenRE = cachedRegex(cacheToken)
 
         silentPlaceholderToken = (r'(?:' +
-                                  r'(?P<SILENT>' + escapeRegexChars('!')+')' +
+                                  r'(?P<SILENT>' + escapeRegexChars('!') + ')' +
                                   '|' +
                                   r'(?P<NOT_SILENT>)' +
                                   ')')
@@ -475,7 +475,7 @@ class _LowLevelParser(SourceReader):
         self.cheetahVarStartRE = cachedRegex(
             escCharLookBehind + r'(?P<startToken>' +
             escapeRegexChars(self.setting('cheetahVarStartToken')) + ')' +
-            r'(?P<silenceToken>' + silentPlaceholderToken+')' +
+            r'(?P<silenceToken>' + silentPlaceholderToken + ')' +
             r'(?P<cacheToken>' + cacheToken + ')' +
             # allow WS after enclosure
             r'(?P<enclosure>|(?:(?:\{|\(|\[)[ \t\f]*))' + r'(?=[A-Za-z_])')
@@ -503,7 +503,7 @@ class _LowLevelParser(SourceReader):
             self.EOLSlurpRE = cachedRegex(
                 escapeRegexChars(self.setting('EOLSlurpToken'))
                 + r'[ \t\f]*'
-                + r'(?:'+EOL+')'
+                + r'(?:' + EOL + ')'
             )
         else:
             self.EOLSlurpRE = None
@@ -743,7 +743,7 @@ class _LowLevelParser(SourceReader):
         self.setPos(startPos)
         return directiveName
 
-    def matchDirectiveName(self, directiveNameChars=identchars+'0123456789-@'):
+    def matchDirectiveName(self, directiveNameChars=identchars + '0123456789-@'):
         startPos = self.pos()
         possibleMatches = self._directiveNamesAndParsers.keys()
         name = ''
@@ -790,7 +790,7 @@ class _LowLevelParser(SourceReader):
 
     def matchColonForSingleLineShortFormDirective(self):
         if not self.atEnd() and self.peek() == ':':
-            restOfLine = self[self.pos()+1:self.findEOL()]
+            restOfLine = self[self.pos()+1:self.findEOL()]  # noqa: E226 missing whitespace around operator
             restOfLine = restOfLine.strip()
             if not restOfLine:
                 return False
@@ -936,7 +936,7 @@ class _LowLevelParser(SourceReader):
                 break
             elif self.peek() == '.':
 
-                if self.pos()+1 < len(self) and self.peek(1) in identchars:
+                if self.pos() + 1 < len(self) and self.peek(1) in identchars:
                     # discard the period as it isn't needed with NameMapper
                     self.advance()
                 else:
@@ -952,7 +952,7 @@ class _LowLevelParser(SourceReader):
                 period = max(dottedName.rfind('.'), 0)
                 if period:
                     chunks.append((dottedName[:period], autoCall, ''))
-                    dottedName = dottedName[period+1:]
+                    dottedName = dottedName[period+1:]  # noqa: E226 missing whitespace around operator
                 if rest and rest[0] == '(':
                     autoCall = False
             chunks.append((dottedName, autoCall, rest))
@@ -1198,8 +1198,8 @@ class _LowLevelParser(SourceReader):
                 exprBits.append(self.getWhiteSpace())
             elif self.matchDirectiveEndToken() and not enclosures:
                 break
-            elif c == "\\" and self.pos()+1 < srcLen:
-                eolMatch = EOLre.match(self.src(), self.pos()+1)
+            elif c == "\\" and self.pos() + 1 < srcLen:
+                eolMatch = EOLre.match(self.src(), self.pos() + 1)
                 if not eolMatch:
                     self.advance()
                     raise ParseError(self, msg='Line ending expected')
@@ -1274,23 +1274,23 @@ class _LowLevelParser(SourceReader):
                 startPosIdx = 3
             else:
                 startPosIdx = 1
-            self.setPos(beforeTokenPos+startPosIdx+1)
+            self.setPos(beforeTokenPos + startPosIdx + 1)
             outputExprs = []
             strConst = ''
-            while self.pos() < (endPos-startPosIdx):
+            while self.pos() < (endPos - startPosIdx):
                 if self.matchCheetahVarStart() \
                         or self.matchExpressionPlaceholderStart():
                     if strConst:
                         outputExprs.append(repr(strConst))
                         strConst = ''
                     placeholderExpr = self.getPlaceholder()
-                    outputExprs.append('str('+placeholderExpr+')')
+                    outputExprs.append('str(' + placeholderExpr + ')')
                 else:
                     strConst += self.getc()
             self.setPos(endPos)
             if strConst:
                 outputExprs.append(repr(strConst))
-            token = "''.join(["+','.join(outputExprs)+"])"
+            token = "''.join([" + ','.join(outputExprs) + "])"
         return token
 
     def _raiseErrorAboutInvalidCheetahVarSyntaxInExpr(self):
@@ -1674,13 +1674,13 @@ class _HighLevelParser(_LowLevelParser):
         elif directiveName in self._simpleIndentingDirectives:
             handlerName = self._directiveHandlerNames.get(directiveName)
             if not handlerName:
-                handlerName = 'add'+directiveName.capitalize()
+                handlerName = 'add' + directiveName.capitalize()
             handler = getattr(self._compiler, handlerName)
             self.eatSimpleIndentingDirective(directiveName, callback=handler)
         elif directiveName in self._simpleExprDirectives:
             handlerName = self._directiveHandlerNames.get(directiveName)
             if not handlerName:
-                handlerName = 'add'+directiveName.capitalize()
+                handlerName = 'add' + directiveName.capitalize()
             handler = getattr(self._compiler, handlerName)
             if directiveName in ('silent', 'echo'):
                 includeDirectiveNameInExpr = False

@@ -92,11 +92,11 @@ class Hierarchy:
 
     def menuLink(self, url, text, indent):
         if url == self._currentURL or self._prefix + url == self._currentURL:
-            return '%s<B%s>%s</B> <BR>\n' % ('&nbsp;'*2*indent,
+            return '%s<B%s>%s</B> <BR>\n' % ('&nbsp;' * 2 * indent,
                                              self._menuCSSClass, text)
         else:
             return '%s<A HREF="%s%s"%s>%s</A> <BR>\n' % \
-                   ('&nbsp;'*2*indent, self._prefix, url,
+                   ('&nbsp;'*2*indent, self._prefix, url,  # noqa: E226 missing whitespace around operator
                     self._menuCSSClass, text)
 
     def crumbLink(self, url, text):
@@ -128,7 +128,7 @@ class Hierarchy:
         stream.write(self.menuLink(url, text, indent))
         if self._inContents(contents):
             for item in rest:
-                self._menubarRecurse(item, indent+1, stream)
+                self._menubarRecurse(item, indent + 1, stream)
 
     def _inContents(self, contents):
         if isinstance(contents, tuple):
@@ -157,10 +157,10 @@ if __name__ == '__main__':
     ]
 
     for url in ['/', '/services', '/services/products/widget', '/contact']:
-        print('<p>', '='*50)
+        print('<p>', '='*50)  # noqa: E226 missing whitespace around operator
         print('<br> %s: <br>\n' % url)
         n = Hierarchy(hierarchy, url, menuCSSClass='menu',
                       crumbCSSClass='crumb', prefix='/here')
         print(n.menuList())
-        print('<p>', '-'*50)
+        print('<p>', '-'*50)  # noqa: E226 missing whitespace around operator
         print(n.crumbs())

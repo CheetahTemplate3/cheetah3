@@ -29,7 +29,7 @@ def convertVersionStringToTuple(s):
         versionNum += [0]
     releaseTypeSubNum = int(releaseTypeSubNum)
 
-    return tuple(versionNum+[releaseType, releaseTypeSubNum])
+    return tuple(versionNum + [releaseType, releaseTypeSubNum])
 
 
 if __name__ == '__main__':

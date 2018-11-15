@@ -39,7 +39,7 @@ def _lookup(name, func, multi, converters):
     colon = name.find(':')
     if colon != -1:
         longName = name
-        shortName, ext = name[:colon], name[colon+1:]
+        shortName, ext = name[:colon], name[colon+1:]  # noqa: E226 missing whitespace around operator
     else:
         longName = shortName = name
         ext = ''

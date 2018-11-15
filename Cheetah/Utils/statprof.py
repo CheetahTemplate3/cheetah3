@@ -163,10 +163,10 @@ class ProfileState(object):
         self.sample_count = 0
         # a float
         if frequency:
-            self.sample_interval = 1.0/frequency
+            self.sample_interval = 1.0 / frequency
         elif not hasattr(self, 'sample_interval'):
             # default to 100 Hz
-            self.sample_interval = 1.0/100.0
+            self.sample_interval = 1.0 / 100.0
         else:
             # leave the frequency as it was
             pass

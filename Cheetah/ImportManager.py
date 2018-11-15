@@ -78,7 +78,7 @@ def _os_bootstrap():
 
     if dirname is None:
         def dirname(a, sep=sep):
-            for i in range(len(a)-1, -1, -1):
+            for i in range(len(a) - 1, -1, -1):
                 c = a[i]
                 if c == '/' or c == sep:
                     return a[:i]
@@ -101,7 +101,7 @@ _os_bootstrap()
 
 
 def packageName(s):
-    for i in range(len(s)-1, -1, -1):
+    for i in range(len(s) - 1, -1, -1):
         if s[i] == '.':
             break
     else:
@@ -115,14 +115,14 @@ def nameSplit(s):
     for j in range(len(s)):
         if s[j] == '.':
             rslt.append(s[i:j])
-            i = j+1
+            i = j + 1
     if i < len(s):
         rslt.append(s[i:])
     return rslt
 
 
 def getPathExt(fnm):
-    for i in range(len(fnm)-1, -1, -1):
+    for i in range(len(fnm) - 1, -1, -1):
         if fnm[i] == '.':
             return fnm[i:]
     return ''
@@ -187,7 +187,7 @@ class DirOwner(Owner):
         py = pyc = None
         for pth, ispkg, pkgpth in possibles:
             for ext, mode, typ in getsuffixes():
-                attempt = pth+ext
+                attempt = pth + ext
                 try:
                     st = _os_stat(attempt)
                 except Exception:
@@ -210,7 +210,7 @@ class DirOwner(Owner):
         while True:
             if pyc is None or py and pyc[1][8] < py[1][8]:
                 try:
-                    co = compile(open(py[0], 'r').read()+'\n', py[0], 'exec')
+                    co = compile(open(py[0], 'r').read() + '\n', py[0], 'exec')
                     try:
                         py_compile.compile(py[0])
                     except IOError:
@@ -275,7 +275,7 @@ class FrozenImportDirector(ImportDirector):
             if hasattr(mod, '__path__'):
                 mod.__importsub__ = \
                     lambda name, pname=nm, owner=self: \
-                    owner.getmod(pname+'.'+name)
+                    owner.getmod(pname + '.' + name)
             return mod
         return None
 
@@ -473,7 +473,7 @@ class ImportManager:
             raise ImportError("No module named %s" % fqname)
         if fromlist is None:
             if context:
-                return sys.modules[context+'.'+nmparts[0]]
+                return sys.modules[context + '.' + nmparts[0]]
             return sys.modules[nmparts[0]]
         bottommod = sys.modules[ctx]
         if hasattr(bottommod, '__path__'):
@@ -482,7 +482,7 @@ class ImportManager:
             while i < len(fromlist):
                 nm = fromlist[i]
                 if nm == '*':
-                    fromlist[i:i+1] = list(getattr(bottommod, '__all__', []))
+                    fromlist[i:i+1] = list(getattr(bottommod, '__all__', []))  # noqa: E226 missing whitespace around operator
                     if i >= len(fromlist):
                         break
                     nm = fromlist[i]
@@ -490,7 +490,7 @@ class ImportManager:
                 if not hasattr(bottommod, nm):
                     if self.threaded:
                         self._acquire()
-                    mod = self.doimport(nm, ctx, ctx+'.'+nm)
+                    mod = self.doimport(nm, ctx, ctx + '.' + nm)
                     if self.threaded:
                         self._release()
                     if not mod:

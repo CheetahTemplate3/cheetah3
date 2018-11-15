@@ -20,7 +20,7 @@ DEBUG = False
 
 # TOLERANCE in Pystones
 kPS = 1000
-TOLERANCE = 0.5*kPS
+TOLERANCE = 0.5*kPS  # noqa: E226 missing whitespace around operator
 
 
 class DurationError(AssertionError):

@@ -94,7 +94,7 @@ class CheetahDirOwner(DirOwner):
                 py_compile.compile(__file__)
             except IOError:
                 pass
-        co = compile(code+'\n', __file__, 'exec')
+        co = compile(code + '\n', __file__, 'exec')
 
         mod = types.ModuleType(name)
         mod.__file__ = co.co_filename

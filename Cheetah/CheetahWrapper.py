@@ -531,8 +531,8 @@ you do have write permission to and re-run the tests.""")
 
         if p >= 0:
             mod = getattr(
-                __import__(modname[:p], {}, {}, [modname[p+1:]]),
-                modname[p+1:])
+                __import__(modname[:p], {}, {}, [modname[p+1:]]),  # noqa: E226 missing whitespace around operator
+                modname[p+1:])  # noqa: E226 missing whitespace around operator
         else:
             mod = __import__(modname, {}, {}, [])
 

@@ -78,13 +78,13 @@ class _CacheDataStoreWrapper(object):
         self._keyPrefix = keyPrefix
 
     def get(self, key):
-        return self._dataStore.get(self._keyPrefix+key)
+        return self._dataStore.get(self._keyPrefix + key)
 
     def delete(self, key):
-        self._dataStore.delete(self._keyPrefix+key)
+        self._dataStore.delete(self._keyPrefix + key)
 
     def set(self, key, val, time=0):
-        self._dataStore.set(self._keyPrefix+key, val, time=time)
+        self._dataStore.set(self._keyPrefix + key, val, time=time)
 
 
 class CacheRegion(object):
@@ -108,7 +108,7 @@ class CacheRegion(object):
             cacheStore = Cheetah.CacheStore.MemoryCacheStore()
         self._cacheStore = cacheStore
         self._wrappedCacheDataStore = _CacheDataStoreWrapper(
-            cacheStore, keyPrefix=templateCacheIdPrefix+':'+regionID+':')
+            cacheStore, keyPrefix=templateCacheIdPrefix + ':' + regionID + ':')
         self._cacheItems = {}
 
     def isNew(self):

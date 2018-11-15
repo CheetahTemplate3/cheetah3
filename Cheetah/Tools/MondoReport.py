@@ -102,7 +102,7 @@ def mean(lis):
 
 def median(lis):
     lis = sorted(lis[:])
-    return lis[int(len(lis)/2)]
+    return lis[int(len(lis)/2)]  # noqa: E226 missing whitespace around operator
 
 
 def variance(lis):
@@ -320,9 +320,9 @@ class RecordStats(IndexFormats, ValuesGetterMixin):
                 start = 1
         else:
             start = 1
-            end = start+size-1
+            end = start + size - 1
             try:
-                sequence[end+orphan-1]
+                sequence[end + orphan - 1]
             except Exception:
                 end = len(sequence)
             # if l - end < orphan: end=l

@@ -114,7 +114,7 @@ class _SettingsCollector(object):
                        'False': (0 == 1),
                        }
         newSettings = {'self': self}
-        exec((theString+os.linesep), globalsDict, newSettings)
+        exec((theString + os.linesep), globalsDict, newSettings)
         del newSettings['self']
         module = types.ModuleType('temp_settings_module')
         module.__dict__.update(newSettings)

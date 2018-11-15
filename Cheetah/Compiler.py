@@ -147,15 +147,15 @@ class GenUtils(object):
         if timeString[-1] == 's':
             interval = float(timeString[:-1])
         elif timeString[-1] == 'm':
-            interval = float(timeString[:-1])*60
+            interval = float(timeString[:-1])*60  # noqa: E226 missing whitespace around operator
         elif timeString[-1] == 'h':
-            interval = float(timeString[:-1])*60*60
+            interval = float(timeString[:-1])*60*60  # noqa: E226 missing whitespace around operator
         elif timeString[-1] == 'd':
-            interval = float(timeString[:-1])*60*60*24
+            interval = float(timeString[:-1])*60*60*24  # noqa: E226 missing whitespace around operator
         elif timeString[-1] == 'w':
-            interval = float(timeString[:-1])*60*60*24*7
+            interval = float(timeString[:-1])*60*60*24*7  # noqa: E226 missing whitespace around operator
         else:                       # default to minutes
-            interval = float(timeString)*60
+            interval = float(timeString)*60  # noqa: E226 missing whitespace around operator
         return interval
 
     def genCacheInfo(self, cacheTokenParts):
@@ -293,13 +293,13 @@ class GenUtils(object):
             firstDotIdx = name.find('.')
             if firstDotIdx != -1 and firstDotIdx < len(name):
                 beforeFirstDot = name[:firstDotIdx]
-                afterDot = name[firstDotIdx+1:]
+                afterDot = name[firstDotIdx+1:]  # noqa: E226 missing whitespace around operator
                 pythonCode = ('VFN(' + beforeFirstDot +
                               ',"' + afterDot +
                               '",' + repr(defaultUseAC and useAC) + ')'
                               + remainder)
             else:
-                pythonCode = name+remainder
+                pythonCode = name + remainder
         elif self.setting('useStackFrames'):
             pythonCode = ('VFFSL(SL,'
                           '"' + name + '",'
@@ -417,7 +417,7 @@ class MethodCompiler(GenUtils):
         if not self._docStringLines:
             return ''
 
-        ind = self._indent*2
+        ind = self._indent*2  # noqa: E226 missing whitespace around operator
         docStr = (ind + '"""\n' + ind +
                   ('\n' + ind).join(
                       [ln.replace('"""', "'''")
@@ -491,7 +491,7 @@ class MethodCompiler(GenUtils):
         if reprstr.startswith('u'):
             i = 1
             out = ['u']
-        body = escapedNewlineRE.sub('\\1\n', reprstr[i+1:-1])
+        body = escapedNewlineRE.sub('\\1\n', reprstr[i+1:-1])  # noqa: E226 missing whitespace around operator
 
         if reprstr[i] == "'":
             out.append("'''")
@@ -508,7 +508,7 @@ class MethodCompiler(GenUtils):
         """
         if self._pendingStrConstChunks:
             src = self._pendingStrConstChunks[-1]
-            BOL = max(src.rfind('\n')+1, src.rfind('\r')+1, 0)
+            BOL = max(src.rfind('\n') + 1, src.rfind('\r') + 1, 0)
             if BOL < len(src):
                 self._pendingStrConstChunks[-1] = src[:BOL]
 
@@ -530,7 +530,7 @@ class MethodCompiler(GenUtils):
 
     def addMethComment(self, comm):
         offSet = self.setting('commentOffset')
-        self.addChunk('#' + ' '*offSet + comm)
+        self.addChunk('#' + ' '*offSet + comm)  # noqa: E226 missing whitespace around operator
 
     def addPlaceholder(self, expr, filterArgs, rawPlaceholder,
                        cacheTokenParts, lineCol,
@@ -680,7 +680,7 @@ class MethodCompiler(GenUtils):
         signature = \
             "def " + functionName + "(" + ','.join(argStringChunks) + "):"
         self.addIndentingDirective(signature)
-        self.addChunk('#'+parserComment)
+        self.addChunk('#' + parserComment)
 
     def addTry(self, expr, lineCol=None):
         self.addIndentingDirective(expr, lineCol=lineCol)
@@ -757,7 +757,7 @@ class MethodCompiler(GenUtils):
             self.indent()
 
     def nextCacheID(self):
-        return ('_'+str(random.randrange(100, 999))
+        return ('_' + str(random.randrange(100, 999))
                 + str(random.randrange(10000, 99999)))
 
     def startCacheRegion(self, cacheInfo, lineCol, rawPlaceholder=None):
@@ -852,7 +852,7 @@ class MethodCompiler(GenUtils):
         self.addChunk('del _cacheCollector_%(ID)s' % locals())
         self.addChunk('del _orig_trans%(ID)s' % locals())
         self.dedent()
-        self.addChunk('## END CACHE REGION: '+ID)
+        self.addChunk('## END CACHE REGION: ' + ID)
         self.addChunk('')
 
     def nextCallRegionID(self):
@@ -925,14 +925,14 @@ class MethodCompiler(GenUtils):
                 '_callCollector%(ID)s.response().getvalue()' % locals())
             self.addChunk('del _callCollector%(ID)s' % locals())
             if initialKwArgs:
-                initialKwArgs = ', '+initialKwArgs
+                initialKwArgs = ', ' + initialKwArgs
             self.addFilteredChunk(
                 '%(functionName)s(_callArgVal%(ID)s%(initialKwArgs)s)'
                 % locals())
             self.addChunk('del _callArgVal%(ID)s' % locals())
         else:
             if initialKwArgs:
-                initialKwArgs = initialKwArgs+', '
+                initialKwArgs = initialKwArgs + ', '
             self._endCallArg()
             reset()
             self.addFilteredChunk(
@@ -1163,13 +1163,13 @@ class AutoMethodCompiler(MethodCompiler):
             else:
                 self.addChunk('_filter = self._CHEETAH__currentFilter')
         self.addChunk('')
-        self.addChunk("#"*40)
+        self.addChunk("#"*40)  # noqa: E226 missing whitespace around operator
         self.addChunk('## START - generated method body')
         self.addChunk('')
 
     def _addAutoCleanupCode(self):
         self.addChunk('')
-        self.addChunk("#"*40)
+        self.addChunk("#"*40)  # noqa: E226 missing whitespace around operator
         self.addChunk('## END - generated method body')
         self.addChunk('')
 
@@ -1218,7 +1218,7 @@ if not self._CHEETAH__instanceInitialized:
     for k,v in KWs.items():
         if k in allowedKWs: cheetahKWArgs[k] = v
     self._initCheetahInstance(**cheetahKWArgs)
-""".replace('\n', '\n'+' '*8)
+""".replace('\n', '\n' + ' '*8)  # noqa: E226 missing whitespace around operator
 
 
 class ClassCompiler(GenUtils):
@@ -1293,7 +1293,7 @@ class ClassCompiler(GenUtils):
 
         if self.setting('templateMetaclass'):
             self._generatedAttribs.append(
-                '__metaclass__ = '+self.setting('templateMetaclass'))
+                '__metaclass__ = ' + self.setting('templateMetaclass'))
         self._initMethChunks = []
         self._blockMetaData = {}
         self._errorCatcherCount = 0
@@ -1543,7 +1543,7 @@ class ClassCompiler(GenUtils):
 
         def addMethods():
             classDefChunks.extend([
-                ind + '#'*50,
+                ind + '#'*50,  # noqa: E226 missing whitespace around operator
                 ind + '## CHEETAH GENERATED METHODS',
                 '\n',
                 self.methodDefs(),
@@ -1551,7 +1551,7 @@ class ClassCompiler(GenUtils):
 
         def addAttributes():
             classDefChunks.extend([
-                ind + '#'*50,
+                ind + '#'*50,  # noqa: E226 missing whitespace around operator
                 ind + '## CHEETAH GENERATED ATTRIBUTES',
                 '\n',
                 self.attributes(),
@@ -1891,11 +1891,11 @@ class ModuleCompiler(SettingsManager, GenUtils):
                     for chunk in chunks[1:-1]:
                         if modName in self.importedVarNames():
                             needToAddImport = False
-                            finalBaseClassName = klass.replace(modName+'.', '')
+                            finalBaseClassName = klass.replace(modName + '.', '')
                             baseclasses.append(finalBaseClassName)
                             break
                         else:
-                            modName += '.'+chunk
+                            modName += '.' + chunk
                     if needToAddImport:
                         modName, finalClassName = (
                             '.'.join(chunks[:-1]), chunks[-1])
@@ -1962,7 +1962,7 @@ class ModuleCompiler(SettingsManager, GenUtils):
     def addSpecialVar(self, basename, contents, includeUnderscores=True):
         """Adds module __specialConstant__ to the module globals.
         """
-        name = includeUnderscores and '__'+basename+'__' or basename
+        name = includeUnderscores and '__' + basename + '__' or basename
         self._specialVars[name] = contents.strip()
 
     def addImportStatement(self, impStatement):
@@ -2121,8 +2121,8 @@ if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
             offSet = self.setting('commentOffset')
 
             header += (
-                '#' + ' '*offSet +
-                ('\n#' + ' '*offSet).join(self._moduleHeaderLines) + '\n')
+                '#' + ' '*offSet +  # noqa: E226 missing whitespace around operator
+                ('\n#' + ' '*offSet).join(self._moduleHeaderLines) + '\n')  # noqa: E226 missing whitespace around operator
 
         return header
 
