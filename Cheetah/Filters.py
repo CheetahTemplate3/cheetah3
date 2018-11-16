@@ -67,7 +67,7 @@ class Markdown(EncodeUnicode):
         tag, as it's usefulness with #filter is marginal at
         best
     '''
-    def filter(self,  value, **kwargs):
+    def filter(self, value, **kwargs):
         # This is a bit of a hack to allow outright embedding
         # of the markdown module.
         import markdown

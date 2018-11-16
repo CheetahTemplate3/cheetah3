@@ -97,12 +97,12 @@ delimeters = ('(', ')', '{', '}', '[', ']',
               ',', '.', ':', ';', '=', '`') + augAssignOps
 
 
-keywords = ('and',       'del',       'for',       'is',        'raise',
-            'assert',    'elif',      'from',      'lambda',    'return',
-            'break',     'else',      'global',    'not',       'try',
-            'class',     'except',    'if',        'or',        'while',
-            'continue',  'exec',      'import',    'pass',
-            'def',       'finally',   'in',        'print',
+keywords = ('and',       'del',       'for',       'is',        'raise',   # noqa: E241 multiple spaces after ','
+            'assert',    'elif',      'from',      'lambda',    'return',  # noqa: E241 multiple spaces after ','
+            'break',     'else',      'global',    'not',       'try',     # noqa: E241 multiple spaces after ','
+            'class',     'except',    'if',        'or',        'while',   # noqa: E241 multiple spaces after ','
+            'continue',  'exec',      'import',    'pass',                 # noqa: E241 multiple spaces after ','
+            'def',       'finally',   'in',        'print',                # noqa: E241 multiple spaces after ','
             )
 
 single3 = "'''"
@@ -1510,7 +1510,7 @@ class _HighLevelParser(_LowLevelParser):
         but I haven't thought of a better name yet.  Suggestions?
         """
         for callback in self.setting('expressionFilterHooks'):
-            expr = callback(parser=self, expr=expr,  exprType=exprType,
+            expr = callback(parser=self, expr=expr, exprType=exprType,
                             rawExpr=rawExpr, startPos=startPos)
         return expr
 

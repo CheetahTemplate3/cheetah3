@@ -2443,7 +2443,7 @@ class PSP(OutputTest):
 
     def test1(self):
         """simple <%= [int] %>"""
-        self.verify("<%= 1234 %>",  "1234")
+        self.verify("<%= 1234 %>", "1234")
 
     def test2(self):
         """simple <%= [string] %>"""

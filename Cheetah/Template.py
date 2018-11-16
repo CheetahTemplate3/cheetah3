@@ -1920,28 +1920,28 @@ class Template(Servlet):
             global _formUsedByWebInput
             if _formUsedByWebInput is None:
                 _formUsedByWebInput = cgi.FieldStorage()
-            source, func = 'field',   _formUsedByWebInput.getvalue
+            source, func = 'field', _formUsedByWebInput.getvalue
         elif isCgi and src == 'c':
             raise RuntimeError("can't get cookies from a CGI script")
         elif isCgi and src == 's':
             raise RuntimeError("can't get session variables from a CGI script")
         elif isCgi and src == 'v':
-            source, func = 'value',   self.request().value
+            source, func = 'value', self.request().value
         elif isCgi and src == 's':
             source, func = 'session', self.request().session().value
         elif src == 'f':
-            source, func = 'field',   self.request().field
+            source, func = 'field', self.request().field
         elif src == 'c':
-            source, func = 'cookie',  self.request().cookie
+            source, func = 'cookie', self.request().cookie
         elif src == 'v':
-            source, func = 'value',   self.request().value
+            source, func = 'value', self.request().value
         elif src == 's':
             source, func = 'session', self.request().session().value  # noqa: E501,F841
         else:
             raise TypeError("arg 'src' invalid")
         converters = {
-            '': _Converter('string', None, default,      default),
-            'int': _Converter('int',     int, defaultInt,   badInt),
+            '': _Converter('string', None, default, default),
+            'int': _Converter('int', int, defaultInt, badInt),
             'float': _Converter('float', float, defaultFloat, badFloat),
         }
         # pprint.pprint(locals());  return {}
