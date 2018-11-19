@@ -97,12 +97,12 @@ delimeters = ('(', ')', '{', '}', '[', ']',
               ',', '.', ':', ';', '=', '`') + augAssignOps
 
 
-keywords = ('and',       'del',       'for',       'is',        'raise',   # noqa: E241 multiple spaces after ','
-            'assert',    'elif',      'from',      'lambda',    'return',  # noqa: E241 multiple spaces after ','
-            'break',     'else',      'global',    'not',       'try',     # noqa: E241 multiple spaces after ','
-            'class',     'except',    'if',        'or',        'while',   # noqa: E241 multiple spaces after ','
-            'continue',  'exec',      'import',    'pass',                 # noqa: E241 multiple spaces after ','
-            'def',       'finally',   'in',        'print',                # noqa: E241 multiple spaces after ','
+keywords = ('and',       'del',       'for',       'is',        'raise',   # noqa: E241,E501 multiple spaces after ','
+            'assert',    'elif',      'from',      'lambda',    'return',  # noqa: E241,E501 multiple spaces after ','
+            'break',     'else',      'global',    'not',       'try',     # noqa: E241,E501 multiple spaces after ','
+            'class',     'except',    'if',        'or',        'while',   # noqa: E241,E501 multiple spaces after ','
+            'continue',  'exec',      'import',    'pass',                 # noqa: E241,E501 multiple spaces after ','
+            'def',       'finally',   'in',        'print',                # noqa: E241,E501 multiple spaces after ','
             )
 
 single3 = "'''"
@@ -314,7 +314,7 @@ class ParseError(ValueError):
             report += "%(row)-4d|%(line)s\n" \
                 % {'row': lineInfo[0], 'line': lineInfo[1]}
         report += "%(row)-4d|%(line)s\n" % {'row': row, 'line': line}
-        report += ' '*5 + ' '*(col - 1) + "^\n"  # noqa: E226 missing whitespace around operator
+        report += ' '*5 + ' '*(col - 1) + "^\n"  # noqa: E226,E501 missing whitespace around operator
 
         while nextLines:
             lineInfo = nextLines.pop()
@@ -466,8 +466,8 @@ class _LowLevelParser(SourceReader):
         self.cacheTokenRE = cachedRegex(cacheToken)
 
         silentPlaceholderToken = (r'(?:' +
-                                  r'(?P<SILENT>' + escapeRegexChars('!') + ')' +
-                                  '|' +
+                                  r'(?P<SILENT>' + escapeRegexChars('!') + ')'
+                                  + '|' +
                                   r'(?P<NOT_SILENT>)' +
                                   ')')
         self.silentPlaceholderTokenRE = cachedRegex(silentPlaceholderToken)
@@ -743,7 +743,8 @@ class _LowLevelParser(SourceReader):
         self.setPos(startPos)
         return directiveName
 
-    def matchDirectiveName(self, directiveNameChars=identchars + '0123456789-@'):
+    def matchDirectiveName(self,
+                           directiveNameChars=identchars + '0123456789-@'):
         startPos = self.pos()
         possibleMatches = self._directiveNamesAndParsers.keys()
         name = ''
@@ -790,7 +791,7 @@ class _LowLevelParser(SourceReader):
 
     def matchColonForSingleLineShortFormDirective(self):
         if not self.atEnd() and self.peek() == ':':
-            restOfLine = self[self.pos()+1:self.findEOL()]  # noqa: E226 missing whitespace around operator
+            restOfLine = self[self.pos()+1:self.findEOL()]  # noqa: E226,E501 missing whitespace around operator
             restOfLine = restOfLine.strip()
             if not restOfLine:
                 return False
@@ -952,7 +953,7 @@ class _LowLevelParser(SourceReader):
                 period = max(dottedName.rfind('.'), 0)
                 if period:
                     chunks.append((dottedName[:period], autoCall, ''))
-                    dottedName = dottedName[period+1:]  # noqa: E226 missing whitespace around operator
+                    dottedName = dottedName[period+1:]  # noqa: E226,E501 missing whitespace around operator
                 if rest and rest[0] == '(':
                     autoCall = False
             chunks.append((dottedName, autoCall, rest))

@@ -96,7 +96,7 @@ class Hierarchy:
                                              self._menuCSSClass, text)
         else:
             return '%s<A HREF="%s%s"%s>%s</A> <BR>\n' % \
-                   ('&nbsp;'*2*indent, self._prefix, url,  # noqa: E226 missing whitespace around operator
+                   ('&nbsp;'*2*indent, self._prefix, url,  # noqa: E226,E501 missing whitespace around operator
                     self._menuCSSClass, text)
 
     def crumbLink(self, url, text):

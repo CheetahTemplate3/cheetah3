@@ -1130,7 +1130,7 @@ $i#slurp
 $aStr#slurp
 #end def
 $foo$foo$foo$foo$foo""",
-                    "1\n01234blarg"*5)  # noqa: E226 missing whitespace around operator
+                    "1\n01234blarg"*5)  # noqa: E226,E501 missing whitespace around operator
 
     def test5(self):
         r"""nested #cache blocks"""
@@ -1148,7 +1148,7 @@ $*(6)#slurp
 $aStr#slurp
 #end def
 $foo$foo$foo$foo$foo""",
-                    "1\n012346blarg"*5)  # noqa: E226 missing whitespace around operator
+                    "1\n012346blarg"*5)  # noqa: E226,E501 missing whitespace around operator
 
     def test6(self):
         r"""Make sure that partial directives don't match"""
@@ -1652,7 +1652,7 @@ class ForDirective(OutputTest):
 
     def test15(self):
         """2 times single line #for"""
-        self.verify("#for $i in range($aFunc(5)): $i#slurp\n"*2,  # noqa: E226 missing whitespace around operator
+        self.verify("#for $i in range($aFunc(5)): $i#slurp\n"*2,  # noqa: E226,E501 missing whitespace around operator
                     "01234"*2)  # noqa: E226 missing whitespace around operator
 
     def test16(self):
@@ -1700,8 +1700,8 @@ class RepeatDirective(OutputTest):
         """single-line #repeat"""
         self.verify("#repeat $numTwo: 1",
                     "11")
-        self.verify("#repeat $numTwo: 1\n"*2,  # noqa: E226 missing whitespace around operator
-                    "1\n1\n"*2)  # noqa: E226 missing whitespace around operator
+        self.verify("#repeat $numTwo: 1\n"*2,  # noqa: E226,E501 missing whitespace around operator
+                    "1\n1\n"*2)  # noqa: E226,E501 missing whitespace around operator
 
         # false single-line
         self.verify("#repeat 3:  \n1\n#end repeat",
@@ -2434,7 +2434,7 @@ class UnlessDirective(OutputTest):
         """single-line #unless"""
         self.verify("#unless 1: 1234", "")
         self.verify("#unless 0: 1234", "1234")
-        self.verify("#unless 0: 1234\n"*2, "1234\n"*2)  # noqa: E226 missing whitespace around operator
+        self.verify("#unless 0: 1234\n"*2, "1234\n"*2)  # noqa: E226,E501 missing whitespace around operator
 
 
 class PSP(OutputTest):

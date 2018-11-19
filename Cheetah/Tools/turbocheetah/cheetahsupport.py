@@ -66,7 +66,7 @@ class TurboCheetah:
         divider = classname.rfind(".")
         if divider > -1:
             package = classname[0:divider]
-            basename = classname[divider+1:]  # noqa: E226 missing whitespace around operator
+            basename = classname[divider+1:]  # noqa: E226,E501 missing whitespace around operator
         else:
             raise ValueError("All templates must be in a package")
 

@@ -147,15 +147,15 @@ class GenUtils(object):
         if timeString[-1] == 's':
             interval = float(timeString[:-1])
         elif timeString[-1] == 'm':
-            interval = float(timeString[:-1])*60  # noqa: E226 missing whitespace around operator
+            interval = float(timeString[:-1])*60  # noqa: E226,E501 missing whitespace around operator
         elif timeString[-1] == 'h':
-            interval = float(timeString[:-1])*60*60  # noqa: E226 missing whitespace around operator
+            interval = float(timeString[:-1])*60*60  # noqa: E226,E501 missing whitespace around operator
         elif timeString[-1] == 'd':
-            interval = float(timeString[:-1])*60*60*24  # noqa: E226 missing whitespace around operator
+            interval = float(timeString[:-1])*60*60*24  # noqa: E226,E501 missing whitespace around operator
         elif timeString[-1] == 'w':
-            interval = float(timeString[:-1])*60*60*24*7  # noqa: E226 missing whitespace around operator
+            interval = float(timeString[:-1])*60*60*24*7  # noqa: E226,E501 missing whitespace around operator
         else:                       # default to minutes
-            interval = float(timeString)*60  # noqa: E226 missing whitespace around operator
+            interval = float(timeString)*60  # noqa: E226,E501 missing whitespace around operator
         return interval
 
     def genCacheInfo(self, cacheTokenParts):
@@ -293,7 +293,7 @@ class GenUtils(object):
             firstDotIdx = name.find('.')
             if firstDotIdx != -1 and firstDotIdx < len(name):
                 beforeFirstDot = name[:firstDotIdx]
-                afterDot = name[firstDotIdx+1:]  # noqa: E226 missing whitespace around operator
+                afterDot = name[firstDotIdx+1:]  # noqa: E226,E501 missing whitespace around operator
                 pythonCode = ('VFN(' + beforeFirstDot +
                               ',"' + afterDot +
                               '",' + repr(defaultUseAC and useAC) + ')'
@@ -491,7 +491,7 @@ class MethodCompiler(GenUtils):
         if reprstr.startswith('u'):
             i = 1
             out = ['u']
-        body = escapedNewlineRE.sub('\\1\n', reprstr[i+1:-1])  # noqa: E226 missing whitespace around operator
+        body = escapedNewlineRE.sub('\\1\n', reprstr[i+1:-1])  # noqa: E226,E501 missing whitespace around operator
 
         if reprstr[i] == "'":
             out.append("'''")
@@ -530,7 +530,7 @@ class MethodCompiler(GenUtils):
 
     def addMethComment(self, comm):
         offSet = self.setting('commentOffset')
-        self.addChunk('#' + ' '*offSet + comm)  # noqa: E226 missing whitespace around operator
+        self.addChunk('#' + ' '*offSet + comm)  # noqa: E226,E501 missing whitespace around operator
 
     def addPlaceholder(self, expr, filterArgs, rawPlaceholder,
                        cacheTokenParts, lineCol,
@@ -1218,7 +1218,7 @@ if not self._CHEETAH__instanceInitialized:
     for k,v in KWs.items():
         if k in allowedKWs: cheetahKWArgs[k] = v
     self._initCheetahInstance(**cheetahKWArgs)
-""".replace('\n', '\n' + ' '*8)  # noqa: E226 missing whitespace around operator
+""".replace('\n', '\n' + ' '*8)  # noqa: E226,E501 missing whitespace around operator
 
 
 class ClassCompiler(GenUtils):
@@ -1891,7 +1891,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
                     for chunk in chunks[1:-1]:
                         if modName in self.importedVarNames():
                             needToAddImport = False
-                            finalBaseClassName = klass.replace(modName + '.', '')
+                            finalBaseClassName = klass.replace(modName + '.',
+                                                               '')
                             baseclasses.append(finalBaseClassName)
                             break
                         else:
@@ -2121,8 +2122,8 @@ if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
             offSet = self.setting('commentOffset')
 
             header += (
-                '#' + ' '*offSet +  # noqa: E226 missing whitespace around operator
-                ('\n#' + ' '*offSet).join(self._moduleHeaderLines) + '\n')  # noqa: E226 missing whitespace around operator
+                '#' + ' '*offSet +  # noqa: E226,E501 missing whitespace around operator
+                ('\n#' + ' '*offSet).join(self._moduleHeaderLines) + '\n')  # noqa: E226,E501 missing whitespace around operator
 
         return header
 

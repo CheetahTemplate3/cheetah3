@@ -26,7 +26,7 @@ Echo = ErrorCatcher
 
 class BigEcho(ErrorCatcher):
     def warn(self, exc_val, code, rawCode, lineCol):
-        return "="*15 + "&lt;" + rawCode + " could not be found&gt;" + "="*15  # noqa: E226 missing whitespace around operator
+        return "="*15 + "&lt;" + rawCode + " could not be found&gt;" + "="*15  # noqa: E226,E501 missing whitespace around operator
 
 
 class KeyError(ErrorCatcher):

@@ -482,7 +482,7 @@ class ImportManager:
             while i < len(fromlist):
                 nm = fromlist[i]
                 if nm == '*':
-                    fromlist[i:i+1] = list(getattr(bottommod, '__all__', []))  # noqa: E226 missing whitespace around operator
+                    fromlist[i:i+1] = list(getattr(bottommod, '__all__', []))  # noqa: E226,E501 missing whitespace around operator
                     if i >= len(fromlist):
                         break
                     nm = fromlist[i]

@@ -995,7 +995,7 @@ class Template(Servlet):
             if 'directiveEndToken' not in compilerSettings:
                 compilerSettings['directiveEndToken'] = directiveToken
             if 'commentStartToken' not in compilerSettings:
-                compilerSettings['commentStartToken'] = directiveToken*2  # noqa: E226 missing whitespace around operator
+                compilerSettings['commentStartToken'] = directiveToken*2  # noqa: E226,E501 missing whitespace around operator
             if 'multiLineCommentStartToken' not in compilerSettings:
                 compilerSettings['multiLineCommentStartToken'] = (
                     directiveToken + '*')
@@ -2006,7 +2006,7 @@ def genParserErrorFromPythonException(source, file,
             % {'row': lineInfo[0], 'line': lineInfo[1]}
 
     if hasattr(exception, 'offset'):
-        report += ' '*(3 + (exception.offset or 0)) + '^\n'  # noqa: E226 missing whitespace around operator
+        report += ' '*(3 + (exception.offset or 0)) + '^\n'  # noqa: E226,E501 missing whitespace around operator
 
     while nextLines:
         lineInfo = nextLines.pop()

@@ -102,7 +102,7 @@ def mean(lis):
 
 def median(lis):
     lis = sorted(lis[:])
-    return lis[int(len(lis)/2)]  # noqa: E226 missing whitespace around operator
+    return lis[int(len(lis)/2)]  # noqa: E226,E501 missing whitespace around operator
 
 
 def variance(lis):

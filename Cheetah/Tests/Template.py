@@ -256,7 +256,7 @@ class Preprocessors(TemplateTest):
         t = klass({'string': 'bit of text'})
         # print str(t), repr(str(t))
         assert str(t) == (
-            'This is a bit of text that needs translation\n'*2)[:-1]  # noqa: E226 missing whitespace around operator
+            'This is a bit of text that needs translation\n'*2)[:-1]  # noqa: E226,E501 missing whitespace around operator
 
 
 class TryExceptImportTest(TemplateTest):
