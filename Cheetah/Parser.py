@@ -42,20 +42,24 @@ def escapeRegexChars(txt,
     return escapeRE.sub(r'\\\1', txt)
 
 
-def group(*choices): return '(' + '|'.join(choices) + ')'
+def group(*choices):
+    return '(' + '|'.join(choices) + ')'
 
 
-def nongroup(*choices): return '(?:' + '|'.join(choices) + ')'
+def nongroup(*choices):
+    return '(?:' + '|'.join(choices) + ')'
 
 
 def namedGroup(name, *choices):
     return '(P:<' + name + '>' + '|'.join(choices) + ')'
 
 
-def any(*choices): return group(*choices) + '*'
+def any(*choices):
+    return group(*choices) + '*'
 
 
-def maybe(*choices): return group(*choices) + '?'
+def maybe(*choices):
+    return group(*choices) + '?'
 
 ##################################################
 # CONSTANTS & GLOBALS ##
