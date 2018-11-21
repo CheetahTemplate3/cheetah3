@@ -986,8 +986,8 @@ class Template(Servlet):
     def _updateSettingsWithPreprocessTokens(
             klass, compilerSettings, placeholderToken, directiveToken):
 
-        if (placeholderToken and
-                'cheetahVarStartToken' not in compilerSettings):
+        if (placeholderToken
+                and 'cheetahVarStartToken' not in compilerSettings):
             compilerSettings['cheetahVarStartToken'] = placeholderToken
         if directiveToken:
             if 'directiveStartToken' not in compilerSettings:
@@ -1236,8 +1236,8 @@ class Template(Servlet):
                             ('file', 'string, file open for reading, or None'))
 
         if not isinstance(filter, (string_type, type)) \
-                and not (isinstance(filter, type) and
-                         issubclass(filter, Filters.Filter)):
+                and not (isinstance(filter, type)
+                         and issubclass(filter, Filters.Filter)):
             raise TypeError(errmsgextra %
                             ('filter', 'string or class',
                              '(if class, must be subclass '
@@ -1266,8 +1266,8 @@ class Template(Servlet):
                                 ('compilerSettings', 'dictionary'))
 
         if source is not None and file is not None:
-            raise TypeError("you must supply either a source string or the" +
-                            " 'file' keyword argument, but not both")
+            raise TypeError("you must supply either a source string or the"
+                            + " 'file' keyword argument, but not both")
 
         ##################################################
         # Do superclass initialization.

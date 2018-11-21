@@ -457,8 +457,8 @@ you do have write permission to and re-run the tests.""")
                     raise Error("source file '%s' is a directory" % path)
             elif os.path.isfile(path):
                 files.append(path)
-            elif (addIextIfMissing and not path.endswith(iext) and
-                  os.path.isfile(pathWithExt)):
+            elif (addIextIfMissing and not path.endswith(iext)
+                    and os.path.isfile(pathWithExt)):
                 files.append(pathWithExt)
                 # Do not recurse directories discovered by iext appending.
             elif os.path.exists(path):

@@ -58,8 +58,8 @@ class _TestInfo(object):
         stream.write(
             '    <%s type="%s">%s\n'
             % (tagname,
-               issubclass(error[0], Exception) and
-               error[0].__name__ or str(error[0]), text))
+               issubclass(error[0], Exception)
+               and error[0].__name__ or str(error[0]), text))
         tb_stream = StringIO()
         traceback.print_tb(error[2], None, tb_stream)
         stream.write(escape(tb_stream.getvalue()))

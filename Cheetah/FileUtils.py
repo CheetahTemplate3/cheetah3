@@ -101,8 +101,8 @@ class FileFinder:
 
         """A hook for filtering out certain dirs. """
 
-        return not (baseName in self._ignoreBasenames or
-                    fullPath in self._ignoreDirs)
+        return not (baseName in self._ignoreBasenames
+                    or fullPath in self._ignoreDirs)
 
     def processDir(self, dir, glob=glob):
         extend = self._files.extend

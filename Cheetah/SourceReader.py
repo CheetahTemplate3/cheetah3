@@ -115,9 +115,9 @@ class SourceReader(object):
     def setBreakPoint(self, pos):
         if pos > self._srcLen:
             raise Error(
-                "New breakpoint (" + str(pos) +
-                ") is invalid: beyond the end of stream's source string (" +
-                str(self._srcLen) + ")")
+                "New breakpoint (" + str(pos)
+                + ") is invalid: beyond the end of stream's source string ("
+                + str(self._srcLen) + ")")
         elif not pos >= 0:
             raise Error(
                 "New breakpoint (" + str(pos) + ") is invalid: less than 0")
@@ -137,8 +137,8 @@ class SourceReader(object):
                 "Invalid bookmark (" + name + ") is invalid: does not exist")
         pos = self._bookmarks[name]
         if not self.validPos(pos):
-            raise Error("Invalid bookmark (" + name + ', ' +
-                        str(pos) + ") is invalid: pos is out of range")
+            raise Error("Invalid bookmark (" + name + ', '
+                        + str(pos) + ") is invalid: pos is out of range")
         self._pos = pos
 
     def atEnd(self):

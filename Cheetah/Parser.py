@@ -429,11 +429,11 @@ class _LowLevelParser(SourceReader):
         self._makeDirectiveREs()
         self._makePspREs()
         self._possibleNonStrConstantChars = (
-            self.setting('commentStartToken')[0] +
-            self.setting('multiLineCommentStartToken')[0] +
-            self.setting('cheetahVarStartToken')[0] +
-            self.setting('directiveStartToken')[0] +
-            self.setting('PSPStartToken')[0])
+            self.setting('commentStartToken')[0]
+            + self.setting('multiLineCommentStartToken')[0]
+            + self.setting('cheetahVarStartToken')[0]
+            + self.setting('directiveStartToken')[0]
+            + self.setting('PSPStartToken')[0])
         self._nonStrConstMatchers = [
             self.matchCommentStartToken,
             self.matchMultiLineCommentStartToken,
@@ -451,43 +451,44 @@ class _LowLevelParser(SourceReader):
         """Setup the regexs for Cheetah $var parsing."""
 
         num = r'[0-9\.]+'
-        interval = (r'(?P<interval>' +
-                    num + r's|' +
-                    num + r'm|' +
-                    num + r'h|' +
-                    num + r'd|' +
-                    num + r'w|' +
-                    num + ')'
+        interval = (r'(?P<interval>'
+                    + num + r's|'
+                    + num + r'm|'
+                    + num + r'h|'
+                    + num + r'd|'
+                    + num + r'w|'
+                    + num + ')'
                     )
 
-        cacheToken = (r'(?:' +
-                      r'(?P<REFRESH_CACHE>\*' + interval + '\*)' +
-                      '|' +
-                      r'(?P<STATIC_CACHE>\*)' +
-                      '|' +
-                      r'(?P<NO_CACHE>)' +
-                      ')')
+        cacheToken = (r'(?:'
+                      + r'(?P<REFRESH_CACHE>\*' + interval + '\*)'
+                      + '|'
+                      + r'(?P<STATIC_CACHE>\*)'
+                      + '|'
+                      + r'(?P<NO_CACHE>)'
+                      + ')')
         self.cacheTokenRE = cachedRegex(cacheToken)
 
-        silentPlaceholderToken = (r'(?:' +
-                                  r'(?P<SILENT>' + escapeRegexChars('!') + ')'
-                                  + '|' +
-                                  r'(?P<NOT_SILENT>)' +
-                                  ')')
+        silentPlaceholderToken = (r'(?:'
+                                  + r'(?P<SILENT>'
+                                  + escapeRegexChars('!') + ')'
+                                  + '|'
+                                  + r'(?P<NOT_SILENT>)'
+                                  + ')')
         self.silentPlaceholderTokenRE = cachedRegex(silentPlaceholderToken)
 
         self.cheetahVarStartRE = cachedRegex(
-            escCharLookBehind + r'(?P<startToken>' +
-            escapeRegexChars(self.setting('cheetahVarStartToken')) + ')' +
-            r'(?P<silenceToken>' + silentPlaceholderToken + ')' +
-            r'(?P<cacheToken>' + cacheToken + ')' +
+            escCharLookBehind + r'(?P<startToken>'
+            + escapeRegexChars(self.setting('cheetahVarStartToken')) + ')'
+            + r'(?P<silenceToken>' + silentPlaceholderToken + ')'
+            + r'(?P<cacheToken>' + cacheToken + ')'
             # allow WS after enclosure
-            r'(?P<enclosure>|(?:(?:\{|\(|\[)[ \t\f]*))' + r'(?=[A-Za-z_])')
+            + r'(?P<enclosure>|(?:(?:\{|\(|\[)[ \t\f]*))' + r'(?=[A-Za-z_])')
         validCharsLookAhead = r'(?=[A-Za-z_\*!\{\(\[])'
         self.cheetahVarStartToken = self.setting('cheetahVarStartToken')
         self.cheetahVarStartTokenRE = cachedRegex(
-            escCharLookBehind +
-            escapeRegexChars(self.setting('cheetahVarStartToken'))
+            escCharLookBehind
+            + escapeRegexChars(self.setting('cheetahVarStartToken'))
             + validCharsLookAhead
         )
 
@@ -497,11 +498,12 @@ class _LowLevelParser(SourceReader):
         )
 
         self.expressionPlaceholderStartRE = cachedRegex(
-            escCharLookBehind + r'(?P<startToken>' +
-            escapeRegexChars(self.setting('cheetahVarStartToken')) + ')' +
-            r'(?P<cacheToken>' + cacheToken + ')' +
+            escCharLookBehind + r'(?P<startToken>'
+            + escapeRegexChars(self.setting('cheetahVarStartToken'))
+            + ')'
+            + r'(?P<cacheToken>' + cacheToken + ')'
             # r'\[[ \t\f]*'
-            r'(?:\{|\(|\[)[ \t\f]*' + r'(?=[^\)\}\]])')
+            + r'(?:\{|\(|\[)[ \t\f]*' + r'(?=[^\)\}\]])')
 
         if self.setting('EOLSlurpToken'):
             self.EOLSlurpRE = cachedRegex(
@@ -523,10 +525,10 @@ class _LowLevelParser(SourceReader):
             self.setting('multiLineCommentStartToken'))
         endTokenEsc = escapeRegexChars(
             self.setting('multiLineCommentEndToken'))
-        self.multiLineCommentTokenStartRE = cachedRegex(escCharLookBehind +
-                                                        startTokenEsc)
-        self.multiLineCommentEndTokenRE = cachedRegex(escCharLookBehind +
-                                                      endTokenEsc)
+        self.multiLineCommentTokenStartRE = cachedRegex(
+            escCharLookBehind + startTokenEsc)
+        self.multiLineCommentEndTokenRE = cachedRegex(
+            escCharLookBehind + endTokenEsc)
 
     def _makeDirectiveREs(self):
         """Construct the regexs that are used in directive parsing."""
@@ -998,8 +1000,8 @@ class _LowLevelParser(SourceReader):
                 close = closurePairsRev[open]
                 self.setPos(enclosures[-1][1])
                 raise ParseError(
-                    self, msg="EOF was reached before a matching '" + close +
-                    "' was found for the '" + open + "'")
+                    self, msg="EOF was reached before a matching '" + close
+                    + "' was found for the '" + open + "'")
 
             c = self.peek()
             if c in ")}]":  # get the ending enclosure and break
@@ -1167,8 +1169,8 @@ class _LowLevelParser(SourceReader):
                     self.setPos(enclosures[-1][1])
                     raise ParseError(
                         self,
-                        msg="EOF was reached before a matching '" + close +
-                        "' was found for the '" + open + "'")
+                        msg="EOF was reached before a matching '" + close
+                        + "' was found for the '" + open + "'")
                 else:
                     break
 
@@ -1193,10 +1195,10 @@ class _LowLevelParser(SourceReader):
                     self.setPos(enclosures[-1][1])
                     raise ParseError(
                         self,
-                        msg="A '" + c + "' was found at line " + str(row) +
-                        ", col " + str(col) +
-                        " before a matching '" + close +
-                        "' was found\nfor the '" + open + "'")
+                        msg="A '" + c + "' was found at line " + str(row)
+                        + ", col " + str(col)
+                        + " before a matching '" + close
+                        + "' was found\nfor the '" + open + "'")
                 self.advance()
 
             elif c in " \f\t":
@@ -2123,8 +2125,8 @@ class _HighLevelParser(_LowLevelParser):
         endOfFirstLinePos = self.findEOL()
         self._eatRestOfDirectiveTag(isLineClearToStartToken, endOfFirstLinePos)
         signature = ' '.join([line.strip() for line in signature.splitlines()])
-        parserComment = ('## CHEETAH: generated from ' + signature +
-                         ' at line %s, col %s' % self.getRowCol(startPos)
+        parserComment = ('## CHEETAH: generated from ' + signature
+                         + ' at line %s, col %s' % self.getRowCol(startPos)
                          + '.')
 
         isNestedDef = (self.setting('allowNestedDefScopes')
@@ -2144,8 +2146,8 @@ class _HighLevelParser(_LowLevelParser):
                           argsList, startPos, endPos):
         # filtered in calling method
         fullSignature = self[startPos:endPos]
-        parserComment = ('## Generated from ' + fullSignature +
-                         ' at line %s, col %s' % self.getRowCol(startPos)
+        parserComment = ('## Generated from ' + fullSignature
+                         + ' at line %s, col %s' % self.getRowCol(startPos)
                          + '.')
         isNestedDef = (self.setting('allowNestedDefScopes')
                        and [name for name in self._openDirectivesStack
@@ -2708,8 +2710,8 @@ class _HighLevelParser(_LowLevelParser):
         expr = ''.join(expressionParts).strip()
         expr = self._applyExpressionFilters(expr, 'if', startPos=startPos)
 
-        isTernaryExpr = ('then' in expressionParts and
-                         'else' in expressionParts)
+        isTernaryExpr = ('then' in expressionParts
+                         and 'else' in expressionParts)
         if isTernaryExpr:
             conditionExpr = []
             trueExpr = []
@@ -2748,9 +2750,9 @@ class _HighLevelParser(_LowLevelParser):
 
     # end directive handlers
     def handleEndDef(self):
-        isNestedDef = (self.setting('allowNestedDefScopes') and
-                       [name for name in self._openDirectivesStack
-                        if name == 'def'])
+        isNestedDef = (self.setting('allowNestedDefScopes')
+                       and [name for name in self._openDirectivesStack
+                            if name == 'def'])
         if not isNestedDef:
             self._compiler.closeDef()
         else:

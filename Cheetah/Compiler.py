@@ -294,9 +294,9 @@ class GenUtils(object):
             if firstDotIdx != -1 and firstDotIdx < len(name):
                 beforeFirstDot = name[:firstDotIdx]
                 afterDot = name[firstDotIdx+1:]  # noqa: E226,E501 missing whitespace around operator
-                pythonCode = ('VFN(' + beforeFirstDot +
-                              ',"' + afterDot +
-                              '",' + repr(defaultUseAC and useAC) + ')'
+                pythonCode = ('VFN(' + beforeFirstDot
+                              + ',"' + afterDot
+                              + '",' + repr(defaultUseAC and useAC) + ')'
                               + remainder)
             else:
                 pythonCode = name + remainder
@@ -313,9 +313,9 @@ class GenUtils(object):
         ##
         while nameChunks:
             name, useAC, remainder = nameChunks.pop()
-            pythonCode = ('VFN(' + pythonCode +
-                          ',"' + name +
-                          '",' + repr(defaultUseAC and useAC) + ')'
+            pythonCode = ('VFN(' + pythonCode
+                          + ',"' + name
+                          + '",' + repr(defaultUseAC and useAC) + ')'
                           + remainder)
         return pythonCode
 
@@ -418,10 +418,9 @@ class MethodCompiler(GenUtils):
             return ''
 
         ind = self._indent*2  # noqa: E226 missing whitespace around operator
-        docStr = (ind + '"""\n' + ind +
-                  ('\n' + ind).join(
-                      [ln.replace('"""', "'''")
-                       for ln in self._docStringLines])
+        docStr = (ind + '"""\n' + ind
+                  + ('\n' + ind).join([ln.replace('"""', "'''")
+                                       for ln in self._docStringLines])
                   + '\n' + ind + '"""\n')
         return docStr
 
@@ -599,10 +598,10 @@ class MethodCompiler(GenUtils):
             self.addChunk(expr)
 
     def addInclude(self, sourceExpr, includeFrom, isRaw):
-        self.addChunk('self._handleCheetahInclude(' + sourceExpr +
-                      ', trans=trans, ' +
-                      'includeFrom="' + includeFrom + '", raw=' +
-                      repr(isRaw) + ')')
+        self.addChunk('self._handleCheetahInclude(' + sourceExpr
+                      + ', trans=trans, '
+                      + 'includeFrom="' + includeFrom + '", raw='
+                      + repr(isRaw) + ')')
 
     def addWhile(self, expr, lineCol=None):
         self.addIndentingDirective(expr, lineCol=lineCol)
@@ -990,8 +989,8 @@ class MethodCompiler(GenUtils):
             'if "' + errorCatcherName + '" in self._CHEETAH__errorCatchers:')
         self.indent()
         self.addChunk(
-            'self._CHEETAH__errorCatcher = self._CHEETAH__errorCatchers["' +
-            errorCatcherName + '"]')
+            'self._CHEETAH__errorCatcher = self._CHEETAH__errorCatchers["'
+            + errorCatcherName + '"]')
         self.dedent()
         self.addChunk('else:')
         self.indent()
@@ -1203,8 +1202,8 @@ class AutoMethodCompiler(MethodCompiler):
             output.append(''.join([self._indent + decorator + '\n'
                                    for decorator in self._decorators]))
         output.append(self._indent + "def "
-                      + self.methodName() + "(" +
-                      argString + "):\n\n")
+                      + self.methodName() + "("
+                      + argString + "):\n\n")
         return ''.join(output)
 
 
@@ -1308,8 +1307,9 @@ class ClassCompiler(GenUtils):
             if self.setting('setup__str__method'):
                 self._generatedAttribs.append(
                     'def __str__(self): return self.respond()')
-        self.addAttribute('_mainCheetahMethod_for_' + self._className +
-                          ' = ' + repr(self._mainMethodName))
+        self.addAttribute(
+            '_mainCheetahMethod_for_' + self._className
+            + ' = ' + repr(self._mainMethodName))
 
     def _setupInitMethod(self):
         __init__ = self._spawnMethodCompiler(
@@ -1332,8 +1332,9 @@ class ClassCompiler(GenUtils):
 
         # the rest is added to the main output method of the class
         # ('mainMethod')
-        self.addChunk('if exists(self._filePath) and ' +
-                      'getmtime(self._filePath) > self._fileMtime:')
+        self.addChunk(
+            'if exists(self._filePath) and '
+            + 'getmtime(self._filePath) > self._fileMtime:')
         self.indent()
         self.addChunk(
             'self._compile(file=self._filePath, moduleName='
@@ -1437,9 +1438,10 @@ class ClassCompiler(GenUtils):
         # any fancy Cheetah syntax (placeholders, directives, etc.)
         # inside the expression
         if attribExpr.find('VFN(') != -1 or attribExpr.find('VFFSL(') != -1:
-            raise ParseError(self,
-                             'Invalid #attr directive.' +
-                             ' It should only contain simple Python literals.')
+            raise ParseError(
+                self,
+                'Invalid #attr directive. It should only contain '
+                + 'simple Python literals.')
         # now add the attribute
         self._generatedAttribs.append(attribExpr)
 
@@ -1474,24 +1476,25 @@ class ClassCompiler(GenUtils):
         catcherMeth = self._spawnMethodCompiler(
             methodName,
             klass=MethodCompiler,
-            initialMethodComment=('## CHEETAH: Generated from ' + rawCode +
-                                  ' at line %s, col %s' % lineCol + '.')
+            initialMethodComment=(
+                '## CHEETAH: Generated from ' + rawCode
+                + ' at line %s, col %s' % lineCol + '.')
         )
         catcherMeth.setMethodSignature(
-            'def ' + methodName +
-            '(self, localsDict={})')  # is this use of localsDict right?
+            'def ' + methodName
+            + '(self, localsDict={})')  # is this use of localsDict right?
         catcherMeth.addChunk('try:')
         catcherMeth.indent()
-        catcherMeth.addChunk("return eval('''" + codeChunk +
-                             "''', globals(), localsDict)")
+        catcherMeth.addChunk(
+            "return eval('''" + codeChunk + "''', globals(), localsDict)")
         catcherMeth.dedent()
         catcherMeth.addChunk(
             'except self._CHEETAH__errorCatcher.exceptions() as e:')
         catcherMeth.indent()
         catcherMeth.addChunk(
-            "return self._CHEETAH__errorCatcher.warn(exc_val=e, code= " +
-            repr(codeChunk) + " , rawCode= " +
-            repr(rawCode) + " , lineCol=" + str(lineCol) + ")")
+            "return self._CHEETAH__errorCatcher.warn(exc_val=e, code= "
+            + repr(codeChunk) + " , rawCode= "
+            + repr(rawCode) + " , lineCol=" + str(lineCol) + ")")
 
         catcherMeth.cleanupState()
 
@@ -1574,9 +1577,9 @@ class ClassCompiler(GenUtils):
         if not self._classDocStringLines:
             return ''
         ind = self.setting('indentationStep')
-        docStr = ('%(ind)s"""\n%(ind)s' +
-                  '\n%(ind)s'.join(self._classDocStringLines) +
-                  '\n%(ind)s"""\n'
+        docStr = ('%(ind)s"""\n%(ind)s'
+                  + '\n%(ind)s'.join(self._classDocStringLines)
+                  + '\n%(ind)s"""\n'
                   ) % {'ind': ind}
         return docStr
 
@@ -2122,8 +2125,9 @@ if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
             offSet = self.setting('commentOffset')
 
             header += (
-                '#' + ' '*offSet +  # noqa: E226,E501 missing whitespace around operator
-                ('\n#' + ' '*offSet).join(self._moduleHeaderLines) + '\n')  # noqa: E226,E501 missing whitespace around operator
+                '#' + ' '*offSet  # noqa: E226,E501 missing whitespace around operator
+                + ('\n#' + ' '*offSet).join(self._moduleHeaderLines)  # noqa: E226,E501 missing whitespace around operator
+                + '\n')
 
         return header
 
@@ -2131,9 +2135,8 @@ if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
         if not self._moduleDocStringLines:
             return ''
 
-        return ('"""' +
-                '\n'.join(self._moduleDocStringLines) +
-                '\n"""\n')
+        return ('"""' + '\n'.join(self._moduleDocStringLines)
+                + '\n"""\n')
 
     def specialVars(self):
         chunks = []
