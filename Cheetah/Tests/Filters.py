@@ -28,7 +28,7 @@ Header
         except ImportError as ex:
             print('>>> We probably failed to import markdown, bummer %s' % ex)
             return
-        except Exception as ex:
+        except Exception:
             raise
 
 

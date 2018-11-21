@@ -24,7 +24,7 @@ class GetAttrTest(unittest.TestCase):
         o = CustomGetAttrClass()
         try:
             print(o.attr)
-        except GetAttrException as e:
+        except GetAttrException:
             # expected
             return
         except Exception as e:
