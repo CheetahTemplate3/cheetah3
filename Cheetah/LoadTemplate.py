@@ -53,8 +53,8 @@ def _loadTemplate(templatePath, debuglevel=0, load='module'):
 
 
 def loadTemplateModule(templatePath, debuglevel=0):
-    return _loadTemplate(templatePath, debuglevel=0, load='module')
+    return _loadTemplate(templatePath, debuglevel=debuglevel, load='module')
 
 
 def loadTemplateClass(templatePath, debuglevel=0):
-    return _loadTemplate(templatePath, debuglevel=0, load='class')
+    return _loadTemplate(templatePath, debuglevel=debuglevel, load='class')
