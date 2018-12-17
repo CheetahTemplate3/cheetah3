@@ -30,6 +30,15 @@ def _cleanup():
     if os.path.isdir(__pycache__):
         shutil.rmtree(__pycache__)
 
+    for modname in list(sys.modules.keys()):
+        if '.ImportHooksTemplates.' in modname \
+                or modname.endswith('.ImportHooksTemplates'):
+            del sys.modules[modname]
+
+    for modname in 'index', 'layout':
+        if modname in sys.modules:
+            del sys.modules[modname]
+
 
 def _exec(code, _dict):
     exec(code, _dict)
