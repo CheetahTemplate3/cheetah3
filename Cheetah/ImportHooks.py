@@ -7,6 +7,10 @@ To use these:
   Cheetah.ImportHooks.install()
 """
 
+try:
+    from importlib import invalidate_caches
+except ImportError:
+    invalidate_caches = None
 import sys
 import os.path
 import py_compile
@@ -73,6 +77,9 @@ class CheetahDirOwner(DirOwner):
             self._releaseLock()
 
     def _compile(self, name, tmplPath):
+        if invalidate_caches:
+            invalidate_caches()
+
         # @@ consider adding an ImportError raiser here
         code = str(Compiler(file=tmplPath, moduleName=name,
                             mainClassName=name))
