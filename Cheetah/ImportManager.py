@@ -194,11 +194,11 @@ class DirOwner(Owner):
                     pass
                 else:
                     if typ == imp.C_EXTENSION:
-                        fp = open(attempt, 'rb')
-                        mod = imp.load_module(
-                            nm, fp, attempt, (ext, mode, typ))
-                        mod.__file__ = attempt
-                        return mod
+                        with open(attempt, 'rb') as fp:
+                            mod = imp.load_module(
+                                nm, fp, attempt, (ext, mode, typ))
+                            mod.__file__ = attempt
+                            return mod
                     elif typ == imp.PY_SOURCE:
                         py = (attempt, st)
                     else:
@@ -210,7 +210,9 @@ class DirOwner(Owner):
         while True:
             if pyc is None or py and pyc[1][8] < py[1][8]:
                 try:
-                    co = compile(open(py[0], 'r').read() + '\n', py[0], 'exec')
+                    with open(py[0], 'r') as py_code_file:
+                        py_code = py_code_file.read()
+                    co = compile(py_code + '\n', py[0], 'exec')
                     try:
                         py_compile.compile(py[0])
                     except IOError:
@@ -222,7 +224,8 @@ class DirOwner(Owner):
                     print(e.args)
                     raise
             elif pyc:
-                stuff = open(pyc[0], 'rb').read()
+                with open(pyc[0], 'rb') as pyc_file:
+                    stuff = pyc_file.read()
                 try:
                     co = loadco(stuff[8:])
                     __file__ = pyc[0]
@@ -320,10 +323,10 @@ class RegistryImportDirector(ImportDirector):
         stuff = self.map.get(nm)
         if stuff:
             fnm, desc = stuff
-            fp = open(fnm, 'rb')
-            mod = imp.load_module(nm, fp, fnm, desc)
-            mod.__file__ = fnm
-            return mod
+            with open(fnm, 'rb') as fp:
+                mod = imp.load_module(nm, fp, fnm, desc)
+                mod.__file__ = fnm
+                return mod
         return None
 
 
