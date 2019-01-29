@@ -84,7 +84,7 @@ install:
   - if "%TOXENV%" == "pypy" SET TOXPYTHON=pypy.exe
   - if "%TOXENV%" == "pypy" pypy --version
   - "python -m pip install --upgrade pip setuptools"
-  - "pip install --upgrade tox ppu"
+  - "pip install --upgrade \"tox < 3.1\" ppu"
   - "pip --version"
 
 # No build step - _namemapper extension will be built under tox
