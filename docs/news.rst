@@ -26,11 +26,19 @@ Bug fixes:
     returns str; it encodes unicode to str using encoding from the
     compiled source. Under Python 3 the method decodes bytes to str.
 
+Code:
+
+  - Source code was made flake8-clean using the latest flake8.
+
 Documentation:
 
   - Remove outdated section markers.
   - Better documentation for ImportHooks.
   - Add an example of a universal makefile.
+
+CI:
+
+  - Run tests with Python 3.7.
 
 
 3.1.0 (2018-03-03)
