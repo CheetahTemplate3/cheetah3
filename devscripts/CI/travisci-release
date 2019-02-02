@@ -17,15 +17,15 @@ py=`python -c "import sys; print('.'.join(sys.version.split('.')[:2]))"`
 v="`echo $py | sed 's/\.//'`" &&
 
 if [ $py = 2.7 ]; then
-   pip3.4 install -U auditwheel
+   pip3.6 install -U auditwheel
 else
    pip install -U auditwheel
 fi &&
 
 cd dist &&
-for f in Cheetah3-*-cp$v-*-linux_i686.whl; do
+for f in Cheetah3-*-cp$v-*-linux_x86_64.whl; do
    if [ $py = 2.7 ]; then
-      python3.4 -m auditwheel repair -w . $f
+      python3.6 -m auditwheel repair -w . $f
    else
       python -m auditwheel repair -w . $f
    fi &&
