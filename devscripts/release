@@ -30,5 +30,5 @@ for py in 2.7 3.4 3.5 3.6 3.7; do
    cd ..
 done &&
 
-twine upload dist/* &&
+twine upload --skip-existing dist/* &&
 exec rm -rf build dist docs/html Cheetah3.egg-info
