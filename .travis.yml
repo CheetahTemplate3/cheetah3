@@ -1,13 +1,3 @@
-# Config file for automatic testing at travis-ci.org
-
-# Only test maint, master and pull requests; skip tags.
-# Other branches can allow themselves.
-branches:
-  only:
-    - maint
-    - master
-    - next
-
 # Prefer docker containers
 sudo: required
 
@@ -46,6 +36,17 @@ install:
 
 script:
   - tox
+
+deploy:
+  provider: pypi
+  server: https://test.pypi.org/legacy/
+  user: phd
+  password:
+    secure: QxKzdSfC8GaU77gb5hjAy4e2s28tWL467wJDluO5JttbAAT2vMsK88MWWZjm0gWcyY9giWCLMbIj735MTmfKzuDXvphDD+9qOBbonMszBP4uDEMcKKNALUoxBDNDksgb0d6qPclH/3u2BnIRhqxfUudYpmp4+kwX3tSziakQJCfwCT92bXEm3ET+nNBhHQNfthfhnb0voHtPwY6gjoz68WTLKfbh9uNZ8MiM90GA5b6z/JVLyOTm8LoEV4oMdefZy78A3qgwyUfXsmO/d+j18C2QSrMQfXgx7kpnRE0D2uQ26SnYRB/SFVXHmHklTTa7BIxYNhRsbOeoxbcRpNSHYIhMKunQinptwMjlLicVfjqUXfG9cg8vuTVQif0SdJu9DRtYb1Yca98xiznr9wN5u9ZuG4twuOcfuZTUKzCmEe2fHQtIB4SeazwRzVAL0UQ7aOI/ZqQdJIH3Ih4bqtcBivXS8j47AKIa/m0lArKh/kuZkiOd4IGVRFLCyRzh+t6TDzcWO7ly7/zjvaYAip2xJY/eTWV0bg8Vq6eWCY8otj32EkJ5X7xktc5dRwNQv/hfK88anEnpFdkQpaRWjMmX/3TK8DLOlnMEf5NIZfytostZkSPhpaPgYMb2HNFWKUyOpRLIMOQPyADFZJkTULq3K1D548W+4QFhljO9cwVTfsQ=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
+  skip_existing: true
 
 before_cache:
   - remove-old-files.py -o 180 ~/.cache/pip

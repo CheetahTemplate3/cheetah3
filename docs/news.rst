@@ -39,6 +39,7 @@ Documentation:
 CI:
 
   - Run tests with Python 3.7.
+  - At travis deploy sdists and wheels for tags.
 
 
 3.1.0 (2018-03-03)
