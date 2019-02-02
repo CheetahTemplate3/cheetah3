@@ -17,6 +17,7 @@ py=`python -c "import sys; print('.'.join(sys.version.split('.')[:2]))"`
 v="`echo $py | sed 's/\.//'`" &&
 
 if [ $py = 2.7 ]; then
+   pyenv global system 3.6 2.7
    pip3.6 install -U auditwheel
 else
    pip install -U auditwheel

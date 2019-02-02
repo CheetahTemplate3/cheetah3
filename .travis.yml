@@ -8,6 +8,11 @@ python:
 
 cache: pip
 
+addons:
+  apt:
+    packages:
+      - patchelf
+
 env:
   global:
     - TWINE_USERNAME=phd
