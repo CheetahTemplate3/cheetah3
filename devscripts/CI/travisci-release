@@ -6,14 +6,14 @@ chmod -R a+rX . &&
 pip install -U pip setuptools wheel &&
 python setup.py sdist &&
 
-find build -name '*.py[co]' -delete &&
+if [ -d build ]; then find build -name '*.py[co]' -delete; fi &&
 python setup.py build_ext &&
 python setup.py build --executable '/usr/bin/env python' &&
 python    -m compileall build &&
 python -O -m compileall build &&
 python setup.py bdist_wheel &&
 
-py=`python -c "import sys; print('.'.join(sys.version_info[:2]))"`
+py=`python -c "import sys; print('.'.join(sys.version.split('.')[:2]))"`
 v="`echo $py | sed 's/\.//'`" &&
 
 if [ $py = 2.7 ]; then
