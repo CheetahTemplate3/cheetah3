@@ -21,7 +21,7 @@ env:
   global:
     - TWINE_USERNAME=phd
     # Note: TWINE_PASSWORD is set in Travis settings.
-    - TWINE_REPOSITORY_URL=https://test.pypi.org/legacy/
+    #- TWINE_REPOSITORY_URL=https://test.pypi.org/legacy/
 
 matrix:
   include:
