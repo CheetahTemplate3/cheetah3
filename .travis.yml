@@ -40,7 +40,6 @@ matrix:
   - python: "3.7"
     env: TOXENV=py37-flake8
   - python: "pypy"
-    dist: trusty
     env: TOXENV=pypy
 
   fast_finish: true
