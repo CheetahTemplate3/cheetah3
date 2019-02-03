@@ -19,12 +19,10 @@
 
 3. Run ../release. This generates and uploads new archives to PyPI.
 
-4. Hide/show old releases at PyPI.
-
-5. Generate new docs using ./build-all-docs. Upload docs using
+4. Generate new docs using ./build-all-docs. Upload docs using
    ./publish-docs.
 
-6. Run ../postrelease. The script checks out master and null-merge maint.
+5. Run ../postrelease. The script checks out master and null-merge maint.
    The script restores ANNOUNCE.rst from the previous commit (HEAD~). It
    calls editor; update next version, remove the list of contributors
    and the list of changes, edit download URL in ANNOUNCE.rst. Edit
@@ -33,14 +31,14 @@
    edit "Development Status" in trove classifiers; edit dev_tag or
    download URL. Commit. Verify. Fast-forward next to master.
 
-7. Run ../push-all in the development repository to push all branches
+6. Run ../push-all in the development repository to push all branches
    and tags to the public repositories.
 
-8. Wait until tests finished at AppVeyor. Download generated wheels, put
+7. Wait until tests finished at AppVeyor. Download generated wheels, put
    them into dist directory and upload to PyPI using twine.
 
-9. Send announcement to the Cheetah mailing list. For a stable release
+8. Send announcement to the Cheetah mailing list. For a stable release
    send announcements to python and python-announce mailing lists.
 
-10. Announce new release at Wikipedia
-    (https://en.wikipedia.org/wiki/CheetahTemplate).
+9. Announce new release at Wikipedia
+   (https://en.wikipedia.org/wiki/CheetahTemplate).
