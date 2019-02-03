@@ -1,4 +1,6 @@
-#! /bin/sh
+#! /usr/bin/env bash
+
+[[ "$TOXENV" == *-flake8 || "$TOXENV" == pypy* ]] && exit 0
 
 umask 022 &&
 chmod -R a+rX . &&
@@ -17,7 +19,7 @@ py=`python -c "import sys; print('.'.join(sys.version.split('.')[:2]))"`
 v="`echo $py | sed 's/\.//'`" &&
 
 if [ $py = 2.7 ]; then
-   pyenv global system 3.6 2.7
+   pyenv global system 3.6.7 2.7.15
    pip3.6 install -U auditwheel
 else
    pip install -U auditwheel

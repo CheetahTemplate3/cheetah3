@@ -40,6 +40,7 @@ matrix:
   - python: "3.7"
     env: TOXENV=py37-flake8
   - python: "pypy"
+    dist: trusty
     env: TOXENV=pypy
 
   fast_finish: true
@@ -50,11 +51,11 @@ install:
 script:
   - tox
 
+before_cache:
+  - remove-old-files.py -o 180 ~/.cache/pip
+
 deploy:
   provider: script
   script: devscripts/CI/travisci-release
   on:
     tags: true
-
-before_cache:
-  - remove-old-files.py -o 180 ~/.cache/pip
