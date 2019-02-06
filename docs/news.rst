@@ -4,6 +4,9 @@ News
 Development (master)
 --------------------
 
+3.2.0 (2019-02-06)
+------------------
+
 Features:
 
   - Dropped support for Python 3.3.
