@@ -2,9 +2,6 @@ os: linux
 
 dist: xenial
 
-# Prefer docker containers
-sudo: required
-
 language: python
 
 python:
