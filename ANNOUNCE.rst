@@ -7,7 +7,7 @@ I'm pleased to announce version 3.2.1, the first bugfix release of branch
 What's new in CheetahTemplate3
 ==============================
 
-Contributors for this release are 
+Contributors for this release are Nicola Soranzo, 
 
 
 What is CheetahTemplate3
