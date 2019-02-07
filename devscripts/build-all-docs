@@ -1,11 +1,10 @@
 #! /bin/sh
 
-PROG_DIR="`dirname \"$0\"`" &&
-cd "$PROG_DIR" &&
+cd "`dirname \"$0\"`" &&
 PROG_DIR="`pwd`" &&
 
-cd "$PROG_DIR"/cheetah3 &&
-../build-docs &&
+cd .. &&
+devscripts/build-docs &&
 rsync -ahP --del --exclude=/.git --exclude=/.nojekyll \
    --exclude=/CNAME --exclude=/robots.txt \
    docs/html/ ../cheetahtemplate3.github.io/ &&

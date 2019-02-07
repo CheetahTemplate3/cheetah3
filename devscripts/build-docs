@@ -1,4 +1,4 @@
 #! /bin/sh
 
-cd "`dirname \"$0\"`"/cheetah3/docs &&
+cd "`dirname \"$0\"`"/../docs &&
 exec ./rebuild
