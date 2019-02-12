@@ -23,6 +23,10 @@ env:
 matrix:
   include:
   - python: "2.7"
+    env: TOXENV=py27-flake8
+  - python: "3.7"
+    env: TOXENV=py37-flake8
+  - python: "2.7"
     env: TOXENV=py27
   - python: "3.4"
     env: TOXENV=py34
@@ -32,14 +36,33 @@ matrix:
     env: TOXENV=py36
   - python: "3.7"
     env: TOXENV=py37
-  - python: "2.7"
-    env: TOXENV=py27-flake8
-  - python: "3.7"
-    env: TOXENV=py37-flake8
+  - os: osx
+    # No version of Python is available via virtualenv on OS X workers, see https://github.com/travis-ci/travis-ci/issues/2312
+    language: generic
+    env: TOXENV=py27
+  - os: osx
+    language: generic
+    env: TOXENV=py35
+  - os: osx
+    language: generic
+    env: TOXENV=py36
+  - os: osx
+    language: generic
+    env: TOXENV=py37
   - python: "pypy2.7-6.0"
     env: TOXENV=pypy
 
   fast_finish: true
+
+before_install:
+  - |
+    if [ "$TRAVIS_OS_NAME" == 'osx' -a "$TOXENV" != "py27" ]; then
+        curl -O https://repo.anaconda.com/miniconda/Miniconda2-latest-MacOSX-x86_64.sh
+        bash Miniconda2-latest-MacOSX-x86_64.sh -b -p "$HOME/miniconda2"
+        REQUIRED_PYTHON_VERSION=$(python -c "import os; toxenv = os.environ['TOXENV']; print('.'.join(list(toxenv[2:])))")
+        ~/miniconda2/bin/conda create -y -n "$TOXENV" python="$REQUIRED_PYTHON_VERSION"
+        . ~/miniconda2/bin/activate "$TOXENV"
+    fi
 
 install:
   - travis_retry pip install --upgrade "pip < 19.1" setuptools tox ppu

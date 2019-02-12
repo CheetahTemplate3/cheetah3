@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+CI:
+
+  - At travis deploy wheels for macOS.
+
 3.2.0 (2019-02-06)
 ------------------
 
