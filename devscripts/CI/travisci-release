@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+set -e
 
 [[ "$TOXENV" == *-flake8 || "$TOXENV" == pypy* ]] && exit 0
 
@@ -15,25 +16,31 @@ python    -m compileall build &&
 python -O -m compileall build &&
 python setup.py bdist_wheel &&
 
-py=`python -c "import sys; print('.'.join(sys.version.split('.')[:2]))"`
-v="`echo $py | sed 's/\.//'`" &&
+py=$(python -c "import sys; print('.'.join(sys.version.split('.')[:2]))")
+v=$(echo "$py" | sed 's/\.//') &&
 
-if [ $py = 2.7 ]; then
-   pyenv global system 3.6.7 2.7.15
-   pip3.6 install -U auditwheel
-else
-   pip install -U auditwheel
+if [ "$TRAVIS_OS_NAME" == 'linux' ]; then
+    if [ "$py" == 2.7 ]; then
+        pyenv global system 3.6.7 2.7.15
+        pip3.6 install -U auditwheel
+    else
+        pip install -U auditwheel
+    fi &&
+
+    for f in dist/Cheetah3-*-cp$v-*-linux_x86_64.whl; do
+        if [ "$py" == 2.7 ]; then
+            python3.6 -m auditwheel repair -w dist/ "$f"
+        else
+            python -m auditwheel repair -w dist/ "$f"
+        fi &&
+        rm -f "$f"
+    done
+
+elif [ "$TRAVIS_OS_NAME" == 'osx' ]; then
+    pip install -U delocate
+    for f in dist/Cheetah3-*-cp$v-*-macosx*.whl; do
+        delocate-wheel -v "$f"
+    done
 fi &&
-
-cd dist &&
-for f in Cheetah3-*-cp$v-*-linux_x86_64.whl; do
-   if [ $py = 2.7 ]; then
-      python3.6 -m auditwheel repair -w . $f
-   else
-      python -m auditwheel repair -w . $f
-   fi &&
-   rm $f
-done &&
-cd .. &&
 
 exec twine upload --skip-existing dist/*
