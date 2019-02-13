@@ -34,11 +34,8 @@
 6. Run devscripts/push-all in the development repository to push all
    branches and tags to the public repositories.
 
-7. Wait until tests finished at AppVeyor. Download generated wheels, put
-   them into dist directory and upload to PyPI using twine.
-
-8. Send announcement to the Cheetah mailing list. For a stable release send
+7. Send announcement to the Cheetah mailing list. For a stable release send
    announcements to python and python-announce mailing lists.
 
-9. Announce new release at Wikipedia
+8. Announce new release at Wikipedia
    (https://en.wikipedia.org/wiki/CheetahTemplate).
