@@ -6,7 +6,8 @@ Development (master)
 
 CI:
 
-  - At travis deploy wheels for macOS.
+  - At Travis deploy wheels for macOS.
+  - At AppVeyor deploy wheels directly to PyPI.
 
 3.2.0 (2019-02-06)
 ------------------
@@ -46,7 +47,7 @@ Documentation:
 CI:
 
   - Run tests with Python 3.7.
-  - At travis deploy sdists and wheels for tags.
+  - At Travis deploy sdists and wheels for tags.
 
 
 3.1.0 (2018-03-03)
