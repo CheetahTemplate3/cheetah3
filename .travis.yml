@@ -56,11 +56,11 @@ matrix:
 before_install:
   - |
     if [ "$TRAVIS_OS_NAME" == 'osx' -a "$TOXENV" != "py27" ]; then
-        curl -O https://repo.anaconda.com/miniconda/Miniconda2-latest-MacOSX-x86_64.sh
-        bash Miniconda2-latest-MacOSX-x86_64.sh -b -p "$HOME/miniconda2"
+        curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+        bash Miniconda3-latest-MacOSX-x86_64.sh -b -p "$HOME/miniconda3"
         REQUIRED_PYTHON_VERSION=$(python -c "import os; toxenv = os.environ['TOXENV']; print('.'.join(list(toxenv[2:])))")
-        ~/miniconda2/bin/conda create -y -n "$TOXENV" python="$REQUIRED_PYTHON_VERSION"
-        . ~/miniconda2/bin/activate "$TOXENV"
+        ~/miniconda3/bin/conda create -y -n "$TOXENV" python="$REQUIRED_PYTHON_VERSION"
+        . ~/miniconda3/bin/activate "$TOXENV"
     fi
 
 install:
