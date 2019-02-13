@@ -43,4 +43,6 @@ elif [ "$TRAVIS_OS_NAME" == 'osx' ]; then
     done
 fi &&
 
+# TWINE_USERNAME / TWINE_PASSWORD / TWINE_REPOSITORY_URL
+# must be set in Travis settings.
 exec twine upload --skip-existing dist/*
