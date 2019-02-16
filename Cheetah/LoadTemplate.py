@@ -38,6 +38,8 @@ def _loadTemplate(templatePath, debuglevel=0):
         template_dir.templateFileExtensions = (ext,)
     template_dir.debuglevel = debuglevel
     mod = template_dir.getmod(filename)
+    if mod is None:
+        raise ImportError("Cannot find {}".format(templatePath))
     fqname = os.path.join(dirname, filename).replace(os.sep, '.')
     mod.__name__ = fqname
     sys.modules[fqname] = mod

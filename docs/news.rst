@@ -4,10 +4,16 @@ News
 Development (master)
 --------------------
 
+Bug fixes:
+
+  - Fix a bug in LoadTemplate.loadTemplate{Module,Class}:
+    raise ImportError if the template was not found.
+
 CI:
 
   - At Travis deploy wheels for macOS.
   - At AppVeyor deploy wheels directly to PyPI.
+
 
 3.2.0 (2019-02-06)
 ------------------

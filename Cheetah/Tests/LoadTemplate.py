@@ -34,6 +34,8 @@ class LoadTemplateTest(unittest.TestCase):
         loadTemplateClass(
             os.path.join(ImportHooksTemplatesDir, 'index.tmpl'))
 
+        self.assertRaises(ImportError, loadTemplateClass, 'doesnotexist')
+
     def test_ImportHooks(self):
         templates = os.listdir(ImportHooksTemplatesDir)
         self.assertNotIn('index.py', templates)
