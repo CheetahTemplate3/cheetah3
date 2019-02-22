@@ -3,10 +3,13 @@ import sys
 from Cheetah.ImportHooks import CheetahDirOwner
 
 
-def _loadTemplate(templatePath, debuglevel=0):
-    """Load template by full or relative path (including extension)
+def loadTemplateModule(templatePath, debuglevel=0):
+    """Load template's module by full or relative path (extension is optional)
 
-    Example: template = loadTemplate('views/index.tmpl')
+    Examples:
+
+        template = loadTemplateModule('views/index')
+        template = loadTemplateClass('views/index.tmpl')
 
     Template is loaded from from .py[co], .py or .tmpl -
     whatever will be found. Files *.tmpl are compiled to *.py;
@@ -34,13 +37,10 @@ def _loadTemplate(templatePath, debuglevel=0):
     co = mod.__co__
     del mod.__co__
     exec(co, mod.__dict__)
-    return mod, filename
-
-
-def loadTemplateModule(templatePath, debuglevel=0):
-    return _loadTemplate(templatePath, debuglevel=debuglevel)[0]
+    return mod
 
 
 def loadTemplateClass(templatePath, debuglevel=0):
-    mod, filename = _loadTemplate(templatePath, debuglevel=debuglevel)
-    return getattr(mod, filename)
+    """Load template's class by full or relative path"""
+    mod = loadTemplateModule(templatePath, debuglevel=debuglevel)
+    return getattr(mod, mod.__name__)
