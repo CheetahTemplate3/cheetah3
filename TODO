@@ -1,7 +1,1 @@
-- https://pypi.org/project/cibuildwheel/ or
-  https://github.com/matthew-brett/multibuild or
-  https://pypi.org/project/wheelhouse-uploader/
-
-- https://pypi.org/project/appveyor-artifacts/
-
 - Support PyPy3.
