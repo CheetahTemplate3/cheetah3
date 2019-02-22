@@ -4,6 +4,11 @@ News
 Development (master)
 --------------------
 
+Minor features:
+
+  - Changed LoadTemplate.loadTemplate{Module,Class}:
+    the loaded module's __name__ set to just the file name.
+
 Bug fixes:
 
   - Fix a bug in LoadTemplate.loadTemplate{Module,Class}:

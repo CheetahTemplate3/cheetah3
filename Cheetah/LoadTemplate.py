@@ -1,4 +1,3 @@
-import imp
 import os
 import sys
 from Cheetah.ImportHooks import CheetahDirOwner
@@ -23,16 +22,6 @@ def _loadTemplate(templatePath, debuglevel=0):
         dirname_list = [d for (i, d) in enumerate(dirname_list)
                         if i == 0 or d]  # Preserve root slash
         dirname = os.sep.join(dirname_list)
-        # Add all "modules" to sys.modules
-        components = []
-        for d in dirname_list:
-            components.append(d)
-            _mod_name = '.'.join(components)
-            _mod = imp.new_module(_mod_name)
-            _d = os.path.abspath(os.sep.join(components))
-            _mod.__file__ = _d
-            _mod.__path__ = [_d]
-            sys.modules[_mod_name] = _mod
     template_dir = CheetahDirOwner(drive + dirname)
     if ext:
         template_dir.templateFileExtensions = (ext,)
@@ -40,9 +29,8 @@ def _loadTemplate(templatePath, debuglevel=0):
     mod = template_dir.getmod(filename)
     if mod is None:
         raise ImportError("Cannot find {}".format(templatePath))
-    fqname = os.path.join(dirname, filename).replace(os.sep, '.')
-    mod.__name__ = fqname
-    sys.modules[fqname] = mod
+    mod.__name__ = filename
+    sys.modules[filename] = mod
     co = mod.__co__
     del mod.__co__
     exec(co, mod.__dict__)
