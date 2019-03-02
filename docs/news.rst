@@ -8,6 +8,7 @@ Minor features:
 
   - Changed LoadTemplate.loadTemplate{Module,Class}:
     the loaded module's __name__ set to just the file name.
+  - Use imp for Python 2, importlib for Python 3.
 
 Bug fixes:
 

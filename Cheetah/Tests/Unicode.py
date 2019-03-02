@@ -2,16 +2,14 @@
 # -*- encoding: utf8 -*-
 
 from glob import glob
-import imp
 import os
-import sys
 from shutil import rmtree
 import tempfile
 import unittest
 from Cheetah.Compiler import Compiler
 from Cheetah.Template import Template
 from Cheetah import CheetahWrapper
-from Cheetah.compat import PY2, unicode
+from Cheetah.compat import PY2, unicode, load_module_from_file
 
 
 class CommandLineTest(unittest.TestCase):
@@ -31,8 +29,9 @@ class CommandLineTest(unittest.TestCase):
         wrap.main(['cheetah', 'compile',
                    '--encoding=utf-8', '--settings=encoding="utf-8"',
                    '--quiet', '--nobackup', sourcefile])
-        module_path, module_name = os.path.split(sourcefile)
-        module = loadModule(module_name, [module_path])
+        module_name = os.path.split(sourcefile)[1]
+        module = load_module_from_file(
+            module_name, module_name, sourcefile + '.py')
         template = getattr(module, module_name)
         os.remove('%s.tmpl' % sourcefile)
         for sourcefile_py in glob('%s.py*' % sourcefile):  # *.py[co]
@@ -109,23 +108,6 @@ class JBQ_UTF8_Test5(unittest.TestCase):
         t.v = u'Unicode String'
 
         assert unicode(t())
-
-
-def loadModule(moduleName, path=None):
-    if path:
-        assert isinstance(path, list)
-    try:
-        mod = sys.modules[moduleName]
-    except KeyError:
-        fp = None
-
-        try:
-            fp, pathname, description = imp.find_module(moduleName, path)
-            mod = imp.load_module(moduleName, fp, pathname, description)
-        finally:
-            if fp:
-                fp.close()
-    return mod
 
 
 class JBQ_UTF8_Test6(unittest.TestCase):
