@@ -1,5 +1,6 @@
 import os
 import sys
+import types
 
 # Compatability definitions (inspired by six)
 PY2 = sys.version_info[0] < 3
@@ -22,9 +23,14 @@ if PY2:
         finally:
             fp.close()
         return module
+
+    new_module = imp.new_module
+
 else:
     import importlib.util
 
     def load_module_from_file(base_name, module_name, filename):
         specs = importlib.util.spec_from_file_location(module_name, filename)
         return specs.loader.load_module()
+
+    new_module = types.ModuleType

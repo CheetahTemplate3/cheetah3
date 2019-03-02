@@ -21,7 +21,7 @@ import imp
 import marshal
 import py_compile
 import sys
-from Cheetah.compat import string_type
+from Cheetah.compat import string_type, new_module
 
 _installed = False
 
@@ -177,7 +177,7 @@ class DirOwner(Owner):
         Owner.__init__(self, path)
 
     def getmod(self, nm, getsuffixes=imp.get_suffixes,
-               loadco=marshal.loads, newmod=imp.new_module):
+               loadco=marshal.loads, newmod=new_module):
 
         pth = _os_path_join(self.path, nm)
 

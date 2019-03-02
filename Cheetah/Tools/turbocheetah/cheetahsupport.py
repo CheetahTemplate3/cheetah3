@@ -1,18 +1,18 @@
 "Template support for Cheetah"
 
-import imp
 import os
+import pkg_resources
 import sys
 
 from Cheetah import Compiler
-import pkg_resources
+from Cheetah.compat import new_module
 
 
 def _recompile_template(package, basename, tfile, classname):
     tmpl = pkg_resources.resource_string(package, "%s.tmpl" % basename)
     c = Compiler.Compiler(source=tmpl, mainClassName='GenTemplate')
     code = str(c)
-    mod = imp.new_module(classname)
+    mod = new_module(classname)
     ns = dict()
     exec(code, ns)
     tempclass = ns.get("GenTemplate",
