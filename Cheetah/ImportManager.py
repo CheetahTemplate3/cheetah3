@@ -21,7 +21,7 @@ import imp
 import marshal
 import py_compile
 import sys
-from Cheetah.compat import string_type, new_module
+from Cheetah.compat import string_type, new_module, get_suffixes
 
 _installed = False
 
@@ -139,7 +139,7 @@ def pathIsDir(pathname):
 
 def getDescr(fnm):
     ext = getPathExt(fnm)
-    for (suffix, mode, typ) in imp.get_suffixes():
+    for (suffix, mode, typ) in get_suffixes():
         if suffix == ext:
             return (suffix, mode, typ)
 
@@ -176,7 +176,7 @@ class DirOwner(Owner):
             raise ValueError("%s is not a directory" % path)
         Owner.__init__(self, path)
 
-    def getmod(self, nm, getsuffixes=imp.get_suffixes,
+    def getmod(self, nm, getsuffixes=get_suffixes,
                loadco=marshal.loads, newmod=new_module):
 
         pth = _os_path_join(self.path, nm)

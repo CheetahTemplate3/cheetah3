@@ -25,8 +25,10 @@ if PY2:
         return module
 
     new_module = imp.new_module
+    get_suffixes = imp.get_suffixes
 
 else:
+    import importlib.machinery
     import importlib.util
 
     def load_module_from_file(base_name, module_name, filename):
@@ -34,3 +36,16 @@ else:
         return specs.loader.load_module()
 
     new_module = types.ModuleType
+
+    def get_suffixes():
+        extensions = [
+            (s, 'rb', 3) for s in importlib.machinery.EXTENSION_SUFFIXES
+        ]
+        source = [
+            (s, 'rU', 1) for s in importlib.machinery.SOURCE_SUFFIXES
+        ]
+        bytecode = [
+            (s, 'rb', 2) for s in importlib.machinery.BYTECODE_SUFFIXES
+        ]
+
+        return extensions + source + bytecode
