@@ -17,11 +17,15 @@ This is a hacked/documented version of Gordon McMillan's iu.py. I have:
   - reorganized the code layout to enhance readability
 """
 
-import imp
 import marshal
 import py_compile
 import sys
-from Cheetah.compat import string_type, new_module, get_suffixes
+from Cheetah.compat import PY2, string_type, new_module, get_suffixes, \
+    load_module_from_file
+if PY2:
+    import imp
+else:
+    import importlib.machinery
 
 _installed = False
 
@@ -193,13 +197,9 @@ class DirOwner(Owner):
                 except Exception:
                     pass
                 else:
-                    if typ == imp.C_EXTENSION:
-                        with open(attempt, 'rb') as fp:
-                            mod = imp.load_module(
-                                nm, fp, attempt, (ext, mode, typ))
-                            mod.__file__ = attempt
-                            return mod
-                    elif typ == imp.PY_SOURCE:
+                    if typ == 3:  # imp.C_EXTENSION
+                        return load_module_from_file(nm, nm, attempt)
+                    elif typ == 1:  # imp.PY_SOURCE
                         py = (attempt, st)
                     else:
                         pyc = (attempt, st)
@@ -258,10 +258,9 @@ class BuiltinImportDirector(ImportDirector):
     def __init__(self):
         self.path = 'Builtins'
 
-    def getmod(self, nm, isbuiltin=imp.is_builtin):
-        if isbuiltin(nm):
-            mod = imp.load_module(nm, None, nm, ('', '', imp.C_BUILTIN))
-            return mod
+    def getmod(self, nm):
+        if nm in sys.builtin_module_names:
+            return __import__(nm)
         return None
 
 
@@ -271,16 +270,19 @@ class FrozenImportDirector(ImportDirector):
     def __init__(self):
         self.path = 'FrozenModules'
 
-    def getmod(self, nm,
-               isFrozen=imp.is_frozen, loadMod=imp.load_module):
-        if isFrozen(nm):
-            mod = loadMod(nm, None, nm, ('', '', imp.PY_FROZEN))
-            if hasattr(mod, '__path__'):
-                mod.__importsub__ = \
-                    lambda name, pname=nm, owner=self: \
-                    owner.getmod(pname + '.' + name)
-            return mod
-        return None
+    def getmod(self, nm):
+        mod = None
+        if PY2:
+            if imp.is_frozen(nm):
+                mod = imp.load_module(nm, None, nm, ('', '', imp.PY_FROZEN))
+        else:
+            if importlib.machinery.FrozenImporter.find_spec(nm):
+                mod = importlib.machinery.FrozenImporter.load_module(nm)
+        if mod and hasattr(mod, '__path__'):
+            mod.__importsub__ = \
+                lambda name, pname=nm, owner=self: \
+                owner.getmod(pname + '.' + name)
+        return mod
 
 
 class RegistryImportDirector(ImportDirector):
@@ -322,11 +324,8 @@ class RegistryImportDirector(ImportDirector):
     def getmod(self, nm):
         stuff = self.map.get(nm)
         if stuff:
-            fnm, desc = stuff
-            with open(fnm, 'rb') as fp:
-                mod = imp.load_module(nm, fp, fnm, desc)
-                mod.__file__ = fnm
-                return mod
+            fnm = stuff[0]
+            return load_module_from_file(nm, nm, fnm)
         return None
 
 
