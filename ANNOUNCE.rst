@@ -7,7 +7,23 @@ I'm pleased to announce version 3.2.1, the first bugfix release of branch
 What's new in CheetahTemplate3
 ==============================
 
-Contributors for this release are Nicola Soranzo, 
+Contributor for this release is Nicola Soranzo.
+
+Minor features:
+
+  - Changed LoadTemplate.loadTemplate{Module,Class}:
+    the loaded module's __name__ set to just the file name.
+  - Use imp for Python 2, importlib for Python 3.
+
+Bug fixes:
+
+  - Fix a bug in LoadTemplate.loadTemplate{Module,Class}:
+    raise ImportError if the template was not found.
+
+CI:
+
+  - At Travis deploy wheels for macOS.
+  - At AppVeyor deploy wheels directly to PyPI.
 
 
 What is CheetahTemplate3
@@ -29,7 +45,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.org/project/Cheetah3/3.2.1dev20190206/
+https://pypi.org/project/Cheetah3/3.2.1/
 
 News and changes:
 http://cheetahtemplate.org/news.html
