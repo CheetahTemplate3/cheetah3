@@ -1,5 +1,5 @@
 -r requirements.txt
 
 auditwheel
-wheel
+wheel==0.31.1
 twine
