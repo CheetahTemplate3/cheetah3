@@ -76,8 +76,7 @@ class CFBase(unittest.TestCase):
                     not pythonPath.endswith(':%s' % cwd):
                 os.environ['PYTHONPATH'] = '%s:%s' % (pythonPath, cwd)
         # Step 1: Create the scratch directory and chdir into it.
-        self.scratchDir = scratchDir = tempfile.mktemp()
-        os.mkdir(scratchDir)
+        self.scratchDir = scratchDir = tempfile.mkdtemp()
         self.origCwd = os.getcwd()
         os.chdir(scratchDir)
         if self.srcDir:
