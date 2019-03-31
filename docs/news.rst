@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+Minor features:
+
+  - Replaced outdated and insecure `mktemp` with `mkstemp`.
+
 3.2.1 (2019-03-19)
 ------------------
 

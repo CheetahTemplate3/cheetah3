@@ -3,7 +3,7 @@ from glob import glob
 import os
 import os.path
 import re
-from tempfile import mktemp
+from tempfile import NamedTemporaryFile
 from Cheetah.compat import string_type
 
 
@@ -244,12 +244,13 @@ class FindAndReplace:
         self._usePgrep = False
         if (os.popen3('pgrep')[2].read()).startswith('Usage:'):
             # now check to make sure pgrep understands the pattern
-            tmpFile = mktemp()
-            open(tmpFile, 'w').write('#')
-            if not (os.popen3('pgrep "' + pattern + '" ' + tmpFile)[2].read()):
+            tmpFile = NamedTemporaryFile()
+            tmpFile.write('#')
+            if not (os.popen3(
+                    'pgrep "' + pattern + '" ' + tmpFile.name)[2].read()):
                 # it didn't print an error msg so we're ok
                 self._usePgrep = True
-            os.remove(tmpFile)
+            tmpFile.close()  # Will be automatically removed on close
 
         self._run()
 

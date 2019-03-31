@@ -14,9 +14,10 @@ from Cheetah.compat import PY2, unicode, load_module_from_file
 
 class CommandLineTest(unittest.TestCase):
     def createAndCompile(self, source):
-        sourcefile = '-'
-        while sourcefile.find('-') != -1:
-            sourcefile = tempfile.mktemp()
+        fd, sourcefile = tempfile.mkstemp()
+        os.close(fd)
+        os.remove(sourcefile)
+        sourcefile = sourcefile.replace('-', '_')
 
         if PY2:
             fd = open('%s.tmpl' % sourcefile, 'w')
