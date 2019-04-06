@@ -6,21 +6,21 @@ Development (master)
 
 Minor features:
 
-  - Replaced outdated and insecure `mktemp` with `mkstemp`.
+  - Replaced outdated and insecure ``mktemp`` with ``mkstemp``.
 
 3.2.1 (2019-03-19)
 ------------------
 
 Minor features:
 
-  - Changed LoadTemplate.loadTemplate{Module,Class}:
-    the loaded module's __name__ set to just the file name.
-  - Use imp for Python 2, importlib for Python 3.
+  - Changed ``LoadTemplate.loadTemplate{Module,Class}``:
+    the loaded module's ``__name__`` set to just the file name.
+  - Use ``imp`` for Python 2, ``importlib`` for Python 3.
 
 Bug fixes:
 
-  - Fix a bug in LoadTemplate.loadTemplate{Module,Class}:
-    raise ImportError if the template was not found.
+  - Fix a bug in ``LoadTemplate.loadTemplate{Module,Class}``:
+    raise ``ImportError`` if the template was not found.
 
 CI:
 
@@ -34,23 +34,23 @@ CI:
 Features:
 
   - Dropped support for Python 3.3.
-  - Implement LoadTemplate.loadTemplate{Module,Class} to load templates
-    from .py[co], .py or .tmpl.
-  - CheetahDirOwner caches compiled template in the template directory.
-  - CheetahDirOwner now silently ignores errors on compiled templates
-    writing. To get tracebacks set CheetahDirOwner.debuglevel = 1.
-  - CheetahDirOwner and DirOwner byte-compile compiled templates
-    to .pyc/.pyo. Errors on writing are silently ignored.
+  - Implement ``LoadTemplate.loadTemplate{Module,Class}``
+    to load templates from ``.py[co]``, ``.py`` or ``.tmpl``.
+  - ``CheetahDirOwner`` caches compiled template in the template directory.
+  - ``CheetahDirOwner`` now silently ignores errors on compiled templates
+    writing. To get tracebacks set ``CheetahDirOwner.debuglevel = 1``.
+  - ``CheetahDirOwner`` and ``DirOwner`` byte-compile compiled templates
+    to ``.pyc/.pyo``. Errors on writing are silently ignored.
 
 Minor features:
 
-  - Implement Compiler.__unicode__ under Python 2 and Compiler.__bytes__
-    under Python 3.
+  - Implement ``Compiler.__unicode__`` under Python 2
+    and ``Compiler.__bytes__`` under Python 3.
 
 Bug fixes:
 
-  - Fix a bug in Compiler.__str__: under Python 2 the method now always
-    returns str; it encodes unicode to str using encoding from the
+  - Fix a bug in ``Compiler.__str__``: under Python 2 the method
+    always returns str; it encodes unicode to str using encoding from the
     compiled source. Under Python 3 the method decodes bytes to str.
 
 Code:
