@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+try:
+    from cgi import escape as html_escape
+except ImportError:  # Python 3.8+
+    from html import escape as html_escape
+
 import unittest
 import Cheetah.NameMapper
 import Cheetah.Template
@@ -138,18 +143,16 @@ class Mantis_Issue_11_Regression_Test(unittest.TestCase):
             s = s.replace("&", "&") # Must be done first!
     '''
     def test_FailingBehavior(self):
-        import cgi
         template = Cheetah.Template.Template(
             "$escape($request)",
-            searchList=[{'escape': cgi.escape, 'request': 'foobar'}])
+            searchList=[{'escape': html_escape, 'request': 'foobar'}])
         assert template
         self.assertRaises(AttributeError, template.respond)
 
     def test_FailingBehaviorWithSetting(self):
-        import cgi
         template = Cheetah.Template.Template(
             "$escape($request)",
-            searchList=[{'escape': cgi.escape, 'request': 'foobar'}],
+            searchList=[{'escape': html_escape, 'request': 'foobar'}],
             compilerSettings={'prioritizeSearchListOverSelf': True})
         assert template
         assert template.respond()

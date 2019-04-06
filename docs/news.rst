@@ -8,6 +8,11 @@ Minor features:
 
   - Replaced outdated and insecure ``mktemp`` with ``mkstemp``.
 
+Tests:
+
+  - Use ``cgi.escape()`` for Python 2, ``html.escape()`` for Python 3.
+
+
 3.2.1 (2019-03-19)
 ------------------
 
