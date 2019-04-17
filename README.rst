@@ -1,8 +1,7 @@
 Cheetah Template 3.2.2
 ======================
 
-Cheetah3 is a free (BSD-style) and open source template engine and code
-generation tool.
+Cheetah3 is a free and open source template engine and code generation tool.
 
 It can be used standalone or combined with other tools and frameworks. Web
 development is its principle use, but Cheetah is very flexible and is also being
