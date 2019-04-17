@@ -45,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Cheetah3'
-copyright = u'2017-2018, Oleg Broytman; 2009-2012, R. Tyler Croy; ' \
+copyright = u'2017-2019, Oleg Broytman; 2009-2012, R. Tyler Croy; ' \
             u'2001-2008, The Cheetah Development Team.'
 
 # The version info for the project you're documenting, acts as replacement for
