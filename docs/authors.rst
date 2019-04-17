@@ -29,5 +29,6 @@ Contributions have been made by:
 * Jonathan Ross Rogers <jrogers at socialserve.com>
 * Mathias Stearn <redbeard0531 at gmail.com>
 * Nicola Soranzo <nicola.soranzo at gmail.com>
-* Pierre-Yves <pyu@riseup.net>
+* Pierre-Yves <pyu at riseup.net>
+* Dan Vinakovsky <dvinak at gmail.com>
 * Oleg Broytman <phd@phdru.name>

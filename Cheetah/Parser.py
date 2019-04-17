@@ -1427,7 +1427,7 @@ class _HighLevelParser(_LowLevelParser):
                 handler = getattr(self, val)
             elif isinstance(val, type):
                 handler = val(self)
-            elif hasattr(val, '__call__'):
+            elif callable(val):
                 handler = val
             elif val is None:
                 handler = val
