@@ -228,7 +228,7 @@ def _valueForName(obj, name, executeCallables=False):
             except AttributeError:
                 _raiseNotFoundException(key, obj)
 
-        if executeCallables and hasattr(nextObj, '__call__') and \
+        if executeCallables and callable(nextObj) and \
                 not _isInstanceOrClass(nextObj):
             obj = nextObj()
         else:
