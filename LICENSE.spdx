@@ -1,0 +1,14 @@
+SPDXVersion: SPDX-2.1
+DataLicense: MIT
+Creator: Oleg Broytman
+Created: 2019-04-15T23:00:00Z
+PackageName: CheetahTemplate
+PackageHomePage: http://cheetahtemplate.org/
+PackageCopyrightText: <text>
+Copyright 2017-2019, Oleg Broytman and contributors.
+Copyright 2009-2012, R. Tyler Croy and contributors.
+Copyright 2001-2008, The Cheetah Development Team: Tavis Rudd, Mike Orr,
+Chuck Esterbrook, Ian Bicking.
+</text>
+PackageLicenseDeclared: MIT
+PackageSummary: <text>Free and open source template engine for Python.</text>
