@@ -24,5 +24,20 @@ class TestHelp(unittest.TestCase):
         self.assertRaises(SystemExit, cmdline._processCmdLineArgs)
 
 
+class TestEnv(unittest.TestCase):
+    def setUp(self):
+        os.environ['foo'] = 'test foo'
+
+    def tearDown(self):
+        del os.environ['foo']
+
+    def test_env(self):
+        klass = Template.compile(source='$foo')
+        t = klass()
+        cmdline = CmdLineIface(t, scriptName='test', cmdLineArgs=['--env'])
+        cmdline._processCmdLineArgs()
+        assert str(t) == 'test foo'
+
+
 if __name__ == '__main__':
     unittest.main()

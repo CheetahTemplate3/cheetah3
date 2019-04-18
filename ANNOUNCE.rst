@@ -7,7 +7,8 @@ I'm pleased to announce version 3.2.2, the second bugfix release of branch
 What's new in CheetahTemplate3
 ==============================
 
-Contributors for this release are Pierre-Yves, Dan Vinakovsky, 
+Contributors for this release are
+Pierre-Yves, Dan Vinakovsky, Nicolai Grodzitski.
 
 
 What is CheetahTemplate3
