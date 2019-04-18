@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 
+try:
+    from io import BytesIO, TextIOWrapper
+except ImportError:
+    try:
+        from cStringIO import StringIO as BytesIO
+    except ImportError:
+        from StringIO import StringIO as BytesIO
+
 import os
+import pickle
 import sys
 import unittest
 
@@ -35,6 +44,26 @@ class TestEnv(unittest.TestCase):
         klass = Template.compile(source='$foo')
         t = klass()
         cmdline = CmdLineIface(t, scriptName='test', cmdLineArgs=['--env'])
+        cmdline._processCmdLineArgs()
+        assert str(t) == 'test foo'
+
+
+class TestPickleStdin(unittest.TestCase):
+    def setUp(self):
+        pickle_bytes = pickle.dumps({'foo': 'test foo'})
+        if hasattr(sys.stdin, 'buffer'):
+            sys.stdin = TextIOWrapper(BytesIO(pickle_bytes))
+        else:
+            sys.stdin = BytesIO(pickle_bytes)
+
+    def tearDown(self):
+        sys.stdin = sys.__stdin__
+
+    def test_pickle_stdin(self):
+        klass = Template.compile(source='$foo')
+        t = klass()
+        cmdline = CmdLineIface(t, scriptName='test',
+                               cmdLineArgs=['--pickle=-'])
         cmdline._processCmdLineArgs()
         assert str(t) == 'test foo'
 

@@ -52,7 +52,11 @@ class CmdLineIface:
                 self._template.searchList().insert(0, os.environ)
             if o == '--pickle':
                 if a == '-':
-                    unpickled = load(sys.stdin)
+                    if hasattr(sys.stdin, 'buffer'):
+                        stdin = sys.stdin.buffer  # Read binary data from stdin
+                    else:
+                        stdin = sys.stdin
+                    unpickled = load(stdin)
                     self._template.searchList().insert(0, unpickled)
                 else:
                     f = open(a)

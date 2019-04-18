@@ -8,6 +8,10 @@ Minor features:
 
   - Replaced outdated and insecure ``mktemp`` with ``mkstemp``.
 
+Bug fixes:
+
+  - Fix a bug in ``TemplateCmdLineIface.py``: read binary pickles from stdin.
+
 Tests:
 
   - Use ``cgi.escape()`` for Python 2, ``html.escape()`` for Python 3.
