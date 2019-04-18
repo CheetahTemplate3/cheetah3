@@ -904,7 +904,7 @@ class Template(Servlet):
         """
         if hasattr(arg, 'preprocess'):
             return arg
-        elif hasattr(arg, '__call__'):
+        elif callable(arg):
             class WrapperPreprocessor:
                 def preprocess(self, source, file):
                     return arg(source, file)
