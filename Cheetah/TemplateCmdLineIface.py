@@ -59,7 +59,7 @@ class CmdLineIface:
                     unpickled = load(stdin)
                     self._template.searchList().insert(0, unpickled)
                 else:
-                    f = open(a)
+                    f = open(a, 'rb')
                     unpickled = load(f)
                     f.close()
                     self._template.searchList().insert(0, unpickled)

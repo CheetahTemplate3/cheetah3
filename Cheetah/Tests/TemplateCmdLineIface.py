@@ -8,6 +8,8 @@ except ImportError:
     except ImportError:
         from StringIO import StringIO as BytesIO
 
+from tempfile import NamedTemporaryFile
+
 import os
 import pickle
 import sys
@@ -64,6 +66,25 @@ class TestPickleStdin(unittest.TestCase):
         t = klass()
         cmdline = CmdLineIface(t, scriptName='test',
                                cmdLineArgs=['--pickle=-'])
+        cmdline._processCmdLineArgs()
+        assert str(t) == 'test foo'
+
+
+class TestPickleFile(unittest.TestCase):
+    def setUp(self):
+        self.pickle_file = pickle_file = \
+            NamedTemporaryFile(mode='wb', delete=False)
+        pickle.dump({'foo': 'test foo'}, pickle_file)
+        pickle_file.close()
+
+    def tearDown(self):
+        os.remove(self.pickle_file.name)
+
+    def test_pickle_file(self):
+        klass = Template.compile(source='$foo')
+        t = klass()
+        cmdline = CmdLineIface(t, scriptName='test',
+                               cmdLineArgs=['--pickle', self.pickle_file.name])
         cmdline._processCmdLineArgs()
         assert str(t) == 'test foo'
 

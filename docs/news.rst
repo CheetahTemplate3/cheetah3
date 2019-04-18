@@ -10,7 +10,8 @@ Minor features:
 
 Bug fixes:
 
-  - Fix a bug in ``TemplateCmdLineIface.py``: read binary pickles from stdin.
+  - Fix bugs in ``TemplateCmdLineIface.py``: read binary pickles from stdin
+    and files.
 
 Tests:
 
