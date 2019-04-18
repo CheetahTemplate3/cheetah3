@@ -27,6 +27,7 @@ from Cheetah.Tests import Parser
 from Cheetah.Tests import Regressions
 from Cheetah.Tests import SyntaxAndOutput
 from Cheetah.Tests import Template
+from Cheetah.Tests import TemplateCmdLineIface
 from Cheetah.Tests import Unicode
 
 SyntaxAndOutput.install_eols()
@@ -43,6 +44,7 @@ suites = [
     unittest.findTestCases(Regressions),
     unittest.findTestCases(SyntaxAndOutput),
     unittest.findTestCases(Template),
+    unittest.findTestCases(TemplateCmdLineIface),
     unittest.findTestCases(Unicode),
     unittest.findTestCases(NameMapper_pure),
 ]

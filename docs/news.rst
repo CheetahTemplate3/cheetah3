@@ -11,6 +11,7 @@ Minor features:
 Tests:
 
   - Use ``cgi.escape()`` for Python 2, ``html.escape()`` for Python 3.
+  - Create tests for ``TemplateCmdLineIface``.
 
 
 3.2.1 (2019-03-19)
