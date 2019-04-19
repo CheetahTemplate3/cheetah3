@@ -12,6 +12,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+from datetime import date
 import os
 import sys
 from Cheetah.Version import Version
@@ -45,8 +46,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Cheetah3'
-copyright = u'2017-2019, Oleg Broytman; 2009-2012, R. Tyler Croy; ' \
-            u'2001-2008, The Cheetah Development Team.'
+copyright = u'2017-%d, Oleg Broytman; 2009-2012, R. Tyler Croy; ' \
+            u'2001-2008, The Cheetah Development Team.' % date.today().year
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
