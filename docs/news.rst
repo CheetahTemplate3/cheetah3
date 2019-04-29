@@ -1,8 +1,8 @@
 News
 ====
 
-Development (master)
---------------------
+3.2.2 (2019-04-29)
+------------------
 
 Minor features:
 
@@ -10,13 +10,13 @@ Minor features:
 
 Bug fixes:
 
-  - Fix bugs in ``TemplateCmdLineIface.py``: read binary pickles from stdin
-    and files.
+  - Fixed bugs in ``TemplateCmdLineIface.py``: read binary pickles
+    from stdin and files.
 
 Tests:
 
   - Use ``cgi.escape()`` for Python 2, ``html.escape()`` for Python 3.
-  - Create tests for ``TemplateCmdLineIface``.
+  - Created tests for ``TemplateCmdLineIface``.
 
 
 3.2.1 (2019-03-19)
