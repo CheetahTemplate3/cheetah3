@@ -1,6 +1,6 @@
 Hello!
 
-I'm pleased to announce version 3.2.2, the second bugfix release of branch
+I'm pleased to announce version 3.2.3, the thitd bugfix release of branch
 3.2 of CheetahTemplate3.
 
 
@@ -8,21 +8,6 @@ What's new in CheetahTemplate3
 ==============================
 
 Contributors for this release are
-Pierre-Yves, Dan Vinakovsky, Nicolai Grodzitski.
-
-Minor features:
-
-  - Replaced outdated and insecure ``mktemp`` with ``mkstemp``.
-
-Bug fixes:
-
-  - Fixed bugs in ``TemplateCmdLineIface.py``: read binary pickles
-    from stdin and files.
-
-Tests:
-
-  - Use ``cgi.escape()`` for Python 2, ``html.escape()`` for Python 3.
-  - Created tests for ``TemplateCmdLineIface``.
 
 
 What is CheetahTemplate3
@@ -44,7 +29,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.org/project/Cheetah3/3.2.2
+https://pypi.org/project/Cheetah3/3.2.3dev20190419/
 
 News and changes:
 http://cheetahtemplate.org/news.html
