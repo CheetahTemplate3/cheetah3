@@ -46,6 +46,9 @@ class ImportHooksTest(unittest.TestCase):
     def setUp(self):
         _cleanup()
 
+    def tearDown(self):
+        _cleanup()
+
     def test_CheetahDirOwner(self):
         templates = list(sorted(os.listdir(ImportHooksTemplatesDir)))
         self.assertListEqual(templates, ['index.tmpl', 'layout.tmpl'])

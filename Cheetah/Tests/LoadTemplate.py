@@ -10,6 +10,9 @@ class LoadTemplateTest(unittest.TestCase):
     def setUp(self):
         _cleanup()
 
+    def tearDown(self):
+        _cleanup()
+
     def test_loadTemplate(self):
         templates = os.listdir(ImportHooksTemplatesDir)
         self.assertNotIn('index.py', templates)
