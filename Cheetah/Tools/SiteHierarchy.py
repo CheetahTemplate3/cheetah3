@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """Create menus and crumbs from a site hierarchy.
 
 You define the site hierarchy as lists/tuples.  Each location in the hierarchy

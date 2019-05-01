@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 '''
     Filters for the #filter directive as well as #transform
 
