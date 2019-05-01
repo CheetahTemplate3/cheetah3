@@ -282,15 +282,14 @@ you do have write permission to and re-run the tests.""")
             f.close()
             os.remove(TEST_WRITE_FILENAME)
         # @@MO: End ugly kludge.
-        from Cheetah.Tests import Test
         import unittest
+        from Cheetah.Tests import Test
         verbosity = 1
         if '-q' in self.testOpts:
             verbosity = 0
         if '-v' in self.testOpts:
             verbosity = 2
         runner = unittest.TextTestRunner(verbosity=verbosity)
-        runner.run(unittest.TestSuite(Test.suites))
         results = runner.run(unittest.TestSuite(Test.suites))
         exit(int(not results.wasSuccessful()))
 

@@ -9,6 +9,7 @@ Tests:
   - Removed ``unittest.main()`` calls from tests:
     ``python -m unittest discover -t Cheetah -s Cheetah/Tests -p '[A-Z]*.py'``
     does it.
+  - Fixed ``cheetah test`` command.
 
 3.2.2 (2019-04-29)
 ------------------
