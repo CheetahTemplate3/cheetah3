@@ -16,7 +16,6 @@ import unittest
 
 from Cheetah.Tests import Analyzer
 from Cheetah.Tests import CheetahWrapper
-# from Cheetah.Tests import Cheps
 from Cheetah.Tests import Filters
 from Cheetah.Tests import ImportHooks
 from Cheetah.Tests import LoadTemplate
@@ -34,7 +33,6 @@ SyntaxAndOutput.install_eols()
 
 suites = [
     unittest.findTestCases(Analyzer),
-    # unittest.findTestCases(Cheps),
     unittest.findTestCases(Filters),
     unittest.findTestCases(ImportHooks),
     unittest.findTestCases(LoadTemplate),

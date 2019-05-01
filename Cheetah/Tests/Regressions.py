@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 try:
     from cgi import escape as html_escape
 except ImportError:  # Python 3.8+
@@ -252,7 +250,3 @@ class Mantis_Issue_22_Regression_Test(unittest.TestCase):
         template = Cheetah.Template.Template.compile(template)
         assert template
         assert template.testMethod(output='bug')
-
-
-if __name__ == '__main__':
-    unittest.main()

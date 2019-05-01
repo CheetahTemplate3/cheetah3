@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import unittest
 
 from Cheetah import SettingsManager
@@ -14,7 +12,3 @@ class SettingsManagerTests(unittest.TestCase):
         }
         result = SettingsManager.mergeNestedDictionaries(left, right)
         self.assertEqual(result, expect)
-
-
-if __name__ == '__main__':
-    unittest.main()

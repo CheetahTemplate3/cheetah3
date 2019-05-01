@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os
 import unittest
 import Cheetah.ImportHooks
@@ -48,7 +46,3 @@ class LoadTemplateTest(unittest.TestCase):
         self.assertIn('index.py', templates)
         self.assertIn('layout.py', templates)
         Cheetah.ImportHooks.uninstall()
-
-
-if __name__ == '__main__':
-    unittest.main()

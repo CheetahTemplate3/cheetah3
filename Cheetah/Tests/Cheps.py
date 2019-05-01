@@ -1,13 +1,12 @@
-#!/usr/bin/env python
-
-import unittest
+# import unittest
 
 import Cheetah
 import Cheetah.Parser
 import Cheetah.Template
 
 
-class Chep_2_Conditionalized_Import_Behavior(unittest.TestCase):
+# class Chep_2_Conditionalized_Import_Behavior(unittest.TestCase):
+class Chep_2_Conditionalized_Import_Behavior():
     def test_ModuleLevelImport(self):
         ''' Verify module level (traditional) import behavior '''
         pass
@@ -35,7 +34,3 @@ class Chep_2_Conditionalized_Import_Behavior(unittest.TestCase):
     def test_LegacyMode(self):
         ''' Verify disabling of CHEP #2 works '''
         pass
-
-
-if __name__ == '__main__':
-    unittest.main()

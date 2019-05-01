@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- encoding: utf8 -*-
 
 from glob import glob
@@ -265,7 +264,3 @@ $someUnicodeString"""
         compiler = Compiler(source)
         self.assertIsInstance(str(compiler), str)
         self.assertEqual(compiler.getModuleEncoding(), 'utf-8')
-
-
-if __name__ == '__main__':
-    unittest.main()

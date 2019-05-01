@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import unittest
 
 from Cheetah import DirectiveAnalyzer
@@ -22,7 +20,3 @@ useNameMapper = False
         '''
         calls = DirectiveAnalyzer.analyze(template)
         self.assertEqual(1, calls.get('compiler-settings'))
-
-
-if __name__ == '__main__':
-    unittest.main()

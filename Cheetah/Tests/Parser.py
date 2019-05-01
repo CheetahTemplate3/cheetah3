@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import unittest
 
 from Cheetah import Parser
@@ -45,7 +43,3 @@ class ArgListTest(unittest.TestCase):
         expect = [('arg', "'This is my block'")]
 
         self.assertEqual(expect, self.al.merge())
-
-
-if __name__ == '__main__':
-    unittest.main()

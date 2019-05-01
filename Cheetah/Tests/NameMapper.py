@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import sys
 import unittest
 
@@ -555,10 +553,3 @@ class MapBuiltins(unittest.TestCase):
                 #return $int(val)
             #end def''', compilerSettings={'useStackFrames': False})
         self.assertEqual(5, t.intify('5'))
-
-
-##################################################
-# if run from the command line ##
-
-if __name__ == '__main__':
-    unittest.main()

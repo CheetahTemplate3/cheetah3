@@ -3343,5 +3343,3 @@ def install_eols():
 if __name__ == '__main__':
     install_eols()
     unittest.main()
-
-# vim: shiftwidth=4 tabstop=4 expandtab

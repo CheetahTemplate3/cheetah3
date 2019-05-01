@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import sys
 import unittest
 
@@ -41,7 +39,3 @@ class NameMapperTest(unittest.TestCase):
     def test_valueForName(self):
         from Cheetah.NameMapper import valueForName
         self.assertEqual(valueForName('upper', 'upper', True), 'UPPER')
-
-
-if __name__ == '__main__':
-    unittest.main()

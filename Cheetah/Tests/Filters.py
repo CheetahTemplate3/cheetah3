@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import unittest
 import Cheetah.Template
 import Cheetah.Filters
@@ -60,7 +58,3 @@ def foo(self):
             template, searchList=[{'foo': 'bar'}])
         template = str(template)
         assert template, (template, 'We should have some content here...')
-
-
-if __name__ == '__main__':
-    unittest.main()

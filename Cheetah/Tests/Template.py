@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import os
 import os.path
 import sys
@@ -339,10 +337,3 @@ class SubclassSearchListTest(TemplateTest):
             greeting = 'Hola'
         tmpl = Sub('''When we meet, I say "${greeting}"''')
         self.assertEqual(unicode(tmpl), 'When we meet, I say "Hola"')
-
-##################################################
-# if run from the command line ##
-
-
-if __name__ == '__main__':
-    unittest.main()

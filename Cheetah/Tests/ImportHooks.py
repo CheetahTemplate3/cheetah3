@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from glob import glob
 import os
 import shutil
@@ -75,7 +73,3 @@ class ImportHooksTest(unittest.TestCase):
         self.assertIn('index.py', templates)
         self.assertIn('layout.py', templates)
         Cheetah.ImportHooks.uninstall()
-
-
-if __name__ == '__main__':
-    unittest.main()

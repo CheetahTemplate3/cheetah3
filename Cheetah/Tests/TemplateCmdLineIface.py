@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 try:
     from io import BytesIO, TextIOWrapper
 except ImportError:
@@ -87,7 +85,3 @@ class TestPickleFile(unittest.TestCase):
                                cmdLineArgs=['--pickle', self.pickle_file.name])
         cmdline._processCmdLineArgs()
         assert str(t) == 'test foo'
-
-
-if __name__ == '__main__':
-    unittest.main()
