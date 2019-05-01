@@ -3,6 +3,7 @@
 import logging
 import os
 import os.path
+import shutil
 import subprocess
 import sys
 
@@ -53,6 +54,14 @@ def main():
             scriptdir = os.path.sep.join((cwd, 'build', sub))
         if sub.startswith('lib'):
             libdir = os.path.sep.join((cwd, 'build', sub))
+
+    # Copy test templates to the ``build/lib`` directory
+    tmpldir = os.path.join('Cheetah', 'Tests', 'ImportHooksTemplates')
+    libtmpldir = os.path.join(libdir, tmpldir)
+    if not os.path.exists(os.path.join(libtmpldir, 'index.tmpl')):
+        if os.path.exists(libtmpldir):
+            shutil.rmtree(libtmpldir)
+        shutil.copytree(tmpldir, libtmpldir)
 
     newpath = '%s:%s' % (scriptdir, os.getenv('PATH'))
     logging.debug('Setting PATH to: %s' % newpath)

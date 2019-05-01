@@ -10,6 +10,8 @@ Tests:
     ``python -m unittest discover -t Cheetah -s Cheetah/Tests -p '[A-Z]*.py'``
     does it.
   - Fixed ``cheetah test`` command.
+  - Fixed script ``buildandrun``: copy test templates
+    to the ``build/lib`` directory.
 
 3.2.2 (2019-04-29)
 ------------------
