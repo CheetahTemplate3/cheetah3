@@ -28,7 +28,6 @@ def main():
         print('Specify a test script')
         sys.exit(1)
 
-
     if opts.clean:
         logging.debug('Removing build/')
         recursiverm('build')
@@ -69,11 +68,19 @@ def main():
     logging.debug('Setting PYTHONPATH to: %s' % libdir)
     os.putenv('PYTHONPATH', libdir)
 
-    rc = subprocess.call( [sys.executable] + args )
+    script = args[0]
+    if os.access(script, os.X_OK):
+        rc = subprocess.call([sys.executable] + args)
+    else:
+        script = os.path.splitext(script)[0]
+        module = script.replace(os.sep, '.')
+        args[0] = module
+        os.chdir(libdir)  # To avoid importing ``Cheetah`` from the current dir
+        rc = subprocess.call([sys.executable, '-m', 'unittest'] + args)
+
     if rc == -11:
         logging.error('Segmentation fault in test process. Test failed.')
     sys.exit(rc)
-
 
 if __name__ == '__main__':
     main()
