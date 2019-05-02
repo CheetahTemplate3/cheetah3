@@ -127,9 +127,6 @@ interactive mode and try the example in the next section.
 
 Certain test failures are insignificant:
 
-    Python 2.3 changed the string representation of booleans, and the
-    tests haven't yet been updated to reflect this.
-
     Certain tests run "cheetah" as a subcommand. The failure may mean
     the command wasn't found in your system path. (What happens if you
     run "cheetah" on the command line?) The failure also happens on

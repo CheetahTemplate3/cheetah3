@@ -43,6 +43,8 @@ tests, execute at the shell prompt:
 
         cheetah test
 
+To run the test suite with all supported Python versions use ``tox``.
+
 Before checking any changes in, run the tests and verify they all
 pass. That way, users can check out the CVS version of Cheetah at
 any time with a fairly high confidence that it will work. If you
@@ -97,7 +99,7 @@ The general procedure for modifying Cheetah is as follows:
 If you add a directory to Cheetah, you have to mention it in
 {setup.py} or it won't be installed.
 
-The tests are in the {Cheetah.Tests} package, aka the {src/Tests/}
+The tests are in the {Cheetah.Tests} package, aka the {Cheetah/Tests/}
 directory of your CVS sandbox. Most of the tests are in
 {SyntaxAndOutput.py}. You can either run all the tests or choose
 which to run:

@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+Documentation:
+
+  - Updated docs regarding fixed tests.
+
 Tests:
 
   - Removed ``unittest.main()`` calls from tests:
