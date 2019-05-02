@@ -6,11 +6,11 @@ import os.path
 import shutil
 import subprocess
 import sys
-
 from optparse import OptionParser
 
 if os.getenv('DEBUG'):
     logging.basicConfig(level=logging.DEBUG)
+
 
 def recursiverm(d):
     for root, dirs, files in os.walk(d):
@@ -19,10 +19,11 @@ def recursiverm(d):
             logging.debug('Removing file: %s' % f)
             os.unlink(f)
 
+
 def main():
     op = OptionParser()
     op.add_option('-c', '--clean', dest='clean', action='store_true',
-            help='Remove the contents of the build directory')
+                  help='Remove the contents of the build directory')
     opts, args = op.parse_args()
     if not args:
         print('Specify a test script')
@@ -82,6 +83,6 @@ def main():
         logging.error('Segmentation fault in test process. Test failed.')
     sys.exit(rc)
 
+
 if __name__ == '__main__':
     main()
-
