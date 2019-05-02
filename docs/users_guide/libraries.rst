@@ -70,7 +70,7 @@ SettingsManager is designed to:
    the application might want to substitute one class for another.
 
 -  allow sections in {.ini config files} to be extended by settings
-   in Python src files. If a section contains a setting like
+   in Python source files. If a section contains a setting like
    "{importSettings=mySettings.py}", {SettingsManager} will merge all
    the settings defined in "{mySettings.py}" with the settings for
    that section that are defined in the {.ini config file}.
@@ -82,7 +82,7 @@ SettingsManager is designed to:
 Cheetah uses {SettingsManager} to manage its configuration
 settings. {SettingsManager} might also be useful in your own
 applications. See the source code and docstrings in the file
-{src/SettingsManager.py} for more information.
+{Cheetah/SettingsManager.py} for more information.
 
 Templates
 ---------
@@ -257,7 +257,7 @@ the writeBody block in SkeletonPage).)
 All of the $placeholders used in the {SkeletonPage} template
 definition are attributes or methods of the {SkeletonPage} class.
 You can reimplement them as you wish in your subclass. Please read
-the source code of the file {src/Templates/\_SkeletonPage.py}
+the source code of the file {Cheetah/Templates/\_SkeletonPage.py}
 before doing so.
 
 You'll need to understand how to use the following methods of the
