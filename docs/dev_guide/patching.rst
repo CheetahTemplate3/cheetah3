@@ -2,8 +2,9 @@ Patching Cheetah
 ================
 
 
-How to commit changes to CVS or submit patches, how to run the test
-suite. Describe distutils and how the regression tests work.
+How to commit changes to git, or submit patches, or send pull requests,
+how to run the test suite. Describe distutils and how the regression tests
+work.
 
 File Requirements
 -----------------
@@ -46,7 +47,7 @@ tests, execute at the shell prompt:
 To run the test suite with all supported Python versions use ``tox``.
 
 Before checking any changes in, run the tests and verify they all
-pass. That way, users can check out the CVS version of Cheetah at
+pass. That way, users can check out the git version of Cheetah at
 any time with a fairly high confidence that it will work. If you
 fix a bug or add a feature, please take the time to add a test that
 exploits the bug/feature. This will help in the future, to prevent
@@ -68,7 +69,7 @@ The general procedure for modifying Cheetah is as follows:
    sources at
    http://perso.wanadoo.fr/gilles.depeyrot/DevTools\_en.html.)
 
-#. Make the change in your Cheetah CVS sandbox or in your installed
+#. Make the change in your Cheetah git sandbox or in your installed
    version of Cheetah. If you make it in the sandbox, you'll have to
    run {python setup.py install} before testing it. If you make it in
    the installed version, do { not} run the installer or it will
@@ -85,7 +86,7 @@ The general procedure for modifying Cheetah is as follows:
 #. When {cheetah test} runs cleanly with your regression test
    included, update the {docs/news.rst} file and check in your changes. If
    you made the changes in your installed copy of Cheetah, you'll have
-   to copy them back into the CVS sandbox first. If you added any
+   to copy them back into the git sandbox first. If you added any
    files that must be distributed, { be sure to} {cvs add} them before
    committing. Otherwise Cheetah will run fine on your computer but
    fail on anybody else's, and the test suite can't check for this.
@@ -100,7 +101,7 @@ If you add a directory to Cheetah, you have to mention it in
 {setup.py} or it won't be installed.
 
 The tests are in the {Cheetah.Tests} package, aka the {Cheetah/Tests/}
-directory of your CVS sandbox. Most of the tests are in
+directory of your git sandbox. Most of the tests are in
 {SyntaxAndOutput.py}. You can either run all the tests or choose
 which to run:
 
