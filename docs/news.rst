@@ -4,6 +4,11 @@ News
 Development (master)
 --------------------
 
+Bug fixes:
+
+  - Fixed infinite recursion in ``ImportManager`` on importing
+    a builtin module.
+
 Documentation:
 
   - Updated docs regarding fixed tests.

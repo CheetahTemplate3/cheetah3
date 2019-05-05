@@ -260,7 +260,11 @@ class BuiltinImportDirector(ImportDirector):
 
     def getmod(self, nm):
         if nm in sys.builtin_module_names:
-            return __import__(nm)
+            try:
+                importfunc = __oldimport__
+            except NameError:
+                importfunc = __import__
+            return importfunc(nm)
         return None
 
 

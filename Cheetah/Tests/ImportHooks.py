@@ -37,6 +37,8 @@ def _cleanup():
         if modname in sys.modules:
             del sys.modules[modname]
 
+    Cheetah.ImportHooks.uninstall()
+
 
 def _exec(code, _dict):
     exec(code, _dict)
@@ -75,4 +77,11 @@ class ImportHooksTest(unittest.TestCase):
         templates = os.listdir(ImportHooksTemplatesDir)
         self.assertIn('index.py', templates)
         self.assertIn('layout.py', templates)
-        Cheetah.ImportHooks.uninstall()
+
+    def test_import_builtin(self):
+        Cheetah.ImportHooks.install()
+        for nm in sys.builtin_module_names:
+            if nm not in sys.modules:
+                __import__(nm)
+                return
+        raise self.fail("All builtin modules are imported")
