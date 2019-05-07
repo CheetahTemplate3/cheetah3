@@ -138,6 +138,8 @@ def uninstall():
     if _installed:
         if isinstance(builtin.__import__, types.MethodType):
             builtin.__import__ = __oldimport__
+            if ImportManager._globalOwnerTypes[0] is CheetahDirOwner:
+                del ImportManager._globalOwnerTypes[0]
             del ImportManager.__oldimport__
             global _manager
             del _manager
