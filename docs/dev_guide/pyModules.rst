@@ -149,7 +149,7 @@ numbers added:
      89 # CHEETAH was developed by Tavis Rudd, Chuck Esterbrook, Ian Bicking
             #     and Mike Orr;
      90 # with code, advice and input from many other volunteers.
-     91 # For more information visit http://cheetahtemplate.org/
+     91 # For more information visit https://cheetahtemplate.org/
 
      92 ##################################################
      93 ## if run from command line:

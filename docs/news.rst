@@ -11,6 +11,7 @@ Bug fixes:
 
 Documentation:
 
+  - The site https://cheetahtemplate.org/ is now served with HTTPS.
   - Updated docs regarding fixed tests.
 
 Tests:

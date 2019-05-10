@@ -2160,7 +2160,7 @@ if not hasattr(%(mainClassName)s, '_initCheetahAttributes'):
         return """
 # CHEETAH was developed by Tavis Rudd and Mike Orr
 # with code, advice and input from many other volunteers.
-# For more information visit http://cheetahtemplate.org/
+# For more information visit https://cheetahtemplate.org/
 
 ##################################################
 ## if run from command line:

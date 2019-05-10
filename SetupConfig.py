@@ -16,13 +16,13 @@ author = "Tavis Rudd"
 author_email = "tavis@damnsimple.com"
 maintainer = "Oleg Broytman"
 maintainer_email = "phd@phdru.name"
-url = "http://cheetahtemplate.org/"
+url = "https://cheetahtemplate.org/"
 dev_tag = ""
 download_url = "https://pypi.org/project/%s/%s%s" \
     % (name, version, dev_tag)
 project_urls = {
-    'Homepage': 'http://cheetahtemplate.org/',
-    'Documentation': 'http://cheetahtemplate.org/users_guide/index.html',
+    'Homepage': 'https://cheetahtemplate.org/',
+    'Documentation': 'https://cheetahtemplate.org/users_guide/index.html',
     'Download': 'https://pypi.org/project/%s/%s%s/'
     % (name, version, dev_tag),
     'Github repo': 'https://github.com/CheetahTemplate3',
@@ -113,17 +113,17 @@ It's a fork of the original CheetahTemplate library.
 Documentation
 ================================================================================
 For a high-level introduction to Cheetah please refer to the User\'s Guide
-at http://cheetahtemplate.org/users_guide/index.html
+at https://cheetahtemplate.org/users_guide/index.html
 
 Credits
 ================================================================================
-http://cheetahtemplate.org/authors.html
+https://cheetahtemplate.org/authors.html
 
 https://github.com/CheetahTemplate3/cheetah3/blob/master/LICENSE
 
 Recent Changes
 ================================================================================
-See http://cheetahtemplate.org/news.html for full details
+See https://cheetahtemplate.org/news.html for full details
 
 '''
 

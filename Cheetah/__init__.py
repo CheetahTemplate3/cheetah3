@@ -10,7 +10,7 @@ Homepage, issue tracker
     https://github.com/CheetahTemplate3/cheetah3
 
 Documentation
-    http://cheetahtemplate.org/
+    https://cheetahtemplate.org/
 '''
 
 from Cheetah.Version import *  # noqa

@@ -13,7 +13,7 @@ Home Page, issue tracker
     - https://github.com/CheetahTemplate3/cheetah3
 
 On-line Documentation
-    - http://cheetahtemplate.org/
+    - https://cheetahtemplate.org/
 
 Questions can also be asked and answered on `StackOverflow
 <https://stackoverflow.com/questions/tagged/cheetah>`_.

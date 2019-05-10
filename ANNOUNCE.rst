@@ -23,7 +23,7 @@ Where is CheetahTemplate3
 =========================
 
 Site:
-http://cheetahtemplate.org/
+https://cheetahtemplate.org/
 
 Development:
 https://github.com/CheetahTemplate3
@@ -32,7 +32,7 @@ Download:
 https://pypi.org/project/Cheetah3/3.2.3dev20190419/
 
 News and changes:
-http://cheetahtemplate.org/news.html
+https://cheetahtemplate.org/news.html
 
 StackOverflow:
 https://stackoverflow.com/questions/tagged/cheetah

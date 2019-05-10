@@ -4,7 +4,7 @@
 -->
 
  <site
-  base_url="http://cheetahtemplate.org/"
+  base_url="https://cheetahtemplate.org/"
   store_into="sitemap.xml"
   default_encoding="utf-8"
   verbose="1"
@@ -13,7 +13,7 @@
  >
 
   <directory
-     url="http://cheetahtemplate.org/"
+     url="https://cheetahtemplate.org/"
      path="."
      default_file="index.html"
   />
