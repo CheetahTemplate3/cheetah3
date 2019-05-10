@@ -1,7 +1,7 @@
 News
 ====
 
-Development (master)
+3.2.3 (2019-05-10)
 --------------------
 
 Bug fixes:

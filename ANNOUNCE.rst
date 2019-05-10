@@ -1,13 +1,30 @@
 Hello!
 
-I'm pleased to announce version 3.2.3, the thitd bugfix release of branch
+I'm pleased to announce version 3.2.3, the third bugfix release of branch
 3.2 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
 
-Contributors for this release are
+Bug fixes:
+
+  - Fixed infinite recursion in ``ImportManager`` on importing
+    a builtin module.
+
+Documentation:
+
+  - The site https://cheetahtemplate.org/ is now served with HTTPS.
+  - Updated docs regarding fixed tests.
+
+Tests:
+
+  - Removed ``unittest.main()`` calls from tests:
+    ``python -m unittest discover -t Cheetah -s Cheetah/Tests -p '[A-Z]*.py'``
+    does it.
+  - Fixed ``cheetah test`` command.
+  - Fixed script ``buildandrun``: copy test templates
+    to the ``build/lib`` directory.
 
 
 What is CheetahTemplate3
@@ -29,7 +46,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.org/project/Cheetah3/3.2.3dev20190419/
+https://pypi.org/project/Cheetah3/3.2.3
 
 News and changes:
 https://cheetahtemplate.org/news.html
