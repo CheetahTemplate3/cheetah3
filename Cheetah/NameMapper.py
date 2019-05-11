@@ -140,10 +140,14 @@ Cheetah uses the optimized C version (_namemapper.c) if it has
 been compiled or falls back to the Python version if not.
 """
 
-from collections import Mapping
 import inspect
 from pprint import pformat
+
 from Cheetah.compat import PY2
+if PY2:
+    from collections import Mapping
+else:
+    from collections.abc import Mapping
 
 _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS = False
 _ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS = True

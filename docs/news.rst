@@ -4,6 +4,14 @@ News
 Development (master)
 --------------------
 
+3.2.4 (2019-05-??)
+------------------
+
+Minor features:
+
+  - Import from ``collections`` for Python 2,
+    from ``collections.abc`` for Python 3.
+
 3.2.3 (2019-05-10)
 ------------------
 
