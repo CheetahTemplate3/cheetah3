@@ -12,6 +12,11 @@ Minor features:
   - Import from ``collections`` for Python 2,
     from ``collections.abc`` for Python 3.
 
+Bug fixes:
+
+  - Fixed infinite recursion in ``ImportManager`` on importing
+    module ``_bootlocale`` inside ``open()``.
+
 3.2.3 (2019-05-10)
 ------------------
 

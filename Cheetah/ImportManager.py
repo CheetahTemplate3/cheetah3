@@ -21,7 +21,7 @@ import marshal
 import py_compile
 import sys
 from Cheetah.compat import PY2, string_type, new_module, get_suffixes, \
-    load_module_from_file
+    load_module_from_file, RecursionError
 if PY2:
     import imp
 else:
@@ -520,7 +520,10 @@ class ImportManager:
         else:
             # now we're dealing with an absolute import
             for director in self.metapath:
-                mod = director.getmod(nm)
+                try:
+                    mod = director.getmod(nm)
+                except RecursionError:
+                    mod = __oldimport__(nm)  # noqa: F821 undefined name
                 if mod:
                     break
         if mod:

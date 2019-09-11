@@ -4,6 +4,7 @@ import shutil
 import sys
 import unittest
 import Cheetah.ImportHooks
+from Cheetah.compat import PY2
 
 
 ImportHooksTemplatesDir = os.path.join(
@@ -85,3 +86,10 @@ class ImportHooksTest(unittest.TestCase):
                 __import__(nm)
                 return
         raise self.fail("All builtin modules are imported")
+
+    if not PY2:
+        def test_import_bootlocale(self):
+            if '_bootlocale' in sys.modules:
+                del sys.modules['_bootlocale']
+            Cheetah.ImportHooks.install()
+            import _bootlocale  # noqa: F401 '_bootlocale' imported but unused

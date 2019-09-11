@@ -12,6 +12,11 @@ else:
     string_type = str
     unicode = str
 
+try:
+    RecursionError = RecursionError
+except NameError:  # Python 2.7, 3.4
+    RecursionError = RuntimeError
+
 if PY2:
     import imp
 
