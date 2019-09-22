@@ -1,6 +1,6 @@
 Hello!
 
-I'm pleased to announce version 3.2.4, the fourth bugfix release of branch
+I'm pleased to announce version 3.2.4, a bugfix release of branch
 3.2 of CheetahTemplate3.
 
 
@@ -29,7 +29,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.org/project/Cheetah3/3.2.4dev20190510/
+https://pypi.org/project/Cheetah3/3.2.4
 
 News and changes:
 https://cheetahtemplate.org/news.html
