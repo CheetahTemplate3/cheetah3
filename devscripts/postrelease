@@ -5,15 +5,15 @@ tag="`python setup.py --version`" &&
 . `dirname $0`/split.sh &&
 split_tag $tag
 
-if [ $micro -eq 0 -a $state = final ]; then
-   if git branch --merged master | grep -Fqw maint; then
-      git checkout maint &&
-      git merge --ff-only master &&
-      git checkout master
-   else:
-      git checkout master &&
-      git merge --strategy=ours -m 'Null-merge branch "maint"' maint
-   fi
+if [ $micro -eq 0 -a $state = final ] &&
+      git branch --merged master | grep -Fqw maint; then
+   git checkout maint &&
+   git merge --ff-only master &&
+   git checkout master
+else:
+   git checkout master &&
+   git merge --ff-only maint ||
+   git merge --strategy=ours -m 'Null-merge branch "maint"' maint
 fi &&
 
 git checkout $tag~ ANNOUNCE.rst &&
