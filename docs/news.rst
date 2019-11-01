@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+CI:
+
+  - Run tests with Python 3.8 at Travis CI.
+
 3.2.4 (2019-10-22)
 ------------------
 

@@ -17,10 +17,6 @@ addons:
 matrix:
   include:
   - python: "2.7"
-    env: TOXENV=py27-flake8
-  - python: "3.7"
-    env: TOXENV=py37-flake8
-  - python: "2.7"
     env: TOXENV=py27
   - python: "3.4"
     env: TOXENV=py34
@@ -30,6 +26,12 @@ matrix:
     env: TOXENV=py36
   - python: "3.7"
     env: TOXENV=py37
+  - python: "3.8"
+    env: TOXENV=py38
+  - python: "2.7"
+    env: TOXENV=py27-flake8
+  - python: "3.8"
+    env: TOXENV=py38-flake8
   - os: osx
     # No version of Python is available via virtualenv on OS X workers, see https://github.com/travis-ci/travis-ci/issues/2312
     language: generic
