@@ -12,6 +12,7 @@ Build:
 CI:
 
   - Run tests with Python 3.8 at Travis CI.
+  - Limit `setuptools<44`, `Markdown<3.2` for Python 2.7.
 
 3.2.4 (2019-10-22)
 ------------------
