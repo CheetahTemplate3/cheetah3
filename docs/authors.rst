@@ -31,4 +31,5 @@ Contributions have been made by:
 * Nicola Soranzo <nicola.soranzo at gmail.com>
 * Pierre-Yves <pyu at riseup.net>
 * Dan Vinakovsky <dvinak at gmail.com>
+* Yegor Yefremov <yegorslists at googlemail.com>
 * Oleg Broytman <phd@phdru.name>
