@@ -4,6 +4,11 @@ News
 Development (master)
 --------------------
 
+Build:
+
+  - Install Cheetah3 + markdown (used in Cheetah.Filters)
+    using ``pip install cheetah3[filters]`` (or ``cheetah3[markdown]``).
+
 CI:
 
   - Run tests with Python 3.8 at Travis CI.
