@@ -1,13 +1,13 @@
 Hello!
 
-I'm pleased to announce version 3.2.5, a bugfix release of branch
-3.2 of CheetahTemplate3.
+I'm pleased to announce version 3.2.5b1, the first beta for bugfix release
+3.2.5 of branch 3.2 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
 
-Contributors for this release are
+The contributor for this release is Yegor Yefremov.
 
 
 What is CheetahTemplate3
@@ -29,7 +29,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.org/project/Cheetah3/3.2.5dev20191022/
+https://pypi.org/project/Cheetah3/3.2.5b1
 
 News and changes:
 https://cheetahtemplate.org/news.html

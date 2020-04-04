@@ -4,6 +4,9 @@ News
 Development (master)
 --------------------
 
+3.2.5b1 (2020-04-04)
+--------------------
+
 Build:
 
   - Install Cheetah3 + markdown (used in Cheetah.Filters)

@@ -40,7 +40,7 @@ packages = ['Cheetah',
             'Cheetah.Utils',
             ]
 classifiers = [line.strip() for line in '''\
-  Development Status :: 5 - Production/Stable
+  Development Status :: 4 - Beta
   Intended Audience :: Developers
   Intended Audience :: System Administrators
   License :: OSI Approved :: MIT License
