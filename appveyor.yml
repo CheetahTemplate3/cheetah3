@@ -79,7 +79,7 @@ install:
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
   - if "%TOXENV%" == "pypy" SET TOXPYTHON=pypy.exe
   - if "%TOXENV%" == "pypy" pypy --version
-  - "python -m pip install --upgrade \"pip<19.1\" \"setuptools<44\""
+  - "python -m pip install --upgrade \"pip<21\" \"setuptools<44\""
   - "pip install --upgrade \"tox<3.1\" ppu"
   - "pip --version"
 
