@@ -6,7 +6,7 @@ set -e
 umask 022 &&
 chmod -R a+rX . &&
 
-pip install -U pip "setuptools<44" "wheel==0.31.1" twine &&
+pip install -U "pip<19.2" "setuptools<44" "wheel==0.31.1" twine &&
 python setup.py sdist &&
 
 if [ -d build ]; then find build -name '*.py[co]' -delete; fi &&
