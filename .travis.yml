@@ -45,6 +45,9 @@ matrix:
   - os: osx
     language: generic
     env: TOXENV=py37
+  - os: osx
+    language: generic
+    env: TOXENV=py38
   - python: "pypy2.7-6.0"
     env: TOXENV=pypy
 
