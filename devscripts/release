@@ -19,9 +19,9 @@ for py in 2.7 3.4 3.5 3.6 3.7 3.8; do
    python$py setup.py bdist_wheel &&
    cd dist &&
    v="`echo $py | sed 's/\.//'`" &&
-   for f in Cheetah3-*-cp$v-*-linux_i686.whl; do
+   for f in Cheetah3-*-cp$v-*-linux_*.whl; do
       if [ $py = 2.7 ]; then
-         python3.4 -m auditwheel repair -w . $f
+         python3.6 -m auditwheel repair -w . $f
       else
          python$py -m auditwheel repair -w . $f
       fi &&
