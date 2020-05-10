@@ -9,13 +9,12 @@ Development (master)
 
 Build:
 
-  - Install Cheetah3 + markdown (used in Cheetah.Filters)
+  - Install ``Cheetah3`` + ``markdown`` (used in ``Cheetah.Filters``)
     using ``pip install cheetah3[filters]`` (or ``cheetah3[markdown]``).
 
 CI:
 
   - Run tests with Python 3.8 at Travis CI.
-  - Limit `setuptools<44`, `Markdown<3.2` for Python 2.7.
 
 3.2.4 (2019-10-22)
 ------------------
