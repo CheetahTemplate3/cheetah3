@@ -1,6 +1,6 @@
 Hello!
 
-I'm pleased to announce version 3.2.5b1, the first beta for bugfix release
+I'm pleased to announce version 3.2.5b2, the first beta for bugfix release
 3.2.5 of branch 3.2 of CheetahTemplate3.
 
 
@@ -8,6 +8,15 @@ What's new in CheetahTemplate3
 ==============================
 
 The contributor for this release is Yegor Yefremov.
+
+Build:
+
+  - Install ``Cheetah3`` + ``markdown`` (used in ``Cheetah.Filters``)
+    using ``pip install cheetah3[filters]`` (or ``cheetah3[markdown]``).
+
+CI:
+
+  - Run tests with Python 3.8 at Travis CI.
 
 
 What is CheetahTemplate3
@@ -29,7 +38,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.org/project/Cheetah3/3.2.5b1
+https://pypi.org/project/Cheetah3/3.2.5b2
 
 News and changes:
 https://cheetahtemplate.org/news.html
