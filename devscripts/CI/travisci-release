@@ -9,7 +9,7 @@ chmod -R a+rX . &&
 py=$(python -c "import sys; print('.'.join(sys.version.split('.')[:2]))")
 v=$(echo "$py" | sed 's/\.//') &&
 
-pip install -U "pip<19.2" "setuptools<44" "twine<2.0" &&
+pip install -U "pip<19.2" "setuptools<44" "readme-renderer<25.0" "twine<2.0" &&
 if [ "$py" == 3.4 ]; then
     pip install -U "wheel==0.31.1"
 else

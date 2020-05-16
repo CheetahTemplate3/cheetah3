@@ -98,7 +98,7 @@ deploy_script:
   # must be set in AppVeyor settings.
   - if "%APPVEYOR_REPO_TAG%" == "true" (
       if "%PYTHON_VERSION%" == "3.4" (
-        pip install --upgrade "twine<2.0" "wheel==0.31.1"
+        pip install --upgrade "readme-renderer<25.0" "twine<2.0" "wheel==0.31.1"
       ) else (
         pip install --upgrade twine "wheel==0.34.1"
       ) &&
