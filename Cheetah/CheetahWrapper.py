@@ -226,10 +226,10 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
             print('>> Available Cheetah compiler settings:')
             from Cheetah.Compiler import _DEFAULT_COMPILER_SETTINGS
             listing = _DEFAULT_COMPILER_SETTINGS
-            listing.sort(key=lambda l: l[0][0].lower())
+            listing.sort(key=lambda _l: _l[0][0].lower())
 
-            for l in listing:
-                print('\t%s (default: "%s")\t%s' % l)
+            for _l in listing:
+                print('\t%s (default: "%s")\t%s' % _l)
             sys.exit(0)
 
         # cleanup trailing path separators

@@ -83,9 +83,9 @@ class PreprocessError(Error):
     pass
 
 
-def hashList(l):
+def hashList(v_list):
     hashedList = []
-    for v in l:
+    for v in v_list:
         if isinstance(v, dict):
             v = hashDict(v)
         elif isinstance(v, list):
