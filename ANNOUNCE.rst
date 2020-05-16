@@ -1,6 +1,6 @@
 Hello!
 
-I'm pleased to announce version 3.2.5b4, the 4rd beta for bugfix release
+I'm pleased to announce version 3.2.5b5, the 5rd beta for bugfix release
 3.2.5 of branch 3.2 of CheetahTemplate3.
 
 
@@ -38,7 +38,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.org/project/Cheetah3/3.2.5b4
+https://pypi.org/project/Cheetah3/3.2.5b5
 
 News and changes:
 https://cheetahtemplate.org/news.html
