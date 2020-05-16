@@ -6,7 +6,15 @@ set -e
 umask 022 &&
 chmod -R a+rX . &&
 
-pip install -U "pip<19.2" "setuptools<44" "wheel==0.34.1" twine &&
+py=$(python -c "import sys; print('.'.join(sys.version.split('.')[:2]))")
+v=$(echo "$py" | sed 's/\.//') &&
+
+pip install -U "pip<19.2" "setuptools<44" twine &&
+if [ "$py" == 3.4 ]; then
+    pip install -U "wheel==0.31.1"
+else
+    pip install -U "wheel==0.34.1"
+fi &&
 python setup.py sdist &&
 
 if [ -d build ]; then find build -name '*.py[co]' -delete; fi &&
@@ -16,13 +24,12 @@ python    -m compileall build &&
 python -O -m compileall build &&
 python setup.py bdist_wheel &&
 
-py=$(python -c "import sys; print('.'.join(sys.version.split('.')[:2]))")
-v=$(echo "$py" | sed 's/\.//') &&
-
 if [ "$TRAVIS_OS_NAME" == 'linux' ]; then
     if [ "$py" == 2.7 ]; then
         pyenv global system 3.6.7 2.7.15
         pip3.6 install -U "auditwheel==3.1.0"
+    elif [ "$py" == 3.4 ]; then
+        pip install -U "auditwheel==2.1.1"
     else
         pip install -U "auditwheel==3.1.0"
     fi &&
