@@ -97,11 +97,11 @@ deploy_script:
   # TWINE_USERNAME / TWINE_PASSWORD / TWINE_REPOSITORY_URL
   # must be set in AppVeyor settings.
   - if "%APPVEYOR_REPO_TAG%" == "true" (
-      if "%TOXENV%" == "py34-w32" (
+      if "%PYTHON_VERSION%" == "3.4" (
         pip install --upgrade twine "wheel==0.31.1"
       ) else (
         pip install --upgrade twine "wheel==0.34.1"
-      )
+      ) &&
       %CMD_IN_ENV% python setup.py bdist_wheel &&
       twine upload --skip-existing dist\\*.whl
     )
