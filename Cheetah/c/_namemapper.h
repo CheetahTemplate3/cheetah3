@@ -55,7 +55,7 @@
     tmpPntr1 = name; \
     tmpPntr2 = nameCopy;\
     while ((*tmpPntr2++ = *tmpPntr1++)); \
-        numChunks = getNameChunks(nameChunks, name, nameCopy); \
+    numChunks = getNameChunks(nameChunks, name, nameCopy); \
     if (PyErr_Occurred()) {     /* there might have been TooManyPeriods */\
         free(nameCopy);\
         return NULL;\

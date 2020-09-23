@@ -117,18 +117,18 @@ static int getNameChunks(char *nameChunks[], char *name, char *nameCopy)
 
     currChunk = nameCopy;
     while ('\0' != (c = *nameCopy)){
-    if ('.' == c) {
-        if (currChunkNum >= (MAXCHUNKS-2)) { /* avoid overflowing nameChunks[] */
-            PyErr_SetString(TooManyPeriods, name);
-            return 0;
-        }
+        if ('.' == c) {
+            if (currChunkNum >= (MAXCHUNKS-2)) { /* avoid overflowing nameChunks[] */
+                PyErr_SetString(TooManyPeriods, name);
+                return 0;
+            }
 
-        *nameCopy ='\0';
-        nameChunks[currChunkNum++] = currChunk;
-        nameCopy++;
-        currChunk = nameCopy;
-    } else
-        nameCopy++;
+            *nameCopy ='\0';
+            nameChunks[currChunkNum++] = currChunk;
+            nameCopy++;
+            currChunk = nameCopy;
+        } else
+            nameCopy++;
     }
     if (nameCopy > currChunk) {
         nameChunks[currChunkNum++] = currChunk;
