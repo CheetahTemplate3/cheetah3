@@ -3049,6 +3049,12 @@ class GetVar(OutputTest):               # Template.getVar()
         self.verify("$getVar('$bogus',  1234)",
                     "1234")
 
+    def test6(self):
+        """$getVar('$') raises ValueError
+        """
+        with self.assertRaises(ValueError):
+            self.verify("$getVar('$')", "never get here")
+
 
 class MiscComplexSyntax(OutputTest):
     def test1(self):

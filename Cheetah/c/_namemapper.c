@@ -117,18 +117,18 @@ static int getNameChunks(char *nameChunks[], char *name, char *nameCopy)
 
     currChunk = nameCopy;
     while ('\0' != (c = *nameCopy)){
-    if ('.' == c) {
-        if (currChunkNum >= (MAXCHUNKS-2)) { /* avoid overflowing nameChunks[] */
-            PyErr_SetString(TooManyPeriods, name);
-            return 0;
-        }
+        if ('.' == c) {
+            if (currChunkNum >= (MAXCHUNKS-2)) { /* avoid overflowing nameChunks[] */
+                PyErr_SetString(TooManyPeriods, name);
+                return 0;
+            }
 
-        *nameCopy ='\0';
-        nameChunks[currChunkNum++] = currChunk;
-        nameCopy++;
-        currChunk = nameCopy;
-    } else
-        nameCopy++;
+            *nameCopy ='\0';
+            nameChunks[currChunkNum++] = currChunk;
+            nameCopy++;
+            currChunk = nameCopy;
+        } else
+            nameCopy++;
     }
     if (nameCopy > currChunk) {
         nameChunks[currChunkNum++] = currChunk;
@@ -268,11 +268,16 @@ static PyObject *namemapper_valueForName(PYARGS)
 
     createNameCopyAndChunks();
 
-    theValue = PyNamemapper_valueForName(obj, nameChunks, numChunks, executeCallables);
-    free(nameCopy);
-    if (wrapInternalNotFoundException(name, obj)) {
+    if (numChunks <= 0) {
+        PyErr_SetString(PyExc_ValueError, "Invalid lookup of empty name");
         theValue = NULL;
+    } else {
+        theValue = PyNamemapper_valueForName(obj, nameChunks, numChunks, executeCallables);
+        if (wrapInternalNotFoundException(name, obj)) {
+            theValue = NULL;
+        }
     }
+    free(nameCopy);
     return theValue;
 }
 
@@ -299,6 +304,11 @@ static PyObject *namemapper_valueFromSearchList(PYARGS)
     }
 
     createNameCopyAndChunks();
+
+    if (numChunks <= 0) {
+        PyErr_SetString(PyExc_ValueError, "Invalid lookup of empty name");
+        goto done;
+    }
 
     iterator = PyObject_GetIter(searchList);
     if (iterator == NULL) {
@@ -354,6 +364,11 @@ static PyObject *namemapper_valueFromFrameOrSearchList(PyObject *self, PyObject 
     }
 
     createNameCopyAndChunks();
+
+    if (numChunks <= 0) {
+        PyErr_SetString(PyExc_ValueError, "Invalid lookup of empty name");
+        goto done;
+    }
 
     nameSpace = PyEval_GetLocals();
     checkForNameInNameSpaceAndReturnIfFound(FALSE);
@@ -417,6 +432,11 @@ static PyObject *namemapper_valueFromFrame(PyObject *self, PyObject *args, PyObj
     }
 
     createNameCopyAndChunks();
+
+    if (numChunks <= 0) {
+        PyErr_SetString(PyExc_ValueError, "Invalid lookup of empty name");
+        goto done;
+    }
 
     nameSpace = PyEval_GetLocals();
     checkForNameInNameSpaceAndReturnIfFound(FALSE);
