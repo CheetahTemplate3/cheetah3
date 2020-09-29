@@ -26,7 +26,8 @@ Contributions have been made by:
 * Mika Eloranta <mel at ohmu.fi>
 * mikola <mikola at tut.by>
 * Adam Karpierz <python at python.pl>
-* Jonathan Ross Rogers <jrogers at socialserve.com>
+* Jonathan Ross Rogers <jrogers at emphasys-software.com>
+* Dale Sedivec <dsedivec at emphasys-software.com>
 * Mathias Stearn <redbeard0531 at gmail.com>
 * Nicola Soranzo <nicola.soranzo at gmail.com>
 * Pierre-Yves <pyu at riseup.net>
