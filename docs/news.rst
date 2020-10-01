@@ -4,6 +4,13 @@ News
 Development (master)
 --------------------
 
+3.2.6 (2020-10-01)
+------------------
+
+Bug fixes:
+
+  - Fixed use of uninitialized variable in _namemapper.
+
 3.2.5 (2020-05-16)
 ------------------
 
