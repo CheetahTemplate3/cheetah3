@@ -1,18 +1,11 @@
 Hello!
 
-I'm pleased to announce version 3.2.6, a bugfix release
-of branch 3.2 of CheetahTemplate3.
+I'm pleased to announce version 3.2.7a0, the 1st alpha for bugfix release
+3.2.7 of branch 3.2 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
-
-The contributors for this release are Jonathan Ross Rogers (reported)
-and Dale Sedivec (provided a pull request).
-
-Bug fixes:
-
-  - Fixed use of uninitialized variable in _namemapper.
 
 
 What is CheetahTemplate3
@@ -34,7 +27,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.org/project/Cheetah3/3.2.6
+https://pypi.org/project/Cheetah3/3.2.7a0
 
 News and changes:
 https://cheetahtemplate.org/news.html
