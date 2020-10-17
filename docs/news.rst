@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+Tests:
+
+   - Add Python 3.9 to ``tox.ini``.
+
 3.2.6 (2020-10-01)
 ------------------
 

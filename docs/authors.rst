@@ -33,4 +33,5 @@ Contributions have been made by:
 * Pierre-Yves <pyu at riseup.net>
 * Dan Vinakovsky <dvinak at gmail.com>
 * Yegor Yefremov <yegorslists at googlemail.com>
+* Andrew J. Hesford <ajh at sideband.org>
 * Oleg Broytman <phd@phdru.name>
