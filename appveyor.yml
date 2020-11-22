@@ -65,6 +65,16 @@ environment:
       PYTHON_VERSION: "3.8"
       PYTHON_ARCH: "64"
       PYTHON_HOME: "C:\\Python38-x64"
+    - TOXENV: "py39"
+      PYTHON_VERSION: "3.9"
+      PYTHON_ARCH: "32"
+      PYTHON_HOME: "C:\\Python39"
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    - TOXENV: "py39"
+      PYTHON_VERSION: "3.9"
+      PYTHON_ARCH: "64"
+      PYTHON_HOME: "C:\\Python39-x64"
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
     - TOXENV: "pypy"
       PYTHON_VERSION: "2.7"
       PYTHON_ARCH: "32"
