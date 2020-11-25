@@ -85,10 +85,10 @@ install:
   - "SET PATH=%PYTHON_HOME%;%PYTHON_HOME%\\Scripts;%PATH%"
   - "SET TOXPYTHON=%PYTHON_HOME%\\python.exe"
   - if "%TOXENV%" == "pypy" devscripts\\CI\\appveyor_install_pypy.cmd
-  - "python --version"
-  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
   - if "%TOXENV%" == "pypy" SET TOXPYTHON=pypy.exe
   - if "%TOXENV%" == "pypy" pypy --version
+  - "python --version"
+  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
   - "python -m pip install --upgrade \"pip<19.2\" \"setuptools<44\""
   - "pip install --upgrade \"tox<3.1\" ppu"
   - "pip --version"
