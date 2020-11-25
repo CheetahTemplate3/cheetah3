@@ -78,7 +78,7 @@ environment:
     - TOXENV: "pypy"
       PYTHON_VERSION: "2.7"
       PYTHON_ARCH: "32"
-      PYTHON_HOME: "C:\\tools\\pypy\\pypy"
+      PYTHON_HOME: "C:\\ProgramData\\chocolatey\\lib\\python.pypy\\tools\\pypy2.7-v7.3.1-win32"
 
 install:
   # Ensure we use the right python version
