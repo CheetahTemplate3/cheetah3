@@ -85,19 +85,18 @@ install:
   - "SET PATH=%PYTHON_HOME%;%PYTHON_HOME%\\Scripts;%PATH%"
   - "SET TOXPYTHON=%PYTHON_HOME%\\python.exe"
   - if "%TOXENV%" == "pypy" devscripts\CI\appveyor_install_pypy.cmd
-  - if "%TOXENV%" == "pypy" SET TOXPYTHON=pypy.exe
-  - if "%TOXENV%" == "pypy" pypy --version
-  - "python --version"
-  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
-  - "python -m pip install --upgrade \"pip<19.2\" \"setuptools<44\""
-  - "pip install --upgrade \"tox<3.1\" ppu"
-  - "pip --version"
+  - if "%TOXENV%" == "pypy" SET TOXPYTHON=%PYTHON_HOME%\pypy.exe
+  - "%TOXPYTHON% --version"
+  - "%TOXPYTHON% -c \"import struct; print(struct.calcsize('P') * 8)\""
+  - "%TOXPYTHON% -m pip install --upgrade \"pip<19.2\" \"setuptools<44\""
+  - "%TOXPYTHON% -m pip install --upgrade \"tox<3.1\" ppu"
+  - "%TOXPYTHON% -m pip --version"
 
 # No build step - _namemapper extension will be built under tox
 build: false
 
 test_script:
-  - "%CMD_IN_ENV% tox"
+  - "%CMD_IN_ENV% %TOXPYTHON% -m tox"
 
 after_test:
   - remove-old-files.py -o 180 %LOCALAPPDATA%\pip\Cache
