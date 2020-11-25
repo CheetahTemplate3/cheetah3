@@ -88,6 +88,7 @@ install:
   - if "%TOXENV%" == "pypy" SET TOXPYTHON=%PYTHON_HOME%\pypy.exe
   - "%TOXPYTHON% --version"
   - "%TOXPYTHON% -c \"import struct; print(struct.calcsize('P') * 8)\""
+  - "%TOXPYTHON% -m ensurepip"
   - "%TOXPYTHON% -m pip install --upgrade \"pip<19.2\" \"setuptools<44\""
   - "%TOXPYTHON% -m pip install --upgrade \"tox<3.1\" ppu"
   - "%TOXPYTHON% -m pip --version"
