@@ -25,14 +25,14 @@ environment:
       PYTHON_VERSION: "2.7"
       PYTHON_ARCH: "64"
       PYTHON_HOME: "C:\\Python27-x64"
-    - TOXENV: "py34-w32"
-      PYTHON_VERSION: "3.4"
+    - TOXENV: "py34"
+      PYTHON_VERSION: "3.5"
       PYTHON_ARCH: "32"
-      PYTHON_HOME: "C:\\Python34"
-    - TOXENV: "py34-w32"
-      PYTHON_VERSION: "3.4"
+      PYTHON_HOME: "C:\\Python35"
+    - TOXENV: "py34"
+      PYTHON_VERSION: "3.5"
       PYTHON_ARCH: "64"
-      PYTHON_HOME: "C:\\Python34-x64"
+      PYTHON_HOME: "C:\\Python35-x64"
     - TOXENV: "py35"
       PYTHON_VERSION: "3.5"
       PYTHON_ARCH: "32"
@@ -90,7 +90,7 @@ install:
   - "%TOXPYTHON% -c \"import struct; print(struct.calcsize('P') * 8)\""
   - "%TOXPYTHON% -m ensurepip"
   - "%TOXPYTHON% -m pip install --upgrade \"pip<19.2\" \"setuptools<44\""
-  - "%TOXPYTHON% -m pip install --upgrade \"tox<3.1\" ppu"
+  - "%TOXPYTHON% -m pip install --upgrade \"tox>=3.15\" ppu"
   - "%TOXPYTHON% -m pip --version"
 
 # No build step - _namemapper extension will be built under tox
@@ -107,7 +107,7 @@ deploy_script:
   # TWINE_USERNAME / TWINE_PASSWORD / TWINE_REPOSITORY_URL
   # must be set in AppVeyor settings.
   - if "%APPVEYOR_REPO_TAG%" == "true" (
-      if "%PYTHON_VERSION%" == "3.4" (
+      if "%TOXENV%" == "py34" (
         pip install --upgrade "readme-renderer<25.0" "twine<2.0" "wheel==0.31.1"
       ) else (
         pip install --upgrade twine "wheel==0.34.1"
