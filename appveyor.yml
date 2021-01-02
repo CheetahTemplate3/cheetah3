@@ -84,7 +84,7 @@ install:
   # Ensure we use the right python version
   - "SET PATH=%PYTHON_HOME%;%PYTHON_HOME%\\Scripts;%PATH%"
   - "SET TOXPYTHON=%PYTHON_HOME%\\python.exe"
-  - if "%TOXENV%" == "pypy" devscripts\\CI\\appveyor_install_pypy.cmd
+  - if "%TOXENV%" == "pypy" devscripts\CI\appveyor_install_pypy.cmd
   - if "%TOXENV%" == "pypy" SET TOXPYTHON=pypy.exe
   - if "%TOXENV%" == "pypy" pypy --version
   - "python --version"
@@ -100,7 +100,7 @@ test_script:
   - "%CMD_IN_ENV% tox"
 
 after_test:
-  - remove-old-files.py -o 180 %LOCALAPPDATA%\\pip\\Cache
+  - remove-old-files.py -o 180 %LOCALAPPDATA%\pip\Cache
 
 deploy_script:
   # If tests are successful and we've tested a tag, deploy binary wheel
@@ -113,5 +113,5 @@ deploy_script:
         pip install --upgrade twine "wheel==0.34.1"
       ) &&
       %CMD_IN_ENV% python setup.py bdist_wheel &&
-      twine upload --skip-existing dist\\*.whl
+      twine upload --skip-existing dist\*.whl
     )
