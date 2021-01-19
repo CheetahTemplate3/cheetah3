@@ -34,4 +34,5 @@ Contributions have been made by:
 * Dan Vinakovsky <dvinak at gmail.com>
 * Yegor Yefremov <yegorslists at googlemail.com>
 * Andrew J. Hesford <ajh at sideband.org>
+* Victor Stinner <vstinner at python.org>
 * Oleg Broytman <phd@phdru.name>
