@@ -87,7 +87,9 @@ class ImportHooksTest(unittest.TestCase):
                 return
         raise self.fail("All builtin modules are imported")
 
-    if not PY2:
+    # _bootlocale was removed in Python 3.10:
+    # https://bugs.python.org/issue42208
+    if not PY2 and sys.version_info < (3, 10):
         def test_import_bootlocale(self):
             if '_bootlocale' in sys.modules:
                 del sys.modules['_bootlocale']
