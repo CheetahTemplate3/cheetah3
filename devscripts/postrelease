@@ -2,7 +2,7 @@
 
 tag="`python setup.py --version`" &&
 
-. `dirname $0`/split.sh &&
+. `dirname $0`/split_tag.sh &&
 split_tag $tag
 
 if [ $micro -eq 0 -a $state = final ] &&

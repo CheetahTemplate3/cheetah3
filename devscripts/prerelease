@@ -7,7 +7,7 @@ else
    tag="$1"
 fi
 
-. `dirname $0`/split.sh &&
+. `dirname $0`/split_tag.sh &&
 split_tag $tag
 
 if [ $micro -eq 0 -o $state != final ]; then
