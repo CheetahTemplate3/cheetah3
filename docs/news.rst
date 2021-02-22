@@ -8,9 +8,13 @@ Tests:
 
    - Add Python 3.9 to ``tox.ini``.
 
+   - Refactor ``tox.ini``.
+
 CI:
 
   - Run tests with Python 3.9 at Travis and AppVeyor.
+
+  - Run tests for Python 3.4 with ``tox`` under Python 3.5.
 
 3.2.6 (2020-10-01)
 ------------------
