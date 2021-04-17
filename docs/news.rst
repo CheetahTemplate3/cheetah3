@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+Build, CI:
+
+  - Build wheels for ``aarch64`` at Travis.
+
 3.2.6.post1 (2021-02-22)
 ------------------------
 

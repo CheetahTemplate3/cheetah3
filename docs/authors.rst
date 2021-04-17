@@ -35,4 +35,5 @@ Contributions have been made by:
 * Yegor Yefremov <yegorslists at googlemail.com>
 * Andrew J. Hesford <ajh at sideband.org>
 * Victor Stinner <vstinner at python.org>
+* odidev <odidev at puresoftware.com>
 * Oleg Broytman <phd@phdru.name>
