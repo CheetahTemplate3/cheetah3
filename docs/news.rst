@@ -1,12 +1,12 @@
 News
 ====
 
-Development (master)
---------------------
+3.2.6.post2 (2021-04-20)
+------------------------
 
 Build, CI:
 
-  - Build wheels for ``aarch64`` at Travis.
+  - Build wheels for ``aarch64`` at Travis; publish them at PyPI.
 
 3.2.6.post1 (2021-02-22)
 ------------------------

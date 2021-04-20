@@ -1,12 +1,17 @@
 Hello!
 
-I'm pleased to announce version 3.2.7a0, the 1st alpha for bugfix release
-3.2.7 of branch 3.2 of CheetahTemplate3.
+I'm pleased to announce version 3.2.6.post2, the 2nd post-release
+for bugfix release 3.2.6 of branch 3.2 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
 
+The contributor for the release is odidev.
+
+Build, CI:
+
+  - Build wheels for ``aarch64`` at Travis; publish them at PyPI.
 
 What is CheetahTemplate3
 ========================
@@ -27,7 +32,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.org/project/Cheetah3/3.2.7a0
+https://pypi.org/project/Cheetah3/3.2.6.post2
 
 News and changes:
 https://cheetahtemplate.org/news.html
