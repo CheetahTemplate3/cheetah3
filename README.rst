@@ -25,32 +25,44 @@ https://github.com/CheetahTemplate3/cheetah3/blob/master/LICENSE
 Praise
 ------
 
-"I'm enamored with Cheetah" - Sam Ruby, senior member of IBM Emerging
+> I'm enamored with Cheetah
+
+Sam Ruby, a senior member of IBM Emerging
 Technologies Group & director of Apache Software Foundation
 
-"Give Cheetah a try. You won't regret it. ... Cheetah is a truly powerful
+> Give Cheetah a try. You won't regret it. ... Cheetah is a truly powerful
 system. ... Cheetah is a serious contender for the 'best of breed' Python
-templating." - Alex Martelli
+templating.
 
-"People with a strong PHP background absolutely love Cheetah for being Smarty,
-but much, much better." - Marek Baczynski
+Alex Martelli
 
-"I am using Smarty and I know it very well, but compiled Cheetah Templates with
-its inheritance approach is much powerful and easier to use than Smarty." -
+> People with a strong PHP background absolutely love Cheetah for being Smarty,
+but much, much better.
+
+Marek Baczynski
+
+> I am using Smarty and I know it very well, but compiled Cheetah Templates with
+its inheritance approach is much powerful and easier to use than Smarty.
+
 Jaroslaw Zabiello
 
 "There is no better solution than Cheetah" - Wilk
 
-"A cheetah template can inherit from a python class, or a cheetah template, and
+> A cheetah template can inherit from a python class, or a cheetah template, and
 a Python class can inherit from a cheetah template. This brings the full power
 of OO programming facilities to the templating system, and simply blows away
-other templating systems" - Mike Meyer
+other templating systems
 
-"Cheetah has successfully been introduced as a replacement for the overweight
+Mike Meyer
+
+> Cheetah has successfully been introduced as a replacement for the overweight
 XSL Templates for code generation. Despite the power of XSL (and notably XPath
 expressions), code generation is better suited to Cheetah as templates are much
-easier to implement and manage." - `The FEAR development team
+easier to implement and manage.
+
+`The FEAR development team
 <http://fear.sourceforge.net/docs/latest/guide/Build.html#id2550573>`_.
 
-"I've used Cheetah quite a bit and it's a very good package" - Kevin Dangoor,
-lead developer of TurboGears.
+> I've used Cheetah quite a bit and it's a very good package
+
+Kevin Dangoor, lead developer of TurboGears.
