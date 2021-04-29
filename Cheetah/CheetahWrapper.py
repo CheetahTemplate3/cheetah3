@@ -256,7 +256,7 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
         if opts.json:
             f = open(opts.json,'r')
             unjsoned = json.load(f)
-			f.close()
+            f.close()
             self.searchList.insert(0,unjsoned)
 
     ##################################################
