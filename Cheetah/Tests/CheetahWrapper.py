@@ -19,6 +19,9 @@ import shutil
 import sys
 import tempfile
 import unittest
+import pickle
+import json
+
 
 from optparse import OptionParser
 from Cheetah.CheetahWrapper import CheetahWrapper  # Used by NoBackup.
@@ -95,7 +98,8 @@ class CFBase(unittest.TestCase):
         if DELETE:
             shutil.rmtree(self.scratchDir, True)  # Ignore errors.
             if os.path.exists(self.scratchDir):
-                warn("Warning: unable to delete scratch directory %s")
+                warn("Warning: unable to delete scratch directory %s"
+                     % self.scratchDir)
         else:
             warn("Warning: not deleting scratch directory %s"
                  % self.scratchDir)
@@ -547,6 +551,92 @@ class NoBackup(CFBase):
         self.go("cheetah fill --nobackup --oext txt a.tmpl")
         self.go("cheetah fill --nobackup --oext txt a.tmpl")
         self.checkNoBackup("a.txt" + BACKUP_SUFFIX)
+
+
+class FileDataFill(CFBase):
+    """Populate searchlist variables from pickled or JSON data"""
+    srcFiles = ('pickle.tmpl', 'json.tmpl')
+
+    def setUp(self):
+        """Create the top-level directories and .tmpl
+           files.
+        """
+        self.cmd = self.locate_cheetah('cheetah')
+        cwd = os.getcwd()
+        if not os.environ.get('PYTHONPATH'):
+            os.environ['PYTHONPATH'] = cwd
+        else:
+            pythonPath = os.environ['PYTHONPATH']
+            if (pythonPath != cwd) and \
+                    not pythonPath.endswith(':%s' % cwd):
+                os.environ['PYTHONPATH'] = '%s:%s' % (pythonPath, cwd)
+        # Step 1: Create the scratch directory and chdir into it.
+        self.scratchDir = scratchDir = tempfile.mkdtemp()
+        self.origCwd = os.getcwd()
+        os.chdir(scratchDir)
+        if self.srcDir:
+            os.mkdir(self.srcDir)
+        # Step 2: Create the .tmpl files, each in its proper directory.
+        for fil in self.srcFiles:
+            with open(fil, 'w') as f:
+                f.write("foo $bar\n")
+        # Step 3: Export a variable to a pickle and json file
+        self.pickle_file = tempfile.NamedTemporaryFile(mode='wb', delete=False)
+        pickle.dump({'bar': 'baz'}, self.pickle_file)
+        self.pickle_file.close()
+        self.json_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
+        json.dump({'bar': 'baz'}, self.json_file)
+        self.json_file.close()
+
+    def tearDown(self):
+        os.chdir(self.origCwd)
+        if DELETE:
+            shutil.rmtree(self.scratchDir, True)  # Ignore errors.
+            if os.path.exists(self.scratchDir):
+                warn("Warning: unable to delete scratch directory %s"
+                     % self.scratchDir)
+        else:
+            warn("Warning: not deleting scratch directory %s"
+                 % self.scratchDir)
+
+    def checkCompile(self, path):
+        # Raw string to prevent "\n" from being converted to a newline.
+        # expected = R"write('Hello, world!\n')"
+        expected = "foo"  # might output a u'' string
+        errmsg = """\
+destination file %(path)s doesn't contain expected substring:
+%(expected)r"""
+        self._checkDestFileHelper(path, expected, True, errmsg)
+
+    def checkFill(self, path):
+        expected = "foo baz\n"
+        errmsg = """\
+destination file %(path)s contains wrong result.
+Expected %(expected)r
+Found %(result)r"""
+        self._checkDestFileHelper(path, expected, False, errmsg)
+
+    def testCompile(self):
+        self.go('cheetah compile json.tmpl')
+        self.go('cheetah compile pickle.tmpl')
+        self.checkCompile('json.py')
+        self.checkCompile('pickle.py')
+
+    def testFill(self):
+        self.go('cheetah fill --json {jsonfile} json.tmpl'
+                .format(jsonfile=self.json_file.name))
+        self.go('cheetah fill --pickle {picklefile} pickle.tmpl'
+                .format(picklefile=self.pickle_file.name))
+        self.checkFill('json.html')
+        self.checkFill('pickle.html')
+
+    def testText(self):
+        self.go('cheetah fill --json {jsonfile} --oext txt json.tmpl'
+                .format(jsonfile=self.json_file.name))
+        self.go('cheetah fill --pickle {picklefile} --oext txt pickle.tmpl'
+                .format(picklefile=self.pickle_file.name))
+        self.checkFill('json.txt')
+        self.checkFill('pickle.txt')
 
 
 def listTests(cheetahWrapperFile):
