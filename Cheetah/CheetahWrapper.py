@@ -254,10 +254,10 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
             f.close()
             self.searchList.insert(0, unpickled)
         if opts.json:
-            f = open(opts.json,'r')
+            f = open(opts.json, 'r')
             unjsoned = json.load(f)
             f.close()
-            self.searchList.insert(0,unjsoned)
+            self.searchList.insert(0, unjsoned)
 
     ##################################################
     # COMMAND METHODS
