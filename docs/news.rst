@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+Minor features:
+
+  - Load from JSON file to searchlist (similar to loading from pickle).
+
 3.2.6.post1 (2021-02-22)
 ------------------------
 
