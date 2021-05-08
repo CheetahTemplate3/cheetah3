@@ -13,9 +13,9 @@ Minor features:
 
 Tests:
 
-   - Add Python 3.9 to ``tox.ini``.
+  - Add Python 3.9 to ``tox.ini``.
 
-   - Refactor ``tox.ini``.
+  - Refactor ``tox.ini``.
 
 CI:
 
