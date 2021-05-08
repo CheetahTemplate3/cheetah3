@@ -1,5 +1,5 @@
 try:
-    from io import BytesIO, TextIOWrapper
+    from io import BytesIO, TextIOWrapper, StringIO
 except ImportError:
     try:
         from cStringIO import StringIO as BytesIO
@@ -10,6 +10,7 @@ from tempfile import NamedTemporaryFile
 
 import os
 import pickle
+import json
 import sys
 import unittest
 
@@ -49,6 +50,7 @@ class TestEnv(unittest.TestCase):
 
 
 class TestPickleStdin(unittest.TestCase):
+
     def setUp(self):
         pickle_bytes = pickle.dumps({'foo': 'test foo'})
         if hasattr(sys.stdin, 'buffer'):
@@ -69,6 +71,7 @@ class TestPickleStdin(unittest.TestCase):
 
 
 class TestPickleFile(unittest.TestCase):
+
     def setUp(self):
         self.pickle_file = pickle_file = \
             NamedTemporaryFile(mode='wb', delete=False)
@@ -83,5 +86,46 @@ class TestPickleFile(unittest.TestCase):
         t = klass()
         cmdline = CmdLineIface(t, scriptName='test',
                                cmdLineArgs=['--pickle', self.pickle_file.name])
+        cmdline._processCmdLineArgs()
+        assert str(t) == 'test foo'
+
+
+class TestJsonStdin(unittest.TestCase):
+
+    def setUp(self):
+        json_string = json.dumps({'foo': 'test foo'})
+        if hasattr(sys.stdin, 'buffer'):
+            sys.stdin = TextIOWrapper(StringIO(json_string))
+        else:
+            sys.stdin = BytesIO(json_string.encode('utf-8'))
+
+    def tearDown(self):
+        sys.stdin = sys.__stdin__
+
+    def test_json_stdin(self):
+        klass = Template.compile(source='$foo')
+        t = klass()
+        cmdline = CmdLineIface(t, scriptName='test',
+                               cmdLineArgs=['--json=-'])
+        cmdline._processCmdLineArgs()
+        assert (True)
+
+
+class TestJsonFile(unittest.TestCase):
+
+    def setUp(self):
+        self.json_file = NamedTemporaryFile(mode='w', delete=False)
+        json.dump({'foo': 'test foo'}, self.json_file)
+        self.json_file.close()
+
+    def tearDown(self):
+        os.remove(self.json_file.name)
+        pass
+
+    def test_json_file(self):
+        klass = Template.compile(source='$foo')
+        t = klass()
+        cmdline = CmdLineIface(t, scriptName='test',
+                               cmdLineArgs=['--json', self.json_file.name])
         cmdline._processCmdLineArgs()
         assert str(t) == 'test foo'

@@ -7,6 +7,7 @@ import pprint
 import re
 import shutil
 import sys
+import json
 try:
     import cPickle as pickle
 except ImportError:  # PY3
@@ -177,6 +178,8 @@ class CheetahWrapper(object):
             help='Pass the environment into the search list')
         pao("--pickle", action="store", dest="pickle", default="",
             help='Unpickle FILE and pass it through in the search list')
+        pao("--json", action="store", dest="json", default="",
+            help='Read from JSON FILE and pass it through in the search list')
         pao("--flat", action="store_true", dest="flat", default=False,
             help='Do not build destination subdirectories')
         pao("--nobackup", action="store_true", dest="nobackup", default=False,
@@ -250,6 +253,11 @@ Files are %s""", args, pprint.pformat(vars(opts)), files)
             unpickled = pickle.load(f)
             f.close()
             self.searchList.insert(0, unpickled)
+        if opts.json:
+            f = open(opts.json, 'r')
+            unjsoned = json.load(f)
+            f.close()
+            self.searchList.insert(0, unjsoned)
 
     ##################################################
     # COMMAND METHODS

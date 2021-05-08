@@ -7,6 +7,7 @@ try:
     from cPickle import load
 except ImportError:
     from pickle import load
+from json import load as jsonload
 
 from Cheetah.Version import Version
 
@@ -35,7 +36,7 @@ class CmdLineIface:
     def _processCmdLineArgs(self):
         try:
             self._opts, self._args = getopt.getopt(
-                self._cmdLineArgs, 'h', ['help', 'env', 'pickle=']
+                self._cmdLineArgs, 'h', ['help', 'env', 'pickle=', 'json=']
             )
 
         except getopt.GetoptError as v:
@@ -63,6 +64,19 @@ class CmdLineIface:
                     unpickled = load(f)
                     f.close()
                     self._template.searchList().insert(0, unpickled)
+            if o == '--json':
+                if a == '-':
+                    if hasattr(sys.stdin, 'buffer'):
+                        stdin = sys.stdin.buffer  # Read binary data from stdin
+                    else:
+                        stdin = sys.stdin
+                    unjsoned = jsonload(stdin)
+                    self._template.searchList().insert(0, unjsoned)
+                else:
+                    f = open(a, 'r')
+                    unjsoned = jsonload(f)
+                    f.close()
+                    self._template.searchList().insert(0, unjsoned)
 
     def usage(self):
         return """Cheetah %(Version)s template module command-line interface
