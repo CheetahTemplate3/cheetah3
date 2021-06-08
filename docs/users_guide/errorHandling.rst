@@ -130,7 +130,7 @@ should either be a string specifying which of the classes in
 can also be used to change the errorCatcher part way through a
 template.
 
-{Cheetah.ErrorCatchers.ListErrors} will produce the same ouput as
+{Cheetah.ErrorCatchers.ListErrors} will produce the same output as
 {Echo} while maintaining a list of the errors that can be retrieved
 later. To retrieve the list, use the {Template} class'
 {'errorCatcher'} method to retrieve the errorCatcher and then call
