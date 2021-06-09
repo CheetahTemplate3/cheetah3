@@ -36,4 +36,5 @@ Contributions have been made by:
 * Andrew J. Hesford <ajh at sideband.org>
 * Victor Stinner <vstinner at python.org>
 * N Protokowicz <nicklivewire at gmail.com>
+* Enzo Conty <contact at enzoconty.dev>
 * Oleg Broytman <phd@phdru.name>
