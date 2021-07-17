@@ -160,6 +160,24 @@ class ClassMethods_compile(TemplateTest):
         assert klass._CHEETAH_isInCompilationCache
 
 
+class OpenFileTest(TemplateTest):
+    def setUp(self):
+        self.template_file = \
+            tempfile.NamedTemporaryFile(mode='w', delete=False)
+        self.template_file.write("<h1>Test open file</h1>")
+        self.template_file.close()
+
+    def tearDown(self):
+        os.remove(self.template_file.name)
+
+    def test_compileFile(self):
+        tmpl_file = open(self.template_file.name)
+        try:
+            Template.compile(file=tmpl_file)
+        finally:
+            tmpl_file.close()
+
+
 class ClassMethods_subclass(TemplateTest):
 
     def test_basicUsage(self):

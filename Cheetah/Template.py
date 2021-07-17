@@ -54,7 +54,7 @@ except ImportError:
             pass
 
 if PY2:
-    filetype = io.IOBase
+    filetype = file  # noqa: F821 undefined name
 
     def createMethod(func, cls):
         return types.MethodType(func, None, cls)

@@ -8,6 +8,10 @@ Minor features:
 
   - Load from JSON file to searchlist (similar to loading from pickle).
 
+Bug fixes:
+
+  - Fix ``filetype`` for Python 2 in ``Template``.
+
 3.2.6.post1 (2021-02-22)
 ------------------------
 

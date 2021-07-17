@@ -37,4 +37,5 @@ Contributions have been made by:
 * Victor Stinner <vstinner at python.org>
 * N Protokowicz <nicklivewire at gmail.com>
 * Enzo Conty <contact at enzoconty.dev>
+* Andrea Mennucci <mennucc1@debian.org>
 * Oleg Broytman <phd@phdru.name>
