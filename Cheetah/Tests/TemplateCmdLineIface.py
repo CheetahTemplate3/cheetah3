@@ -120,7 +120,6 @@ class TestJsonFile(unittest.TestCase):
 
     def tearDown(self):
         os.remove(self.json_file.name)
-        pass
 
     def test_json_file(self):
         klass = Template.compile(source='$foo')
