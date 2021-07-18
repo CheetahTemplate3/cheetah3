@@ -29,7 +29,7 @@ and then they can be organized into particular releases as is necessary.
 
 In addition to the bug tracker, Cheetah uses Travis CI for automating builds
 and test runs (see: `Cheetah at Travis
-<https://travis-ci.org/CheetahTemplate3/cheetah3>`_).
+<https://travis-ci.com/github/CheetahTemplate3/cheetah3>`_).
 
 Prior to the tarballing of a release, **all** tests must be passing before the
 **next** branch is merged down to the Git **master** branch where the release
