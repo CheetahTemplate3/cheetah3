@@ -4,7 +4,7 @@
 
 """
 
-from Cheetah.Utils.htmlEncode import htmlCodesReversed
+from .htmlEncode import htmlCodesReversed
 
 
 def htmlDecode(s, codes=htmlCodesReversed):

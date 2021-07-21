@@ -143,7 +143,7 @@ been compiled or falls back to the Python version if not.
 import inspect
 from pprint import pformat
 
-from Cheetah.compat import PY2
+from .compat import PY2
 if PY2:
     from collections import Mapping
 else:
@@ -263,7 +263,7 @@ def hasName(obj, name):
 
 
 try:
-    from Cheetah._namemapper import NotFound, valueForKey, valueForName, \
+    from ._namemapper import NotFound, valueForKey, valueForName, \
         valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
     C_VERSION = True
 except Exception:

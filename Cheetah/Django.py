@@ -1,4 +1,4 @@
-import Cheetah.Template
+from . import Template
 
 
 def render(template_file, **kwargs):
@@ -13,5 +13,5 @@ def render(template_file, **kwargs):
     import django.http
     import django.template.loader
     source, loader = django.template.loader.find_template_source(template_file)
-    t = Cheetah.Template.Template(source, searchList=[kwargs])
+    t = Template.Template(source, searchList=[kwargs])
     return django.http.HttpResponse(t.__str__())

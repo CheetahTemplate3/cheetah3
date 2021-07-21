@@ -3,9 +3,9 @@
 import os
 import pprint
 
-from Cheetah import Parser
-from Cheetah import Compiler
-from Cheetah import Template
+from . import Parser
+from . import Compiler
+from . import Template
 
 
 class Analyzer(Parser.Parser):

@@ -20,7 +20,7 @@ This is a hacked/documented version of Gordon McMillan's iu.py. I have:
 import marshal
 import py_compile
 import sys
-from Cheetah.compat import PY2, string_type, new_module, get_suffixes, \
+from .compat import PY2, string_type, new_module, get_suffixes, \
     load_module_from_file, RecursionError
 if PY2:
     import imp

@@ -4,7 +4,7 @@ import os
 import os.path
 import re
 from tempfile import NamedTemporaryFile
-from Cheetah.compat import string_type
+from .compat import string_type
 
 
 def _escapeRegexChars(

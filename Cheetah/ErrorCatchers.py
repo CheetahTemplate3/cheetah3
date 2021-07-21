@@ -1,6 +1,6 @@
 
 import time
-from Cheetah.NameMapper import NotFound
+from .NameMapper import NotFound
 
 
 class Error(Exception):

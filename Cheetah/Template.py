@@ -24,24 +24,24 @@ import pprint
 import cgi  # Used by .webInput() if the template is a CGI script.
 import types
 
-from Cheetah import ErrorCatchers              # for placeholder tags
-from Cheetah import Filters                    # the output filters
-from Cheetah.CacheRegion import CacheRegion
-from Cheetah.CacheStore import MemoryCacheStore  # , MemcachedCacheStore
-from Cheetah.Compiler import Compiler
-from Cheetah.NameMapper import NotFound, valueFromSearchList
-from Cheetah.Parser import ParseError, SourceReader
+from . import ErrorCatchers              # for placeholder tags
+from . import Filters                    # the output filters
+from .CacheRegion import CacheRegion
+from .CacheStore import MemoryCacheStore  # , MemcachedCacheStore
+from .Compiler import Compiler
+from .NameMapper import NotFound, valueFromSearchList
+from .Parser import ParseError, SourceReader
 # Base classes for Template
-from Cheetah.Servlet import Servlet
-from Cheetah.Unspecified import Unspecified
-from Cheetah.Utils.Indenter import Indenter      # and for placeholders
-from Cheetah.Utils.WebInputMixin import _Converter, _lookup, \
+from .Servlet import Servlet
+from .Unspecified import Unspecified
+from .Utils.Indenter import Indenter      # and for placeholders
+from .Utils.WebInputMixin import _Converter, _lookup, \
     NonNumericInputError
-from Cheetah.Version import MinCompatibleVersion
-from Cheetah.Version import convertVersionStringToTuple, \
+from .Version import MinCompatibleVersion
+from .Version import convertVersionStringToTuple, \
     MinCompatibleVersionTuple
-from Cheetah.compat import PY2, string_type, unicode
-from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
+from .compat import PY2, string_type, unicode
+from .convertTmplPathToModuleName import convertTmplPathToModuleName
 
 try:
     from threading import Lock
@@ -1514,7 +1514,7 @@ class Template(Servlet):
         Type 'python yourtemplate.py --help to see what it's capabable of.
         """
 
-        from Cheetah.TemplateCmdLineIface import CmdLineIface
+        from .TemplateCmdLineIface import CmdLineIface
         CmdLineIface(templateObj=self).run()
 
     ##################################################

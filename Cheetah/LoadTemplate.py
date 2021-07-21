@@ -1,6 +1,6 @@
 import os
 import sys
-from Cheetah.ImportHooks import CheetahDirOwner
+from .ImportHooks import CheetahDirOwner
 
 
 def loadTemplateModule(templatePath, debuglevel=0):

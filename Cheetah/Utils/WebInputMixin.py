@@ -2,7 +2,7 @@
 transaction variables in bulk.  See the docstring of webInput for full details.
 """
 
-from Cheetah.Utils.Misc import useOrRaise
+from .Misc import useOrRaise
 
 
 class NonNumericInputError(ValueError):
