@@ -16,6 +16,10 @@ Build, CI:
 
   - Build wheels for ``aarch64`` at Travis; publish them at PyPI.
 
+Tests:
+
+  - ``tox.ini``: Limit ``VIRTUALENV_PIP`` version for Python 3.4.
+
 3.2.6.post1 (2021-02-22)
 ------------------------
 
