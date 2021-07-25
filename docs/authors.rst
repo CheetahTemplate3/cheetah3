@@ -38,4 +38,5 @@ Contributions have been made by:
 * N Protokowicz <nicklivewire at gmail.com>
 * Enzo Conty <contact at enzoconty.dev>
 * Andrea Mennucci <mennucc1@debian.org>
+* odidev <odidev at puresoftware.com>
 * Oleg Broytman <phd@phdru.name>

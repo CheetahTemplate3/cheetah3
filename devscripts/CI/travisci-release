@@ -34,7 +34,7 @@ if [ "$TRAVIS_OS_NAME" == 'linux' ]; then
         pip install -U "auditwheel==3.1.0"
     fi &&
 
-    for f in dist/Cheetah3-*-cp$v-*-linux_x86_64.whl; do
+    for f in dist/Cheetah3-*-cp$v-*-linux*.whl; do
         if [ "$py" == 2.7 ]; then
             python3.6 -m auditwheel repair -w dist/ "$f"
         else

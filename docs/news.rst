@@ -12,6 +12,10 @@ Bug fixes:
 
   - Fix ``filetype`` for Python 2 in ``Template``.
 
+Build, CI:
+
+  - Build wheels for ``aarch64`` at Travis; publish them at PyPI.
+
 3.2.6.post1 (2021-02-22)
 ------------------------
 
