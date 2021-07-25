@@ -1,7 +1,7 @@
 News
 ====
 
-Development (master)
+3.2.7a0 (2021-07-25)
 --------------------
 
 Minor features:

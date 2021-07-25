@@ -1,11 +1,31 @@
 Hello!
 
-I'm pleased to announce version 3.2.7a0, the 1st alpha for bugfix release
-3.2.7 of branch 3.2 of CheetahTemplate3.
+I'm pleased to announce version 3.2.7a0, the 1st alpha
+for minor feature release 3.2.7 of branch 3.2 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
+
+The contributors for this release are:
+N Protokowicz, Enzo Conty, Andrea Mennucci, Saiprasad Kale, odidev.
+Many thanks!
+
+Minor features:
+
+  - Load from JSON file to searchlist (similar to loading from pickle).
+
+Bug fixes:
+
+  - Fix ``filetype`` for Python 2 in ``Template``.
+
+Build, CI:
+
+  - Build wheels for ``aarch64`` at Travis; publish them at PyPI.
+
+Tests:
+
+  - ``tox.ini``: Limit ``VIRTUALENV_PIP`` version for Python 3.4.
 
 
 What is CheetahTemplate3
