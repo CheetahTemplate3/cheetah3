@@ -8,8 +8,8 @@ What's new in CheetahTemplate3
 ==============================
 
 The contributors for this release are:
-N Protokowicz, Enzo Conty, Andrea Mennucci, Saiprasad Kale, odidev.
-Many thanks!
+N Protokowicz, Enzo Conty, Andrea Mennucci, Saiprasad Kale, odidev,
+Pierre Ossman. Many thanks!
 
 Minor features:
 

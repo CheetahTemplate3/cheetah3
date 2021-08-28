@@ -1,6 +1,13 @@
 News
 ====
 
+Development (master)
+--------------------
+
+Minor features:
+
+  - Use relative imports everywhere.
+
 3.2.7b1 (2021-07-25)
 --------------------
 

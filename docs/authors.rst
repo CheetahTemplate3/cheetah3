@@ -39,4 +39,5 @@ Contributions have been made by:
 * Enzo Conty <contact at enzoconty.dev>
 * Andrea Mennucci <mennucc1@debian.org>
 * odidev <odidev at puresoftware.com>
+* Pierre Ossman <ossman at cendio.se>
 * Oleg Broytman <phd@phdru.name>
