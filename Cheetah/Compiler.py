@@ -19,16 +19,16 @@ import warnings
 import copy
 import codecs
 
-from Cheetah.Version import Version, VersionTuple
-from Cheetah.SettingsManager import SettingsManager
-from Cheetah.Utils.Indenter import indentize  # an undocumented preprocessor
-from Cheetah import NameMapper
-from Cheetah.Parser import Parser, ParseError, specialVarRE, \
+from .Version import Version, VersionTuple
+from .SettingsManager import SettingsManager
+from .Utils.Indenter import indentize  # an undocumented preprocessor
+from . import NameMapper
+from .Parser import Parser, ParseError, specialVarRE, \
     STATIC_CACHE, REFRESH_CACHE, SET_GLOBAL, SET_MODULE, \
     unicodeDirectiveRE, encodingDirectiveRE, escapedNewlineRE
-from Cheetah.compat import PY2, string_type, unicode
+from .compat import PY2, string_type, unicode
 
-from Cheetah.NameMapper import valueForName, valueFromSearchList, \
+from .NameMapper import valueForName, valueFromSearchList, \
     valueFromFrameOrSearchList
 VFFSL = valueFromFrameOrSearchList
 VFSL = valueFromSearchList
@@ -1749,6 +1749,11 @@ class ModuleCompiler(SettingsManager, GenUtils):
         self._moduleHeaderLines = []
         self._moduleDocStringLines = []
         self._specialVars = {}
+        # we might have been moved to be a sub-package
+        if "__spec__" in globals():
+            package = __spec__.parent   # noqa: F821 undefined name '__spec__'
+        else:
+            package = __package__
         self._importStatements = [
             "import sys",
             "import os",
@@ -1760,18 +1765,19 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "from os.path import getmtime, exists",
             "import time",
             "import types",
-            "from Cheetah.Version import MinCompatibleVersion as "
-            "RequiredCheetahVersion",
-            "from Cheetah.Version import MinCompatibleVersionTuple "
-            "as RequiredCheetahVersionTuple",
-            "from Cheetah.Template import Template",
-            "from Cheetah.DummyTransaction import *",
-            "from Cheetah.NameMapper import NotFound, "
-            "valueForName, valueFromSearchList, valueFromFrameOrSearchList",
-            "from Cheetah.CacheRegion import CacheRegion",
-            "import Cheetah.Filters as Filters",
-            "import Cheetah.ErrorCatchers as ErrorCatchers",
-            "from Cheetah.compat import unicode",
+            "from %s.Version import MinCompatibleVersion as "
+            "RequiredCheetahVersion" % package,
+            "from %s.Version import MinCompatibleVersionTuple "
+            "as RequiredCheetahVersionTuple" % package,
+            "from %s.Template import Template" % package,
+            "from %s.DummyTransaction import *" % package,
+            "from %s.NameMapper import NotFound, "
+            "valueForName, valueFromSearchList, "
+            "valueFromFrameOrSearchList" % package,
+            "from %s.CacheRegion import CacheRegion" % package,
+            "import %s.Filters as Filters" % package,
+            "import %s.ErrorCatchers as ErrorCatchers" % package,
+            "from %s.compat import unicode" % package,
         ]
 
         self._importedVarNames = ['sys',

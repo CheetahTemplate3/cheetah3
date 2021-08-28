@@ -11,7 +11,7 @@ try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-from Cheetah.compat import PY2
+from .compat import PY2
 
 
 numberRE = re.compile(Number)

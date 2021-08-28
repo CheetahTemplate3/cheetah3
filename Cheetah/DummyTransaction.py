@@ -9,7 +9,7 @@ specific DummyTransaction or DummyResponse behavior
 '''
 
 import logging
-from Cheetah.compat import unicode
+from .compat import unicode
 
 
 class DummyResponseFailure(Exception):

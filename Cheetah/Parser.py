@@ -13,10 +13,10 @@ import re
 import types
 import inspect
 
-from Cheetah.SourceReader import SourceReader
-from Cheetah.Unspecified import Unspecified
-from Cheetah.Macros.I18n import I18n
-from Cheetah.compat import PY2, string_type, unicode
+from .SourceReader import SourceReader
+from .Unspecified import Unspecified
+from .Macros.I18n import I18n
+from .compat import PY2, string_type, unicode
 if PY2:
     from tokenize import pseudoprog
 else:
@@ -2390,7 +2390,7 @@ class _HighLevelParser(_LowLevelParser):
              macroSrc,
              '%end def'])
 
-        from Cheetah.Template import Template
+        from .Template import Template
         templateAPIClass = self.setting('templateAPIClassForDefMacro',
                                         default=Template)
         compilerSettings = self.setting('compilerSettingsForDefMacro',

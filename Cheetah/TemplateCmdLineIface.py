@@ -9,7 +9,7 @@ except ImportError:
     from pickle import load
 from json import load as jsonload
 
-from Cheetah.Version import Version
+from .Version import Version
 
 
 class Error(Exception):

@@ -22,10 +22,10 @@ except ImportError:  # PY2
 from threading import RLock
 import traceback
 
-from Cheetah import ImportManager
-from Cheetah.ImportManager import DirOwner
-from Cheetah.Compiler import Compiler
-from Cheetah.convertTmplPathToModuleName import convertTmplPathToModuleName
+from . import ImportManager
+from .ImportManager import DirOwner
+from .Compiler import Compiler
+from .convertTmplPathToModuleName import convertTmplPathToModuleName
 
 _installed = False
 

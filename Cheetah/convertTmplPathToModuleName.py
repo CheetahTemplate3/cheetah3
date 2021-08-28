@@ -1,6 +1,6 @@
 import os.path
 import string
-from Cheetah.compat import unicode
+from .compat import unicode
 
 letters = None
 try:
