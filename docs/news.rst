@@ -18,6 +18,8 @@ Tests:
 
 CI:
 
+  - GitHub Actions.
+
   - Stop testing at Travis CI.
 
   - Stop testing at AppVeyor.
