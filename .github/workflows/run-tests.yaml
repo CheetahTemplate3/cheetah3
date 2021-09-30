@@ -8,12 +8,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
         python-version: ["2.7"]
         include:
         - os: ubuntu-latest
           os-name: Linux
           pip-cache-path: ~/.cache/pip
+        - os: windows-latest
+          os-name: w32
+          pip-cache-path: ~\AppData\Local\pip\Cache
 
     name: Python ${{ matrix.python-version }} @ ${{ matrix.os-name }}
     runs-on: ${{ matrix.os }}
@@ -43,7 +46,8 @@ jobs:
           import os, sys
           pyver = '%d%d' % tuple(sys.version_info[:2])
           toxenv = 'py%s' % pyver
-          toxenv += ',py%s-flake8' % pyver
+          if os.name == 'posix':
+            toxenv += ',py%s-flake8' % pyver
           with open(os.environ['GITHUB_ENV'], 'a') as f:
             f.write('TOXENV=' + toxenv + '\n')
           print(toxenv)
