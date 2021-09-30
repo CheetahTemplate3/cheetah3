@@ -16,6 +16,12 @@ Tests:
 
   - Add Python 3.10 to ``tox.ini``.
 
+CI:
+
+  - Stop testing at Travis CI.
+
+  - Stop testing at AppVeyor.
+
 3.2.7b1 (2021-07-25)
 --------------------
 
