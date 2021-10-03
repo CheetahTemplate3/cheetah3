@@ -5,7 +5,7 @@ PROG_DIR="`pwd`" &&
 
 cd .. &&
 devscripts/build-docs &&
-rsync -ahP --del --exclude=/.git --exclude=/.nojekyll \
+rsync -ahPv --del --exclude=/.git --exclude=/.nojekyll \
    --exclude=/CNAME --exclude=/robots.txt \
    docs/html/ ../cheetahtemplate3.github.io/ &&
 
