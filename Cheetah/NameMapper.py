@@ -142,6 +142,7 @@ been compiled or falls back to the Python version if not.
 
 import inspect
 from pprint import pformat
+import sys
 
 from .compat import PY2
 if PY2:
@@ -263,6 +264,8 @@ def hasName(obj, name):
 
 
 try:
+    if getattr(sys, '_cheetah_namemapper_pure', False):
+        raise ValueError  # Not an error, just a way to skip ``_namemapper``
     from ._namemapper import NotFound, valueForKey, valueForName, \
         valueFromSearchList, valueFromFrameOrSearchList, valueFromFrame
     C_VERSION = True

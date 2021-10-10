@@ -8,6 +8,10 @@ Minor features:
 
   - Use relative imports everywhere.
 
+Tests:
+
+  - Run pure-python ``NameMapper`` tests in a separate process.
+
 3.2.7b1 (2021-07-25)
 --------------------
 

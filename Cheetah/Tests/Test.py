@@ -12,22 +12,38 @@ TODO
 """
 
 import sys
-import unittest
 
-from Cheetah.Tests import Analyzer
-from Cheetah.Tests import CheetahWrapper
-from Cheetah.Tests import Filters
-from Cheetah.Tests import ImportHooks
-from Cheetah.Tests import LoadTemplate
-from Cheetah.Tests import Misc
-from Cheetah.Tests import NameMapper
-from Cheetah.Tests import NameMapper_pure
-from Cheetah.Tests import Parser
-from Cheetah.Tests import Regressions
-from Cheetah.Tests import SyntaxAndOutput
-from Cheetah.Tests import Template
-from Cheetah.Tests import TemplateCmdLineIface
-from Cheetah.Tests import Unicode
+args_l = len(sys.argv)
+if args_l == 1:
+    pass
+elif args_l == 2 and sys.argv[1] == '--namemapper-pure':
+    try:
+        from Cheetah import _namemapper  # noqa
+    except ImportError:
+        # _namemapper hasn't been compiled so Tests/NameMapper.py
+        # tests pure-python NameMapper.py; no need to duplicate these tests.
+        print('Ok')
+        sys.exit(0)
+    sys.modules['Cheetah._namemapper'] = None
+    sys._cheetah_namemapper_pure = True
+else:
+    sys.exit('Wrong argument or wrong number of arguments')
+
+import unittest  # noqa: E402 module level import not at top of file
+
+from Cheetah.Tests import Analyzer  # noqa: E402
+from Cheetah.Tests import CheetahWrapper  # noqa: E402
+from Cheetah.Tests import Filters  # noqa: E402
+from Cheetah.Tests import ImportHooks  # noqa: E402
+from Cheetah.Tests import LoadTemplate  # noqa: E402
+from Cheetah.Tests import Misc  # noqa: E402
+from Cheetah.Tests import NameMapper  # noqa: E402
+from Cheetah.Tests import Parser  # noqa: E402
+from Cheetah.Tests import Regressions  # noqa: E402
+from Cheetah.Tests import SyntaxAndOutput  # noqa: E402
+from Cheetah.Tests import Template  # noqa: E402
+from Cheetah.Tests import TemplateCmdLineIface  # noqa: E402
+from Cheetah.Tests import Unicode  # noqa: E402
 
 SyntaxAndOutput.install_eols()
 
@@ -44,7 +60,6 @@ suites = [
     unittest.findTestCases(Template),
     unittest.findTestCases(TemplateCmdLineIface),
     unittest.findTestCases(Unicode),
-    unittest.findTestCases(NameMapper_pure),
 ]
 
 if not sys.platform.startswith('java'):
