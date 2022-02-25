@@ -381,7 +381,8 @@ def example():
         'item': 'itemval',
         'subDict': {'nestedMethod': a.method3}
     }
-    # b = 'this is local b'
+
+    b = 'this is local b'  # noqa: F841 local variable assigned but never used
 
     print(valueForKey(a.dic, 'subDict'))
     print(valueForName(a, 'dic.item'))

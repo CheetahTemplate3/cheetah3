@@ -3050,9 +3050,9 @@ class GetVar(OutputTest):               # Template.getVar()
                     "1234")
 
     def test6(self):
-        """$getVar('$') raises ValueError
+        """$getVar('$') raises ValueError or NotFound(LookupError)
         """
-        with self.assertRaises(ValueError):
+        with self.assertRaises((ValueError, LookupError)):
             self.verify("$getVar('$')", "never get here")
 
 
