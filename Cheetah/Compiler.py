@@ -108,7 +108,7 @@ _DEFAULT_COMPILER_SETTINGS = [
      'The filters *must* return the expr or raise an expression, '
      'they can modify the expr if needed'),
     ('templateMetaclass', None,
-     'Strictly optional, only will work with new-style basecalsses as well'),
+     'Strictly optional, only will work with new-style baseclasses as well'),
     ('i18NFunctionName', 'self.i18n', ''),
 
     ('cheetahVarStartToken', '$', ''),
