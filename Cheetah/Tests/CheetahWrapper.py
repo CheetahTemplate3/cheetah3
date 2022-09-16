@@ -214,11 +214,13 @@ Found %(result)r"""
             status, output = self.assertPosixSubprocess(cmd)
 
         if not nonzero:
-            self.assertEqual(status, 0, '''Subprocess exited with a non-zero status (%d)
-                            %s''' % (status, output))
+            self.assertEqual(status, 0,
+                             '''Subprocess exited with a non-zero status (%d)
+                             %s''' % (status, output))
         else:
-            self.assertNotEqual(status, 0, '''Subprocess exited with a zero status (%d)
-                            %s''' % (status, output))
+            self.assertNotEqual(status, 0,
+                                '''Subprocess exited with a zero status (%d)
+                                %s''' % (status, output))
         return output
 
     def go(self, cmd, expectedStatus=0, expectedOutputSubstring=None):

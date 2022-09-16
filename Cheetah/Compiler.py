@@ -136,7 +136,8 @@ DEFAULT_COMPILER_SETTINGS = \
 
 
 class GenUtils(object):
-    """An abstract baseclass for the Compiler classes that provides methods that
+    """
+    An abstract baseclass for the Compiler classes that provides methods that
     perform generic utility functions or generate pieces of output code from
     information passed in by the Parser baseclass.  These methods don't do any
     parsing themselves.
@@ -473,7 +474,8 @@ class MethodCompiler(GenUtils):
             self._pendingStrConstChunks = [strConst]
 
     def commitStrConst(self):
-        """Add the code for outputting the pending strConst without chopping off
+        """
+        Add the code for outputting the pending strConst without chopping off
         any whitespace from it.
         """
         if not self._pendingStrConstChunks:

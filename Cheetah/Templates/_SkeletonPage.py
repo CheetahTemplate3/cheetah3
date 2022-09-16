@@ -57,7 +57,8 @@ class _SkeletonPage(Template):
         self._bodyTagAttribs = {}
 
     def metaTags(self):
-        """Return a formatted vesion of the self._metaTags dictionary, using the
+        """
+        Return a formatted vesion of the self._metaTags dictionary, using the
         formatMetaTags function from Cheetah.Macros.HTML"""
 
         return self.formatMetaTags(self._metaTags)

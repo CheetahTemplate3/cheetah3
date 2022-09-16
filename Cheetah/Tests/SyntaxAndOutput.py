@@ -300,7 +300,9 @@ class Backslashes(OutputTest):
                     "\ \ " + "\n\n\n\n\n\n\n\n\n")
 
     def test8(self):
-        """ single line from an apache conf file with single quotes and many NEWLINES
+        """
+        Single line from an apache conf file
+        with single quotes and many NEWLINES
         """
 
         self.verify(
@@ -794,18 +796,18 @@ class UnicodeDirective(OutputTest):
         self.verify("#unicode latin-1\n1234",
                     u"1234")
 
-        self.verify("#unicode latin-1\n1234ü",
-                    u"1234ü")
-        self.verify("#unicode: latin-1\n1234ü",
-                    u"1234ü")
-        self.verify("#  unicode  : latin-1\n1234ü",
-                    u"1234ü")
+        self.verify("#unicode latin-1\n1234?",
+                    u"1234?")
+        self.verify("#unicode: latin-1\n1234?",
+                    u"1234?")
+        self.verify("#  unicode  : latin-1\n1234?",
+                    u"1234?")
 
-        self.verify(u"#unicode latin-1\n1234ü",
-                    u"1234ü")
+        self.verify(u"#unicode latin-1\n1234?",
+                    u"1234?")
 
-        self.verify("#encoding latin-1\n1234ü",
-                    u"1234ü")
+        self.verify("#encoding latin-1\n1234?",
+                    u"1234?")
 
 
 class Placeholders_Esc(OutputTest):
@@ -2148,7 +2150,8 @@ class SetDirective(OutputTest):
 
     def test5(self):
         """#set with a dictionary"""
-        self.verify("""#set $testDict = {'one':'one1','two':'two2','three':'three3'}
+        self.verify(
+"""#set $testDict = {'one':'one1','two':'two2','three':'three3'}
 $testDict.one
 $testDict.two""",
                     "one1\ntwo2")
@@ -2820,14 +2823,16 @@ class ExtendsDirective(OutputTest):
 
     def test1(self):
         """#extends Cheetah.Templates._SkeletonPage"""
-        self.verify("""#from Cheetah.Templates._SkeletonPage import _SkeletonPage
+        self.verify(
+"""#from Cheetah.Templates._SkeletonPage import _SkeletonPage
 #extends _SkeletonPage
 #implements respond
 $spacer()
 """,
                     '<img src="spacer.gif" width="1" height="1" alt="" />\n')
 
-        self.verify("""#from Cheetah.Templates._SkeletonPage import _SkeletonPage
+        self.verify(
+"""#from Cheetah.Templates._SkeletonPage import _SkeletonPage
 #extends _SkeletonPage
 #implements respond(foo=1234)
 $spacer()$foo

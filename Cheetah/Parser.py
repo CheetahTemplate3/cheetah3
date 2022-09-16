@@ -893,7 +893,8 @@ class _LowLevelParser(SourceReader):
         return varnames
 
     def getCheetahVar(self, plain=False, skipStartToken=False):
-        """This is called when parsing inside expressions. Cache tokens are only
+        """
+        This is called when parsing inside expressions. Cache tokens are only
         valid in placeholders so this method discards any cache tokens found.
         """
         if not skipStartToken:

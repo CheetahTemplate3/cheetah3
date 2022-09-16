@@ -329,7 +329,8 @@ you do have write permission to and re-run the tests.""")
         fprintfMessage(sys.stderr, format, *args)
 
     def error(self, format, *args):
-        """Always print a warning message to stderr and exit with an error code.
+        """
+        Always print a warning message to stderr and exit with an error code.
         """
         fprintfMessage(sys.stderr, format, *args)
         sys.exit(1)

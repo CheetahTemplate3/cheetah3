@@ -23,27 +23,30 @@ def findFiles(*args, **kw):
 
 def replaceStrInFiles(files, theStr, repl):
 
-    """Replace all instances of 'theStr' with 'repl' for each file in the 'files'
+    """
+    Replace all instances of 'theStr' with 'repl' for each file in the 'files'
     list. Returns a dictionary with data about the matches found.
 
     This is like string.replace() on a multi-file basis.
 
     This function is a wrapper around the FindAndReplace class. See its
-    docstring for more details."""
+    docstring for more details.
+    """
 
     pattern = _escapeRegexChars(theStr)
     return FindAndReplace(files, pattern, repl).results()
 
 
 def replaceRegexInFiles(files, pattern, repl):
-
-    """Replace all instances of regex 'pattern' with 'repl' for each file in the
+    """
+    Replace all instances of regex 'pattern' with 'repl' for each file in the
     'files' list. Returns a dictionary with data about the matches found.
 
     This is like re.sub on a multi-file basis.
 
     This function is a wrapper around the FindAndReplace class. See its
-    docstring for more details."""
+    docstring for more details.
+    """
 
     return FindAndReplace(files, pattern, repl).results()
 
