@@ -2150,8 +2150,8 @@ class SetDirective(OutputTest):
 
     def test5(self):
         """#set with a dictionary"""
-        self.verify(
-"""#set $testDict = {'one':'one1','two':'two2','three':'three3'}
+        self.verify("""\
+#set $testDict = {'one':'one1','two':'two2','three':'three3'}
 $testDict.one
 $testDict.two""",
                     "one1\ntwo2")
@@ -2823,16 +2823,16 @@ class ExtendsDirective(OutputTest):
 
     def test1(self):
         """#extends Cheetah.Templates._SkeletonPage"""
-        self.verify(
-"""#from Cheetah.Templates._SkeletonPage import _SkeletonPage
+        self.verify("""\
+#from Cheetah.Templates._SkeletonPage import _SkeletonPage
 #extends _SkeletonPage
 #implements respond
 $spacer()
 """,
                     '<img src="spacer.gif" width="1" height="1" alt="" />\n')
 
-        self.verify(
-"""#from Cheetah.Templates._SkeletonPage import _SkeletonPage
+        self.verify("""\
+#from Cheetah.Templates._SkeletonPage import _SkeletonPage
 #extends _SkeletonPage
 #implements respond(foo=1234)
 $spacer()$foo
