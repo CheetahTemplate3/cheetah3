@@ -17,7 +17,7 @@ if sys.platform == 'win32':
     # 2.6's distutils.msvc9compiler can raise an IOError when failing to
     # find the compiler
     ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError,
-                  IOError)
+                  IOError, TypeError)
 else:
     ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError)
 
