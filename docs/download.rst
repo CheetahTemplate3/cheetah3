@@ -2,7 +2,7 @@ Downloading Cheetah
 ===================
 
 You can download wheels, eggs and tarballs of Cheetah from the `Python
-Package Index <http://pypi.org/project/Cheetah3/>`_.
+Package Index <http://pypi.org/project/CT3/>`_.
 
 You can keep up to date with release candidates or other downloads of
 Cheetah by visiting the `CheetahTemplate GitHub page

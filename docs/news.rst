@@ -4,6 +4,14 @@ News
 Development (master)
 --------------------
 
+Great move:
+
+  - PyPI has wrongfully classified project ``Cheetah3`` as "critical".
+    This puts a burden to use 2FA to manage the project at PyPI. To
+    avoid the burden the project is renamed to ``CT3`` at PyPI.
+    There will be no updates for ``Cheetah3``.
+    Sorry for the inconvenience!
+
 Minor features:
 
   - Use relative imports everywhere.

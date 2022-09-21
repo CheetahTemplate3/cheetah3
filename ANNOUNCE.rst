@@ -47,7 +47,7 @@ Development:
 https://github.com/CheetahTemplate3
 
 Download:
-https://pypi.org/project/Cheetah3/3.2.7b1
+https://pypi.org/project/CT3/3.2.7b1
 
 News and changes:
 https://cheetahtemplate.org/news.html

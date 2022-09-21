@@ -19,7 +19,7 @@ for py in 2.7 3.4 3.5 3.6 3.7 3.8 3.9 3.10; do
    python$py setup.py bdist_wheel &&
    cd dist &&
    v="`echo $py | sed 's/\.//'`" &&
-   for f in Cheetah3-*-cp$v-*-linux_*.whl; do
+   for f in CT3-*-cp$v-*-linux_*.whl; do
       if [ $py = 2.7 ]; then
          python3.6 -m auditwheel repair -w . $f
       else
@@ -31,4 +31,4 @@ for py in 2.7 3.4 3.5 3.6 3.7 3.8 3.9 3.10; do
 done &&
 
 twine upload --disable-progress-bar --skip-existing dist/* &&
-exec rm -rf build dist docs/html Cheetah3.egg-info
+exec rm -rf build dist docs/html CT3.egg-info

@@ -29,7 +29,7 @@ To install Cheetah in your system-wide Python library:
    command is normally 'su root'. On non-POSIX systems such as Windows
    NT, login as an administrator.
 
-#. Run {pip install Cheetah3} at the command prompt.
+#. Run {pip install CT3} at the command prompt.
 
 #. Or download source code and run {python setup.py install}.
 
@@ -39,7 +39,7 @@ To install Cheetah in your system-wide Python library:
 
 #. If you cannot login as as an administrator install Cheetah as user to your
    own home directory: add option {--user} to commands: either
-   {pip install --user Cheetah3} or {python setup.py install --user}.
+   {pip install --user CT3} or {python setup.py install --user}.
 
 Cheetah's installation is managed by Python's Distribution
 Utilities ('distutils'). There are many options for customization.
