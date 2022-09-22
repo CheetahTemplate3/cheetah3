@@ -1,4 +1,6 @@
-name: Run tests
+name: Test, build, publish
+
+# Run tests (all branches), build wheels (for tags), publish wheels to PyPI
 
 on: [push, pull_request]
 
@@ -27,6 +29,11 @@ jobs:
 
       # Setup Python/pip
       - uses: actions/checkout@v2
+        # Python 3.6 is needed for ghactions-release script
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.6"
+        if: ${{ matrix.python-version == '2.7' && runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -59,3 +66,14 @@ jobs:
         run: |
           tox --version
           tox
+
+      - name: Build sdist and wheel on Unix
+        run: |
+          devscripts/CI/ghactions-release
+          ls -l dist/
+        if: ${{ runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
+      - name: Build sdist and wheel on w64
+        run: |
+          python setup.py sdist bdist_wheel
+          dir dist/
+        if: ${{ runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/') }}
