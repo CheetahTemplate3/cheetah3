@@ -67,13 +67,21 @@ jobs:
           tox --version
           tox
 
-      - name: Build sdist and wheel on Unix
+      - name: Build and publish sdist and wheel on Unix
         run: |
           devscripts/CI/ghactions-release
-          ls -l dist/
+        env:
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+          TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
         if: ${{ runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
-      - name: Build wheel on w64
+      - name: Build and publish wheel on w64
         run: |
+          pip install -U pip setuptools twine wheel
           python setup.py bdist_wheel
-          dir dist/
+          twine upload --disable-progress-bar --skip-existing dist\*
         if: ${{ runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/') }}
+        env:
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+          TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
