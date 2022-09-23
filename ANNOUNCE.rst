@@ -58,6 +58,9 @@ https://cheetahtemplate.org/
 Development:
 https://github.com/CheetahTemplate3
 
+Developer Guide:
+https://cheetahtemplate.org/dev_guide/
+
 Download:
 https://pypi.org/project/CT3/3.3.0a1
 
@@ -70,6 +73,10 @@ https://stackoverflow.com/questions/tagged/cheetah
 
 Example
 =======
+
+Install::
+
+    $ pip install CT3 # (or even "ct3")
 
 Below is a simple example of some Cheetah code, as you can see it's practically
 Python. You can import, inherit and define methods just like in a regular Python
