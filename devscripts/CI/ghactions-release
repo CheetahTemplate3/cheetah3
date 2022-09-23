@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 set -e
 
-[[ "$TOXENV" == *-flake8 || "$TOXENV" == pypy* ]] && exit 0
+[[ "$TOXENV" == pypy* ]] && exit 0
 
 umask 022 &&
 chmod -R a+rX . &&
