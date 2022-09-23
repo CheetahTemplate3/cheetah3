@@ -26,7 +26,15 @@ Tests:
 
 CI:
 
-  - GitHub Actions.
+  - Migrated to GitHub Actions.
+
+    Due to the absent of Python 3.4 at GH Actions tests are not run and
+    wheels are not built.
+
+    Due to GH Actions lacking old compilers for w32/w64 releases for old
+    Python versions (currently 2.7 and 3.5) will be packaged without
+    compiled _namemapper.dll extension. Cheetah can be used without
+    compiled _namemapper.dll extension. A pure-python replacement works.
 
   - Stop testing at Travis CI.
 
