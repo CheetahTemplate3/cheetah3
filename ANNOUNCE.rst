@@ -55,12 +55,6 @@ Where is CheetahTemplate3
 Site:
 https://cheetahtemplate.org/
 
-Development:
-https://github.com/CheetahTemplate3
-
-Developer Guide:
-https://cheetahtemplate.org/dev_guide/
-
 Download:
 https://pypi.org/project/CT3/3.3.0a1
 
@@ -69,6 +63,15 @@ https://cheetahtemplate.org/news.html
 
 StackOverflow:
 https://stackoverflow.com/questions/tagged/cheetah
+
+Mailing lists:
+https://sourceforge.net/p/cheetahtemplate/mailman/
+
+Development:
+https://github.com/CheetahTemplate3
+
+Developer Guide:
+https://cheetahtemplate.org/dev_guide/
 
 
 Example
