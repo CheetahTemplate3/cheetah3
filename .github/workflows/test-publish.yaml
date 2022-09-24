@@ -73,7 +73,6 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
-          TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
         if: ${{ runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
       - name: Build and publish wheel on w64
         run: |
@@ -84,4 +83,3 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
-          TWINE_REPOSITORY_URL: ${{ secrets.TWINE_REPOSITORY_URL }}
