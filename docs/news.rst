@@ -35,7 +35,8 @@ CI:
     Python versions (currently 2.7 and 3.5) will be packaged without
     compiled _namemapper.dll extension. Cheetah can be used
     without compiled _namemapper.dll extension.
-    A pure-python replacement should work.
+    A pure-python replacement should work; ``Cheetah`` imports it
+    automatically if the compiled extension is not available.
 
   - Stop testing at Travis CI.
 
