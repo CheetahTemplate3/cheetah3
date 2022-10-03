@@ -1,6 +1,6 @@
 Hello!
 
-I'm pleased to announce version 3.3.0a1, the 2nd alpha release
+I'm pleased to announce version 3.3.0b0, the 1st beta release
 of branch 3.3 of CheetahTemplate3.
 
 
@@ -33,7 +33,17 @@ Tests:
 
 CI:
 
-  - GitHub Actions.
+  - Migrated to GitHub Actions.
+
+    Due to the absent of Python 3.4 at GH Actions tests are not run and
+    wheels are not built. Installation from sources should work.
+
+    Due to GH Actions lacking old compilers for w32/w64 releases for old
+    Python versions (currently 2.7 and 3.5) will be packaged without
+    compiled _namemapper.dll extension. Cheetah can be used
+    without compiled _namemapper.dll extension.
+    A pure-python replacement should work; ``Cheetah`` imports it
+    automatically if the compiled extension is not available.
 
   - Stop testing at Travis CI.
 
@@ -56,7 +66,7 @@ Site:
 https://cheetahtemplate.org/
 
 Download:
-https://pypi.org/project/CT3/3.3.0a1
+https://pypi.org/project/CT3/3.3.0b0
 
 News and changes:
 https://cheetahtemplate.org/news.html
