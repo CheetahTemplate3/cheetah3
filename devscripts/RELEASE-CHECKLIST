@@ -17,15 +17,12 @@
    branch and creates the new tag at the head of the release branch. Push
    the branch and the tag to start test/build.
 
-3. Run devscripts/push-all in the development repository to push all
-   branches and tags to the public repositories.
+3. Run devscripts/release. This generates and uploads new archives to PyPI.
 
-4. Run devscripts/release. This generates and uploads new archives to PyPI.
-
-5. Generate new docs using devscripts/build-all-docs. Upload docs using
+4. Generate new docs using devscripts/build-all-docs. Upload docs using
    devscripts/publish-docs.
 
-6. Run devscripts/postrelease. The script checks out master and null-merge
+5. Run devscripts/postrelease. The script checks out master and null-merge
    maint. The script restores ANNOUNCE.rst from the previous commit
    (HEAD~). It calls editor; update next version, remove the list of
    contributors and the list of changes, edit download URL in ANNOUNCE.rst.
@@ -34,8 +31,8 @@
    edit "Development Status" in trove classifiers; edit dev_tag or download
    URL. Commit. Verify. Fast-forward next to master.
 
-7. Send announcement to the Cheetah mailing list. For a stable release send
+6. Send announcement to the Cheetah mailing list. For a stable release send
    announcements to python and python-announce mailing lists.
 
-8. Announce new release at Wikipedia
+7. Announce new release at Wikipedia
    (https://en.wikipedia.org/wiki/CheetahTemplate).
