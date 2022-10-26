@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+Tests, CI:
+
+  - Run tests with Python 3.11.
+
 3.3.0 (2022-10-10)
 ------------------
 
