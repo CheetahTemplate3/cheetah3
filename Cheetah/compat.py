@@ -47,7 +47,7 @@ else:
             (s, 'rb', 3) for s in importlib.machinery.EXTENSION_SUFFIXES
         ]
         source = [
-            (s, 'rU', 1) for s in importlib.machinery.SOURCE_SUFFIXES
+            (s, 'r', 1) for s in importlib.machinery.SOURCE_SUFFIXES
         ]
         bytecode = [
             (s, 'rb', 2) for s in importlib.machinery.BYTECODE_SUFFIXES
