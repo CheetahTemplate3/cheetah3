@@ -1,56 +1,59 @@
 Cheetah Template 3.3.1a0
 ========================
 
-Cheetah3 is a free and open source template engine and code generation tool.
-
-It can be used standalone or combined with other tools and frameworks. Web
-development is its principle use, but Cheetah is very flexible and is also being
-used to generate C++ game code, Java, sql, form emails and even Python code.
-
+Cheetah3 is a free and open source (MIT) Python template engine.
 It's a fork of the original CheetahTemplate library.
 
-Documentation
--------------
+Python 2.7 or 3.4+ is required.
 
-For a high-level introduction to Cheetah please refer to the User's Guide
-at https://cheetahtemplate.org/users_guide/index.html
 
-Credits
--------
+Where is CheetahTemplate3
+=========================
 
-https://cheetahtemplate.org/authors.html
+Site:
+https://cheetahtemplate.org/
 
-https://github.com/CheetahTemplate3/cheetah3/blob/master/LICENSE
+Download:
+https://pypi.org/project/CT3/
 
-Praise
-------
+News and changes:
+https://cheetahtemplate.org/news.html
 
-"I'm enamored with Cheetah" - Sam Ruby, senior member of IBM Emerging
-Technologies Group & director of Apache Software Foundation
+StackOverflow:
+https://stackoverflow.com/questions/tagged/cheetah
 
-"Give Cheetah a try. You won't regret it. ... Cheetah is a truly powerful
-system. ... Cheetah is a serious contender for the 'best of breed' Python
-templating." - Alex Martelli
+Mailing lists:
+https://sourceforge.net/p/cheetahtemplate/mailman/
 
-"People with a strong PHP background absolutely love Cheetah for being Smarty,
-but much, much better." - Marek Baczynski
+Development:
+https://github.com/CheetahTemplate3
 
-"I am using Smarty and I know it very well, but compiled Cheetah Templates with
-its inheritance approach is much powerful and easier to use than Smarty." -
-Jaroslaw Zabiello
+Developer Guide:
+https://cheetahtemplate.org/dev_guide/
 
-"There is no better solution than Cheetah" - Wilk
 
-"A cheetah template can inherit from a python class, or a cheetah template, and
-a Python class can inherit from a cheetah template. This brings the full power
-of OO programming facilities to the templating system, and simply blows away
-other templating systems" - Mike Meyer
+Example
+=======
 
-"Cheetah has successfully been introduced as a replacement for the overweight
-XSL Templates for code generation. Despite the power of XSL (and notably XPath
-expressions), code generation is better suited to Cheetah as templates are much
-easier to implement and manage." - `The FEAR development team
-<http://fear.sourceforge.net/docs/latest/guide/Build.html#id2550573>`_.
+Install::
 
-"I've used Cheetah quite a bit and it's a very good package" - Kevin Dangoor,
-lead developer of TurboGears.
+    $ pip install CT3 # (or even "ct3")
+
+Below is a simple example of some Cheetah code, as you can see it's practically
+Python. You can import, inherit and define methods just like in a regular Python
+module, since that's what your Cheetah templates are compiled to :) ::
+
+    #from Cheetah.Template import Template
+    #extends Template
+
+    #set $people = [{'name' : 'Tom', 'mood' : 'Happy'}, {'name' : 'Dick',
+                            'mood' : 'Sad'}, {'name' : 'Harry', 'mood' : 'Hairy'}]
+
+    <strong>How are you feeling?</strong>
+    <ul>
+        #for $person in $people
+            <li>
+                $person['name'] is $person['mood']
+            </li>
+        #end for
+    </ul>
