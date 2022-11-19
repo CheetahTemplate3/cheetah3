@@ -8,6 +8,10 @@ Tests, CI:
 
   - Run tests with Python 3.11.
 
+  - Fix DeprecationWarning: ``unittest.findTestCases()`` is deprecated. Use
+    ``unittest.TestLoader.loadTestsFromModule()`` instead.
+
+
 3.3.0 (2022-10-10)
 ------------------
 

@@ -48,22 +48,23 @@ from Cheetah.Tests import Unicode  # noqa: E402
 SyntaxAndOutput.install_eols()
 
 suites = [
-    unittest.findTestCases(Analyzer),
-    unittest.findTestCases(Filters),
-    unittest.findTestCases(ImportHooks),
-    unittest.findTestCases(LoadTemplate),
-    unittest.findTestCases(Misc),
-    unittest.findTestCases(NameMapper),
-    unittest.findTestCases(Parser),
-    unittest.findTestCases(Regressions),
-    unittest.findTestCases(SyntaxAndOutput),
-    unittest.findTestCases(Template),
-    unittest.findTestCases(TemplateCmdLineIface),
-    unittest.findTestCases(Unicode),
+    unittest.defaultTestLoader.loadTestsFromModule(Analyzer),
+    unittest.defaultTestLoader.loadTestsFromModule(Filters),
+    unittest.defaultTestLoader.loadTestsFromModule(ImportHooks),
+    unittest.defaultTestLoader.loadTestsFromModule(LoadTemplate),
+    unittest.defaultTestLoader.loadTestsFromModule(Misc),
+    unittest.defaultTestLoader.loadTestsFromModule(NameMapper),
+    unittest.defaultTestLoader.loadTestsFromModule(Parser),
+    unittest.defaultTestLoader.loadTestsFromModule(Regressions),
+    unittest.defaultTestLoader.loadTestsFromModule(SyntaxAndOutput),
+    unittest.defaultTestLoader.loadTestsFromModule(Template),
+    unittest.defaultTestLoader.loadTestsFromModule(TemplateCmdLineIface),
+    unittest.defaultTestLoader.loadTestsFromModule(Unicode),
 ]
 
 if not sys.platform.startswith('java'):
-    suites.append(unittest.findTestCases(CheetahWrapper))
+    suites.append(
+        unittest.defaultTestLoader.loadTestsFromModule(CheetahWrapper))
 
 if __name__ == '__main__':
     if 'xml' in sys.argv:
