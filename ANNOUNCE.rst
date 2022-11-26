@@ -1,24 +1,13 @@
 Hello!
 
-I'm pleased to announce version 3.3.0.post1, the 1st post release
-of release 3.3.0 of branch 3.3 of CheetahTemplate3.
+I'm pleased to announce version 3.3.1a0, the 1st alpha release
+of release 3.3.1 of branch 3.3 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
 
-Nothing changes in the library code.
-
-Tests:
-
-  - Run tests with Python 3.11.
-
-  - Fix DeprecationWarning: ``unittest.findTestCases()`` is deprecated. Use
-    ``unittest.TestLoader.loadTestsFromModule()`` instead.
-
-CI:
-
-  - Publish wheels at Github Releases.
+The contributors for this release are:
 
 What is CheetahTemplate3
 ========================
@@ -36,7 +25,7 @@ Site:
 https://cheetahtemplate.org/
 
 Download:
-https://pypi.org/project/CT3/3.3.0.post1
+https://pypi.org/project/CT3/3.3.1a0
 
 News and changes:
 https://cheetahtemplate.org/news.html
