@@ -20,12 +20,13 @@ python -O -m compileall build &&
 python setup.py bdist_wheel &&
 
 if [ "$RUNNER_OS" == 'Linux' ]; then
+    # auditwheel 5.2+ require patchelf 0.14+
     if [ "$py" == 2.7 ]; then
-        pip3.6 install -U auditwheel
+        pip3.6 install -U "auditwheel<5.2"
     elif [ "$py" == 3.4 ]; then
         pip install -U typing "auditwheel==2.1.1"
     else
-        pip install -U auditwheel
+        pip install -U "auditwheel<5.2"
     fi &&
 
     for f in dist/CT3-*-cp$v-*-linux*.whl; do
