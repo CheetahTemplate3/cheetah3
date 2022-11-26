@@ -10,7 +10,7 @@ fi
 . `dirname $0`/split_tag.sh &&
 split_tag $tag
 
-if [ $micro -eq 0 -o $state != final ]; then
+if [ $micro -eq 0 -o $state != final -o $state != post ]; then
    git checkout master
 else
    git checkout maint

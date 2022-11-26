@@ -95,4 +95,6 @@ jobs:
           omitPrereleaseDuringUpdate: true
           prerelease: false
           replacesArtifacts: false
+          skipIfReleaseExists: false
+          updateOnlyUnreleased: false
         if: ${{ startsWith(github.ref, 'refs/tags/') }}

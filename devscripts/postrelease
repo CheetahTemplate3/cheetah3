@@ -5,7 +5,7 @@ tag="`python setup.py --version`" &&
 . `dirname $0`/split_tag.sh &&
 split_tag $tag
 
-if [ $micro -eq 0 -a $state = final ] &&
+if [ $micro -eq 0 -a \( $state = final -o $state = post \) ] &&
       git branch --merged master | grep -Fqw maint; then
    git checkout maint &&
    git merge --ff-only master &&
