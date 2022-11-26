@@ -1,6 +1,7 @@
 name: Test, build, publish
 
-# Run tests (all branches), build wheels (for tags), publish wheels to PyPI
+# Run tests (all branches),
+# for tags build wheels, publish wheels to PyPI and Github Releases.
 
 on: [push, pull_request]
 
@@ -83,3 +84,15 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+      - name: Publish wheel to Releases
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "dist/*"
+          allowUpdates: true
+          bodyFile: "LATEST-CHANGES.rst"
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          prerelease: false
+          replacesArtifacts: false
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}

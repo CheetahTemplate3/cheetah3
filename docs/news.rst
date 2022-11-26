@@ -4,13 +4,16 @@ News
 Development (master)
 --------------------
 
-Tests, CI:
+Tests:
 
   - Run tests with Python 3.11.
 
   - Fix DeprecationWarning: ``unittest.findTestCases()`` is deprecated. Use
     ``unittest.TestLoader.loadTestsFromModule()`` instead.
 
+CI:
+
+  - Publish wheels at Github Releases.
 
 3.3.0 (2022-10-10)
 ------------------

@@ -16,5 +16,12 @@ else
    git checkout maint
 fi &&
 
-`git var GIT_EDITOR` ANNOUNCE.rst docs/news.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py &&
-exec git commit --message="Release $tag" ANNOUNCE.rst docs/news.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py
+if [ $state = final ]; then
+    ghr_prerelease=false
+else
+    ghr_prerelease=true
+fi &&
+sed -Ei "s/(^ +prerelease): .*\$/\1: $ghr_prerelease/" .github/workflows/test-publish.yaml &&
+
+`git var GIT_EDITOR` ANNOUNCE.rst LATEST-CHANGES.rst docs/news.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py &&
+exec git commit --message="Release $tag" ANNOUNCE.rst LATEST-CHANGES.rst docs/news.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py
