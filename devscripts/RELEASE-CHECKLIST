@@ -5,9 +5,10 @@
 1a. The script checks out the release branch ('maint' for a bug-fix
     release, 'master' for minor or major release) and calls editor; update
     version, the list of contributors, the list of changes and download URL
-    in ANNOUNCE.rst; if it is a stable release - edit docs/news.rst to set
-    release date. Edit Version.py and README.rst in the release branch -
-    fix versions. Edit section [egg_info] in setup.cfg - set if it is a
+    in ANNOUNCE.rst; copy the list of changes from ANNOUNCE.rst to
+    LATEST-CHANGES.rst; if it is a stable release - edit docs/news.rst to
+    set release date. Edit Version.py and README.rst in the release branch
+    - fix versions. Edit section [egg_info] in setup.cfg - set if it is a
     stable or development release. In SetupConfig.py edit "Development
     Status" in trove classifiers; edit dev_tag or download URL: if a
     non-stable version - append 'dev' and date stamp, for a stable version

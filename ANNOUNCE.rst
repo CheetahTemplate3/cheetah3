@@ -8,47 +8,17 @@ What's new in CheetahTemplate3
 ==============================
 
 The contributors for this release are:
-N Protokowicz, Enzo Conty, Andrea Mennucci, Saiprasad Kale, odidev,
-Pierre Ossman. Many thanks!
-
-Great move:
-
-  - PyPI has wrongfully classified project ``Cheetah3`` as "critical".
-    This puts a burden to use 2FA to manage the project at PyPI. To
-    avoid the burden the project is renamed to ``CT3`` at PyPI.
-    There will be no updates for ``Cheetah3``.
-    Sorry for the inconvenience!
-
-Minor features:
-
-  - Use relative imports everywhere.
 
 Tests:
 
-  - Run pure-python ``NameMapper`` tests in a separate process.
+  - Run tests with Python 3.11.
 
-  - Fixed a bug in tests with pure-python ``NameMapper``.
-
-  - Add Python 3.10 to ``tox.ini``.
+  - Fix DeprecationWarning: ``unittest.findTestCases()`` is deprecated. Use
+    ``unittest.TestLoader.loadTestsFromModule()`` instead.
 
 CI:
 
-  - Migrated to GitHub Actions.
-
-    Due to the absent of Python 3.4 at GH Actions tests are not run and
-    wheels are not built. Installation from sources should work.
-
-    Due to GH Actions lacking old compilers for w32/w64 releases for old
-    Python versions (currently 2.7) are packaged without compiled
-    _namemapper.pyd extension. Cheetah can be used without compiled
-    _namemapper.pyd extension. A pure-python replacement should work;
-    ``Cheetah`` imports it automatically if the compiled extension is
-    not available.
-
-  - Stop testing at Travis CI.
-
-  - Stop testing at AppVeyor.
-
+  - Publish wheels at Github Releases.
 
 What is CheetahTemplate3
 ========================
