@@ -79,7 +79,7 @@ jobs:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
         if: ${{ runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
-      - name: Build and publish wheel on w64
+      - name: Build and publish wheel on w32
         run: |
           pip install -U pip setuptools twine wheel
           python setup.py bdist_wheel
