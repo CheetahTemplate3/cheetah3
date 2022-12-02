@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+CI:
+
+  - Run tests with PyPy.
+
 3.3.0.post1 (2022-11-26)
 ------------------------
 

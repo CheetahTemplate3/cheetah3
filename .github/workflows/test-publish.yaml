@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-11, windows-latest]
-        python-version: ["2.7", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
+        python-version: ["2.7", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "pypy-2.7"]
         include:
         - os: ubuntu-latest
           os-name: Linux
@@ -54,10 +54,13 @@ jobs:
       - name: Set TOXENV
         run: |
           import os, sys
-          pyver = '%d%d' % tuple(sys.version_info[:2])
-          toxenv = 'py%s' % pyver
-          if os.name == 'posix':
-            toxenv += ',py%s-flake8' % pyver
+          if hasattr(sys, 'pypy_version_info'):
+            toxenv = 'pypy'
+          else:
+            pyver = '%d%d' % tuple(sys.version_info[:2])
+            toxenv = 'py%s' % pyver
+            if os.name == 'posix':
+              toxenv += ',py%s-flake8' % pyver
           with open(os.environ['GITHUB_ENV'], 'a') as f:
             f.write('TOXENV=' + toxenv + '\n')
           print(toxenv)
@@ -65,6 +68,7 @@ jobs:
 
       - name: Run tox
         run: |
+          python -c "import os; print(os.environ['TOXENV'])"
           tox --version
           tox
 
