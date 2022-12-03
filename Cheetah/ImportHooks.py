@@ -121,7 +121,8 @@ def install(templateFileExtensions=('.tmpl',)):
     global _installed
     if not _installed:
         CheetahDirOwner.templateFileExtensions = templateFileExtensions
-        if isinstance(builtin.__import__, types.BuiltinFunctionType):
+        if isinstance(builtin.__import__,
+                      (types.BuiltinFunctionType, types.FunctionType)):
             global __oldimport__
             ImportManager.__oldimport__ = __oldimport__ = builtin.__import__
             ImportManager._globalOwnerTypes.insert(0, CheetahDirOwner)

@@ -4,9 +4,13 @@ News
 Development (master)
 --------------------
 
+Bug fixes:
+
+  - Fixed ``ImportHooks`` under PyPy3.
+
 CI:
 
-  - Run tests with PyPy.
+  - Run tests with PyPy and PyPy3.
 
 3.3.0.post1 (2022-11-26)
 ------------------------
