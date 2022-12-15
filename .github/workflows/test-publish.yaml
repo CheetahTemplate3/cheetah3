@@ -64,14 +64,21 @@ jobs:
       - name: Set TOXENV
         run: |
           import os, sys
+          ld_library_path = None
           if hasattr(sys, 'pypy_version_info'):
             toxenv = 'pypy3'
           else:
             pyver = '%d%d' % tuple(sys.version_info[:2])
+            if os.name == 'posix':
+              if pyver == '27':  # Python 2.7 on Linux requires `$LD_LIBRARY_PATH`
+                ld_library_path = os.path.join(
+                  os.path.dirname(os.path.dirname(sys.executable)), 'lib')
             toxenv = 'py%s' % pyver
             if os.name == 'posix':
               toxenv += ',py%s-flake8' % pyver
           with open(os.environ['GITHUB_ENV'], 'a') as f:
+            if ld_library_path:
+              f.write('LD_LIBRARY_PATH=' + ld_library_path + '\n')
             f.write('TOXENV=' + toxenv + '\n')
           print(toxenv)
         shell: python
