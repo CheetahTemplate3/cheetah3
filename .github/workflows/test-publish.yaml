@@ -7,11 +7,13 @@ on: [push, pull_request]
 
 jobs:
   run-tests:
+    env:
+      not_in_conda: "['3.7', '3.11', 'pypy-3.7']"
 
     strategy:
       matrix:
         os: [ubuntu-latest, macos-11, windows-latest]
-        python-version: ["2.7", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "pypy-2.7", "pypy-3.7"]
+        python-version: ["2.7", "3.5", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "pypy-3.7"]
         include:
         - os: ubuntu-latest
           os-name: Linux
@@ -33,14 +35,19 @@ jobs:
 
       # Setup Python/pip
       - uses: actions/checkout@v2
-        # Python 3.6 is needed for ghactions-release script
+        # Python 3.7 is needed for ghactions-release script
       - uses: actions/setup-python@v4
         with:
-          python-version: "3.6"
+          python-version: "3.7"
         if: ${{ matrix.python-version == '2.7' && runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
+      - uses: s-weigand/setup-conda@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+        if: ${{ runner.os == 'Linux' && !contains(fromJSON(env.not_in_conda), matrix.python-version) }}
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+        if: ${{ runner.os != 'Linux' || contains(fromJSON(env.not_in_conda), matrix.python-version) }}
       - name: Cache pip
         uses: actions/cache@v3
         with:
@@ -53,18 +60,25 @@ jobs:
           python --version
           python -m pip install --upgrade pip setuptools wheel
           pip --version
-          pip install --upgrade virtualenv tox
+          pip install --upgrade virtualenv "tox < 4"
       - name: Set TOXENV
         run: |
           import os, sys
+          ld_library_path = None
           if hasattr(sys, 'pypy_version_info'):
-            toxenv = 'pypy'
+            toxenv = 'pypy3'
           else:
             pyver = '%d%d' % tuple(sys.version_info[:2])
+            if os.name == 'posix':
+              if pyver == '27':  # Python 2.7 on Linux requires `$LD_LIBRARY_PATH`
+                ld_library_path = os.path.join(
+                  os.path.dirname(os.path.dirname(sys.executable)), 'lib')
             toxenv = 'py%s' % pyver
             if os.name == 'posix':
               toxenv += ',py%s-flake8' % pyver
           with open(os.environ['GITHUB_ENV'], 'a') as f:
+            if ld_library_path:
+              f.write('LD_LIBRARY_PATH=' + ld_library_path + '\n')
             f.write('TOXENV=' + toxenv + '\n')
           print(toxenv)
         shell: python
