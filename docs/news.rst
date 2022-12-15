@@ -8,9 +8,11 @@ Bug fixes:
 
   - Fixed ``ImportHooks`` under PyPy3.
 
-CI:
+Tests:
 
   - Run tests with PyPy3.
+
+CI:
 
   - Use ``conda`` to install older Pythons
 
