@@ -16,6 +16,8 @@ import sys
 args_l = len(sys.argv)
 if args_l == 1:
     pass
+elif args_l == 2 and sys.argv[1] == 'test':
+    pass
 elif args_l == 2 and sys.argv[1] == '--namemapper-pure':
     try:
         from Cheetah import _namemapper  # noqa
