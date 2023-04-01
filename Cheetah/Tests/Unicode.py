@@ -1,6 +1,5 @@
 # -*- encoding: utf8 -*-
 
-from glob import glob
 import os
 from shutil import rmtree
 import tempfile
@@ -13,33 +12,28 @@ from Cheetah.compat import PY2, unicode, load_module_from_file
 
 class CommandLineTest(unittest.TestCase):
     def createAndCompile(self, source):
-        fd, sourcefile = tempfile.mkstemp()
-        os.close(fd)
-        os.remove(sourcefile)
-        sourcefile = sourcefile.replace('-', '_')
+        tmpDir = tempfile.mkdtemp()
+        try:
+            sourcefile = os.path.join(tmpDir, "source")
 
-        if PY2:
-            fd = open('%s.tmpl' % sourcefile, 'w')
-        else:
-            fd = open('%s.tmpl' % sourcefile, 'w', encoding='utf-8')
-        fd.write(source)
-        fd.close()
+            if PY2:
+                fd = open('%s.tmpl' % sourcefile, 'w')
+            else:
+                fd = open('%s.tmpl' % sourcefile, 'w', encoding='utf-8')
+            fd.write(source)
+            fd.close()
 
-        wrap = CheetahWrapper.CheetahWrapper()
-        wrap.main(['cheetah', 'compile',
-                   '--encoding=utf-8', '--settings=encoding="utf-8"',
-                   '--quiet', '--nobackup', sourcefile])
-        module_name = os.path.split(sourcefile)[1]
-        module = load_module_from_file(
-            module_name, module_name, sourcefile + '.py')
-        template = getattr(module, module_name)
-        os.remove('%s.tmpl' % sourcefile)
-        for sourcefile_py in glob('%s.py*' % sourcefile):  # *.py[co]
-            os.remove(sourcefile_py)
-        __pycache__ = os.path.join(os.path.dirname(sourcefile), '__pycache__')
-        if os.path.exists(__pycache__):  # PY3
-            rmtree(__pycache__)
-        return template
+            wrap = CheetahWrapper.CheetahWrapper()
+            wrap.main(['cheetah', 'compile',
+                       '--encoding=utf-8', '--settings=encoding="utf-8"',
+                       '--quiet', '--nobackup', sourcefile])
+            module_name = os.path.split(sourcefile)[1]
+            module = load_module_from_file(
+                module_name, module_name, sourcefile + '.py')
+            template = getattr(module, module_name)
+            return template
+        finally:
+            rmtree(tmpDir, True)
 
 
 class JBQ_UTF8_Test1(unittest.TestCase):
