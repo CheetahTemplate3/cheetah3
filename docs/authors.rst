@@ -40,4 +40,5 @@ Contributions have been made by:
 * Andrea Mennucci <mennucc1@debian.org>
 * odidev <odidev at puresoftware.com>
 * Pierre Ossman <ossman at cendio.se>
+* Michael Gorny <mgorny at gentoo.org>
 * Oleg Broytman <phd@phdru.name>
