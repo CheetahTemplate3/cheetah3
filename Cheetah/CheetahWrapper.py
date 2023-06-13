@@ -592,7 +592,7 @@ you do have write permission to and re-run the tests.""")
             pysrc = TemplateClass.compile(file=sys.stdin,
                                           compilerSettings=compilerSettings,
                                           returnAClass=False)
-            output = pysrc
+            output = pysrc if PY2 else pysrc.decode()
         else:
             output = str(TemplateClass(file=sys.stdin,
                                        compilerSettings=compilerSettings))
