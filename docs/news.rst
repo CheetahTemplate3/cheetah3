@@ -4,6 +4,8 @@ News
 Development (master)
 --------------------
 
+* CI(GHActions): Install all Python and PyPy versions from ``conda-forge``.
+
 3.3.1 (2022-12-25)
 ------------------
 
