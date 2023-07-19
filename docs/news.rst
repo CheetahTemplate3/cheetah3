@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+Bug fixes:
+
+  - Fixed printing to stdout in ``CheetahWrapper``.
+
 3.3.1 (2022-12-25)
 ------------------
 
