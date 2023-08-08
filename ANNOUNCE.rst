@@ -1,6 +1,6 @@
 Hello!
 
-I'm pleased to announce version 3.3.2b1, the 1st beta release
+I'm pleased to announce version 3.3.2b2, the 1st beta release
 of release 3.3.2 of branch 3.3 of CheetahTemplate3.
 
 
@@ -12,6 +12,11 @@ The contributor for this release is nate.k. Thanks!
 Bug fixes:
 
   - Fixed printing to stdout in ``CheetahWrapper``.
+
+Code style:
+
+  - Fixed a ``F811`` warning from ``flake8``:
+    redefinition of unused 'join' in ``ImportManager.py``.
 
 CI:
 
@@ -34,7 +39,7 @@ Site:
 https://cheetahtemplate.org/
 
 Download:
-https://pypi.org/project/CT3/3.3.2b1
+https://pypi.org/project/CT3/3.3.2b2
 
 News and changes:
 https://cheetahtemplate.org/news.html
