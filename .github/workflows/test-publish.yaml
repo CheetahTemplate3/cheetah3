@@ -35,17 +35,23 @@ jobs:
 
       # Setup Python/pip
       - uses: actions/checkout@v2
-      # Python 3.7 is needed for ghactions-release script
-      - uses: s-weigand/setup-conda@v1
-        with:
-          conda-channels: conda-forge
-          python-version: "3.7"
-        if: ${{ matrix.python-version == '2.7' && runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
       - uses: s-weigand/setup-conda@v1
         with:
           conda-channels: conda-forge
           python-version: ${{ matrix.python-version }}
         if: ${{ !contains(fromJSON(env.not_in_conda), matrix.python-version) }}
+      # Python 3.7 is needed for ghactions-release script
+      - run: |
+          conda deactivate
+          conda install -n py37 python=3.7
+          conda activate py37
+          conda config --set auto_stack 1
+          conda activate __setup_conda
+          echo "$GITHUB_ENV"
+          echo "$PATH" >> "$GITHUB_ENV"
+          cat "$GITHUB_ENV"
+        shell: bash
+        if: ${{ matrix.python-version == '2.7' && runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
