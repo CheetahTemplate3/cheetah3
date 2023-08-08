@@ -1,21 +1,13 @@
 Hello!
 
-I'm pleased to announce version 3.3.2, the 2nd bug-fix
-of branch 3.3 of CheetahTemplate3.
+I'm pleased to announce version 3.3.3a0, the first alpha release
+of release 3.3.3 of branch 3.3 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
 
-The contributor for this release is nate.k. Thanks!
-
-Bug fixes:
-
-  - Fixed printing to stdout in ``CheetahWrapper``.
-
-CI:
-
-   - CI(GHActions): Install all Python and PyPy versions from ``conda-forge``.
+The contributors for this release are ...
 
 
 What is CheetahTemplate3
@@ -34,7 +26,7 @@ Site:
 https://cheetahtemplate.org/
 
 Download:
-https://pypi.org/project/CT3/3.3.2
+https://pypi.org/project/CT3/3.3.3a0
 
 News and changes:
 https://cheetahtemplate.org/news.html
