@@ -60,14 +60,15 @@ def _os_bootstrap():
     elif 'mac' in names:
         from mac import stat, getcwd
 
-        def join(a, b):
-            if a == '':
-                return b
-            if ':' not in a:
-                a = ':' + a
-            if a[-1:] != ':':
-                a = a + ':'
-            return a + b
+        if join is None:
+            def join(a, b):
+                if a == '':
+                    return b
+                if ':' not in a:
+                    a = ':' + a
+                if a[-1:] != ':':
+                    a = a + ':'
+                return a + b
     else:
         raise ImportError('no os specific module found')
 
