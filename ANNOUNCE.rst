@@ -1,6 +1,6 @@
 Hello!
 
-I'm pleased to announce version 3.3.2b1, the 1st beta release
+I'm pleased to announce version 3.3.2b14, a beta release
 of release 3.3.2 of branch 3.3 of CheetahTemplate3.
 
 
@@ -34,7 +34,7 @@ Site:
 https://cheetahtemplate.org/
 
 Download:
-https://pypi.org/project/CT3/3.3.2b1
+https://pypi.org/project/CT3/3.3.2b14
 
 News and changes:
 https://cheetahtemplate.org/news.html
