@@ -13,16 +13,6 @@ def die(reason):
     sys.exit(1)
 
 
-def useOrRaise(thing, errmsg=''):
-    """Raise 'thing' if it's a subclass of Exception.  Otherwise return it.
-
-    Called by: Cheetah.Servlet.cgiImport()
-    """
-    if isinstance(thing, type) and issubclass(thing, Exception):
-        raise thing(errmsg)
-    return thing
-
-
 def checkKeywords(dic, legalKeywords, what='argument'):
     """Verify no illegal keyword arguments were passed to a function.
 

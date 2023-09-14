@@ -375,7 +375,6 @@ Comparisions of various Smarty constructs:
     count_paragraphs/sentances/words   (no equivalent, user can write function)
     date_format    (use 'time' module or download Egenix's mx.DateTime)
     default    ($getVar('varName', 'default value') )
-    escape: html encode    ($cgi.escape(VALUE) )
     escape: url encode    ($urllib.quote_plus(VALUE) )
     escape: hex encode   (no equivalent?  user can write function)
     escape: hex entity encode  (no equivalent?  user can write function)

@@ -248,15 +248,6 @@ templates or in pure Python classes.
     standalone program.
 
 
-\*{Inherited from Cheetah.Utils.WebInputMixin}
-
-    Exception raised by {.webInput}.
-
-    Convenience method to access GET/POST variables from a Webware
-    servlet or CGI script, or Webware cookie or session variables. See
-    section webware.webInput for usage information.
-
-
 \*{Inherited from Cheetah.SettingsManager}
 
     Get a compiler setting.

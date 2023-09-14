@@ -160,33 +160,6 @@ Package {Cheetah.Utils} contains non-Cheetah-specific functions and
 classes that are imported by other Cheetah components. Many of
 these utils can be used standalone in other applications too.
 
-Current Utils include:
-
-    This is inherited by {Template} objects, and provides the method,
-    {.cgiImport} method (section webware.cgiImport).
-
-    A catch-all module for small functions.
-
-        Raise 'thing' if it's a subclass of Exception, otherwise return it.
-        Useful when one argument does double duty as a default value or an
-        exception to throw. Contribyted by Mike Orr.
-
-        Verifies the dictionary does not contain any keys not listed in
-        'legalKeywords'. If it does, raise TypeError. Useful for checking
-        the keyword arguments to a function. Contributed by Mike Orr.
-
-
-    Not implemented yet, but will contain the {.uploadFile} method (or
-    three methods) to "safely" copy a form-uploaded file to a local
-    file, to a searchList variable, or return it. When finished, this
-    will be inherited by {Template}, allowing all templates to do this.
-    If you want this feature, read the docstring in the source and let
-    us know on the mailing list what you'd like this method to do.
-    Contributed by Mike Orr.
-
-    Functions to verify the type of a user-supplied function argument.
-    Contributed by Mike Orr.
-
 
 Cheetah.Templates.SkeletonPage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

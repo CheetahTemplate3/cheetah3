@@ -18,7 +18,6 @@ Submodules
 
 .. toctree::
 
-   Cheetah.Tools.CGITemplate
    Cheetah.Tools.MondoReport
    Cheetah.Tools.RecursiveNull
    Cheetah.Tools.SiteHierarchy
