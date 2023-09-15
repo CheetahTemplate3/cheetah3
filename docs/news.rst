@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+Minor features:
+
+  - Protect ``import cgi`` in preparation to Python 3.13.
+
 Tests:
 
   - Run tests with Python 3.12.

@@ -21,7 +21,10 @@ except ImportError:
     from io import StringIO
 import traceback
 import pprint
-import cgi  # Used by .webInput() if the template is a CGI script.
+try:
+    import cgi  # Used by .webInput() if the template is a CGI script.
+except ImportError:  # Python 3.13+
+    cgi = None
 import types
 
 from . import ErrorCatchers              # for placeholder tags
@@ -1917,7 +1920,7 @@ class Template(Servlet):
         """
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
-        if isCgi and src in ('f', 'v'):
+        if isCgi and (cgi is not None) and src in ('f', 'v'):
             global _formUsedByWebInput
             if _formUsedByWebInput is None:
                 _formUsedByWebInput = cgi.FieldStorage()
