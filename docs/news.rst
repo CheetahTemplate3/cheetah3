@@ -4,6 +4,13 @@ News
 Development (master)
 --------------------
 
+CI:
+
+  - GHActions: Ensure ``pip`` only if needed
+
+    This is to work around a problem in conda with Python 3.7 -
+    it brings in wrong version of ``setuptools`` incompatible with Python 3.7.
+
 3.3.2 (2023-08-08)
 ------------------
 
