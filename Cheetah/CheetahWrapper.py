@@ -67,7 +67,7 @@ def usage(usageMessage, errorMessage="", out=sys.stderr):
     sys.exit(exitStatus)
 
 
-WRAPPER_TOP = """\
+WRAPPER_TOP = r"""\
          __  ____________  __
          \ \/            \/ /
           \/    *   *     \/    CHEETAH %(Version)s Command-Line Tool

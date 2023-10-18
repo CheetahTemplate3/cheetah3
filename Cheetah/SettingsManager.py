@@ -16,7 +16,7 @@ from .compat import PY2
 
 numberRE = re.compile(Number)
 complexNumberRE = re.compile(
-    '[\(]*' + Number + r'[ \t]*\+[ \t]*' + Number + '[\)]*')
+    r'[\(]*' + Number + r'[ \t]*\+[ \t]*' + Number + r'[\)]*')
 
 ##################################################
 # FUNCTIONS ##

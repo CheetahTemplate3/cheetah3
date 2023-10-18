@@ -268,8 +268,8 @@ class Backslashes(OutputTest):
 
     def test3(self):
         """ a single \\ without using rawstrings"""
-        self.verify("\ \ ",
-                    "\ \ ")
+        self.verify("\\ \\ ",
+                    "\\ \\ ")
 
     def test4(self):
         """ single line from an apache conf file"""
@@ -296,8 +296,8 @@ class Backslashes(OutputTest):
 
     def test7(self):
         """ a single \\ without using rawstrings plus many NEWLINES"""
-        self.verify("\ \ " + "\n\n\n\n\n\n\n\n\n",
-                    "\ \ " + "\n\n\n\n\n\n\n\n\n")
+        self.verify("\\ \\ " + "\n\n\n\n\n\n\n\n\n",
+                    "\\ \\ " + "\n\n\n\n\n\n\n\n\n")
 
     def test8(self):
         """
@@ -318,17 +318,17 @@ class NonTokens(OutputTest):
 
     def test2(self):
         """hash not in #directives"""
-        self.verify("# \# #5 ",
+        self.verify("# \\# #5 ",
                     "# # #5 ")
 
     def test3(self):
         """escapted comments"""
-        self.verify("  \##escaped comment  ",
+        self.verify("  \\##escaped comment  ",
                     "  ##escaped comment  ")
 
     def test4(self):
         """escapted multi-line comments"""
-        self.verify("  \#*escaped comment \n*#  ",
+        self.verify("  \\#*escaped comment \n*#  ",
                     "  #*escaped comment \n*#  ")
 
     def test5(self):
@@ -815,27 +815,27 @@ class Placeholders_Esc(OutputTest):
 
     def test1(self):
         """1 escaped placeholder"""
-        self.verify("\$var",
+        self.verify("\\$var",
                     "$var")
 
     def test2(self):
         """2 escaped placeholders"""
-        self.verify("\$var \$_",
+        self.verify("\\$var \\$_",
                     "$var $_")
 
     def test3(self):
         """2 escaped placeholders - back to back"""
-        self.verify("\$var\$_",
+        self.verify("\\$var\\$_",
                     "$var$_")
 
     def test4(self):
         """2 escaped placeholders - nested"""
-        self.verify("\$var(\$_)",
+        self.verify("\\$var(\\$_)",
                     "$var($_)")
 
     def test5(self):
         """2 escaped placeholders - nested and enclosed"""
-        self.verify("\$(var(\$_)",
+        self.verify("\\$(var(\\$_)",
                     "$(var($_)")
 
 
@@ -1826,19 +1826,19 @@ class DefDirective(OutputTest):
     def test13(self):
         """single line #def escaped $placeholders"""
         self.verify(
-            "#def testMeth: \$aFunc(\$anInt)\n- $testMeth -",
+            "#def testMeth: \\$aFunc(\\$anInt)\n- $testMeth -",
             "- $aFunc($anInt) -")
 
     def test14(self):
         """single line #def 1 escaped $placeholders"""
         self.verify(
-            "#def testMeth: \$aFunc($anInt)\n- $testMeth -",
+            "#def testMeth: \\$aFunc($anInt)\n- $testMeth -",
             "- $aFunc(1) -")
 
     def test15(self):
         """single line #def 1 escaped $placeholders + more WS"""
         self.verify(
-            "#def testMeth    : \$aFunc($anInt)\n- $testMeth -",
+            "#def testMeth    : \\$aFunc($anInt)\n- $testMeth -",
             "- $aFunc(1) -")
 
     def test16(self):
@@ -1975,19 +1975,19 @@ inner
     def test8(self):
         """single line #block 1 escaped $placeholders"""
         self.verify(
-            "#block testMeth: \$aFunc($anInt)",
+            "#block testMeth: \\$aFunc($anInt)",
             "$aFunc(1)")
 
     def test9(self):
         """single line #block 1 escaped $placeholders + WS"""
         self.verify(
-            "#block testMeth: \$aFunc( $anInt )",
+            "#block testMeth: \\$aFunc( $anInt )",
             "$aFunc( 1 )")
 
     def test10(self):
         """single line #block 1 escaped $placeholders + more WS"""
         self.verify(
-            "#block testMeth  : \$aFunc( $anInt )",
+            "#block testMeth  : \\$aFunc( $anInt )",
             "$aFunc( 1 )")
 
     def test11(self):

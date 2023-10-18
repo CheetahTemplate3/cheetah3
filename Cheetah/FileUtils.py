@@ -344,7 +344,7 @@ class SourceFileStats:
         blankLines = 0
         commentLines = 0
         commentLineRe = re.compile(r'\s#.*$')
-        blankLineRe = re.compile('\s$')
+        blankLineRe = re.compile(r'\s$')
         lines = open(fileName).read().splitlines()
         totalLines = len(lines)
 

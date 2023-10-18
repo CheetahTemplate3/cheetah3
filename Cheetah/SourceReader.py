@@ -5,7 +5,7 @@ from .compat import unicode
 
 EOLre = re.compile(r'[ \f\t]*(?:\r\n|\r|\n)')
 EOLZre = re.compile(r'(?:\r\n|\r|\n|\Z)')
-ENCODINGsearch = re.compile("coding[=:]\s*([-\w.]+)").search
+ENCODINGsearch = re.compile(r"coding[=:]\s*([-\w.]+)").search
 
 
 class Error(Exception):

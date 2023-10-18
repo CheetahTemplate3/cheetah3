@@ -144,7 +144,7 @@ class TemplatePreprocessor(object):
 
     See the docstring for Template.compile
 
-    \*\* Preprocessors are an advanced topic \*\*
+    \\*\\* Preprocessors are an advanced topic \\*\\*
     '''
 
     def __init__(self, settings):
@@ -1617,7 +1617,7 @@ class Template(Servlet):
         """Compile the template. This method is automatically called by
         Template.__init__ it is provided with 'file' or 'source' args.
 
-        USERS SHOULD \*NEVER\* CALL THIS METHOD THEMSELVES.
+        USERS SHOULD \\*NEVER\\* CALL THIS METHOD THEMSELVES.
         Use Template.compile instead.
         """
         if compilerSettings is Unspecified:
@@ -1771,11 +1771,12 @@ class Template(Servlet):
 
         because this pretty-prints all the values inside HTML <PRE> tags.
 
-        \*\*\* KLUDGE: 'debug' is supposed to insert into the template output,
+        \\*\\*\\* KLUDGE: 'debug' is supposed to insert
+        into the template output,
         but it wasn't working so I changed it to a'print' statement.
         So the debugging output will appear wherever standard output
         is pointed, whether at the terminal, in a Webware log file,
-        or whatever. \*\*\*
+        or whatever. \\*\\*\\*
 
         Since we didn't specify any coversions, the value is a string.  It's a
         'single' value because we specified it in 'names' rather than
@@ -1981,7 +1982,7 @@ def genParserErrorFromPythonException(source, file,
         pyLineno = exception.lineno
     else:
         pyLineno = int(
-            re.search('[ \t]*File.*line (\d+)', formatedExc).group(1))
+            re.search('[ \t]*File.*line (\\d+)', formatedExc).group(1))
 
     lines = generatedPyCode.splitlines()
 
@@ -2022,7 +2023,7 @@ def genParserErrorFromPythonException(source, file,
         report,
         '='*80,  # noqa: E226 missing whitespace around operator
     ]
-    cheetahPosMatch = re.search('line (\d+), col (\d+)', formatedExc)
+    cheetahPosMatch = re.search('line (\\d+), col (\\d+)', formatedExc)
     if cheetahPosMatch:
         lineno = int(cheetahPosMatch.group(1))
         col = int(cheetahPosMatch.group(2))
@@ -2032,7 +2033,7 @@ def genParserErrorFromPythonException(source, file,
     else:
         lineno = None
         col = None
-        cheetahPosMatch = re.search('line (\d+), col (\d+)',
+        cheetahPosMatch = re.search('line (\\d+), col (\\d+)',
                                     '\n'.join(lines[max(pyLineno - 2, 0):]))
         if cheetahPosMatch:
             lineno = int(cheetahPosMatch.group(1))
