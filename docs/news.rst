@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+Tests:
+
+  - Run tests with Python 3.12.
+
 CI:
 
   - GHActions: Ensure ``pip`` only if needed
