@@ -1,8 +1,8 @@
 News
 ====
 
-Development (master)
---------------------
+3.3.3 (2023-10-22)
+------------------
 
 Minor features:
 
