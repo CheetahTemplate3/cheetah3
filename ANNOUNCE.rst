@@ -1,26 +1,13 @@
 Hello!
 
-I'm pleased to announce version 3.3.3, the fourth release
-of branch 3.3 of CheetahTemplate3.
+I'm pleased to announce version 3.3.4a0, the first alpha release
+of release 3.3.4 of branch 3.3 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
 
-Minor features:
-
-  - Protect ``import cgi`` in preparation to Python 3.13.
-
-Tests:
-
-  - Run tests with Python 3.12.
-
-CI:
-
-  - GHActions: Ensure ``pip`` only if needed
-
-    This is to work around a problem in conda with Python 3.7 -
-    it brings in wrong version of ``setuptools`` incompatible with Python 3.7.
+The contributors for this release are ...
 
 
 What is CheetahTemplate3
@@ -39,7 +26,7 @@ Site:
 https://cheetahtemplate.org/
 
 Download:
-https://pypi.org/project/CT3/3.3.3
+https://pypi.org/project/CT3/3.3.4a0
 
 News and changes:
 https://cheetahtemplate.org/news.html
