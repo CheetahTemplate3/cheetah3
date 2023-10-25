@@ -16,6 +16,18 @@ else
    git checkout maint
 fi &&
 
+if [ "$state" = alpha ]; then
+    trove_cls='3 - Alpha'
+elif [ "$state" = beta -o "$state" = 'release candidate' ]; then
+    trove_cls='4 - Beta'
+elif [ "$state" = final -o "$state" = post ]; then
+    trove_cls='5 - Production/Stable'
+else
+    echo "Error: unknown state $state" >&2
+    exit 1
+fi &&
+sed -Ei "s/Development Status :: .+\$/Development Status :: $trove_cls/" SetupConfig.py &&
+
 if [ "$state" = final -o "$state" = post ]; then
     ghr_prerelease=false
 else
