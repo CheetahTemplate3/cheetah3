@@ -16,6 +16,11 @@ else
    git checkout maint
 fi &&
 
+chth_tag="Cheetah Template $tag" &&
+chth_tag_len=${#chth_tag} &&
+sed -Ei "1s/^Cheetah Template [1-9].+\$/$chth_tag/" README.rst &&
+sed -Ei "2s/^==========+\$/`python -c \"print('='*$chth_tag_len)\"`/" README.rst &&
+
 if [ "$state" = alpha ]; then
     trove_cls='3 - Alpha'
 elif [ "$state" = beta -o "$state" = 'release candidate' ]; then
