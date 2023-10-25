@@ -40,5 +40,5 @@ else
 fi &&
 sed -Ei "s/(^ +prerelease): .*\$/\1: $ghr_prerelease/" .github/workflows/test-publish.yaml &&
 
-`git var GIT_EDITOR` ANNOUNCE.rst LATEST-CHANGES.rst docs/news.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py &&
-exec git commit --message="Release $tag" ANNOUNCE.rst LATEST-CHANGES.rst docs/news.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py .github/workflows/test-publish.yaml
+`git var GIT_EDITOR` docs/news.rst ANNOUNCE.rst LATEST-CHANGES.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py &&
+exec git commit --message="Release $tag" docs/news.rst ANNOUNCE.rst LATEST-CHANGES.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py .github/workflows/test-publish.yaml
