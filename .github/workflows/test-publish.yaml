@@ -9,6 +9,7 @@ jobs:
   run-tests:
     env:
       not_in_conda: "[]"
+      not_in_aarch64: "['3.5', 'pypy3.7']"
 
     strategy:
       matrix:
@@ -32,7 +33,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-
       # Setup Python/pip
       - uses: actions/checkout@v4
       - uses: s-weigand/setup-conda@v1
@@ -112,6 +112,32 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+      - name: Build and publish wheel on Linux/aarch64
+        uses: uraimo/run-on-arch-action@v2
+        with:
+          arch: aarch64
+          distro: ubuntu22.04
+          env: |
+            PY_VER: "${{ matrix.python-version }}"
+            RUNNER_OS: ${{ runner.os }}
+          install: |
+            set -ex
+            apt-get update -q -y
+            apt-get install -q -y curl gcc patchelf
+          run: |
+            set -ex
+            curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+            bash Miniforge3-$(uname)-$(uname -m).sh -b -u -p "$HOME"/miniforge3
+            source "$HOME"/miniforge3/etc/profile.d/conda.sh
+            #conda update -n base -c conda-forge --yes conda
+            conda create -n $PY_VER --yes python=$PY_VER
+            conda activate $PY_VER
+            python --version
+            python -m pip || python -m ensurepip --default-pip --upgrade
+            python -m pip install --upgrade pip setuptools wheel
+            pip --version
+            exec devscripts/CI/ghactions-release
+        if: ${{ !contains(fromJSON(env.not_in_aarch64), matrix.python-version) && runner.os == 'Linux' && startsWith(github.ref, 'refs/tags/') }}
       - name: Publish wheel to Releases
         uses: ncipollo/release-action@v1
         with:
