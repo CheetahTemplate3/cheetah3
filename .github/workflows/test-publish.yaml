@@ -43,10 +43,12 @@ jobs:
       # Python 3.7 is needed for ghactions-release script
       - name: Install additional Python 3.7
         run: |
-          conda create -n py37 python=3.7
+          conda create -n py37 --yes python=3.7
           py37_prefix="`echo $CONDA_PREFIX | sed 's/__setup_conda/py37/'`"
           ln -s "$py37_prefix/bin/python" "$CONDA_PREFIX/bin/python3.7"
           ln -s "$py37_prefix/bin/pip" "$CONDA_PREFIX/bin/pip3.7"
+          python3.7 --version
+          pip3.7 --version
         shell: bash
         if: ${{ matrix.python-version == '2.7' && runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
       - uses: actions/setup-python@v4
@@ -130,12 +132,20 @@ jobs:
             bash Miniforge3-$(uname)-$(uname -m).sh -b -u -p "$HOME"/miniforge3
             source "$HOME"/miniforge3/etc/profile.d/conda.sh
             #conda update -n base -c conda-forge --yes conda
-            conda create -n $PY_VER --yes python=$PY_VER
-            conda activate $PY_VER
+            pyv="`echo $PY_VER | sed 's/\.//'`"
+            conda create -n py$pyv --yes python=$PY_VER
+            conda activate py$pyv
             python --version
             python -m pip || python -m ensurepip --default-pip --upgrade
             python -m pip install --upgrade pip setuptools wheel
             pip --version
+            if [ $PY_VER = 2.7 ]; then
+              conda create -n py37 --yes python=3.7
+              ln -s "$HOME"/miniforge3/envs/py37/bin/python "$HOME"/miniforge3/envs/py27/bin/python3.7
+              ln -s "$HOME"/miniforge3/envs/py37/bin/pip "$HOME"/miniforge3/envs/py27/bin/pip3.7
+              python3.7 --version
+              pip3.7 --version
+            fi
             exec devscripts/CI/ghactions-release
         if: ${{ !contains(fromJSON(env.not_in_aarch64), matrix.python-version) && runner.os == 'Linux' && startsWith(github.ref, 'refs/tags/') }}
       - name: Publish wheel to Releases
