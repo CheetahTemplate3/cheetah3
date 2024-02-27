@@ -1,6 +1,6 @@
 Hello!
 
-I'm pleased to announce version 3.3.4a1, the second alpha release
+I'm pleased to announce version 3.3.4a2, an alpha release
 of release 3.3.4 of branch 3.3 of CheetahTemplate3.
 
 
@@ -28,7 +28,7 @@ Site:
 https://cheetahtemplate.org/
 
 Download:
-https://pypi.org/project/CT3/3.3.4a1
+https://pypi.org/project/CT3/3.3.4a2
 
 News and changes:
 https://cheetahtemplate.org/news.html
