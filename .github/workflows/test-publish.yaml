@@ -147,7 +147,7 @@ jobs:
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
           omitPrereleaseDuringUpdate: true
-          prerelease: false
+          prerelease: true
           replacesArtifacts: false
           skipIfReleaseExists: false
           updateOnlyUnreleased: false

@@ -7,7 +7,9 @@ of release 3.3.4 of branch 3.3 of CheetahTemplate3.
 What's new in CheetahTemplate3
 ==============================
 
-The contributors for this release are ...
+CI:
+
+  - GHActions: Build and publish wheels on Linux/aarch64.
 
 
 What is CheetahTemplate3
