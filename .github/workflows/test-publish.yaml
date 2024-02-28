@@ -122,6 +122,8 @@ jobs:
           env: |
             PY_VER: "${{ matrix.python-version }}"
             RUNNER_OS: ${{ runner.os }}
+            TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+            TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
           install: |
             set -ex
             apt-get update -q -y
