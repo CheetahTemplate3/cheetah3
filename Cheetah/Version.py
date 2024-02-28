@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-Version = '3.3.4a2'
-VersionTuple = (3, 3, 4, 'alpha', 2)
+Version = '3.3.4a3'
+VersionTuple = (3, 3, 4, 'alpha', 3)
 
 MinCompatibleVersion = '3.0.0a1'
 MinCompatibleVersionTuple = (3, 0, 0, 'alpha', 1)
