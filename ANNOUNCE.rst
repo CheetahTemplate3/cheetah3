@@ -1,15 +1,13 @@
 Hello!
 
-I'm pleased to announce version 3.3.3.post1, the first post-release
-of release 3.3.3 of branch 3.3 of CheetahTemplate3.
+I'm pleased to announce version 3.3.4a4, an alpha release
+of release 3.3.4 of branch 3.3 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
 
-CI:
-
-  - GHActions: Build and publish wheels on Linux/aarch64.
+The contributors for this release are ...
 
 
 What is CheetahTemplate3
@@ -28,7 +26,7 @@ Site:
 https://cheetahtemplate.org/
 
 Download:
-https://pypi.org/project/CT3/3.3.3.post1
+https://pypi.org/project/CT3/3.3.4a4
 
 News and changes:
 https://cheetahtemplate.org/news.html
