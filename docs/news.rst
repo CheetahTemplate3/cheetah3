@@ -4,6 +4,9 @@ News
 Development (master)
 --------------------
 
+3.3.3.post1 (2024-02-28)
+------------------------
+
 CI:
 
   - GHActions: Build and publish wheels on Linux/aarch64.
