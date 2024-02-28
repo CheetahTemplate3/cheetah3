@@ -1,50 +1,52 @@
-#! /usr/bin/env bash
+#! /bin/sh
 set -e
 
-[[ "$TOXENV" == pypy* ]] && exit 0
+case "$TOXENV" in
+    pypy*) exit 0 ;;
+esac
 
-umask 022 &&
-chmod -R a+rX . &&
+umask 022
+chmod -R a+rX .
 
 py=$(python -c "import sys; print('.'.join(sys.version.split('.')[:2]))")
-v=$(echo "$py" | sed 's/\.//') &&
+v=$(echo "$py" | sed 's/\.//')
 
-pip install -U pip setuptools readme-renderer twine wheel &&
-python setup.py sdist &&
+pip install -U pip setuptools readme-renderer twine wheel
+python setup.py sdist
 
-if [ -d build ]; then find build -name '*.py[co]' -delete; fi &&
-python setup.py build_ext &&
-python setup.py build --executable '/usr/bin/env python' &&
-python    -m compileall build &&
-python -O -m compileall build &&
-python setup.py bdist_wheel &&
+if [ -d build ]; then find build -name '*.py[co]' -delete; fi
+python setup.py build_ext
+python setup.py build --executable '/usr/bin/env python'
+python    -m compileall build
+python -O -m compileall build
+python setup.py bdist_wheel
 
-if [ "$RUNNER_OS" == 'Linux' ]; then
+if [ "$RUNNER_OS" = 'Linux' ]; then
     # auditwheel 5.2+ require patchelf 0.14+
-    if [ "$py" == 2.7 ]; then
+    if [ "$py" = 2.7 ]; then
         pip3.7 install -U "auditwheel<5.2"
-    elif [ "$py" == 3.4 ]; then
+    elif [ "$py" = 3.4 ]; then
         pip install -U typing "auditwheel==2.1.1"
     else
         pip install -U "auditwheel<5.2"
-    fi &&
+    fi
 
-    for f in dist/CT3-*-cp$v-*-linux*.whl; do
-        if [ "$py" == 2.7 ]; then
+    for f in dist/CT3-*-cp"$v"-*-linux*.whl; do
+        if [ "$py" = 2.7 ]; then
             python3.7 -m auditwheel repair -w dist/ "$f"
         else
             python -m auditwheel repair -w dist/ "$f"
-        fi &&
+        fi
         rm -f "$f"
     done
 
-elif [ "$RUNNER_OS" == 'macOS' ]; then
+elif [ "$RUNNER_OS" = 'macOS' ]; then
 
     pip install -U delocate
-    for f in dist/CT3-*-cp$v-*-macosx*.whl; do
+    for f in dist/CT3-*-cp"$v"-*-macosx*.whl; do
         delocate-wheel -v "$f"
     done
-fi &&
+fi
 
 # TWINE_USERNAME / TWINE_PASSWORD / TWINE_REPOSITORY_URL
 # must be set in Github Actions settings.

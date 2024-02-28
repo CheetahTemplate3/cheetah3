@@ -9,6 +9,7 @@ jobs:
   run-tests:
     env:
       not_in_conda: "[]"
+      not_in_aarch64: "['3.5', 'pypy3.7']"
 
     strategy:
       matrix:
@@ -32,7 +33,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-
       # Setup Python/pip
       - uses: actions/checkout@v4
       - uses: s-weigand/setup-conda@v1
@@ -43,10 +43,12 @@ jobs:
       # Python 3.7 is needed for ghactions-release script
       - name: Install additional Python 3.7
         run: |
-          conda create -n py37 python=3.7
+          conda create -n py37 --yes python=3.7
           py37_prefix="`echo $CONDA_PREFIX | sed 's/__setup_conda/py37/'`"
           ln -s "$py37_prefix/bin/python" "$CONDA_PREFIX/bin/python3.7"
           ln -s "$py37_prefix/bin/pip" "$CONDA_PREFIX/bin/pip3.7"
+          python3.7 --version
+          pip3.7 --version
         shell: bash
         if: ${{ matrix.python-version == '2.7' && runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
       - uses: actions/setup-python@v4
@@ -102,16 +104,52 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
-        if: ${{ runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
       - name: Build and publish wheel on w32
         run: |
           pip install -U pip setuptools twine wheel
           python setup.py bdist_wheel
           twine upload --disable-progress-bar --skip-existing dist\*
-        if: ${{ runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/') }}
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/') }}
         env:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+      - name: Build and publish wheel on Linux/aarch64
+        uses: uraimo/run-on-arch-action@v2
+        with:
+          arch: aarch64
+          distro: ubuntu22.04
+          env: |
+            PY_VER: "${{ matrix.python-version }}"
+            RUNNER_OS: ${{ runner.os }}
+            TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+            TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+          install: |
+            set -ex
+            apt-get update -q -y
+            apt-get install -q -y curl gcc patchelf
+          run: |
+            set -ex
+            curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+            bash Miniforge3-$(uname)-$(uname -m).sh -b -u -p "$HOME"/miniforge3
+            source "$HOME"/miniforge3/etc/profile.d/conda.sh
+            #conda update -n base -c conda-forge --yes conda
+            pyv="`echo $PY_VER | sed 's/\.//'`"
+            conda create -n py$pyv --yes python=$PY_VER
+            conda activate py$pyv
+            python --version
+            python -m pip || python -m ensurepip --default-pip --upgrade
+            python -m pip install --upgrade pip setuptools wheel
+            pip --version
+            if [ $PY_VER = 2.7 ]; then
+              conda create -n py37 --yes python=3.7
+              ln -s "$HOME"/miniforge3/envs/py37/bin/python "$HOME"/miniforge3/envs/py27/bin/python3.7
+              ln -s "$HOME"/miniforge3/envs/py37/bin/pip "$HOME"/miniforge3/envs/py27/bin/pip3.7
+              python3.7 --version
+              pip3.7 --version
+            fi
+            exec devscripts/CI/ghactions-release
+        if: ${{ !contains(fromJSON(env.not_in_aarch64), matrix.python-version) && runner.os == 'Linux' && startsWith(github.ref, 'refs/tags/') }}
       - name: Publish wheel to Releases
         uses: ncipollo/release-action@v1
         with:
@@ -121,8 +159,8 @@ jobs:
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
           omitPrereleaseDuringUpdate: true
-          prerelease: false
+          prerelease: true
           replacesArtifacts: false
           skipIfReleaseExists: false
           updateOnlyUnreleased: false
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        if: ${{ !startsWith(matrix.python-version, 'pypy') && startsWith(github.ref, 'refs/tags/') }}
