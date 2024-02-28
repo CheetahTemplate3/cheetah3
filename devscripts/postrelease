@@ -1,9 +1,17 @@
 #! /bin/sh
 
-tag="`python setup.py --version`" &&
+if [ $# -eq 0 ]; then
+    tag="`python setup.py --version`"
+    commit="$tag"~
+elif [ $# -eq 1 ]; then
+    commit="$1"
+else
+    echo "Usage: $0 [commit]" >&2
+    exit 1
+fi &&
 
 . `dirname $0`/split_tag.sh &&
-split_tag $tag
+split_tag $commit
 
 if [ $micro -eq 0 -a \( $state = final -o $state = post \) ] &&
       git branch --merged master | grep -Fqw maint; then
@@ -16,7 +24,7 @@ else:
    git merge --strategy=ours -m 'Null-merge branch "maint"' maint
 fi &&
 
-git checkout $tag~ ANNOUNCE.rst &&
+git checkout $commit ANNOUNCE.rst &&
 
 `git var GIT_EDITOR` ANNOUNCE.rst LATEST-CHANGES.rst docs/news.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py &&
 exec git commit --message="Build: Prepare for the next release" --message="[skip ci]" ANNOUNCE.rst LATEST-CHANGES.rst docs/news.rst Cheetah/Version.py README.rst setup.cfg SetupConfig.py
