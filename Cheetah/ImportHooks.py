@@ -25,6 +25,7 @@ import traceback
 from . import ImportManager
 from .ImportManager import DirOwner
 from .Compiler import Compiler
+from .compat import ModuleNotFoundError
 from .convertTmplPathToModuleName import convertTmplPathToModuleName
 
 _installed = False
@@ -67,7 +68,7 @@ class CheetahDirOwner(DirOwner):
                         # @@TR: log the error
                         exc_txt = traceback.format_exc()
                         exc_txt = '  ' + ('  \n'.join(exc_txt.splitlines()))
-                        raise ImportError(
+                        raise ModuleNotFoundError(
                             'Error while compiling Cheetah module '
                             '%(name)s, original traceback follows:\n'
                             '%(exc_txt)s' % locals())

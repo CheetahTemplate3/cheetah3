@@ -1,6 +1,7 @@
 import os
 import sys
 from .ImportHooks import CheetahDirOwner
+from .compat import ModuleNotFoundError
 
 
 def loadTemplateModule(templatePath, debuglevel=0):
@@ -31,7 +32,7 @@ def loadTemplateModule(templatePath, debuglevel=0):
     template_dir.debuglevel = debuglevel
     mod = template_dir.getmod(filename)
     if mod is None:
-        raise ImportError("Cannot find {}".format(templatePath))
+        raise ModuleNotFoundError("Cannot find {}".format(templatePath))
     mod.__name__ = filename
     sys.modules[filename] = mod
     co = mod.__co__

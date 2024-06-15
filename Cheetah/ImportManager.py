@@ -21,7 +21,7 @@ import marshal
 import py_compile
 import sys
 from .compat import PY2, string_type, new_module, get_suffixes, \
-    load_module_from_file, RecursionError
+    load_module_from_file, ModuleNotFoundError, RecursionError
 if PY2:
     import imp
 else:
@@ -70,7 +70,7 @@ def _os_bootstrap():
                     a = a + ':'
                 return a + b
     else:
-        raise ImportError('no os specific module found')
+        raise ModuleNotFoundError('no os specific module found')
 
     if join is None:
         def join(a, b, sep=sep):
@@ -477,7 +477,7 @@ class ImportManager:
             if ctx and hasattr(sys.modules[ctx], nmparts[i]):
                 return sys.modules[nmparts[0]]
             del sys.modules[fqname]
-            raise ImportError("No module named %s" % fqname)
+            raise ModuleNotFoundError("No module named %s" % fqname)
         if fromlist is None:
             if context:
                 return sys.modules[context + '.' + nmparts[0]]
@@ -501,7 +501,8 @@ class ImportManager:
                     if self.threaded:
                         self._release()
                     if not mod:
-                        raise ImportError("%s not found in %s" % (nm, ctx))
+                        raise ModuleNotFoundError(
+                            "%s not found in %s" % (nm, ctx))
         return bottommod
 
     def doimport(self, nm, parentnm, fqname):

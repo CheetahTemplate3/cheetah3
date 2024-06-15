@@ -4,6 +4,11 @@ News
 Development (master)
 --------------------
 
+Bug fixes:
+
+  - Fixed ``ImportHooks``: it must raise ``ModuleNotFoundError``
+    instead of ``ImportError``.
+
 3.3.3.post1 (2024-02-28)
 ------------------------
 

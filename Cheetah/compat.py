@@ -13,6 +13,11 @@ else:
     unicode = str
 
 try:
+    ModuleNotFoundError = ModuleNotFoundError
+except NameError:  # Python 2.7, 3.4, 3.5
+    ModuleNotFoundError = ImportError
+
+try:
     RecursionError = RecursionError
 except NameError:  # Python 2.7, 3.4
     RecursionError = RuntimeError

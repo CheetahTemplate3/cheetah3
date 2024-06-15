@@ -95,3 +95,17 @@ class ImportHooksTest(unittest.TestCase):
                 del sys.modules['_bootlocale']
             Cheetah.ImportHooks.install()
             import _bootlocale  # noqa: F401 '_bootlocale' imported but unused
+
+    try:
+        ModuleNotFoundError
+    except NameError:  # Python 2.7, 3.4, 3.5
+        pass
+    else:
+        def test_module_not_found(self):
+            Cheetah.ImportHooks.install()
+            try:
+                import no_such_module  # noqa: F401 imported but unused
+            except ModuleNotFoundError:  # noqa: F821 undefined name
+                pass
+            except ImportError:
+                self.fail("raised ImportError, expected ModuleNotFoundError")
