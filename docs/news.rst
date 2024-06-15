@@ -9,6 +9,11 @@ Bug fixes:
   - Fixed ``ImportHooks``: it must raise ``ModuleNotFoundError``
     instead of ``ImportError``.
 
+CI:
+
+  - GHActions: Temporary run tests on macos-12. See
+    https://github.com/s-weigand/setup-conda/issues/432 for the reason.
+
 3.3.3.post1 (2024-02-28)
 ------------------------
 
