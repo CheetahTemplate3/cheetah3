@@ -9,6 +9,10 @@ Bug fixes:
   - Fixed ``ImportHooks``: it must raise ``ModuleNotFoundError``
     instead of ``ImportError``.
 
+Tests:
+
+  - tox: Run tests under Python 3.13.
+
 CI:
 
   - GHActions: Temporary run tests on macos-12. See
