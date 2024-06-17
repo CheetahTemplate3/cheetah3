@@ -9,6 +9,9 @@ Bug fixes:
   - Fixed ``ImportHooks``: it must raise ``ModuleNotFoundError``
     instead of ``ImportError``.
 
+  - Fixed ``Template.webInput``: Use ``urllib.parse.parse_qs``
+    instead of ``cgi.FieldStorage``; Python 3.13 dropped ``cgi``.
+
 Tests:
 
   - tox: Run tests under Python 3.13.
