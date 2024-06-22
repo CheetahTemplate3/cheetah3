@@ -179,11 +179,26 @@ static PyObject *PyNamemapper_valueForName(PyObject *obj, char *nameChunks[], in
             return NULL;
         }
 
+        #if PY_VERSION_HEX >= 0x030d0000
+        /* Python 3.13+: this is to silent error from PyMapping_HasKeyString */
+        if (PyMapping_Check(currentVal) && PyMapping_GetOptionalItemString(currentVal, currentKey, &nextVal)
+                && (!PyErr_Occurred())
+           ) {
+        #else
         if (PyMapping_Check(currentVal) && PyMapping_HasKeyString(currentVal, currentKey)) {
             nextVal = PyMapping_GetItemString(currentVal, currentKey);
-        }
+        #endif
 
-        else {
+        } else {
+        #if PY_VERSION_HEX >= 0x030d0000
+            if ((PyErr_Occurred() != NULL) &&
+                   (PyErr_ExceptionMatches(PyExc_TypeError))) {
+                /* Python 3.13+ don't like testing 'str1'['str2'].
+                   The error must be silenced to continue testing
+                   getattr('str1', 'str2'). */
+                PyErr_Clear();
+            }
+        #endif
             PyObject *exc;
             nextVal = PyObject_GetAttrString(currentVal, currentKey);
             exc = PyErr_Occurred();

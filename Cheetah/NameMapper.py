@@ -140,8 +140,8 @@ Cheetah uses the optimized C version (_namemapper.c) if it has
 been compiled or falls back to the Python version if not.
 """
 
-import inspect
 from pprint import pformat
+import inspect
 import sys
 
 from .compat import PY2
@@ -149,6 +149,8 @@ if PY2:
     from collections import Mapping
 else:
     from collections.abc import Mapping
+    if sys.version_info[:2] >= (3, 13):
+        from collections.abc import MutableMapping
 
 _INCLUDE_NAMESPACE_REPR_IN_NOTFOUND_EXCEPTIONS = False
 _ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS = True
@@ -319,6 +321,10 @@ except Exception:
         try:
             if not frame:
                 frame = inspect.stack()[1][0]
+            if sys.version_info[:2] >= (3, 13):
+                FrameLocalsProxy = frame.f_locals
+                if not isinstance(FrameLocalsProxy, Mapping):
+                    MutableMapping.register(type(FrameLocalsProxy))
             key = name.split('.')[0]
             for namespace in _namespaces(frame, searchList):
                 if hasKey(namespace, key):

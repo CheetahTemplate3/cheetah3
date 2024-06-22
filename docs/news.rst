@@ -9,6 +9,20 @@ Bug fixes:
   - Fixed ``ImportHooks``: it must raise ``ModuleNotFoundError``
     instead of ``ImportError``.
 
+  - Fixed ``Template.webInput``: Use ``urllib.parse.parse_qs``
+    instead of ``cgi.FieldStorage``; Python 3.13 dropped ``cgi``.
+
+  - Fixed ``_namemapper.c``: Silent an inadvertent ``TypeError`` exception
+    in ``PyMapping_HasKeyString`` under Python 3.13+
+    caused by ``_namemapper`` looking up a key in a non-dictionary.
+
+  - Fixed mapping test in ``NameMapper.py``:
+    Python 3.13 brough a new mapping type ``FrameLocalsProxy``.
+
+Tests:
+
+  - tox: Run tests under Python 3.13.
+
 CI:
 
   - GHActions: Temporary run tests on macos-12. See

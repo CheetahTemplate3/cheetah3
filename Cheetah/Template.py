@@ -24,6 +24,7 @@ import pprint
 try:
     import cgi  # Used by .webInput() if the template is a CGI script.
 except ImportError:  # Python 3.13+
+    from urllib.parse import parse_qs
     cgi = None
 import types
 
@@ -1920,11 +1921,17 @@ class Template(Servlet):
         """
         src = src.lower()
         isCgi = not self._CHEETAH__isControlledByWebKit
-        if isCgi and (cgi is not None) and src in ('f', 'v'):
+        if isCgi and src in ('f', 'v'):
             global _formUsedByWebInput
-            if _formUsedByWebInput is None:
-                _formUsedByWebInput = cgi.FieldStorage()
-            source, func = 'field', _formUsedByWebInput.getvalue
+            if cgi is None:
+                if _formUsedByWebInput is None:
+                    _formUsedByWebInput = \
+                        parse_qs(os.environ.get('QUERY_STRING', ''))
+                source, func = 'field', _formUsedByWebInput.get
+            else:
+                if _formUsedByWebInput is None:
+                    _formUsedByWebInput = cgi.FieldStorage()
+                source, func = 'field', _formUsedByWebInput.getvalue
         elif isCgi and src == 'c':
             raise RuntimeError("can't get cookies from a CGI script")
         elif isCgi and src == 's':
