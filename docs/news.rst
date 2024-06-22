@@ -16,6 +16,9 @@ Bug fixes:
     in ``PyMapping_HasKeyString`` under Python 3.13+
     caused by ``_namemapper`` looking up a key in a non-dictionary.
 
+  - Fixed mapping test in ``NameMapper.py``:
+    Python 3.13 brough a new mapping type ``FrameLocalsProxy``.
+
 Tests:
 
   - tox: Run tests under Python 3.13.
