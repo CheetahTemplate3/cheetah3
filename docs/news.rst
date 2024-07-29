@@ -19,6 +19,8 @@ Bug fixes:
   - Fixed mapping test in ``NameMapper.py``:
     Python 3.13 brough a new mapping type ``FrameLocalsProxy``.
 
+  - Fixed another ``RecursionError`` in ``ImportHooks`` under PyPy3.
+
 Tests:
 
   - tox: Run tests under Python 3.13.
