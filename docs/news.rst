@@ -25,8 +25,7 @@ Tests:
 
 CI:
 
-  - GHActions: Temporary run tests on macos-12. See
-    https://github.com/s-weigand/setup-conda/issues/432 for the reason.
+  - CI(GHActions): Switch to ``setup-miniconda``.
 
 3.3.3.post1 (2024-02-28)
 ------------------------
