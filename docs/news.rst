@@ -35,6 +35,8 @@ CI:
 
   - CI(GHActions): Switch to ``setup-miniconda``.
 
+  - CI(GHActions): Run tests under Python 3.13.
+
 3.3.3.post1 (2024-02-28)
 ------------------------
 
