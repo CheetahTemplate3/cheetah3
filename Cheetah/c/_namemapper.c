@@ -192,7 +192,10 @@ static PyObject *PyNamemapper_valueForName(PyObject *obj, char *nameChunks[], in
         } else {
         #if PY_VERSION_HEX >= 0x030d0000
             if ((PyErr_Occurred() != NULL) &&
-                   (PyErr_ExceptionMatches(PyExc_TypeError))) {
+                   (
+                    PyErr_ExceptionMatches(PyExc_IndexError) ||
+                    PyErr_ExceptionMatches(PyExc_TypeError)
+                    )) {
                 /* Python 3.13+ don't like testing 'str1'['str2'].
                    The error must be silenced to continue testing
                    getattr('str1', 'str2'). */

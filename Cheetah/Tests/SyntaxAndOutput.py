@@ -3072,6 +3072,19 @@ class MiscComplexSyntax(OutputTest):
                     "0")
 
 
+class MatchObject(OutputTest):
+    def test1(self):
+        """re Match objects implement both attribute access and index access;
+        match[2] is equivalent to match.group(2).
+        That confuses NameMapper and requires special handling.
+        """
+        self.verify(
+            r"""#import re
+#set $match = re.match(r'(.*)\s(\(\w+\))', 'test (add)')
+$match.group(2)""",
+            "(add)")
+
+
 class CGI(OutputTest):
     """CGI scripts with(out) the CGI environment and with(out) GET variables.
     """

@@ -16,6 +16,12 @@ Bug fixes:
     in ``PyMapping_HasKeyString`` under Python 3.13+
     caused by ``_namemapper`` looking up a key in a non-dictionary.
 
+  - Fixed ``_namemapper.c``: Silence ``IndexError`` when testing
+    ``name[attr]``. Some objects like ``re.MatchObject`` implement both
+    attribute access and index access. This confuses ``NameMapper`` because
+    it expects ``name[attr]`` to raise ``TypeError`` for objects that don't
+    implement mapping protocol.
+
   - Fixed mapping test in ``NameMapper.py``:
     Python 3.13 brough a new mapping type ``FrameLocalsProxy``.
 
