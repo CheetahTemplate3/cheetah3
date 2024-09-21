@@ -449,6 +449,7 @@ class ImportManager:
         _self_doimport = self.doimport
         threaded = self.threaded
         for context in contexts:
+            i = 0
             ctx = context
             for i in range(len(nmparts)):
                 nm = nmparts[i]
