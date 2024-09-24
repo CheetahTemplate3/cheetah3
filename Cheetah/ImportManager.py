@@ -449,6 +449,7 @@ class ImportManager:
         _self_doimport = self.doimport
         threaded = self.threaded
         for context in contexts:
+            i = 0
             ctx = context
             for i in range(len(nmparts)):
                 nm = nmparts[i]
@@ -507,6 +508,7 @@ class ImportManager:
 
     def doimport(self, nm, parentnm, fqname):
         # Not that nm is NEVER a dotted name at this point
+        mod = None
         if parentnm:
             parent = sys.modules[parentnm]
             if hasattr(parent, '__path__'):
@@ -525,7 +527,10 @@ class ImportManager:
                 try:
                     mod = director.getmod(nm)
                 except RecursionError:
-                    mod = __oldimport__(nm)  # noqa: F821 undefined name
+                    try:
+                        mod = __oldimport__(nm)  # noqa: F821 undefined name
+                    except RecursionError:
+                        pass
                 if mod:
                     break
         if mod:
