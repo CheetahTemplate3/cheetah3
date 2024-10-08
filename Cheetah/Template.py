@@ -22,7 +22,10 @@ except ImportError:
 import traceback
 import pprint
 try:
-    import cgi  # Used by .webInput() if the template is a CGI script.
+    import warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", ".*cgi.*", DeprecationWarning)
+        import cgi  # Used by .webInput() if the template is a CGI script.
 except ImportError:  # Python 3.13+
     from urllib.parse import parse_qs
     cgi = None
