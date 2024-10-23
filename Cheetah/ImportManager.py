@@ -433,7 +433,7 @@ class ImportManager:
         # first see if we could be importing a relative name
         _sys_modules_get = sys.modules.get
         contexts = [None]
-        if globals:
+        if (PY2 or not name or level > 0) and globals:
             importernm = globals.get('__name__', '')
             if importernm:
                 if hasattr(_sys_modules_get(importernm), '__path__'):
