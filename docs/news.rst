@@ -1,7 +1,7 @@
 News
 ====
 
-Development (master)
+3.4.0b1 (2024-11-10)
 --------------------
 
 Bug fixes:
