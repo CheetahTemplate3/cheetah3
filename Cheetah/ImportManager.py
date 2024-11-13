@@ -211,8 +211,13 @@ class DirOwner(Owner):
         while True:
             if pyc is None or py and pyc[1][8] < py[1][8]:
                 try:
-                    with open(py[0], 'r') as py_code_file:
-                        py_code = py_code_file.read()
+                    try:
+                        with open(py[0], 'r') as py_code_file:
+                            py_code = py_code_file.read()
+                    except UnicodeDecodeError:
+                        with open(py[0], 'r', encoding='utf-8') \
+                                as py_code_file:
+                            py_code = py_code_file.read()
                     co = compile(py_code + '\n', py[0], 'exec')
                     try:
                         py_compile.compile(py[0])
