@@ -13,6 +13,15 @@ v=$(echo "$py" | sed 's/\.//')
 
 pip install -U pip setuptools readme-renderer twine wheel
 python setup.py sdist
+if [ -f dist/ct3-*.tar.gz ]; then
+    # Rename sdist to uppercase; different build tools produce different case.
+    # This is important because stupid PyPI doesn't ignore sdists
+    # in different cases but also doesn't allow uploading.
+    # So we use single case, all upper.
+    cd dist
+    mv ct3-*.tar.gz "`echo ct3-*.tar.gz | sed 's/^ct3-/CT3-/'`"
+    cd ..
+fi
 
 if [ -d build ]; then find build -name '*.py[co]' -delete; fi
 python setup.py build_ext
