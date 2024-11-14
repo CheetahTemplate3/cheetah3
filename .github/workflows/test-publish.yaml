@@ -121,6 +121,7 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+        shell: bash -el {0}
         if: ${{ !contains(matrix.python-version, '_pypy') && runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
       - name: Build and publish wheel on w32
         run: |
