@@ -57,12 +57,11 @@ jobs:
       - name: Install additional Python 3.7
         run: |
           conda create -n py37 --yes python=3.7
-          py37_prefix="`echo $CONDA_PREFIX | sed 's/__setup_conda/py37/'`"
-          ln -s "$py37_prefix/bin/python" "$CONDA_PREFIX/bin/python3.7"
-          ln -s "$py37_prefix/bin/pip" "$CONDA_PREFIX/bin/pip3.7"
+          ln -s "$CONDA/envs/py37/bin/python" "$CONDA/envs/test/bin/python3.7"
+          ln -s "$CONDA/envs/py37/bin/pip" "$CONDA/envs/test/bin/pip3.7"
           python3.7 --version
           pip3.7 --version
-        shell: bash
+        shell: bash -el {0}
         if: ${{ matrix.python-version == '2.7' && runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
       - uses: actions/setup-python@v4
         with:
@@ -148,10 +147,10 @@ jobs:
             apt-get install -q -y curl gcc patchelf
           run: |
             set -ex
+            CONDA_ROOT="$HOME"/miniforge3
             curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
-            bash Miniforge3-$(uname)-$(uname -m).sh -b -u -p "$HOME"/miniforge3
-            source "$HOME"/miniforge3/etc/profile.d/conda.sh
-            #conda update -n base -c conda-forge --yes conda
+            bash Miniforge3-$(uname)-$(uname -m).sh -b -u -p "$CONDA_ROOT"
+            source "$CONDA_ROOT"/etc/profile.d/conda.sh
             pyv="`echo $PY_VER | sed 's/\.//'`"
             conda create -n py$pyv --yes python=$PY_VER
             conda activate py$pyv
@@ -161,8 +160,8 @@ jobs:
             pip --version
             if [ $PY_VER = 2.7 ]; then
               conda create -n py37 --yes python=3.7
-              ln -s "$HOME"/miniforge3/envs/py37/bin/python "$HOME"/miniforge3/envs/py27/bin/python3.7
-              ln -s "$HOME"/miniforge3/envs/py37/bin/pip "$HOME"/miniforge3/envs/py27/bin/pip3.7
+              ln -s "$CONDA_ROOT"/envs/py37/bin/python "$HOME"/miniforge3/envs/py27/bin/python3.7
+              ln -s "$CONDA_ROOT"/envs/py37/bin/pip "$HOME"/miniforge3/envs/py27/bin/pip3.7
               python3.7 --version
               pip3.7 --version
             fi
