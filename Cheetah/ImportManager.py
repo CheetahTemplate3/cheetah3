@@ -21,7 +21,8 @@ import marshal
 import py_compile
 import sys
 from .compat import PY2, string_type, new_module, get_suffixes, \
-    load_module_from_file, ModuleNotFoundError, RecursionError
+    load_module_from_file, cache_from_source, \
+    ModuleNotFoundError, RecursionError
 if PY2:
     import imp
 else:
@@ -192,7 +193,10 @@ class DirOwner(Owner):
         py = pyc = None
         for pth, ispkg, pkgpth in possibles:
             for ext, mode, typ in getsuffixes():
-                attempt = pth + ext
+                if typ == 2:  # imp.PY_COMPILED
+                    attempt = cache_from_source(pth + '.py')
+                else:
+                    attempt = pth + ext
                 try:
                     st = _os_stat(attempt)
                 except Exception:
@@ -202,8 +206,10 @@ class DirOwner(Owner):
                         return load_module_from_file(nm, nm, attempt)
                     elif typ == 1:  # imp.PY_SOURCE
                         py = (attempt, st)
-                    else:
+                    elif typ == 2:  # imp.PY_COMPILED
                         pyc = (attempt, st)
+                    else:
+                        raise ValueError("Unknown module type %d" % typ)
             if py or pyc:
                 break
         if py is None and pyc is None:

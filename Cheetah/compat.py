@@ -37,6 +37,16 @@ if PY2:
     new_module = imp.new_module
     get_suffixes = imp.get_suffixes
 
+    def cache_from_source(path, debug_override=None):
+        assert path.endswith('.py'), path
+        if debug_override is None:
+            debug_override = __debug__
+        if debug_override:
+            suffix = 'c'
+        else:
+            suffix = 'o'
+        return path + suffix
+
 else:
     import importlib.machinery
     import importlib.util
@@ -59,3 +69,5 @@ else:
         ]
 
         return extensions + source + bytecode
+
+    from importlib.util import cache_from_source  # noqa: F401 unused
