@@ -4,7 +4,7 @@ import shutil
 import sys
 import unittest
 import Cheetah.ImportHooks
-from Cheetah.compat import PY2
+from Cheetah.compat import PY2, cache_from_source
 
 
 ImportHooksTemplatesDir = os.path.join(
@@ -53,31 +53,41 @@ class ImportHooksTest(unittest.TestCase):
         _cleanup()
 
     def test_CheetahDirOwner(self):
-        templates = list(sorted(os.listdir(ImportHooksTemplatesDir)))
-        self.assertListEqual(templates, ['index.tmpl', 'layout.tmpl'])
+        files = list(sorted(os.listdir(ImportHooksTemplatesDir)))
+        self.assertListEqual(files, ['index.tmpl', 'layout.tmpl'])
 
         cdo = Cheetah.ImportHooks.CheetahDirOwner(ImportHooksTemplatesDir)
         index_mod = cdo.getmod('index')
-        templates = os.listdir(ImportHooksTemplatesDir)
-        self.assertIn('index.py', templates)
-        self.assertNotIn('layout.py', templates)
+        files = os.listdir(ImportHooksTemplatesDir)
+        self.assertIn('index.py', files)
+        self.assertNotIn('layout.py', files)
 
         index_co = index_mod.__co__
         del index_mod.__co__
         self.assertRaises(ImportError, _exec, index_co, index_mod.__dict__)
 
         cdo.getmod('layout')  # Compiled to layout.py and .pyc
-        self.assertIn('layout.py', os.listdir(ImportHooksTemplatesDir))
+        files = os.listdir(ImportHooksTemplatesDir)
+        self.assertIn('layout.py', files)
+        if not PY2:
+            files = os.listdir(
+                os.path.join(ImportHooksTemplatesDir, '__pycache__'))
+        self.assertIn(os.path.basename(cache_from_source('layout.py')), files)
 
     def test_ImportHooks(self):
-        templates = os.listdir(ImportHooksTemplatesDir)
-        self.assertNotIn('index.py', templates)
-        self.assertNotIn('layout.py', templates)
+        files = os.listdir(ImportHooksTemplatesDir)
+        self.assertNotIn('index.py', files)
+        self.assertNotIn('layout.py', files)
         Cheetah.ImportHooks.install()
         from index import index  # noqa
-        templates = os.listdir(ImportHooksTemplatesDir)
-        self.assertIn('index.py', templates)
-        self.assertIn('layout.py', templates)
+        files = os.listdir(ImportHooksTemplatesDir)
+        self.assertIn('index.py', files)
+        self.assertIn('layout.py', files)
+        if not PY2:
+            files = os.listdir(
+                os.path.join(ImportHooksTemplatesDir, '__pycache__'))
+        self.assertIn(os.path.basename(cache_from_source('index.py')), files)
+        self.assertIn(os.path.basename(cache_from_source('layout.py')), files)
 
     def test_import_builtin(self):
         Cheetah.ImportHooks.install()
