@@ -239,7 +239,17 @@ class DirOwner(Owner):
                 with open(pyc[0], 'rb') as pyc_file:
                     stuff = pyc_file.read()
                 try:
-                    co = loadco(stuff[8:])
+                    # Different Python versions
+                    # change marshalled byte-code format
+                    if PY2:
+                        offset = 8
+                    else:
+                        sv = sys.version_info[:2]
+                        if sv >= (3, 7):
+                            offset = 16
+                        else:
+                            offset = 12
+                    co = loadco(stuff[offset:])
                     __file__ = pyc[0]
                     break
                 except (ValueError, EOFError):

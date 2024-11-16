@@ -14,6 +14,9 @@ Bug fixes:
   - Use ``cache_from_source`` in ``ImportManager`` to find out
     ``.pyc``/``.pyo`` byte-code files.
 
+  - Fixed unmarshalling ``.pyc``/``.pyo`` byte-code files
+    in ``ImportManager``.
+
   - Fixed ``Template.webInput``: Use ``urllib.parse.parse_qs``
     instead of ``cgi.FieldStorage``; Python 3.13 dropped ``cgi``.
 
