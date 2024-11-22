@@ -45,6 +45,13 @@ CI:
 
   - CI(GHActions): Run tests under Python 3.13.
 
+Build/release:
+
+  - Rename sdist to lowercase; different build tools produce different case.
+    This is important because stupid PyPI doesn't ignore sdists
+    in different cases but also doesn't allow uploading.
+    So we use single case, all lower. Also see PEP 625.
+
 3.3.3.post1 (2024-02-28)
 ------------------------
 
