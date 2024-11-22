@@ -1,6 +1,6 @@
 Hello!
 
-I'm pleased to announce version 3.4.0b4, the first beta
+I'm pleased to announce version 3.4.0b5, the 5th beta
 of release 3.4.0 of branch 3.4 of CheetahTemplate3.
 
 
@@ -13,6 +13,12 @@ Bug fixes:
     instead of ``ImportError``.
 
   - Fixed absolute import in ``ImportHooks`` under Python 3.
+
+  - Use ``cache_from_source`` in ``ImportManager`` to find out
+    ``.pyc``/``.pyo`` byte-code files.
+
+  - Fixed unmarshalling ``.pyc``/``.pyo`` byte-code files
+    in ``ImportManager``.
 
   - Fixed ``Template.webInput``: Use ``urllib.parse.parse_qs``
     instead of ``cgi.FieldStorage``; Python 3.13 dropped ``cgi``.
@@ -60,7 +66,7 @@ Site:
 https://cheetahtemplate.org/
 
 Download:
-https://pypi.org/project/CT3/3.4.0b4
+https://pypi.org/project/CT3/3.4.0b5
 
 News and changes:
 https://cheetahtemplate.org/news.html
