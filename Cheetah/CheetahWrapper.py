@@ -199,7 +199,8 @@ class CheetahWrapper(object):
             help='Compile/fill templates in parallel, e.g. --parallel=4')
         pao('--shbang', dest='shbang', default='#!/usr/bin/env python',
             help='Specify the shbang to place at the top '
-                 'of compiled templates, e.g. --shbang="#!/usr/bin/python2.6"')
+                 'of compiled templates, '
+                 'e.g. --shbang="#!/usr/bin/env python"')
         pao('--encoding', dest='encoding', default=None,
             help='Specify the encoding of source files '
                  '(e.g. "utf-8" to force input files to be interpreted '
