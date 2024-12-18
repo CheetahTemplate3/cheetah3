@@ -13,13 +13,14 @@ v=$(echo "$py" | sed 's/\.//')
 
 pip install -U pip setuptools readme-renderer twine wheel
 python setup.py sdist
-if [ -f dist/CT3-*.tar.gz ]; then
+rv=$(python setup.py --version)
+if [ -f dist/CT3-$rv.tar.gz ]; then
     # Rename sdist to lowercase; different build tools produce different case.
     # This is important because stupid PyPI doesn't ignore sdists
     # in different cases but also doesn't allow uploading.
     # So we use single case, all lower. Also see PEP 625.
     cd dist
-    mv CT3-*.tar.gz "`echo CT3-*.tar.gz | sed 's/^CT3-/ct3-/'`"
+    mv CT3-$rv.tar.gz ct3-$rv.tar.gz 
     cd ..
 fi
 
