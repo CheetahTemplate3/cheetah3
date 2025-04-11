@@ -14,15 +14,6 @@ v=$(echo "$py" | sed 's/\.//')
 pip install -U pip setuptools readme-renderer twine wheel
 python setup.py sdist
 rv=$(python setup.py --version)
-if [ -f dist/CT3-$rv.tar.gz ]; then
-    # Rename sdist to lowercase; different build tools produce different case.
-    # This is important because stupid PyPI doesn't ignore sdists
-    # in different cases but also doesn't allow uploading.
-    # So we use single case, all lower. Also see PEP 625.
-    cd dist
-    mv CT3-$rv.tar.gz ct3-$rv.tar.gz 
-    cd ..
-fi
 
 if [ -d build ]; then find build -name '*.py[co]' -delete; fi
 python setup.py build_ext
@@ -30,6 +21,13 @@ python setup.py build --executable '/usr/bin/env python'
 python    -m compileall build
 python -O -m compileall build
 python setup.py bdist_wheel
+
+cd dist
+for f in CT3-${rv}*; do
+    if [ "$f" = "CT3-${rv}*" ]; then break; fi # dist dir is empty
+    mv "$f" "`echo "$f" | sed 's/^.\+$/\L&/'`"
+done
+cd ..
 
 if [ "$RUNNER_OS" = 'Linux' ]; then
     # auditwheel 5.2+ require patchelf 0.14+
