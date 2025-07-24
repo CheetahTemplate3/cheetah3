@@ -37,7 +37,6 @@ _cacheDir = []
 
 
 def setCacheDir(cacheDir):
-    global _cacheDir
     _cacheDir.append(cacheDir)
 
 ##################################################
@@ -144,5 +143,6 @@ def uninstall():
                 del ImportManager._globalOwnerTypes[0]
             del ImportManager.__oldimport__
             global _manager
+            _manager = None
             del _manager
             _installed = False
