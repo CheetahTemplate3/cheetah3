@@ -4,6 +4,8 @@ News
 Development (master)
 --------------------
 
+  - Tested with Python 3.14.
+
 3.4.0 (2024-12-02)
 ------------------
 
