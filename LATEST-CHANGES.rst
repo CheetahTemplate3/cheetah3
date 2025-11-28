@@ -1,1 +1,1 @@
-  - Tested with Python 3.14.
+- Tested with Python 3.14.
