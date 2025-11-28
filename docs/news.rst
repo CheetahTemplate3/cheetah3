@@ -1,8 +1,8 @@
 News
 ====
 
-Development (master)
---------------------
+3.4.0.post1 (2025-11-28)
+------------------------
 
   - Tested with Python 3.14.
 
