@@ -10,7 +10,7 @@ from Cheetah.compat import PY2
 # Cheetah3 has already been taken at PyPI,
 # CheetahTemplate3 seems to be too long.
 # CT3 is just right!
-name = 'CT3'
+name = 'ct3'
 description = "Cheetah is a template engine and code generation tool"
 license = "MIT"
 author = "Tavis Rudd"

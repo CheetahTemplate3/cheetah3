@@ -22,13 +22,6 @@ python    -m compileall build
 python -O -m compileall build
 python setup.py bdist_wheel
 
-cd dist
-for f in CT3-${rv}*; do
-    if [ "$f" = "CT3-${rv}*" ]; then break; fi # dist dir is empty
-    mv "$f" "`echo "$f" | sed 's/^.\+$/\L&/'`"
-done
-cd ..
-
 if [ "$RUNNER_OS" = 'Linux' ]; then
     # auditwheel 5.2+ require patchelf 0.14+
     if [ "$py" = 2.7 ]; then
