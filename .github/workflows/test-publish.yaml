@@ -121,7 +121,7 @@ jobs:
         if: ${{ !contains(matrix.python-version, '_pypy') && runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
       - name: Build and publish wheel on w32
         run: |
-          pip install -U pip setuptools twine wheel
+          pip install -U pip setuptools "twine<6" wheel
           python setup.py bdist_wheel
           twine upload --disable-progress-bar --skip-existing dist\*
         if: ${{ !contains(matrix.python-version, '_pypy') && runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/') }}

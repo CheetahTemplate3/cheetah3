@@ -3,4 +3,4 @@
 auditwheel
 wheel==0.31.1; python_version == '2.7' or python_version == '3.4'
 wheel==0.38.1; python_version >= '3.5'
-twine
+twine<6
