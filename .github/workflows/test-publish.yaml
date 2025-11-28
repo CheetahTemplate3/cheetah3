@@ -77,7 +77,7 @@ jobs:
         run: |
           python --version
           python -m pip || python -m ensurepip --default-pip --upgrade
-          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade pip "setuptools<77" wheel
           pip --version
           pip install --upgrade virtualenv "tox >= 3.15, < 4"
         shell: bash -el {0}
@@ -121,7 +121,7 @@ jobs:
         if: ${{ !contains(matrix.python-version, '_pypy') && runner.os != 'Windows' && startsWith(github.ref, 'refs/tags/') }}
       - name: Build and publish wheel on w32
         run: |
-          pip install -U pip setuptools "twine<6" wheel
+          pip install -U pip "setuptools<77" "twine<6" wheel
           python setup.py bdist_wheel
           twine upload --disable-progress-bar --skip-existing dist\*
         if: ${{ !contains(matrix.python-version, '_pypy') && runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/') }}
@@ -153,7 +153,7 @@ jobs:
             conda activate py$pyv
             python --version
             python -m pip || python -m ensurepip --default-pip --upgrade
-            python -m pip install --upgrade pip setuptools wheel
+            python -m pip install --upgrade pip "setuptools<77" wheel
             pip --version
             if [ $PY_VER = 2.7 ]; then
               conda create -n py37 --yes python=3.7

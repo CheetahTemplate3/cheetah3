@@ -11,7 +11,7 @@ chmod -R a+rX .
 py=$(python -c "import sys; print('.'.join(sys.version.split('.')[:2]))")
 v=$(echo "$py" | sed 's/\.//')
 
-pip install -U pip setuptools readme-renderer "twine<6" wheel
+pip install -U pip "setuptools<77" readme-renderer "twine<6" wheel
 python setup.py sdist
 rv=$(python setup.py --version)
 
