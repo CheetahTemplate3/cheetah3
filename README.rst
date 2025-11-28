@@ -1,4 +1,4 @@
-Cheetah Template 3.4.0.post3
+Cheetah Template 3.4.0.post4
 ============================
 
 Cheetah3 is a free and open source (MIT) Python template engine.

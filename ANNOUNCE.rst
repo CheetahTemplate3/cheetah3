@@ -1,6 +1,6 @@
 Hello!
 
-I'm pleased to announce version 3.4.0.post3, the 1st post-release
+I'm pleased to announce version 3.4.0.post4, a post-release
 of release 3.4.0 of branch 3.4 of CheetahTemplate3.
 
 
@@ -24,7 +24,7 @@ Site:
 https://cheetahtemplate.org/
 
 Download:
-https://pypi.org/project/ct3/3.4.0.post3
+https://pypi.org/project/ct3/3.4.0.post4
 
 News and changes:
 https://cheetahtemplate.org/news.html
