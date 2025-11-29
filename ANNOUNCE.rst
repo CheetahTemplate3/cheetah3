@@ -1,13 +1,12 @@
 Hello!
 
-I'm pleased to announce version 3.4.0.post5, a post-release
-of release 3.4.0 of branch 3.4 of CheetahTemplate3.
+I'm pleased to announce version 3.4.1a0, the 0th alpha
+of release 3.4.1 of branch 3.4 of CheetahTemplate3.
 
 
 What's new in CheetahTemplate3
 ==============================
 
-  - Tested with Python 3.14.
 
 What is CheetahTemplate3
 ========================
@@ -25,7 +24,7 @@ Site:
 https://cheetahtemplate.org/
 
 Download:
-https://pypi.org/project/ct3/3.4.0.post5
+https://pypi.org/project/CT3/3.4.1a0
 
 News and changes:
 https://cheetahtemplate.org/news.html
@@ -48,7 +47,7 @@ Example
 
 Install::
 
-    $ pip install ct3
+    $ pip install CT3 # (or even "ct3")
 
 Below is a simple example of some Cheetah code, as you can see it's practically
 Python. You can import, inherit and define methods just like in a regular Python
