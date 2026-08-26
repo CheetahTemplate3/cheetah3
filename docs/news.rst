@@ -4,6 +4,18 @@ News
 Development (master)
 --------------------
 
+Bug fixes:
+
+  - Fixed two error paths in ``Compiler`` that passed a compiler where
+    ``ParseError`` expects a stream. ``#unicode`` together with
+    ``#encoding`` raised ``RecursionError`` and an ``#attr`` directive
+    holding a placeholder raised ``AttributeError``, both instead of
+    the intended message.
+
+  - Fixed the ``#attr`` check: it looked for ``VFN(`` and ``VFFSL(``
+    but not for ``VFSL(``, the form generated when ``useStackFrames``
+    is off.
+
   - Dropped support for Python 3.4 and 3.5.
 
 3.4.0.post5 (2025-11-29)

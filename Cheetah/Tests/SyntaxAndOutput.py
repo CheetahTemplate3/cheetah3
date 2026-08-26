@@ -25,6 +25,7 @@ import warnings
 from Cheetah.NameMapper import NotFound
 from Cheetah.Template import Template
 from Cheetah.Parser import ParseError
+from Cheetah.Compiler import Error as CompilerError
 from Cheetah.Compiler import DEFAULT_COMPILER_SETTINGS
 from Cheetah.compat import PY2
 
@@ -785,6 +786,11 @@ class EncodingDirective(OutputTest):
 
 
 class UnicodeDirective(OutputTest):
+    def test_conflict_with_encoding(self):
+        """#unicode and #encoding together are reported, not a crash"""
+        self.assertRaises(CompilerError, Template.compile,
+                          "#unicode utf-8\n#encoding utf-8\n1234")
+
     def test1(self):
         """basic #unicode """
         self.verify("#unicode utf-8\n1234",
@@ -1738,6 +1744,11 @@ class AttrDirective(OutputTest):
         Shouldn't gobble"""
         self.verify("  --   #attr $test = 'blarg'   \n$test",
                     "  --   \nblarg")
+
+    def test6(self):
+        """#attr with a placeholder is reported, not a crash"""
+        self.assertRaises(CompilerError, Template.compile,
+                          "#attr $test = $foo\n$test")
 
 
 class DefDirective(OutputTest):
