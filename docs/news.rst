@@ -4,6 +4,12 @@ News
 Development (master)
 --------------------
 
+Bug fixes:
+
+  - Fixed ``SourceReader.ungetc``: the guard was inverted, so it raised
+    in the normal case, and writing the character back did an item
+    assignment on a string.
+
   - Dropped support for Python 3.4 and 3.5.
 
 3.4.0.post5 (2025-11-29)
