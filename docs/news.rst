@@ -4,6 +4,14 @@ News
 Development (master)
 --------------------
 
+Bug fixes:
+
+  - Fixed ``_namemapper.c``: ``NotFound`` lost the "while searching
+    for" part of its message on Python 3.12+, where the interpreter
+    keeps the exception normalized and the wrapper called ``.find`` on
+    the exception instead of on its text. The exception value was
+    leaked on every wrap, too.
+
   - Dropped support for Python 3.4 and 3.5.
 
 3.4.0.post5 (2025-11-29)

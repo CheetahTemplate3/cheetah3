@@ -39,10 +39,16 @@ static void setNotFoundException(char *key, PyObject *namespace)
     Py_XDECREF(exceptionStr);
 }
 
+#if PY_MAJOR_VERSION >= 3
+#define NM_ToUnicode PyObject_Str
+#else
+#define NM_ToUnicode PyObject_Unicode
+#endif
+
 static int wrapInternalNotFoundException(char *fullName, PyObject *namespace)
 {
     PyObject *excType, *excValue, *excTraceback, *isAlreadyWrapped = NULL;
-    PyObject *newExcValue = NULL;
+    PyObject *excStr = NULL, *newExcValue = NULL;
     if (!ALLOW_WRAPPING_OF_NOTFOUND_EXCEPTIONS) {
         return 0;
     }
@@ -53,17 +59,31 @@ static int wrapInternalNotFoundException(char *fullName, PyObject *namespace)
 
     if (PyErr_GivenExceptionMatches(PyErr_Occurred(), NotFound)) {
         PyErr_Fetch(&excType, &excValue, &excTraceback);
-        isAlreadyWrapped = PyObject_CallMethod(excValue, "find", "s", "while searching");
+        /* Python 3.12 keeps the exception normalized, so excValue is an
+           instance rather than the message it was set with. */
+        excStr = NM_ToUnicode(excValue);
 
-        if (isAlreadyWrapped != NULL) {
-            if (PyLong_AsLong(isAlreadyWrapped) == -1) {
-                newExcValue = PyUnicode_FromFormat("%U while searching for \'%s\'",
-                        excValue, fullName);
+        if (excStr != NULL) {
+            isAlreadyWrapped = PyObject_CallMethod(excStr, "find", "s", "while searching");
+
+            if (isAlreadyWrapped != NULL) {
+                long alreadyWrappedAt = PyLong_AsLong(isAlreadyWrapped);
+                Py_DECREF(isAlreadyWrapped);
+                if (alreadyWrappedAt == -1 && !PyErr_Occurred()) {
+                    newExcValue = PyUnicode_FromFormat("%U while searching for \'%s\'",
+                            excStr, fullName);
+                }
             }
-            Py_DECREF(isAlreadyWrapped);
+            Py_DECREF(excStr);
+        }
+        /* Anything that went wrong above only costs the added context. */
+        PyErr_Clear();
+
+        if (newExcValue == NULL) {
+            newExcValue = excValue;
         }
         else {
-           newExcValue = excValue;
+            Py_XDECREF(excValue);
         }
         PyErr_Restore(excType, newExcValue, excTraceback);
         return -1;
