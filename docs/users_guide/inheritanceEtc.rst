@@ -67,6 +67,41 @@ practical way to get a parent template into a module is to
 precompile it, all parent templates essentially have to be
 precompiled.
 
+The class name of a precompiled template is its module name, so
+``my_template.tmpl`` defines the class ``my_template``. Turn on the
+compiler setting ``titleCaseClassNames`` to get class names in title
+case instead:
+
+::
+
+    $ cheetah compile --settings=titleCaseClassNames=True my_template.tmpl
+
+``my_template.tmpl`` now defines the class ``MyTemplate``, which you
+import as
+
+::
+
+    from my_template import MyTemplate
+
+The setting changes the implicit import of {#extends} accordingly:
+``#extends my_base`` now does ``#from my_base import MyBase``. The name
+in the {#extends} directive is still the module name; only the class
+name is converted. A name that is already in title case comes through
+unchanged, as in {#extends Cheetah.Templates.SkeletonPage.SkeletonPage},
+and a class you imported yourself is not touched at all.
+
+The conversion applies to a class name you pass to the compiler
+yourself, not only to one taken from the module name. A name that would
+collide with a Python keyword gets a trailing underscore, so
+``none.tmpl`` defines ``None_``.
+
+The class name is fixed before parsing starts, so a
+{#compiler-settings} directive inside a template comes too late and
+does not change it. Pass the setting to the compiler instead, as
+{--settings} on the command line, as {compilerSettings} to
+{Template.compile}, or as {_CHEETAH_compilerSettings} on your
+{Template} subclass.
+
 There can be only one {#extends} directive in a template and it may
 list only one class. In other words, templates don't do multiple
 inheritance. This is intentional: it's too hard to initialize

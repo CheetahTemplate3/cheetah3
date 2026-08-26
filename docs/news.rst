@@ -4,6 +4,11 @@ News
 Development (master)
 --------------------
 
+  - Added compiler setting ``titleCaseClassNames``: derive the class
+    name of a compiled template from its module name in title case,
+    so ``my_template.tmpl`` defines the class ``MyTemplate``. The
+    implicit import of ``#extends`` follows the setting.
+
   - Dropped support for Python 3.4 and 3.5.
 
 3.4.0.post5 (2025-11-29)
