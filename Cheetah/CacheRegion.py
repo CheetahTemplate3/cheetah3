@@ -25,7 +25,23 @@ except ImportError:
     from md5 import md5
 
 import time
+
 from . import CacheStore
+from .compat import unicode
+
+
+def _hashKey(key):
+    """Hash a cache key
+
+    md5 is not used as a security primitive here, so it has to keep
+    working on a FIPS-enabled build.
+    """
+    if not isinstance(key, bytes):
+        key = unicode(key).encode('utf-8')
+    try:
+        return md5(key, usedforsecurity=False).hexdigest()
+    except TypeError:  # Python < 3.9
+        return md5(key).hexdigest()
 
 
 class CacheItem(object):
@@ -129,7 +145,7 @@ class CacheRegion(object):
 
             Returns a `CacheItem` instance.
         """
-        cacheItemID = md5(str(cacheItemID).encode('ascii')).hexdigest()
+        cacheItemID = _hashKey(cacheItemID)
 
         if cacheItemID not in self._cacheItems:
             cacheItem = self._cacheItemClass(
