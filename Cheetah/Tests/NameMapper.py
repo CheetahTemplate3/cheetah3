@@ -545,6 +545,29 @@ if sys.platform.startswith('java'):
     del VFF, VFFSL, VFFSL_2, VFFSL_3, VFFSL_4
 
 
+class NotFoundMessage(unittest.TestCase):
+    """The message names the missing key and the name being searched"""
+
+    def searchFor(self, name):
+        try:
+            valueForName(DummyClass(), name)
+        except NotFound as exc:
+            return str(exc)
+        self.fail('%s was found' % name)
+
+    def test_names_the_missing_key(self):
+        self.assertIn("cannot find 'missingAttr'",
+                      self.searchFor('missingAttr'))
+
+    def test_names_what_was_searched_for(self):
+        self.assertIn("while searching for 'classVar1.missingAttr'",
+                      self.searchFor('classVar1.missingAttr'))
+
+    def test_wraps_only_once(self):
+        message = self.searchFor('classVar1.missingAttr')
+        self.assertEqual(message.count('while searching'), 1)
+
+
 class MapBuiltins(unittest.TestCase):
     def test_int(self):
         from Cheetah.Template import Template
