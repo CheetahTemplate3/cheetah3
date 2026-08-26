@@ -23,7 +23,7 @@ from .Version import Version, VersionTuple
 from .SettingsManager import SettingsManager
 from .Utils.Indenter import indentize  # an undocumented preprocessor
 from . import NameMapper
-from .Parser import Parser, ParseError, specialVarRE, \
+from .Parser import Parser, specialVarRE, \
     STATIC_CACHE, REFRESH_CACHE, SET_GLOBAL, SET_MODULE, \
     unicodeDirectiveRE, encodingDirectiveRE, escapedNewlineRE
 from .compat import PY2, string_type, unicode
@@ -1439,11 +1439,12 @@ class ClassCompiler(GenUtils):
         # First test to make sure that the user hasn't used
         # any fancy Cheetah syntax (placeholders, directives, etc.)
         # inside the expression
-        if attribExpr.find('VFN(') != -1 or attribExpr.find('VFFSL(') != -1:
-            raise ParseError(
-                self,
+        if (attribExpr.find('VFN(') != -1
+                or attribExpr.find('VFFSL(') != -1
+                or attribExpr.find('VFSL(') != -1):
+            raise Error(
                 'Invalid #attr directive. It should only contain '
-                + 'simple Python literals.')
+                'simple Python literals.')
         # now add the attribute
         self._generatedAttribs.append(attribExpr)
 
@@ -1692,8 +1693,8 @@ class ModuleCompiler(SettingsManager, GenUtils):
             encodingMatch = encodingDirectiveRE.search(source)
             if unicodeMatch:
                 if encodingMatch:
-                    raise ParseError(
-                        self, "#encoding and #unicode are mutually exclusive! "
+                    raise Error(
+                        "#encoding and #unicode are mutually exclusive! "
                         "Use one or the other.")
                 source = unicodeDirectiveRE.sub('', source)
                 if isinstance(source, bytes):
