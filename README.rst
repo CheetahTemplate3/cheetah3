@@ -7,6 +7,15 @@ It's a fork of the original CheetahTemplate library.
 Python 2.7 or 3.6+ is required.
 
 
+Templates are code
+==================
+
+Cheetah compiles a template into a Python module and runs it. Render
+only templates you trust, never one built from user input; that is
+remote code execution. There is no sandbox. See
+https://cheetahtemplate.org/users_guide/security.html
+
+
 Where is CheetahTemplate3
 =========================
 
