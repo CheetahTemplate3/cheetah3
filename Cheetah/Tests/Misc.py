@@ -12,3 +12,15 @@ class SettingsManagerTests(unittest.TestCase):
         }
         result = SettingsManager.mergeNestedDictionaries(left, right)
         self.assertEqual(result, expect)
+
+    def test_stringIsNumber(self):
+        self.assertTrue(SettingsManager.stringIsNumber('42'))
+        self.assertTrue(SettingsManager.stringIsNumber(' -1.5 '))
+        self.assertFalse(SettingsManager.stringIsNumber('x'))
+        self.assertFalse(SettingsManager.stringIsNumber(''))
+        self.assertFalse(SettingsManager.stringIsNumber('   '))
+
+    def test_empty_setting_value(self):
+        manager = SettingsManager.SettingsManager()
+        manager.updateSettingsFromConfigStr('foo =')
+        self.assertEqual(manager.setting('foo'), '')
