@@ -808,7 +808,8 @@ class Template(Servlet):
 
                     __file__ = os.path.join(cacheDirForModuleFiles, __file__)
                     # @@TR: might want to assert that it doesn't already exist
-                    open(__file__, 'w').write(generatedModuleCode)
+                    with open(__file__, 'w') as _py_file:
+                        _py_file.write(generatedModuleCode)
                     # @@TR: should probably restrict the perms, etc.
 
                 mod = types.ModuleType(str(uniqueModuleName))

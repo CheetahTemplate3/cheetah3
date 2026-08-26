@@ -4,6 +4,11 @@ News
 Development (master)
 --------------------
 
+Bug fixes:
+
+  - Fixed ``Template.compile``: the module file written for
+    ``cacheModuleFilesForTracebacks`` was never closed.
+
   - Dropped support for Python 3.4 and 3.5.
 
 3.4.0.post5 (2025-11-29)
