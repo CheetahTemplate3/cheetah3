@@ -12,6 +12,7 @@ import sys
 import os
 import os.path
 from os.path import getmtime
+import keyword
 import re
 import time
 import random
@@ -38,6 +39,25 @@ currentTime = time.time
 
 class Error(Exception):
     pass
+
+
+def titleCaseClassName(name):
+    """Convert a module name to a title case class name
+
+    ``my_template`` becomes ``MyTemplate``. A name that is already
+    in title case is returned unchanged. Leading underscores are preserved.
+    A name that would collide with a Python keyword gets a trailing
+    underscore, so that ``none.tmpl`` defines ``None_``.
+    """
+    stripped = name.lstrip('_')
+    leadingUnderscores = name[:len(name) - len(stripped)]
+    className = leadingUnderscores + ''.join(
+        [part[:1].upper() + part[1:] for part in stripped.split('_')])
+    # None, True and False are not keywords under Python 2 but cannot
+    # be class names there either.
+    if keyword.iskeyword(className) or className in ('None', 'True', 'False'):
+        className += '_'
+    return className
 
 
 # Settings format: (key, default, docstring)
@@ -83,6 +103,11 @@ _DEFAULT_COMPILER_SETTINGS = [
     ('setup__str__method', False, ''),
     ('mainMethodName', 'respond', ''),
     ('mainMethodNameForSubclasses', 'writeBody', ''),
+    ('titleCaseClassNames', False,
+     'Convert the class name of a compiled template to title case: '
+     'my_template.tmpl defines the class MyTemplate. Applies to a class '
+     'name passed to the compiler as well as to one taken from the '
+     'module name'),
     ('indentationStep', ' ' * 4, ''),
     ('initialMethIndentLevel', 2, ''),
     ('monitorSrcFile', False, ''),
@@ -1638,10 +1663,17 @@ class ModuleCompiler(SettingsManager, GenUtils):
 
         self._compiled = False
         self._moduleName = moduleName
+        # The main class name has to be fixed before parsing starts, so a
+        # #compiler-settings directive is too late to change it. Freeze the
+        # setting here and use the frozen value for the #extends imports,
+        # too; otherwise a directive would rename the base class but not
+        # the class of the template itself.
+        self._titleCaseClassNames = self.setting('titleCaseClassNames')
         if not mainClassName:
-            self._mainClassName = moduleName
-        else:
-            self._mainClassName = mainClassName
+            mainClassName = moduleName
+        if self._titleCaseClassNames:
+            mainClassName = titleCaseClassName(mainClassName)
+        self._mainClassName = mainClassName
         self._mainMethodNameArg = mainMethodName
         if mainMethodName:
             self.setSetting('mainMethodName', mainMethodName)
@@ -1802,6 +1834,9 @@ class ModuleCompiler(SettingsManager, GenUtils):
             "currentTime=time.time",
         ]
 
+    def mainClassName(self):
+        return self._mainClassName
+
     def compile(self):
         classCompiler = self._spawnClassCompiler(self._mainClassName)
         if self._baseclassName:
@@ -1887,11 +1922,15 @@ class ModuleCompiler(SettingsManager, GenUtils):
                 klass = klass.strip()
                 chunks = klass.split('.')
                 if len(chunks) == 1:
-                    baseclasses.append(klass)
-                    if klass not in self.importedVarNames():
+                    if klass in self.importedVarNames():
+                        baseclasses.append(klass)
+                    else:
                         modName = klass
                         # we assume the class name to be the module name
                         # and that it's not a builtin:
+                        if self._titleCaseClassNames:
+                            klass = titleCaseClassName(klass)
+                        baseclasses.append(klass)
                         importStatement = "from %s import %s" % (
                             modName, klass)
                         self.addImportStatement(importStatement)
@@ -1915,6 +1954,9 @@ class ModuleCompiler(SettingsManager, GenUtils):
                         if finalClassName != chunks[-2]:
                             # we assume the class name to be the module name
                             modName = '.'.join(chunks)
+                        if self._titleCaseClassNames:
+                            finalClassName = titleCaseClassName(
+                                finalClassName)
                         baseclasses.append(finalClassName)
                         importStatement = "from %s import %s" % (
                             modName, finalClassName)
