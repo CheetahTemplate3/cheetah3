@@ -1,5 +1,6 @@
 import os
 import sys
+from .Compiler import titleCaseClassName
 from .ImportHooks import CheetahDirOwner
 from .compat import ModuleNotFoundError
 
@@ -44,4 +45,8 @@ def loadTemplateModule(templatePath, debuglevel=0):
 def loadTemplateClass(templatePath, debuglevel=0):
     """Load template's class by full or relative path"""
     mod = loadTemplateModule(templatePath, debuglevel=debuglevel)
-    return getattr(mod, mod.__name__)
+    try:
+        return getattr(mod, mod.__name__)
+    except AttributeError:
+        # The template may have been compiled with titleCaseClassNames.
+        return getattr(mod, titleCaseClassName(mod.__name__))

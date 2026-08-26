@@ -35,6 +35,7 @@ import unittest  # noqa: E402 module level import not at top of file
 
 from Cheetah.Tests import Analyzer  # noqa: E402
 from Cheetah.Tests import CheetahWrapper  # noqa: E402
+from Cheetah.Tests import ClassNames  # noqa: E402
 from Cheetah.Tests import Filters  # noqa: E402
 from Cheetah.Tests import ImportHooks  # noqa: E402
 from Cheetah.Tests import LoadTemplate  # noqa: E402
@@ -51,6 +52,7 @@ SyntaxAndOutput.install_eols()
 
 suites = [
     unittest.defaultTestLoader.loadTestsFromModule(Analyzer),
+    unittest.defaultTestLoader.loadTestsFromModule(ClassNames),
     unittest.defaultTestLoader.loadTestsFromModule(Filters),
     unittest.defaultTestLoader.loadTestsFromModule(ImportHooks),
     unittest.defaultTestLoader.loadTestsFromModule(LoadTemplate),

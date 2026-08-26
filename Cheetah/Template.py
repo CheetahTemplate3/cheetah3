@@ -779,6 +779,11 @@ class Template(Servlet):
             compiler.compile()
             generatedModuleCode = compiler.getModuleCode()
             outputEncoding = compiler.getModuleEncoding()
+            # The compiler may have derived a different class name,
+            # see the titleCaseClassNames setting. A compilerClass of
+            # one's own need not implement the method.
+            if hasattr(compiler, 'mainClassName'):
+                className = compiler.mainClassName()
 
         if not returnAClass:
             # This is a bit of a hackish solution to make sure
