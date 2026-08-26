@@ -4,6 +4,13 @@ News
 Development (master)
 --------------------
 
+Bug fixes:
+
+  - Fixed ``SettingsManager.stringIsNumber``: it indexed the string
+    without checking for an empty one, so a config file or a
+    ``#compiler-settings`` block with a blank value raised
+    ``IndexError``.
+
   - Dropped support for Python 3.4 and 3.5.
 
 3.4.0.post5 (2025-11-29)
