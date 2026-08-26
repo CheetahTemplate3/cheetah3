@@ -726,6 +726,15 @@ class PlaceholderStrings(OutputTest):
 
                     "BLARG1")
 
+    def test8(self):
+        """a c'...' string containing a backslash escape"""
+        self.verify("$str(c'a\\nb')", "a\\nb")
+
+    def test9(self):
+        """an empty c'...' string"""
+        self.verify("$str(c'')", "")
+        self.verify('$str(c"")', "")
+
 
 class UnicodeStrings(OutputTest):
     def test1(self):
@@ -1925,6 +1934,11 @@ class BlockDirective(OutputTest):
         """#block without argstring, gobble WS"""
         self.verify("  #block testBlock   \n1234\n  #end block  ",
                     "1234\n")
+
+    def test2a(self):
+        """single line #block nested in a #def"""
+        self.verify("#def outer\n#block inner: hi\n#end def\n$outer()",
+                    "hi")
 
     def test3(self):
         """#block with argstring, gobble WS
