@@ -14,6 +14,7 @@ Cheetah User's Guide
     flowControl.rst
     errorHandling.rst
     parserInstructions.rst
+    security.rst
 
     tipsAndTricks.rst
     webware.rst

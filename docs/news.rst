@@ -4,6 +4,10 @@ News
 Development (master)
 --------------------
 
+  - Docs: Added a chapter on security to the User's Guide. Templates
+    are code; rendering a template built from user input is remote
+    code execution, and no compiler setting prevents it.
+
   - Dropped support for Python 3.4 and 3.5.
 
 3.4.0.post5 (2025-11-29)
