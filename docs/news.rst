@@ -4,6 +4,16 @@ News
 Development (master)
 --------------------
 
+Bug fixes:
+
+  - Fixed ``Parser.transformToken``: it uppercased the whole string
+    literal before evaluating it, which broke every ``c'...'`` string
+    containing a backslash escape, and it returned ``None`` for an
+    empty string, which crashed the caller.
+
+  - Fixed ``Parser._eatSingleLineDef``: a single-line ``#block`` nested
+    in a ``#def`` raised ``UnboundLocalError``.
+
   - Dropped support for Python 3.4 and 3.5.
 
 3.4.0.post5 (2025-11-29)
