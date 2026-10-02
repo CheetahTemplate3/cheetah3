@@ -1272,13 +1272,14 @@ class _LowLevelParser(SourceReader):
         """
         if token == 'c' and not self.atEnd() and self.peek() in '\'"':
             nextToken = self.getPyToken()
-            token = nextToken.upper()
-            theStr = eval(token)
+            theStr = eval(nextToken)
             endPos = self.pos()
             if not theStr:
-                return
+                # An empty string is already a valid expression.
+                return nextToken
 
-            if token.startswith(single3) or token.startswith(double3):
+            if (nextToken.startswith(single3)
+                    or nextToken.startswith(double3)):
                 startPosIdx = 3
             else:
                 startPosIdx = 1
@@ -2153,18 +2154,19 @@ class _HighLevelParser(_LowLevelParser):
         isNestedDef = (self.setting('allowNestedDefScopes')
                        and [name for name in self._openDirectivesStack
                             if name == 'def'])
-        if directiveName == 'block' or (
-                directiveName == 'def' and not isNestedDef):
-            self._compiler.startMethodDef(methodName, argsList, parserComment)
-        else:  # closure
+        isClosure = not (directiveName == 'block' or (
+            directiveName == 'def' and not isNestedDef))
+        if isClosure:
             # @@TR: temporary hack of useSearchList
             useSearchList_orig = self.setting('useSearchList')
             self.setSetting('useSearchList', False)
             self._compiler.addClosure(methodName, argsList, parserComment)
+        else:
+            self._compiler.startMethodDef(methodName, argsList, parserComment)
 
         self.getWhiteSpace(max=1)
         self.parse(breakPoint=endPos)
-        if directiveName == 'closure' or isNestedDef:
+        if isClosure:
             # @@TR: temporary hack of useSearchList
             self.setSetting('useSearchList', useSearchList_orig)
 
