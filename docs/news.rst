@@ -4,9 +4,9 @@ News
 Development (master)
 --------------------
 
-  - Docs: Added a chapter on security to the User's Guide. Templates
-    are code; rendering a template built from user input is remote
-    code execution, and no compiler setting prevents it.
+Major features:
+
+  - Dropped support for Python 3.4 and 3.5.
 
   - Added compiler setting ``titleCaseClassNames``: derive the class
     name of a compiled template from its module name in title case,
@@ -23,7 +23,11 @@ Bug fixes:
   - Fixed ``Parser._eatSingleLineDef``: a single-line ``#block`` nested
     in a ``#def`` raised ``UnboundLocalError``.
 
-  - Dropped support for Python 3.4 and 3.5.
+Docs:
+
+  - Added a chapter on security to the User's Guide. Templates
+    are code; rendering a template built from user input is remote
+    code execution, and no compiler setting prevents it.
 
 3.4.0.post5 (2025-11-29)
 ------------------------
