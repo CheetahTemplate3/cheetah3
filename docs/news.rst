@@ -13,6 +13,8 @@ Major features:
     so ``my_template.tmpl`` defines the class ``MyTemplate``. The
     implicit import of ``#extends`` follows the setting.
 
+  - Tested with Python 3.15 rc.
+
 Bug fixes:
 
   - Fixed ``Parser.transformToken``: it uppercased the whole string
