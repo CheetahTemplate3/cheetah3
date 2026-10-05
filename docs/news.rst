@@ -17,6 +17,16 @@ Major features:
 
 Bug fixes:
 
+  - Fixed two error paths in ``Compiler`` that passed a compiler where
+    ``ParseError`` expects a stream. ``#unicode`` together with
+    ``#encoding`` raised ``RecursionError`` and an ``#attr`` directive
+    holding a placeholder raised ``AttributeError``, both instead of
+    the intended message.
+
+  - Fixed the ``#attr`` check: it looked for ``VFN(`` and ``VFFSL(``
+    but not for ``VFSL(``, the form generated when ``useStackFrames``
+    is off.
+
   - Fixed ``Parser.transformToken``: it uppercased the whole string
     literal before evaluating it, which broke every ``c'...'`` string
     containing a backslash escape, and it returned ``None`` for an
