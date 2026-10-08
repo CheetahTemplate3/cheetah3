@@ -159,12 +159,13 @@ class SourceReader(object):
         return self._src[pos]
 
     def ungetc(self, c=None):
-        if not self.atStart():
+        if self.atStart():
             raise Error('Already at beginning of stream')
 
         self._pos -= 1
         if c is not None:
-            self._src[self._pos] = c
+            self._src = (self._src[:self._pos] + c
+                         + self._src[self._pos + 1:])
 
     def advance(self, offset=1):
         self.checkPos(self._pos + offset)

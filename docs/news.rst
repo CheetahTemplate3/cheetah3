@@ -17,6 +17,10 @@ Major features:
 
 Bug fixes:
 
+  - Fixed ``SourceReader.ungetc``: the guard was inverted, so it raised
+    in the normal case, and writing the character back did an item
+    assignment on a string.
+
   - Fixed two error paths in ``Compiler`` that passed a compiler where
     ``ParseError`` expects a stream. ``#unicode`` together with
     ``#encoding`` raised ``RecursionError`` and an ``#attr`` directive
