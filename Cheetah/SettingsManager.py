@@ -48,6 +48,8 @@ def stringIsNumber(S):
     This also works for complex numbers and numbers with +/- in front."""
 
     S = S.strip()
+    if not S:
+        return False
 
     if S[0] in '-+' and len(S) > 1:
         S = S[1:].strip()

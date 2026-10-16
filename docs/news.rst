@@ -5,6 +5,7 @@ Development (master)
 --------------------
 
 Major features:
+=======
 
   - Dropped support for Python 3.4 and 3.5.
 
@@ -16,6 +17,11 @@ Major features:
   - Tested with Python 3.15.
 
 Bug fixes:
+
+  - Fixed ``SettingsManager.stringIsNumber``: it indexed the string
+    without checking for an empty one, so a config file or a
+    ``#compiler-settings`` block with a blank value raised
+    ``IndexError``.
 
   - Fixed ``SourceReader.ungetc``: the guard was inverted, so it raised
     in the normal case, and writing the character back did an item
