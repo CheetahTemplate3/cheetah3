@@ -43,4 +43,5 @@ Contributions have been made by:
 * Michael Gorny <mgorny at gentoo.org>
 * nate.k <nate.k at onetrueloan.com>
 * Steve Kowalik <steven at wedontsleep.org>
+* Manuel <manuel at lichtbild-freising.de>
 * Oleg Broytman <phd@phdru.name>
