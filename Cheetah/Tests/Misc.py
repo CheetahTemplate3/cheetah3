@@ -1,6 +1,10 @@
+# -*- coding: utf-8 -*-
+
 import unittest
 
 from Cheetah import SettingsManager
+from Cheetah.CacheRegion import CacheRegion
+from Cheetah.CacheStore import Error as CacheError, MemoryCacheStore
 from Cheetah.SourceReader import Error, SourceReader
 
 
@@ -44,3 +48,33 @@ class SourceReaderTests(unittest.TestCase):
         manager = SettingsManager.SettingsManager()
         manager.updateSettingsFromConfigStr('foo =')
         self.assertEqual(manager.setting('foo'), '')
+
+
+class MemoryCacheStoreTests(unittest.TestCase):
+    def test_add(self):
+        store = MemoryCacheStore()
+        store.add('k', 'v')
+        self.assertEqual(store.get('k'), 'v')
+        self.assertRaises(CacheError, store.add, 'k', 'w')
+
+    def test_replace_needs_the_key(self):
+        store = MemoryCacheStore()
+        self.assertRaises(CacheError, store.replace, 'k', 'v')
+
+    def test_replace(self):
+        store = MemoryCacheStore()
+        store.set('k', 'v')
+        store.replace('k', 'w')
+        self.assertEqual(store.get('k'), 'w')
+
+
+class CacheRegionTests(unittest.TestCase):
+    def test_non_ascii_vary_by(self):
+        region = CacheRegion('r')
+        item = region.getCacheItem(u'M\xfcnchen')
+        self.assertIs(region.getCacheItem(u'M\xfcnchen'), item)
+        self.assertIsNot(region.getCacheItem(u'Berlin'), item)
+
+    def test_key_is_stable_for_ascii(self):
+        region = CacheRegion('r')
+        self.assertIs(region.getCacheItem('x'), region.getCacheItem(u'x'))

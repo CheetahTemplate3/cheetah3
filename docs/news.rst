@@ -5,7 +5,6 @@ Development (master)
 --------------------
 
 Major features:
-=======
 
   - Dropped support for Python 3.4 and 3.5.
 
@@ -17,6 +16,19 @@ Major features:
   - Tested with Python 3.15.
 
 Bug fixes:
+
+  - Fixed ``MemoryCacheStore.replace``: it was a copy of ``add`` and
+    raised when the key was present instead of when it was missing.
+
+  - Fixed ``MemcachedCacheStore``: ``servers`` was a string instead of
+    a tuple, ``add`` and ``replace`` wrote to a ``_data`` attribute
+    that only exists in ``MemoryCacheStore``, and ``replace`` reported
+    the wrong condition.
+
+  - Fixed ``CacheRegion.getCacheItem``: it encoded the ``varyBy`` value
+    as ASCII, so any non-ASCII cache key raised ``UnicodeEncodeError``.
+    The key also no longer asks ``md5`` for a security primitive, which
+    it never was, so it keeps working on FIPS-enabled builds.
 
   - Fixed ``SettingsManager.stringIsNumber``: it indexed the string
     without checking for an empty one, so a config file or a
