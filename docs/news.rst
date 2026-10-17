@@ -13,8 +13,6 @@ Major features:
     so ``my_template.tmpl`` defines the class ``MyTemplate``. The
     implicit import of ``#extends`` follows the setting.
 
-  - Tested with Python 3.15.
-
 Bug fixes:
 
   - Fixed ``MemoryCacheStore.replace``: it was a copy of ``add`` and
@@ -56,6 +54,10 @@ Bug fixes:
 
   - Fixed ``Parser._eatSingleLineDef``: a single-line ``#block`` nested
     in a ``#def`` raised ``UnboundLocalError``.
+
+Tests:
+
+  - Tested with Python 3.15.
 
 Docs:
 
