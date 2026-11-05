@@ -178,6 +178,29 @@ class OpenFileTest(TemplateTest):
             tmpl_file.close()
 
 
+class ModuleFileCacheTest(TemplateTest):
+    def setUp(self):
+        self.cacheDir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.cacheDir, ignore_errors=True)
+
+    def test_module_file_is_complete(self):
+        klass = Template.compile(
+            'Hello', cacheModuleFilesForTracebacks=True,
+            cacheDirForModuleFiles=self.cacheDir)
+        cached = os.listdir(self.cacheDir)
+        self.assertEqual(len(cached), 1)
+        moduleFile = open(os.path.join(self.cacheDir, cached[0]))
+        try:
+            source = moduleFile.read()
+        finally:
+            moduleFile.close()
+        self.assertIn('class ', source)
+        self.assertTrue(source.endswith('\n'))
+        self.assertEqual(str(klass()), 'Hello')
+
+
 class ClassMethods_subclass(TemplateTest):
 
     def test_basicUsage(self):

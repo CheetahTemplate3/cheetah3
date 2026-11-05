@@ -15,6 +15,9 @@ Major features:
 
 Bug fixes:
 
+  - Fixed ``Template.compile``: the module file written for
+    ``cacheModuleFilesForTracebacks`` was never closed.
+
   - Fixed ``MemoryCacheStore.replace``: it was a copy of ``add`` and
     raised when the key was present instead of when it was missing.
 
