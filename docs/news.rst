@@ -15,6 +15,10 @@ Major features:
 
 Bug fixes:
 
+  - Restored ``SettingsManager.readSettingsFromPySrcFile`` so
+    ``importSettings`` can load Python configuration files again. Imports
+    can find sibling modules, and the import path is restored on failure.
+
   - Fixed ``MemoryCacheStore.replace``: it was a copy of ``add`` and
     raised when the key was present instead of when it was missing.
 
