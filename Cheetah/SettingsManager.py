@@ -5,6 +5,8 @@ try:
 except ImportError:  # PY3
     from configparser import ConfigParser
 import re
+import sys
+from threading import RLock
 from tokenize import Number
 import types
 try:
@@ -17,6 +19,7 @@ from .compat import PY2
 numberRE = re.compile(Number)
 complexNumberRE = re.compile(
     r'[\(]*' + Number + r'[ \t]*\+[ \t]*' + Number + r'[\)]*')
+_sysPathLock = RLock()
 
 ##################################################
 # FUNCTIONS ##
@@ -120,6 +123,26 @@ class _SettingsCollector(object):
         del newSettings['self']
         module = types.ModuleType('temp_settings_module')
         module.__dict__.update(newSettings)
+        return self.readSettingsFromModule(module)
+
+    def readSettingsFromPySrcFile(self, path):
+        """Return settings defined in a Python source file.
+
+        Temporarily add its directory to sys.path for imports of sibling
+        modules. As with Python source strings, the file is executed as code.
+        """
+        path = os.path.abspath(path)
+        with open(path, 'rb') as source:
+            code = compile(source.read(), path, 'exec')
+        module = types.ModuleType('temp_settings_module')
+        module.__file__ = path
+        with _sysPathLock:
+            originalPath = sys.path[:]
+            try:
+                sys.path.insert(0, os.path.dirname(path))
+                exec(code, module.__dict__)
+            finally:
+                sys.path[:] = originalPath
         return self.readSettingsFromModule(module)
 
     def readSettingsFromConfigFileObj(self, inFile, convert=True):
