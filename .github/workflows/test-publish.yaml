@@ -26,6 +26,8 @@ jobs:
           python-version: "=3.9[build=*_pypy]"
         - os: windows-latest
           python-version: "2.7"
+        - os: windows-latest
+          python-version: "=3.9[build=*_pypy]"
         include:
         - os: ubuntu-latest
           os-name: Linux
