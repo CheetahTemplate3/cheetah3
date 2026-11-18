@@ -15,6 +15,12 @@ Major features:
 
 Bug fixes:
 
+  - Fixed ``_namemapper.c``: ``NotFound`` lost the "while searching
+    for" part of its message on Python 3.12+, where the interpreter
+    keeps the exception normalized and the wrapper called ``.find`` on
+    the exception instead of on its text. The exception value was
+    leaked on every wrap, too.
+
   - Fixed ``Template.compile``: the module file written for
     ``cacheModuleFilesForTracebacks`` was never closed.
 
