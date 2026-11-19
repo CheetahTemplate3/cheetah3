@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest, windows-11-arm]
         python-version: ["2.7", "3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15", "=3.9[build=*_pypy]"]
         exclude:
         - os: macos-latest
@@ -28,6 +28,20 @@ jobs:
           python-version: "2.7"
         - os: windows-latest
           python-version: "=3.9[build=*_pypy]"
+        - os: windows-11-arm
+          python-version: "2.7"
+        - os: windows-11-arm
+          python-version: "3.6"
+        - os: windows-11-arm
+          python-version: "3.7"
+        - os: windows-11-arm
+          python-version: "3.8"
+        - os: windows-11-arm
+          python-version: "3.9"
+        - os: windows-11-arm
+          python-version: "3.10"
+        - os: windows-11-arm
+          python-version: "=3.9[build=*_pypy]"
         include:
         - os: ubuntu-latest
           os-name: Linux
@@ -38,6 +52,11 @@ jobs:
         - os: windows-latest
           os-name: w32
           pip-cache-path: ~\AppData\Local\pip\Cache
+        # conda-forge has no win-arm64 Python before 3.14
+        - os: windows-11-arm
+          os-name: w32-arm64
+          pip-cache-path: ~\AppData\Local\pip\Cache
+          no-conda: true
 
     name: Python ${{ matrix.python-version }} @ ${{ matrix.os-name }}
     runs-on: ${{ matrix.os }}
@@ -50,7 +69,7 @@ jobs:
           channels: conda-forge, conda-forge/label/python_rc
           miniforge-version: latest
           python-version: ${{ matrix.python-version }}
-        if: ${{ !contains(fromJSON(env.not_in_conda), matrix.python-version) }}
+        if: ${{ !matrix.no-conda && !contains(fromJSON(env.not_in_conda), matrix.python-version) }}
       # Python 3.7 is needed for ghactions-release script
       - name: Install additional Python 3.7
         run: |
@@ -64,7 +83,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
-        if: ${{ contains(fromJSON(env.not_in_conda), matrix.python-version) }}
+        if: ${{ matrix.no-conda || contains(fromJSON(env.not_in_conda), matrix.python-version) }}
       - uses: actions/cache@v5
         with:
           path: ~/conda_pkgs_dir

@@ -68,6 +68,10 @@ Tests:
 
   - Tested with Python 3.15.
 
+CI:
+
+  - GHActions: Build and publish wheels on w32/ARM64.
+
 Docs:
 
   - Added a chapter on security to the User's Guide. Templates
